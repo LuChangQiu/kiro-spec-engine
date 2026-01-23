@@ -302,13 +302,13 @@ This implementation plan extends kiro-spec-engine to support multi-user collabor
     - Format output for readability
     - _Requirements: 5.1_
 
-- [ ] 13. Implement backward compatibility
-  - [ ] 13.1 Add single-user mode detection to all commands
+- [x] 13. Implement backward compatibility
+  - [x] 13.1 Add single-user mode detection to all commands
     - Check for workspace directories before multi-user operations
     - Provide helpful migration messages in single-user mode
     - _Requirements: 10.2, 10.3_
   
-  - [ ] 13.2 Implement gradual migration support
+  - [x] 13.2 Implement gradual migration support
     - Allow `kse workspace init` on existing single-user projects
     - Preserve existing specs and tasks during migration
     - Update documentation with migration guide
@@ -385,20 +385,20 @@ This implementation plan extends kiro-spec-engine to support multi-user collabor
 - [ ] 17. Final checkpoint - Ensure all features work together
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 18. Update project documentation
-  - [ ] 18.1 Update README.md
+- [x] 18. Update project documentation
+  - [x] 18.1 Update README.md
     - Add multi-user collaboration section
     - Add cross-tool compatibility section
     - Update feature list
     - _Requirements: 8.1_
   
-  - [ ] 18.2 Update adoption guide
+  - [x] 18.2 Update adoption guide
     - Document steering strategy selection
     - Explain multi-user mode setup
     - Add troubleshooting section
     - _Requirements: 2.6, 3.1_
   
-  - [ ] 18.3 Create migration guide
+  - [x] 18.3 Create migration guide
     - Document migration from single-user to multi-user
     - Provide step-by-step instructions
     - Include examples and best practices

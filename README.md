@@ -25,6 +25,8 @@ At its heart, KSE is a **rules engine** that operates on **specs**:
 
 - ✅ **Spec-Driven Development**: Structured Requirements → Design → Tasks workflow
 - ✅ **Steering Rules System**: Control AI behavior with project-specific rules
+- ✅ **Multi-User Collaboration**: Personal workspaces, task claiming, team coordination
+- ✅ **Cross-Tool Compatibility**: Export context for Claude Code, Cursor, Codex, etc.
 - ✅ **Quality Assessment**: Automatic document quality scoring (0-10 scale)
 - ✅ **Intelligent Enhancement**: Auto-identify and apply improvements with Ultrawork
 - ✅ **Professional Standards**: Ensure production-ready documentation
@@ -112,6 +114,43 @@ kse doctor
 # Set language
 kse --lang zh <command>  # Chinese
 kse --lang en <command>  # English (default)
+```
+
+### Multi-User Collaboration
+
+```bash
+# Initialize personal workspace
+kse workspace init
+kse workspace init --user=alice
+
+# Synchronize workspace with team
+kse workspace sync
+
+# List all workspaces
+kse workspace list
+
+# Claim a task
+kse task claim <spec-name> <task-id>
+kse task claim 01-00-user-auth 1.1 --force
+
+# Unclaim a task
+kse task unclaim <spec-name> <task-id>
+
+# List claimed tasks
+kse task list <spec-name>
+```
+
+### Cross-Tool Support
+
+```bash
+# Export spec context for AI tools
+kse context export <spec-name>
+kse context export 01-00-user-auth --steering --steering-files=CORE_PRINCIPLES.md
+
+# Generate task-specific prompt
+kse prompt generate <spec-name> <task-id>
+kse prompt generate 01-00-user-auth 1.1 --tool=claude-code
+kse prompt generate 01-00-user-auth 1.2 --tool=cursor --max-length=5000
 ```
 
 ### Document Enhancement

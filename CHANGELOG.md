@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.3] - 2026-01-23
+
+### Added
+- **Developer Documentation**: Comprehensive guides for contributors and extenders
+  - `docs/developer-guide.md`: Complete developer guide with API documentation
+  - `docs/architecture.md`: Detailed architecture diagrams and data flow documentation
+  - Migration script interface documentation with examples
+  - Extension points for custom strategies and validators
+  - Testing guidelines for unit, property-based, and integration tests
+  - Contributing guidelines and development setup
+
+### Enhanced
+- Improved documentation structure for developers
+- Added detailed API documentation for all core classes
+- Added architecture diagrams for system understanding
+- Added data flow diagrams for adoption, upgrade, and backup processes
+
 ## [1.2.2] - 2026-01-23
 
 ### Added

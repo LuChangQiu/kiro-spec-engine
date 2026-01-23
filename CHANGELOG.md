@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-01-23
+
+### Added
+- **User Documentation**: Comprehensive guides for adoption and upgrade workflows
+  - `docs/adoption-guide.md`: Complete guide for adopting existing projects
+  - `docs/upgrade-guide.md`: Complete guide for upgrading project versions
+  - Step-by-step instructions with examples
+  - Troubleshooting sections for common issues
+  - Best practices and recommendations
+
+### Enhanced
+- Improved documentation structure for better user experience
+- Added practical examples for all adoption modes
+- Added detailed upgrade scenarios with migration examples
+
 ## [1.2.1] - 2026-01-23
 
 ### Added

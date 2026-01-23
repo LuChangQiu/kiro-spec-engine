@@ -231,32 +231,32 @@ This implementation plan extends kiro-spec-engine to support multi-user collabor
     - **Property 13: Context Export Completeness**
     - **Validates: Requirements 6.1, 6.2, 6.3, 6.4, 6.5**
 
-- [ ] 10. Implement Prompt Generator
-  - [ ] 10.1 Create PromptGenerator class
+- [x] 10. Implement Prompt Generator
+  - [x] 10.1 Create PromptGenerator class
     - Implement `generatePrompt()` for task-specific prompts
     - Parse task from tasks.md
     - Extract task description and metadata
     - _Requirements: 7.1_
   
-  - [ ] 10.2 Implement requirements extraction
+  - [x] 10.2 Implement requirements extraction
     - Create `extractRelevantRequirements()` to find related requirements
     - Parse requirements references from task description
     - Include full requirement text in prompt
     - _Requirements: 7.2_
   
-  - [ ] 10.3 Implement design extraction
+  - [x] 10.3 Implement design extraction
     - Create `extractRelevantDesignSections()` to find related design
     - Identify relevant components and interfaces
     - Include design sections in prompt
     - _Requirements: 7.2_
   
-  - [ ] 10.4 Implement prompt formatting
+  - [x] 10.4 Implement prompt formatting
     - Format prompt with task description, requirements, design
     - Add implementation guidelines
     - Include task status update instructions
     - _Requirements: 7.5_
   
-  - [ ] 10.5 Implement prompt file saving
+  - [x] 10.5 Implement prompt file saving
     - Save prompt to `.kiro/specs/{spec-name}/prompts/task-{id}.md`
     - Ensure prompts directory exists
     - Handle file write errors

@@ -13,37 +13,37 @@ This implementation plan extends kiro-spec-engine to support multi-user collabor
 
 ## Tasks
 
-- [ ] 1. Implement Steering Manager
-  - [ ] 1.1 Create SteeringManager class with detection logic
+- [x] 1. Implement Steering Manager
+  - [x] 1.1 Create SteeringManager class with detection logic
     - Implement `detectSteering()` to scan `.kiro/steering/` for existing files
     - Return detection result with file list and metadata
     - _Requirements: 1.1, 2.1_
   
-  - [ ] 1.2 Implement strategy prompting and selection
+  - [x] 1.2 Implement strategy prompting and selection
     - Create interactive prompt for strategy selection (use-kse/use-project)
     - Display existing steering files to user
     - Validate user selection
     - _Requirements: 1.2, 2.2_
   
-  - [ ] 1.3 Implement steering backup functionality
+  - [x] 1.3 Implement steering backup functionality
     - Create `backupSteering()` method with timestamped backup directories
     - Copy existing steering files to `.kiro/backups/steering-{timestamp}/`
     - Validate backup integrity
     - _Requirements: 1.3_
   
-  - [ ] 1.4 Implement kse steering installation
+  - [x] 1.4 Implement kse steering installation
     - Create `installKseSteering()` to copy template files
     - Handle file conflicts and permissions
     - Verify installation success
     - _Requirements: 1.3_
   
-  - [ ] 1.5 Implement steering restoration
+  - [x] 1.5 Implement steering restoration
     - Create `restoreSteering()` for rollback capability
     - Restore from backup directory
     - Validate restoration
     - _Requirements: 1.3_
   
-  - [ ] 1.6 Update adoption-config.json with strategy
+  - [x] 1.6 Update adoption-config.json with strategy
     - Record chosen strategy in config file
     - Include backup ID if applicable
     - Add timestamp and version info
@@ -56,19 +56,19 @@ This implementation plan extends kiro-spec-engine to support multi-user collabor
     - **Property 4: Strategy Documentation**
     - **Validates: Requirements 1.1, 1.3, 1.4, 2.1, 2.6**
 
-- [ ] 2. Integrate Steering Manager into adoption workflow
-  - [ ] 2.1 Update DetectionEngine to use SteeringManager
+- [x] 2. Integrate Steering Manager into adoption workflow
+  - [x] 2.1 Update DetectionEngine to use SteeringManager
     - Call `detectSteering()` during project analysis
     - Include steering detection in analysis result
     - _Requirements: 1.1_
   
-  - [ ] 2.2 Update adoption command to handle steering strategies
+  - [x] 2.2 Update adoption command to handle steering strategies
     - Prompt for strategy when conflicts detected
     - Execute chosen strategy before template installation
     - Update adoption result with steering info
     - _Requirements: 1.2, 2.2_
   
-  - [ ] 2.3 Update adoption documentation
+  - [x] 2.3 Update adoption documentation
     - Document steering exclusivity constraint
     - Explain strategy options and implications
     - Provide rollback instructions

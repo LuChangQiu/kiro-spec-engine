@@ -12,6 +12,7 @@
     "lib/",
     "template/",
     "locales/",
+    "docs/",
     "README.md",
     "README.zh.md",
     "LICENSE",

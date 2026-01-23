@@ -8,6 +8,11 @@ module.exports = {
     '**/tests/**/*.spec.js'
   ],
   
+  // Transform ignore patterns - allow chokidar to be transformed
+  transformIgnorePatterns: [
+    'node_modules/(?!(chokidar)/)'
+  ],
+  
   // Coverage configuration
   collectCoverageFrom: [
     'bin/**/*.js',

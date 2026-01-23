@@ -11,12 +11,26 @@ const doctorCommand = require('../lib/commands/doctor');
 const adoptCommand = require('../lib/commands/adopt');
 const upgradeCommand = require('../lib/commands/upgrade');
 const rollbackCommand = require('../lib/commands/rollback');
+const VersionChecker = require('../lib/version/version-checker');
 
 const i18n = getI18n();
 const t = (key, params) => i18n.t(key, params);
 
 // Read version from package.json
 const packageJson = require('../package.json');
+
+// Create version checker instance
+const versionChecker = new VersionChecker();
+
+// Helper function to check version before command execution
+async function checkVersionBeforeCommand(options = {}) {
+  const projectPath = process.cwd();
+  const noVersionCheck = options.noVersionCheck || false;
+  
+  if (!noVersionCheck) {
+    await versionChecker.checkVersion(projectPath, { noVersionCheck });
+  }
+}
 
 const program = new Command();
 
@@ -27,7 +41,8 @@ program
   .version(packageJson.version, '-v, --version', 'Display version number')
   .option('-l, --lang <locale>', 'Set language (en/zh)', (locale) => {
     i18n.setLocale(locale);
-  });
+  })
+  .option('--no-version-check', 'Suppress version mismatch warnings');
 
 // 初始化项目命令
 program
@@ -238,6 +253,15 @@ program
         });
       }
     }
+  });
+
+// 版本信息命令
+program
+  .command('version-info')
+  .description('Display detailed version information')
+  .action(async () => {
+    const projectPath = process.cwd();
+    await versionChecker.displayVersionInfo(projectPath);
   });
 
 // 更新项目配置的辅助函数

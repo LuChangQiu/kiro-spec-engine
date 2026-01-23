@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-01-23
+
+### Added
+- **Validation System**: Comprehensive project validation
+  - `validateProjectStructure()`: Check required files and directories
+  - `validateVersionFile()`: Verify version.json structure
+  - `validateDependencies()`: Check Node.js and Python versions
+  - `validateProject()`: Complete project validation
+- **Automatic Version Checking**: Detect version mismatches
+  - VersionChecker class for automatic version detection
+  - Warning display when project version differs from installed kse
+  - `--no-version-check` flag to suppress warnings
+  - `kse version-info` command for detailed version information
+- **Enhanced Testing**: Added tests for validation and version checking
+  - 7 new unit tests for validation system
+  - 4 new unit tests for version checker
+  - Total: 25 tests passing
+
+### Enhanced
+- CLI now checks for version mismatches before command execution
+- Better error messages for validation failures
+- Improved user experience with version information display
+
 ## [1.2.0] - 2026-01-23
 
 ### Added

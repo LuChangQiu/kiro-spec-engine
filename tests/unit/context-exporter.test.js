@@ -12,6 +12,16 @@ describe('ContextExporter', () => {
     testProjectPath = path.join(__dirname, '../fixtures/test-project');
     testSpecPath = path.join(testProjectPath, '.kiro/specs/test-spec');
 
+    // Clean up any existing test directory first
+    try {
+      await fs.remove(testProjectPath);
+    } catch (error) {
+      // Ignore if doesn't exist
+    }
+    
+    // Add delay to ensure cleanup completes
+    await new Promise(resolve => setTimeout(resolve, 50));
+
     // Create test directory structure
     await fs.ensureDir(testSpecPath);
     await fs.writeFile(

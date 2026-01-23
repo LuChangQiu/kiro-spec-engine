@@ -264,7 +264,7 @@ This implementation plan establishes a complete release pipeline for the kiro-sp
   - Verify GitHub Actions workflows are enabled
   - _Requirements: 1.5, 1.6, 5.6_
 
-- [ ] 18. First release
+- [x] 18. First release
   - Update package.json version to 1.0.0
   - Update CHANGELOG.md with release notes
   - Commit changes: `git commit -am "Release v1.0.0"`
@@ -274,7 +274,7 @@ This implementation plan establishes a complete release pipeline for the kiro-sp
   - Verify GitHub release is created
   - _Requirements: 6.1, 6.2, 6.3, 6.5, 9.1, 9.2, 9.3, 9.4_
 
-- [ ] 19. Post-release validation
+- [x] 19. Post-release validation
   - Install package globally from npm: `npm install -g kiro-spec-engine`
   - Test `kse --version` displays correct version
   - Test `kiro-spec-engine --version` displays correct version

@@ -7,21 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-01-23
+
 ### Added
-- Initial project structure
-- CLI implementation with Node.js
-- Ultrawork quality enhancement tool (Python)
-- Multi-language support (English and Chinese)
-- Project initialization command (`kse init`)
-- Spec creation command (`kse create-spec`)
-- Status checking command (`kse status`)
-- Document enhancement command (`kse enhance`)
+- Version management system for project adoption and upgrades
+- VersionManager class for tracking project versions
+- Compatibility matrix for version compatibility checking
+- Upgrade path calculation for incremental upgrades
+- Safe file system utilities with atomic operations
+- Path validation to prevent path traversal attacks
+- Project structure for future adoption/upgrade features
+
+### Infrastructure
+- Added semver dependency for version comparison
+- Created lib/version/ directory for version management
+- Created lib/utils/ directory for shared utilities
+- Prepared foundation for kse adopt and kse upgrade commands
 
 ### Documentation
-- README.md (English)
-- README.zh.md (Chinese)
-- CONTRIBUTING.md
-- LICENSE (MIT)
+- Created spec 02-00-project-adoption-and-upgrade
+- Comprehensive design for project adoption system
+- Detailed requirements for smooth upgrade experience
 
 ## [1.0.0] - 2026-01-23
 

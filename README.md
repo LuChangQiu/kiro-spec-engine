@@ -27,6 +27,9 @@ At its heart, KSE is a **rules engine** that operates on **specs**:
 - ✅ **Steering Rules System**: Control AI behavior with project-specific rules
 - ✅ **Multi-User Collaboration**: Personal workspaces, task claiming, team coordination
 - ✅ **Cross-Tool Compatibility**: Export context for Claude Code, Cursor, Codex, etc.
+- ✅ **Watch Mode Automation**: Automatic file monitoring and workflow execution
+- ✅ **Manual Workflows**: Step-by-step guides for common tasks
+- ✅ **Tool Detection**: Auto-detect IDE and suggest appropriate automation
 - ✅ **Quality Assessment**: Automatic document quality scoring (0-10 scale)
 - ✅ **Intelligent Enhancement**: Auto-identify and apply improvements with Ultrawork
 - ✅ **Professional Standards**: Ensure production-ready documentation
@@ -153,6 +156,61 @@ kse prompt generate 01-00-user-auth 1.1 --tool=claude-code
 kse prompt generate 01-00-user-auth 1.2 --tool=cursor --max-length=5000
 ```
 
+### Watch Mode (Automation)
+
+```bash
+# Initialize watch configuration
+kse watch init
+kse watch init --force  # Overwrite existing config
+
+# Start watch mode
+kse watch start
+kse watch start --config custom-config.json
+kse watch start --patterns "**/*.md,**/*.js"
+
+# Stop watch mode
+kse watch stop
+
+# Check watch mode status
+kse watch status
+
+# View execution logs
+kse watch logs
+kse watch logs --tail 100
+kse watch logs --follow
+
+# View automation metrics
+kse watch metrics
+kse watch metrics --format json
+
+# List available presets
+kse watch presets
+
+# Install a preset
+kse watch install auto-sync
+kse watch install prompt-regen
+kse watch install context-export
+kse watch install test-runner
+```
+
+### Manual Workflows
+
+```bash
+# List available workflows
+kse workflows
+
+# Show workflow details
+kse workflows show task-sync
+kse workflows show context-export
+kse workflows show prompt-generation
+
+# Open full workflows guide
+kse workflows guide
+
+# Mark workflow as complete
+kse workflows complete task-sync
+```
+
 ### Document Enhancement
 
 ```bash
@@ -269,6 +327,81 @@ kse rollback
 - ✅ Backup validation and integrity checking
 - ✅ Easy rollback to previous states
 - ✅ Dry-run mode to preview changes
+
+## 🤖 Automation and Workflows
+
+### Watch Mode
+
+Watch mode provides automatic file monitoring and workflow execution:
+
+**Features**:
+- 📁 **File Monitoring**: Automatically detect file changes
+- ⚡ **Debouncing**: Prevent duplicate executions
+- 🔄 **Retry Logic**: Automatic retry with exponential backoff
+- 📊 **Metrics Tracking**: Track executions, time saved, success rates
+- 📝 **Execution Logging**: Complete audit trail with log rotation
+
+**Quick Start**:
+```bash
+# Initialize watch configuration
+kse watch init
+
+# Install a preset (auto-sync, prompt-regen, context-export, test-runner)
+kse watch install auto-sync
+
+# Start watching
+kse watch start
+
+# Check status
+kse watch status
+
+# View metrics
+kse watch metrics
+```
+
+**Presets**:
+- `auto-sync`: Automatically sync workspace when tasks.md changes
+- `prompt-regen`: Regenerate prompts when requirements/design change
+- `context-export`: Export context when tasks complete
+- `test-runner`: Run tests when source files change
+
+### Tool Detection
+
+KSE automatically detects your development environment and suggests appropriate automation:
+
+```bash
+# During adoption, KSE detects:
+kse adopt
+
+# Detected: Kiro IDE → Suggests native agent hooks
+# Detected: VS Code/Cursor → Suggests watch mode
+# Detected: Other → Suggests manual workflows
+```
+
+### Manual Workflows
+
+For environments without automation, KSE provides step-by-step workflow guides:
+
+```bash
+# List available workflows
+kse workflows
+
+# View workflow details
+kse workflows show task-sync        # 30-60 seconds
+kse workflows show context-export   # 15-45 seconds
+kse workflows show prompt-generation # 20-30 seconds
+
+# Open complete guide
+kse workflows guide
+```
+
+**Available Workflows**:
+- **Task Sync**: Keep workspace synchronized with task progress
+- **Context Export**: Export spec context for AI assistants
+- **Prompt Generation**: Generate task-specific prompts
+- **Daily Checklist**: Complete daily workflow routine
+- **Task Completion**: Checklist for completing tasks
+- **Spec Creation**: Checklist for creating new specs
 
 ## 🛠️ Project Structure
 

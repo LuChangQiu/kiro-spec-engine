@@ -204,15 +204,17 @@ kse works with any AI coding assistant. Choose your tool for specific guidance:
 ```mermaid
 sequenceDiagram
     participant You
-    participant kse
     participant AI Tool
-    You->>kse: Create Spec (requirements, design, tasks)
-    You->>kse: Export context
-    kse->>You: context-export.md
-    You->>AI Tool: Provide context
-    AI Tool->>You: Generate code based on Spec
-    You->>kse: Update task status
+    participant kse
+    You->>AI Tool: "I have a Spec for user-login, implement task 1.1"
+    AI Tool->>kse: kse context export user-login
+    kse->>AI Tool: Spec content (requirements, design, tasks)
+    AI Tool->>AI Tool: Generate code following Spec
+    AI Tool->>You: Here's the implementation
+    AI Tool->>kse: Update tasks.md (mark task complete)
 ```
+
+**Key insight:** You stay in your AI tool. The AI reads the Spec and generates code that matches your design.
 
 ---
 

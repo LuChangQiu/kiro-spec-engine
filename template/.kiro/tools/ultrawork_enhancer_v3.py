@@ -14,6 +14,7 @@ from document_evaluator import DocumentEvaluator, QualityAssessment
 from improvement_identifier import ImprovementIdentifier, Improvement
 from modification_applicator import ModificationApplicator, ModificationResult
 from quality_scorer import QualityScorer, ScoringResult
+from backup_manager import BackupManager, BackupInfo
 
 
 @dataclass
@@ -43,7 +44,9 @@ class UltraworkEnhancerV3:
                  quality_threshold: float = 9.0,
                  max_iterations: int = 10,
                  plateau_iterations: int = 3,
-                 min_score_improvement: float = 0.1):
+                 min_score_improvement: float = 0.1,
+                 create_backups: bool = True,
+                 cleanup_backups_on_success: bool = True):
         """
         初始化增强器
         
@@ -52,17 +55,22 @@ class UltraworkEnhancerV3:
             max_iterations: 最大迭代次数
             plateau_iterations: 平台期迭代次数（连续N次无改进则停止）
             min_score_improvement: 最小分数改进（低于此值视为无改进）
+            create_backups: 是否创建备份
+            cleanup_backups_on_success: 成功后是否清理备份
         """
         self.quality_threshold = quality_threshold
         self.max_iterations = max_iterations
         self.plateau_iterations = plateau_iterations
         self.min_score_improvement = min_score_improvement
+        self.create_backups = create_backups
+        self.cleanup_backups_on_success = cleanup_backups_on_success
         
         # 初始化核心组件
         self.evaluator = DocumentEvaluator()
         self.identifier = ImprovementIdentifier()
         self.applicator = ModificationApplicator()
         self.scorer = QualityScorer()
+        self.backup_manager = BackupManager()
     
     def set_quality_threshold(self, threshold: float):
         """设置质量阈值"""
@@ -125,6 +133,27 @@ class UltraworkEnhancerV3:
                 stopping_reason='threshold_reached',
                 score_history=[initial_score]
             )
+        
+        # 创建备份
+        backup_id = None
+        if self.create_backups:
+            try:
+                backup_id = self.backup_manager.create_backup(
+                    requirements_path, 
+                    reason="requirements_enhancement"
+                )
+                print(f"✓ Created backup: {backup_id}\n")
+            except Exception as e:
+                print(f"✗ Failed to create backup: {e}")
+                print("  Aborting enhancement to preserve document integrity\n")
+                return EnhancementResult(
+                    success=False,
+                    document_type='requirements',
+                    initial_score=initial_score,
+                    final_score=initial_score,
+                    iterations=0,
+                    stopping_reason=f"backup_failed: {e}"
+                )
         
         # 开始改进循环
         current_content = content
@@ -212,8 +241,23 @@ class UltraworkEnhancerV3:
             with open(requirements_path, 'w', encoding='utf-8') as f:
                 f.write(current_content)
             print(f"\n✓ Saved enhanced document to {requirements_path}")
+            
+            # 清理备份（如果成功且配置为清理）
+            if backup_id and self.cleanup_backups_on_success:
+                if self.backup_manager.cleanup_backup(backup_id):
+                    print(f"✓ Cleaned up backup: {backup_id}")
+                    
         except Exception as e:
             print(f"\n✗ Failed to save document: {e}")
+            
+            # 尝试恢复备份
+            if backup_id:
+                try:
+                    self.backup_manager.restore_backup(backup_id)
+                    print(f"✓ Restored from backup: {backup_id}")
+                except Exception as restore_error:
+                    print(f"✗ Failed to restore backup: {restore_error}")
+            
             return EnhancementResult(
                 success=False,
                 document_type='requirements',
@@ -306,6 +350,27 @@ class UltraworkEnhancerV3:
                 stopping_reason='threshold_reached',
                 score_history=[initial_score]
             )
+        
+        # 创建备份
+        backup_id = None
+        if self.create_backups:
+            try:
+                backup_id = self.backup_manager.create_backup(
+                    design_path, 
+                    reason="design_enhancement"
+                )
+                print(f"✓ Created backup: {backup_id}\n")
+            except Exception as e:
+                print(f"✗ Failed to create backup: {e}")
+                print("  Aborting enhancement to preserve document integrity\n")
+                return EnhancementResult(
+                    success=False,
+                    document_type='design',
+                    initial_score=initial_score,
+                    final_score=initial_score,
+                    iterations=0,
+                    stopping_reason=f"backup_failed: {e}"
+                )
         
         # 开始改进循环
         current_content = design_content
@@ -401,8 +466,23 @@ class UltraworkEnhancerV3:
             with open(design_path, 'w', encoding='utf-8') as f:
                 f.write(current_content)
             print(f"\n✓ Saved enhanced document to {design_path}")
+            
+            # 清理备份（如果成功且配置为清理）
+            if backup_id and self.cleanup_backups_on_success:
+                if self.backup_manager.cleanup_backup(backup_id):
+                    print(f"✓ Cleaned up backup: {backup_id}")
+                    
         except Exception as e:
             print(f"\n✗ Failed to save document: {e}")
+            
+            # 尝试恢复备份
+            if backup_id:
+                try:
+                    self.backup_manager.restore_backup(backup_id)
+                    print(f"✓ Restored from backup: {backup_id}")
+                except Exception as restore_error:
+                    print(f"✗ Failed to restore backup: {restore_error}")
+            
             return EnhancementResult(
                 success=False,
                 document_type='design',

@@ -50,16 +50,16 @@
     "quality-enhancement",
     "sisyphus"
   ],
-  "author": "Your Name <your.email@example.com>",
+  "author": "heguangyong",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/kiro-spec-engine.git"
+    "url": "https://github.com/heguangyong/kiro-spec-engine.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/kiro-spec-engine/issues"
+    "url": "https://github.com/heguangyong/kiro-spec-engine/issues"
   },
-  "homepage": "https://github.com/yourusername/kiro-spec-engine#readme",
+  "homepage": "https://github.com/heguangyong/kiro-spec-engine#readme",
   "engines": {
     "node": ">=14.0.0",
     "python": ">=3.8.0"

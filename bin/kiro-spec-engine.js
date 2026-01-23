@@ -306,6 +306,17 @@ watchCmd
   .option('-f, --force', 'Overwrite existing config')
   .action(watchCommands.initWatch);
 
+watchCmd
+  .command('presets')
+  .description('List available watch presets')
+  .action(watchCommands.listPresetsWatch);
+
+watchCmd
+  .command('install <preset>')
+  .description('Install a watch preset')
+  .option('-f, --force', 'Overwrite existing actions')
+  .action(watchCommands.installPresetWatch);
+
 // 更新项目配置的辅助函数
 async function updateProjectConfig(projectName) {
   const envPath = path.join(process.cwd(), '.kiro/steering/ENVIRONMENT.md');

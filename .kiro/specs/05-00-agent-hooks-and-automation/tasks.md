@@ -199,32 +199,32 @@ This implementation plan delivers automation capabilities across all tools:
     - Add troubleshooting tips
     - _Requirements: 3.1, 3.2_
 
-- [ ] 8. Implement watch mode presets
-  - [ ] 8.1 Create auto-sync preset
+- [x] 8. Implement watch mode presets
+  - [x] 8.1 Create auto-sync preset
     - Watch tasks.md
     - Run workspace sync
     - Configure debounce
     - _Requirements: 5.1, 5.2_
   
-  - [ ] 8.2 Create prompt-regen preset
+  - [x] 8.2 Create prompt-regen preset
     - Watch requirements.md and design.md
     - Regenerate prompts
     - Configure debounce
     - _Requirements: 5.1, 5.2_
   
-  - [ ] 8.3 Create context-export preset
+  - [x] 8.3 Create context-export preset
     - Watch completion markers
     - Export context
     - Configure debounce
     - _Requirements: 5.1, 5.2_
   
-  - [ ] 8.4 Create test-runner preset
+  - [x] 8.4 Create test-runner preset
     - Watch source files
     - Run relevant tests
     - Configure debounce
     - _Requirements: 5.1, 5.2_
   
-  - [ ] 8.5 Implement preset installation
+  - [x] 8.5 Implement preset installation
     - `kse watch install <preset>`
     - Merge with existing config
     - Validate before installation

@@ -343,14 +343,14 @@ This implementation plan extends kiro-spec-engine to support multi-user collabor
     - Provide integration plan if applicable
     - _Requirements: 11.1_
 
-- [ ] 15. Create cross-tool documentation
-  - [ ] 15.1 Write cross-tool usage guide
+- [x] 15. Create cross-tool documentation
+  - [x] 15.1 Write cross-tool usage guide
     - Create `docs/cross-tool-guide.md`
     - Document setup for Kiro IDE, Claude Code, Cursor, Codex
     - Provide example workflows for each tool
     - _Requirements: 8.1, 8.2, 8.3_
   
-  - [ ] 15.2 Document limitations and trade-offs
+  - [x] 15.2 Document limitations and trade-offs
     - Explain feature availability per tool
     - Document manual steps required for non-Kiro tools
     - Provide troubleshooting tips

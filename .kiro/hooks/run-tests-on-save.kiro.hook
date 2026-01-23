@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "name": "Run Tests on Save",
+  "description": "Automatically run tests when JavaScript files in lib/ or tests/ are saved",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "lib/**/*.js",
+      "tests/**/*.js"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Run the test suite with `npm test` and report any failures. If tests fail, analyze the errors and suggest fixes."
+  }
+}

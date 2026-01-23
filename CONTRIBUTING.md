@@ -38,8 +38,6 @@ We welcome translations to make Kiro Spec Engine accessible to more developers w
 6. **Test Your Translation**
    ```bash
    npm link
-   kiro-spec-engine --lang [language-code] init
-   # Or use the short alias
    kse --lang [language-code] init
    ```
 

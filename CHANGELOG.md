@@ -7,6 +7,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-01-23
+
+### Added - User Onboarding and Documentation Overhaul 📚
+
+**Complete Documentation Restructure**:
+- **New Positioning**: Repositioned kse as "A context provider for AI coding tools"
+- **Three-Tier Structure**: README → Core Guides → Tool-Specific Guides
+- **"What kse is NOT" Section**: Clear clarification of kse's role
+
+**New Documentation** (20+ new files):
+- **Quick Start Guide** (`docs/quick-start.md`): Complete 5-minute tutorial with user-login example
+- **6 Tool-Specific Guides**:
+  - Cursor Integration Guide
+  - Claude Code Integration Guide
+  - Windsurf Integration Guide
+  - Kiro Integration Guide
+  - VS Code + Copilot Integration Guide
+  - Generic AI Tools Guide
+- **Core Guides**:
+  - Spec Workflow Guide (deep dive into Spec creation)
+  - Integration Modes Guide (Native, Manual Export, Watch Mode)
+  - Troubleshooting Guide (organized by category)
+  - FAQ (frequently asked questions)
+- **3 Complete Example Specs**:
+  - API Feature Example (RESTful API with authentication)
+  - UI Feature Example (React dashboard)
+  - CLI Feature Example (export command)
+- **Documentation Index** (`docs/README.md`): Comprehensive navigation hub
+
+**Visual Enhancements**:
+- **3 Mermaid Diagrams**:
+  - Spec creation workflow diagram
+  - Integration modes diagram
+  - Context flow sequence diagram
+
+**Bilingual Support**:
+- **Complete Chinese Translations**:
+  - Chinese README (`README.zh.md`)
+  - Chinese Quick Start Guide (`docs/zh/quick-start.md`)
+  - All 6 tool guides translated (`docs/zh/tools/`)
+  - Chinese documentation index (`docs/zh/README.md`)
+
+**Metadata and Navigation**:
+- Added version, date, audience, and time estimates to all major docs
+- Cross-document linking with "Related Documentation" sections
+- "Next Steps" sections for progressive learning
+- "Getting Help" sections with multiple support channels
+
+### Changed
+
+- **README.md**: Complete restructure with embedded quick start and clear positioning
+- **README.zh.md**: Updated to match new English structure
+- All documentation now emphasizes kse's role as a context provider for AI tools
+
+### Improved
+
+- **User Experience**: Reduced time-to-first-feature from unclear to 5 minutes
+- **Tool Integration**: Clear guidance for 6 major AI tools
+- **Learning Path**: Progressive disclosure from beginner to advanced
+- **Accessibility**: Bilingual support for English and Chinese developers
+
 ## [1.3.0] - 2026-01-23
 
 ### Added - Watch Mode Automation System 🤖

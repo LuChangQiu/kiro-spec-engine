@@ -1,470 +1,320 @@
-﻿# kiro-spec-engine
+﻿# kse - Kiro Spec Engine
 
 [![npm version](https://badge.fury.io/js/kiro-spec-engine.svg)](https://badge.fury.io/js/kiro-spec-engine)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Kiro Spec Engine** - A spec-driven rules engine with quality enhancement powered by Ultrawork spirit.
-
-> 🔥 Transform your development workflow with structured specs, steering rules, and relentless quality pursuit.
+**A context provider for AI coding tools** - Structure your project requirements, design, and tasks so AI assistants can help you build better software.
 
 English | [简体中文](README.zh.md)
 
-## 🎯 What is Kiro Spec Engine?
+---
 
-Kiro Spec Engine (KSE) is a **spec-driven rules engine** that brings structure, quality, and the **Ultrawork spirit** to your development process. It's not just a tool—it's a methodology for building software with clarity and excellence.
+## What is kse?
 
-### Core Concept: Spec-Driven Rules Engine
+**kse (Kiro Spec Engine) is a context management system for AI-assisted development.** It helps you organize project information into structured "Specs" (Requirements → Design → Tasks) that AI tools can understand and use effectively.
 
-At its heart, KSE is a **rules engine** that operates on **specs**:
+Think of kse as a **librarian for your AI assistant** - it organizes and presents project context so your AI tool knows exactly what you're building, why, and how.
 
-- **Specs** define what you want to build (Requirements → Design → Tasks)
-- **Steering rules** guide how AI assistants should help you build it
-- **Ultrawork spirit** ensures professional-grade quality at every stage
+### How it Works
 
-### Key Features
+```mermaid
+graph LR
+    A[You create Specs] --> B[kse organizes context]
+    B --> C[AI tool reads context]
+    C --> D[AI generates better code]
+```
 
-- ✅ **Spec-Driven Development**: Structured Requirements → Design → Tasks workflow
-- ✅ **Steering Rules System**: Control AI behavior with project-specific rules
-- ✅ **Multi-User Collaboration**: Personal workspaces, task claiming, team coordination
-- ✅ **Cross-Tool Compatibility**: Export context for Claude Code, Cursor, Codex, etc.
-- ✅ **Watch Mode Automation**: Automatic file monitoring and workflow execution
-- ✅ **Manual Workflows**: Step-by-step guides for common tasks
-- ✅ **Tool Detection**: Auto-detect IDE and suggest appropriate automation
-- ✅ **Quality Assessment**: Automatic document quality scoring (0-10 scale)
-- ✅ **Intelligent Enhancement**: Auto-identify and apply improvements with Ultrawork
-- ✅ **Professional Standards**: Ensure production-ready documentation
-- ✅ **Multi-language Support**: English and Chinese interfaces
-- ✅ **CLI Interface**: Easy-to-use command-line tools
+1. **You create Specs** - Write requirements, design, and tasks in structured markdown files
+2. **kse organizes context** - Exports formatted context optimized for AI tools
+3. **AI tool reads context** - Your AI assistant understands your project structure
+4. **AI generates better code** - Code that matches your design and requirements
 
-## 🚀 Quick Start
+### What kse is NOT
 
-### Installation
+- ❌ **Not a code generator** - kse doesn't write code; your AI tool does
+- ❌ **Not an IDE** - kse works alongside your existing development tools
+- ❌ **Not AI-specific** - Works with Claude, Cursor, Windsurf, Copilot, and any AI tool
+- ❌ **Not a replacement for documentation** - It's a structured way to organize project context
 
-Install globally via npm:
+### Who Should Use kse?
+
+- ✅ Developers using AI coding assistants (Claude, Cursor, Copilot, etc.)
+- ✅ Teams wanting structured project documentation
+- ✅ Anyone building features that need clear requirements and design
+- ✅ Projects that benefit from spec-driven development
+
+---
+
+## Quick Start (5 Minutes)
+
+### Step 1: Install kse (30 seconds)
 
 ```bash
 npm install -g kiro-spec-engine
 ```
 
-Or use the short alias:
-
+Verify installation:
 ```bash
-npm install -g kiro-spec-engine
-# Creates both 'kiro-spec-engine' and 'kse' commands
+kse --version
 ```
 
-### Initialize a Project
+### Step 2: Adopt kse in Your Project (1 minute)
+
+Navigate to your project directory and run:
 
 ```bash
-# Initialize in current directory
-kiro-spec-engine init
-
-# Or specify project name
-kiro-spec-engine init "My Awesome Project"
-
-# Use Chinese interface
-kiro-spec-engine --lang zh init
-
-# Use short alias
-kse init
+cd your-project
+kse adopt
 ```
 
-### Create and Enhance Your First Spec
+This creates a `.kiro/` directory with:
+- `specs/` - Where your Specs live
+- `steering/` - Rules for AI behavior (optional)
+
+### Step 3: Create Your First Spec (2 minutes)
 
 ```bash
-# Create a new spec
-kse create-spec 01-00-user-authentication
-
-# Write your basic requirements.md file
-# Then enhance it with Ultrawork
-kse enhance requirements .kiro/specs/01-00-user-authentication/requirements.md
+kse create-spec 01-00-user-login
 ```
 
-## 📋 Commands
+This creates three files in `.kiro/specs/01-00-user-login/`:
 
-### Project Management
+**requirements.md** - What you're building:
+```markdown
+# User Login Feature
+
+## User Stories
+- As a user, I want to log in with email and password
+- As a user, I want to see an error if credentials are wrong
+
+## Acceptance Criteria
+- WHEN user enters valid credentials THEN they are logged in
+- WHEN user enters invalid credentials THEN they see an error message
+```
+
+**design.md** - How you'll build it:
+```markdown
+# Design
+
+## API Design
+- POST /api/auth/login
+- Request: { email: string, password: string }
+- Response: { token: string } or { error: string }
+
+## Components
+- AuthController - handles login logic
+- validateEmail() - validates email format
+- validatePassword() - checks password requirements
+```
+
+**tasks.md** - Step-by-step implementation:
+```markdown
+- [ ] 1.1 Create AuthController class
+- [ ] 1.2 Implement email validation
+- [ ] 1.3 Implement password validation
+- [ ] 1.4 Implement login endpoint
+- [ ] 1.5 Write unit tests
+```
+
+### Step 4: Export Context for Your AI Tool (1 minute)
 
 ```bash
-# Initialize project
-kse init [project-name]
-
-# Adopt existing project
-kse adopt                    # Interactive adoption
-kse adopt --auto             # Skip confirmations
-kse adopt --dry-run          # Show what would change
-kse adopt --mode fresh       # Force specific mode
-
-# Upgrade project version
-kse upgrade                  # Interactive upgrade
-kse upgrade --auto           # Skip confirmations
-kse upgrade --dry-run        # Show upgrade plan
-kse upgrade --to 1.2.0       # Upgrade to specific version
-
-# Rollback to previous state
-kse rollback                 # Interactive rollback
-kse rollback --auto          # Skip confirmations
-kse rollback --backup <id>   # Restore specific backup
-
-# Check project status
-kse status
-
-# Create new spec
-kse create-spec <spec-name>
-
-# System diagnostics
-kse doctor
-
-# Set language
-kse --lang zh <command>  # Chinese
-kse --lang en <command>  # English (default)
+kse context export 01-00-user-login
 ```
 
-### Multi-User Collaboration
+This generates `.kiro/specs/01-00-user-login/context-export.md` with all your Spec information formatted for AI tools.
 
+**Using with different AI tools:**
+
+**Claude Code / ChatGPT:**
+1. Open `context-export.md`
+2. Copy the entire content
+3. Paste into your AI conversation
+4. Say: "Please implement task 1.1"
+
+**Cursor:**
 ```bash
-# Initialize personal workspace
-kse workspace init
-kse workspace init --user=alice
+kse prompt generate 01-00-user-login 1.1
+```
+Copy the generated prompt into Cursor Composer (Cmd+K)
 
-# Synchronize workspace with team
-kse workspace sync
+**Windsurf / Cline:**
+Just tell the AI: "Use kse to check the spec for user-login and implement task 1.1"
+(These tools can execute kse commands directly!)
 
-# List all workspaces
-kse workspace list
+### Step 5: Next Steps (30 seconds)
 
-# Claim a task
-kse task claim <spec-name> <task-id>
-kse task claim 01-00-user-auth 1.1 --force
+- 📖 Read the [Quick Start Guide](docs/quick-start.md) for detailed examples
+- 🔧 Check your tool's integration guide: [Cursor](docs/tools/cursor-guide.md) | [Claude](docs/tools/claude-guide.md) | [Windsurf](docs/tools/windsurf-guide.md)
+- 💡 Learn about [Integration Modes](docs/integration-modes.md)
 
-# Unclaim a task
-kse task unclaim <spec-name> <task-id>
+---
 
-# List claimed tasks
-kse task list <spec-name>
+## Core Concepts
+
+### Specs
+
+A **Spec** is a structured description of a feature or project component. Each Spec contains:
+
+- **Requirements** (`requirements.md`) - What you're building and why
+- **Design** (`design.md`) - How you'll build it (architecture, APIs, components)
+- **Tasks** (`tasks.md`) - Step-by-step implementation checklist
+
+### Context Export
+
+**Context export** transforms your Spec into a format optimized for AI tools. It includes:
+- All requirements, design decisions, and tasks
+- Project structure and conventions
+- Steering rules (optional) for AI behavior
+
+### Integration Modes
+
+kse supports three ways to work with AI tools:
+
+1. **Native Integration** - AI tool directly accesses kse (Kiro IDE)
+2. **Manual Export** - You export and paste context (Claude, ChatGPT, Cursor)
+3. **Watch Mode** - Automatic context updates on file changes (all tools)
+
+Learn more: [Integration Modes Guide](docs/integration-modes.md)
+
+---
+
+## Integration with Your AI Tool
+
+kse works with any AI coding assistant. Choose your tool for specific guidance:
+
+### Popular AI Tools
+
+- **[Cursor](docs/tools/cursor-guide.md)** - IDE with AI pair programming
+- **[Claude Code](docs/tools/claude-guide.md)** - Anthropic's coding assistant
+- **[Windsurf](docs/tools/windsurf-guide.md)** - AI agent with command execution
+- **[Kiro](docs/tools/kiro-guide.md)** - Native integration, no manual export needed
+- **[VS Code + Copilot](docs/tools/vscode-guide.md)** - GitHub Copilot integration
+- **[Generic AI Tools](docs/tools/generic-guide.md)** - Works with any AI assistant
+
+### Integration Workflow
+
+```mermaid
+sequenceDiagram
+    participant You
+    participant kse
+    participant AI Tool
+    You->>kse: Create Spec (requirements, design, tasks)
+    You->>kse: Export context
+    kse->>You: context-export.md
+    You->>AI Tool: Provide context
+    AI Tool->>You: Generate code based on Spec
+    You->>kse: Update task status
 ```
 
-### Cross-Tool Support
+---
 
-```bash
-# Export spec context for AI tools
-kse context export <spec-name>
-kse context export 01-00-user-auth --steering --steering-files=CORE_PRINCIPLES.md
+## Documentation
 
-# Generate task-specific prompt
-kse prompt generate <spec-name> <task-id>
-kse prompt generate 01-00-user-auth 1.1 --tool=claude-code
-kse prompt generate 01-00-user-auth 1.2 --tool=cursor --max-length=5000
-```
+### Getting Started
+- 📖 **[Quick Start Guide](docs/quick-start.md)** - Detailed 5-minute tutorial
+- 🤔 **[FAQ](docs/faq.md)** - Frequently asked questions
+- 🔧 **[Troubleshooting](docs/troubleshooting.md)** - Common issues and solutions
 
-### Watch Mode (Automation)
+### Core Guides
+- 📋 **[Spec Workflow](docs/spec-workflow.md)** - Understanding Specs in depth
+- 🔌 **[Integration Modes](docs/integration-modes.md)** - Three ways to integrate kse
+- 📝 **[Command Reference](docs/command-reference.md)** - All kse commands
 
-```bash
-# Initialize watch configuration
-kse watch init
-kse watch init --force  # Overwrite existing config
-
-# Start watch mode
-kse watch start
-kse watch start --config custom-config.json
-kse watch start --patterns "**/*.md,**/*.js"
-
-# Stop watch mode
-kse watch stop
-
-# Check watch mode status
-kse watch status
-
-# View execution logs
-kse watch logs
-kse watch logs --tail 100
-kse watch logs --follow
-
-# View automation metrics
-kse watch metrics
-kse watch metrics --format json
-
-# List available presets
-kse watch presets
-
-# Install a preset
-kse watch install auto-sync
-kse watch install prompt-regen
-kse watch install context-export
-kse watch install test-runner
-```
-
-### Manual Workflows
-
-```bash
-# List available workflows
-kse workflows
-
-# Show workflow details
-kse workflows show task-sync
-kse workflows show context-export
-kse workflows show prompt-generation
-
-# Open full workflows guide
-kse workflows guide
-
-# Mark workflow as complete
-kse workflows complete task-sync
-```
-
-### Document Enhancement
-
-```bash
-# Enhance requirements document
-kse enhance requirements <file>
-
-# Enhance design document (requires requirements file)
-kse enhance design <design-file> --requirements <requirements-file>
-
-# Check tasks completion
-kse enhance tasks <tasks-file>
-```
+### Tool-Specific Guides
+- [Cursor Integration](docs/tools/cursor-guide.md)
+- [Claude Code Integration](docs/tools/claude-guide.md)
+- [Windsurf Integration](docs/tools/windsurf-guide.md)
+- [Kiro Integration](docs/tools/kiro-guide.md)
+- [VS Code + Copilot Integration](docs/tools/vscode-guide.md)
+- [Generic AI Tools](docs/tools/generic-guide.md)
 
 ### Examples
+- [API Feature Example](docs/examples/add-rest-api/) - RESTful API Spec
+- [UI Feature Example](docs/examples/add-user-dashboard/) - React dashboard Spec
+- [CLI Feature Example](docs/examples/add-export-command/) - CLI command Spec
+
+### Advanced Topics
+- [Adoption Guide](docs/adoption-guide.md) - Adopting kse in existing projects
+- [Upgrade Guide](docs/upgrade-guide.md) - Version upgrade instructions
+- [Manual Workflows](docs/manual-workflows-guide.md) - Step-by-step workflows
+- [Developer Guide](docs/developer-guide.md) - Contributing and extending kse
+
+### Complete Documentation
+- 📚 **[Documentation Index](docs/README.md)** - All documentation in one place
+
+---
+
+## Key Features
+
+### Spec-Driven Development
+Structure your work with Requirements → Design → Tasks workflow
+
+### Multi-User Collaboration
+- Personal workspaces for team members
+- Task claiming and tracking
+- Workspace synchronization
+
+### Cross-Tool Compatibility
+Export context for Claude Code, Cursor, Windsurf, Copilot, and more
+
+### Watch Mode Automation
+Automatic file monitoring and context updates
+
+### Quality Enhancement
+- Document quality scoring (0-10 scale)
+- Intelligent improvement suggestions
+- Professional standards enforcement
+
+### Multi-Language Support
+English and Chinese interfaces
+
+---
+
+## Command Overview
 
 ```bash
-# Full workflow example
-kse init "E-commerce Platform"
-kse create-spec 01-00-user-auth
-# Edit .kiro/specs/01-00-user-auth/requirements.md
-kse enhance requirements .kiro/specs/01-00-user-auth/requirements.md
-# Edit .kiro/specs/01-00-user-auth/design.md  
-kse enhance design .kiro/specs/01-00-user-auth/design.md --requirements .kiro/specs/01-00-user-auth/requirements.md
+# Project setup
+kse adopt                          # Adopt kse in existing project
+kse create-spec <name>             # Create new Spec
+
+# Context management
+kse context export <spec-name>     # Export context for AI tools
+kse prompt generate <spec> <task>  # Generate task-specific prompt
+
+# Task management
+kse task claim <spec> <task-id>    # Claim a task
+kse task list <spec>               # List claimed tasks
+
+# Automation
+kse watch start                    # Start watch mode
+kse watch status                   # Check watch status
+
+# Project info
+kse status                         # Project status
+kse workflows                      # List available workflows
 ```
 
-## 📊 Quality Standards
+See [Command Reference](docs/command-reference.md) for complete documentation.
 
-### Requirements Stage (0-10 scoring)
-- **Basic Structure** (2pts): Overview, user stories, functional requirements, non-functional requirements
-- **EARS Format** (2pts): WHEN...THEN acceptance criteria
-- **User Stories** (2pts): "As a...I want...So that" format
-- **Acceptance Criteria** (2pts): Complete acceptance criteria definitions
-- **Non-functional Requirements** (1pt): Performance, security, usability, etc.
-- **Constraints** (1pt): Technical constraints, resource constraints, etc.
+---
 
-### Design Stage (0-10 scoring)
-- **Basic Structure** (2pts): System overview, architecture design, component design, interface design
-- **Requirements Traceability** (2pts): Bidirectional traceability from requirements to design
-- **Architecture Diagrams** (1.5pts): Mermaid diagrams or other design diagrams
-- **Technology Selection** (1.5pts): Technology stack choices and rationale
-- **Non-functional Design** (1.5pts): Performance design, security design, scalability
-- **Interface Definition** (1.5pts): API design, data structure definitions
+## Contributing & Support
 
-### Tasks Stage
-- **Completion Analysis**: Statistics on completed, in-progress, not-started tasks
-- **Priority Identification**: Identify priorities based on keywords and task numbers
-- **Ultrawork Motivation**: Provide Sisyphus spirit motivation and suggestions
-- **Next Steps Guidance**: Suggest specific execution strategies
+### Getting Help
 
-## 🔄 Project Adoption and Upgrade
+- 📖 **Documentation**: Start with the [Quick Start Guide](docs/quick-start.md)
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/yourusername/kiro-spec-engine/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/kiro-spec-engine/discussions)
+- 📧 **Email**: support@example.com
 
-### Adopting Existing Projects
+### Contributing
 
-KSE can intelligently adopt existing projects with three modes:
-
-**Fresh Adoption** (no `.kiro/` directory):
-```bash
-kse adopt
-# Creates complete .kiro/ structure from scratch
-```
-
-**Partial Adoption** (`.kiro/` exists but incomplete):
-```bash
-kse adopt
-# Preserves existing specs/ and steering/
-# Adds missing components
-```
-
-**Full Adoption** (complete `.kiro/` from older version):
-```bash
-kse adopt
-# Upgrades components to current version
-# Preserves all user content
-# Creates backup before changes
-```
-
-### Upgrading to New Versions
-
-When a new version of KSE is released:
-
-```bash
-# Check current version
-kse --version
-
-# Upgrade to latest version
-kse upgrade
-
-# Upgrade to specific version
-kse upgrade --to 1.2.0
-
-# Preview upgrade plan
-kse upgrade --dry-run
-```
-
-**Incremental Upgrades**: KSE automatically handles version gaps by upgrading through intermediate versions (e.g., 1.0.0 → 1.1.0 → 1.2.0).
-
-### Rollback and Safety
-
-All destructive operations create automatic backups:
-
-```bash
-# List available backups
-kse rollback
-
-# Restore from specific backup
-kse rollback --backup adopt-2026-01-23-100000
-
-# Quick rollback (interactive)
-kse rollback
-```
-
-**Safety Features**:
-- ✅ Automatic backup before adoption/upgrade
-- ✅ Backup validation and integrity checking
-- ✅ Easy rollback to previous states
-- ✅ Dry-run mode to preview changes
-
-## 🤖 Automation and Workflows
-
-### Watch Mode
-
-Watch mode provides automatic file monitoring and workflow execution:
-
-**Features**:
-- 📁 **File Monitoring**: Automatically detect file changes
-- ⚡ **Debouncing**: Prevent duplicate executions
-- 🔄 **Retry Logic**: Automatic retry with exponential backoff
-- 📊 **Metrics Tracking**: Track executions, time saved, success rates
-- 📝 **Execution Logging**: Complete audit trail with log rotation
-
-**Quick Start**:
-```bash
-# Initialize watch configuration
-kse watch init
-
-# Install a preset (auto-sync, prompt-regen, context-export, test-runner)
-kse watch install auto-sync
-
-# Start watching
-kse watch start
-
-# Check status
-kse watch status
-
-# View metrics
-kse watch metrics
-```
-
-**Presets**:
-- `auto-sync`: Automatically sync workspace when tasks.md changes
-- `prompt-regen`: Regenerate prompts when requirements/design change
-- `context-export`: Export context when tasks complete
-- `test-runner`: Run tests when source files change
-
-### Tool Detection
-
-KSE automatically detects your development environment and suggests appropriate automation:
-
-```bash
-# During adoption, KSE detects:
-kse adopt
-
-# Detected: Kiro IDE → Suggests native agent hooks
-# Detected: VS Code/Cursor → Suggests watch mode
-# Detected: Other → Suggests manual workflows
-```
-
-### Manual Workflows
-
-For environments without automation, KSE provides step-by-step workflow guides:
-
-```bash
-# List available workflows
-kse workflows
-
-# View workflow details
-kse workflows show task-sync        # 30-60 seconds
-kse workflows show context-export   # 15-45 seconds
-kse workflows show prompt-generation # 20-30 seconds
-
-# Open complete guide
-kse workflows guide
-```
-
-**Available Workflows**:
-- **Task Sync**: Keep workspace synchronized with task progress
-- **Context Export**: Export spec context for AI assistants
-- **Prompt Generation**: Generate task-specific prompts
-- **Daily Checklist**: Complete daily workflow routine
-- **Task Completion**: Checklist for completing tasks
-- **Spec Creation**: Checklist for creating new specs
-
-## 🛠️ Project Structure
-
-After initialization, your project will have:
-
-```
-your-project/
-├── .kiro/                          # Kiro core directory
-│   ├── specs/                      # Spec storage
-│   │   └── SPEC_WORKFLOW_GUIDE.md
-│   ├── steering/                   # AI behavior rules (the "rules engine")
-│   │   ├── CORE_PRINCIPLES.md      # Core principles + Ultrawork spirit
-│   │   ├── ENVIRONMENT.md          # Environment configuration
-│   │   ├── CURRENT_CONTEXT.md      # Current context
-│   │   └── RULES_GUIDE.md          # Rules index
-│   ├── tools/                      # Ultrawork tools
-│   │   └── ultrawork_enhancer.py   # Core enhancement tool
-│   └── README.md                   # Kiro system documentation
-└── README.md                       # Project documentation
-```
-
-## 🔥 The Ultrawork Spirit
-
-> Inspired by Sisyphus from Greek mythology, who was condemned to push a boulder up a mountain for eternity, only to watch it roll back down each time.
-
-The Ultrawork spirit embodies:
-
-- **Relentless Effort**: Never give up when facing challenges
-- **Continuous Improvement**: Always strive for better quality
-- **Professional Standards**: Pursue excellence in every detail (9.0/10 target)
-- **Persistent Execution**: Keep pushing forward until completion
-
-Ultrawork is the **quality enhancement philosophy** within Kiro Spec Engine—it's what drives the engine to produce professional-grade results.
-
-## 🌍 Multi-language Support
-
-Kiro Spec Engine supports multiple languages out of the box.
-
-### Setting Language
-
-```bash
-# Using command line option
-kse --lang zh init
-
-# Using environment variable
-export KIRO_LANG=zh
-kse init
-
-# Windows
-set KIRO_LANG=zh
-kse init
-```
-
-### Supported Languages
-
-- 🇺🇸 English (en) - Default
-- 🇨🇳 Simplified Chinese (zh)
-
-The tool automatically detects your system language and uses it by default. You can override this with the `--lang` option or `KIRO_LANG` environment variable.
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for:
+- Code contributions
+- Documentation improvements
+- Bug reports and feature requests
+- Translation help
 
 ### Development Setup
 
@@ -473,20 +323,18 @@ git clone https://github.com/yourusername/kiro-spec-engine.git
 cd kiro-spec-engine
 npm install
 npm link  # For local development
+npm test  # Run tests
 ```
 
-### Adding New Languages
+---
 
-1. Create a new language file in `locales/` (e.g., `ja.json`)
-2. Copy the structure from `en.json` and translate all text
-3. Add language detection logic in `lib/i18n.js`
-4. Update README documentation
-
-## 📄 License
+## License
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+---
+
+## Acknowledgments
 
 - Inspired by the **Sisyphus** myth and the concept of noble struggle
 - Built on the foundation of **Kiro** spec-driven development
@@ -494,9 +342,15 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-**Start your spec-driven journey today! 🔥**
+**Ready to enhance your AI-assisted development?** 🚀
 
 ```bash
 npm install -g kiro-spec-engine
-kse init
+kse adopt
+kse create-spec 01-00-my-first-feature
 ```
+
+---
+
+**Version**: 1.4.0  
+**Last Updated**: 2026-01-23

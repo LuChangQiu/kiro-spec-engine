@@ -1,0 +1,8 @@
+# Kiro IDE ignore patterns
+# Exclude template directory from steering rules
+
+template/
+test-project/
+.kiro-test/
+node_modules/
+coverage/

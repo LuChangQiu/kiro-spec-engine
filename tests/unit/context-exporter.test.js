@@ -26,6 +26,9 @@ describe('ContextExporter', () => {
       path.join(testSpecPath, 'tasks.md'),
       '# Tasks\n\n- [ ] 1.1 Test task'
     );
+    
+    // Add delay to ensure files are written in CI environment
+    await new Promise(resolve => setTimeout(resolve, 100));
   });
 
   afterEach(async () => {

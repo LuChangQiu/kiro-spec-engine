@@ -7,6 +7,80 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-01-23
+
+### Added - Watch Mode Automation System 🤖
+
+**Core Components** (2150+ lines of code, 172 tests):
+- **FileWatcher**: Cross-platform file monitoring with chokidar
+  - Glob pattern matching with minimatch
+  - Configurable ignored patterns
+  - Event emission for file changes
+  - Error recovery and health monitoring
+- **EventDebouncer**: Smart event management
+  - Debounce and throttle logic
+  - Event queue with duplicate prevention
+  - Configurable delays per pattern
+- **ActionExecutor**: Command execution engine
+  - Shell command execution with context interpolation
+  - Retry logic with exponential/linear backoff
+  - Timeout handling and process management
+  - Command validation and security
+- **ExecutionLogger**: Complete audit trail
+  - Log rotation by size
+  - Metrics tracking (executions, time saved, success rates)
+  - Export to JSON/CSV
+  - Configurable log levels
+- **WatchManager**: Central coordinator
+  - Lifecycle management (start/stop/restart)
+  - Configuration loading and validation
+  - Status reporting and metrics
+
+**CLI Commands** (7 commands):
+- `kse watch init` - Initialize watch configuration
+- `kse watch start/stop` - Control watch mode
+- `kse watch status` - Show current status
+- `kse watch logs` - View execution logs (with tail/follow)
+- `kse watch metrics` - Display automation metrics
+- `kse watch presets` - List available presets
+- `kse watch install <preset>` - Install automation preset
+
+**Automation Presets** (4 presets):
+- `auto-sync` - Automatically sync workspace when tasks.md changes
+- `prompt-regen` - Regenerate prompts when requirements/design change
+- `context-export` - Export context when tasks complete
+- `test-runner` - Run tests when source files change
+
+**Tool Detection & Auto-Configuration**:
+- Automatic IDE detection (Kiro IDE, VS Code, Cursor)
+- Tool-specific automation recommendations
+- Auto-configuration during project adoption
+- Confidence-based suggestions
+
+**Manual Workflows** (6 workflows):
+- Complete workflow guide (300+ lines)
+- `kse workflows` command for workflow management
+- Step-by-step instructions with time estimates
+- Interactive checklists for common tasks
+- Workflows: task-sync, context-export, prompt-generation, daily, task-completion, spec-creation
+
+### Enhanced
+- **README.md**: Added comprehensive automation section
+- **Project Adoption**: Integrated tool detection with automation setup
+- **Documentation**: Complete manual workflows guide
+
+### Testing
+- 289 tests passing (100% pass rate)
+- 279 unit tests
+- 10 integration tests
+- Full coverage of all watch mode components
+
+### Performance
+- Efficient file watching with debouncing
+- Configurable retry logic
+- Log rotation to prevent disk space issues
+- Metrics tracking for optimization
+
 ## [1.2.3] - 2026-01-23
 
 ### Added

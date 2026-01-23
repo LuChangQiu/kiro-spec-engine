@@ -233,20 +233,20 @@ This implementation plan delivers automation capabilities across all tools:
 - [x] 9. Checkpoint - Ensure watch mode CLI works
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 10. Implement tool detection
-  - [ ] 10.1 Create tool detector
+- [x] 10. Implement tool detection
+  - [x] 10.1 Create tool detector
     - Detect Kiro IDE
     - Detect VS Code / Cursor
     - Detect other IDEs
     - _Requirements: 10.1, 10.2_
   
-  - [ ] 10.2 Add auto-configuration
+  - [x] 10.2 Add auto-configuration
     - Suggest appropriate automation
     - Offer to install presets
     - Provide tool-specific tips
     - _Requirements: 10.3, 10.4_
   
-  - [ ] 10.3 Update `kse adopt` command
+  - [x] 10.3 Update `kse adopt` command
     - Integrate tool detection
     - Offer automation setup
     - Document choices

@@ -19,8 +19,8 @@ describe('ContextExporter', () => {
       // Ignore if doesn't exist
     }
     
-    // Add delay to ensure cleanup completes
-    await new Promise(resolve => setTimeout(resolve, 50));
+    // Add delay to ensure cleanup completes in CI
+    await new Promise(resolve => setTimeout(resolve, 150));
 
     // Create test directory structure
     await fs.ensureDir(testSpecPath);
@@ -38,7 +38,7 @@ describe('ContextExporter', () => {
     );
     
     // Add delay to ensure files are written in CI environment
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 200));
   });
 
   afterEach(async () => {
@@ -54,7 +54,17 @@ describe('ContextExporter', () => {
 
   describe('exportContext', () => {
     test('should export spec context successfully', async () => {
+      // Add extra delay before test to ensure setup is complete
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
       const result = await exporter.exportContext(testProjectPath, 'test-spec');
+
+      // Log error if test fails
+      if (!result.success) {
+        console.error('Export failed:', result.error);
+        console.error('Test project path:', testProjectPath);
+        console.error('Spec path exists:', await fs.pathExists(testSpecPath));
+      }
 
       expect(result.success).toBe(true);
       expect(result.specName).toBe('test-spec');

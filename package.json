@@ -61,7 +61,7 @@
   },
   "homepage": "https://github.com/heguangyong/kiro-spec-engine#readme",
   "engines": {
-    "node": ">=14.0.0",
+    "node": ">=16.0.0",
     "python": ">=3.8.0"
   },
   "dependencies": {

@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
 yarn.lock
 
 # Logs
@@ -53,3 +52,9 @@ test-project/
 *.tmp
 .tmp/
 temp/
+
+# Credentials (NEVER commit!)
+.credentials.txt
+*.credentials
+.env.local
+.env.*.local

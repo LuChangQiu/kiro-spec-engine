@@ -23,15 +23,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CONTRIBUTING.md
 - LICENSE (MIT)
 
-## [1.0.0] - TBD
+## [1.0.0] - 2026-01-23
 
 ### Added
-- First stable release
+- Initial stable release
 - Complete npm and GitHub release pipeline
+- Python dependency detection with OS-specific installation instructions
+- Doctor command for system diagnostics
 - Automated CI/CD with GitHub Actions
-- Python dependency detection
-- Comprehensive test suite
-- Installation verification tools
+- Multi-language support (English and Chinese)
+- Comprehensive test infrastructure
+- Ultrawork quality enhancement tool
+- CLI commands: init, doctor, --version, --help
+- Template system for new projects
+
+### Documentation
+- Complete README with installation and usage guide
+- Chinese README (README.zh.md)
+- Contributing guidelines (CONTRIBUTING.md)
+- MIT License
+
+### Infrastructure
+- GitHub Actions workflows for testing and releasing
+- Jest test framework with property-based testing support
+- Cross-platform support (Windows, macOS, Linux)
+- Node.js 16+ support
 
 ---
 

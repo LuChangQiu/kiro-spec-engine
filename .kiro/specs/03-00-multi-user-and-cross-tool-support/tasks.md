@@ -318,26 +318,26 @@ This implementation plan extends kiro-spec-engine to support multi-user collabor
     - **Property 18: Gradual Migration Support**
     - **Validates: Requirements 10.4**
 
-- [ ] 14. Investigate Kiro Agent Hooks
-  - [ ] 14.1 Research agent hooks documentation
+- [x] 14. Investigate Kiro Agent Hooks
+  - [x] 14.1 Research agent hooks documentation
     - Review Kiro IDE documentation for agent hooks
     - Understand hooks API and capabilities
     - Document findings in notes
     - _Requirements: 11.1, 11.2_
   
-  - [ ] 14.2 Analyze use cases for kse
+  - [x] 14.2 Analyze use cases for kse
     - Identify potential integration points
     - Evaluate benefits and trade-offs
     - Document use cases
     - _Requirements: 11.3_
   
-  - [ ] 14.3 Generate recommendations
+  - [x] 14.3 Generate recommendations
     - Determine if agent hooks should be integrated
     - Outline integration plan if beneficial
     - Document recommendations
     - _Requirements: 11.4, 11.5_
   
-  - [ ] 14.4 Create agent hooks analysis document
+  - [x] 14.4 Create agent hooks analysis document
     - Write `docs/agent-hooks-analysis.md`
     - Include research findings, use cases, and recommendations
     - Provide integration plan if applicable

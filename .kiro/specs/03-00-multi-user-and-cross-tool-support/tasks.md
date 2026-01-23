@@ -156,14 +156,14 @@ This implementation plan extends kiro-spec-engine to support multi-user collabor
     - **Property 12: Stale Claim Detection**
     - **Validates: Requirements 4.1, 4.2, 4.3, 4.4, 4.5, 5.5**
 
-- [ ] 6. Implement team status command
-  - [ ] 6.1 Create status command handler
+- [x] 6. Implement team status command
+  - [x] 6.1 Create status command handler
     - Implement `kse status` command
     - List all specs in project
     - Calculate task completion statistics per spec
     - _Requirements: 5.1, 5.2_
   
-  - [ ] 6.2 Implement claimed tasks display
+  - [x] 6.2 Implement claimed tasks display
     - Group claimed tasks by developer
     - Show task status for each claim
     - Highlight stale claims
@@ -174,7 +174,7 @@ This implementation plan extends kiro-spec-engine to support multi-user collabor
     - **Property 11: Status Display Completeness**
     - **Validates: Requirements 5.1, 5.2, 5.3, 5.4**
 
-- [ ] 7. Checkpoint - Ensure workspace and task claiming work
+- [x] 7. Checkpoint - Ensure workspace and task claiming work
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 8. Implement workspace synchronization

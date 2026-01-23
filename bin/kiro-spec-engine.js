@@ -12,6 +12,7 @@ const adoptCommand = require('../lib/commands/adopt');
 const upgradeCommand = require('../lib/commands/upgrade');
 const rollbackCommand = require('../lib/commands/rollback');
 const watchCommands = require('../lib/commands/watch');
+const workflowsCommand = require('../lib/commands/workflows');
 const VersionChecker = require('../lib/version/version-checker');
 
 const i18n = getI18n();
@@ -316,6 +317,14 @@ watchCmd
   .description('Install a watch preset')
   .option('-f, --force', 'Overwrite existing actions')
   .action(watchCommands.installPresetWatch);
+
+// Workflows commands
+const workflowsCmd = program
+  .command('workflows [action] [workflow-id]')
+  .description('Manage manual workflows and checklists')
+  .action(async (action, workflowId) => {
+    await workflowsCommand(action, workflowId);
+  });
 
 // 更新项目配置的辅助函数
 async function updateProjectConfig(projectName) {

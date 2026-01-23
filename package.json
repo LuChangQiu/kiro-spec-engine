@@ -19,12 +19,12 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "test": "jest",
-    "test:unit": "jest tests/unit",
-    "test:integration": "jest tests/integration",
-    "test:properties": "jest tests/properties",
-    "test:watch": "jest --watch",
-    "coverage": "jest --coverage",
+    "test": "npx jest",
+    "test:unit": "npx jest tests/unit",
+    "test:integration": "npx jest tests/integration",
+    "test:properties": "npx jest tests/properties",
+    "test:watch": "npx jest --watch",
+    "coverage": "npx jest --coverage",
     "prepublishOnly": "npm test",
     "publish:manual": "npm publish --access public",
     "install-global": "npm install -g .",

@@ -202,26 +202,26 @@ This implementation plan extends kiro-spec-engine to support multi-user collabor
     - **Property 16: Sync Logging**
     - **Validates: Requirements 9.1, 9.2, 9.4, 9.5**
 
-- [ ] 9. Implement Context Exporter
-  - [ ] 9.1 Create ContextExporter class
+- [x] 9. Implement Context Exporter
+  - [x] 9.1 Create ContextExporter class
     - Implement `exportContext()` to combine spec files
     - Read requirements.md, design.md, tasks.md
     - Optionally include steering files
     - _Requirements: 6.1, 6.2_
   
-  - [ ] 9.2 Implement export formatting
+  - [x] 9.2 Implement export formatting
     - Format as single Markdown document with section headers
     - Add metadata (spec name, export timestamp, username)
     - Include usage instructions for different AI tools
     - _Requirements: 6.3, 6.5_
   
-  - [ ] 9.3 Implement steering rules inclusion
+  - [x] 9.3 Implement steering rules inclusion
     - Create `includeSteeringRules()` to add steering content
     - Allow selection of specific steering files
     - Format steering rules as separate section
     - _Requirements: 6.2_
   
-  - [ ] 9.4 Implement export file saving
+  - [x] 9.4 Implement export file saving
     - Save export to `.kiro/specs/{spec-name}/context-export.md`
     - Ensure directory exists
     - Handle file write errors

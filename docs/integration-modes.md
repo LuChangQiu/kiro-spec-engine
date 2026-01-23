@@ -88,26 +88,28 @@ Kiro AI:
 ## Mode 2: Manual Export
 
 **Best for:** Claude Code, ChatGPT, Cursor, VS Code + Copilot  
-**Automation Level:** Semi-Manual  
+**Automation Level:** AI-Driven (for tools with command execution) or Semi-Manual (for web tools)  
 **Setup Complexity:** Low
 
 ### How It Works
 
-You manually export context from kse and provide it to your AI tool. The AI tool doesn't directly access kse.
+The AI tool can directly call kse commands during your conversation. You stay in your familiar AI tool interface - the AI handles kse interaction automatically.
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant kse
     participant AI Tool
+    participant kse
     
-    User->>kse: kse context export spec-name
-    kse->>User: context-export.md
-    User->>User: Copy context
-    User->>AI Tool: Paste context
-    AI Tool->>User: Generate code
-    User->>kse: Update tasks.md manually
+    User->>AI Tool: "Implement user login feature"
+    AI Tool->>kse: kse context export user-login
+    kse->>AI Tool: context-export.md content
+    AI Tool->>AI Tool: Generate code based on Spec
+    AI Tool->>User: Here's the implementation
+    AI Tool->>kse: Update tasks.md
 ```
+
+**Note:** For AI tools without command execution (like ChatGPT web), you can manually export and paste as a fallback.
 
 ### Supported Tools
 
@@ -119,50 +121,52 @@ sequenceDiagram
 
 ### Workflow Example
 
-**Step 1: Export context**
-```bash
-kse context export 01-00-user-login
+**With AI tools that can execute commands (Cursor, Windsurf, Claude Desktop):**
+
+```
+You: "I have a Spec for user login at 01-00-user-login. 
+     Please implement task 1.1: Create AuthController"
+
+AI Tool: 
+  [Executes: kse context export 01-00-user-login]
+  [Reads the exported context]
+  [Generates AuthController code]
+  [Updates tasks.md automatically]
+  
+  ✓ Created AuthController with login/logout methods
+  ✓ Updated task 1.1 to complete
 ```
 
-**Step 2: Copy context**
+**With web-based AI tools (ChatGPT, Claude web):**
+
 ```bash
-# macOS
+# You run this once
+kse context export 01-00-user-login
 cat .kiro/specs/01-00-user-login/context-export.md | pbcopy
 
-# Windows
-type .kiro\specs\01-00-user-login\context-export.md | clip
-
-# Linux
-cat .kiro/specs/01-00-user-login/context-export.md | xclip -selection clipboard
-```
-
-**Step 3: Paste into AI tool**
-```
-[Paste context into Claude/ChatGPT/Cursor]
-
-You: "Please implement task 1.1: Create AuthController"
+# Then paste into AI tool
+You: "Here's my Spec context: [paste]
+     Please implement task 1.1: Create AuthController"
 
 AI: [Generates code based on your Spec]
-```
 
-**Step 4: Update tasks**
-Edit `.kiro/specs/01-00-user-login/tasks.md`:
-```markdown
-- [x] 1.1 Create AuthController  ← Changed from [ ] to [x]
+# You update tasks manually
+# Edit .kiro/specs/01-00-user-login/tasks.md
 ```
 
 ### Advantages
 
 - ✅ **Works with any AI tool** - Universal compatibility
-- ✅ **Full control** - You decide what context to share
+- ✅ **AI can call kse directly** - For tools with command execution
+- ✅ **Fallback to manual** - Copy-paste for web-based tools
 - ✅ **Simple setup** - No configuration needed
-- ✅ **Reliable** - No dependencies on tool capabilities
+- ✅ **Reliable** - No dependencies on special integrations
 
 ### Limitations
 
-- ❌ **Manual steps** - Copy-paste required
-- ❌ **Context can be stale** - Need to re-export after Spec changes
-- ❌ **Manual task tracking** - You update tasks.md yourself
+- ❌ **Varies by tool** - Command execution depends on AI tool capabilities
+- ❌ **Manual fallback** - Web-based tools require copy-paste
+- ❌ **Context refresh** - May need to re-export after Spec changes (unless using Watch Mode)
 
 ### Optimization Tips
 

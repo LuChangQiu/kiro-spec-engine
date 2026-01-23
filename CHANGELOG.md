@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-01-23
+
+### Fixed - Documentation Clarity 🎯
+
+**Corrected Integration Flow**:
+- **Fixed sequence diagrams** - Now correctly show "User ↔ AI Tool ↔ kse" instead of "User → kse → AI Tool"
+- **Emphasized AI-driven workflow** - AI tools call kse directly, users stay in their familiar interface
+- **Clarified positioning** - kse works behind the scenes, users don't "switch tools"
+
+**Updated Documentation**:
+- `README.md` - Rewrote Step 4 to emphasize AI tool calls kse automatically
+- `README.zh.md` - Chinese version updated to match
+- `docs/integration-modes.md` - Fixed sequence diagrams and workflow descriptions
+
+**Key Message**:
+- ✅ Users continue using their preferred AI tool (Cursor, Claude, Windsurf, etc.)
+- ✅ AI tool calls kse commands during conversation
+- ✅ No "tool switching" - seamless integration
+- ✅ kse is the "context provider" working behind the scenes
+
+### Why This Matters
+
+Users are already comfortable with their AI tools. kse enhances their existing workflow by providing structured context, not by replacing their tools. This patch clarifies that positioning.
+
 ## [1.4.0] - 2026-01-23
 
 ### Added - User Onboarding and Documentation Overhaul 📚

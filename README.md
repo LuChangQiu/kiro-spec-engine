@@ -116,31 +116,38 @@ This creates three files in `.kiro/specs/01-00-user-login/`:
 - [ ] 1.5 Write unit tests
 ```
 
-### Step 4: Export Context for Your AI Tool (1 minute)
+### Step 4: Let Your AI Tool Use the Spec (1 minute)
+
+Now your AI tool can access the Spec to generate better code.
+
+**For AI tools with command execution (Cursor, Windsurf, Claude Desktop):**
+
+Just tell your AI:
+```
+"I have a Spec at 01-00-user-login. Please implement task 1.1"
+```
+
+The AI will:
+1. Execute `kse context export 01-00-user-login`
+2. Read the Spec (requirements, design, tasks)
+3. Generate code that follows your design
+4. Update task status automatically
+
+**For web-based AI tools (ChatGPT, Claude web):**
 
 ```bash
+# Export context once
 kse context export 01-00-user-login
+
+# Copy to clipboard
+cat .kiro/specs/01-00-user-login/context-export.md | pbcopy  # macOS
+type .kiro\specs\01-00-user-login\context-export.md | clip  # Windows
+
+# Paste into AI tool and say:
+"Here's my Spec. Please implement task 1.1"
 ```
 
-This generates `.kiro/specs/01-00-user-login/context-export.md` with all your Spec information formatted for AI tools.
-
-**Using with different AI tools:**
-
-**Claude Code / ChatGPT:**
-1. Open `context-export.md`
-2. Copy the entire content
-3. Paste into your AI conversation
-4. Say: "Please implement task 1.1"
-
-**Cursor:**
-```bash
-kse prompt generate 01-00-user-login 1.1
-```
-Copy the generated prompt into Cursor Composer (Cmd+K)
-
-**Windsurf / Cline:**
-Just tell the AI: "Use kse to check the spec for user-login and implement task 1.1"
-(These tools can execute kse commands directly!)
+**The key insight:** You stay in your AI tool. The AI reads the Spec and generates code that matches your design.
 
 ### Step 5: Next Steps (30 seconds)
 

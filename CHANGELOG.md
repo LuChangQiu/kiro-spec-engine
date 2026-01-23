@@ -7,6 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-01-23
+
+### Added
+- **Project Adoption System**: Intelligent project adoption with three modes
+  - Fresh adoption: Create complete .kiro/ structure from scratch
+  - Partial adoption: Add missing components to existing .kiro/
+  - Full adoption: Upgrade existing complete .kiro/ to current version
+- **Version Upgrade System**: Smooth version migration with migration scripts
+  - Incremental upgrades through intermediate versions
+  - Migration script support for breaking changes
+  - Automatic backup before upgrades
+- **Backup and Rollback System**: Safe operations with automatic backups
+  - Automatic backup creation before destructive operations
+  - Backup validation and integrity checking
+  - Easy rollback to previous states
+- **New CLI Commands**:
+  - `kse adopt`: Adopt existing projects into Kiro Spec Engine
+  - `kse upgrade`: Upgrade project to newer version
+  - `kse rollback`: Restore project from backup
+- **Core Components**:
+  - DetectionEngine: Analyzes project structure and determines adoption strategy
+  - AdoptionStrategy: Implements fresh, partial, and full adoption modes
+  - MigrationEngine: Plans and executes version upgrades
+  - BackupSystem: Creates, manages, and restores backups
+
+### Enhanced
+- Version management with upgrade history tracking
+- File system utilities with backup support
+- Project structure detection (Node.js, Python, mixed)
+- Conflict detection and resolution
+
+### Infrastructure
+- Created lib/adoption/ directory for adoption strategies
+- Created lib/upgrade/ directory for migration engine
+- Created lib/backup/ directory for backup system
+- Created lib/commands/ directory for CLI commands
+- Migration script template and loader system
+
+### Documentation
+- Comprehensive adoption and upgrade system design
+- Migration script interface documentation
+- User guides for adoption, upgrade, and rollback workflows
+
 ## [1.1.0] - 2026-01-23
 
 ### Added

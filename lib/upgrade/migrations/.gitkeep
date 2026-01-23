@@ -1,0 +1,52 @@
+# Migration Scripts Directory
+
+This directory contains migration scripts for upgrading between versions.
+
+## Migration Script Format
+
+Each migration script should follow this format:
+
+```javascript
+module.exports = {
+  version: "1.1.0",
+  breaking: false,
+  description: "Description of what this migration does",
+  
+  /**
+   * Executes migration
+   * @param {string} projectPath - Absolute path to project root
+   * @param {MigrationContext} context - Migration context
+   * @returns {Promise<MigrationResult>}
+   */
+  async migrate(projectPath, context) {
+    const changes = [];
+    
+    // Migration logic here
+    // Example: Update file structure, modify configs, etc.
+    
+    return {
+      success: true,
+      changes
+    };
+  },
+  
+  /**
+   * Rolls back migration (optional)
+   * @param {string} projectPath - Absolute path to project root
+   * @param {MigrationContext} context - Migration context
+   * @returns {Promise<void>}
+   */
+  async rollback(projectPath, context) {
+    // Rollback logic here
+  }
+};
+```
+
+## Naming Convention
+
+Migration scripts should be named: `{fromVersion}-to-{toVersion}.js`
+
+Examples:
+- `1.0.0-to-1.1.0.js`
+- `1.1.0-to-1.2.0.js`
+- `1.2.0-to-2.0.0.js`

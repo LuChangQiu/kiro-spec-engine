@@ -8,6 +8,9 @@ const path = require('path');
 const { spawn } = require('child_process');
 const { getI18n } = require('../lib/i18n');
 const doctorCommand = require('../lib/commands/doctor');
+const adoptCommand = require('../lib/commands/adopt');
+const upgradeCommand = require('../lib/commands/upgrade');
+const rollbackCommand = require('../lib/commands/rollback');
 
 const i18n = getI18n();
 const t = (key, params) => i18n.t(key, params);
@@ -155,6 +158,38 @@ program
   .description(t('cli.commands.doctor.description'))
   .action(() => {
     doctorCommand();
+  });
+
+// 项目接管命令
+program
+  .command('adopt')
+  .description('Adopt existing project into Kiro Spec Engine')
+  .option('--auto', 'Skip confirmations (use with caution)')
+  .option('--dry-run', 'Show what would change without making changes')
+  .option('--mode <mode>', 'Force specific adoption mode (fresh/partial/full)')
+  .action((options) => {
+    adoptCommand(options);
+  });
+
+// 项目升级命令
+program
+  .command('upgrade')
+  .description('Upgrade project to newer version')
+  .option('--auto', 'Skip confirmations (use with caution)')
+  .option('--dry-run', 'Show upgrade plan without making changes')
+  .option('--to <version>', 'Target version (default: current kse version)')
+  .action((options) => {
+    upgradeCommand(options);
+  });
+
+// 回滚命令
+program
+  .command('rollback')
+  .description('Restore project from backup')
+  .option('--auto', 'Skip confirmations (use with caution)')
+  .option('--backup <id>', 'Specific backup ID to restore')
+  .action((options) => {
+    rollbackCommand(options);
   });
 
 // 状态检查命令

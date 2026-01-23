@@ -83,11 +83,31 @@ kse enhance requirements .kiro/specs/01-00-user-authentication/requirements.md
 # Initialize project
 kse init [project-name]
 
+# Adopt existing project
+kse adopt                    # Interactive adoption
+kse adopt --auto             # Skip confirmations
+kse adopt --dry-run          # Show what would change
+kse adopt --mode fresh       # Force specific mode
+
+# Upgrade project version
+kse upgrade                  # Interactive upgrade
+kse upgrade --auto           # Skip confirmations
+kse upgrade --dry-run        # Show upgrade plan
+kse upgrade --to 1.2.0       # Upgrade to specific version
+
+# Rollback to previous state
+kse rollback                 # Interactive rollback
+kse rollback --auto          # Skip confirmations
+kse rollback --backup <id>   # Restore specific backup
+
 # Check project status
 kse status
 
 # Create new spec
 kse create-spec <spec-name>
+
+# System diagnostics
+kse doctor
 
 # Set language
 kse --lang zh <command>  # Chinese
@@ -142,6 +162,74 @@ kse enhance design .kiro/specs/01-00-user-auth/design.md --requirements .kiro/sp
 - **Priority Identification**: Identify priorities based on keywords and task numbers
 - **Ultrawork Motivation**: Provide Sisyphus spirit motivation and suggestions
 - **Next Steps Guidance**: Suggest specific execution strategies
+
+## 🔄 Project Adoption and Upgrade
+
+### Adopting Existing Projects
+
+KSE can intelligently adopt existing projects with three modes:
+
+**Fresh Adoption** (no `.kiro/` directory):
+```bash
+kse adopt
+# Creates complete .kiro/ structure from scratch
+```
+
+**Partial Adoption** (`.kiro/` exists but incomplete):
+```bash
+kse adopt
+# Preserves existing specs/ and steering/
+# Adds missing components
+```
+
+**Full Adoption** (complete `.kiro/` from older version):
+```bash
+kse adopt
+# Upgrades components to current version
+# Preserves all user content
+# Creates backup before changes
+```
+
+### Upgrading to New Versions
+
+When a new version of KSE is released:
+
+```bash
+# Check current version
+kse --version
+
+# Upgrade to latest version
+kse upgrade
+
+# Upgrade to specific version
+kse upgrade --to 1.2.0
+
+# Preview upgrade plan
+kse upgrade --dry-run
+```
+
+**Incremental Upgrades**: KSE automatically handles version gaps by upgrading through intermediate versions (e.g., 1.0.0 → 1.1.0 → 1.2.0).
+
+### Rollback and Safety
+
+All destructive operations create automatic backups:
+
+```bash
+# List available backups
+kse rollback
+
+# Restore from specific backup
+kse rollback --backup adopt-2026-01-23-100000
+
+# Quick rollback (interactive)
+kse rollback
+```
+
+**Safety Features**:
+- ✅ Automatic backup before adoption/upgrade
+- ✅ Backup validation and integrity checking
+- ✅ Easy rollback to previous states
+- ✅ Dry-run mode to preview changes
 
 ## 🛠️ Project Structure
 

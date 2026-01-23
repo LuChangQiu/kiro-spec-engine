@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.2] - 2026-01-23
+
+### Fixed - Test Suite and Documentation 🔧
+
+**Test Fixes**:
+- Fixed syntax error in `action-executor.test.js` caused by duplicate code
+- Removed duplicate `expect` and timeout lines that caused Jest parse error
+- All 289 tests now pass successfully in CI environment
+
+**Documentation Improvements**:
+- Corrected Integration Workflow diagram in README.md and README.zh.md
+- Changed flow from "User → kse → User → AI Tool" to "User ↔ AI Tool ↔ kse"
+- Added key insight: "You stay in your AI tool. The AI reads the Spec and generates code."
+- Both English and Chinese versions updated
+
+### Why This Matters
+
+This patch ensures CI/CD pipeline works correctly and reinforces the correct mental model: users stay in their AI tool, which calls kse behind the scenes.
+
 ## [1.4.1] - 2026-01-23
 
 ### Fixed - Documentation Clarity 🎯

@@ -11,6 +11,7 @@ const doctorCommand = require('../lib/commands/doctor');
 const adoptCommand = require('../lib/commands/adopt');
 const upgradeCommand = require('../lib/commands/upgrade');
 const rollbackCommand = require('../lib/commands/rollback');
+const watchCommands = require('../lib/commands/watch');
 const VersionChecker = require('../lib/version/version-checker');
 
 const i18n = getI18n();
@@ -263,6 +264,47 @@ program
     const projectPath = process.cwd();
     await versionChecker.displayVersionInfo(projectPath);
   });
+
+// Watch mode commands
+const watchCmd = program
+  .command('watch')
+  .description('Manage watch mode for automated file monitoring');
+
+watchCmd
+  .command('start')
+  .description('Start watch mode')
+  .option('-c, --config <path>', 'Custom config file path')
+  .option('-p, --patterns <patterns>', 'Override patterns (comma-separated)')
+  .action(watchCommands.startWatch);
+
+watchCmd
+  .command('stop')
+  .description('Stop watch mode')
+  .action(watchCommands.stopWatch);
+
+watchCmd
+  .command('status')
+  .description('Show watch mode status')
+  .action(watchCommands.statusWatch);
+
+watchCmd
+  .command('logs')
+  .description('Display execution logs')
+  .option('-t, --tail <lines>', 'Number of lines to show', '50')
+  .option('-f, --follow', 'Follow mode (tail -f)')
+  .action(watchCommands.logsWatch);
+
+watchCmd
+  .command('metrics')
+  .description('Display automation metrics')
+  .option('--format <format>', 'Output format (text/json)', 'text')
+  .action(watchCommands.metricsWatch);
+
+watchCmd
+  .command('init')
+  .description('Initialize watch configuration')
+  .option('-f, --force', 'Overwrite existing config')
+  .action(watchCommands.initWatch);
 
 // 更新项目配置的辅助函数
 async function updateProjectConfig(projectName) {

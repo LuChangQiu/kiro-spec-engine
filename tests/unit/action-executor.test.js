@@ -328,9 +328,8 @@ describe('ActionExecutor', () => {
 
       const timeoutData = await timeoutPromise;
       expect(timeoutData.timeout).toBe(100);
-    }, 15000); // Increase timeout to 15 seconds for CI environments
       expect(executor.stats.timeoutExecutions).toBe(1);
-    }, 10000);
+    }, 15000); // Increase timeout to 15 seconds for CI environments
 
     test('should use action-specific timeout', async () => {
       executor = new ActionExecutor({

@@ -74,38 +74,38 @@ This implementation plan extends kiro-spec-engine to support multi-user collabor
     - Provide rollback instructions
     - _Requirements: 2.6_
 
-- [ ] 3. Checkpoint - Ensure steering management works
+- [x] 3. Checkpoint - Ensure steering management works
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. Implement Workspace Manager
-  - [ ] 4.1 Create WorkspaceManager class
+- [x] 4. Implement Workspace Manager
+  - [x] 4.1 Create WorkspaceManager class
     - Implement `initWorkspace()` to create personal workspace directory
     - Create `.kiro/workspace/{username}/` structure
     - Generate initial CURRENT_CONTEXT.md and task-state.json
     - _Requirements: 3.1, 3.2, 3.3_
   
-  - [ ] 4.2 Implement username detection
+  - [x] 4.2 Implement username detection
     - Try `git config user.name` first
     - Fall back to USER or USERNAME environment variable
     - Prompt user if detection fails
     - _Requirements: 3.5_
   
-  - [ ] 4.3 Implement workspace path resolution
+  - [x] 4.3 Implement workspace path resolution
     - Create `getWorkspacePath()` to resolve current user's workspace
     - Handle missing workspace gracefully
     - _Requirements: 3.1_
   
-  - [ ] 4.4 Implement multi-user mode detection
+  - [x] 4.4 Implement multi-user mode detection
     - Create `isMultiUserMode()` to check for workspace directories
     - Return true if `.kiro/workspace/` exists with subdirectories
     - _Requirements: 10.2_
   
-  - [ ] 4.5 Implement workspace listing
+  - [x] 4.5 Implement workspace listing
     - Create `listWorkspaces()` to enumerate all user workspaces
     - Return array of usernames
     - _Requirements: 3.4_
   
-  - [ ] 4.6 Create workspace .gitignore
+  - [x] 4.6 Create workspace .gitignore
     - Add `.kiro/workspace/` to project .gitignore
     - Ensure personal workspaces are not committed
     - _Requirements: 3.4_
@@ -117,33 +117,33 @@ This implementation plan extends kiro-spec-engine to support multi-user collabor
     - **Property 17: Single-User Mode Detection**
     - **Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5, 10.2**
 
-- [ ] 5. Implement Task Claimer
-  - [ ] 5.1 Create TaskClaimer class with parsing logic
+- [x] 5. Implement Task Claimer
+  - [x] 5.1 Create TaskClaimer class with parsing logic
     - Implement tasks.md parser to extract task list
     - Parse task format: `- [status] {id} {title} [@{user}, claimed: {timestamp}]`
     - Handle various task formats gracefully
     - _Requirements: 4.1, 4.5_
   
-  - [ ] 5.2 Implement task claiming
+  - [x] 5.2 Implement task claiming
     - Create `claimTask()` to mark task with username and timestamp
     - Update task status to "in-progress"
     - Detect and warn on existing claims
     - Support `--force` flag to override claims
     - _Requirements: 4.1, 4.2, 4.3_
   
-  - [ ] 5.3 Implement task unclaiming
+  - [x] 5.3 Implement task unclaiming
     - Create `unclaimTask()` to remove claim marker
     - Reset task status to "not-started"
     - Verify user owns the claim before unclaiming
     - _Requirements: 4.4_
   
-  - [ ] 5.4 Implement claimed tasks query
+  - [x] 5.4 Implement claimed tasks query
     - Create `getClaimedTasks()` to list all claimed tasks in a spec
     - Return ClaimedTask objects with metadata
     - Identify stale claims (>7 days old)
     - _Requirements: 5.2, 5.5_
   
-  - [ ] 5.5 Implement task status updates
+  - [x] 5.5 Implement task status updates
     - Create `updateTaskStatus()` to change task status
     - Support not-started/in-progress/completed states
     - Update checkbox markers in tasks.md

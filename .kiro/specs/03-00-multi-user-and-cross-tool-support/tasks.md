@@ -266,37 +266,37 @@ This implementation plan extends kiro-spec-engine to support multi-user collabor
     - **Property 14: Prompt Generation Completeness**
     - **Validates: Requirements 7.1, 7.2, 7.4, 7.5**
 
-- [ ] 11. Checkpoint - Ensure export and prompt generation work
+- [x] 11. Checkpoint - Ensure export and prompt generation work
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 12. Implement CLI commands
-  - [ ] 12.1 Create `kse workspace` command group
+- [x] 12. Implement CLI commands
+  - [x] 12.1 Create `kse workspace` command group
     - Implement `kse workspace init` to initialize personal workspace
     - Implement `kse workspace sync` to synchronize state
     - Implement `kse workspace list` to show all workspaces
     - Add command help and usage examples
     - _Requirements: 3.1, 9.2_
   
-  - [ ] 12.2 Create `kse task` command group
+  - [x] 12.2 Create `kse task` command group
     - Implement `kse task claim {spec-name} {task-id}` to claim tasks
     - Implement `kse task unclaim {spec-name} {task-id}` to unclaim tasks
     - Add `--force` flag for claim override
     - Add command help and usage examples
     - _Requirements: 4.1, 4.4_
   
-  - [ ] 12.3 Create `kse context` command
+  - [x] 12.3 Create `kse context` command
     - Implement `kse context export {spec-name}` to export context
     - Add options for including/excluding sections
     - Add command help and usage examples
     - _Requirements: 6.1_
   
-  - [ ] 12.4 Create `kse prompt` command
+  - [x] 12.4 Create `kse prompt` command
     - Implement `kse prompt generate {spec-name} {task-id}` to generate prompts
     - Add options for target tool and context length
     - Add command help and usage examples
     - _Requirements: 7.1_
   
-  - [ ] 12.5 Update `kse status` command
+  - [x] 12.5 Update `kse status` command
     - Enhance to show claimed tasks and team status
     - Add workspace information if in multi-user mode
     - Format output for readability

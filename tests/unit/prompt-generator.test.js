@@ -54,7 +54,14 @@ The session manager maintains user sessions.`
   });
 
   afterEach(async () => {
-    await fs.remove(testProjectPath);
+    // Add delay to allow file handles to close
+    await new Promise(resolve => setTimeout(resolve, 100));
+    try {
+      await fs.remove(testProjectPath);
+    } catch (error) {
+      // Ignore cleanup errors in tests
+      console.warn('Cleanup warning:', error.message);
+    }
   });
 
   describe('generatePrompt', () => {

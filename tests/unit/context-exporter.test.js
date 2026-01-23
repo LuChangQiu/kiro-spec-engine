@@ -29,7 +29,14 @@ describe('ContextExporter', () => {
   });
 
   afterEach(async () => {
-    await fs.remove(testProjectPath);
+    // Add delay to allow file handles to close
+    await new Promise(resolve => setTimeout(resolve, 100));
+    try {
+      await fs.remove(testProjectPath);
+    } catch (error) {
+      // Ignore cleanup errors in tests
+      console.warn('Cleanup warning:', error.message);
+    }
   });
 
   describe('exportContext', () => {
@@ -105,7 +112,7 @@ describe('ContextExporter', () => {
       expect(result.success).toBe(true);
       expect(result.taskId).toBe('1.1');
       expect(result.taskInfo).toBeDefined();
-      expect(result.taskInfo.title).toContain('Test task');
+      expect(result.taskInfo.title).toBe('Test task');
     });
 
     test('should handle non-existent task', async () => {

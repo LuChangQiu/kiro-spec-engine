@@ -1,0 +1,114 @@
+{
+  "cli": {
+    "name": "kiro-spec-engine",
+    "description": "🔥 Kiro Spec 引擎 - 基于 Spec 的驱动规则引擎",
+    "commands": {
+      "init": {
+        "description": "初始化新的 Kiro Spec Engine 项目",
+        "projectNamePrompt": "请输入项目名称:",
+        "forceOption": "强制初始化，即使 .kiro 目录已存在",
+        "alreadyExists": "⚠️  .kiro 目录已存在",
+        "overwritePrompt": "是否要覆盖它？",
+        "cancelled": "初始化已取消。",
+        "success": "🎉 Kiro Spec Engine 项目初始化成功！",
+        "nextSteps": "📋 下一步操作:",
+        "step1": "创建第一个 Spec: mkdir .kiro/specs/01-00-your-feature",
+        "step2": "编写基础 requirements.md",
+        "step3": "使用 Ultrawork 增强: kiro-spec-engine enhance requirements .kiro/specs/01-00-your-feature/requirements.md",
+        "startJourney": "🔥 开始你的 Ultrawork 之旅！",
+        "error": "❌ 初始化项目时出错:"
+      },
+      "enhance": {
+        "description": "使用 Ultrawork 精神增强文档质量",
+        "starting": "🔥 启动 {stage} 阶段 Ultrawork 增强...",
+        "toolNotFound": "❌ 找不到 Ultrawork 工具。请运行: kiro-spec-engine init",
+        "completed": "✅ Ultrawork 增强完成！",
+        "failed": "❌ 增强失败，错误代码:",
+        "pythonError": "❌ 运行 Python 工具时出错:",
+        "pythonTip": "💡 请确保已安装 Python 3.8+ 并在 PATH 中"
+      },
+      "createSpec": {
+        "description": "创建新的 Spec 目录",
+        "success": "✅ 已创建 Spec 目录:",
+        "nextSteps": "📋 下一步操作:",
+        "step1": "在 Spec 目录中创建 requirements.md",
+        "step2": "使用以下命令增强: kiro-spec-engine enhance requirements {specPath}/requirements.md",
+        "error": "❌ 创建 Spec 时出错:"
+      },
+      "status": {
+        "description": "检查项目状态和可用的 Specs",
+        "noProject": "⚠️  当前目录中未找到 Kiro Spec Engine 项目",
+        "initTip": "运行: kiro-spec-engine init 来初始化",
+        "title": "🔥 Kiro Spec Engine 项目状态",
+        "toolStatus": "Ultrawork 工具:",
+        "available": "✅ 可用",
+        "missing": "❌ 缺失",
+        "specsTitle": "📋 可用的 Specs:",
+        "noSpecs": "未找到 Specs",
+        "requirements": "需求文档:",
+        "design": "设计文档:",
+        "tasks": "任务文档:"
+      },
+      "doctor": {
+        "description": "检查系统要求和诊断信息",
+        "title": "系统诊断",
+        "checking": "正在检查系统要求...",
+        "nodejs": "Node.js",
+        "python": "Python",
+        "python_note": "注意: Ultrawork 质量增强功能需要 Python。",
+        "all_good": "所有系统要求均已满足！",
+        "ready": "您已准备好使用 Kiro Spec Engine 的所有功能，包括 Ultrawork 增强。",
+        "python_missing": "Python 不可用",
+        "basic_features": "基本 CLI 功能（init、status、create-spec）可以正常工作。",
+        "ultrawork_unavailable": "Ultrawork 增强功能需要 Python 3.8 或更高版本。"
+      }
+    }
+  },
+  "ultrawork": {
+    "spirit": {
+      "title": "🔥 Ultrawork 精神",
+      "subtitle": "像西西弗斯推石上山一样",
+      "principles": {
+        "relentless": "永不放弃，不懈努力",
+        "excellence": "追求专业级质量",
+        "improvement": "持续改进和优化",
+        "completion": "完美完成每个任务"
+      }
+    },
+    "quality": {
+      "scoring": "质量评分: {score}/10",
+      "professional": "✅ 文档已达到专业级标准！",
+      "improving": "🔄 第 {iteration} 轮改进: {improvements}",
+      "noImprovements": "⚠️ 无法识别更多改进点，停止迭代",
+      "scoreNotImproved": "⚠️ 质量评分未提升，停止迭代"
+    },
+    "stages": {
+      "requirements": "需求",
+      "design": "设计",
+      "tasks": "任务"
+    }
+  },
+  "messages": {
+    "success": "✅ 成功",
+    "error": "❌ 错误",
+    "warning": "⚠️ 警告",
+    "info": "💡 提示",
+    "processing": "🔄 处理中",
+    "completed": "🎉 完成"
+  },
+  "python": {
+    "available": "Python {version} 可用",
+    "not_found": "未安装 Python 或 Python 不在 PATH 中",
+    "version_too_old": "已安装 Python {version}，但需要 {required} 或更高版本",
+    "malformed_version": "无法解析 Python 版本: {version}",
+    "error_header": "✗ Ultrawork 质量增强功能需要 Python",
+    "install_header": "安装说明:",
+    "help_footer": "获取更多帮助，请访问: https://github.com/USERNAME/kiro-spec-engine#python-setup",
+    "install": {
+      "windows": "Windows:\n1. 从 https://www.python.org/downloads/ 下载 Python\n2. 运行安装程序并勾选 'Add Python to PATH'\n3. 重启终端并运行: python --version",
+      "macos": "macOS:\n1. 如果尚未安装 Homebrew，请先安装: /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"\n2. 安装 Python: brew install python\n3. 验证安装: python3 --version",
+      "linux": "Linux:\n1. Ubuntu/Debian: sudo apt-get update && sudo apt-get install python3 python3-pip\n2. Fedora/RHEL: sudo dnf install python3 python3-pip\n3. 验证安装: python3 --version",
+      "default": "请访问 https://www.python.org/downloads/ 下载并安装适合您操作系统的 Python 3.8 或更高版本。"
+    }
+  }
+}

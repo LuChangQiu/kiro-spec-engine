@@ -1,0 +1,114 @@
+{
+  "cli": {
+    "name": "kiro-spec-engine",
+    "description": "🔥 Kiro Spec Engine - Spec-driven development with steering rules",
+    "commands": {
+      "init": {
+        "description": "Initialize a new Kiro Ultrawork project",
+        "projectNamePrompt": "Enter project name:",
+        "forceOption": "Force initialization even if .kiro directory exists",
+        "alreadyExists": "⚠️  .kiro directory already exists",
+        "overwritePrompt": "Do you want to overwrite it?",
+        "cancelled": "Initialization cancelled.",
+        "success": "🎉 Kiro Ultrawork project initialized successfully!",
+        "nextSteps": "📋 Next steps:",
+        "step1": "Create your first spec: mkdir .kiro/specs/01-00-your-feature",
+        "step2": "Write basic requirements.md",
+        "step3": "Enhance with Ultrawork: kiro-spec-engine enhance requirements .kiro/specs/01-00-your-feature/requirements.md",
+        "startJourney": "🔥 Start your Ultrawork journey!",
+        "error": "❌ Error initializing project:"
+      },
+      "enhance": {
+        "description": "Enhance document quality with Ultrawork spirit",
+        "starting": "🔥 Starting {stage} stage Ultrawork enhancement...",
+        "toolNotFound": "❌ Ultrawork tool not found. Please run: kiro-spec-engine init",
+        "completed": "✅ Ultrawork enhancement completed!",
+        "failed": "❌ Enhancement failed with code:",
+        "pythonError": "❌ Error running Python tool:",
+        "pythonTip": "💡 Make sure Python 3.8+ is installed and in PATH"
+      },
+      "createSpec": {
+        "description": "Create a new spec directory",
+        "success": "✅ Created spec directory:",
+        "nextSteps": "📋 Next steps:",
+        "step1": "Create requirements.md in the spec directory",
+        "step2": "Enhance with: kiro-spec-engine enhance requirements {specPath}/requirements.md",
+        "error": "❌ Error creating spec:"
+      },
+      "status": {
+        "description": "Check project status and available specs",
+        "noProject": "⚠️  No Kiro Ultrawork project found in current directory",
+        "initTip": "Run: kiro-spec-engine init to initialize",
+        "title": "🔥 Kiro Ultrawork Project Status",
+        "toolStatus": "Ultrawork Tool:",
+        "available": "✅ Available",
+        "missing": "❌ Missing",
+        "specsTitle": "📋 Available Specs:",
+        "noSpecs": "No specs found",
+        "requirements": "Requirements:",
+        "design": "Design:",
+        "tasks": "Tasks:"
+      },
+      "doctor": {
+        "description": "Check system requirements and diagnostics",
+        "title": "System Diagnostics",
+        "checking": "Checking system requirements...",
+        "nodejs": "Node.js",
+        "python": "Python",
+        "python_note": "Note: Python is required for Ultrawork quality enhancement features.",
+        "all_good": "All system requirements are met!",
+        "ready": "You're ready to use all Kiro Spec Engine features including Ultrawork enhancements.",
+        "python_missing": "Python is not available",
+        "basic_features": "Basic CLI features (init, status, create-spec) will work normally.",
+        "ultrawork_unavailable": "Ultrawork enhancement features require Python 3.8 or higher."
+      }
+    }
+  },
+  "ultrawork": {
+    "spirit": {
+      "title": "🔥 Ultrawork Spirit",
+      "subtitle": "Like Sisyphus pushing the boulder up the mountain",
+      "principles": {
+        "relentless": "Never give up, relentless effort",
+        "excellence": "Pursue professional-grade quality",
+        "improvement": "Continuous improvement and optimization",
+        "completion": "Perfect completion of every task"
+      }
+    },
+    "quality": {
+      "scoring": "Quality Scoring: {score}/10",
+      "professional": "✅ Document has reached professional standards!",
+      "improving": "🔄 Round {iteration} improvement: {improvements}",
+      "noImprovements": "⚠️ No more improvements identified, stopping iteration",
+      "scoreNotImproved": "⚠️ Quality score not improved, stopping iteration"
+    },
+    "stages": {
+      "requirements": "Requirements",
+      "design": "Design", 
+      "tasks": "Tasks"
+    }
+  },
+  "messages": {
+    "success": "✅ Success",
+    "error": "❌ Error",
+    "warning": "⚠️ Warning",
+    "info": "💡 Info",
+    "processing": "🔄 Processing",
+    "completed": "🎉 Completed"
+  },
+  "python": {
+    "available": "Python {version} is available",
+    "not_found": "Python is not installed or not found in PATH",
+    "version_too_old": "Python {version} is installed, but version {required} or higher is required",
+    "malformed_version": "Unable to parse Python version: {version}",
+    "error_header": "✗ Python is required for Ultrawork quality enhancement features",
+    "install_header": "Installation instructions:",
+    "help_footer": "For more help, visit: https://github.com/USERNAME/kiro-spec-engine#python-setup",
+    "install": {
+      "windows": "Windows:\n1. Download Python from https://www.python.org/downloads/\n2. Run the installer and check 'Add Python to PATH'\n3. Restart your terminal and run: python --version",
+      "macos": "macOS:\n1. Install Homebrew if not already installed: /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"\n2. Install Python: brew install python\n3. Verify installation: python3 --version",
+      "linux": "Linux:\n1. Ubuntu/Debian: sudo apt-get update && sudo apt-get install python3 python3-pip\n2. Fedora/RHEL: sudo dnf install python3 python3-pip\n3. Verify installation: python3 --version",
+      "default": "Please visit https://www.python.org/downloads/ to download and install Python 3.8 or higher for your operating system."
+    }
+  }
+}

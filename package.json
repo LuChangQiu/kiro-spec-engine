@@ -1,0 +1,78 @@
+{
+  "name": "kiro-spec-engine",
+  "version": "1.0.0",
+  "description": "Kiro Spec Engine - A spec-driven development engine with steering rules and quality enhancement powered by Ultrawork spirit",
+  "main": "index.js",
+  "bin": {
+    "kiro-spec-engine": "./bin/kiro-spec-engine.js",
+    "kse": "./bin/kiro-spec-engine.js"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "template/",
+    "locales/",
+    "README.md",
+    "README.zh.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "test": "jest",
+    "test:unit": "jest tests/unit",
+    "test:integration": "jest tests/integration",
+    "test:properties": "jest tests/properties",
+    "test:watch": "jest --watch",
+    "coverage": "jest --coverage",
+    "prepublishOnly": "npm test",
+    "publish:manual": "npm publish --access public",
+    "install-global": "npm install -g .",
+    "uninstall-global": "npm uninstall -g kiro-spec-engine"
+  },
+  "keywords": [
+    "kiro",
+    "spec",
+    "spec-driven",
+    "engine",
+    "steering",
+    "rules-engine",
+    "development",
+    "quality",
+    "ultrawork",
+    "ai",
+    "productivity",
+    "cli",
+    "i18n",
+    "multilingual",
+    "chinese",
+    "english",
+    "development-tools",
+    "quality-enhancement",
+    "sisyphus"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/kiro-spec-engine.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/kiro-spec-engine/issues"
+  },
+  "homepage": "https://github.com/yourusername/kiro-spec-engine#readme",
+  "engines": {
+    "node": ">=14.0.0",
+    "python": ">=3.8.0"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^9.0.0",
+    "fs-extra": "^10.0.0",
+    "inquirer": "^8.2.0",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "fast-check": "^4.5.3",
+    "jest": "^27.5.1"
+  }
+}

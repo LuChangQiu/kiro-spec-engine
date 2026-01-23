@@ -153,7 +153,7 @@ This implementation plan delivers automation capabilities across all tools:
     - Test status reporting
     - _Requirements: 2.1, 2.4, 2.5, 6.1, 6.2_
 
-- [ ] 6. Checkpoint - Ensure watch mode core works
+- [-] 6. Checkpoint - Ensure watch mode core works
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 7. Implement watch CLI commands

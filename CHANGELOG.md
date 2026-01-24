@@ -5,6 +5,50 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-01-24
+
+### Changed - BREAKING CONCEPTUAL CHANGE 🎯
+
+**Repositioned kse from "tool" to "methodology enforcer"**
+
+This is a fundamental shift in how kse should be understood and used:
+
+**Before (WRONG approach):**
+- `.kiro/README.md` was a "kse command manual"
+- Taught AI "how to use kse tool"
+- Listed 20+ commands with examples
+- Users had to "learn kse" before using it
+
+**After (CORRECT approach):**
+- `.kiro/README.md` is a "project development guide"
+- Explains project follows Spec-driven methodology
+- AI's role: follow the methodology, not learn the tool
+- kse commands are helpers used automatically when needed
+
+**Key insight from user feedback:**
+> "After installing kse, just tell AI to read .kiro/README.md. 
+> AI will understand the methodology and naturally use kse commands 
+> to solve problems, rather than memorizing command syntax."
+
+**What changed:**
+- `.kiro/README.md` - Completely rewritten as methodology guide (not tool manual)
+- `kse adopt` completion message - Now says "Tell AI to read README" instead of "Create your first spec"
+- `docs/quick-start.md` - Simplified from 5-minute tool tutorial to 2-minute methodology introduction
+- Removed detailed Spec creation examples (that's AI's job, not user's manual work)
+
+**Impact:**
+- Users don't need to "learn kse" anymore
+- AI tools understand project methodology by reading README
+- Natural workflow: User asks for feature → AI creates Spec → AI implements
+- kse becomes invisible infrastructure, not a tool to master
+
+**Migration:**
+- Existing projects: Run `kse adopt --force` to get new README
+- Tell your AI: "Please read .kiro/README.md to understand project methodology"
+- AI will automatically understand and follow Spec-driven approach
+
+This aligns kse with its true purpose: **enforcing development methodology**, not being a CLI tool to learn.
+
 ## [1.5.5] - 2026-01-24
 
 ### Added

@@ -1,6 +1,6 @@
 {
   "name": "kiro-spec-engine",
-  "version": "1.5.5",
+  "version": "1.6.0",
   "description": "Kiro Spec Engine - A spec-driven development engine with steering rules and quality enhancement powered by Ultrawork spirit",
   "main": "index.js",
   "bin": {

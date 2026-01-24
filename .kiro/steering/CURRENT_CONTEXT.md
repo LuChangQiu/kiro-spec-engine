@@ -7,7 +7,7 @@
 
 ## 🎯 当前状态
 
-**状态**: 🚀 Spec 10 已创建 - Adopt 命令冲突处理改进  
+**状态**: ✅ v1.6.4 已发布 - 添加 Kiro IDE 区分说明  
 **Spec**: 10-00-adopt-conflict-resolution-improvement  
 **阶段**: 规划完成，准备执行  
 **项目**: kiro-spec-engine  
@@ -32,6 +32,16 @@
 ---
 
 ## 📝 最近完成的工作
+
+**v1.6.4 (2026-01-24)**: 添加 Kiro IDE 区分说明 🎯
+- 问题：iFlow (使用 GLM-4.7) 混淆 kse 和 Kiro IDE，下载了错误的软件
+- 修复：在 README.md 和 README.zh.md 顶部添加醒目警告框
+- 更新：package.json 描述明确说明"NOT the Kiro IDE desktop application"
+- 影响：防止 AI 工具（尤其是小模型）混淆 kse 和 Kiro IDE
+- 来源：真实用户反馈（iFlow 用 GLM-4.7 下载了 Kiro IDE）
+
+**v1.6.3 (2026-01-24)**: 修复 archive 命令推荐错误 🐛
+- 修复 `kse doctor --docs` 和 `kse status` 推荐错误命令的问题
 
 **Spec 10-00**: adopt-conflict-resolution-improvement 🚀 规划完成
 - 交互式冲突解决系统，三种策略（跳过/覆盖/逐个审查），选择性备份，差异查看器
@@ -84,7 +94,7 @@
 
 ---
 
-**版本**: v9.0  
+**版本**: v10.0  
 **创建**: 2026-01-24  
 **项目**: kiro-spec-engine  
-**说明**: Spec 09 规划完成，文档治理自动化系统设计完成，准备执行任务
+**说明**: v1.6.4 已发布，添加 Kiro IDE 区分说明，防止 AI 工具混淆

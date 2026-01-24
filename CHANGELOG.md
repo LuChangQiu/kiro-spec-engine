@@ -5,6 +5,97 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-01-24
+
+### Added - Interactive Conflict Resolution System 🎯
+
+**Spec 10-00**: Complete overhaul of `kse adopt` conflict handling with interactive resolution
+
+**Core Features**:
+- **Interactive Conflict Resolution**: Choose how to handle each conflicting file
+  - Three strategies: Skip all, Overwrite all, Review each file
+  - Per-file review with progress tracking ("Conflict 2 of 5")
+  - View file differences before deciding
+- **Selective Backup System**: Only backs up files being overwritten (not entire .kiro/)
+  - Efficient backup creation with conflict-specific IDs
+  - Selective restore capability
+  - Automatic backup before any overwrites
+- **File Difference Viewer**: Compare existing vs template files
+  - Side-by-side metadata comparison (size, modification date)
+  - Line-by-line diff for text files (with line limits)
+  - Binary file detection and handling
+  - Color-coded output with chalk
+
+**Enhanced Modes**:
+- **Force Mode** (`--force`): Automatically overwrite all conflicts with backup
+  - Clear warning message before proceeding
+  - Selective backup of all conflicting files
+  - No interactive prompts
+- **Auto Mode** (`--auto`): Non-interactive adoption
+  - Defaults to skip-all strategy (safe default)
+  - Can combine with `--force` for auto-overwrite
+  - Suitable for CI/CD environments
+- **Dry Run Mode** (`--dry-run`): Preview conflict actions
+  - Shows what conflicts would be detected
+  - Displays what action would be taken
+  - No file modifications or backups created
+
+**Improved Reporting**:
+- **Conflict Resolution Summary**: Detailed adoption results
+  - List of skipped files with reasons
+  - List of overwritten files
+  - Backup ID for rollback
+  - Total conflict count
+  - Rollback instructions when applicable
+- **Error Handling**: Comprehensive error recovery
+  - Backup failure detection and abort
+  - Individual file overwrite failure handling
+  - Diff generation failure graceful degradation
+  - Non-interactive environment detection
+  - Detailed error summaries with recovery guidance
+
+**New Components**:
+- `lib/adoption/conflict-resolver.js` - Interactive conflict resolution prompts
+- `lib/backup/selective-backup.js` - Selective file backup system
+- `lib/adoption/diff-viewer.js` - File difference viewer
+- Enhanced `lib/adoption/detection-engine.js` - Conflict categorization
+- Enhanced `lib/commands/adopt.js` - Integrated conflict resolution flow
+- Enhanced `lib/adoption/adoption-strategy.js` - Resolution map support
+
+**Usage Examples**:
+```bash
+# Interactive mode (default) - prompts for each conflict
+kse adopt
+
+# Force mode - overwrite all conflicts with backup
+kse adopt --force
+
+# Auto mode - skip all conflicts automatically
+kse adopt --auto
+
+# Auto + force - overwrite all conflicts without prompts
+kse adopt --auto --force
+
+# Dry run - preview what would happen
+kse adopt --dry-run
+```
+
+**Benefits**:
+- Full control over which files to keep or overwrite
+- View differences before making decisions
+- Efficient backups (only affected files, not entire .kiro/)
+- Safe adoption with automatic rollback support
+- Clear feedback about what changed
+- Suitable for both interactive and automated workflows
+
+**Technical Details**:
+- Uses inquirer for interactive prompts
+- Categorizes conflicts by type (steering, documentation, tools, other)
+- Preserves directory structure in selective backups
+- Handles both text and binary files appropriately
+- Cross-platform path handling (Windows/Unix)
+- Non-TTY environment detection for CI/CD
+
 ## [1.6.4] - 2026-01-24
 
 ### Added

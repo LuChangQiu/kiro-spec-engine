@@ -118,7 +118,7 @@ This implementation plan breaks down the conflict resolution enhancement into di
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6_
 
 - [ ] 5. Enhance DetectionEngine with conflict categorization
-  - [ ] 5.1 Add categorizeConflicts method to DetectionEngine
+  - [x] 5.1 Add categorizeConflicts method to DetectionEngine
     - Modify `lib/adoption/detection-engine.js`
     - Implement `categorizeConflicts(conflicts)` method
     - Return CategorizedConflicts object with steering, documentation, tools, other arrays
@@ -180,8 +180,8 @@ This implementation plan breaks down the conflict resolution enhancement into di
     - Test auto + force mode combination
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 4.5, 5.1, 6.1, 6.2, 6.3_
 
-- [ ] 8. Implement dry run mode conflict reporting
-  - [ ] 8.1 Enhance dry run output to show conflict actions
+- [x] 8. Implement dry run mode conflict reporting
+  - [x] 8.1 Enhance dry run output to show conflict actions
     - Modify dry run handling in adopt.js
     - Display all conflicts that would be detected
     - Show what action would be taken based on flags
@@ -199,8 +199,8 @@ This implementation plan breaks down the conflict resolution enhancement into di
     - Verify no file system changes occur
     - _Requirements: 7.1, 7.2, 7.3_
 
-- [ ] 9. Implement adoption result summary enhancements
-  - [ ] 9.1 Add conflict resolution summary to adoption results
+- [x] 9. Implement adoption result summary enhancements
+  - [x] 9.1 Add conflict resolution summary to adoption results
     - Modify result reporting in adopt.js
     - Display skipped files list
     - Display overwritten files list
@@ -225,36 +225,36 @@ This implementation plan breaks down the conflict resolution enhancement into di
 - [ ] 10. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 11. Implement error handling and recovery
-  - [ ] 11.1 Add backup failure handling
+- [x] 11. Implement error handling and recovery
+  - [x] 11.1 Add backup failure handling
     - Catch backup creation exceptions in adopt.js
     - Display clear error message
     - Abort adoption without modifying files
     - Return non-zero exit code
     - _Requirements: 10.1_
   
-  - [ ] 11.2 Add file overwrite failure handling
+  - [x] 11.2 Add file overwrite failure handling
     - Catch individual file overwrite exceptions in AdoptionStrategy
     - Log error and continue with remaining files
     - Include failed files in error summary
     - Mark adoption as partially successful
     - _Requirements: 10.2_
   
-  - [ ] 11.3 Add diff generation failure handling
+  - [x] 11.3 Add diff generation failure handling
     - Catch diff viewer exceptions in ConflictResolver
     - Display "Unable to generate diff" message
     - Show file metadata only
     - Continue with resolution prompt
     - _Requirements: 9.4_
   
-  - [ ] 11.4 Add non-interactive environment detection
+  - [x] 11.4 Add non-interactive environment detection
     - Detect when stdin is not a TTY
     - Fall back to default behavior (skip conflicts)
     - Log warning about non-interactive mode
     - Continue with adoption
     - _Requirements: 6.3_
   
-  - [ ] 11.5 Enhance error summary display
+  - [x] 11.5 Enhance error summary display
     - Collect all errors during adoption
     - Display error details in final summary
     - Include error count in summary

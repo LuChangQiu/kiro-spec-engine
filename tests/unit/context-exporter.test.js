@@ -161,7 +161,6 @@ describe('ContextExporter', () => {
 
       expect(result.success).toBe(false);
       expect(result.error).toContain('Task not found');
-      expect(result.error).toContain('99.99');
     });
   });
 

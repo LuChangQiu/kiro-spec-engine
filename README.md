@@ -45,9 +45,32 @@ graph LR
 
 ---
 
-## Quick Start (5 Minutes)
+## Quick Start
 
-### Step 1: Install kse (30 seconds)
+### The Simplest Way (30 seconds) ⚡
+
+**Just tell your AI:**
+
+```
+Install kse and use it to manage this project with Spec-driven development.
+```
+
+**Your AI will:**
+1. Install kse globally (`npm install -g kiro-spec-engine`)
+2. Adopt it in your project (`kse adopt`)
+3. Read the methodology guide (`.kiro/README.md`)
+4. Start working according to Spec-driven approach
+
+**That's it!** Your AI handles everything. No manual steps needed.
+
+---
+
+### Step-by-Step Guide (if you want details) 📋
+
+<details>
+<summary><b>Click to expand detailed steps</b></summary>
+
+#### Step 1: Install kse (30 seconds)
 
 ```bash
 npm install -g kiro-spec-engine
@@ -58,7 +81,7 @@ Verify installation:
 kse --version
 ```
 
-### Step 2: Adopt kse in Your Project (1 minute)
+#### Step 2: Adopt kse in Your Project (30 seconds)
 
 Navigate to your project directory and run:
 
@@ -68,86 +91,49 @@ kse adopt
 ```
 
 This creates a `.kiro/` directory with:
+- `README.md` - Project development guide for AI
 - `specs/` - Where your Specs live
-- `steering/` - Rules for AI behavior (optional)
+- `steering/` - Development rules (optional)
 
-### Step 3: Create Your First Spec (2 minutes)
+#### Step 3: Tell Your AI About the Methodology (30 seconds)
 
-```bash
-kse create-spec 01-00-user-login
+**In your AI tool (Cursor, Claude, Windsurf, Kiro, etc.), say:**
+
+```
+Please read .kiro/README.md to understand how this project works.
 ```
 
-This creates three files in `.kiro/specs/01-00-user-login/`:
+**Your AI will learn:**
+- This project follows Spec-driven development
+- Every feature starts with a Spec (requirements + design + tasks)
+- How to work with this methodology
+- When to use kse commands
 
-**requirements.md** - What you're building:
-```markdown
-# User Login Feature
+#### Step 4: Start Building Features
 
-## User Stories
-- As a user, I want to log in with email and password
-- As a user, I want to see an error if credentials are wrong
+**Just ask your AI to implement features naturally:**
 
-## Acceptance Criteria
-- WHEN user enters valid credentials THEN they are logged in
-- WHEN user enters invalid credentials THEN they see an error message
+```
+I need a user login feature with email and password.
 ```
 
-**design.md** - How you'll build it:
-```markdown
-# Design
+**Your AI will automatically:**
+1. Create a Spec with requirements, design, and tasks
+2. Implement according to the Spec
+3. Update task status as work progresses
+4. Use kse commands internally (you don't need to run them)
 
-## API Design
-- POST /api/auth/login
-- Request: { email: string, password: string }
-- Response: { token: string } or { error: string }
+**Example conversation:**
+- **You**: "I need user login with email and password"
+- **AI**: "I'll create a Spec for this. Let me define the requirements..."
+- **AI**: "Here's the design... Now I'll implement task 1.1..."
+- **AI**: "Task 1.1 complete. Moving to task 1.2..."
 
-## Components
-- AuthController - handles login logic
-- validateEmail() - validates email format
-- validatePassword() - checks password requirements
-```
+</details>
 
-**tasks.md** - Step-by-step implementation:
-```markdown
-- [ ] 1.1 Create AuthController class
-- [ ] 1.2 Implement email validation
-- [ ] 1.3 Implement password validation
-- [ ] 1.4 Implement login endpoint
-- [ ] 1.5 Write unit tests
-```
+---
 
-### Step 4: Let Your AI Tool Use the Spec (1 minute)
-
-Now your AI tool can access the Spec to generate better code.
-
-**For AI tools with command execution (Cursor, Windsurf, Claude Desktop):**
-
-Just tell your AI:
-```
-"I have a Spec at 01-00-user-login. Please implement task 1.1"
-```
-
-The AI will:
-1. Execute `kse context export 01-00-user-login`
-2. Read the Spec (requirements, design, tasks)
-3. Generate code that follows your design
-4. Update task status automatically
-
-**For web-based AI tools (ChatGPT, Claude web):**
-
-```bash
-# Export context once
-kse context export 01-00-user-login
-
-# Copy to clipboard
-cat .kiro/specs/01-00-user-login/context-export.md | pbcopy  # macOS
-type .kiro\specs\01-00-user-login\context-export.md | clip  # Windows
-
-# Paste into AI tool and say:
-"Here's my Spec. Please implement task 1.1"
-```
-
-**The key insight:** You stay in your AI tool. The AI reads the Spec and generates code that matches your design.
+**Key insight:** You don't "use kse" - your project "follows Spec-driven methodology" and kse helps enforce it. The AI handles all the kse commands for you.
 
 ### Step 5: Next Steps (30 seconds)
 

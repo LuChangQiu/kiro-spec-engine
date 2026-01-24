@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.2] - 2026-01-24
+
+### Changed
+- **Simplified Quick Start based on real user feedback** 📝
+  - Added "The Simplest Way" section (30 seconds, one command to AI)
+  - Moved detailed steps into collapsible section
+  - Reflects actual user experience: "Just tell AI to install and use kse"
+  - AI handles everything automatically (install, adopt, read docs, start working)
+  - Updated both English and Chinese README files
+
+**User feedback:**
+> "I just told Codex to install kse, and it figured out how to use it. 
+> Then I just said 'use this mode to manage the project' and it worked."
+
+**Why this matters:**
+- Reduces perceived complexity from "5 minutes, 4 steps" to "30 seconds, 1 command"
+- Matches real-world usage pattern
+- Emphasizes AI autonomy rather than manual steps
+- Makes kse feel even more like "invisible infrastructure"
+
 ## [1.6.1] - 2026-01-24
 
 ### Fixed

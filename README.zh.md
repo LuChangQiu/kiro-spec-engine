@@ -45,9 +45,32 @@ graph LR
 
 ---
 
-## 快速开始（5 分钟）
+## 快速开始
 
-### 步骤 1：安装 kse（30 秒）
+### 最简单的方式（30 秒）⚡
+
+**只需告诉你的 AI：**
+
+```
+安装 kse 并用它以 Spec 驱动开发的方式管理这个项目。
+```
+
+**你的 AI 会：**
+1. 全局安装 kse（`npm install -g kiro-spec-engine`）
+2. 在项目中采用它（`kse adopt`）
+3. 阅读方法论指南（`.kiro/README.md`）
+4. 按照 Spec 驱动方式开始工作
+
+**就这样！** 你的 AI 处理一切。不需要手动步骤。
+
+---
+
+### 分步指南（如果你想了解细节）📋
+
+<details>
+<summary><b>点击展开详细步骤</b></summary>
+
+#### 步骤 1：安装 kse（30 秒）
 
 ```bash
 npm install -g kiro-spec-engine
@@ -58,7 +81,7 @@ npm install -g kiro-spec-engine
 kse --version
 ```
 
-### 步骤 2：在项目中采用 kse（1 分钟）
+#### 步骤 2：在项目中采用 kse（30 秒）
 
 导航到项目目录并运行：
 
@@ -68,86 +91,49 @@ kse adopt
 ```
 
 这会创建一个 `.kiro/` 目录，包含：
+- `README.md` - 给 AI 的项目开发指南
 - `specs/` - Spec 存放位置
-- `steering/` - AI 行为规则（可选）
+- `steering/` - 开发规则（可选）
 
-### 步骤 3：创建第一个 Spec（2 分钟）
+#### 步骤 3：告诉 AI 项目的开发方法（30 秒）
 
-```bash
-kse create-spec 01-00-user-login
+**在你的 AI 工具中（Cursor、Claude、Windsurf、Kiro 等），说：**
+
+```
+请阅读 .kiro/README.md 了解项目的开发方法。
 ```
 
-这会在 `.kiro/specs/01-00-user-login/` 中创建三个文件：
+**你的 AI 会学到：**
+- 这个项目遵循 Spec 驱动开发
+- 每个功能都从 Spec 开始（需求 + 设计 + 任务）
+- 如何按照这个方法论工作
+- 何时使用 kse 命令
 
-**requirements.md** - 你要构建什么：
-```markdown
-# 用户登录功能
+#### 步骤 4：开始构建功能
 
-## 用户故事
-- 作为用户，我想用邮箱和密码登录
-- 作为用户，我想在凭据错误时看到错误提示
+**自然地让 AI 实现功能：**
 
-## 验收标准
-- 当用户输入有效凭据时，则用户登录成功
-- 当用户输入无效凭据时，则显示错误消息
+```
+我需要一个用邮箱和密码登录的功能。
 ```
 
-**design.md** - 如何构建：
-```markdown
-# 设计
+**你的 AI 会自动：**
+1. 创建包含需求、设计和任务的 Spec
+2. 按照 Spec 实现
+3. 随着工作进展更新任务状态
+4. 内部使用 kse 命令（你不需要运行它们）
 
-## API 设计
-- POST /api/auth/login
-- 请求：{ email: string, password: string }
-- 响应：{ token: string } 或 { error: string }
+**示例对话：**
+- **你**："我需要用邮箱和密码登录的功能"
+- **AI**："我会为此创建一个 Spec。让我定义需求..."
+- **AI**："这是设计... 现在我会实现任务 1.1..."
+- **AI**："任务 1.1 完成。继续任务 1.2..."
 
-## 组件
-- AuthController - 处理登录逻辑
-- validateEmail() - 验证邮箱格式
-- validatePassword() - 检查密码要求
-```
+</details>
 
-**tasks.md** - 分步实现：
-```markdown
-- [ ] 1.1 创建 AuthController 类
-- [ ] 1.2 实现邮箱验证
-- [ ] 1.3 实现密码验证
-- [ ] 1.4 实现登录端点
-- [ ] 1.5 编写单元测试
-```
+---
 
-### 步骤 4：让 AI 工具使用 Spec（1 分钟）
-
-现在你的 AI 工具可以访问 Spec 来生成更好的代码。
-
-**对于支持命令执行的 AI 工具（Cursor、Windsurf、Claude Desktop）：**
-
-只需告诉你的 AI：
-```
-"我有一个 01-00-user-login 的 Spec。请实现任务 1.1"
-```
-
-AI 会：
-1. 执行 `kse context export 01-00-user-login`
-2. 读取 Spec（需求、设计、任务）
-3. 生成遵循你设计的代码
-4. 自动更新任务状态
-
-**对于基于 Web 的 AI 工具（ChatGPT、Claude web）：**
-
-```bash
-# 导出上下文一次
-kse context export 01-00-user-login
-
-# 复制到剪贴板
-cat .kiro/specs/01-00-user-login/context-export.md | pbcopy  # macOS
-type .kiro\specs\01-00-user-login\context-export.md | clip  # Windows
-
-# 粘贴到 AI 工具并说：
-"这是我的 Spec。请实现任务 1.1"
-```
-
-**关键洞察：** 你留在 AI 工具中。AI 读取 Spec 并生成符合你设计的代码。
+**关键洞察：** 你不是"使用 kse" - 你的项目"遵循 Spec 驱动方法论"，kse 帮助执行它。AI 为你处理所有 kse 命令。
 
 ### 步骤 5：下一步（30 秒）
 

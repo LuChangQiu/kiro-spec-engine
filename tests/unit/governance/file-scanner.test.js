@@ -487,15 +487,22 @@ describe('FileScanner', () => {
     });
     
     it('should handle mixed separators', () => {
-      const normalized = scanner.normalizePath('path\\to/file.md');
+      const input = 'path\\to/file.md';
+      const normalized = scanner.normalizePath(input);
       
-      expect(normalized).toBe(path.normalize('path/to/file.md'));
+      // Normalize should convert to platform-specific separators
+      // On Windows: path\to\file.md, On Unix: path/to/file.md
+      const expected = path.join('path', 'to', 'file.md');
+      expect(normalized).toBe(expected);
     });
     
     it('should handle redundant separators', () => {
-      const normalized = scanner.normalizePath('path//to///file.md');
+      const input = 'path//to///file.md';
+      const normalized = scanner.normalizePath(input);
       
-      expect(normalized).toBe(path.normalize('path/to/file.md'));
+      // Should remove redundant separators
+      const expected = path.join('path', 'to', 'file.md');
+      expect(normalized).toBe(expected);
     });
   });
   

@@ -197,7 +197,7 @@ describe('Status Command - Document Compliance Integration', () => {
       expect(output).toContain('kse doctor --docs');
       expect(output).toContain('kse cleanup');
       expect(output).toContain('kse validate --all');
-      expect(output).toContain('kse archive --spec <name>');
+      expect(output).toContain('kse docs archive --spec <name>');
     });
     
     test('should handle multiple violation types correctly', async () => {

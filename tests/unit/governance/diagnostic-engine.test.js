@@ -435,7 +435,7 @@ describe('DiagnosticEngine', () => {
       
       expect(report.recommendations).toEqual(
         expect.arrayContaining([
-          expect.stringContaining('kse archive')
+          expect.stringContaining('kse docs archive')
         ])
       );
     });

@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.3] - 2026-01-24
+
+### Fixed
+- **Fixed incorrect command recommendations in diagnostic tools** 🐛
+  - Updated `lib/governance/diagnostic-engine.js` to recommend `kse docs archive --spec <spec-name>` instead of `kse archive --spec <spec-name>`
+  - Updated `lib/commands/status.js` to show correct archive command in quick fix suggestions
+  - Fixed all related test expectations to match actual command structure
+  - **Impact**: Users will now see correct commands when `kse doctor --docs` or `kse status` detect misplaced artifacts
+  - **Root cause**: Documentation/functionality mismatch - the actual command is `kse docs archive`, not `kse archive`
+
+**Discovered from real user feedback:**
+> User's AI (Codex) tried to run `kse archive --spec 01-00-user-space-diagnosis` 
+> based on `kse doctor --docs` recommendation, but got `error: unknown command 'archive'`
+
+**Why this matters:**
+- Prevents user confusion when following system recommendations
+- AI agents will now execute correct commands automatically
+- Improves reliability of automated workflows
+
 ## [1.6.2] - 2026-01-24
 
 ### Changed

@@ -180,7 +180,7 @@ describe('Doctor Command', () => {
       // Verify: Should show recommendations
       const output = consoleLogSpy.mock.calls.map(call => call.join(' ')).join('\n');
       expect(output).toContain('Recommended Actions');
-      expect(output).toContain('kse archive');
+      expect(output).toContain('kse docs archive');
     });
     
     test('should group violations by type', async () => {

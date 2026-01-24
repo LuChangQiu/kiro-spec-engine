@@ -220,6 +220,59 @@ kse adopt --mode partial
 kse adopt --mode full
 ```
 
+### Force Overwrite Conflicting Files
+
+When you want to update template files to the latest version:
+
+```bash
+# Force overwrite conflicting files (creates backup first)
+kse adopt --force
+```
+
+**What it does**:
+- Overwrites existing steering files with latest templates
+- Automatically creates backup before overwriting
+- Useful when upgrading to get latest template improvements
+- Shows clear warning about which files will be overwritten
+
+**Use cases**:
+- Upgrading template files to latest version
+- Resetting steering files to defaults
+- Applying new template improvements
+
+**Safety**:
+- Always creates backup before overwriting
+- Can rollback with `kse rollback` if needed
+- Preserves your Spec content (only updates templates)
+
+**Example**:
+```bash
+$ kse adopt --force
+
+⚠️  Conflicts detected:
+    - steering/CORE_PRINCIPLES.md
+    - steering/ENVIRONMENT.md
+    - README.md
+  ⚠️  --force enabled: Conflicting files will be overwritten
+  A backup will be created before overwriting
+
+? Proceed with adoption? Yes
+
+📦 Creating backup...
+✅ Backup created: backup-20260124-143022
+
+🚀 Executing adoption...
+✅ Adoption completed successfully!
+
+Files updated:
+  ~ steering/CORE_PRINCIPLES.md
+  ~ steering/ENVIRONMENT.md
+  ~ README.md
+
+📦 Backup: backup-20260124-143022
+  Run kse rollback if you need to undo changes
+```
+
 ---
 
 ## Common Scenarios

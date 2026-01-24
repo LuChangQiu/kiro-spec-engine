@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **--force option for kse adopt** - Force overwrite conflicting files during adoption
+  - Automatically creates backup before overwriting
+  - Shows clear warning when enabled
+  - Useful for upgrading template files to latest version
+  - Usage: `kse adopt --force`
+
 ## [1.4.5] - 2026-01-24
 
 ### Added

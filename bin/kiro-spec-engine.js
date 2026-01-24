@@ -185,6 +185,7 @@ program
   .option('--auto', 'Skip confirmations (use with caution)')
   .option('--dry-run', 'Show what would change without making changes')
   .option('--mode <mode>', 'Force specific adoption mode (fresh/partial/full)')
+  .option('--force', 'Force overwrite conflicting files (creates backup first)')
   .action((options) => {
     adoptCommand(options);
   });

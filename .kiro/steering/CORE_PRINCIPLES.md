@@ -157,8 +157,43 @@
 
 **详细规则**：参考 `.kiro/specs/08-00-document-lifecycle-management/DOCUMENT_MANAGEMENT_GUIDE.md`
 
+### 10. 🚀 npm 发布版本管理原则
+
+**关键规则：每次代码修改后必须增加版本号才能发布**
+
+**版本号规则**：
+- 使用语义化版本：`major.minor.patch`（如 1.5.1）
+- **每次推送代码修改后，必须立即增加 patch 版本号**
+- 即使只是修复测试或小改动，也必须增加版本号
+- 否则 npm 发布会失败（不能重复发布相同版本）
+
+**发布流程**：
+1. 修改代码
+2. **立即更新 package.json 中的 version**
+3. **更新 CHANGELOG.md 添加新版本说明**
+4. 提交代码：`git commit -m "chore: bump version to x.y.z"`
+5. 创建标签：`git tag vx.y.z`
+6. 推送代码和标签：`git push origin main && git push origin vx.y.z`
+7. GitHub Actions 自动运行测试并发布到 npm
+
+**版本号增加规则**：
+- 新功能：增加 minor 版本（1.5.0 → 1.6.0）
+- Bug 修复：增加 patch 版本（1.5.0 → 1.5.1）
+- 测试修复：增加 patch 版本（1.5.1 → 1.5.2）
+- 重大变更：增加 major 版本（1.5.0 → 2.0.0）
+
+**常见错误**：
+- ❌ 修改代码后不更新版本号直接推送
+- ❌ 测试失败后修复，但忘记增加版本号
+- ❌ 使用已存在的版本号标签
+
+**正确做法**：
+- ✅ 每次修改后都检查是否需要增加版本号
+- ✅ 测试失败修复后，增加 patch 版本号
+- ✅ 确保 package.json、CHANGELOG.md、git tag 版本号一致
+
 ---
 
-**版本**: v5.0  
-**更新**: 2026-01-22  
-**说明**: 适用于所有 Spec 的稳定核心原则
+**版本**: v6.0  
+**更新**: 2026-01-24  
+**说明**: 添加 npm 发布版本管理原则

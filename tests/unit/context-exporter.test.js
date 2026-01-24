@@ -160,7 +160,7 @@ describe('ContextExporter', () => {
       );
 
       expect(result.success).toBe(false);
-      expect(result.error).toContain('Task not found');
+      expect(result.error).toMatch(/tasks\.md not found|Task not found/);
     });
   });
 

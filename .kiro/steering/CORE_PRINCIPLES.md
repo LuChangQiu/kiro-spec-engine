@@ -133,6 +133,30 @@
 - 历史数据归档到 Spec 目录
 - Session 启动后 token 使用率 > 50%：立即精简
 
+### 9. 文档生命周期管理原则
+
+**文档分类**：
+- **永久文档**：README, CHANGELOG, CONTRIBUTING, LICENSE, docs/ 下的用户文档, Spec 的 requirements/design/tasks
+- **归档文档**：Spec 产物（reports/, scripts/, tests/, results/, docs/）
+- **临时文档**：会话总结、临时指南、完成总结（Spec 完成后删除）
+
+**根目录管理**：
+- 只允许 4 个 .md 文件：README.md, README.zh.md, CHANGELOG.md, CONTRIBUTING.md
+- 禁止创建临时总结文档
+- 禁止创建会话记录文档
+
+**Spec 目录管理**：
+- 标准结构：requirements.md, design.md, tasks.md + 子目录（reports/, scripts/, tests/, results/, docs/）
+- 临时文档必须在 Spec 完成后删除
+- 产物文档归档到对应子目录
+
+**文档生命周期**：
+1. **创建时**：确定文档类型，选择正确位置
+2. **使用中**：临时文档可以存在，但要明确标记
+3. **完成后**：提取关键信息到 CHANGELOG，删除临时文档，归档产物
+
+**详细规则**：参考 `.kiro/specs/08-00-document-lifecycle-management/DOCUMENT_MANAGEMENT_GUIDE.md`
+
 ---
 
 **版本**: v5.0  

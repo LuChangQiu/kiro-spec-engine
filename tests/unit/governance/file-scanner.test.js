@@ -491,8 +491,8 @@ describe('FileScanner', () => {
       const normalized = scanner.normalizePath(input);
       
       // Normalize should convert to platform-specific separators
-      // On Windows: path\to\file.md, On Unix: path/to/file.md
-      const expected = path.join('path', 'to', 'file.md');
+      // Use path.normalize to get platform-consistent expected value
+      const expected = path.normalize('path/to/file.md');
       expect(normalized).toBe(expected);
     });
     

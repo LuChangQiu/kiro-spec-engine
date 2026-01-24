@@ -8,11 +8,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **--force option for kse adopt** - Force overwrite conflicting files during adoption
+- **Interactive conflict resolution for kse adopt** 🎯 - Choose how to handle conflicting files
+  - Three resolution strategies: skip all, overwrite all, or review each file
+  - Per-file review with diff viewing capability
+  - Selective backup system (only backs up files being overwritten)
+  - Full support for --force, --auto, and --dry-run modes
+  - Clear conflict categorization (steering, documentation, tools)
+  - Usage: `kse adopt` (interactive prompts when conflicts detected)
+
+**Benefits**:
+- Full control over which files to keep or overwrite
+- View differences before making decisions
+- Efficient backups (only affected files)
+- Safe adoption with automatic rollback support
+
+## [1.4.6] - 2026-01-24
+
+### Added
+- **--force option for kse adopt** 🔥 - Force overwrite conflicting files during adoption
   - Automatically creates backup before overwriting
   - Shows clear warning when enabled
   - Useful for upgrading template files to latest version
   - Usage: `kse adopt --force`
+
+### Fixed
+- Cross-platform path normalization test compatibility
+- Restored missing Chinese README content
+
+**Benefits**:
+- Easy template upgrades without manual file management
+- Safe overwriting with automatic backups
+- Clear feedback about what will be changed
 
 ## [1.4.5] - 2026-01-24
 

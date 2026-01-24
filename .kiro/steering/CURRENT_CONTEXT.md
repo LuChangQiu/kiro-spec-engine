@@ -7,8 +7,8 @@
 
 ## 🎯 当前状态
 
-**状态**: 🚀 Spec 09 已创建 - 文档治理自动化  
-**Spec**: 09-00-document-governance-automation  
+**状态**: 🚀 Spec 10 已创建 - Adopt 命令冲突处理改进  
+**Spec**: 10-00-adopt-conflict-resolution-improvement  
 **阶段**: 规划完成，准备执行  
 **项目**: kiro-spec-engine  
 **最后更新**: 2026-01-24
@@ -17,21 +17,27 @@
 
 ## 📝 当前 Spec 信息
 
-**Spec 09-00**: document-governance-automation 🚀 规划完成
-- 目标：开发自动化工具强制执行文档生命周期管理规则
+**Spec 10-00**: adopt-conflict-resolution-improvement 🚀 规划完成
+- 目标：改进 kse adopt 命令的冲突处理机制，提供交互式冲突解决选项
 - 核心功能：
-  - 文档检测和诊断 (kse doctor --docs)
-  - 自动清理工具 (kse cleanup)
-  - 目录结构验证 (kse validate)
-  - 自动归档工具 (kse archive)
-  - Git Hooks 集成 (kse hooks install)
-  - 配置和统计 (kse config docs, kse docs stats)
-- 技术栈：Node.js, Jest, fast-check (property-based testing)
+  - 交互式冲突解决提示（跳过/覆盖/逐个审查）
+  - 选择性备份（仅备份被覆盖的文件）
+  - 文件差异查看器
+  - Force/Auto/Dry-run 模式支持
+  - 完整的错误处理和恢复
+- 技术栈：Node.js, inquirer, chalk, fast-check (property-based testing)
 - 任务策略：可选的 property-based tests，专注核心功能 MVP
+- 新增组件：ConflictResolver, SelectiveBackup, DiffViewer
 
 ---
 
 ## 📝 最近完成的工作
+
+**Spec 10-00**: adopt-conflict-resolution-improvement 🚀 规划完成
+- 交互式冲突解决系统，三种策略（跳过/覆盖/逐个审查），选择性备份，差异查看器
+
+**Spec 09-00**: document-governance-automation 📋 已创建
+- 文档治理自动化工具规划
 
 **Spec 08-00**: document-lifecycle-management ✅ 已完成
 - 文档分类系统：永久/归档/临时，清理6个临时文档，建立文档管理规范

@@ -7,21 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.4] - 2026-01-24
+
 ### Added - Document Lifecycle Management 📚
 
 **Spec 08-00**: Document lifecycle management system
 - Established clear document classification rules (permanent, archival, temporary)
-- Created comprehensive document management guide
+- Created comprehensive document management guide (DOCUMENT_MANAGEMENT_GUIDE.md)
 - Updated CORE_PRINCIPLES.md with document lifecycle management principles
 
 **Project Cleanup**:
 - Removed temporary documents from root directory (SESSION-SUMMARY.md, COMMAND-STANDARDIZATION.md)
 - Removed temporary documents from Spec directories (4 files across Specs 01, 03, 05)
-- Standardized all Spec directory structures
+- Standardized all Spec directory structures to follow consistent pattern
 
 **Benefits**:
-- Cleaner project structure
-- Easier document discovery
+- Cleaner project structure with only essential files in root
+- Easier document discovery and navigation
 - Better long-term maintainability
 - Clear guidelines for future document management
 

@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.5] - 2026-01-24
+
+### Added
+- AI-friendly `.kiro/README.md` template explaining kse commands and usage
+- Comprehensive kse command reference for AI tools (status, workflows, context export, etc.)
+- AI workflow guide with step-by-step instructions for common tasks
+- Spec structure documentation for AI understanding
+- Best practices section for AI tools using kse
+
+### Changed
+- Updated `.kiro/README.md` template to focus on kse CLI usage instead of Kiro Spec system philosophy
+- Simplified template file list in adoption strategy (removed obsolete files)
+- Fixed template path in adoption strategy to point to correct location (`template/.kiro`)
+
+### Fixed
+- AI tools can now understand what kse is and how to use it by reading `.kiro/README.md`
+- Adoption command now correctly copies README from template
+
 ## [1.5.4] - 2026-01-24
 
 ### Fixed

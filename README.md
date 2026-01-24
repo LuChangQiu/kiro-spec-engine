@@ -227,6 +227,8 @@ sequenceDiagram
 
 ### Core Guides
 - 📋 **[Spec Workflow](docs/spec-workflow.md)** - Understanding Specs in depth
+- 🔢 **[Spec Numbering Strategy](docs/spec-numbering-guide.md)** - How to number your Specs
+- 📄 **[Document Governance](docs/document-governance.md)** - Automated document management
 - 🔌 **[Integration Modes](docs/integration-modes.md)** - Three ways to integrate kse
 - 📝 **[Command Reference](docs/command-reference.md)** - All kse commands
 
@@ -258,6 +260,13 @@ sequenceDiagram
 
 ### Spec-Driven Development
 Structure your work with Requirements → Design → Tasks workflow
+
+### Document Governance
+- Automated document lifecycle management
+- Clean project structure enforcement
+- Temporary file cleanup
+- Artifact organization
+- Git hooks for compliance
 
 ### Multi-User Collaboration
 - Personal workspaces for team members
@@ -294,6 +303,13 @@ kse prompt generate <spec> <task>  # Generate task-specific prompt
 # Task management
 kse task claim <spec> <task-id>    # Claim a task
 kse task list <spec>               # List claimed tasks
+
+# Document governance
+kse docs diagnose                  # Check document compliance
+kse docs cleanup                   # Remove temporary files
+kse docs validate                  # Validate document structure
+kse docs archive --spec <name>     # Organize Spec artifacts
+kse docs hooks install             # Install Git pre-commit hooks
 
 # Automation
 kse watch start                    # Start watch mode

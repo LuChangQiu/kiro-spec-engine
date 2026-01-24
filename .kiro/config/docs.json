@@ -1,0 +1,21 @@
+{
+  "rootAllowedFiles": [
+    "README.md",
+    "README.zh.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md"
+  ],
+  "specSubdirs": [
+    "reports",
+    "scripts",
+    "custom"
+  ],
+  "temporaryPatterns": [
+    "*-SUMMARY.md",
+    "SESSION-*.md",
+    "*-COMPLETE.md",
+    "TEMP-*.md",
+    "WIP-*.md",
+    "MVP-*.md"
+  ]
+}

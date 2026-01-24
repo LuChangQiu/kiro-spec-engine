@@ -19,6 +19,49 @@ Every Spec follows a three-stage workflow: **Requirements → Design → Tasks**
 
 ---
 
+## Spec Naming and Numbering
+
+Before creating a Spec, you need to choose a name following the format: `{major}-{minor}-{description}`
+
+### Quick Numbering Guide
+
+**Format**: `XX-YY-feature-name`
+- `XX` = Major number (01, 02, 03, ...)
+- `YY` = Minor number (00, 01, 02, ...)
+- `feature-name` = kebab-case description
+
+**Common Strategies**:
+
+1. **Simple Projects** (recommended for most cases):
+   ```
+   01-00-user-authentication
+   02-00-payment-system
+   03-00-notification-service
+   ```
+   Use major numbers only (minor always `00`) for independent features.
+
+2. **Complex Projects** (grouped by domain):
+   ```
+   01-00-auth-foundation
+   01-01-auth-add-oauth
+   01-02-auth-add-2fa
+   02-00-payment-mvp
+   02-01-payment-subscriptions
+   ```
+   Group related features under the same major number.
+
+3. **Hybrid Approach** (flexible):
+   Start simple, add structure when needed. Use `XX-00` for independent features, introduce `XX-01+` when iterations are needed.
+
+**Decision Tree**:
+- First Spec? → Use `01-00-{name}`
+- Related to existing Spec? → Same major, increment minor
+- Independent feature? → Next major number with `-00`
+
+📖 **For detailed guidance, see**: [Spec Numbering Strategy Guide](spec-numbering-guide.md)
+
+---
+
 ## The Spec Creation Workflow
 
 ```mermaid
@@ -262,6 +305,21 @@ kse context export 01-00-user-login
 kse status
 ```
 
+**8. Maintain Document Governance:**
+```bash
+# Check for document violations
+kse docs diagnose
+
+# Clean up temporary files
+kse docs cleanup --spec 01-00-user-login
+
+# Organize artifacts (reports, scripts, etc.)
+kse docs archive --spec 01-00-user-login
+
+# Validate final structure
+kse docs validate --spec 01-00-user-login
+```
+
 ---
 
 ## Workflow Variations
@@ -363,6 +421,12 @@ sequenceDiagram
 3. **Include testing** - Every feature needs tests
 4. **Be AI-friendly** - Tasks should be clear enough for AI to implement
 
+### Document Governance
+1. **Keep Specs clean** - Use `kse docs archive` to organize artifacts
+2. **Remove temporary files** - Use `kse docs cleanup` regularly
+3. **Validate structure** - Use `kse docs validate` before committing
+4. **Install Git hooks** - Use `kse docs hooks install` to prevent violations
+
 ### Throughout
 1. **Keep it updated** - Specs are living documents
 2. **Use version control** - Commit Spec changes
@@ -420,6 +484,7 @@ sequenceDiagram
 ## Related Documentation
 
 - **[Quick Start Guide](quick-start.md)** - Get started with your first Spec
+- **[Document Governance](document-governance.md)** - Keep your Specs clean and organized
 - **[Integration Modes](integration-modes.md)** - How to use Specs with AI tools
 - **[Command Reference](command-reference.md)** - All kse commands
 - **[Examples](examples/)** - Complete example Specs

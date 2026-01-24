@@ -173,8 +173,9 @@ program
 program
   .command('doctor')
   .description(t('cli.commands.doctor.description'))
-  .action(() => {
-    doctorCommand();
+  .option('--docs', 'Show detailed document governance diagnostics')
+  .action((options) => {
+    doctorCommand(options);
   });
 
 // 项目接管命令
@@ -210,51 +211,15 @@ program
   });
 
 // 状态检查命令
+const statusCommand = require('../lib/commands/status');
+
 program
   .command('status')
   .description('Check project status and available specs')
-  .action(async () => {
-    const kiroDir = path.join(process.cwd(), '.kiro');
-    
-    if (!fs.existsSync(kiroDir)) {
-      console.log(chalk.yellow('⚠️  No Kiro Spec Engine project found in current directory'));
-      console.log('Run: ' + chalk.cyan('kiro-spec-engine init') + ' to initialize');
-      return;
-    }
-
-    console.log(chalk.red('🔥') + ' Kiro Spec Engine Project Status');
-    console.log();
-
-    // 检查工具状态
-    const toolPath = path.join(kiroDir, 'tools/ultrawork_enhancer.py');
-    const toolStatus = fs.existsSync(toolPath) ? chalk.green('✅ Available') : chalk.red('❌ Missing');
-    console.log('Ultrawork Tool:', toolStatus);
-
-    // 列出 Specs
-    const specsDir = path.join(kiroDir, 'specs');
-    if (fs.existsSync(specsDir)) {
-      const specs = fs.readdirSync(specsDir).filter(item => 
-        fs.statSync(path.join(specsDir, item)).isDirectory()
-      );
-      
-      console.log();
-      console.log(chalk.blue('📋 Available Specs:'));
-      if (specs.length === 0) {
-        console.log('  No specs found');
-      } else {
-        specs.forEach(spec => {
-          const specPath = path.join(specsDir, spec);
-          const hasReq = fs.existsSync(path.join(specPath, 'requirements.md'));
-          const hasDesign = fs.existsSync(path.join(specPath, 'design.md'));
-          const hasTasks = fs.existsSync(path.join(specPath, 'tasks.md'));
-          
-          console.log(`  ${spec}:`);
-          console.log(`    Requirements: ${hasReq ? chalk.green('✅') : chalk.gray('⚪')}`);
-          console.log(`    Design: ${hasDesign ? chalk.green('✅') : chalk.gray('⚪')}`);
-          console.log(`    Tasks: ${hasTasks ? chalk.green('✅') : chalk.gray('⚪')}`);
-        });
-      }
-    }
+  .option('--verbose', 'Show detailed information')
+  .option('--team', 'Show team activity')
+  .action(async (options) => {
+    await statusCommand(options);
   });
 
 // 版本信息命令
@@ -324,6 +289,98 @@ const workflowsCmd = program
   .description('Manage manual workflows and checklists')
   .action(async (action, workflowId) => {
     await workflowsCommand(action, workflowId);
+  });
+
+// Document governance commands
+const docsCommand = require('../lib/commands/docs');
+
+const docsCmd = program
+  .command('docs')
+  .description('Document governance and lifecycle management');
+
+docsCmd
+  .command('diagnose')
+  .alias('diagnostic')
+  .description('Scan project for document violations')
+  .action(async () => {
+    const exitCode = await docsCommand('diagnose');
+    process.exit(exitCode);
+  });
+
+docsCmd
+  .command('cleanup')
+  .description('Remove temporary documents')
+  .option('--dry-run, --dry', 'Preview changes without applying them')
+  .option('-i, --interactive', 'Prompt for confirmation before each deletion')
+  .option('--spec <name>', 'Target specific Spec directory')
+  .action(async (options) => {
+    const exitCode = await docsCommand('cleanup', options);
+    process.exit(exitCode);
+  });
+
+docsCmd
+  .command('validate')
+  .description('Validate document structure')
+  .option('--spec <name>', 'Validate specific Spec directory')
+  .option('--all', 'Validate all Spec directories')
+  .action(async (options) => {
+    const exitCode = await docsCommand('validate', options);
+    process.exit(exitCode);
+  });
+
+docsCmd
+  .command('archive')
+  .description('Organize Spec artifacts into subdirectories')
+  .option('--spec <name>', 'Target Spec directory (required)')
+  .option('--dry-run, --dry', 'Preview changes without applying them')
+  .action(async (options) => {
+    const exitCode = await docsCommand('archive', options);
+    process.exit(exitCode);
+  });
+
+docsCmd
+  .command('hooks <action>')
+  .description('Manage Git hooks (install, uninstall, status)')
+  .action(async (action) => {
+    const exitCode = await docsCommand('hooks', { _: [action] });
+    process.exit(exitCode);
+  });
+
+docsCmd
+  .command('config [key] [value]')
+  .description('Display or modify configuration')
+  .option('--set', 'Set configuration value (use with key and value arguments)')
+  .option('--reset', 'Reset configuration to defaults')
+  .action(async (key, value, options) => {
+    // Build options object for the docs command
+    const cmdOptions = {
+      set: options.set,
+      reset: options.reset,
+      _: ['config']
+    };
+    
+    // Add key and value if provided
+    if (key) cmdOptions._.push(key);
+    if (value) cmdOptions._.push(value);
+    
+    const exitCode = await docsCommand('config', cmdOptions);
+    process.exit(exitCode);
+  });
+
+docsCmd
+  .command('stats')
+  .description('Display compliance statistics')
+  .action(async () => {
+    const exitCode = await docsCommand('stats');
+    process.exit(exitCode);
+  });
+
+docsCmd
+  .command('report')
+  .description('Generate compliance report')
+  .action(async () => {
+    const exitCode = await docsCommand('report');
+    process.exit(exitCode);
   });
 
 // 更新项目配置的辅助函数

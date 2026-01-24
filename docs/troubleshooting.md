@@ -18,6 +18,7 @@
 - [Command Issues](#command-issues)
 - [Integration Issues](#integration-issues)
 - [Watch Mode Issues](#watch-mode-issues)
+- [Document Governance Issues](#document-governance-issues)
 - [Platform-Specific Issues](#platform-specific-issues)
 - [Getting More Help](#getting-more-help)
 
@@ -566,6 +567,337 @@ kse context export 01-00-user-login
 
 ---
 
+## Document Governance Issues
+
+### Diagnostic not finding violations
+
+**Symptoms:**
+```bash
+$ kse docs diagnose
+✅ Project is compliant
+# But you know there are temporary files
+```
+
+**Cause:** Files don't match temporary patterns or are in unexpected locations
+
+**Solutions:**
+
+**1. Check what patterns are configured:**
+```bash
+kse docs config
+# Look at "Temporary Patterns" section
+```
+
+**2. Add custom patterns if needed:**
+```bash
+kse docs config --set temporary-patterns "*-SUMMARY.md,SESSION-*.md,*-COMPLETE.md,TEMP-*.md,WIP-*.md,MVP-*.md,DRAFT-*.md"
+```
+
+**3. Manually check for violations:**
+```bash
+# Check root directory
+ls *.md
+
+# Should only see: README.md, README.zh.md, CHANGELOG.md, CONTRIBUTING.md
+```
+
+---
+
+### Cleanup not removing files
+
+**Symptoms:**
+```bash
+$ kse docs cleanup
+Deleted 0 file(s)
+# But temporary files still exist
+```
+
+**Possible Causes & Solutions:**
+
+**1. Files don't match temporary patterns:**
+```bash
+# Check file names
+ls *.md
+
+# If file is "notes.md" (doesn't match patterns)
+# Either rename it to match pattern or delete manually
+mv notes.md TEMP-notes.md
+kse docs cleanup
+```
+
+**2. Files are in subdirectories:**
+```bash
+# Cleanup only checks root and Spec directories
+# Check subdirectories manually
+find . -name "*-SUMMARY.md"
+```
+
+**3. Permission issues:**
+```bash
+# Check file permissions
+ls -la *.md
+
+# Fix if needed
+chmod u+w filename.md
+kse docs cleanup
+```
+
+---
+
+### Archive moving files to wrong subdirectory
+
+**Symptoms:**
+```bash
+$ kse docs archive --spec my-spec
+# Files moved to unexpected subdirectories
+```
+
+**Cause:** File type classification based on filename
+
+**Solution:**
+
+**Understand classification rules:**
+- **scripts/** - `.js`, `.py`, `.sh`, "script" in name
+- **reports/** - "report", "analysis", "summary" in name
+- **tests/** - `.test.js`, `.spec.js`, "test" in name
+- **results/** - "result", "output" in name
+- **docs/** - Everything else
+
+**Rename files to match intended subdirectory:**
+```bash
+# Want file in reports/
+mv data.md analysis-report.md
+
+# Want file in scripts/
+mv tool.js test-script.js
+
+# Then archive
+kse docs archive --spec my-spec
+```
+
+---
+
+### Git hooks not blocking commits
+
+**Symptoms:**
+```bash
+$ git commit -m "Add feature"
+# Commit succeeds even with violations
+```
+
+**Possible Causes & Solutions:**
+
+**1. Hooks not installed:**
+```bash
+# Check status
+kse docs hooks status
+
+# If not installed
+kse docs hooks install
+```
+
+**2. Hook file not executable:**
+```bash
+# Check permissions (macOS/Linux)
+ls -la .git/hooks/pre-commit
+
+# Make executable
+chmod +x .git/hooks/pre-commit
+```
+
+**3. Using --no-verify flag:**
+```bash
+# This bypasses hooks
+git commit --no-verify -m "message"
+
+# Remove --no-verify to enable validation
+git commit -m "message"
+```
+
+**4. Not a git repository:**
+```bash
+# Check if .git exists
+ls -la .git/
+
+# If not, initialize git
+git init
+kse docs hooks install
+```
+
+---
+
+### Validation failing for valid structure
+
+**Symptoms:**
+```bash
+$ kse docs validate --spec my-spec
+❌ Missing required file: requirements.md
+# But the file exists
+```
+
+**Possible Causes & Solutions:**
+
+**1. File in wrong location:**
+```bash
+# Check exact path
+ls -la .kiro/specs/my-spec/requirements.md
+
+# Should be directly in Spec directory, not in subdirectory
+```
+
+**2. Wrong Spec name:**
+```bash
+# Check Spec directory name
+ls .kiro/specs/
+
+# Use exact name
+kse docs validate --spec 01-00-my-feature
+```
+
+**3. Case sensitivity (Linux/macOS):**
+```bash
+# File is "Requirements.md" but should be "requirements.md"
+mv Requirements.md requirements.md
+```
+
+---
+
+### Configuration changes not taking effect
+
+**Symptoms:**
+```bash
+$ kse docs config --set root-allowed-files "README.md,CUSTOM.md"
+✅ Configuration updated
+
+$ kse docs diagnose
+# Still reports CUSTOM.md as violation
+```
+
+**Cause:** Configuration file not being read or cached
+
+**Solutions:**
+
+**1. Verify configuration was saved:**
+```bash
+# Check config file
+cat .kiro/config/docs.json
+
+# Should show your changes
+```
+
+**2. Check for typos in key name:**
+```bash
+# Wrong: root-files
+# Correct: root-allowed-files
+
+kse docs config --set root-allowed-files "README.md,CUSTOM.md"
+```
+
+**3. Restart any running processes:**
+```bash
+# If watch mode is running
+kse watch stop
+kse watch start
+```
+
+---
+
+### "Permission denied" when installing hooks
+
+**Symptoms:**
+```bash
+$ kse docs hooks install
+Error: EACCES: permission denied, open '.git/hooks/pre-commit'
+```
+
+**Cause:** Insufficient permissions for .git/hooks directory
+
+**Solutions:**
+
+**1. Check directory permissions:**
+```bash
+ls -la .git/hooks/
+```
+
+**2. Fix permissions:**
+```bash
+# Make hooks directory writable
+chmod u+w .git/hooks/
+
+# Try again
+kse docs hooks install
+```
+
+**3. Check if file is read-only:**
+```bash
+# If pre-commit already exists
+ls -la .git/hooks/pre-commit
+
+# Remove read-only flag
+chmod u+w .git/hooks/pre-commit
+```
+
+---
+
+### Stats showing no data
+
+**Symptoms:**
+```bash
+$ kse docs stats
+⚠️  No execution history found
+```
+
+**Cause:** No governance commands have been run yet
+
+**Solution:**
+
+**Run some governance commands:**
+```bash
+# Run diagnostic
+kse docs diagnose
+
+# Run cleanup
+kse docs cleanup --dry-run
+
+# Now check stats
+kse docs stats
+```
+
+**Note:** Only actual operations are logged (not --dry-run for cleanup/archive)
+
+---
+
+### Report generation fails
+
+**Symptoms:**
+```bash
+$ kse docs report
+Error: ENOENT: no such file or directory, open '.kiro/reports/...'
+```
+
+**Cause:** Reports directory doesn't exist
+
+**Solution:**
+
+**Create reports directory:**
+```bash
+mkdir -p .kiro/reports
+
+# Try again
+kse docs report
+```
+
+**Or let kse create it:**
+```bash
+# Run diagnostic first (creates directory structure)
+kse docs diagnose
+
+# Then generate report
+kse docs report
+```
+
+---
+
 ## Platform-Specific Issues
 
 ### Windows Issues
@@ -771,6 +1103,7 @@ Error: EINVAL: invalid filename
 3. **Spec name format** - Use XX-YY-feature-name format
 4. **Context too large** - Use task-specific prompts
 5. **Watch mode** - Restart or check configuration
+6. **Document governance** - Check patterns and permissions
 
 **Quick Fixes:**
 ```bash
@@ -785,6 +1118,12 @@ ls -la .kiro/specs/
 
 # Test context export
 kse context export spec-name
+
+# Check document compliance
+kse docs diagnose
+
+# Clean up temporary files
+kse docs cleanup --dry-run
 ```
 
 **Still stuck?** → [Create an issue](https://github.com/kiro-spec-engine/kse/issues/new)

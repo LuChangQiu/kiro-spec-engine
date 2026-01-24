@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.5] - 2026-01-24
+
+### Added
+- **Spec Numbering Strategy Guide** 🔢 - Comprehensive guide for choosing Spec numbering strategies
+  - English version: `docs/spec-numbering-guide.md`
+  - Chinese version: `docs/zh/spec-numbering-guide.md`
+  - Quick reference added to `docs/spec-workflow.md`
+  - Covers simple, complex, and hybrid numbering approaches
+  - Includes decision tree and practical examples
+  - Helps users choose between `XX-00` (simple) vs `XX-YY` (grouped) strategies
+
+**Benefits**:
+- Clear guidance on when to use major vs minor numbers
+- Practical examples from real projects (kiro-spec-engine, e-commerce, SaaS)
+- Decision tree for quick strategy selection
+- Best practices and common pitfalls
+- Supports both simple and complex project needs
+
 ## [1.4.4] - 2026-01-24
 
 ### Added - Document Lifecycle Management 📚

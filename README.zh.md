@@ -3,6 +3,9 @@
 [![npm version](https://badge.fury.io/js/kiro-spec-engine.svg)](https://badge.fury.io/js/kiro-spec-engine)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+> **⚠️ 重要说明**: `kiro-spec-engine` (kse) 是一个 **npm 包和 CLI 工具**，用于 Spec 驱动开发。  
+> 它**不是** Kiro IDE 桌面应用程序。如果你在寻找 Kiro IDE，请访问 https://kiro.dev
+
 **AI 编码工具的上下文提供者** - 结构化你的项目需求、设计和任务，让 AI 助手帮你构建更好的软件。
 
 [English](README.md) | 简体中文

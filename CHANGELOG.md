@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.4] - 2026-01-24
+
+### Added
+- **Prominent clarification to prevent confusion with Kiro IDE** 🎯
+  - Added warning box at top of README.md and README.zh.md
+  - Clarifies that kse is an npm package/CLI tool, NOT the Kiro IDE desktop application
+  - Updated package.json description to explicitly state the difference
+  - **Triggered by**: Real user feedback - iFlow (using GLM-4.7) confused kse with Kiro IDE and tried to download the wrong software
+
+**Why this matters:**
+- Prevents AI tools (especially smaller models) from confusing kse with Kiro IDE
+- Saves users time by immediately clarifying what kse is
+- Improves first-time user experience
+- Sets foundation for Spec 11 (comprehensive documentation alignment)
+
+**User feedback that triggered this:**
+> "iFlow 用 GLM-4.7 好傻 下载 kiro 了"  
+> (iFlow using GLM-4.7 was silly and downloaded Kiro [IDE] instead)
+
 ## [1.6.3] - 2026-01-24
 
 ### Fixed

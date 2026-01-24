@@ -3,6 +3,9 @@
 [![npm version](https://badge.fury.io/js/kiro-spec-engine.svg)](https://badge.fury.io/js/kiro-spec-engine)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+> **⚠️ Important Clarification**: `kiro-spec-engine` (kse) is an **npm package and CLI tool** for spec-driven development.  
+> It is **NOT** the Kiro IDE desktop application. If you're looking for Kiro IDE, visit https://kiro.dev
+
 **A context provider for AI coding tools** - Structure your project requirements, design, and tasks so AI assistants can help you build better software.
 
 English | [简体中文](README.zh.md)

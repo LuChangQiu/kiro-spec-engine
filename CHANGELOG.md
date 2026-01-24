@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2026-01-24
+
+### Fixed
+- **Cross-platform path handling in SelectiveBackup** 🐛
+  - Fixed path construction bug in `lib/backup/selective-backup.js`
+  - Changed from string replacement (`this.backupDir.replace('/backups', '')`) to proper path joining
+  - Now uses `path.join(projectPath, '.kiro', filePath)` for consistent cross-platform behavior
+  - Affects both `createSelectiveBackup()` and `restoreSelective()` methods
+  - Ensures backup/restore works correctly on Windows (backslash paths) and Unix (forward slash paths)
+
+**Why this matters:**
+- Previous code used string replacement which failed on Windows paths
+- Could cause backup creation to fail silently or create backups in wrong locations
+- Critical for `kse adopt --force` conflict resolution feature
+
 ## [1.6.0] - 2026-01-24
 
 ### Changed - BREAKING CONCEPTUAL CHANGE 🎯

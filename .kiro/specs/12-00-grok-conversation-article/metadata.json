@@ -1,0 +1,53 @@
+{
+  "title": "AI 驱动开发的哲学与实践：从"投喂"到"自主"的范式转变",
+  "subtitle": "一场关于 AI 发展趋势、心学哲学与软件工程实践的深度对话",
+  "author": "heguangyong",
+  "date": "2026-01-24",
+  "version": "1.0",
+  "keywords": [
+    "AI 开发",
+    "Spec 驱动",
+    "心学",
+    "软件工程",
+    "Agent",
+    "kiro-spec-engine",
+    "AlphaGo",
+    "范式转变",
+    "哲学",
+    "实践"
+  ],
+  "tags": [
+    "AI",
+    "软件工程",
+    "哲学",
+    "开源项目"
+  ],
+  "platforms": {
+    "github": {
+      "discussions_category": "Show and tell",
+      "labels": ["article", "philosophy", "ai-development"]
+    },
+    "wechat": {
+      "status": "planned",
+      "category": "技术分享"
+    },
+    "juejin": {
+      "status": "recommended",
+      "category": "后端/AI"
+    },
+    "zhihu": {
+      "status": "recommended",
+      "category": "人工智能/软件工程"
+    }
+  },
+  "files": {
+    "draft": ".kiro/specs/12-00-grok-conversation-article/draft.md",
+    "article": ".kiro/specs/12-00-grok-conversation-article/article.md",
+    "github_doc": "docs/articles/ai-driven-development-philosophy-and-practice.md",
+    "discussions_template": ".kiro/specs/12-00-grok-conversation-article/github-discussions-template.md"
+  },
+  "related_links": {
+    "project": "https://github.com/heguangyong/kiro-spec-engine",
+    "npm": "https://www.npmjs.com/package/kiro-spec-engine"
+  }
+}

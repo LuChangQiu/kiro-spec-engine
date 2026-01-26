@@ -366,5 +366,36 @@ kse create-spec 01-00-my-first-feature
 
 ---
 
+## 💬 Community & Discussion
+
+Join our community to discuss AI-driven development, Spec workflows, and best practices.
+
+### WeChat Group
+
+<img src="docs/images/wechat-qr.png" width="200" alt="WeChat Group QR Code">
+
+*Scan to add WeChat, note "kse" to join the group*
+
+### Other Channels
+
+- **GitHub Discussions**: [Join Discussion](https://github.com/heguangyong/kiro-spec-engine/discussions)
+- **Issues**: [Report Issues](https://github.com/heguangyong/kiro-spec-engine/issues)
+
+### Featured Article
+
+📖 **[The Philosophy and Practice of AI-Driven Development](docs/articles/ai-driven-development-philosophy-and-practice.md)**
+
+A deep conversation about AI development trends, Neo-Confucian philosophy, and software engineering practices. Based on 2000+ hours of AI-assisted programming experience.
+
+[Read in English](docs/articles/ai-driven-development-philosophy-and-practice.en.md) | [中文版](docs/articles/ai-driven-development-philosophy-and-practice.md)
+
+**Also available on:**
+- [WeChat Official Account (微信公众号)](https://mp.weixin.qq.com/s/GRo0XQ6GvQ03T4_FTvAsKA)
+- [Juejin (掘金)](https://juejin.cn/post/7598899986857377798)
+- [Zhihu (知乎)](https://zhuanlan.zhihu.com/p/1999164891391624163)
+- [X/Twitter](https://x.com/heguangyong/status/2015668235065229782)
+
+---
+
 **Version**: 1.4.0  
 **Last Updated**: 2026-01-23

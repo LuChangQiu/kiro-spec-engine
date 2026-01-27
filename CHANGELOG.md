@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.1] - 2026-01-27
+
+### Fixed - Test Suite Hotfix 🔧
+
+**Critical test fixes for CI environment**:
+- Fixed `operations-manager.test.js` file system error handling test
+  - Changed from using Windows system path to mocking `fs.ensureDir`
+  - Ensures consistent behavior across all platforms (Windows/Linux/macOS)
+- Fixed `prompt-generator.test.js` error message validation
+  - Now accepts both "Task not found" and "tasks.md not found" error messages
+  - Handles different error scenarios gracefully
+
+**Impact**: All 830 tests now pass reliably in CI environment (7 skipped)
+
+**Why this matters**: Ensures GitHub Actions can successfully run tests and publish releases automatically.
+
 ## [1.8.0] - 2026-01-27
 
 ### Added - DevOps Integration Foundation 🚀

@@ -1,7 +1,7 @@
-# Release Summary: v1.8.0
+# Release Summary: v1.8.1 (Hotfix)
 
 **Release Date**: 2026-01-27  
-**Version**: 1.8.0  
+**Version**: 1.8.1 (Hotfix for v1.8.0)  
 **Spec**: 13-00-devops-integration-foundation  
 **Status**: 🚀 In Progress (Automated)
 
@@ -16,10 +16,12 @@
 | 2026-01-27 14:35 | GitHub Actions triggered | ✅ Complete |
 | 2026-01-27 14:36 | First test run failed (2 tests) | ⚠️ Fixed |
 | 2026-01-27 14:40 | Tests fixed and pushed | ✅ Complete |
-| 2026-01-27 14:41 | GitHub Actions re-running | ⏳ In Progress |
-| 2026-01-27 14:42 | Running tests | ⏳ Pending |
-| 2026-01-27 14:43 | Publishing to npm | ⏳ Pending |
-| 2026-01-27 14:44 | Creating GitHub Release | ⏳ Pending |
+| 2026-01-27 14:45 | Version bumped to v1.8.1 (hotfix) | ✅ Complete |
+| 2026-01-27 14:46 | Tagged v1.8.1 and pushed | ✅ Complete |
+| 2026-01-27 14:46 | GitHub Actions triggered for v1.8.1 | ⏳ Running |
+| 2026-01-27 14:47 | Running tests | ⏳ In Progress |
+| 2026-01-27 14:48 | Publishing to npm | ⏳ Pending |
+| 2026-01-27 14:49 | Creating GitHub Release | ⏳ Pending |
 
 ---
 
@@ -261,20 +263,30 @@ None at release time.
 
 ### Fix Implementation
 
-**Commit**: `6ff41a6` - "Fix failing tests in CI environment"
+**Version Bump**: v1.8.0 → v1.8.1 (hotfix)  
+**Commit**: `e758e94` - "1.8.1 - Hotfix: Fix failing tests in CI environment"  
+**Tag**: v1.8.1
 
 **Changes**:
 - Updated `operations-manager.test.js` to use mocking instead of system paths
 - Updated `prompt-generator.test.js` to accept multiple error message formats
+- Updated `CHANGELOG.md` with v1.8.1 hotfix entry
+- Updated `package.json` version to 1.8.1
 - All 830 tests now passing (7 skipped)
 
-**Result**: ✅ Tests fixed and pushed to GitHub
+**Result**: ✅ Tests fixed, version bumped, and pushed to GitHub with new tag
 
 ---
 
 ## Current Status
 
-**GitHub Actions**: Re-running with fixed tests  
-**Expected Outcome**: All tests pass → npm publish → GitHub Release created
+**Version**: v1.8.1 (Hotfix)  
+**GitHub Actions**: Running with v1.8.1 tag  
+**Expected Outcome**: All tests pass → npm publish v1.8.1 → GitHub Release created
 
 **Monitor**: https://github.com/heguangyong/kiro-spec-engine/actions
+
+**Install Command** (after release):
+```bash
+npm install -g kiro-spec-engine@1.8.1
+```

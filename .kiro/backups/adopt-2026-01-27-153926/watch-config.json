@@ -1,0 +1,66 @@
+{
+  "enabled": true,
+  "patterns": [
+    "**/tasks.md",
+    "**/.kiro/specs/*/requirements.md",
+    "**/.kiro/specs/*/design.md",
+    "**/lib/**/*.js",
+    "**/src/**/*.js",
+    "**/lib/**/*.ts",
+    "**/src/**/*.ts"
+  ],
+  "ignored": [
+    "**/node_modules/**",
+    "**/.git/**",
+    "**/coverage/**"
+  ],
+  "actions": {
+    "**/tasks.md": {
+      "command": "kse workspace sync",
+      "debounce": 2000,
+      "description": "Sync workspace when tasks are updated"
+    },
+    "**/lib/**/*.js": {
+      "command": "npm test -- ${file}.test.js",
+      "debounce": 3000,
+      "retry": false,
+      "condition": "test_file_exists",
+      "description": "Run tests when lib files change"
+    },
+    "**/src/**/*.js": {
+      "command": "npm test -- ${file}.test.js",
+      "debounce": 3000,
+      "retry": false,
+      "condition": "test_file_exists",
+      "description": "Run tests when src files change"
+    },
+    "**/lib/**/*.ts": {
+      "command": "npm test -- ${file}.test.ts",
+      "debounce": 3000,
+      "retry": false,
+      "condition": "test_file_exists",
+      "description": "Run tests when lib TypeScript files change"
+    },
+    "**/src/**/*.ts": {
+      "command": "npm test -- ${file}.test.ts",
+      "debounce": 3000,
+      "retry": false,
+      "condition": "test_file_exists",
+      "description": "Run tests when src TypeScript files change"
+    }
+  },
+  "debounce": {
+    "default": 2000
+  },
+  "logging": {
+    "enabled": true,
+    "level": "info",
+    "maxSize": "10MB",
+    "rotation": true
+  },
+  "retry": {
+    "enabled": true,
+    "maxAttempts": 3,
+    "backoff": "exponential"
+  }
+}

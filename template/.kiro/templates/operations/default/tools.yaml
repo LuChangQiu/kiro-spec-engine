@@ -1,0 +1,364 @@
+# AI-Driven Operations Tools Configuration
+# 
+# This file defines tools and strategies for AI-driven operations.
+# Focus on: 1) AI-friendly tools, 2) Version matching, 3) Execution efficiency
+
+version: "1.0"
+project: "project-name"
+project_version: "1.0.0"
+
+# Tool selection principles:
+# - Prefer native system tools over third-party
+# - Prioritize CLI-only, structured output, idempotent operations
+# - Choose based on data size, network conditions, time windows
+# - Match tool versions with system versions
+
+tools:
+  # Database Operations
+  database_backup:
+    purpose: "Backup database with optimal strategy"
+    
+    strategies:
+      - name: "logical_backup"
+        description: "Logical backup using native dump tool"
+        suitable_for:
+          data_size: "< 10GB"
+          downtime_acceptable: false
+          consistency_level: "transaction"
+        
+        tool:
+          command: "pg_dump"  # Example: PostgreSQL
+          native: true
+          version_match: "must match database version"
+          alternatives:
+            mysql: "mysqldump"
+            mongodb: "mongodump"
+        
+        execution:
+          estimated_time_per_gb: "60 seconds"
+          cpu_intensive: false
+          io_intensive: true
+          network_intensive: false
+          parallelizable: false
+        
+        ai_friendly:
+          cli_only: true
+          interactive: false
+          structured_output: true
+          output_format: "SQL"
+          idempotent: true
+          progress_reporting: false
+          exit_codes_clear: true
+        
+        command_template: |
+          pg_dump -h {host} -U {user} -d {database} \
+            --format=custom \
+            --compress=9 \
+            --file={output_file}
+      
+      - name: "physical_backup"
+        description: "Physical backup for large databases"
+        suitable_for:
+          data_size: "> 10GB"
+          downtime_acceptable: false
+          consistency_level: "point-in-time"
+        
+        tool:
+          command: "pg_basebackup"
+          native: true
+          version_match: "must match database version"
+        
+        execution:
+          estimated_time_per_gb: "30 seconds"
+          cpu_intensive: false
+          io_intensive: true
+          network_intensive: true
+          parallelizable: false
+        
+        ai_friendly:
+          cli_only: true
+          interactive: false
+          structured_output: false
+          output_format: "binary"
+          idempotent: true
+          progress_reporting: true
+          exit_codes_clear: true
+        
+        command_template: |
+          pg_basebackup -h {host} -U {user} \
+            --format=tar \
+            --gzip \
+            --progress \
+            --checkpoint=fast \
+            -D {output_dir}
+      
+      - name: "snapshot_backup"
+        description: "Instant snapshot for very large databases"
+        suitable_for:
+          data_size: "> 100GB"
+          downtime_acceptable: true  # Brief pause
+          storage_type: "LVM"
+        
+        tool:
+          command: "lvcreate"
+          native: true
+          version_match: "LVM2"
+          requires_root: true
+        
+        execution:
+          estimated_time_per_gb: "< 1 second"
+          cpu_intensive: false
+          io_intensive: false
+          network_intensive: false
+          parallelizable: false
+        
+        ai_friendly:
+          cli_only: true
+          interactive: false
+          structured_output: true
+          output_format: "text"
+          idempotent: false  # Need unique names
+          progress_reporting: false
+          exit_codes_clear: true
+        
+        command_template: |
+          lvcreate --snapshot --size {snapshot_size} \
+            --name {snapshot_name} \
+            {volume_group}/{logical_volume}
+
+  # Log Analysis
+  log_analysis:
+    purpose: "Analyze application logs efficiently"
+    
+    strategies:
+      - name: "native_text_processing"
+        description: "Use grep/awk for simple patterns"
+        suitable_for:
+          log_size: "< 1GB"
+          log_format: "text"
+          pattern_complexity: "simple"
+        
+        tool:
+          command: "grep"
+          native: true
+          version_match: "any"
+          chain_with: ["awk", "sort", "uniq"]
+        
+        execution:
+          estimated_time_per_100mb: "1 second"
+          cpu_intensive: true
+          io_intensive: true
+          network_intensive: false
+          parallelizable: true
+        
+        ai_friendly:
+          cli_only: true
+          interactive: false
+          structured_output: true
+          output_format: "text/json"
+          idempotent: true
+          progress_reporting: false
+          exit_codes_clear: true
+        
+        command_template: |
+          grep -E '{pattern}' {log_file} | \
+            awk '{print $1, $2, $NF}' | \
+            sort | uniq -c
+      
+      - name: "json_log_processing"
+        description: "Process JSON logs with jq"
+        suitable_for:
+          log_size: "any"
+          log_format: "JSON"
+          pattern_complexity: "complex"
+        
+        tool:
+          command: "jq"
+          native: false
+          version_match: ">= 1.6"
+          install_if_missing: "apt-get install jq"
+        
+        execution:
+          estimated_time_per_100mb: "2 seconds"
+          cpu_intensive: true
+          io_intensive: false
+          network_intensive: false
+          parallelizable: false
+        
+        ai_friendly:
+          cli_only: true
+          interactive: false
+          structured_output: true
+          output_format: "JSON"
+          idempotent: true
+          progress_reporting: false
+          exit_codes_clear: true
+        
+        command_template: |
+          jq '{filter}' {log_file}
+
+  # Deployment
+  deployment:
+    purpose: "Deploy application to target environment"
+    
+    strategies:
+      - name: "systemd_service"
+        description: "Deploy as systemd service (Linux native)"
+        suitable_for:
+          deployment_type: "system_service"
+          os: "Linux with systemd"
+          restart_strategy: "graceful"
+        
+        tool:
+          command: "systemctl"
+          native: true
+          version_match: "systemd >= 230"
+          requires_root: true
+        
+        execution:
+          estimated_time: "< 5 seconds"
+          cpu_intensive: false
+          io_intensive: false
+          network_intensive: false
+          parallelizable: false
+        
+        ai_friendly:
+          cli_only: true
+          interactive: false
+          structured_output: true
+          output_format: "json"
+          idempotent: true
+          progress_reporting: false
+          exit_codes_clear: true
+        
+        command_template: |
+          systemctl daemon-reload
+          systemctl restart {service_name}
+          systemctl status {service_name} --output=json
+      
+      - name: "process_manager"
+        description: "Deploy using process manager (pm2, supervisor)"
+        suitable_for:
+          deployment_type: "application"
+          os: "any"
+          restart_strategy: "zero_downtime"
+        
+        tool:
+          command: "pm2"
+          native: false
+          version_match: ">= 5.0"
+          install_if_missing: "npm install -g pm2"
+        
+        execution:
+          estimated_time: "< 10 seconds"
+          cpu_intensive: false
+          io_intensive: false
+          network_intensive: false
+          parallelizable: false
+        
+        ai_friendly:
+          cli_only: true
+          interactive: false
+          structured_output: true
+          output_format: "json"
+          idempotent: true
+          progress_reporting: false
+          exit_codes_clear: true
+        
+        command_template: |
+          pm2 reload {app_name} --update-env
+
+  # Monitoring
+  health_check:
+    purpose: "Check system health"
+    
+    strategies:
+      - name: "http_endpoint"
+        description: "Check HTTP health endpoint"
+        suitable_for:
+          service_type: "web_service"
+          protocol: "HTTP/HTTPS"
+        
+        tool:
+          command: "curl"
+          native: true
+          version_match: "any"
+        
+        execution:
+          estimated_time: "< 1 second"
+          cpu_intensive: false
+          io_intensive: false
+          network_intensive: true
+          parallelizable: true
+        
+        ai_friendly:
+          cli_only: true
+          interactive: false
+          structured_output: true
+          output_format: "json"
+          idempotent: true
+          progress_reporting: false
+          exit_codes_clear: true
+        
+        command_template: |
+          curl -f -s -o /dev/null -w "%{http_code}" \
+            --max-time 5 \
+            {health_endpoint}
+      
+      - name: "process_check"
+        description: "Check if process is running"
+        suitable_for:
+          service_type: "system_service"
+          os: "Linux"
+        
+        tool:
+          command: "systemctl"
+          native: true
+          version_match: "any"
+        
+        execution:
+          estimated_time: "< 1 second"
+          cpu_intensive: false
+          io_intensive: false
+          network_intensive: false
+          parallelizable: true
+        
+        ai_friendly:
+          cli_only: true
+          interactive: false
+          structured_output: true
+          output_format: "text"
+          idempotent: true
+          progress_reporting: false
+          exit_codes_clear: true
+        
+        command_template: |
+          systemctl is-active {service_name}
+
+# Tool selection algorithm parameters
+selection_criteria:
+  weights:
+    ai_friendly: 0.4      # 40% weight
+    native_tool: 0.3      # 30% weight
+    execution_efficiency: 0.3  # 30% weight
+  
+  efficiency_factors:
+    - data_size
+    - network_bandwidth
+    - time_window
+    - resource_availability
+
+# Environment-specific overrides
+environments:
+  development:
+    allow_non_native: true
+    auto_install_tools: true
+    prefer_verbose_output: true
+  
+  production:
+    allow_non_native: false
+    auto_install_tools: false
+    prefer_silent_output: true
+    require_approval_for:
+      - snapshot_backup
+      - any operation requiring root

@@ -250,6 +250,14 @@ sequenceDiagram
 ### Spec 驱动开发
 使用需求 → 设计 → 任务工作流结构化你的工作
 
+### DevOps 集成基础 🚀 新功能
+- **运维 Spec 管理**：标准化运维文档（部署、监控、故障排查等）
+- **渐进式 AI 自主**：L1-L5 接管级别，逐步实现 AI 运维控制
+- **审计日志**：基于 SHA-256 的防篡改审计追踪
+- **反馈集成**：自动化用户反馈处理和分析
+- **权限管理**：基于环境的安全控制（开发、测试、预生产、生产）
+- **运维验证**：完整的 spec 验证和清晰的错误报告
+
 ### 文档治理
 - 自动化文档生命周期管理
 - 强制执行清洁项目结构
@@ -288,6 +296,13 @@ kse create-spec <name>             # 创建新 Spec
 # 上下文管理
 kse context export <spec-name>     # 为 AI 工具导出上下文
 kse prompt generate <spec> <task>  # 生成任务特定提示
+
+# DevOps 运维（v1.8.0 新增）
+kse ops init <project-name>        # 初始化运维 specs
+kse ops validate [<project>]       # 验证运维完整性
+kse ops audit [options]            # 查询审计日志
+kse ops takeover <action>          # 管理 AI 接管级别
+kse ops feedback <action>          # 管理用户反馈
 
 # 任务管理
 kse task claim <spec> <task-id>    # 认领任务

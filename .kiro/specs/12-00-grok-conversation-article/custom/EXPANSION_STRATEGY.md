@@ -27,9 +27,10 @@
 - [x] GitHub（文章 + Discussions）
 - [x] npm 包发布
 - [x] 微信公众号（130+ 阅读）- https://mp.weixin.qq.com/s/GRo0XQ6GvQ03T4_FTvAsKA
-- [x] X/Twitter 发布（https://x.com/heguangyong/status/2015668235065229782）
-- [x] 掘金发布（https://juejin.cn/post/7598899986857377798）
-- [x] 知乎专栏发布（https://zhuanlan.zhihu.com/p/1999164891391624163）
+- [x] X/Twitter 发布 - https://x.com/heguangyong/status/2015668235065229782
+- [x] 掘金发布 - https://juejin.cn/post/7598899986857377798
+- [x] 知乎专栏发布 - https://zhuanlan.zhihu.com/p/1999164891391624163
+- [x] Dev.to 发布（英文）- https://dev.to/guangyong_he_801a39925878/the-philosophy-and-practice-of-ai-driven-development-a-deep-dialogue-with-grok-597i
 
 #### 🎯 待完成
 
@@ -50,7 +51,6 @@
 
 | 平台 | 优先级 | 预计时间 | 操作要点 |
 |------|--------|----------|----------|
-| **Dev.to** | ⭐⭐⭐⭐⭐ | 立即 | 开发者社区，支持 Markdown |
 | **Medium** | ⭐⭐⭐⭐ | 1-2 天 | 付费墙可选，传播广 |
 | **Hacker News** | ⭐⭐⭐⭐ | 3-5 天 | 需要好的标题，时机很重要 |
 | **Reddit (r/programming)** | ⭐⭐⭐⭐ | 3-5 天 | 技术讨论社区 |

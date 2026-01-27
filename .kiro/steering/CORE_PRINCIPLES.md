@@ -133,67 +133,32 @@
 - 历史数据归档到 Spec 目录
 - Session 启动后 token 使用率 > 50%：立即精简
 
-### 9. 文档生命周期管理原则
+### 9. 文档审查原则
 
-**文档分类**：
-- **永久文档**：README, CHANGELOG, CONTRIBUTING, LICENSE, docs/ 下的用户文档, Spec 的 requirements/design/tasks
-- **归档文档**：Spec 产物（reports/, scripts/, tests/, results/, docs/）
-- **临时文档**：会话总结、临时指南、完成总结（Spec 完成后删除）
+**项目初始化时必须审查**：
+- 检查所有文档中的项目名称和描述
+- 替换所有 `[TODO: ...]` 占位符
+- 移除从其他项目复制的遗留信息
+- 运行 `kse docs check-refs` 确认无错误引用
 
-**根目录管理**：
-- 只允许 4 个 .md 文件：README.md, README.zh.md, CHANGELOG.md, CONTRIBUTING.md
-- 禁止创建临时总结文档
-- 禁止创建会话记录文档
+**Spec 完成后必须审查**：
+- 检查文档追溯性（Requirements ↔ Design ↔ Tasks）
+- 确认所有产物已归档到正确目录
+- 验证文档一致性（名称、版本、日期）
 
-**Spec 目录管理**：
-- 标准结构：requirements.md, design.md, tasks.md + 子目录（reports/, scripts/, tests/, results/, docs/）
-- 临时文档必须在 Spec 完成后删除
-- 产物文档归档到对应子目录
+**发布前必须审查**：
+- 运行完整的文档检查工具链
+- 确认所有文档反映当前项目状态
+- 验证所有链接和引用有效
 
-**文档生命周期**：
-1. **创建时**：确定文档类型，选择正确位置
-2. **使用中**：临时文档可以存在，但要明确标记
-3. **完成后**：提取关键信息到 CHANGELOG，删除临时文档，归档产物
-
-**详细规则**：参考 `.kiro/specs/08-00-document-lifecycle-management/DOCUMENT_MANAGEMENT_GUIDE.md`
-
-### 10. 🚀 npm 发布版本管理原则
-
-**关键规则：每次代码修改后必须增加版本号才能发布**
-
-**版本号规则**：
-- 使用语义化版本：`major.minor.patch`（如 1.5.1）
-- **每次推送代码修改后，必须立即增加 patch 版本号**
-- 即使只是修复测试或小改动，也必须增加版本号
-- 否则 npm 发布会失败（不能重复发布相同版本）
-
-**发布流程**：
-1. 修改代码
-2. **立即更新 package.json 中的 version**
-3. **更新 CHANGELOG.md 添加新版本说明**
-4. 提交代码：`git commit -m "chore: bump version to x.y.z"`
-5. 创建标签：`git tag vx.y.z`
-6. 推送代码和标签：`git push origin main && git push origin vx.y.z`
-7. GitHub Actions 自动运行测试并发布到 npm
-
-**版本号增加规则**：
-- 新功能：增加 minor 版本（1.5.0 → 1.6.0）
-- Bug 修复：增加 patch 版本（1.5.0 → 1.5.1）
-- 测试修复：增加 patch 版本（1.5.1 → 1.5.2）
-- 重大变更：增加 major 版本（1.5.0 → 2.0.0）
-
-**常见错误**：
-- ❌ 修改代码后不更新版本号直接推送
-- ❌ 测试失败后修复，但忘记增加版本号
-- ❌ 使用已存在的版本号标签
-
-**正确做法**：
-- ✅ 每次修改后都检查是否需要增加版本号
-- ✅ 测试失败修复后，增加 patch 版本号
-- ✅ 确保 package.json、CHANGELOG.md、git tag 版本号一致
+**审查工具**：
+- `kse docs check-refs` - 检查错误引用和占位符
+- `kse docs diagnose` - 检查文档合规性
+- `kse docs validate --all` - 验证 Spec 结构
+- 参考 `doc-review-checklist.md` 进行手动审查
 
 ---
 
-**版本**: v6.0  
-**更新**: 2026-01-24  
-**说明**: 添加 npm 发布版本管理原则
+**版本**: v5.1  
+**更新**: 2026-01-27  
+**说明**: 添加文档审查原则，防止项目引用错误

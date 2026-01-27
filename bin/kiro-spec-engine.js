@@ -384,6 +384,29 @@ docsCmd
     process.exit(exitCode);
   });
 
+docsCmd
+  .command('check-refs')
+  .alias('check-references')
+  .description('Check for incorrect project references and placeholders')
+  .option('--report', 'Save report to file')
+  .option('--verbose', 'Show detailed error information')
+  .action(async (options) => {
+    const exitCode = await docsCommand('check-refs', options);
+    process.exit(exitCode);
+  });
+
+// DevOps integration commands
+const opsCommand = require('../lib/commands/ops');
+
+const opsCmd = program
+  .command('ops <subcommand> [args...]')
+  .description('DevOps integration foundation commands');
+
+// Note: The ops command handles its own subcommand routing internally
+opsCmd.action(async (subcommand, args, options) => {
+  await opsCommand(subcommand, args, options);
+});
+
 // 更新项目配置的辅助函数
 async function updateProjectConfig(projectName) {
   const envPath = path.join(process.cwd(), '.kiro/steering/ENVIRONMENT.md');

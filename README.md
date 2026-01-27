@@ -250,6 +250,14 @@ sequenceDiagram
 ### Spec-Driven Development
 Structure your work with Requirements → Design → Tasks workflow
 
+### DevOps Integration Foundation 🚀 NEW
+- **Operations Spec Management**: Standardized operations documentation (deployment, monitoring, troubleshooting, etc.)
+- **Progressive AI Autonomy**: L1-L5 takeover levels for gradual AI operations control
+- **Audit Logging**: Tamper-evident audit trail with SHA-256 integrity verification
+- **Feedback Integration**: Automated user feedback processing and analytics
+- **Permission Management**: Environment-based security controls (dev, test, pre-prod, prod)
+- **Operations Validation**: Complete spec validation with clear error reporting
+
 ### Document Governance
 - Automated document lifecycle management
 - Clean project structure enforcement
@@ -288,6 +296,13 @@ kse create-spec <name>             # Create new Spec
 # Context management
 kse context export <spec-name>     # Export context for AI tools
 kse prompt generate <spec> <task>  # Generate task-specific prompt
+
+# DevOps operations (NEW in v1.8.0)
+kse ops init <project-name>        # Initialize operations specs
+kse ops validate [<project>]       # Validate operations completeness
+kse ops audit [options]            # Query audit logs
+kse ops takeover <action>          # Manage AI takeover levels
+kse ops feedback <action>          # Manage user feedback
 
 # Task management
 kse task claim <spec> <task-id>    # Claim a task

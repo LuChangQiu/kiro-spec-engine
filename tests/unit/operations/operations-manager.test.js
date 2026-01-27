@@ -226,11 +226,17 @@ describe('OperationsManager', () => {
   
   describe('error handling', () => {
     test('should handle file system errors gracefully', async () => {
-      // Try to create spec in read-only location (will fail on Windows)
-      const readOnlyManager = new OperationsManager('C:/Windows/System32');
+      // Mock fs.ensureDir to simulate file system error
+      const originalEnsureDir = fs.ensureDir;
+      fs.ensureDir = jest.fn().mockRejectedValue(new Error('Permission denied'));
       
-      await expect(readOnlyManager.createOperationsSpec('test'))
-        .rejects.toThrow();
+      try {
+        await expect(manager.createOperationsSpec('test'))
+          .rejects.toThrow('Permission denied');
+      } finally {
+        // Restore original function
+        fs.ensureDir = originalEnsureDir;
+      }
     });
     
     test('should handle corrupted metadata file', async () => {

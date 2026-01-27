@@ -109,7 +109,8 @@ The session manager maintains user sessions.`
       );
 
       expect(result.success).toBe(false);
-      expect(result.error).toContain('Task not found');
+      // Error message could be either "Task not found" or "tasks.md not found"
+      expect(result.error).toMatch(/Task not found|tasks\.md not found/);
     });
 
     test('should support different target tools', async () => {

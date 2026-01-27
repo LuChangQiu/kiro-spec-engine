@@ -29,8 +29,8 @@
 
 - [x] package.json version updated to 1.8.0
 - [x] .kiro/version.json reflects current version
-- [ ] Git tag created (v1.8.0)
-- [ ] GitHub release created
+- [x] Git tag created (v1.8.0)
+- [x] Code pushed to GitHub (main + tags)
 
 ### Testing
 
@@ -272,11 +272,11 @@ Based on Spec 13 implementation review:
 
 ## Checklist Summary
 
-**Pre-Release**: 13/17 complete (76%)  
-**Release Process**: 0/5 complete (0%)  
+**Pre-Release**: 14/17 complete (82%)  
+**Release Process**: 2/5 complete (40%)  
 **Post-Release**: 0/10 complete (0%)
 
-**Status**: Ready for release process
+**Status**: GitHub Actions running - awaiting npm publication
 
 ---
 

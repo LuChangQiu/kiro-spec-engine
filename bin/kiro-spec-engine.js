@@ -182,10 +182,14 @@ program
 program
   .command('adopt')
   .description('Adopt existing project into Kiro Spec Engine')
-  .option('--auto', 'Skip confirmations (use with caution)')
+  .option('--interactive', 'Enable interactive mode (legacy behavior with prompts)')
   .option('--dry-run', 'Show what would change without making changes')
-  .option('--mode <mode>', 'Force specific adoption mode (fresh/partial/full)')
-  .option('--force', 'Force overwrite conflicting files (creates backup first)')
+  .option('--verbose', 'Show detailed logs')
+  .option('--no-backup', 'Skip backup creation (dangerous, not recommended)')
+  .option('--skip-update', 'Skip template file updates')
+  .option('--force', 'Force overwrite conflicting files (legacy, creates backup first)')
+  .option('--auto', 'Skip confirmations (legacy, use --interactive for old behavior)')
+  .option('--mode <mode>', 'Force specific adoption mode (legacy: fresh/partial/full)')
   .action((options) => {
     adoptCommand(options);
   });

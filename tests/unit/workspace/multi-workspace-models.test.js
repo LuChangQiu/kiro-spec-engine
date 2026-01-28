@@ -167,7 +167,8 @@ describe('WorkspaceRegistry', () => {
     it('should use default config path if not specified', () => {
       const defaultRegistry = new WorkspaceRegistry();
       const homeDir = os.homedir();
-      const expectedPath = path.join(homeDir, '.kse', 'workspaces.json');
+      // Updated: Now uses workspace-state.json (single source of truth)
+      const expectedPath = path.join(homeDir, '.kse', 'workspace-state.json');
       
       expect(defaultRegistry.configPath).toBe(expectedPath);
     });
@@ -414,7 +415,8 @@ describe('GlobalConfig', () => {
     it('should use default config path if not specified', () => {
       const defaultConfig = new GlobalConfig();
       const homeDir = os.homedir();
-      const expectedPath = path.join(homeDir, '.kse', 'config.json');
+      // Updated: Now uses workspace-state.json (single source of truth)
+      const expectedPath = path.join(homeDir, '.kse', 'workspace-state.json');
       
       expect(defaultConfig.configPath).toBe(expectedPath);
     });
@@ -439,7 +441,8 @@ describe('GlobalConfig', () => {
       
       const content = await fs.readFile(config.configPath, 'utf8');
       const data = JSON.parse(content);
-      expect(data.active_workspace).toBe('test-workspace');
+      // Updated: New format uses activeWorkspace (camelCase)
+      expect(data.activeWorkspace).toBe('test-workspace');
     });
   });
 
@@ -471,7 +474,8 @@ describe('GlobalConfig', () => {
       
       const content = await fs.readFile(config.configPath, 'utf8');
       const data = JSON.parse(content);
-      expect(data.preferences.auto_detect_workspace).toBe(false);
+      // Updated: New format uses camelCase
+      expect(data.preferences.autoDetectWorkspace).toBe(false);
     });
   });
 

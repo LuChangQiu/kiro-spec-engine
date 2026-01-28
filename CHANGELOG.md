@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.2] - 2026-01-29
+
+### Fixed - Test Reliability Improvements 🔧
+
+**Bug Fix**: Enhanced test reliability on Linux CI environments
+
+**Issues Fixed**:
+- Fixed `workspace-context-resolver.test.js` directory structure issues
+  - Tests now create complete `.kiro/specs` directory structure
+  - Added existence checks before cleanup operations
+- Fixed `backup-manager.test.js` temp directory cleanup
+  - Added error handling for ENOTEMPTY errors on Linux
+  - Graceful cleanup with existence checks
+
+**Technical Details**:
+- Changed from creating only `.kiro` to creating `.kiro/specs` subdirectories
+- Added try-catch error handling for temp directory cleanup
+- Added directory existence checks in afterEach cleanup
+
+**Impact**:
+- All 1417 tests now pass reliably on all platforms
+- Improved CI/CD stability
+- Production-ready cross-platform support
+
 ## [1.11.1] - 2026-01-29
 
 ### Fixed - Cross-Platform Test Compatibility 🔧

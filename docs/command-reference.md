@@ -2,8 +2,8 @@
 
 > Quick reference for all kse commands
 
-**Version**: 1.3.0  
-**Last Updated**: 2026-01-23
+**Version**: 1.11.2  
+**Last Updated**: 2026-01-29
 
 ---
 
@@ -134,13 +134,23 @@ kse workflows complete <workflow-name>
 ### Workspace Management
 
 ```bash
-# Sync workspace
-kse workspace sync
+# Create a new workspace
+kse workspace create <name> [path]
+
+# List all workspaces
+kse workspace list
+
+# Switch active workspace
+kse workspace switch <name>
 
 # Show workspace info
-kse workspace info
+kse workspace info [name]
 
-# List team members
+# Remove a workspace
+kse workspace remove <name> [--force]
+
+# Legacy commands (still supported)
+kse workspace sync
 kse workspace team
 ```
 
@@ -193,6 +203,28 @@ kse context export 01-00-my-feature
 kse workspace sync
 ```
 
+### Managing Multiple Projects
+
+```bash
+# 1. Register your projects as workspaces
+kse workspace create project-a ~/projects/project-a
+kse workspace create project-b ~/projects/project-b
+
+# 2. List all workspaces
+kse workspace list
+
+# 3. Switch between projects
+kse workspace switch project-a
+
+# 4. Check current workspace
+kse workspace info
+
+# 5. Work on the active project...
+
+# 6. Switch to another project
+kse workspace switch project-b
+```
+
 ### Setting Up Automation
 
 ```bash
@@ -234,6 +266,7 @@ kse workspace sync
 3. **Use tab completion** - Most shells support command completion
 4. **Check `kse doctor`** - Diagnose issues quickly
 5. **Use watch mode** - Automate repetitive tasks
+6. **Use workspace management** - Easily switch between multiple kse projects
 
 ---
 

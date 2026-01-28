@@ -250,7 +250,14 @@ sequenceDiagram
 ### Spec-Driven Development
 Structure your work with Requirements → Design → Tasks workflow
 
-### DevOps Integration Foundation 🚀 NEW
+### Multi-Workspace Management 🚀 NEW in v1.11.0
+- **Workspace Registry**: Manage multiple kse projects from a single location
+- **Quick Switching**: Switch between projects without directory navigation
+- **Data Atomicity**: Single source of truth (`~/.kse/workspace-state.json`)
+- **Cross-Platform**: Consistent path handling across Windows/Linux/macOS
+- **Auto Migration**: Seamless upgrade from legacy workspace format
+
+### DevOps Integration Foundation 🚀
 - **Operations Spec Management**: Standardized operations documentation (deployment, monitoring, troubleshooting, etc.)
 - **Progressive AI Autonomy**: L1-L5 takeover levels for gradual AI operations control
 - **Audit Logging**: Tamper-evident audit trail with SHA-256 integrity verification
@@ -297,7 +304,14 @@ kse create-spec <name>             # Create new Spec
 kse context export <spec-name>     # Export context for AI tools
 kse prompt generate <spec> <task>  # Generate task-specific prompt
 
-# DevOps operations (NEW in v1.8.0)
+# Workspace management (NEW in v1.11.0)
+kse workspace create <name> [path] # Register a new workspace
+kse workspace list                 # List all workspaces
+kse workspace switch <name>        # Switch active workspace
+kse workspace info [name]          # Show workspace details
+kse workspace remove <name>        # Remove workspace
+
+# DevOps operations
 kse ops init <project-name>        # Initialize operations specs
 kse ops validate [<project>]       # Validate operations completeness
 kse ops audit [options]            # Query audit logs

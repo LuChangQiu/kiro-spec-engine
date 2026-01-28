@@ -250,7 +250,14 @@ sequenceDiagram
 ### Spec 驱动开发
 使用需求 → 设计 → 任务工作流结构化你的工作
 
-### DevOps 集成基础 🚀 新功能
+### 多工作区管理 🚀 v1.11.0 新功能
+- **工作区注册表**：从单一位置管理多个 kse 项目
+- **快速切换**：无需目录导航即可在项目间切换
+- **数据原子性**：单一数据源（`~/.kse/workspace-state.json`）
+- **跨平台**：Windows/Linux/macOS 一致的路径处理
+- **自动迁移**：从旧版工作区格式无缝升级
+
+### DevOps 集成基础 🚀
 - **运维 Spec 管理**：标准化运维文档（部署、监控、故障排查等）
 - **渐进式 AI 自主**：L1-L5 接管级别，逐步实现 AI 运维控制
 - **审计日志**：基于 SHA-256 的防篡改审计追踪
@@ -297,7 +304,14 @@ kse create-spec <name>             # 创建新 Spec
 kse context export <spec-name>     # 为 AI 工具导出上下文
 kse prompt generate <spec> <task>  # 生成任务特定提示
 
-# DevOps 运维（v1.8.0 新增）
+# 工作区管理（v1.11.0 新增）
+kse workspace create <name> [path] # 注册新工作区
+kse workspace list                 # 列出所有工作区
+kse workspace switch <name>        # 切换活动工作区
+kse workspace info [name]          # 显示工作区详情
+kse workspace remove <name>        # 删除工作区
+
+# DevOps 运维
 kse ops init <project-name>        # 初始化运维 specs
 kse ops validate [<project>]       # 验证运维完整性
 kse ops audit [options]            # 查询审计日志

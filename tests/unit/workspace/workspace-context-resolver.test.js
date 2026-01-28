@@ -34,14 +34,15 @@ describe('WorkspaceContextResolver', () => {
     registryPath = path.join(testDir, 'workspaces.json');
     configPath = path.join(testDir, 'config.json');
 
-    // Create test workspace directories
+    // Create test workspace directories with complete .kiro structure
     workspace1Dir = path.join(testDir, 'workspace-1');
     workspace2Dir = path.join(testDir, 'workspace-2');
     workspace3Dir = path.join(testDir, 'workspace-3');
 
-    await fs.ensureDir(path.join(workspace1Dir, '.kiro'));
-    await fs.ensureDir(path.join(workspace2Dir, '.kiro'));
-    await fs.ensureDir(path.join(workspace3Dir, '.kiro'));
+    // Create .kiro and .kiro/specs directories for each workspace
+    await fs.ensureDir(path.join(workspace1Dir, '.kiro', 'specs'));
+    await fs.ensureDir(path.join(workspace2Dir, '.kiro', 'specs'));
+    await fs.ensureDir(path.join(workspace3Dir, '.kiro', 'specs'));
 
     // Initialize registry and config
     registry = new WorkspaceRegistry(registryPath);
@@ -55,8 +56,10 @@ describe('WorkspaceContextResolver', () => {
   });
 
   afterEach(async () => {
-    // Clean up
-    await fs.remove(testDir);
+    // Clean up - use force option for better cross-platform compatibility
+    if (await fs.pathExists(testDir)) {
+      await fs.remove(testDir);
+    }
   });
 
   describe('resolveWorkspace', () => {

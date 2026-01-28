@@ -32,8 +32,15 @@ describe('BackupManager', () => {
   });
 
   afterEach(async () => {
-    // Clean up test directory
-    await fs.remove(testProjectPath);
+    // Clean up test directory - check if exists first for better cross-platform compatibility
+    if (await fs.pathExists(testProjectPath)) {
+      try {
+        await fs.remove(testProjectPath);
+      } catch (error) {
+        // Ignore cleanup errors in tests
+        console.warn(`Warning: Could not clean up test directory: ${error.message}`);
+      }
+    }
   });
 
   describe('createMandatoryBackup', () => {

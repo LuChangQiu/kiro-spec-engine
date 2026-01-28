@@ -22,9 +22,17 @@ describe('Workspace Data Model', () => {
     });
 
     it('should normalize paths with forward slashes', () => {
-      const workspace = new Workspace('test', 'C:\\Users\\test\\project');
+      // Use platform-appropriate absolute paths
+      const inputPath = process.platform === 'win32' 
+        ? 'C:\\Users\\test\\project' 
+        : '/home/test/project';
+      const expectedPath = process.platform === 'win32'
+        ? 'C:/Users/test/project'
+        : '/home/test/project';
       
-      expect(workspace.path).toBe('C:/Users/test/project');
+      const workspace = new Workspace('test', inputPath);
+      
+      expect(workspace.path).toBe(expectedPath);
       expect(workspace.path).not.toContain('\\');
     });
 

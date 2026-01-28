@@ -169,8 +169,13 @@ describe('PathUtils', () => {
     });
 
     it('should use forward slashes', () => {
-      const input = 'C:\\Users\\test\\file.txt';
+      // Use platform-appropriate paths
+      const input = process.platform === 'win32'
+        ? 'C:\\Users\\test\\file.txt'
+        : '/home/test/file.txt';
       const result = PathUtils.dirname(input);
+      
+      // Result should use forward slashes
       expect(result).toMatch(/\//);
       expect(result).not.toMatch(/\\/);
     });

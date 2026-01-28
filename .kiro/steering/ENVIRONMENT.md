@@ -1,15 +1,15 @@
 ﻿# 项目环境配置（模板）
 
-> **重要**: 这是项目的环境配置模板，复制到新项目时请根据实际情况修改。
+> ⚠️ **这是模板文件**: 请根据实际项目修改所有 `[TODO: ...]` 占位符
 
 ---
 
 ## 📋 项目基本信息
 
-- **项目名称**: kiro-spec-engine (kse)
-- **项目类型**: npm package and CLI tool for spec-driven development
-- **核心技术**: Node.js + Jest + Spec-driven methodology
-- **开发语言**: JavaScript (Node.js 16+)
+- **项目名称**: [TODO: 项目名称 - 请修改]
+- **项目类型**: [TODO: 项目类型 - 请修改，如: Web应用/CLI工具/库]
+- **核心技术**: [TODO: 核心技术栈 - 请修改，如: React + Node.js]
+- **开发语言**: [TODO: 主要开发语言 - 请修改，如: TypeScript/Python]
 
 ---
 
@@ -109,7 +109,7 @@ project-root/
 
 ---
 
-**版本**: v4.1  
-**更新**: 2026-01-27  
-**项目**: kiro-spec-engine (kse)  
-**说明**: 已更新为实际项目信息，集成 Ultrawork 精神
+**版本**: v4.0  
+**更新**: 2026-01-22  
+**项目**: 通用 Kiro Spec 项目模板  
+**说明**: 已清理项目特定内容，集成 Ultrawork 精神，可复制使用

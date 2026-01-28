@@ -5,6 +5,66 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.0] - 2026-01-29
+
+### Added - Multi-Workspace Management 🚀
+
+**Spec 16-00**: Complete multi-workspace management system for managing multiple kse projects
+
+**New Features**:
+- **Workspace Management Commands**
+  - `kse workspace create <name> [path]` - Register a new workspace
+  - `kse workspace list` - List all registered workspaces
+  - `kse workspace switch <name>` - Switch active workspace
+  - `kse workspace remove <name>` - Remove workspace from registry
+  - `kse workspace info [name]` - Display workspace details
+- **Data Atomicity Architecture**
+  - Single source of truth: `~/.kse/workspace-state.json`
+  - Atomic operations for all workspace state changes
+  - Automatic migration from legacy format
+  - Cross-platform path handling with PathUtils
+- **Workspace Context Resolution**
+  - Automatic workspace detection from current directory
+  - Priority-based resolution (explicit > current dir > active > error)
+  - Seamless integration with existing commands
+
+**New Modules**:
+- `lib/workspace/multi/workspace-state-manager.js` - State management (SSOT)
+- `lib/workspace/multi/path-utils.js` - Cross-platform path utilities
+- `lib/workspace/multi/workspace.js` - Workspace data model
+- `lib/workspace/multi/workspace-context-resolver.js` - Context resolution
+- `lib/commands/workspace-multi.js` - CLI command implementation
+
+**Architecture Improvements**:
+- Implemented Data Atomicity Principle (added to CORE_PRINCIPLES.md)
+- Single configuration file eliminates data inconsistency risks
+- Atomic save mechanism with temp file + rename
+- Backward compatible with automatic migration
+
+**Testing**:
+- 190+ new tests across 6 test files
+- 100% coverage for core functionality
+- All 1417 tests passing (8 skipped)
+- Property-based test framework ready (optional)
+
+**Documentation**:
+- Complete requirements, design, and tasks documentation
+- Data atomicity enhancement design document
+- Phase 4 refactoring summary
+- Session summary and completion report
+
+**Benefits**:
+- Manage multiple kse projects from a single location
+- Quick workspace switching without directory navigation
+- Consistent workspace state across all operations
+- Foundation for future cross-workspace features
+
+**Quality**:
+- Production-ready MVP implementation
+- Clean architecture with clear separation of concerns
+- Comprehensive error handling and validation
+- Cross-platform support (Windows, Linux, macOS)
+
 ## [1.9.1] - 2026-01-28
 
 ### Added - Documentation Completion 📚

@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.2] - 2026-01-29
+
+### Added
+- **Critical Principle**: Added "测试失败零容忍原则" (Zero Tolerance for Test Failures) to CORE_PRINCIPLES.md
+  - Emphasizes "千里之堤溃于蚁穴" - never ignore any test failure
+  - Provides clear execution standards and rationale
+  - Aligns with Ultrawork spirit and KSE core values
+
+### Changed
+- **Documentation Optimization**: Refactored CORE_PRINCIPLES.md for clarity and value density
+  - Fixed duplicate principle numbering (two #6)
+  - Merged overlapping content (context management + doc simplification)
+  - Consolidated quality principles (code quality + test zero-tolerance)
+  - Simplified Spec naming examples (7 → 3 examples)
+  - Removed redundant content while preserving all core value
+  - Reduced from ~200 lines to ~130 lines (35% reduction)
+  - Improved scannability and memorability
+  - Updated to v7.0
+
 ## [1.12.1] - 2026-01-29
 
 ### Fixed

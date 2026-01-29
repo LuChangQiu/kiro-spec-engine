@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.1] - 2026-01-29
+
+### Fixed
+- **CI Test Stability**: Resolved intermittent test failures in workspace-context-resolver tests
+  - Added 100ms delay after directory creation to ensure filesystem sync in CI environment
+  - Fixed ENOENT race condition in workspace-state-manager atomic rename operation
+  - All 27 workspace context resolver tests now pass reliably
+
+## [1.13.0] - 2026-01-29
+
 ### Added
 - **Steering Directory Compliance Check with Auto-Fix**: Automatic validation and repair of `.kiro/steering/` directory
   - Enforces allowlist of 4 files: CORE_PRINCIPLES.md, ENVIRONMENT.md, CURRENT_CONTEXT.md, RULES_GUIDE.md

@@ -124,6 +124,15 @@ project-root/
 - ❌ 不要手动运行 `npm run publish:manual`
 - ❌ tag 推送后会自动触发 CI/CD 发布流程
 
+**CI 测试失败处理** ⚠️:
+- 如果 tag 推送后 CI 测试失败，必须：
+  1. 修复测试问题并提交
+  2. 删除失败的 tag（本地和远程）: `git tag -d vX.Y.Z` + `git push origin :refs/tags/vX.Y.Z`
+  3. **增加版本号**（如 v1.13.0 失败 → 修复后发布 v1.13.1）
+  4. 更新 `package.json` 和 `CHANGELOG.md` 为新版本号
+  5. 重新提交并打新 tag
+- **原因**: 避免版本号混乱，保持发布历史清晰
+
 **验证发布**:
 - 检查 GitHub Actions 工作流状态
 - 等待几分钟后在 npm 上验证: `npm view kiro-spec-engine@X.Y.Z`
@@ -134,7 +143,7 @@ project-root/
 
 ---
 
-**版本**: v5.0  
+**版本**: v6.0  
 **更新**: 2026-01-29  
 **项目**: kiro-spec-engine  
-**说明**: 已更新项目信息，添加 npm 自动发布流程说明
+**说明**: 添加 CI 测试失败处理规则

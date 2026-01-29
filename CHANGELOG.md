@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Steering Directory Compliance Check with Auto-Fix**: Automatic validation and repair of `.kiro/steering/` directory
+  - Enforces allowlist of 4 files: CORE_PRINCIPLES.md, ENVIRONMENT.md, CURRENT_CONTEXT.md, RULES_GUIDE.md
+  - Prohibits subdirectories to prevent context pollution
+  - **Auto-fix feature**: Automatically backs up and removes violations without user confirmation
+  - **Multi-user support**: Detects and respects `contexts/` multi-user collaboration setup
+  - Differential backup: Only backs up violating files/directories (not entire .kiro/)
+  - Backup location: `.kiro/backups/steering-cleanup-{timestamp}/`
+  - Version-based caching (~/.kse/steering-check-cache.json) to avoid repeated checks
+  - Performance target: <50ms per check
+  - Clear progress messages during auto-fix
+  - Bypass options: `--skip-steering-check` flag and `KSE_SKIP_STEERING_CHECK` environment variable
+  - Force check option: `--force-steering-check` flag
+  - Comprehensive documentation in `.kiro/README.md`
+
+### Changed
+- **CLI**: All commands now run steering directory compliance check before execution
+- **Auto-fix behavior**: Violations are automatically fixed (backup + clean) without user confirmation
+- **Multi-user awareness**: Auto-fix shows informational message when multi-user project detected
+- **Documentation**: Added "Steering Directory Compliance" section with multi-user guidance to `.kiro/README.md`
+
+### Breaking Changes
+- Commands will automatically fix steering directory violations on first run
+- Violating files/directories are backed up to `.kiro/backups/steering-cleanup-{timestamp}/`
+- Use `--skip-steering-check` flag to bypass if needed during migration
+- Multi-user projects: Personal contexts in `contexts/` are preserved during auto-fix
+
 ## [1.12.3] - 2026-01-29
 
 ### Added

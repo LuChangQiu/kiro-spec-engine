@@ -1,91 +1,55 @@
 ﻿# 当前场景规则
 
-> Spec 18-00: Integration Test Expansion - Phase 1 完成 ✅
+> Spec 19-00: Steering Directory Compliance Check - 已完成（含自动修正）✅
 
-## 🎯 最终状态
+## 🎯 当前状态
 
-**活跃 Spec**: 18-00-integration-test-expansion
+**活跃 Spec**: 无（Spec 19-00 已完成）
 
-**阶段**: Phase 1 完成，已归档
+**阶段**: 准备发布
 
-**Spec 目标**: 添加综合集成测试，覆盖关键命令，提升测试质量
+**最近完成**: Spec 19-00 - Steering Directory Compliance Check with Auto-Fix
 
-## ✅ 完成成果
+## 📋 Spec 19-00 完成总结
 
-### 测试扩展结果
+### 实现内容
+- ✅ 核心验证逻辑 (SteeringComplianceChecker)
+- ✅ 版本缓存机制 (ComplianceCache)
+- ✅ 错误报告系统 (ComplianceErrorReporter)
+- ✅ **自动修正系统 (ComplianceAutoFixer)** - 新增
+- ✅ CLI 集成（所有命令执行前自动检查和修正）
+- ✅ 性能监控（<50ms 目标）
+- ✅ 完整文档（README + CHANGELOG）
+- ✅ 全面测试（35 个单元测试，全部通过）
 
-**优化前**:
-- 集成测试: 10 个
-- 关键路径覆盖: 0%
-- CI 时间: ~15 秒
+### 关键特性
+- 只允许 4 个文件：CORE_PRINCIPLES.md, ENVIRONMENT.md, CURRENT_CONTEXT.md, RULES_GUIDE.md
+- 禁止任何子目录
+- **自动修正**：检测到违规时自动备份并清理，无需用户确认
+- **多人协作支持**：自动检测 contexts/ 目录，保护个人上下文
+- **差异化备份**：只备份违规文件/目录，不备份整个 .kiro/
+- 备份位置：`.kiro/backups/steering-cleanup-{timestamp}/`
+- 版本缓存避免重复检查
+- 清晰的进度消息
+- 绕过选项：`--skip-steering-check` 和 `KSE_SKIP_STEERING_CHECK`
 
-**优化后**:
-- 集成测试: 29 个 ✅ (+190%)
-- 命令覆盖: 3 个关键命令（workspace-multi, status, doctor）
-- CI 时间: ~16.8 秒 ✅ (< 20秒目标)
-- 测试通过率: 100%
+### 自动修正流程
+1. 检测违规 → 2. 创建差异化备份 → 3. 清理违规项 → 4. 显示结果和回滚命令
 
-### 基础设施
+### 测试结果
+- 全部 35 个 steering 测试通过 ✅
+- 8 个新的自动修正测试 ✅
+- 手动测试验证 ✅
+- 性能达标 ✅
 
-创建了可复用的测试工具：
-- IntegrationTestFixture - 测试环境管理
-- CommandTestHelper - 命令执行和验证工具
+## 🚀 下一步
 
-### 文档产出
-
-- `PROGRESS.md` - 详细进度报告
-- `COMPLETION.md` - 完成报告
-- `tests/integration/README.md` - 集成测试指南
-- 更新 `docs/testing-strategy.md`
-
-## 🔍 关键决策
-
-### 深度优先策略
-
-选择了**深度优先**而非广度优先：
-- ✅ 3 个命令的深入测试（11-19 个测试/命令）
-- ✅ 更高质量的回归预防
-- ✅ 建立了清晰的测试模式
-- ✅ 仍然超过了测试数量目标（29 vs 22-25）
-
-### 价值体现
-
-- **高质量覆盖**: 工作区管理的全面测试
-- **可复用基础**: 使未来测试开发更容易
-- **优秀性能**: CI 时间保持在 16% 的安全边际内
-- **清晰模式**: 为后续测试建立了最佳实践
-
-## 📊 当前指标
-
-- **总测试数**: 1,353 个（1,324 单元 + 29 集成）
-- **集成测试**: 29 个
-- **CI 执行时间**: ~16.8 秒
-- **测试通过率**: 100%
-
-## 💡 后续建议
-
-**短期**（下一个 Spec）:
-1. 为 3-5 个高优先级命令添加集成测试
-   - adopt (2 tests)
-   - task (2 tests)
-   - context (1 test)
-
-**中期**（可选）:
-1. 测量实际关键路径覆盖率
-2. 识别覆盖缺口
-3. 基于使用频率优先级排序
-
-**长期**（持续）:
-1. 每个 sprint 增加 2-3 个测试
-2. 季度审查和重构
-3. 监控 CI 执行时间趋势
-
-## 📁 Spec 归档
-
-所有产物已归档到：
-`.kiro/specs/18-00-integration-test-expansion/`
+准备发布 v1.13.0：
+1. 审查 CHANGELOG.md 中的变更说明
+2. 更新 package.json 版本号
+3. 提交并创建 tag
+4. GitHub Actions 自动发布到 npm
 
 ---
 
-v37.0 | 2026-01-29 | Spec 18-00 Phase 1 完成 + 深度优先策略
-
+v41.0 | 2026-01-29 | Spec 19-00 完成（含自动修正功能）

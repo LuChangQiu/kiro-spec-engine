@@ -249,15 +249,163 @@ For teams working on the same project:
 
 # Switch context (Windows)
 .kiro\switch-workspace.bat <workspace-name>
+
+# Linux/macOS
+bash .kiro/create-workspace.sh <your-name>
+bash .kiro/switch-workspace.sh <workspace-name>
 ```
 
 **Use case**: Multiple developers working on the same project, each with their own `CURRENT_CONTEXT.md`.
 
 **Data storage**: `.kiro/contexts/{developer}/CURRENT_CONTEXT.md`
 
+**How it works**:
+1. Each developer has their own context in `contexts/{name}/`
+2. When you switch workspace, your current context is saved
+3. The new workspace's context is loaded to `steering/CURRENT_CONTEXT.md`
+4. Only the active context is read by AI tools
+
+**Multi-user + Auto-fix**:
+- ✅ Auto-fix detects multi-user projects automatically
+- ✅ Your personal context in `contexts/` is preserved
+- ✅ Only `steering/CURRENT_CONTEXT.md` is managed by auto-fix
+- ✅ Switch workspace to restore your personal context
+
 **Key difference**:
 - **kse workspace**: Cross-project management (different directories)
 - **contexts/**: Same project, different developers
+
+**Setup for new team members**:
+```bash
+# 1. Clone the project
+git clone <repo-url>
+cd <project>
+
+# 2. Install kse
+npm install -g kiro-spec-engine
+
+# 3. Create your personal workspace
+.kiro\create-workspace.bat <your-name>
+
+# 4. Start working
+kse status
+```
+
+---
+
+## 🔒 Steering Directory Compliance
+
+The `.kiro/steering/` directory is **automatically loaded in every AI session**, making it critical to keep clean and minimal.
+
+### Allowed Files (Only These 4)
+
+- ✅ `CORE_PRINCIPLES.md` - Core development principles
+- ✅ `ENVIRONMENT.md` - Project environment configuration
+- ✅ `CURRENT_CONTEXT.md` - Current work context
+- ✅ `RULES_GUIDE.md` - Rules index
+
+### Prohibited Content
+
+- ❌ **Any other files** (analysis reports, temporary notes, etc.)
+- ❌ **Any subdirectories** (archive/, old-rules/, etc.)
+- ❌ **Hidden files** (.gitkeep, .DS_Store, etc.)
+
+### Why This Matters
+
+**Context pollution**: Every file in steering/ is loaded into AI context, consuming tokens and slowing responses.
+
+**Token waste**: Unnecessary files increase costs and reduce available context for actual work.
+
+### Automatic Compliance Check
+
+kse automatically checks steering directory compliance before every command:
+
+```bash
+# Normal usage - check runs automatically and fixes violations
+kse status
+
+# If violations found, they are automatically backed up and removed
+# Output example:
+# 🔧 Auto-fixing steering directory compliance violations...
+# Disallowed files to be removed:
+#   - analysis-report.md
+# ✓ Backup created: .kiro/backups/steering-cleanup-2026-01-29T10-30-00
+# ✓ Removed file: analysis-report.md
+# ✓ Steering directory cleaned successfully!
+
+# Bypass check (not recommended)
+kse status --skip-steering-check
+
+# Force check even if cached
+kse status --force-steering-check
+
+# Environment variable bypass
+set KSE_SKIP_STEERING_CHECK=1
+kse status
+```
+
+**Cache behavior**: After first successful check, kse caches the result per version to avoid repeated checks.
+
+**Cache location**: `~/.kse/steering-check-cache.json`
+
+### Auto-Fix Behavior
+
+When violations are detected, kse automatically:
+
+1. **Creates differential backup** - Only backs up violating files/directories
+2. **Backup location** - `.kiro/backups/steering-cleanup-{timestamp}/`
+3. **Removes violations** - Cleans steering directory to compliant state
+4. **Shows progress** - Clear messages about what was backed up and removed
+5. **Provides rollback info** - Shows command to restore if needed
+
+**No user confirmation required** - The system takes over and fixes automatically.
+
+**Multi-user projects**: 
+- Auto-fix detects if you're using `contexts/` for multi-user collaboration
+- Your personal context in `contexts/{your-name}/` is preserved
+- Only `steering/CURRENT_CONTEXT.md` is managed by auto-fix
+- Use workspace scripts to switch between personal contexts
+
+### Restoring from Backup
+
+If you need to restore backed-up files:
+
+```bash
+kse rollback --backup steering-cleanup-2026-01-29T10-30-00
+```
+
+### Multi-User Collaboration
+
+If multiple developers work on the same project:
+
+1. **Each developer creates their workspace**:
+   ```bash
+   .kiro\create-workspace.bat alice
+   .kiro\create-workspace.bat bob
+   ```
+
+2. **Switch between workspaces**:
+   ```bash
+   .kiro\switch-workspace.bat alice
+   ```
+
+3. **Auto-fix respects multi-user setup**:
+   - Detects `contexts/` directory automatically
+   - Preserves personal contexts
+   - Shows informational message during fix
+
+4. **Git workflow**:
+   - Commit: `contexts/` directory structure
+   - Ignore: `contexts/**/CURRENT_CONTEXT.md` (personal contexts)
+   - Ignore: `steering/CURRENT_CONTEXT.md` (active context)
+
+---
+
+**Where to move content**:
+- Analysis reports → `.kiro/specs/{spec-name}/results/`
+- Historical data → `.kiro/specs/{spec-name}/`
+- Detailed documentation → `docs/`
+- Temporary files → Delete them
 
 ---
 

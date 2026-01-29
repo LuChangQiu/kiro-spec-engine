@@ -44,7 +44,9 @@ program
   .option('-l, --lang <locale>', 'Set language (en/zh)', (locale) => {
     i18n.setLocale(locale);
   })
-  .option('--no-version-check', 'Suppress version mismatch warnings');
+  .option('--no-version-check', 'Suppress version mismatch warnings')
+  .option('--skip-steering-check', 'Skip steering directory compliance check (not recommended)')
+  .option('--force-steering-check', 'Force steering directory compliance check even if cache is valid');
 
 // 初始化项目命令
 program
@@ -478,5 +480,24 @@ async function updateProjectConfig(projectName) {
   }
 }
 
-// 解析命令行参数
-program.parse();
+// Run steering directory compliance check before parsing commands
+(async function() {
+  const { runSteeringComplianceCheck } = require('../lib/steering');
+  
+  // Check for bypass flags
+  const args = process.argv.slice(2);
+  const skipCheck = args.includes('--skip-steering-check') || 
+                    process.env.KSE_SKIP_STEERING_CHECK === '1';
+  const forceCheck = args.includes('--force-steering-check');
+  
+  // Run compliance check
+  await runSteeringComplianceCheck({
+    skip: skipCheck,
+    force: forceCheck,
+    projectPath: process.cwd(),
+    version: packageJson.version
+  });
+
+  // 解析命令行参数
+  program.parse();
+})();

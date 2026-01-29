@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.4] - 2026-01-29
+
+### Fixed
+
+- Fixed test failure in `workspace-context-resolver.test.js`
+- Removed redundant state clearing in `clearActiveWorkspace` test that caused CI failures
+- All tests now pass (1417 passed, 8 skipped)
+
 ## [1.11.3] - 2026-01-29
 
 ### Fixed - CRITICAL: Workspace Context Pollution 🚨

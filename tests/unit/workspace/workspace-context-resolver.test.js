@@ -48,6 +48,9 @@ describe('WorkspaceContextResolver', () => {
     registry = new WorkspaceRegistry(registryPath);
     config = new GlobalConfig(configPath);
     
+    // Wait a bit to ensure directories are fully created (CI environment)
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     // Clear any existing state
     await config.setActiveWorkspace(null);
     

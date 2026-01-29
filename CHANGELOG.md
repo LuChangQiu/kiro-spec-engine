@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.3] - 2026-01-29
+
+### Added
+- **Documentation Enhancement**: Comprehensive `.kiro/README.md` update (v2.0)
+  - Added complete directory structure documentation with purpose explanations
+  - Added workspace management section with detailed usage examples
+  - Added document governance section with validation commands
+  - Added data storage location details for `kse workspace` feature
+  - Added JSON data structure examples for workspace-state.json
+  - Clarified difference between `kse workspace` (cross-project) and `contexts/` (multi-user)
+  - Added key features list for workspace management
+
+### Changed
+- **Documentation**: Updated `.kiro/README.md` version to 2.0 with comprehensive feature documentation
+- **Documentation**: Enhanced workspace storage explanation with platform-specific paths
+
 ## [1.12.2] - 2026-01-29
 
 ### Added

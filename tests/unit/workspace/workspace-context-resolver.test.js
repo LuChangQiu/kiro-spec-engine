@@ -228,11 +228,8 @@ describe('WorkspaceContextResolver', () => {
 
   describe('clearActiveWorkspace', () => {
     test('should clear active workspace', async () => {
-      // First, ensure we start with a clean state
-      await config.setActiveWorkspace(null);
-      
       // Set workspace-1 as active
-      await config.setActiveWorkspace('workspace-1');
+      await resolver.setActiveWorkspace('workspace-1');
       
       // Verify it's set
       let activeWorkspaceName = await config.getActiveWorkspace();

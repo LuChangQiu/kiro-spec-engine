@@ -1,0 +1,602 @@
+{
+  "timestamp": "2026-01-29T04:59:18.494Z",
+  "coverage": {
+    "totalCriticalPaths": 32,
+    "coveredPaths": 0,
+    "uncoveredPaths": [
+      {
+        "id": "adoption-backup-manager",
+        "featureArea": "adoption",
+        "description": "adoption: backup-manager",
+        "entryPoints": [
+          "lib/adoption/backup-manager.js"
+        ],
+        "dependencies": [
+          "../backup/selective-backup"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "adoption-detection-engine",
+        "featureArea": "adoption",
+        "description": "adoption: detection-engine",
+        "entryPoints": [
+          "lib/adoption/detection-engine.js"
+        ],
+        "dependencies": [
+          "../utils/fs-utils",
+          "../steering/steering-manager"
+        ],
+        "priority": "low"
+      },
+      {
+        "id": "adoption-smart-orchestrator",
+        "featureArea": "adoption",
+        "description": "adoption: smart-orchestrator",
+        "entryPoints": [
+          "lib/adoption/smart-orchestrator.js"
+        ],
+        "dependencies": [
+          "./detection-engine",
+          "./adoption-strategy",
+          "./backup-manager",
+          "../version/version-manager",
+          "./strategy-selector",
+          "./progress-reporter",
+          "./summary-generator",
+          "./error-formatter",
+          "../../package.json"
+        ],
+        "priority": "low"
+      },
+      {
+        "id": "commands-adopt",
+        "featureArea": "commands",
+        "description": "commands: adopt",
+        "entryPoints": [
+          "lib/commands/adopt.js"
+        ],
+        "dependencies": [
+          "../adoption/detection-engine",
+          "../adoption/adoption-strategy",
+          "../backup/backup-system",
+          "../version/version-manager",
+          "../steering/steering-manager",
+          "../steering/adoption-config",
+          "../utils/tool-detector",
+          "../adoption/conflict-resolver",
+          "../backup/selective-backup",
+          "../adoption/smart-orchestrator",
+          "../../package.json"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "commands-context",
+        "featureArea": "commands",
+        "description": "commands: context",
+        "entryPoints": [
+          "lib/commands/context.js"
+        ],
+        "dependencies": [
+          "../context/context-exporter"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "commands-docs",
+        "featureArea": "commands",
+        "description": "commands: docs",
+        "entryPoints": [
+          "lib/commands/docs.js"
+        ],
+        "dependencies": [
+          "../governance/config-manager",
+          "../governance/diagnostic-engine",
+          "../governance/cleanup-tool",
+          "../governance/validation-engine",
+          "../governance/archive-tool",
+          "../governance/hooks-manager",
+          "../governance/reporter",
+          "../governance/execution-logger",
+          "../governance/doc-reference-checker"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "commands-doctor",
+        "featureArea": "commands",
+        "description": "commands: doctor",
+        "entryPoints": [
+          "lib/commands/doctor.js"
+        ],
+        "dependencies": [
+          "../python-checker",
+          "../i18n",
+          "../governance/diagnostic-engine",
+          "../governance/config-manager"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "commands-ops",
+        "featureArea": "commands",
+        "description": "commands: ops",
+        "entryPoints": [
+          "lib/commands/ops.js"
+        ],
+        "dependencies": [
+          "../operations/operations-manager",
+          "../operations/permission-manager",
+          "../operations/audit-logger",
+          "../operations/feedback-manager",
+          "../operations/models"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "commands-prompt",
+        "featureArea": "commands",
+        "description": "commands: prompt",
+        "entryPoints": [
+          "lib/commands/prompt.js"
+        ],
+        "dependencies": [
+          "../context/prompt-generator"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "commands-rollback",
+        "featureArea": "commands",
+        "description": "commands: rollback",
+        "entryPoints": [
+          "lib/commands/rollback.js"
+        ],
+        "dependencies": [
+          "../backup/backup-system"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "commands-status",
+        "featureArea": "commands",
+        "description": "commands: status",
+        "entryPoints": [
+          "lib/commands/status.js"
+        ],
+        "dependencies": [
+          "../task/task-claimer",
+          "../workspace/workspace-manager",
+          "../governance/diagnostic-engine",
+          "../governance/config-manager"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "commands-task",
+        "featureArea": "commands",
+        "description": "commands: task",
+        "entryPoints": [
+          "lib/commands/task.js"
+        ],
+        "dependencies": [
+          "../task/task-claimer",
+          "../workspace/workspace-manager"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "commands-upgrade",
+        "featureArea": "commands",
+        "description": "commands: upgrade",
+        "entryPoints": [
+          "lib/commands/upgrade.js"
+        ],
+        "dependencies": [
+          "../version/version-manager",
+          "../upgrade/migration-engine",
+          "../backup/backup-system",
+          "../../package.json"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "commands-watch",
+        "featureArea": "watch",
+        "description": "watch: watch",
+        "entryPoints": [
+          "lib/commands/watch.js"
+        ],
+        "dependencies": [
+          "../watch/watch-manager",
+          "../watch/presets"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "commands-workflows",
+        "featureArea": "commands",
+        "description": "commands: workflows",
+        "entryPoints": [
+          "lib/commands/workflows.js"
+        ],
+        "dependencies": [],
+        "priority": "high"
+      },
+      {
+        "id": "commands-workspace-multi",
+        "featureArea": "commands",
+        "description": "commands: workspace-multi",
+        "entryPoints": [
+          "lib/commands/workspace-multi.js"
+        ],
+        "dependencies": [
+          "../workspace/multi/workspace-state-manager"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "commands-workspace",
+        "featureArea": "workspace",
+        "description": "workspace: workspace",
+        "entryPoints": [
+          "lib/commands/workspace.js"
+        ],
+        "dependencies": [
+          "../workspace/workspace-manager",
+          "../workspace/workspace-sync"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "governance-config-manager",
+        "featureArea": "governance",
+        "description": "governance: config-manager",
+        "entryPoints": [
+          "lib/governance/config-manager.js"
+        ],
+        "dependencies": [],
+        "priority": "high"
+      },
+      {
+        "id": "governance-diagnostic-engine",
+        "featureArea": "governance",
+        "description": "governance: diagnostic-engine",
+        "entryPoints": [
+          "lib/governance/diagnostic-engine.js"
+        ],
+        "dependencies": [
+          "./file-scanner",
+          "./config-manager"
+        ],
+        "priority": "low"
+      },
+      {
+        "id": "governance-hooks-manager",
+        "featureArea": "governance",
+        "description": "governance: hooks-manager",
+        "entryPoints": [
+          "lib/governance/hooks-manager.js"
+        ],
+        "dependencies": [
+          "./lib/governance/config-manager",
+          "./lib/governance/validation-engine"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "governance-validation-engine",
+        "featureArea": "governance",
+        "description": "governance: validation-engine",
+        "entryPoints": [
+          "lib/governance/validation-engine.js"
+        ],
+        "dependencies": [
+          "./file-scanner"
+        ],
+        "priority": "medium"
+      },
+      {
+        "id": "operations-feedback-manager",
+        "featureArea": "operations",
+        "description": "operations: feedback-manager",
+        "entryPoints": [
+          "lib/operations/feedback-manager.js"
+        ],
+        "dependencies": [
+          "./models",
+          "../utils/fs-utils"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "operations-operations-manager",
+        "featureArea": "operations",
+        "description": "operations: operations-manager",
+        "entryPoints": [
+          "lib/operations/operations-manager.js"
+        ],
+        "dependencies": [
+          "./template-loader",
+          "./operations-validator",
+          "./models"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "operations-permission-manager",
+        "featureArea": "operations",
+        "description": "operations: permission-manager",
+        "entryPoints": [
+          "lib/operations/permission-manager.js"
+        ],
+        "dependencies": [
+          "./models"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "steering-steering-manager",
+        "featureArea": "utils",
+        "description": "utils: steering-manager",
+        "entryPoints": [
+          "lib/steering/steering-manager.js"
+        ],
+        "dependencies": [],
+        "priority": "high"
+      },
+      {
+        "id": "upgrade-migration-engine",
+        "featureArea": "utils",
+        "description": "utils: migration-engine",
+        "entryPoints": [
+          "lib/upgrade/migration-engine.js"
+        ],
+        "dependencies": [
+          "../utils/fs-utils",
+          "../version/version-manager"
+        ],
+        "priority": "low"
+      },
+      {
+        "id": "version-version-manager",
+        "featureArea": "utils",
+        "description": "utils: version-manager",
+        "entryPoints": [
+          "lib/version/version-manager.js"
+        ],
+        "dependencies": [
+          "../utils/fs-utils"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "watch-action-executor",
+        "featureArea": "watch",
+        "description": "watch: action-executor",
+        "entryPoints": [
+          "lib/watch/action-executor.js"
+        ],
+        "dependencies": [],
+        "priority": "low"
+      },
+      {
+        "id": "watch-watch-manager",
+        "featureArea": "watch",
+        "description": "watch: watch-manager",
+        "entryPoints": [
+          "lib/watch/watch-manager.js"
+        ],
+        "dependencies": [
+          "./file-watcher",
+          "./event-debouncer",
+          "./action-executor",
+          "./execution-logger"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "workspace-multi-workspace-registry",
+        "featureArea": "workspace",
+        "description": "workspace: workspace-registry",
+        "entryPoints": [
+          "lib/workspace/multi/workspace-registry.js"
+        ],
+        "dependencies": [
+          "./workspace-state-manager"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "workspace-multi-workspace-state-manager",
+        "featureArea": "workspace",
+        "description": "workspace: workspace-state-manager",
+        "entryPoints": [
+          "lib/workspace/multi/workspace-state-manager.js"
+        ],
+        "dependencies": [
+          "./workspace"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "workspace-workspace-manager",
+        "featureArea": "workspace",
+        "description": "workspace: workspace-manager",
+        "entryPoints": [
+          "lib/workspace/workspace-manager.js"
+        ],
+        "dependencies": [],
+        "priority": "high"
+      }
+    ],
+    "coveragePercentage": 0,
+    "byFeatureArea": {
+      "workspace": {
+        "total": 4,
+        "covered": 0,
+        "percentage": 0
+      },
+      "adoption": {
+        "total": 3,
+        "covered": 0,
+        "percentage": 0
+      },
+      "governance": {
+        "total": 4,
+        "covered": 0,
+        "percentage": 0
+      },
+      "operations": {
+        "total": 3,
+        "covered": 0,
+        "percentage": 0
+      },
+      "watch": {
+        "total": 3,
+        "covered": 0,
+        "percentage": 0
+      },
+      "utils": {
+        "total": 3,
+        "covered": 0,
+        "percentage": 0
+      },
+      "commands": {
+        "total": 12,
+        "covered": 0,
+        "percentage": 0
+      }
+    }
+  },
+  "testFileStats": [
+    {
+      "path": "tests\\unit\\adoption\\file-classifier.test.js",
+      "tests": 83,
+      "lines": 737
+    },
+    {
+      "path": "tests\\unit\\governance\\file-scanner.test.js",
+      "tests": 59,
+      "lines": 618
+    },
+    {
+      "path": "tests\\unit\\adoption\\summary-generator.test.js",
+      "tests": 51,
+      "lines": 509
+    },
+    {
+      "path": "tests\\unit\\adoption\\error-formatter.test.js",
+      "tests": 50,
+      "lines": 499
+    },
+    {
+      "path": "tests\\unit\\adoption\\progress-reporter.test.js",
+      "tests": 46,
+      "lines": 589
+    },
+    {
+      "path": "tests\\unit\\adoption\\adoption-logger.test.js",
+      "tests": 42,
+      "lines": 596
+    },
+    {
+      "path": "tests\\unit\\adoption\\strategy-selector.test.js",
+      "tests": 41,
+      "lines": 529
+    },
+    {
+      "path": "tests\\unit\\operations\\audit-logger.test.js",
+      "tests": 41,
+      "lines": 557
+    },
+    {
+      "path": "tests\\unit\\execution-logger.test.js",
+      "tests": 40,
+      "lines": 453
+    },
+    {
+      "path": "tests\\unit\\adoption\\template-sync.test.js",
+      "tests": 39,
+      "lines": 602
+    },
+    {
+      "path": "tests\\unit\\event-debouncer.test.js",
+      "tests": 39,
+      "lines": 469
+    },
+    {
+      "path": "tests\\unit\\action-executor.test.js",
+      "tests": 35,
+      "lines": 467
+    },
+    {
+      "path": "tests\\unit\\operations\\feedback-manager.test.js",
+      "tests": 34,
+      "lines": 544
+    },
+    {
+      "path": "tests\\unit\\workspace\\workspace-state-manager.test.js",
+      "tests": 34,
+      "lines": 551
+    },
+    {
+      "path": "tests\\unit\\adoption\\conflict-resolver-auto.test.js",
+      "tests": 33,
+      "lines": 515
+    },
+    {
+      "path": "tests\\unit\\commands\\docs.test.js",
+      "tests": 33,
+      "lines": 455
+    },
+    {
+      "path": "tests\\unit\\governance\\config-manager.test.js",
+      "tests": 32,
+      "lines": 432
+    },
+    {
+      "path": "tests\\unit\\operations\\permission-manager.test.js",
+      "tests": 31,
+      "lines": 474
+    },
+    {
+      "path": "tests\\unit\\workspace\\path-utils.test.js",
+      "tests": 31,
+      "lines": 212
+    },
+    {
+      "path": "tests\\unit\\file-watcher.test.js",
+      "tests": 30,
+      "lines": 494
+    }
+  ],
+  "statistics": {
+    "totalTests": 1394,
+    "unitTests": 1384,
+    "integrationTests": 10,
+    "testFiles": 55,
+    "excessiveFiles": 3
+  },
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "type": "Add Integration Tests",
+      "description": "Only 0% of critical paths are covered. Add integration tests for uncovered paths.",
+      "impact": "32 critical paths need coverage"
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "Consolidate Unit Tests",
+      "description": "3 test files exceed the 50 test threshold.",
+      "impact": "Potential to reduce 43 tests"
+    },
+    {
+      "priority": "HIGH",
+      "type": "Expand Integration Tests",
+      "description": "Only 10 integration tests exist. This may not provide sufficient end-to-end coverage.",
+      "impact": "CI pipeline may miss critical regressions"
+    }
+  ]
+}

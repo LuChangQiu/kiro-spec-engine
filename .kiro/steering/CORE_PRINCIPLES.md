@@ -55,6 +55,13 @@
 - 临时文件用完立即删除
 - 所有产物归档到对应的 Spec 目录
 
+**严格管控 .kiro/steering/ 目录**
+- ⚠️ **重要**: steering 目录下的所有文件（包括子目录）会在每个 session 自动加载
+- **只能放置**: 核心原则、环境配置、当前上下文等必须每次加载的规则文件
+- **禁止放置**: 分析报告、历史数据、临时文件、详细文档等非核心内容
+- **当前允许的文件**: CORE_PRINCIPLES.md, ENVIRONMENT.md, CURRENT_CONTEXT.md, RULES_GUIDE.md
+- **其他内容归档到**: `.kiro/specs/` 或 `docs/` 目录
+
 ### 3. 代码质量原则
 
 - 代码必须能够编译通过

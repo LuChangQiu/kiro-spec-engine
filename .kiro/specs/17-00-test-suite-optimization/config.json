@@ -1,0 +1,33 @@
+{
+  "testSuiteOptimization": {
+    "paths": {
+      "lib": "./lib",
+      "tests": "./tests",
+      "output": "./.kiro/specs/17-00-test-suite-optimization/results"
+    },
+    "thresholds": {
+      "maxTestsPerFile": 50,
+      "maxAssertionsPerTest": 10,
+      "minCoveragePercentage": 85,
+      "criticalPathCoverage": 100,
+      "ciMaxExecutionTime": 20,
+      "localMaxExecutionTime": 30,
+      "slowTestThreshold": 100
+    },
+    "featureAreas": [
+      "workspace",
+      "adoption",
+      "governance",
+      "operations",
+      "watch",
+      "utils",
+      "commands"
+    ],
+    "analysis": {
+      "detectRedundancy": true,
+      "classifyTests": true,
+      "identifyCriticalPaths": true,
+      "generateTemplates": true
+    }
+  }
+}

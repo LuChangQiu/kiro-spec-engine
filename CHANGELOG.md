@@ -5,6 +5,50 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.0] - 2026-01-29
+
+### Added - Test Suite Optimization and Expansion 🚀
+
+**Spec 17-00: Test Suite Optimization**
+- Reduced 65 redundant unit tests (1,389 → 1,324)
+- Optimized `file-classifier.test.js` (83 → 18 tests, 78% reduction)
+- Maintained 100% test coverage
+- Improved full suite execution time (~21s → ~19s)
+
+**Spec 18-00: Integration Test Expansion**
+- Added 19 new integration tests (10 → 29, +190%)
+- Created `IntegrationTestFixture` class for test environment management
+- Created `CommandTestHelper` class for command execution and validation
+- Added comprehensive tests for 3 critical commands:
+  - `workspace-multi` (11 tests): Creation, switching, listing, deletion
+  - `status` (3 tests): Spec reporting, empty state, counting
+  - `doctor` (3 tests): Health checks, missing directories, invalid config
+- CI execution time: ~15.9 seconds (well under 20s target)
+
+**Documentation**
+- Added `tests/integration/README.md` - Integration test guide
+- Updated `docs/testing-strategy.md` - Added optimization and expansion results
+- Created comprehensive completion reports for both specs
+
+**Infrastructure**
+- Reusable test fixtures for integration testing
+- Command execution utilities with timeout and error handling
+- Cross-platform path handling (Windows/Unix compatibility)
+- Test isolation with unique fixtures per test
+
+### Changed
+
+- Test distribution: 99% unit → 98% unit, 1% integration → 2% integration
+- Total tests: 1,389 → 1,353 (optimized)
+- CI performance: Improved by 24% (~21s → ~15.9s)
+
+### Performance
+
+- **Total Tests**: 1,353 (1,324 unit + 29 integration)
+- **CI Time**: ~15.9 seconds ⚡
+- **Test Pass Rate**: 100%
+- **Coverage**: Maintained at 100%
+
 ## [1.11.4] - 2026-01-29
 
 ### Fixed

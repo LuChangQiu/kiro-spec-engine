@@ -44,9 +44,14 @@ describe('WorkspaceContextResolver', () => {
     await fs.ensureDir(path.join(workspace2Dir, '.kiro', 'specs'));
     await fs.ensureDir(path.join(workspace3Dir, '.kiro', 'specs'));
 
-    // Initialize registry and config
+    // Initialize registry and config FIRST
     registry = new WorkspaceRegistry(registryPath);
     config = new GlobalConfig(configPath);
+    
+    // Clear any existing state
+    await config.setActiveWorkspace(null);
+    
+    // Initialize resolver
     resolver = new WorkspaceContextResolver(registry, config);
 
     // Register test workspaces

@@ -411,6 +411,53 @@ opsCmd.action(async (subcommand, args, options) => {
   await opsCommand(subcommand, args, options);
 });
 
+// Multi-workspace management commands
+const workspaceCommand = require('../lib/commands/workspace-multi');
+
+const workspaceCmd = program
+  .command('workspace')
+  .description('Manage multiple kse project workspaces');
+
+workspaceCmd
+  .command('create <name>')
+  .description('Create a new workspace')
+  .option('-p, --path <path>', 'Workspace path (defaults to current directory)')
+  .action(async (name, options) => {
+    await workspaceCommand.createWorkspace(name, options);
+  });
+
+workspaceCmd
+  .command('list')
+  .alias('ls')
+  .description('List all workspaces')
+  .option('-v, --verbose', 'Show detailed information')
+  .action(async (options) => {
+    await workspaceCommand.listWorkspaces(options);
+  });
+
+workspaceCmd
+  .command('switch <name>')
+  .description('Switch to a workspace')
+  .action(async (name) => {
+    await workspaceCommand.switchWorkspace(name);
+  });
+
+workspaceCmd
+  .command('remove <name>')
+  .alias('rm')
+  .description('Remove a workspace')
+  .option('-f, --force', 'Skip confirmation prompt')
+  .action(async (name, options) => {
+    await workspaceCommand.removeWorkspace(name, options);
+  });
+
+workspaceCmd
+  .command('info [name]')
+  .description('Show workspace information (defaults to current workspace)')
+  .action(async (name) => {
+    await workspaceCommand.infoWorkspace(name);
+  });
+
 // 更新项目配置的辅助函数
 async function updateProjectConfig(projectName) {
   const envPath = path.join(process.cwd(), '.kiro/steering/ENVIRONMENT.md');

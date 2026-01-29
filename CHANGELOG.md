@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.1] - 2026-01-29
+
+### Fixed
+- **Critical**: Registered `workspace` command in CLI that was missing from v1.12.0
+  - Added workspace command registration in `bin/kiro-spec-engine.js`
+  - All workspace subcommands now available: create, list, switch, remove, info
+  - Fixes issue where users couldn't access multi-workspace management features
+
 ## [1.12.0] - 2026-01-29
 
 ### Added - Test Suite Optimization and Expansion 🚀

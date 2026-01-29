@@ -5,6 +5,58 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.3] - 2026-01-29
+
+### Fixed - CRITICAL: Workspace Context Pollution 🚨
+
+**HOTFIX**: Fixed critical bug where Kiro IDE reads all workspace contexts
+
+**Critical Issue**:
+- Workspace contexts were stored in `.kiro/steering/workspaces/`
+- Kiro IDE reads ALL `.md` files in `steering/` directory
+- This caused ALL personal CURRENT_CONTEXT.md files to be read simultaneously
+- Result: Context pollution, confusion, and incorrect AI behavior
+
+**Solution**:
+- Moved workspace contexts to `.kiro/contexts/` (outside steering/)
+- Only active workspace context is copied to `steering/CURRENT_CONTEXT.md`
+- Prevents multiple contexts from being read at once
+
+**New Structure**:
+```
+.kiro/
+├── steering/
+│   └── CURRENT_CONTEXT.md  ← Only active context (read by Kiro)
+└── contexts/               ← Personal workspaces (NOT read by Kiro)
+    ├── developer1/
+    │   └── CURRENT_CONTEXT.md
+    └── developer2/
+        └── CURRENT_CONTEXT.md
+```
+
+**New Features**:
+- Workspace management scripts (create/switch)
+- Auto-save current context on switch
+- Auto-load new context on switch
+- Comprehensive README for workspace management
+
+**Migration**:
+If you have existing workspaces in `steering/workspaces/`:
+```bash
+# Move to new location
+mkdir -p .kiro/contexts
+mv .kiro/steering/workspaces/* .kiro/contexts/
+rm -rf .kiro/steering/workspaces
+```
+
+**Impact**:
+- ✅ Fixes context pollution bug
+- ✅ Ensures only one CURRENT_CONTEXT.md is active
+- ✅ Prevents AI confusion in multi-user projects
+- ✅ Backward compatible (no breaking changes for single-user projects)
+
+**Upgrade Recommended**: All users should upgrade immediately if using workspace features.
+
 ## [1.11.2] - 2026-01-29
 
 ### Fixed - Test Reliability Improvements 🔧

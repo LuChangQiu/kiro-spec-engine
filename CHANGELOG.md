@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.14.0] - 2026-01-30
+
+### Added
+- **Environment Configuration Management**: Lightweight multi-environment configuration system
+  - Register and manage multiple environment configurations (development, staging, production, etc.)
+  - Quick environment switching with automatic file copying
+  - Automatic backup system before each switch (maintains up to 10 backups per file)
+  - Rollback capability to restore previous environment state
+  - Support for multiple configuration file mappings per environment
+  - Environment verification with custom commands (optional)
+  - Commands: `kse env list`, `kse env switch`, `kse env info`, `kse env register`, `kse env unregister`, `kse env rollback`
+  - Comprehensive user documentation in `docs/environment-management-guide.md`
+  - 66 unit tests covering all core functionality
+
+### Technical Details
+- **EnvironmentRegistry**: JSON-based persistent storage (`.kiro/environments.json`)
+- **EnvironmentManager**: Core logic for environment operations
+- **BackupSystem**: Automatic backup/restore with history management
+- **CLI Integration**: Seamless integration with existing kse commands
+- **Cross-platform**: Consistent behavior on Windows, Linux, and Mac
+
 ## [1.13.1] - 2026-01-29
 
 ### Fixed

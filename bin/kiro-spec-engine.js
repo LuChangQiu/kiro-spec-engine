@@ -460,6 +460,18 @@ workspaceCmd
     await workspaceCommand.infoWorkspace(name);
   });
 
+// Environment configuration management commands
+const envCommand = require('../lib/commands/env');
+
+const envCmd = program
+  .command('env <subcommand> [args...]')
+  .description('Manage environment configurations');
+
+envCmd.action(async (subcommand, args, options) => {
+  const exitCode = await envCommand.handleCommand([subcommand, ...args]);
+  process.exit(exitCode);
+});
+
 // 更新项目配置的辅助函数
 async function updateProjectConfig(projectName) {
   const envPath = path.join(process.cwd(), '.kiro/steering/ENVIRONMENT.md');

@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "last_updated": "2025-01-30",
+  "last_updated": "2025-01-31",
   "templates": [
     {
       "id": "web-features/rest-api",
@@ -23,6 +23,50 @@
       "author": "kse-team",
       "created_at": "2025-01-30",
       "updated_at": "2025-01-30"
+    },
+    {
+      "id": "web-features/graphql-api",
+      "name": "GraphQL API Feature",
+      "category": "web-features",
+      "description": "Template for creating GraphQL API with schema, resolvers, and proper error handling",
+      "difficulty": "intermediate",
+      "tags": ["api", "graphql", "backend", "schema", "resolvers"],
+      "applicable_scenarios": [
+        "Creating GraphQL APIs",
+        "Implementing flexible data queries",
+        "Building real-time applications",
+        "Replacing REST APIs with GraphQL"
+      ],
+      "files": [
+        "requirements.md",
+        "design.md",
+        "tasks.md"
+      ],
+      "author": "kse-team",
+      "created_at": "2025-01-31",
+      "updated_at": "2025-01-31"
+    },
+    {
+      "id": "backend-features/database-integration",
+      "name": "Database Integration",
+      "category": "backend-features",
+      "description": "Template for integrating database with schema design, migrations, and ORM setup",
+      "difficulty": "intermediate",
+      "tags": ["database", "schema", "migrations", "orm", "backend"],
+      "applicable_scenarios": [
+        "Setting up database for new project",
+        "Adding database to existing application",
+        "Implementing data persistence layer",
+        "Creating database migrations"
+      ],
+      "files": [
+        "requirements.md",
+        "design.md",
+        "tasks.md"
+      ],
+      "author": "kse-team",
+      "created_at": "2025-01-31",
+      "updated_at": "2025-01-31"
     }
   ]
 }

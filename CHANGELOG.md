@@ -7,6 +7,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.17.0] - 2026-01-31
+
+### Added
+- **Template Creation from Existing Spec**: Automated workflow to convert completed Specs into reusable templates
+  - CLI command: `kse templates create-from-spec --spec <identifier> [options]`
+  - Automatic content generalization (replaces project-specific details with template variables)
+  - Interactive metadata collection (name, description, category, tags, author, version)
+  - YAML frontmatter generation for all template files
+  - Template validation with quality scoring (0-100)
+  - Complete export package with documentation:
+    - Template files (requirements.md, design.md, tasks.md with frontmatter)
+    - template-registry.json (registry entry)
+    - SUBMISSION_GUIDE.md (step-by-step submission instructions)
+    - PR_DESCRIPTION.md (draft pull request description)
+    - REVIEW_CHECKLIST.md (quality verification checklist)
+    - USAGE_EXAMPLE.md (template usage examples)
+    - creation.log (detailed creation log)
+  - Command options:
+    - `--spec <identifier>`: Specify Spec by number or name
+    - `--output <path>`: Custom output directory
+    - `--preview`: Show diff before export
+    - `--dry-run`: Simulate without writing files
+    - `--no-interactive`: Use defaults for all prompts
+
+### Technical Details
+- **SpecReader**: Reads and validates Spec files, extracts metadata (name, dates, author)
+- **ContentGeneralizer**: Pattern-based content generalization with ambiguous content detection
+  - Replaces: Spec names, dates, author names, version numbers, paths
+  - Template variables: {{SPEC_NAME}}, {{SPEC_NAME_TITLE}}, {{DATE}}, {{AUTHOR}}, {{VERSION}}
+  - Flags suspicious content for manual review
+- **MetadataCollector**: Interactive prompts with validation (kebab-case, semver, categories)
+  - Categories: web-features, backend-features, infrastructure, testing, documentation, other
+  - Tag suggestions based on content analysis
+  - Git config integration for author name
+- **FrontmatterGenerator**: YAML frontmatter generation with proper formatting
+- **TemplateExporter**: Complete export package generation with all documentation
+- **TemplateCreator**: Main orchestrator coordinating the entire workflow
+
+### Workflow
+1. Read and validate Spec structure
+2. Generalize content (replace project-specific details)
+3. Collect template metadata (interactive or defaults)
+4. Generate YAML frontmatter
+5. Validate template quality
+6. Export complete template package
+
+### Notes
+- Reduces template creation time from hours to minutes
+- Ensures consistency across community-contributed templates
+- All existing tests pass (1491 tests)
+- Tested with real Specs (22-00, dry-run and actual creation)
+- Quality score calculation based on: structure, frontmatter, variables, content, references
+
 ## [1.16.0] - 2026-01-30
 
 ### Added

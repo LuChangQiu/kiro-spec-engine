@@ -586,6 +586,18 @@ templatesCmd
     await templatesCommand.displayGuide();
   });
 
+templatesCmd
+  .command('create-from-spec')
+  .description('Create template from existing Spec')
+  .option('--spec <identifier>', 'Spec identifier (number or name)')
+  .option('--output <path>', 'Custom output directory')
+  .option('--preview', 'Show diff before export')
+  .option('--dry-run', 'Simulate without writing files')
+  .option('--no-interactive', 'Use defaults for all prompts')
+  .action(async (options) => {
+    await templatesCommand.createFromSpec(options);
+  });
+
 // 更新项目配置的辅助函数
 async function updateProjectConfig(projectName) {
   const envPath = path.join(process.cwd(), '.kiro/steering/ENVIRONMENT.md');

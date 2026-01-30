@@ -31,19 +31,19 @@ kse templates update
 ## 🎯 Available Templates
 
 ### Web Features
-- `rest-api` - RESTful API endpoints with validation and error handling
-- `graphql-api` - GraphQL API with schema and resolvers
-- `file-upload` - File upload with validation and storage
+- `rest-api` - RESTful API endpoints with validation and error handling ✅
+- `graphql-api` - GraphQL API with schema and resolvers ✅
 
 ### Backend Features
-- `database-integration` - Database schema and migrations
-- `caching-layer` - Caching strategy with Redis/Memcached
-- `message-queue` - Message queue integration
+- `database-integration` - Database schema and migrations ✅
 
-### Infrastructure
-- `ci-cd-pipeline` - Continuous integration and deployment
-- `monitoring-setup` - Application monitoring and alerting
-- `deployment-automation` - Automated deployment workflows
+### Coming Soon
+- `web-features/file-upload` - File upload with validation and storage
+- `backend-features/caching-layer` - Caching strategy with Redis/Memcached
+- `backend-features/message-queue` - Message queue integration
+- `infrastructure/ci-cd-pipeline` - Continuous integration and deployment
+- `infrastructure/monitoring-setup` - Application monitoring and alerting
+- `infrastructure/deployment-automation` - Automated deployment workflows
 
 ## 📝 Template Format
 

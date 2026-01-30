@@ -169,8 +169,11 @@ The backup system automatically:
 1. **Adopt projects with kse**: Run `kse adopt` to let kse manage your project autonomously, enabling faster AI-assisted development without constant confirmations
 2. **Use descriptive names**: Choose clear, descriptive names for your environments
 3. **Keep source files in version control**: Store all environment-specific configuration files in your repository
-4. **Exclude .kiro from version control**: Add `.kiro/` to your `.gitignore` to avoid merge conflicts in multi-user projects. The `.kiro/` directory contains user-specific state and should not be shared.
-5. **Share environment templates**: Instead of sharing `.kiro/` contents, share environment configuration JSON files (e.g., `env-local.json`, `env-production.json`) that team members can register individually
+4. **Selective .kiro/ version control**: Use layered .gitignore strategy:
+   - ✅ **DO commit**: `.kiro/specs/` (Spec documents), `.kiro/steering/CORE_PRINCIPLES.md`, `.kiro/steering/ENVIRONMENT.md`, `.kiro/steering/RULES_GUIDE.md`, `.kiro/tools/`, `.kiro/config/`
+   - ❌ **DO NOT commit**: `.kiro/steering/CURRENT_CONTEXT.md` (personal context), `.kiro/environments.json` (user-specific), `.kiro/backups/`, `.kiro/logs/`, `.kiro/reports/`
+   - **Why**: Share Spec documents and team rules, but avoid conflicts from personal state and user-specific configurations
+5. **Share environment templates**: Commit environment configuration JSON files (e.g., `env-local.json`, `env-production.json`) to your repository root or a `config/` directory, not in `.kiro/`
 6. **Test switches**: Test environment switches in a safe environment before using in production
 7. **Regular backups**: The system creates automatic backups, but consider additional backup strategies for critical configurations
 8. **Document verification**: Add verification rules to catch configuration errors early

@@ -154,19 +154,55 @@ program
 // 创建 Spec 命令
 program
   .command('create-spec <spec-name>')
+  .alias('spec')
   .description('Create a new spec directory')
-  .action(async (specName) => {
+  .option('-t, --template <template-id>', 'Use a template from the library')
+  .option('-f, --force', 'Overwrite existing spec directory')
+  .action(async (specName, options) => {
     const specPath = path.join(process.cwd(), '.kiro/specs', specName);
     
     try {
-      await fs.ensureDir(specPath);
-      console.log(chalk.green('✅ Created spec directory:'), specPath);
-      console.log();
-      console.log(chalk.blue('📋 Next steps:'));
-      console.log('  1. Create requirements.md in the spec directory');
-      console.log('  2. Enhance with: ' + chalk.cyan(`kiro-spec-engine enhance requirements ${specPath}/requirements.md`));
+      // Check if using template
+      if (options.template) {
+        const TemplateManager = require('../lib/templates/template-manager');
+        const manager = new TemplateManager();
+        
+        console.log(chalk.red('🔥') + ' Creating Spec from Template');
+        console.log();
+        console.log(`  ${chalk.gray('Spec:')} ${specName}`);
+        console.log(`  ${chalk.gray('Template:')} ${options.template}`);
+        console.log();
+        
+        await manager.applyTemplate(specName, options.template, {
+          force: options.force
+        });
+        
+        console.log(chalk.green('✅ Spec created successfully'));
+        console.log();
+        console.log(chalk.blue('📋 Next steps:'));
+        console.log('  1. Review and customize the generated files');
+        console.log('  2. Fill in project-specific details');
+        console.log('  3. Start implementing tasks');
+      } else {
+        // Create empty spec directory
+        await fs.ensureDir(specPath);
+        console.log(chalk.green('✅ Created spec directory:'), specPath);
+        console.log();
+        console.log(chalk.blue('📋 Next steps:'));
+        console.log('  1. Create requirements.md in the spec directory');
+        console.log('  2. Enhance with: ' + chalk.cyan(`kiro-spec-engine enhance requirements ${specPath}/requirements.md`));
+        console.log();
+        console.log(chalk.yellow('💡 Tip:'));
+        console.log('  Use a template: ' + chalk.cyan(`kse spec create ${specName} --template <template-id>`));
+        console.log('  Browse templates: ' + chalk.cyan('kse templates list'));
+      }
     } catch (error) {
       console.error(chalk.red('❌ Error creating spec:'), error.message);
+      if (error.suggestions) {
+        console.log();
+        console.log(chalk.yellow('💡 Suggestions:'));
+        error.suggestions.forEach(s => console.log(`  • ${s}`));
+      }
       process.exit(1);
     }
   });
@@ -472,6 +508,83 @@ envCmd.action(async (subcommand, args, options) => {
   const exitCode = await envCommand.handleCommand([subcommand, ...args]);
   process.exit(exitCode);
 });
+
+// Template management commands
+const templatesCommand = require('../lib/commands/templates');
+
+const templatesCmd = program
+  .command('templates')
+  .description('Manage Spec templates from official and custom sources');
+
+templatesCmd
+  .command('list')
+  .description('List all available templates')
+  .option('--category <category>', 'Filter by category')
+  .option('--source <source>', 'Filter by source')
+  .action(async (options) => {
+    await templatesCommand.listTemplates(options);
+  });
+
+templatesCmd
+  .command('search <keyword>')
+  .description('Search templates by keyword')
+  .option('--category <category>', 'Filter by category')
+  .action(async (keyword, options) => {
+    await templatesCommand.searchTemplates(keyword, options);
+  });
+
+templatesCmd
+  .command('show <template-path>')
+  .description('Show template details')
+  .action(async (templatePath) => {
+    await templatesCommand.showTemplate(templatePath);
+  });
+
+templatesCmd
+  .command('update')
+  .description('Update templates from sources')
+  .option('--source <source>', 'Update specific source only')
+  .option('--version <version>', 'Checkout specific version/tag')
+  .action(async (options) => {
+    await templatesCommand.updateTemplates(options);
+  });
+
+templatesCmd
+  .command('add-source <name> <git-url>')
+  .description('Add custom template source')
+  .action(async (name, gitUrl) => {
+    await templatesCommand.addSource(name, gitUrl);
+  });
+
+templatesCmd
+  .command('remove-source <name>')
+  .description('Remove template source')
+  .action(async (name) => {
+    await templatesCommand.removeSource(name);
+  });
+
+templatesCmd
+  .command('sources')
+  .description('List configured template sources')
+  .action(async () => {
+    await templatesCommand.listSources();
+  });
+
+templatesCmd
+  .command('cache')
+  .description('Manage template cache')
+  .option('--clear', 'Clear cache')
+  .option('--source <source>', 'Target specific source')
+  .action(async (options) => {
+    await templatesCommand.cacheCommand(options);
+  });
+
+templatesCmd
+  .command('guide')
+  .description('Display template usage guide')
+  .action(async () => {
+    await templatesCommand.displayGuide();
+  });
 
 // 更新项目配置的辅助函数
 async function updateProjectConfig(projectName) {

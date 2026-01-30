@@ -1,20 +1,28 @@
 ﻿# 当前场景规则
 
-> 当前无活跃 Spec
+> **当前 Spec**: 22-00-spec-template-library
 
 ## 🎯 当前状态
 
-**最近完成**: Spec 21-00-gitignore-auto-fix (v1.15.0) ✅
+**阶段**: 核心功能完成 ✅
 
-**发布状态**: 
-- ✅ v1.15.0 已发布到 npm
-- ✅ 所有测试通过 (1491 passed, 8 skipped)
-- ✅ GitHub Actions 发布成功
+**已完成**:
+- ✅ 核心组件 (Tasks 1-10)
+  - GitHandler, CacheManager, RegistryParser
+  - TemplateValidator, TemplateApplicator
+  - TemplateManager（完整功能）
+- ✅ CLI 命令集成 (Task 12)
+  - templates list/search/show/update/guide
+  - templates add-source/remove-source/sources
+  - templates cache (status/clear)
+  - spec create --template
+- ✅ 高级功能 (Task 10.1, 10.3, 13)
+  - 变更检测（added/modified/deleted）
+  - 多源支持（源前缀、冲突解决）
+  - 跨平台路径处理
 
-## 🎯 下一步
-
-等待新的 Spec 或功能需求。
+**下一步**: 文档和最终测试（Tasks 15-17）
 
 ---
 
-v50.0 | 2026-01-30 | Spec 21-00 发布完成，清空当前场景
+v56.0 | 2026-01-30 | 核心功能完成

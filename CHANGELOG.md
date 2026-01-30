@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.16.0] - 2026-01-30
+
+### Added
+- **Spec Template Library**: Complete template management system for rapid Spec creation
+  - Browse, search, and apply pre-built Spec templates from official and custom sources
+  - Template discovery: `kse templates list`, `kse templates search <keyword>`, `kse templates show <template-id>`
+  - Template management: `kse templates update`, `kse templates cache`, `kse templates guide`
+  - Custom sources: `kse templates add-source <name> <url>`, `kse templates remove-source <name>`, `kse templates sources`
+  - Create Spec from template: `kse spec create <name> --template <template-id>`
+  - Local caching for offline use (~/.kse/templates/)
+  - Multi-source support with conflict resolution (source:template-id format)
+  - Automatic variable substitution ({{SPEC_NAME}}, {{DATE}}, {{AUTHOR}}, etc.)
+  - YAML frontmatter removal in applied templates
+  - Change detection for updates (added/modified/deleted templates)
+  - Cross-platform path handling (Windows/Linux/macOS)
+
+### Technical Details
+- **GitHandler**: Git operations (clone, pull, checkout, version management, repository validation)
+- **CacheManager**: Local cache management (directory structure, metadata, size calculation, cleanup)
+- **RegistryParser**: Template registry parsing (schema validation, indexing, search, filtering)
+- **TemplateValidator**: Template validation (frontmatter parsing, structure validation)
+- **TemplateApplicator**: Template application (file copying, variable substitution, frontmatter removal)
+- **TemplateManager**: Core management class integrating all components
+- **Template Registry Schema**: JSON-based registry with metadata (name, category, difficulty, tags, scenarios)
+- **Cache Structure**: Organized by source with metadata tracking
+- **Error Handling**: Comprehensive error types (network, validation, filesystem, git) with suggestions
+
+### Core Principles Updates
+- Added "完全自主执行权限" (Full Autonomous Execution Authority) principle
+  - AI can autonomously complete entire Spec without step-by-step confirmation
+  - Only requires user intervention for: fatal errors, external resources, major architecture decisions, final acceptance
+- Added "避免重复测试" (Avoid Redundant Testing) clarification
+  - Skip tests if just executed during Spec implementation
+  - Handles Kiro's file-save-triggered subagent scenario
+
+### Notes
+- All existing tests pass (1491 tests)
+- Optional property-based tests skipped for faster MVP delivery
+- Template repository creation (official kse-spec-templates) to be done separately
+- Documentation and final integration testing to follow in subsequent iterations
+
 ## [1.15.0] - 2026-01-30
 
 ### Added

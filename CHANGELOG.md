@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.0] - 2026-01-30
+
+### Added
+- **.gitignore Auto-Fix for Team Collaboration**: Automatic detection and fixing of .gitignore configuration
+  - Detects old blanket `.kiro/` exclusion patterns that prevent Spec sharing
+  - Replaces with layered strategy: commit Specs, exclude personal state
+  - Integrated into `kse adopt` and `kse upgrade` flows (automatic)
+  - Standalone command: `kse doctor --fix-gitignore`
+  - Creates backup before modification (stored in `.kiro/backups/gitignore-{timestamp}`)
+  - Preserves all user rules (non-.kiro patterns)
+  - Handles different line endings (CRLF/LF) correctly
+  - 26 unit tests covering detection, transformation, backup, and integration
+
+### Technical Details
+- **GitignoreDetector**: Analyzes .gitignore status (missing, old-pattern, incomplete, compliant)
+- **GitignoreTransformer**: Applies layered exclusion strategy while preserving user rules
+- **GitignoreBackup**: Creates timestamped backups with metadata
+- **GitignoreIntegration**: Coordinates detection → backup → transform → report
+- **Layered Strategy**: Commits `.kiro/specs/` while excluding personal state (CURRENT_CONTEXT.md, environments.json, backups/, logs/)
+- **Cross-platform**: Preserves original line ending style (CRLF on Windows, LF on Unix)
+
+### Documentation
+- Updated `docs/adoption-guide.md` with .gitignore auto-fix information
+- Updated `docs/upgrade-guide.md` with .gitignore verification steps
+- Comprehensive `docs/team-collaboration-guide.md` already exists (500+ lines)
+
 ## [1.14.0] - 2026-01-30
 
 ### Added

@@ -576,20 +576,27 @@ your-project/
 
 After successful adoption:
 
-1. **Create your first spec**:
+1. **Verify .gitignore configuration**:
+   The adoption process automatically checks and fixes your `.gitignore` for team collaboration. If you see a warning about .gitignore, you can manually fix it:
+   ```bash
+   kse doctor --fix-gitignore
+   ```
+   Learn more: [Team Collaboration Guide](./team-collaboration-guide.md)
+
+2. **Create your first spec**:
    ```bash
    kse create-spec 01-00-my-feature
    ```
 
-2. **Check project status**:
+3. **Check project status**:
    ```bash
    kse status
    ```
 
-3. **Read the spec workflow guide**:
+4. **Read the spec workflow guide**:
    - See `.kiro/specs/SPEC_WORKFLOW_GUIDE.md`
 
-4. **Explore Ultrawork**:
+5. **Explore Ultrawork**:
    ```bash
    kse enhance requirements .kiro/specs/01-00-my-feature/requirements.md
    ```

@@ -603,15 +603,22 @@ After successful upgrade:
    kse status
    ```
 
-2. **Test your specs**:
+2. **Check .gitignore configuration**:
+   The upgrade process automatically checks and fixes your `.gitignore` for team collaboration. If you see a warning about .gitignore, you can manually fix it:
+   ```bash
+   kse doctor --fix-gitignore
+   ```
+   Learn more: [Team Collaboration Guide](./team-collaboration-guide.md)
+
+3. **Test your specs**:
    - Run existing specs
    - Check for any issues
 
-3. **Explore new features**:
+4. **Explore new features**:
    - Check CHANGELOG.md
    - Try new commands
 
-4. **Clean old backups** (optional):
+5. **Clean old backups** (optional):
    ```bash
    # Keep last 3 backups
    ls .kiro/backups/

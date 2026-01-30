@@ -176,6 +176,7 @@ program
   .command('doctor')
   .description(t('cli.commands.doctor.description'))
   .option('--docs', 'Show detailed document governance diagnostics')
+  .option('--fix-gitignore', 'Check and fix .gitignore for team collaboration')
   .action((options) => {
     doctorCommand(options);
   });

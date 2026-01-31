@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.18.0] - 2026-01-31
+
+### Added
+- **Documentation Synchronization Principle**: Added principle #8 to CORE_PRINCIPLES.md
+  - Mandates synchronous documentation updates for important features
+  - Prevents documentation lag and improves feature discoverability
+  - Reduces user confusion and learning barriers
+
+### Fixed
+- **Documentation Completeness**: Applied principle #8 to discover and fix missing documentation
+  - Updated `docs/command-reference.md` with environment management commands (8 commands)
+  - Added environment management workflow examples
+  - Updated `docs/README.md` with environment management guide links
+  - Updated `README.zh.md` with environment management features (Chinese)
+  - All documentation now synchronized with v1.14.0 environment management feature
+
+### Changed
+- **CORE_PRINCIPLES.md**: Updated to v10.0 with new documentation synchronization principle
+- **Command Reference**: Updated to v1.17.0 with complete environment management section
+- **Documentation Index**: Updated to v1.17.0 with environment management guide
+
+### Notes
+- This release ensures all documentation is synchronized with existing features
+- Environment management feature (v1.14.0) is now fully documented
+- All 1491 tests passing
+
 ## [1.17.0] - 2026-01-31
 
 ### Added

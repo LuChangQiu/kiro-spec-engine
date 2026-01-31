@@ -218,6 +218,7 @@ sequenceDiagram
 - 📋 **[Spec Workflow](docs/spec-workflow.md)** - Understanding Specs in depth
 - 🔢 **[Spec Numbering Strategy](docs/spec-numbering-guide.md)** - How to number your Specs
 - 📄 **[Document Governance](docs/document-governance.md)** - Automated document management
+- 🌍 **[Environment Management](docs/environment-management-guide.md)** - Multi-environment configuration
 - 🔌 **[Integration Modes](docs/integration-modes.md)** - Three ways to integrate kse
 - 📝 **[Command Reference](docs/command-reference.md)** - All kse commands
 
@@ -256,6 +257,15 @@ Structure your work with Requirements → Design → Tasks workflow
 - **Data Atomicity**: Single source of truth (`~/.kse/workspace-state.json`)
 - **Cross-Platform**: Consistent path handling across Windows/Linux/macOS
 - **Auto Migration**: Seamless upgrade from legacy workspace format
+
+### Environment Configuration Management 🚀 NEW in v1.14.0
+- **Environment Registry**: Manage multiple environment configurations (dev, test, staging, prod)
+- **Quick Switching**: Switch between environments with automatic backup
+- **Automatic Backup**: Create timestamped backups before each switch
+- **Rollback Support**: Restore previous environment configuration instantly
+- **Verification**: Validate environment configuration after switching
+- **Command Execution**: Run commands in specific environment context
+- **Cross-Platform**: Works seamlessly on Windows, Linux, and macOS
 
 ### DevOps Integration Foundation 🚀
 - **Operations Spec Management**: Standardized operations documentation (deployment, monitoring, troubleshooting, etc.)
@@ -310,6 +320,16 @@ kse workspace list                 # List all workspaces
 kse workspace switch <name>        # Switch active workspace
 kse workspace info [name]          # Show workspace details
 kse workspace remove <name>        # Remove workspace
+
+# Environment management (NEW in v1.14.0)
+kse env list                       # List all environments
+kse env switch <name>              # Switch to environment (with backup)
+kse env info                       # Show active environment details
+kse env register <config-file>     # Register new environment
+kse env unregister <name>          # Remove environment
+kse env rollback                   # Rollback to previous environment
+kse env verify                     # Verify current environment
+kse env run "<command>"            # Run command in environment context
 
 # DevOps operations
 kse ops init <project-name>        # Initialize operations specs

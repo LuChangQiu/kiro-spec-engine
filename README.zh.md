@@ -257,6 +257,15 @@ sequenceDiagram
 - **跨平台**：Windows/Linux/macOS 一致的路径处理
 - **自动迁移**：从旧版工作区格式无缝升级
 
+### 环境配置管理 🚀 v1.14.0 新功能
+- **环境注册表**：管理多个环境配置（dev, test, staging, prod）
+- **快速切换**：自动备份的环境切换
+- **自动备份**：每次切换前创建时间戳备份
+- **回滚支持**：即时恢复上一个环境配置
+- **验证功能**：切换后验证环境配置
+- **命令执行**：在特定环境上下文中运行命令
+- **跨平台**：在 Windows、Linux 和 macOS 上无缝工作
+
 ### DevOps 集成基础 🚀
 - **运维 Spec 管理**：标准化运维文档（部署、监控、故障排查等）
 - **渐进式 AI 自主**：L1-L5 接管级别，逐步实现 AI 运维控制
@@ -310,6 +319,16 @@ kse workspace list                 # 列出所有工作区
 kse workspace switch <name>        # 切换活动工作区
 kse workspace info [name]          # 显示工作区详情
 kse workspace remove <name>        # 删除工作区
+
+# 环境管理（v1.14.0 新增）
+kse env list                       # 列出所有环境
+kse env switch <name>              # 切换到环境（自动备份）
+kse env info                       # 显示活动环境详情
+kse env register <config-file>     # 注册新环境
+kse env unregister <name>          # 删除环境
+kse env rollback                   # 回滚到上一个环境
+kse env verify                     # 验证当前环境
+kse env run "<command>"            # 在环境上下文中运行命令
 
 # DevOps 运维
 kse ops init <project-name>        # 初始化运维 specs

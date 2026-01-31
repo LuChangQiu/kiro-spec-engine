@@ -2,8 +2,8 @@
 
 > Quick reference for all kse commands
 
-**Version**: 1.11.2  
-**Last Updated**: 2026-01-29
+**Version**: 1.17.0  
+**Last Updated**: 2026-01-31
 
 ---
 
@@ -154,6 +154,34 @@ kse workspace sync
 kse workspace team
 ```
 
+### Environment Management
+
+```bash
+# List all environments
+kse env list
+
+# Switch to environment (with automatic backup)
+kse env switch <name>
+
+# Show active environment details
+kse env info
+
+# Register new environment from config file
+kse env register <config-file>
+
+# Remove environment (requires --force)
+kse env unregister <name> --force
+
+# Rollback to previous environment
+kse env rollback
+
+# Verify current environment (optional)
+kse env verify
+
+# Run command in environment context (optional)
+kse env run "<command>"
+```
+
 ### Version & Upgrade
 
 ```bash
@@ -257,6 +285,36 @@ kse task claim 01-00-feature 1.1
 kse workspace sync
 ```
 
+### Managing Multiple Environments
+
+```bash
+# 1. Register your environments
+kse env register config/dev.json
+kse env register config/staging.json
+kse env register config/prod.json
+
+# 2. List all environments
+kse env list
+
+# 3. Switch to development environment
+kse env switch development
+
+# 4. Check current environment
+kse env info
+
+# 5. Verify environment is configured correctly
+kse env verify
+
+# 6. Run commands in environment context
+kse env run "npm test"
+
+# 7. Switch to staging for testing
+kse env switch staging
+
+# 8. Rollback if something goes wrong
+kse env rollback
+```
+
 ---
 
 ## Tips
@@ -267,11 +325,13 @@ kse workspace sync
 4. **Check `kse doctor`** - Diagnose issues quickly
 5. **Use watch mode** - Automate repetitive tasks
 6. **Use workspace management** - Easily switch between multiple kse projects
+7. **Use environment management** - Manage dev, test, staging, prod configurations with automatic backup
 
 ---
 
 ## See Also
 
+- [Environment Management Guide](./environment-management-guide.md)
 - [Manual Workflows Guide](./manual-workflows-guide.md)
 - [Cross-Tool Guide](./cross-tool-guide.md)
 - [Adoption Guide](./adoption-guide.md)

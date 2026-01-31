@@ -4,8 +4,8 @@
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-01-23
+**Version**: 1.17.0  
+**Last Updated**: 2026-01-31
 
 ---
 
@@ -78,6 +78,7 @@ Learn by example with complete Spec demonstrations:
 Detailed technical documentation:
 
 - **[Command Reference](command-reference.md)** - All kse commands with examples
+- **[Environment Management Guide](environment-management-guide.md)** - Multi-environment configuration management
 - **[Troubleshooting](troubleshooting.md)** - Solutions to common problems
 - **[FAQ](faq.md)** - Answers to frequently asked questions
 
@@ -87,6 +88,7 @@ Detailed technical documentation:
 
 - **[Adoption Guide](adoption-guide.md)** - Adopting kse in existing projects
 - **[Upgrade Guide](upgrade-guide.md)** - Upgrading kse to newer versions
+- **[Environment Management Guide](environment-management-guide.md)** - Managing multiple environments
 - **[Developer Guide](developer-guide.md)** - Contributing to kse development
 - **[Architecture](architecture.md)** - kse system architecture
 
@@ -151,6 +153,11 @@ Detailed technical documentation:
 - [Spec Structure](spec-workflow.md#the-spec-creation-workflow)
 - [Example Specs](examples/)
 
+### Environment Management
+- [Environment Management Guide](environment-management-guide.md)
+- [Environment Commands](command-reference.md#environment-management)
+- [Multi-Environment Workflow](environment-management-guide.md#common-workflows)
+
 ### Context Export
 - [Manual Export Mode](integration-modes.md#mode-2-manual-export)
 - [Export Commands](command-reference.md#context--prompts)
@@ -199,7 +206,8 @@ Detailed technical documentation:
 | Examples (3) | ✅ Complete | 2026-01-23 |
 | FAQ | ✅ Complete | 2026-01-23 |
 | Troubleshooting | ✅ Complete | 2026-01-23 |
-| Command Reference | ✅ Complete | 2026-01-23 |
+| Command Reference | ✅ Complete | 2026-01-31 |
+| Environment Management | ✅ Complete | 2026-01-31 |
 
 ---
 

@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.18.1] - 2026-01-31
+
+### Added
+- **Version Synchronization Principle**: Added principle #9 to CORE_PRINCIPLES.md
+  - Mandates reading `.kiro/README.md` after version updates or first installation
+  - Requires refreshing Steering rules to sync with latest version
+  - Prevents AI from using outdated workflows or ignoring new features
+  - Ensures consistency between AI behavior and project state
+
+### Changed
+- **CORE_PRINCIPLES.md**: Updated to v11.0 with new version synchronization principle
+- **Steering Rules**: Enhanced with automatic version sync workflow
+
+### Notes
+- This release ensures AI tools stay synchronized with kse version updates
+- All 1491 tests passing
+
 ## [1.18.0] - 2026-01-31
 
 ### Added

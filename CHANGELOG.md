@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.20.2] - 2026-02-01
+
+### Fixed
+- **Nested Repository Validation**: Fixed circular reference detection for large nested repository sets
+  - Circular reference detection now uses normalized paths consistently
+  - Fixed bug where original paths were used instead of normalized paths in cycle detection
+  - Now correctly handles 100+ nested repositories
+  - All parent-child relationships validated correctly
+
+### Technical Details
+- Updated `detectCycle()` function to use normalized paths throughout
+- Fixed `pathMap` lookup to use normalized parent paths
+- Ensures consistency between parent validation and cycle detection
+- No performance regression for large repository counts
+
 ## [1.20.1] - 2026-02-01
 
 ### Fixed

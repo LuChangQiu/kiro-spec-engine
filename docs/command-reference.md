@@ -2,7 +2,7 @@
 
 > Quick reference for all kse commands
 
-**Version**: 1.17.0  
+**Version**: 1.19.0  
 **Last Updated**: 2026-01-31
 
 ---
@@ -182,6 +182,22 @@ kse env verify
 kse env run "<command>"
 ```
 
+### Multi-Repository Management
+
+```bash
+# Initialize repository configuration
+kse repo init [--force] [--depth <n>]
+
+# Show status of all repositories
+kse repo status [--verbose] [--json]
+
+# Execute command in all repositories
+kse repo exec "<command>" [--dry-run]
+
+# Check repository health
+kse repo health [--json]
+```
+
 ### Version & Upgrade
 
 ```bash
@@ -326,11 +342,206 @@ kse env rollback
 5. **Use watch mode** - Automate repetitive tasks
 6. **Use workspace management** - Easily switch between multiple kse projects
 7. **Use environment management** - Manage dev, test, staging, prod configurations with automatic backup
+8. **Use multi-repo management** - Coordinate operations across multiple Git repositories
+
+---
+
+## Detailed Command Documentation
+
+### Multi-Repository Management Commands
+
+#### `kse repo init`
+
+Initialize repository configuration by scanning the project directory for Git repositories.
+
+**Usage:**
+```bash
+kse repo init [options]
+```
+
+**Options:**
+- `--force` - Overwrite existing configuration without confirmation
+- `--depth <n>` - Maximum directory depth to scan (default: 3)
+
+**Behavior:**
+- Scans project directory recursively for Git repositories
+- Excludes `.kiro` directory from scanning
+- Extracts remote URL from `origin` remote (or first available remote)
+- Detects current branch for each repository
+- Prompts for confirmation if configuration already exists (unless `--force`)
+- Creates `.kiro/project-repos.json` configuration file
+
+**Example:**
+```bash
+# Initialize with default settings
+kse repo init
+
+# Force overwrite without confirmation
+kse repo init --force
+
+# Scan deeper directory structure
+kse repo init --depth 5
+```
+
+**Output:**
+```
+Scanning for Git repositories...
+Found 3 repositories:
+  ✓ frontend (main) - https://github.com/user/frontend.git
+  ✓ backend (develop) - https://github.com/user/backend.git
+  ✓ shared (main) - https://github.com/user/shared.git
+
+Configuration saved to .kiro/project-repos.json
+```
+
+---
+
+#### `kse repo status`
+
+Display the Git status of all configured repositories.
+
+**Usage:**
+```bash
+kse repo status [options]
+```
+
+**Options:**
+- `--verbose` - Show detailed file-level changes
+- `--json` - Output in JSON format for scripting
+
+**Output includes:**
+- Current branch name
+- Number of modified, added, and deleted files
+- Commits ahead/behind remote
+- Clean/dirty status indicator
+- Error status for inaccessible repositories
+
+**Example:**
+```bash
+# Basic status
+kse repo status
+
+# Detailed status with file changes
+kse repo status --verbose
+
+# JSON output for automation
+kse repo status --json
+```
+
+**Output:**
+```
+┌──────────┬─────────┬────────┬──────────┬───────┬────────┐
+│ Name     │ Branch  │ Status │ Modified │ Ahead │ Behind │
+├──────────┼─────────┼────────┼──────────┼───────┼────────┤
+│ frontend │ main    │ Clean  │ 0        │ 0     │ 0      │
+│ backend  │ develop │ Dirty  │ 3        │ 2     │ 0      │
+│ shared   │ main    │ Clean  │ 0        │ 0     │ 1      │
+└──────────┴─────────┴────────┴──────────┴───────┴────────┘
+```
+
+---
+
+#### `kse repo exec`
+
+Execute a Git command in all configured repositories.
+
+**Usage:**
+```bash
+kse repo exec "<command>" [options]
+```
+
+**Options:**
+- `--dry-run` - Show commands without executing them
+- `--continue-on-error` - Continue even if commands fail (default: true)
+
+**Behavior:**
+- Executes command sequentially in each repository
+- Displays output for each repository with clear separators
+- Continues with remaining repositories if one fails
+- Shows summary of successes and failures at the end
+
+**Example:**
+```bash
+# Pull latest changes
+kse repo exec "git pull"
+
+# Create and checkout new branch
+kse repo exec "git checkout -b feature/new-feature"
+
+# Preview without executing
+kse repo exec "git push" --dry-run
+
+# Fetch all remotes
+kse repo exec "git fetch --all"
+
+# Show commit history
+kse repo exec "git log --oneline -5"
+```
+
+**Output:**
+```
+=== frontend ===
+Already up to date.
+
+=== backend ===
+Updating abc123..def456
+Fast-forward
+ src/api.js | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+=== shared ===
+Already up to date.
+
+Summary: 3 succeeded, 0 failed
+```
+
+---
+
+#### `kse repo health`
+
+Perform health checks on all configured repositories.
+
+**Usage:**
+```bash
+kse repo health [options]
+```
+
+**Options:**
+- `--json` - Output in JSON format for automation
+
+**Checks performed:**
+- Path exists and is accessible
+- Directory is a valid Git repository
+- Remote URL is reachable (network check)
+- Default branch exists
+
+**Example:**
+```bash
+# Run health check
+kse repo health
+
+# JSON output for CI/CD
+kse repo health --json
+```
+
+**Output:**
+```
+┌──────────┬──────────────┬────────────┬──────────────────┬───────────────┐
+│ Name     │ Path Exists  │ Git Repo   │ Remote Reachable │ Branch Exists │
+├──────────┼──────────────┼────────────┼──────────────────┼───────────────┤
+│ frontend │ ✓            │ ✓          │ ✓                │ ✓             │
+│ backend  │ ✓            │ ✓          │ ✓                │ ✓             │
+│ shared   │ ✓            │ ✓          │ ✗                │ ✓             │
+└──────────┴──────────────┴────────────┴──────────────────┴───────────────┘
+
+Overall Health: 2 healthy, 1 unhealthy
+```
 
 ---
 
 ## See Also
 
+- [Multi-Repository Management Guide](./multi-repo-management-guide.md)
 - [Environment Management Guide](./environment-management-guide.md)
 - [Manual Workflows Guide](./manual-workflows-guide.md)
 - [Cross-Tool Guide](./cross-tool-guide.md)

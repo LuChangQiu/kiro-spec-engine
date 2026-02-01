@@ -219,6 +219,7 @@ sequenceDiagram
 - 🔢 **[Spec Numbering Strategy](docs/spec-numbering-guide.md)** - How to number your Specs
 - 📄 **[Document Governance](docs/document-governance.md)** - Automated document management
 - 🌍 **[Environment Management](docs/environment-management-guide.md)** - Multi-environment configuration
+- 📦 **[Multi-Repository Management](docs/multi-repo-management-guide.md)** - Manage multiple Git repositories
 - 🔌 **[Integration Modes](docs/integration-modes.md)** - Three ways to integrate kse
 - 📝 **[Command Reference](docs/command-reference.md)** - All kse commands
 
@@ -266,6 +267,14 @@ Structure your work with Requirements → Design → Tasks workflow
 - **Verification**: Validate environment configuration after switching
 - **Command Execution**: Run commands in specific environment context
 - **Cross-Platform**: Works seamlessly on Windows, Linux, and macOS
+
+### Multi-Repository Management 🚀 NEW in v1.19.0
+- **Unified Interface**: Manage multiple Git subrepositories from a single command
+- **Auto-Discovery**: Automatically scan and configure all Git repositories in your project
+- **Batch Operations**: Execute Git commands across all repositories simultaneously
+- **Status Overview**: View status of all repositories in a single table
+- **Health Checks**: Verify repository configuration and connectivity
+- **Cross-Platform**: Consistent path handling across Windows/Linux/macOS
 
 ### DevOps Integration Foundation 🚀
 - **Operations Spec Management**: Standardized operations documentation (deployment, monitoring, troubleshooting, etc.)
@@ -330,6 +339,12 @@ kse env unregister <name>          # Remove environment
 kse env rollback                   # Rollback to previous environment
 kse env verify                     # Verify current environment
 kse env run "<command>"            # Run command in environment context
+
+# Multi-repository management (NEW in v1.19.0)
+kse repo init                      # Initialize repository configuration
+kse repo status [--verbose]        # Show status of all repositories
+kse repo exec "<command>"          # Execute command in all repositories
+kse repo health                    # Check repository health
 
 # DevOps operations
 kse ops init <project-name>        # Initialize operations specs

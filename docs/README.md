@@ -79,6 +79,7 @@ Detailed technical documentation:
 
 - **[Command Reference](command-reference.md)** - All kse commands with examples
 - **[Environment Management Guide](environment-management-guide.md)** - Multi-environment configuration management
+- **[Multi-Repository Management Guide](multi-repo-management-guide.md)** - Managing multiple Git repositories
 - **[Troubleshooting](troubleshooting.md)** - Solutions to common problems
 - **[FAQ](faq.md)** - Answers to frequently asked questions
 
@@ -89,6 +90,7 @@ Detailed technical documentation:
 - **[Adoption Guide](adoption-guide.md)** - Adopting kse in existing projects
 - **[Upgrade Guide](upgrade-guide.md)** - Upgrading kse to newer versions
 - **[Environment Management Guide](environment-management-guide.md)** - Managing multiple environments
+- **[Multi-Repository Management Guide](multi-repo-management-guide.md)** - Managing multiple Git repositories
 - **[Developer Guide](developer-guide.md)** - Contributing to kse development
 - **[Architecture](architecture.md)** - kse system architecture
 
@@ -158,6 +160,11 @@ Detailed technical documentation:
 - [Environment Commands](command-reference.md#environment-management)
 - [Multi-Environment Workflow](environment-management-guide.md#common-workflows)
 
+### Multi-Repository Management
+- [Multi-Repository Management Guide](multi-repo-management-guide.md)
+- [Repository Commands](command-reference.md#multi-repository-management)
+- [Multi-Repo Workflows](multi-repo-management-guide.md#common-workflows)
+
 ### Context Export
 - [Manual Export Mode](integration-modes.md#mode-2-manual-export)
 - [Export Commands](command-reference.md#context--prompts)
@@ -208,6 +215,7 @@ Detailed technical documentation:
 | Troubleshooting | ✅ Complete | 2026-01-23 |
 | Command Reference | ✅ Complete | 2026-01-31 |
 | Environment Management | ✅ Complete | 2026-01-31 |
+| Multi-Repository Management | ✅ Complete | 2026-01-31 |
 
 ---
 

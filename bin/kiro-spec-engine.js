@@ -509,6 +509,46 @@ envCmd.action(async (subcommand, args, options) => {
   process.exit(exitCode);
 });
 
+// Multi-repository management commands
+const repoCommand = require('../lib/commands/repo');
+
+const repoCmd = program
+  .command('repo')
+  .description('Manage multiple Git subrepositories');
+
+repoCmd
+  .command('init')
+  .description('Initialize repository configuration')
+  .option('-y, --yes', 'Skip confirmation prompts')
+  .option('--max-depth <depth>', 'Maximum scan depth', parseInt)
+  .option('--exclude <paths>', 'Comma-separated paths to exclude')
+  .action(async (options) => {
+    await repoCommand.initRepo(options);
+  });
+
+repoCmd
+  .command('status')
+  .description('Display repository status')
+  .option('-v, --verbose', 'Show detailed status')
+  .action(async (options) => {
+    await repoCommand.statusRepo(options);
+  });
+
+repoCmd
+  .command('exec <command>')
+  .description('Execute command across repositories')
+  .option('--dry-run', 'Show commands without executing')
+  .action(async (command, options) => {
+    await repoCommand.execRepo(command, options);
+  });
+
+repoCmd
+  .command('health')
+  .description('Check repository health')
+  .action(async (options) => {
+    await repoCommand.healthRepo(options);
+  });
+
 // Template management commands
 const templatesCommand = require('../lib/commands/templates');
 

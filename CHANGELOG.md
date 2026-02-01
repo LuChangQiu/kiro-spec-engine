@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.19.0] - 2026-01-31
+
+### Added
+- **Multi-Repository Management**: Complete feature for managing multiple Git subrepositories
+  - `kse repo init`: Auto-discover and initialize repository configuration
+  - `kse repo status`: View status of all repositories in unified table
+  - `kse repo exec`: Execute Git commands across all repositories
+  - `kse repo health`: Verify repository configuration and connectivity
+  - Configuration stored in `.kiro/project-repos.json`
+  - Support for repository groups, tags, and metadata
+  - Cross-platform path handling (Windows/Linux/macOS)
+  - Comprehensive error handling and validation
+  - Dry-run mode for safe command preview
+
+### Documentation
+- Added `docs/multi-repo-management-guide.md` with comprehensive usage guide
+  - Quick start guide with examples
+  - Configuration file format documentation
+  - Common workflows (sync, feature branches, releases, troubleshooting)
+  - Manual configuration examples
+  - Troubleshooting section
+  - Best practices and advanced usage
+- Updated `README.md` with multi-repo management section
+- Updated command overview with repo commands
+
+### Implementation
+- Core utilities: ConfigManager, RepoManager, GitOperations, PathResolver, OutputFormatter
+- Command handlers: InitHandler, StatusHandler, ExecHandler, HealthHandler
+- Error classes: ConfigError, RepoError, GitError
+- CLI integration with Commander
+- Full test coverage (unit + integration tests)
+
+### Dependencies
+- Added `simple-git@^3.22.0` for Git operations
+- Added `cli-table3@^0.6.3` for table formatting
+
+### Notes
+- All 1491+ tests passing
+- Implements Spec 24-00-multi-repo-management
+- Follows data atomicity principle (single source of truth)
+- Documentation synchronized with implementation (principle #8)
+
 ## [1.18.1] - 2026-01-31
 
 ### Added

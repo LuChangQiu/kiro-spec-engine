@@ -1,6 +1,6 @@
 {
   "name": "kiro-spec-engine",
-  "version": "1.18.1",
+  "version": "1.19.0",
   "description": "kiro-spec-engine (kse) - A CLI tool and npm package for spec-driven development with AI coding assistants. NOT the Kiro IDE desktop application.",
   "main": "index.js",
   "bin": {
@@ -69,6 +69,7 @@
   "dependencies": {
     "chalk": "^4.1.2",
     "chokidar": "^3.5.3",
+    "cli-table3": "^0.6.5",
     "commander": "^9.0.0",
     "fs-extra": "^10.0.0",
     "inquirer": "^8.2.0",
@@ -76,7 +77,8 @@
     "kiro-spec-engine": "^1.7.0",
     "minimatch": "^10.1.1",
     "path": "^0.12.7",
-    "semver": "^7.5.4"
+    "semver": "^7.5.4",
+    "simple-git": "^3.30.0"
   },
   "devDependencies": {
     "fast-check": "^4.5.3",

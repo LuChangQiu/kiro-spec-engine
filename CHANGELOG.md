@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.20.3] - 2026-02-01
+
+### Fixed
+- **Nested Scanning Validation**: Fixed three critical validation issues preventing nested repository configuration saves
+  - Repository names starting with dots (`.github`, `.kiro`) now accepted as valid
+  - Path overlap validation now context-aware: allows overlapping paths in nested mode, rejects in non-nested mode
+  - Fixed empty name/path bug for root directory repositories (now normalized to '.')
+  - Added `settings.nestedMode` field to track scanning mode in configuration
+  - Successfully tested with 104 nested repositories in real-world project
+
+### Technical Details
+- Updated `_isValidRepoName()` regex to allow names starting with dots: `/^\.?[a-zA-Z0-9][a-zA-Z0-9._-]*$/`
+- Modified `_validatePaths()` to accept `allowNested` parameter and skip overlap errors in nested mode
+- Updated `validateConfig()` to pass `settings.nestedMode` to path validation
+- Fixed `discoverRepositories()` to normalize empty relativePath to '.' instead of empty string
+- Added detailed error reporting in `init-handler.js` to show validation errors during scanning
+- All 1686 tests passing
+
 ## [1.20.2] - 2026-02-01
 
 ### Fixed

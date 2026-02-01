@@ -6,21 +6,21 @@
 
 **阶段**: ✅ 空闲状态，等待新任务
 
-**最近完成**: Spec 29-00-multi-repo-validation-fix (v1.20.4 hotfix)
+**最近完成**: Spec 30-00-git-repository-detection-fix (v1.20.5 hotfix)
 
 **成果**:
-- ✅ 修复多仓库验证 bug - 独立仓库配置被错误拒绝
-  - 增强 `_validatePaths()` 区分 duplicate 和 nested 错误
-  - 独立仓库（无重叠）现在始终通过验证
-  - 嵌套仓库需要 `nestedMode: true` 才能通过
-  - 添加友好提示信息建议启用 nestedMode
-- ✅ 所有测试通过（1686 tests）
-- ✅ 版本更新：v1.20.4
+- ✅ 修复 Git 仓库检测 bug - 消除 false positives
+  - 增强 `isGitRepo()` 验证 .git 目录存在性
+  - 正确排除 Git worktrees（.git 文件而非目录）
+  - 用户场景：34 个误报 → 8 个真实仓库 ✓
+  - 所有 198 个 repo 测试通过
+- ✅ 版本更新：v1.20.5
+- ✅ 文档更新：CHANGELOG + troubleshooting guide
 - ✅ 准备发布到 npm
 
-**下一步**: 等待用户指示新任务或发布 v1.20.4
+**下一步**: 等待用户指示发布 v1.20.5 或新任务
 
 ---
 
-v77.0 | 2026-02-01 | Spec 29-00 完成，v1.20.4 准备发布
+v79.0 | 2026-02-01 | Spec 30-00 完成，v1.20.5 准备发布
 

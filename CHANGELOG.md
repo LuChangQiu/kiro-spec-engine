@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.20.5] - 2026-02-01 🔥 HOTFIX
+
+### Fixed
+- **Git Repository Detection Bug**: Fixed critical scanning logic that incorrectly identified regular subdirectories as Git repositories
+  - Scanner now validates `.git` directory existence before identifying a directory as a repository
+  - Eliminates false positives: previously detected 34 "repositories" when only 8 were actual Git repos
+  - Correctly excludes Git worktrees (directories with `.git` files instead of directories)
+  - Maintains backward compatibility with existing valid configurations
+  - Root cause: `isGitRepo()` used `git revparse --git-dir` which returns true for any directory within a Git repository tree, not just repository roots
+
+### Technical Details
+- Enhanced `GitOperations.isGitRepo()` to check for `.git` directory using `fs.stat()`
+- Verifies `.git` is a directory (not a file, which occurs in Git worktrees)
+- Keeps optional `git revparse` verification for additional validation
+- Handles filesystem errors gracefully (treats as non-repository)
+- All 198 repo-related tests pass
+- Reference: User report of 34 false positives when only 8 real repositories existed
+
 ## [1.20.4] - 2026-02-01 🔥 HOTFIX
 
 ### Fixed

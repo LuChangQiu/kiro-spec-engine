@@ -782,6 +782,47 @@ You can manually edit `.kiro/project-repos.json` to:
 
 ## Troubleshooting
 
+### Directory Not Detected as Repository
+
+**Problem:**
+`kse repo init` doesn't detect a directory that you know contains a Git repository.
+
+**Cause:**
+The scanner only identifies directories that contain a `.git` subdirectory. Regular subdirectories within a Git repository are not detected as separate repositories.
+
+**Solution:**
+1. Verify the directory has a `.git` subdirectory:
+   ```bash
+   ls -la your-directory/.git
+   ```
+2. If `.git` is missing, the directory is not a Git repository root. Initialize it:
+   ```bash
+   cd your-directory
+   git init
+   ```
+3. If you're working with Git worktrees (where `.git` is a file, not a directory), note that worktrees are intentionally excluded from detection.
+
+**Note:** This behavior was fixed in v1.20.5 to eliminate false positives where regular subdirectories were incorrectly identified as repositories.
+
+### Too Many Repositories Detected
+
+**Problem:**
+`kse repo init` detects many more repositories than you actually have (e.g., 34 detected when you only have 8).
+
+**Cause:**
+If you're using a version prior to v1.20.5, the scanner may incorrectly identify regular subdirectories as repositories.
+
+**Solution:**
+1. Upgrade to v1.20.5 or later:
+   ```bash
+   npm install -g kiro-spec-engine@latest
+   ```
+2. Re-run the initialization:
+   ```bash
+   kse repo init
+   ```
+3. The scanner will now only detect directories with `.git` subdirectories.
+
 ### Configuration File Not Found
 
 **Error:**

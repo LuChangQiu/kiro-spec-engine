@@ -2,11 +2,24 @@ const GitOperations = require('../../../lib/repo/git-operations');
 const GitError = require('../../../lib/repo/errors/git-error');
 const simpleGit = require('simple-git');
 const path = require('path');
-const fs = require('fs-extra');
-const os = require('os');
+const fs = require('fs');
 
 // Mock simple-git
 jest.mock('simple-git');
+
+// Mock fs.promises.stat
+jest.mock('fs', () => {
+  const originalModule = jest.requireActual('fs');
+  return {
+    ...originalModule,
+    promises: {
+      ...originalModule.promises,
+      stat: jest.fn()
+    }
+  };
+});
+
+const mockStat = fs.promises.stat;
 
 describe('GitOperations', () => {
   let gitOps;
@@ -43,24 +56,66 @@ describe('GitOperations', () => {
 
   describe('isGitRepo', () => {
     it('should return true for a valid Git repository', async () => {
+      // Mock .git directory exists and is a directory
+      mockStat.mockResolvedValue({
+        isDirectory: () => true
+      });
       mockGit.revparse.mockResolvedValue('.git');
       
       const result = await gitOps.isGitRepo('/path/to/repo');
       
       expect(result).toBe(true);
+      expect(mockStat).toHaveBeenCalledWith(path.join('/path/to/repo', '.git'));
       expect(mockGit.revparse).toHaveBeenCalledWith(['--git-dir']);
     });
 
-    it('should return false for an invalid Git repository', async () => {
-      mockGit.revparse.mockRejectedValue(new Error('Not a git repository'));
+    it('should return false for a directory without .git', async () => {
+      // Mock .git directory does not exist
+      mockStat.mockRejectedValue(new Error('ENOENT: no such file or directory'));
       
       const result = await gitOps.isGitRepo('/path/to/non-repo');
       
       expect(result).toBe(false);
+      expect(mockStat).toHaveBeenCalledWith(path.join('/path/to/non-repo', '.git'));
+    });
+
+    it('should return false for a directory with .git file (Git worktree)', async () => {
+      // Mock .git exists but is a file, not a directory
+      mockStat.mockResolvedValue({
+        isDirectory: () => false
+      });
+      
+      const result = await gitOps.isGitRepo('/path/to/worktree');
+      
+      expect(result).toBe(false);
+      expect(mockStat).toHaveBeenCalledWith(path.join('/path/to/worktree', '.git'));
+    });
+
+    it('should return false for inaccessible .git directory', async () => {
+      // Mock permission denied
+      mockStat.mockRejectedValue(new Error('EACCES: permission denied'));
+      
+      const result = await gitOps.isGitRepo('/path/to/restricted');
+      
+      expect(result).toBe(false);
+    });
+
+    it('should return true even if git command fails but .git directory exists', async () => {
+      // Mock .git directory exists
+      mockStat.mockResolvedValue({
+        isDirectory: () => true
+      });
+      // Mock git command fails (corrupted repo)
+      mockGit.revparse.mockRejectedValue(new Error('Not a git repository'));
+      
+      const result = await gitOps.isGitRepo('/path/to/corrupted-repo');
+      
+      expect(result).toBe(true);
+      expect(mockStat).toHaveBeenCalledWith(path.join('/path/to/corrupted-repo', '.git'));
     });
 
     it('should return false for a non-existent path', async () => {
-      mockGit.revparse.mockRejectedValue(new Error('Path does not exist'));
+      mockStat.mockRejectedValue(new Error('Path does not exist'));
       
       const result = await gitOps.isGitRepo('/non/existent/path');
       

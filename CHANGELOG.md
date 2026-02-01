@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.20.1] - 2026-02-01
+
+### Fixed
+- **Configuration Save Failure**: Fixed multi-repository configuration validation that prevented saving
+  - Added path normalization in ConfigManager to handle trailing slashes and path format variations
+  - Parent reference validation now correctly matches parent paths with repository paths
+  - Improved error messages to include available paths when validation fails
+- **Git Command Duplication**: Fixed command execution that duplicated "git" prefix
+  - `kse repo exec "git branch"` now correctly executes "git branch" instead of "git git branch"
+  - Command trimming and prefix detection added to RepoManager.execInRepo()
+- **Backward Compatibility**: All existing configurations work without changes
+  - Existing single-repository configurations function identically
+  - All 1685 tests passing (1 unrelated workspace test failure)
+
+### Technical Details
+- Added `_normalizePath()` helper method to ConfigManager for consistent path comparison
+- Updated `_validateParentReferences()` to use normalized paths
+- Updated `execInRepo()` to detect and avoid duplicating "git" prefix in commands
+- No changes to configuration file format or scanning logic
+
 ## [1.20.0] - 2026-02-01
 
 ### Added

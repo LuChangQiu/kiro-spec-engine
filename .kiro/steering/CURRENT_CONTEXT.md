@@ -1,37 +1,28 @@
 ﻿# 当前场景规则
 
-> **当前 Spec**: 25-00-nested-repo-support
+> **当前 Spec**: 26-00-repo-config-hotfix
 
 ## 🎯 当前状态
 
-**阶段**: ✅ Spec 完成，准备发布 v1.20.0
+**阶段**: ✅ Spec 创建完成，准备执行任务
 
-**Spec 概述**: 增强 kse repo 功能，支持嵌套 Git 仓库扫描
+**Spec 概述**: 修复 v1.20.0 中的三个关键 bug（配置保存失败、父引用验证错误、git 命令重复）
 
 **已完成**:
-- ✅ requirements.md - 9 个需求
-- ✅ design.md - 完整架构设计，10 个正确性属性
-- ✅ tasks.md - 12 个主任务（跳过可选的 property-based 测试）
-- ✅ 核心功能实现：
-  - RepoManager 支持嵌套扫描（nested 参数，默认 true）
-  - ConfigManager 支持 parent 字段验证
-  - InitHandler 支持嵌套扫描选项
-  - CLI 添加 --nested/--no-nested 标志
-  - 自动排除常见非仓库目录
-  - 循环符号链接检测
-- ✅ 测试：所有 1686 个测试通过
-- ✅ 文档：
-  - 更新 multi-repo-management-guide.md（完整的嵌套仓库文档）
-  - 更新 README.md（功能概述）
-  - 更新 CHANGELOG.md（v1.20.0 变更记录）
-- ✅ 版本：package.json 更新为 v1.20.0
+- ✅ requirements.md - 9 个需求（覆盖路径规范化、父引用验证、命令去重、向后兼容）
+- ✅ design.md - 最小化修改设计，6 个正确性属性
+- ✅ tasks.md - 7 个主任务（可选测试任务标记为 *）
+
+**核心修复**:
+1. ConfigManager 添加 `_normalizePath()` 方法
+2. `_validateParentReferences()` 使用规范化路径比较
+3. RepoManager `execInRepo()` 检测并避免 "git" 前缀重复
 
 **下一步**: 
-1. 提交所有更改
-2. 创建 tag v1.20.0
-3. 推送到 GitHub（自动触发 npm 发布）
+- 执行任务（打开 tasks.md，点击 "Start task"）
+- 目标版本：v1.20.1（hotfix）
 
 ---
 
-v71.0 | 2026-02-01 | Spec 25-00 完成，准备发布 v1.20.0
+v72.0 | 2026-02-01 | Spec 26-00 创建完成
 

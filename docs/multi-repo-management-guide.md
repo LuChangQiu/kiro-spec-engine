@@ -193,6 +193,260 @@ Paths can be specified as:
   "path": "packages/frontend"   // Unix/Mac
   ```
 
+## Manual Configuration
+
+### Overview
+
+Starting with v1.21.0, you can manually create and edit the `.kiro/project-repos.json` configuration file without relying solely on `kse repo init`. This is useful for:
+
+- Curating a specific list of repositories
+- Removing false positives from auto-scan
+- Adding repositories that weren't auto-detected
+- Creating configurations for repositories that don't exist yet
+
+### Minimal Configuration Format
+
+The simplest valid configuration requires only `name` and `path` for each repository:
+
+```json
+{
+  "repositories": [
+    {
+      "name": "my-repo",
+      "path": "./my-repo"
+    },
+    {
+      "name": "another-repo",
+      "path": "./another-repo"
+    }
+  ]
+}
+```
+
+**Key points:**
+- The `version` field is optional (defaults to "1.0")
+- Only `name` and `path` are required for each repository
+- All other fields (`remote`, `defaultBranch`, `description`, `tags`, `group`) are optional
+
+### Complete Configuration Example
+
+For more detailed configurations, you can include all optional fields:
+
+```json
+{
+  "version": "1.0",
+  "repositories": [
+    {
+      "name": "frontend",
+      "path": "./packages/frontend",
+      "remote": "https://github.com/user/frontend.git",
+      "defaultBranch": "main",
+      "description": "React frontend application",
+      "tags": ["ui", "react"],
+      "group": "client"
+    },
+    {
+      "name": "backend",
+      "path": "./packages/backend",
+      "remote": "https://github.com/user/backend.git",
+      "defaultBranch": "develop",
+      "description": "Node.js API server",
+      "tags": ["api", "nodejs"],
+      "group": "server"
+    },
+    {
+      "name": "local-only",
+      "path": "./local-repo"
+    }
+  ],
+  "groups": {
+    "client": {
+      "description": "Client-side applications"
+    },
+    "server": {
+      "description": "Server-side services"
+    }
+  }
+}
+```
+
+### Field Requirements
+
+#### Required Fields
+- **name**: Unique identifier for the repository
+  - Must contain only alphanumeric characters, hyphens, underscores, and dots
+  - Examples: `"frontend"`, `"my-repo"`, `"repo.1"`, `".github"`
+
+- **path**: Path to the repository directory
+  - Can be relative (e.g., `"./my-repo"`) or absolute (e.g., `"/home/user/my-repo"`)
+  - Must point to an existing directory containing a `.git` directory
+  - Cannot point to a Git worktree (`.git` file instead of directory)
+
+#### Optional Fields
+- **remote**: Git remote URL (can be omitted for local-only repositories)
+- **defaultBranch**: Default branch name (e.g., `"main"`, `"develop"`)
+- **description**: Human-readable description
+- **tags**: Array of tags for categorization
+- **group**: Group name for logical organization
+- **parent**: Parent repository path (for nested repositories)
+
+### Validation Rules
+
+When you manually create or edit the configuration, `kse` validates:
+
+1. **File Format**: Must be valid JSON
+2. **Structure**: Must have a `repositories` array
+3. **Required Fields**: Each repository must have `name` and `path`
+4. **Path Existence**: Each path must exist on the filesystem
+5. **Git Repository**: Each path must contain a `.git` directory (not file)
+6. **No Duplicates**: Repository names and paths must be unique
+7. **No Worktrees**: Paths cannot point to Git worktrees
+
+### Creating a Manual Configuration
+
+**Step 1: Create the directory structure**
+
+```bash
+mkdir -p .kiro
+```
+
+**Step 2: Create the configuration file**
+
+Create `.kiro/project-repos.json` with your repositories:
+
+```json
+{
+  "repositories": [
+    {
+      "name": "repo1",
+      "path": "./repo1"
+    },
+    {
+      "name": "repo2",
+      "path": "./repo2"
+    }
+  ]
+}
+```
+
+**Step 3: Verify the configuration**
+
+```bash
+kse repo status
+```
+
+If there are validation errors, `kse` will display clear error messages:
+
+```
+Error: Repository path validation failed
+  - Repository "repo1": path "./repo1" does not exist. Please check the path is correct.
+  - Repository "repo2": path "./repo2" is not a Git repository (no .git directory found). Please ensure this is a Git repository.
+```
+
+### Editing an Existing Configuration
+
+You can manually edit the auto-generated configuration to:
+
+**Remove repositories:**
+```json
+{
+  "repositories": [
+    // Remove unwanted entries from this array
+    {
+      "name": "keep-this",
+      "path": "./keep-this"
+    }
+    // Deleted: { "name": "remove-this", "path": "./remove-this" }
+  ]
+}
+```
+
+**Add new repositories:**
+```json
+{
+  "repositories": [
+    {
+      "name": "existing-repo",
+      "path": "./existing-repo"
+    },
+    {
+      "name": "new-repo",
+      "path": "./new-repo"
+    }
+  ]
+}
+```
+
+**Simplify to minimal format:**
+```json
+{
+  "repositories": [
+    {
+      "name": "repo1",
+      "path": "./repo1"
+      // Removed: remote, defaultBranch, description, tags, group
+    }
+  ]
+}
+```
+
+### Troubleshooting
+
+#### Error: "path does not exist"
+
+**Cause**: The specified path doesn't exist on the filesystem.
+
+**Solution**: Check the path is correct and the directory exists:
+```bash
+ls -la ./my-repo  # Unix/Mac
+dir .\my-repo     # Windows
+```
+
+#### Error: "is not a Git repository"
+
+**Cause**: The path exists but doesn't contain a `.git` directory.
+
+**Solution**: Initialize the directory as a Git repository:
+```bash
+cd ./my-repo
+git init
+```
+
+#### Error: "appears to be a Git worktree"
+
+**Cause**: The path contains a `.git` file instead of a directory (Git worktree).
+
+**Solution**: Use the main repository path instead of the worktree path:
+```json
+{
+  "name": "my-repo",
+  "path": "./main-repo"  // Use main repo, not worktree
+}
+```
+
+#### Error: "Duplicate repository name"
+
+**Cause**: Two repositories have the same name.
+
+**Solution**: Ensure each repository has a unique name:
+```json
+{
+  "repositories": [
+    { "name": "repo1", "path": "./path1" },
+    { "name": "repo2", "path": "./path2" }  // Changed from "repo1"
+  ]
+}
+```
+
+#### Error: "Configuration file contains invalid JSON"
+
+**Cause**: The JSON syntax is incorrect (missing comma, bracket, etc.).
+
+**Solution**: Validate your JSON using a JSON validator or IDE:
+- Check for missing commas between array elements
+- Ensure all brackets and braces are properly closed
+- Use a JSON formatter to identify syntax errors
+
 ## Nested Repository Support
 
 ### Overview

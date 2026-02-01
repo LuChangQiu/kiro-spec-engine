@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.21.0] - 2026-02-01
+
+### Added
+- **Manual Configuration Support**: Users can now manually create and edit `.kiro/project-repos.json` without relying solely on auto-scan
+  - Version field is now optional (defaults to "1.0" if omitted)
+  - Only `name` and `path` are required for each repository entry
+  - All other fields (`remote`, `defaultBranch`, `description`, `tags`, `group`, `parent`) are optional
+  - Filesystem validation ensures paths exist and contain valid `.git` directories
+  - Clear, actionable error messages guide users in fixing configuration issues
+  - Comprehensive documentation in `docs/multi-repo-management-guide.md` with examples and troubleshooting
+
+### Changed
+- **Enhanced Validation**: Configuration validation now performs filesystem checks when loading from disk
+  - Validates that repository paths exist on the filesystem
+  - Verifies each path contains a `.git` directory (not file)
+  - Detects and rejects Git worktrees with helpful error messages
+  - Reports all validation errors together (not just the first one)
+  - Maintains backward compatibility with all v1.18.0+ configurations
+
+### Fixed
+- **Manual Configuration Rejection**: Fixed issue where manually-created configurations were rejected even when valid
+  - Users can now manually curate repository lists
+  - Users can remove false positives from auto-scan results
+  - Users can add repositories that weren't auto-detected
+  - Minimal configurations (name + path only) now pass validation
+  - User-reported issue: 8 real Git repositories rejected by validation
+
+### Documentation
+- Added comprehensive "Manual Configuration" section to multi-repo management guide
+- Documented minimal configuration format with examples
+- Added troubleshooting guide for common validation errors
+- Included step-by-step instructions for creating manual configurations
+
 ## [1.20.5] - 2026-02-01 🔥 HOTFIX
 
 ### Fixed

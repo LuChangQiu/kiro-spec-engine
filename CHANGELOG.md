@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.19.3] - 2026-02-01
+
+### Fixed
+- **Cross-Platform**: Fixed PathResolver.isAbsolute() to work correctly on all platforms
+  - Replaced platform-dependent path.isAbsolute() with explicit path.startsWith('/')
+  - Now correctly identifies Windows paths (C:/) on Unix systems
+  - All 1686 tests passing on all platforms
+
+### Notes
+- Final fix for v1.19.2 CI test failures
+- All functionality from v1.19.0-v1.19.2 is included
+
 ## [1.19.2] - 2026-02-01
 
 ### Fixed

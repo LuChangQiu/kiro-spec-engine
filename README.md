@@ -268,13 +268,16 @@ Structure your work with Requirements → Design → Tasks workflow
 - **Command Execution**: Run commands in specific environment context
 - **Cross-Platform**: Works seamlessly on Windows, Linux, and macOS
 
-### Multi-Repository Management 🚀 NEW in v1.19.0
+### Multi-Repository Management 🚀 NEW in v1.20.0
 - **Unified Interface**: Manage multiple Git subrepositories from a single command
 - **Auto-Discovery**: Automatically scan and configure all Git repositories in your project
+- **Nested Repository Support**: Discover and manage Git repositories nested inside other repositories
+- **Parent-Child Tracking**: Track relationships between parent and nested repositories
 - **Batch Operations**: Execute Git commands across all repositories simultaneously
-- **Status Overview**: View status of all repositories in a single table
+- **Status Overview**: View status of all repositories in a single table with parent relationships
 - **Health Checks**: Verify repository configuration and connectivity
 - **Cross-Platform**: Consistent path handling across Windows/Linux/macOS
+- **Smart Exclusions**: Automatically skip common non-repository directories (node_modules, build, etc.)
 
 ### DevOps Integration Foundation 🚀
 - **Operations Spec Management**: Standardized operations documentation (deployment, monitoring, troubleshooting, etc.)
@@ -340,9 +343,10 @@ kse env rollback                   # Rollback to previous environment
 kse env verify                     # Verify current environment
 kse env run "<command>"            # Run command in environment context
 
-# Multi-repository management (NEW in v1.19.0)
-kse repo init                      # Initialize repository configuration
-kse repo status [--verbose]        # Show status of all repositories
+# Multi-repository management (NEW in v1.20.0)
+kse repo init [--nested]           # Initialize repository configuration (nested scanning by default)
+kse repo init --no-nested          # Initialize without nested repository scanning
+kse repo status [--verbose]        # Show status of all repositories (including nested)
 kse repo exec "<command>"          # Execute command in all repositories
 kse repo health                    # Check repository health
 

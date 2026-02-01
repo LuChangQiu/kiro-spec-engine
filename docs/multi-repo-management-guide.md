@@ -193,6 +193,293 @@ Paths can be specified as:
   "path": "packages/frontend"   // Unix/Mac
   ```
 
+## Nested Repository Support
+
+### Overview
+
+Nested repository support allows `kse` to discover and manage Git repositories that are nested inside other Git repositories. This is useful for projects with complex structures where components are organized as independent Git repositories within a parent repository.
+
+**Example structure:**
+```
+project-root/
+├── .git/                    # Parent repository
+├── backend/
+│   ├── .git/               # Backend repository
+│   └── runtime/
+│       └── component/
+│           ├── HiveMind/
+│           │   └── .git/   # Nested component repository
+│           ├── mantle-udm/
+│           │   └── .git/   # Nested component repository
+│           └── MarbleERP/
+│               └── .git/   # Nested component repository
+└── frontend/
+    └── .git/               # Frontend repository
+```
+
+### Enabling Nested Scanning
+
+Nested scanning is **enabled by default** in `kse repo init`. To explicitly control this behavior:
+
+```bash
+# Enable nested scanning (default)
+kse repo init --nested
+
+# Disable nested scanning (stop at first repo)
+kse repo init --no-nested
+```
+
+### Parent-Child Relationships
+
+When nested repositories are discovered, `kse` tracks the parent-child relationship in the configuration file:
+
+```json
+{
+  "version": "1.0",
+  "repositories": [
+    {
+      "name": "backend",
+      "path": "backend",
+      "remote": "https://github.com/user/backend.git",
+      "defaultBranch": "main",
+      "parent": null
+    },
+    {
+      "name": "HiveMind",
+      "path": "backend/runtime/component/HiveMind",
+      "remote": "https://github.com/user/HiveMind.git",
+      "defaultBranch": "master",
+      "parent": "backend"
+    },
+    {
+      "name": "mantle-udm",
+      "path": "backend/runtime/component/mantle-udm",
+      "remote": "https://github.com/moqui/mantle-udm.git",
+      "defaultBranch": "master",
+      "parent": "backend"
+    }
+  ]
+}
+```
+
+**Key points:**
+- Top-level repositories have `parent: null`
+- Nested repositories have `parent` set to the path of their parent repository
+- The `parent` field is optional for backward compatibility
+
+### Display and Output
+
+When nested repositories are present, commands display the parent-child relationship:
+
+```bash
+$ kse repo status
+
+┌────────────┬─────────┬────────┬──────────┬───────┬────────┬─────────┐
+│ Name       │ Branch  │ Status │ Modified │ Ahead │ Behind │ Parent  │
+├────────────┼─────────┼────────┼──────────┼───────┼────────┼─────────┤
+│ backend    │ main    │ Clean  │ 0        │ 0     │ 0      │ -       │
+│ HiveMind   │ master  │ Dirty  │ 2        │ 1     │ 0      │ backend │
+│ mantle-udm │ master  │ Clean  │ 0        │ 0     │ 0      │ backend │
+└────────────┴─────────┴────────┴──────────┴───────┴────────┴─────────┘
+```
+
+The **Parent** column shows:
+- `-` for top-level repositories
+- Parent repository path for nested repositories
+
+### Use Cases
+
+#### 1. Monorepo with Component Repositories
+
+A monorepo that includes independent component repositories:
+
+```
+monorepo/
+├── .git/                    # Main monorepo
+├── packages/
+│   ├── core/
+│   │   └── .git/           # Core package as separate repo
+│   └── plugins/
+│       ├── plugin-a/
+│       │   └── .git/       # Plugin A as separate repo
+│       └── plugin-b/
+│           └── .git/       # Plugin B as separate repo
+```
+
+**Benefits:**
+- Manage all repositories from the monorepo root
+- Track status of all components at once
+- Execute commands across all components
+
+#### 2. Framework with Runtime Components
+
+A framework that includes runtime components as separate repositories:
+
+```
+framework/
+├── .git/                    # Framework repository
+└── runtime/
+    └── component/
+        ├── component-a/
+        │   └── .git/       # Component A
+        ├── component-b/
+        │   └── .git/       # Component B
+        └── component-c/
+            └── .git/       # Component C
+```
+
+**Benefits:**
+- Components can be developed independently
+- Framework and components can have different release cycles
+- Easy to update all components at once
+
+#### 3. Multi-Tier Application
+
+An application with frontend, backend, and shared libraries:
+
+```
+app/
+├── .git/                    # Application repository
+├── frontend/
+│   └── .git/               # Frontend repository
+├── backend/
+│   ├── .git/               # Backend repository
+│   └── services/
+│       ├── auth/
+│       │   └── .git/       # Auth service
+│       └── api/
+│           └── .git/       # API service
+└── shared/
+    └── .git/               # Shared libraries
+```
+
+**Benefits:**
+- Each tier can be developed by different teams
+- Shared libraries can be versioned independently
+- Unified management from application root
+
+### Directory Exclusions
+
+To improve performance and avoid scanning unnecessary directories, `kse` automatically excludes common non-repository directories:
+
+- `node_modules` - Node.js dependencies
+- `.git` - Git metadata
+- `build`, `dist`, `out` - Build outputs
+- `target` - Java/Maven build output
+- `.next`, `.nuxt` - Framework build caches
+- `vendor` - PHP/Go dependencies
+
+You can add custom exclusions using the `--exclude` option:
+
+```bash
+kse repo init --exclude "node_modules,vendor,custom-dir"
+```
+
+### Circular Symlink Detection
+
+`kse` automatically detects and skips circular symbolic links to prevent infinite loops during scanning:
+
+```bash
+# This structure is handled safely
+project/
+├── .git/
+├── link-to-parent -> ../project  # Circular symlink
+└── subdir/
+    └── .git/
+```
+
+### Performance Considerations
+
+Nested scanning may take longer for large directory structures. To optimize:
+
+1. **Reduce scan depth**: Use `--max-depth` to limit how deep to scan
+   ```bash
+   kse repo init --max-depth 4
+   ```
+
+2. **Exclude directories**: Skip known non-repository directories
+   ```bash
+   kse repo init --exclude "node_modules,build,dist"
+   ```
+
+3. **Disable nested scanning**: If you only need top-level repositories
+   ```bash
+   kse repo init --no-nested
+   ```
+
+### Troubleshooting Nested Repositories
+
+#### Missing Nested Repositories
+
+If nested repositories are not discovered:
+
+1. **Check scan depth**: Increase `--max-depth` if repositories are deeply nested
+   ```bash
+   kse repo init --max-depth 5
+   ```
+
+2. **Verify nested scanning is enabled**: Ensure `--no-nested` is not used
+   ```bash
+   kse repo init --nested
+   ```
+
+3. **Check exclusions**: Ensure the directory is not excluded
+   ```bash
+   kse repo init --exclude "node_modules"  # Don't exclude the parent directory
+   ```
+
+#### Circular Reference Errors
+
+If you see circular reference errors in health checks:
+
+```
+Error: Circular parent reference detected: repo-a -> repo-b -> repo-a
+```
+
+**Solution:**
+1. Open `.kiro/project-repos.json`
+2. Check the `parent` fields
+3. Remove or fix the circular reference
+4. Run `kse repo health` to verify
+
+#### Parent Repository Not Found
+
+If you see parent not found errors:
+
+```
+Error: Parent repository not found: backend
+```
+
+**Solution:**
+1. Ensure the parent repository is in the configuration
+2. Check that the `parent` field matches the parent's `path` field exactly
+3. Run `kse repo init` to regenerate the configuration
+
+### Backward Compatibility
+
+Nested repository support is fully backward compatible:
+
+- Existing configurations without `parent` fields work unchanged
+- Repositories without `parent` are treated as top-level repositories
+- The `parent` field is optional and can be omitted
+- Old configurations can be upgraded by running `kse repo init`
+
+### Migration from Non-Nested to Nested
+
+To migrate an existing configuration to use nested scanning:
+
+```bash
+# Backup existing configuration
+cp .kiro/project-repos.json .kiro/project-repos.json.backup
+
+# Re-initialize with nested scanning
+kse repo init --nested -y
+
+# Verify the new configuration
+kse repo status
+kse repo health
+```
+
 ## Commands
 
 ### `kse repo init`
@@ -205,26 +492,37 @@ kse repo init [options]
 ```
 
 **Options:**
-- `--force`: Overwrite existing configuration without confirmation
-- `--depth <n>`: Maximum directory depth to scan (default: 3)
+- `-y, --yes`: Skip confirmation prompts
+- `--max-depth <depth>`: Maximum directory depth to scan (default: 3)
+- `--exclude <paths>`: Comma-separated paths to exclude from scanning
+- `--nested`: Enable nested repository scanning (default)
+- `--no-nested`: Disable nested repository scanning
 
 **Behavior:**
 - Scans project directory recursively for Git repositories
-- Excludes `.kiro` directory
+- Excludes `.kiro` directory and common build directories (node_modules, build, dist, etc.)
 - Extracts remote URL from `origin` remote (or first available remote)
 - Detects current branch
 - Prompts for confirmation if configuration already exists
+- **Nested scanning** (default): Continues scanning inside Git repositories to find nested subrepositories
+- **Non-nested scanning**: Stops at the first Git repository found in each directory branch
 
 **Example:**
 ```bash
-# Initialize with default settings
+# Initialize with default settings (nested scanning enabled)
 kse repo init
 
-# Force overwrite without confirmation
-kse repo init --force
+# Skip confirmation prompts
+kse repo init -y
+
+# Disable nested repository scanning
+kse repo init --no-nested
 
 # Scan deeper directory structure
-kse repo init --depth 5
+kse repo init --max-depth 5
+
+# Exclude specific directories
+kse repo init --exclude "node_modules,vendor"
 ```
 
 ### `kse repo status`
@@ -746,5 +1044,6 @@ If you encounter issues or have questions:
 
 ---
 
-**Version**: 1.19.0  
-**Last Updated**: 2026-01-31
+**Version**: 1.20.0  
+**Last Updated**: 2026-02-01  
+**Changes**: Added nested repository support documentation

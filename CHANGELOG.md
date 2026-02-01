@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.20.0] - 2026-02-01
+
+### Added
+- **Nested Repository Support**: Discover and manage Git repositories nested inside other repositories
+  - `kse repo init` now scans inside Git repositories to find nested subrepositories by default
+  - Added `--nested` and `--no-nested` flags to control scanning behavior
+  - Parent-child relationships tracked in configuration with `parent` field
+  - Display parent relationships in status and health commands
+  - Automatic exclusion of common non-repository directories (node_modules, build, dist, etc.)
+  - Circular symlink detection to prevent infinite loops
+  - Full backward compatibility with existing configurations
+
+### Changed
+- **Multi-Repository Management**: Enhanced scanning capabilities
+  - Default behavior now includes nested repository scanning
+  - Improved directory exclusion logic for better performance
+  - Better handling of complex repository structures
+
+### Documentation
+- Added comprehensive nested repository support documentation to multi-repo-management-guide.md
+- Updated README.md with nested repository features
+- Added examples for monorepo, framework, and multi-tier application structures
+- Added troubleshooting section for nested repository issues
+
 ## [1.19.3] - 2026-02-01
 
 ### Fixed

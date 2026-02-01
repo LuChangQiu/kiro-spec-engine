@@ -151,7 +151,8 @@ describe('InitHandler', () => {
 
       expect(discoverSpy).toHaveBeenCalledWith(testDir, {
         maxDepth: 5,
-        exclude: ['.kiro']
+        exclude: ['.kiro'],
+        nested: true
       });
     });
 
@@ -163,7 +164,8 @@ describe('InitHandler', () => {
 
       expect(discoverSpy).toHaveBeenCalledWith(testDir, {
         maxDepth: 3,
-        exclude: ['.kiro', 'node_modules']
+        exclude: ['.kiro', 'node_modules'],
+        nested: true
       });
     });
   });

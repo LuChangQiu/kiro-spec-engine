@@ -522,6 +522,8 @@ repoCmd
   .option('-y, --yes', 'Skip confirmation prompts')
   .option('--max-depth <depth>', 'Maximum scan depth', parseInt)
   .option('--exclude <paths>', 'Comma-separated paths to exclude')
+  .option('--nested', 'Enable nested repository scanning (default)')
+  .option('--no-nested', 'Disable nested repository scanning')
   .action(async (options) => {
     await repoCommand.initRepo(options);
   });

@@ -69,7 +69,7 @@ describe('InitHandler', () => {
       expect(configExists).toBe(true);
 
       // Verify configuration content
-      const config = await handler.configManager.loadConfig();
+      const config = await handler.configManager.loadConfig({ skipFilesystemValidation: true });
       expect(config.version).toBe('1.0');
       expect(config.repositories).toHaveLength(2);
       expect(config.repositories[0].name).toBe('repo1');

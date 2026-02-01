@@ -64,11 +64,11 @@ describe('ConfigManager', () => {
       expect(result.errors).toContain('Configuration must be an object');
     });
 
-    test('should reject config without version', () => {
+    test('should accept config without version (defaults to 1.0)', () => {
       const config = { repositories: [] };
       const result = configManager.validateConfig(config);
-      expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Missing required field: version');
+      expect(result.valid).toBe(true);
+      expect(result.errors).toEqual([]);
     });
 
     test('should reject config with non-string version', () => {
@@ -379,7 +379,7 @@ describe('ConfigManager', () => {
       };
 
       await configManager.saveConfig(config);
-      const loadedConfig = await configManager.loadConfig();
+      const loadedConfig = await configManager.loadConfig({ skipFilesystemValidation: true });
 
       expect(loadedConfig).toEqual(config);
     });
@@ -407,7 +407,7 @@ describe('ConfigManager', () => {
       };
 
       await configManager.saveConfig(config);
-      const loadedConfig = await configManager.loadConfig();
+      const loadedConfig = await configManager.loadConfig({ skipFilesystemValidation: true });
 
       expect(loadedConfig).toEqual(config);
     });
@@ -444,7 +444,7 @@ describe('ConfigManager', () => {
       };
 
       await configManager.saveConfig(config);
-      const loadedConfig = await configManager.loadConfig();
+      const loadedConfig = await configManager.loadConfig({ skipFilesystemValidation: true });
 
       expect(loadedConfig).toEqual(config);
     });

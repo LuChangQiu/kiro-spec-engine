@@ -13,6 +13,9 @@ describe('ExecHandler', () => {
     await fs.mkdir(path.join(testDir, '.kiro'), { recursive: true });
 
     handler = new ExecHandler(testDir);
+    
+    // Mock filesystem validation to avoid path existence checks in tests
+    jest.spyOn(handler.configManager, '_validateRepositoryPath').mockResolvedValue([]);
   });
 
   afterEach(async () => {

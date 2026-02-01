@@ -334,9 +334,14 @@ describe('Document Governance - Stats and Report', () => {
         deletedFiles: ['/test1.md', '/test2.md', '/test3.md']
       });
       
+      // Small delay to ensure file is written (CI timing issue)
+      await new Promise(resolve => setTimeout(resolve, 10));
+      
       const history = await logger.getHistory();
       const entry = history[0];
       
+      expect(entry).toBeDefined();
+      expect(entry.results).toBeDefined();
       expect(entry.results.deletedFiles.length).toBe(3);
     });
     

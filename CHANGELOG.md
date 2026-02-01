@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.20.4] - 2026-02-01 🔥 HOTFIX
+
+### Fixed
+- **Multi-Repository Validation Bug**: Fixed critical validation logic that incorrectly rejected valid multi-repository configurations
+  - Independent repositories (non-overlapping paths) now pass validation regardless of `nestedMode` setting
+  - Validation now correctly distinguishes between duplicate paths (always invalid) and nested paths (invalid only without `nestedMode`)
+  - Enhanced error messages with actionable hints: suggests enabling `nestedMode` when nested paths detected
+  - User-reported test cases now pass:
+    - ✅ Two independent repositories (`backend/`, `frontend/`)
+    - ✅ Eight independent repositories
+    - ✅ Nested repositories with `nestedMode: true`
+    - ❌ Nested repositories without `nestedMode` (correctly fails with helpful hint)
+
+### Technical Details
+- Enhanced `_validatePaths()` method to categorize errors into duplicate and nested types
+- Duplicate path errors always reported (always invalid)
+- Nested path errors only reported when `nestedMode` is false or undefined
+- Added hint message: "Enable nestedMode in settings to allow nested repositories: { \"settings\": { \"nestedMode\": true } }"
+- Root cause: Previous logic didn't distinguish between independent and nested repositories
+- Reference: User bug report with 4 test cases demonstrating the issue
+
 ## [1.20.3] - 2026-02-01
 
 ### Fixed

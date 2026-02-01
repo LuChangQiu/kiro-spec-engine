@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.19.2] - 2026-02-01
+
+### Fixed
+- **Cross-Platform**: Fixed Windows path detection in PathResolver
+  - isAbsolute() now correctly detects Windows paths (C:/) on Unix systems
+  - Resolves CI test failures on Linux/macOS
+  - All PathResolver tests now passing
+
+### Notes
+- Hotfix for v1.19.1 CI test failures
+- All functionality from v1.19.0 and v1.19.1 is included
+- All 1686 tests passing
+
+## [1.19.1] - 2026-02-01
+
+### Fixed
+- **CI/CD**: Updated package-lock.json to sync with new dependencies
+  - Added simple-git@^3.22.0 to lock file
+  - Added cli-table3@^0.6.3 to lock file
+  - Fixed npm ci failure in GitHub Actions
+
+### Notes
+- Hotfix release to resolve CI test failures
+- All functionality from v1.19.0 is included
+- All 1686+ tests passing
+
 ## [1.19.0] - 2026-01-31
 
 ### Added

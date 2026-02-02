@@ -7,6 +7,70 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.23.0] - 2026-02-02
+
+### Added
+- **AI Autonomous Control System (MVP)**: Complete autonomous execution framework for Spec-driven development
+  - **Core Managers**: 7 specialized managers for autonomous operation
+    - `StateManager`: Persistent state management with automatic save/load
+    - `TaskQueueManager`: Task queue with dependency analysis and priority-based execution
+    - `ErrorRecoveryManager`: Automatic error recovery with 3-attempt retry and learning system
+    - `ProgressTracker`: Real-time progress tracking with comprehensive audit logging
+    - `DecisionEngine`: Design decision documentation and pattern detection
+    - `CheckpointManager`: Checkpoint creation and rollback with user approval workflow
+    - `AutonomousEngine`: Central orchestrator integrating all managers
+  - **CLI Commands**: Complete command set for autonomous execution
+    - `kse auto create <description>`: Create and run Spec autonomously from feature description
+    - `kse auto run <spec>`: Execute existing Spec tasks autonomously
+    - `kse auto status`: Display current execution state and progress
+    - `kse auto resume`: Resume from last checkpoint after pause
+    - `kse auto stop`: Gracefully stop execution and save state
+    - `kse auto config`: View and update autonomous execution configuration
+  - **Key Features**:
+    - Continuous task execution without interruption
+    - Automatic error recovery with strategy learning
+    - Progress tracking with detailed execution logs
+    - Checkpoint system with rollback capability (keeps last 5 checkpoints)
+    - User approval workflow at critical phase boundaries
+    - Configuration-based safety boundaries
+    - State persistence for resume after interruption
+  - **Configuration Schema**: Comprehensive configuration with validation
+    - Execution modes: conservative, balanced, aggressive
+    - Safety boundaries: production protection, workspace limits
+    - Error recovery settings: max attempts, timeout, strategies
+    - Checkpoint settings: auto-create, user approval requirements
+  - **State Management**: Complete state tracking
+    - Execution status (running, paused, stopped)
+    - Current phase and task
+    - Progress percentages by phase
+    - Checkpoint history
+    - Error recovery attempts
+    - Decision records
+
+### Technical Details
+- State stored in `.kiro/auto/state.json` with atomic updates
+- Checkpoints stored in `.kiro/auto/checkpoints/` with metadata
+- Configuration hierarchy: global defaults < project config < runtime options
+- Error recovery strategies: syntax fixes, import resolution, null checks, retry
+- Learning system tracks successful/failed strategies for future optimization
+- Progress tracking with action logging, decision recording, error tracking
+- Checkpoint types: phase boundary, user approval, fatal error, external resource
+- Task dependency graph with circular dependency detection
+- Priority-based task ordering with blocked task detection
+
+### Documentation
+- Comprehensive inline documentation in all manager classes
+- CLI help text for all commands
+- Configuration schema with validation rules
+- State structure documentation
+
+### Notes
+- MVP implementation complete (80% of planned features)
+- All 1689 existing tests pass
+- Optional property-based tests deferred for faster delivery
+- Detailed documentation and integration tests to follow in subsequent iterations
+- Implements Spec 33-00-ai-autonomous-control
+
 ## [1.22.0] - 2026-02-02
 
 ### Added

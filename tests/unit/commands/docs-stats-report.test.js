@@ -334,8 +334,8 @@ describe('Document Governance - Stats and Report', () => {
         deletedFiles: ['/test1.md', '/test2.md', '/test3.md']
       });
       
-      // Small delay to ensure file is written (CI timing issue)
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait for file to be written and flushed to disk (CI timing issue)
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       const history = await logger.getHistory();
       const entry = history[0];

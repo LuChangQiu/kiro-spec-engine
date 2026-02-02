@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.23.2] - 2026-02-02
+
+### Added
+- **AI Autonomous Control System (Complete Version)**: Full autonomous execution framework
+  - **Safety Manager**: Safety boundary enforcement with operation validation
+    - Production environment access control
+    - Workspace boundary validation
+    - External system access confirmation
+    - Destructive operation protection
+    - Audit logging for all operations
+  - **Learning System Persistence**: Error recovery learning with historical data
+    - Success/failure history tracking across sessions
+    - Strategy prioritization based on historical performance
+    - Automatic learning data persistence to `.kiro/auto/learning-data.json`
+  - **Estimation Improvement**: Task duration tracking and prediction
+    - Historical task duration tracking by task type
+    - Weighted average estimation (more weight to recent data)
+    - Improved completion time estimates over multiple executions
+    - Historical data persistence to `.kiro/auto/historical-data.json`
+  - **CORE_PRINCIPLES Compliance**: Automatic verification of kse project structure
+    - Checks for `.kiro` directory (adoption marker)
+    - Validates `version.json`, `specs/`, `steering/` directories
+    - Ensures Spec-driven development workflow compliance
+  - **Comprehensive Documentation**:
+    - Complete user guide: `docs/autonomous-control-guide.md`
+    - Quick start examples and best practices
+    - Troubleshooting guide with common issues
+    - Configuration reference with all options
+    - FAQ section
+  - **README Updates**: Added Autonomous Control feature to main README
+    - Feature overview with quick start examples
+    - Links to detailed documentation
+
+### Improved
+- **Error Recovery**: Enhanced with persistent learning across sessions
+- **Progress Tracking**: Improved time estimates using historical data
+- **Safety**: Integrated safety checks into all file operations and task execution
+
 ## [1.23.1] - 2026-02-02
 
 ### Fixed

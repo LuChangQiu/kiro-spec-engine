@@ -8,6 +8,8 @@
 
 **A context provider for AI coding tools** - Structure your project requirements, design, and tasks so AI assistants can help you build better software.
 
+**🚀 NEW: Autonomous Control** - Let AI independently manage entire development workflows from requirements to delivery.
+
 English | [简体中文](README.zh.md)
 
 ---
@@ -248,6 +250,35 @@ sequenceDiagram
 ---
 
 ## Key Features
+
+### Autonomous Control 🚀 NEW in v1.23.0
+- **Fully Autonomous Execution**: AI independently manages entire development workflows from requirements to delivery
+- **Intelligent Error Recovery**: Automatically diagnose and fix errors with 3 retry attempts and learning system
+- **Strategic Checkpoints**: Pause only at meaningful milestones (phase boundaries, fatal errors, external resources)
+- **Continuous Task Execution**: Execute multiple tasks without interruption between individual tasks
+- **Learning System**: Improve over time by learning from successful and failed recovery strategies
+- **Safety Boundaries**: Respect workspace boundaries, require confirmation for production/external operations
+- **Three Execution Modes**: Conservative (safe), Balanced (default), Aggressive (fast)
+- **Progress Tracking**: Real-time status, estimated completion time, detailed execution reports
+- **Rollback Support**: Create checkpoints and rollback to previous states if needed
+- **CORE_PRINCIPLES Compliance**: Follows Spec-driven development, file management, and quality standards
+
+**Quick Start**:
+```bash
+# Create and execute a feature autonomously
+kse auto create "user authentication with JWT tokens"
+
+# Run existing Spec autonomously
+kse auto run 33-00-ai-autonomous-control
+
+# Check status
+kse auto status
+
+# Resume after pause
+kse auto resume
+```
+
+[Learn more about Autonomous Control →](docs/autonomous-control-guide.md)
 
 ### Spec-Driven Development
 Structure your work with Requirements → Design → Tasks workflow

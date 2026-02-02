@@ -335,7 +335,7 @@ describe('Document Governance - Stats and Report', () => {
       });
       
       // Wait for file to be written and flushed to disk (CI timing issue)
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       const history = await logger.getHistory();
       const entry = history[0];

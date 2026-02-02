@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.22.0] - 2026-02-02
+
+### Added
+- **Spec-Level Collaboration System**: Enable multiple AI instances to work on different Specs in parallel
+  - **Master Spec and Sub-Specs**: Break down large features into manageable, independently developable modules
+  - **Dependency Management**: Define and track dependencies between Specs with automatic circular dependency detection
+  - **Interface Contracts**: Formal API definitions (JSON/TypeScript format) ensuring compatibility between Specs
+  - **Status Tracking**: Monitor progress, assignments, and blocking issues across all Specs
+  - **Integration Testing**: Run cross-Spec integration tests to verify modules work together correctly
+  - **Dependency Visualization**: View dependency graphs with critical path highlighting
+  - **CLI Commands**: Complete set of commands for collaboration management
+    - `kse collab init` - Initialize Master Spec with Sub-Specs
+    - `kse collab status` - Display collaboration status and dependency graph
+    - `kse collab assign` - Assign Specs to Kiro instances
+    - `kse collab verify` - Verify interface contract compliance
+    - `kse collab integrate` - Run integration tests across Specs
+    - `kse collab migrate` - Convert standalone Spec to collaborative mode
+  - **Backward Compatible**: Opt-in system that doesn't affect existing single-Spec workflows
+  - **Comprehensive Documentation**: Complete guide with examples and best practices
+
+### Technical Details
+- New collaboration managers: MetadataManager, DependencyManager, ContractManager, IntegrationManager, Visualizer
+- Collaboration metadata stored in `.kiro/specs/{spec-name}/collaboration.json`
+- Interface contracts stored in `.kiro/specs/{spec-name}/interfaces/{interface-name}.json`
+- Atomic metadata updates with file locking and retry logic
+- Graph-based dependency analysis with cycle detection
+- Automated interface verification for JavaScript/TypeScript
+- Integration test framework with dependency validation
+- Text and Mermaid format graph visualization
+
 ## [1.21.1] - 2026-02-01
 
 ### Fixed

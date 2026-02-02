@@ -13,6 +13,7 @@ const upgradeCommand = require('../lib/commands/upgrade');
 const rollbackCommand = require('../lib/commands/rollback');
 const watchCommands = require('../lib/commands/watch');
 const workflowsCommand = require('../lib/commands/workflows');
+const registerCollabCommands = require('../lib/commands/collab');
 const VersionChecker = require('../lib/version/version-checker');
 
 const i18n = getI18n();
@@ -550,6 +551,9 @@ repoCmd
   .action(async (options) => {
     await repoCommand.healthRepo(options);
   });
+
+// Spec-level collaboration commands
+registerCollabCommands(program);
 
 // Template management commands
 const templatesCommand = require('../lib/commands/templates');

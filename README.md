@@ -279,6 +279,17 @@ Structure your work with Requirements → Design → Tasks workflow
 - **Cross-Platform**: Consistent path handling across Windows/Linux/macOS
 - **Smart Exclusions**: Automatically skip common non-repository directories (node_modules, build, etc.)
 
+### Spec-Level Collaboration 🚀 NEW in v1.22.0
+- **Parallel Development**: Enable multiple AI instances to work on different Specs simultaneously
+- **Dependency Management**: Define and track dependencies between Specs with circular dependency detection
+- **Interface Contracts**: Formal API definitions ensuring compatibility between independently developed Specs
+- **Status Tracking**: Monitor progress and assignments across all Specs in real-time
+- **Integration Testing**: Run cross-Spec integration tests to verify modules work together
+- **Dependency Visualization**: View dependency graphs with critical path highlighting
+- **Backward Compatible**: Opt-in system that doesn't affect existing single-Spec workflows
+
+[Learn more about Spec-Level Collaboration →](docs/spec-collaboration-guide.md)
+
 ### DevOps Integration Foundation 🚀
 - **Operations Spec Management**: Standardized operations documentation (deployment, monitoring, troubleshooting, etc.)
 - **Progressive AI Autonomy**: L1-L5 takeover levels for gradual AI operations control
@@ -348,6 +359,14 @@ kse repo init [--nested]           # Initialize repository configuration (nested
 kse repo init --no-nested          # Initialize without nested repository scanning
 kse repo status [--verbose]        # Show status of all repositories (including nested)
 kse repo exec "<command>"          # Execute command in all repositories
+
+# Spec-level collaboration (NEW in v1.22.0)
+kse collab init <master> [options] # Initialize Master Spec with Sub-Specs
+kse collab status [spec] [--graph] # Display collaboration status
+kse collab assign <spec> <kiro>    # Assign Spec to Kiro instance
+kse collab verify <spec>           # Verify interface contracts
+kse collab integrate <specs...>    # Run integration tests
+kse collab migrate <spec>          # Convert standalone Spec to collaborative
 kse repo health                    # Check repository health
 
 # DevOps operations

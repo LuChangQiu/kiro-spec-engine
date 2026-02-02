@@ -555,6 +555,10 @@ repoCmd
 // Spec-level collaboration commands
 registerCollabCommands(program);
 
+// Autonomous control commands
+const { registerAutoCommands } = require('../lib/commands/auto');
+registerAutoCommands(program);
+
 // Template management commands
 const templatesCommand = require('../lib/commands/templates');
 

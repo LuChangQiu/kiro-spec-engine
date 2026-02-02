@@ -213,13 +213,13 @@ This implementation plan breaks down the AI Autonomous Control feature into disc
     - **Property 22: Rollback Documentation**
     - **Validates: Requirements 9.6**
 
-- [ ] 9. Implement Autonomous Engine core
-  - [ ] 9.1 Create AutonomousEngine class with lifecycle management
+- [x] 9. Implement Autonomous Engine core
+  - [x] 9.1 Create AutonomousEngine class with lifecycle management
     - Implement initialize, start, pause, resume, stop methods
     - Integrate all managers (task queue, error recovery, progress, checkpoint)
     - _Requirements: 1.1, 1.5, 1.6_
   
-  - [ ] 9.2 Implement state management
+  - [x] 9.2 Implement state management
     - Implement saveState and loadState
     - Persist to .kiro/auto/state.json
     - _Requirements: 8.3, 6.3_
@@ -228,7 +228,7 @@ This implementation plan breaks down the AI Autonomous Control feature into disc
     - **Property 18: Graceful Interrupt Handling**
     - **Validates: Requirements 8.3, 6.3**
   
-  - [ ] 9.3 Implement autonomous Spec creation
+  - [x] 9.3 Implement autonomous Spec creation
     - Implement createSpecAutonomously
     - Implement generateRequirements, generateDesign, generateTasks
     - _Requirements: 1.1, 1.2, 1.3, 1.4_
@@ -241,7 +241,7 @@ This implementation plan breaks down the AI Autonomous Control feature into disc
     - **Property 2: EARS Compliance in Generated Requirements**
     - **Validates: Requirements 1.2**
   
-  - [ ] 9.6 Implement continuous task execution
+  - [x] 9.6 Implement continuous task execution
     - Implement executeTaskQueue and executeTask
     - Ensure no interruptions between tasks
     - _Requirements: 1.5, 1.6, 4.1_
@@ -250,12 +250,12 @@ This implementation plan breaks down the AI Autonomous Control feature into disc
     - **Property 5: Continuous Execution Without Interruption**
     - **Validates: Requirements 1.5, 1.6, 4.1**
   
-  - [ ] 9.8 Implement error handling during execution
+  - [x] 9.8 Implement error handling during execution
     - Integrate with ErrorRecoveryManager
     - Handle task errors automatically
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
   
-  - [ ] 9.9 Implement checkpoint triggers
+  - [x] 9.9 Implement checkpoint triggers
     - Create checkpoints at phase boundaries
     - Handle external resource needs
     - Handle fatal errors
@@ -308,13 +308,13 @@ This implementation plan breaks down the AI Autonomous Control feature into disc
     - **Property 25: Mode-Specific Behavior**
     - **Validates: Requirements 11.1, 11.2, 11.3**
 
-- [ ] 12. Implement CLI commands
-  - [ ] 12.1 Create auto.js CLI command file
+- [x] 12. Implement CLI commands
+  - [x] 12.1 Create auto.js CLI command file
     - Set up command structure with yargs
     - Implement command routing
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6_
   
-  - [ ] 12.2 Implement `kse auto create` command
+  - [x] 12.2 Implement `kse auto create` command
     - Parse feature description
     - Initialize AutonomousEngine
     - Execute autonomous Spec creation
@@ -324,7 +324,7 @@ This implementation plan breaks down the AI Autonomous Control feature into disc
     - Test command parsing and execution
     - **Validates: Requirements 6.2**
   
-  - [ ] 12.4 Implement `kse auto run` command
+  - [x] 12.4 Implement `kse auto run` command
     - Load existing Spec
     - Resume from current state
     - Execute remaining tasks
@@ -334,7 +334,7 @@ This implementation plan breaks down the AI Autonomous Control feature into disc
     - Test with various Spec states
     - **Validates: Requirements 6.1**
   
-  - [ ] 12.6 Implement `kse auto resume` command
+  - [x] 12.6 Implement `kse auto resume` command
     - Load saved state
     - Resume from last checkpoint
     - _Requirements: 6.3_
@@ -343,7 +343,7 @@ This implementation plan breaks down the AI Autonomous Control feature into disc
     - Test resumption from checkpoint
     - **Validates: Requirements 6.3**
   
-  - [ ] 12.8 Implement `kse auto status` command
+  - [x] 12.8 Implement `kse auto status` command
     - Display current execution state
     - Show progress and active tasks
     - _Requirements: 6.4, 7.6_
@@ -352,7 +352,7 @@ This implementation plan breaks down the AI Autonomous Control feature into disc
     - Verify all required information is displayed
     - **Validates: Requirements 6.4**
   
-  - [ ] 12.10 Implement `kse auto config` command
+  - [x] 12.10 Implement `kse auto config` command
     - Display current configuration
     - Allow configuration updates
     - Validate and save configuration
@@ -362,7 +362,7 @@ This implementation plan breaks down the AI Autonomous Control feature into disc
     - Test configuration updates
     - **Validates: Requirements 6.5**
   
-  - [ ] 12.12 Implement `kse auto stop` command
+  - [x] 12.12 Implement `kse auto stop` command
     - Gracefully halt execution
     - Save current state
     - _Requirements: 6.6_
@@ -371,7 +371,7 @@ This implementation plan breaks down the AI Autonomous Control feature into disc
     - Verify state is saved
     - **Validates: Requirements 6.6**
   
-  - [ ] 12.14 Add --help flag support for all commands
+  - [x] 12.14 Add --help flag support for all commands
     - Implement inline help for each command
     - _Requirements: 13.6_
 

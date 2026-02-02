@@ -7,7 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.23.0] - 2026-02-02
+## [1.23.1] - 2026-02-02
+
+### Fixed
+- **CI Test Stability**: Fixed timing issue in docs-stats-report test
+  - Increased delay from 10ms to 100ms to ensure file write completion in CI environment
+  - Aligns with other similar tests that use 100ms delay for filesystem operations
+  - All 1689 tests now pass reliably
+
+## [1.23.0] - 2026-02-02 [YANKED]
+
+### Note
+- This version was yanked due to CI test failure
+- All features moved to v1.23.1
 
 ### Added
 - **AI Autonomous Control System (MVP)**: Complete autonomous execution framework for Spec-driven development

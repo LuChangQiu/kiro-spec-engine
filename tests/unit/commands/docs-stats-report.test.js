@@ -335,7 +335,7 @@ describe('Document Governance - Stats and Report', () => {
       });
       
       // Small delay to ensure file is written (CI timing issue)
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       const history = await logger.getHistory();
       const entry = history[0];

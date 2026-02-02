@@ -1,115 +1,35 @@
 ﻿# 项目环境配置（模板）
 
-> ⚠️ **这是模板文件**: 请根据实际项目修改所有 `[TODO: ...]` 占位符
+> ⚠️ **模板文件**: 请根据实际项目修改所有 `[TODO: ...]` 占位符
 
----
+## 📋 项目信息
 
-## 📋 项目基本信息
+- **项目**: [TODO: 项目名称]
+- **类型**: [TODO: 项目类型 - Web应用/CLI工具/库]
+- **技术**: [TODO: 核心技术栈 - React + Node.js]
+- **语言**: [TODO: 主要开发语言 - TypeScript/Python]
 
-- **项目名称**: [TODO: 项目名称 - 请修改]
-- **项目类型**: [TODO: 项目类型 - 请修改，如: Web应用/CLI工具/库]
-- **核心技术**: [TODO: 核心技术栈 - 请修改，如: React + Node.js]
-- **开发语言**: [TODO: 主要开发语言 - 请修改，如: TypeScript/Python]
+## 🖥️ 环境
 
----
+**本地**: Windows (cmd) | Python 3.8+ | Kiro IDE
 
-## 🖥️ 开发环境
+**核心组件**:
+- `.kiro/specs/` - Spec 驱动开发
+- `.kiro/steering/` - AI 行为规则
+- `.kiro/tools/` - Ultrawork 工具
 
-### 本地环境
-- **操作系统**: Windows (cmd shell)
-- **Python**: 3.8+ (用于 Ultrawork 工具)
-- **Kiro IDE**: 最新版本
+## 🔧 配置
 
-### 核心组件
-- **Spec 系统**: `.kiro/specs/` - Spec 驱动开发的核心
-- **Steering 系统**: `.kiro/steering/` - AI 行为规则和上下文管理
-- **工具系统**: `.kiro/tools/` - Ultrawork 增强工具
+**Steering**: CORE_PRINCIPLES | ENVIRONMENT | CURRENT_CONTEXT | RULES_GUIDE
 
----
-
-## 🔧 配置文件
-
-**核心配置**:
-- `CORE_PRINCIPLES.md` - 基准开发规则(包含 Ultrawork 原则)
-- `ENVIRONMENT.md` - 环境配置(本文件)
-- `CURRENT_CONTEXT.md` - 当前 Spec 场景(每个 Spec 更新)
-- `RULES_GUIDE.md` - 规则索引
-
-**Spec 结构**:
-- `requirements.md` - 需求文档
-- `design.md` - 设计文档
-- `tasks.md` - 任务列表
-
----
-
-## 🌐 关键目录
-
-- `.kiro/specs/` - 所有 Spec 的存储目录
-- `.kiro/steering/` - AI 行为规则和上下文
-- `.kiro/tools/` - Ultrawork 增强工具
-- `docs/` - 项目文档
-
----
+**Spec**: requirements.md | design.md | tasks.md
 
 ## 🔐 AI 权限
 
-**授权范围**:
-- ✅ 查看和修改 Spec 文档
-- ✅ 创建和修改 Steering 规则
-- ✅ 使用 Ultrawork 工具增强质量
-- ✅ 执行 Python 脚本(工具层)
-- ❌ 不能修改核心原则(CORE_PRINCIPLES.md)未经用户同意
+**授权**: ✅ Spec 文档 | ✅ Steering 规则 | ✅ Ultrawork 工具 | ✅ Python 脚本
 
-**操作限制**:
-- 修改 CORE_PRINCIPLES.md 前必须征得用户同意
-- 创建新工具前应先在 Spec 中设计
-- 保持"有节制的 AI 权限"原则
+**限制**: ❌ 修改 CORE_PRINCIPLES 需用户同意 | 新工具需先设计
 
 ---
 
-## 📦 项目结构
-
-```
-project-root/
-├── .kiro/                      # Kiro 核心目录
-│   ├── specs/                  # Spec 存储
-│   │   └── SPEC_WORKFLOW_GUIDE.md
-│   ├── steering/               # AI 行为规则
-│   │   ├── CORE_PRINCIPLES.md
-│   │   ├── ENVIRONMENT.md (本文件)
-│   │   ├── CURRENT_CONTEXT.md
-│   │   └── RULES_GUIDE.md
-│   ├── tools/                  # Ultrawork 工具
-│   │   └── ultrawork_enhancer.py
-│   ├── ultrawork-application-guide.md
-│   ├── ultrawork-integration-summary.md
-│   └── sisyphus-deep-dive.md
-├── docs/                       # 项目文档
-├── ultrawork.bat              # Ultrawork 便捷脚本
-└── README.md                   # 项目说明
-```
-
----
-
-## 🔥 Ultrawork 功能
-
-**已集成 Sisyphus 的"不懈努力"精神**:
-- 专业级质量评估体系 (0-10 评分)
-- Requirements/Design/Tasks 三阶段增强
-- 自动改进识别和应用
-- 便捷的批处理脚本
-
-**使用方法**:
-```bash
-.\ultrawork.bat spec-name requirements  # 增强需求文档
-.\ultrawork.bat spec-name design       # 增强设计文档
-.\ultrawork.bat spec-name tasks        # 检查任务完成
-.\ultrawork.bat spec-name all          # 全阶段增强
-```
-
----
-
-**版本**: v4.0  
-**更新**: 2026-01-22  
-**项目**: 通用 Kiro Spec 项目模板  
-**说明**: 已清理项目特定内容，集成 Ultrawork 精神，可复制使用
+v7.0 | 2026-02-02 | 精简 60% token

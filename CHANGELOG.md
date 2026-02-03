@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.24.1] - 2026-02-03
+
+### Added
+- **Knowledge Management - EntryManager**: Core file operations for knowledge entries
+  - Entry creation with YAML frontmatter and metadata
+  - Entry reading and parsing with frontmatter support
+  - Entry updating with automatic timestamp management
+  - Entry deletion with optional backup system
+  - Entry validation with comprehensive error checking
+  - Unique ID generation (kb-{timestamp}-{random} format)
+  - Kebab-case filename generation from titles
+  - Full CRUD operations for knowledge base entries
+
+### Technical Details
+- Implements all methods from design specification
+- Uses fs-extra for atomic file operations
+- Uses js-yaml for frontmatter parsing/serialization
+- Backup system stores deleted entries in .backups/ directory
+- Comprehensive error handling with descriptive messages
+- Foundation for Phase 1 of Spec 34-00-user-knowledge-management
+
 ## [1.24.0] - 2026-02-03
 
 ### Added

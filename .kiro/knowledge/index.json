@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "entries": [
+    {
+      "id": "kb-1770099318706-4dmali",
+      "type": "pattern",
+      "title": "Repository Pattern Best Practices",
+      "file": "patterns\\repository-pattern-best-practices.md",
+      "created": "2026-02-03T06:15:18.706Z",
+      "updated": "2026-02-03T06:15:18.707Z",
+      "tags": [
+        "design-pattern",
+        "database"
+      ],
+      "category": "backend",
+      "status": "active",
+      "integration": null
+    }
+  ],
+  "stats": {
+    "totalEntries": 1,
+    "byType": {
+      "pattern": 1
+    },
+    "byStatus": {
+      "active": 1
+    },
+    "byTag": {
+      "design-pattern": 1,
+      "database": 1
+    }
+  },
+  "lastUpdated": "2026-02-03T06:15:18.723Z"
+}

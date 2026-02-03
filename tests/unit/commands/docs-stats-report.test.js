@@ -334,10 +334,20 @@ describe('Document Governance - Stats and Report', () => {
         deletedFiles: ['/test1.md', '/test2.md', '/test3.md']
       });
       
-      // Wait for file to be written and flushed to disk (CI timing issue)
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Poll for file to be written and readable (CI timing issue)
+      let history = [];
+      let attempts = 0;
+      const maxAttempts = 20; // 2 seconds max
       
-      const history = await logger.getHistory();
+      while (attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        history = await logger.getHistory();
+        if (history.length > 0) {
+          break;
+        }
+        attempts++;
+      }
+      
       const entry = history[0];
       
       expect(entry).toBeDefined();

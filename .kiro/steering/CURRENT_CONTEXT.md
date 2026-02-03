@@ -1,50 +1,46 @@
 ﻿# 当前场景规则
 
-> **当前 Spec**: 33-00-ai-autonomous-control
+> **当前 Spec**: 34-00-user-knowledge-management
 
 ## 🎯 当前状态
 
-**阶段**: ✅ 完整版完成 - 生产就绪的自主控制系统
+**阶段**: ✅ MVP 完成 - 基础知识管理系统可用
 
-**进度**: 100% (所有核心功能完成)
-- ✅ 所有核心管理器 (7/7)
-- ✅ AutonomousEngine (含 SafetyManager 集成)
-- ✅ CLI命令 (6个)
-- ✅ 学习系统持久化
-- ✅ 估算改进系统
-- ✅ CORE_PRINCIPLES 合规性验证
-- ✅ 完整文档 (用户指南 + README + CHANGELOG)
-- ⏳ 测试套件（可选，已跳过）
+**进度**: 70% (核心功能完成)
 
-**完整功能**:
-- ✅ 自主任务执行
-- ✅ 错误恢复（3次重试 + 学习系统持久化）
-- ✅ 进度追踪（含历史数据估算改进）
-- ✅ 检查点和回滚
-- ✅ 安全边界强制执行
-- ✅ CLI命令完整
-- ✅ 完整文档
+**已完成**:
+- ✅ 核心基础设施 (4个管理器)
+- ✅ CLI 命令 (7个)
+- ✅ 基本 CRUD 操作
+- ✅ 搜索功能
+- ✅ 用户文档
+- ✅ 测试验证 (1689 tests passing)
 
-**CLI命令**:
+**CLI 命令**:
 ```bash
-kse auto create "feature"  # 创建并运行
-kse auto run <spec>        # 运行Spec
-kse auto status            # 查看状态
-kse auto resume            # 恢复执行
-kse auto stop              # 停止
-kse auto config            # 配置
+kse knowledge init          # 初始化
+kse knowledge add           # 添加条目
+kse knowledge list          # 列表
+kse knowledge search        # 搜索
+kse knowledge show          # 查看
+kse knowledge delete        # 删除
+kse knowledge stats         # 统计
 ```
 
-**文档**:
-- `docs/autonomous-control-guide.md` - 完整用户指南
-- `README.md` - 已更新特性概览
-- `CHANGELOG.md` - v1.23.2 发布说明
+**待完成** (后续迭代):
+- ⏳ AI 分析和建议
+- ⏳ 知识整合功能
+- ⏳ 导入/导出
+- ⏳ 单元测试
 
-**下一步**: 
-1. 运行测试验证修复
-2. 发布 v1.23.2
-3. 收集用户反馈
+**新需求记录**:
+- 自动依赖安装功能 (当缺少解析器时自动安装)
+
+**下一步**:
+1. 发布 v1.24.0
+2. 收集用户反馈
+3. 后续迭代完善高级功能
 
 ---
 
-v85.0 | 2026-02-02 | 完整版完成
+v2.0 | 2026-02-03 | MVP 完成

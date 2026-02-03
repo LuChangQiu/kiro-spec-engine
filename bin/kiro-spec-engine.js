@@ -559,6 +559,10 @@ registerCollabCommands(program);
 const { registerAutoCommands } = require('../lib/commands/auto');
 registerAutoCommands(program);
 
+// Knowledge management commands
+const { registerKnowledgeCommands } = require('../lib/commands/knowledge');
+registerKnowledgeCommands(program);
+
 // Template management commands
 const templatesCommand = require('../lib/commands/templates');
 

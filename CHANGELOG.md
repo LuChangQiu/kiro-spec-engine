@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.24.0] - 2026-02-03
+
+### Added
+- **User Knowledge Management System (MVP)**: Personal knowledge base for capturing project experiences
+  - **Knowledge Base**: Organize patterns, lessons, workflows, checklists, and references
+  - **CLI Commands**: Complete command set for knowledge management
+    - `kse knowledge init` - Initialize knowledge base
+    - `kse knowledge add <type> <title>` - Add new entry (pattern/lesson/workflow/checklist/reference)
+    - `kse knowledge list` - List all entries with filtering and sorting
+    - `kse knowledge search <keyword>` - Search entries (title, tags, content)
+    - `kse knowledge show <id>` - Display entry details
+    - `kse knowledge delete <id>` - Delete entry with backup
+    - `kse knowledge stats` - Show statistics
+  - **Entry Types**: Five built-in types with customizable templates
+    - Pattern: Design patterns and architectural solutions
+    - Lesson: Lessons learned from experience
+    - Workflow: Custom workflows and processes
+    - Checklist: Task checklists
+    - Reference: Reference materials and links
+  - **Features**:
+    - YAML frontmatter + Markdown content
+    - Tag-based organization
+    - Fast metadata indexing (index.json)
+    - Automatic backup on deletion
+    - Full-text search support
+    - Customizable templates
+  - **Documentation**: Complete user guide at `docs/knowledge-management-guide.md`
+
+### Technical Details
+- Knowledge stored in `.kiro/knowledge/` directory
+- Lightweight index for fast lookups (not auto-loaded into AI context)
+- Modular architecture: EntryManager, IndexManager, TemplateManager, KnowledgeManager
+- Cross-platform support (Windows/Linux/macOS)
+
+### Future Enhancements
+- AI-powered knowledge analysis and suggestions
+- Knowledge integration into project documentation
+- Import/export functionality
+- Advanced search with semantic understanding
+
 ## [1.23.2] - 2026-02-02
 
 ### Added

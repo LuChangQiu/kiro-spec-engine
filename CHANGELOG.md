@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.24.2] - 2026-02-05
+
+### Changed
+- **Steering Optimization**: Reduced token consumption by 70-80% across all steering files
+  - ENVIRONMENT.md: Simplified from detailed sections to core information (75% reduction)
+  - CURRENT_CONTEXT.md: Condensed to essential status summary (80% reduction)
+  - RULES_GUIDE.md: Streamlined to key rules only (70% reduction)
+  - Total reduction: ~1500 tokens saved per session
+  - Improved AI response speed and available context space
+
+### Added
+- **Frontend-Backend Alignment Principle**: New core principle for field consistency
+  - Backend data model as authoritative source
+  - Frontend fields must align with backend definitions
+  - Prevents legacy field accumulation in frontend code
+
 ## [1.24.1] - 2026-02-03
 
 ### Added

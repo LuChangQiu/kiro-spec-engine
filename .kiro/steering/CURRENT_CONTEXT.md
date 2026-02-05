@@ -1,46 +1,37 @@
 ﻿# 当前场景规则
 
-> **当前 Spec**: 34-00-user-knowledge-management
+> **当前状态**: v1.24.1 已发布 - 离线安装包已准备
 
 ## 🎯 当前状态
 
-**阶段**: ✅ MVP 完成 - 基础知识管理系统可用
+**版本**: v1.24.1  
+**发布方式**: 离线安装包（GitHub 账号受限）  
+**测试状态**: ✅ 1689 tests passing
 
-**进度**: 70% (核心功能完成)
+## 📦 离线安装包
 
-**已完成**:
-- ✅ 核心基础设施 (4个管理器)
-- ✅ CLI 命令 (7个)
-- ✅ 基本 CRUD 操作
-- ✅ 搜索功能
-- ✅ 用户文档
-- ✅ 测试验证 (1689 tests passing)
+**文件**:
+- `kiro-spec-engine-1.24.1.tgz` (709 KB) - npm 包
+- `kse-v1.24.1-offline.zip` (725 KB) - 完整安装包
 
-**CLI 命令**:
+**安装**:
 ```bash
-kse knowledge init          # 初始化
-kse knowledge add           # 添加条目
-kse knowledge list          # 列表
-kse knowledge search        # 搜索
-kse knowledge show          # 查看
-kse knowledge delete        # 删除
-kse knowledge stats         # 统计
+npm install -g kiro-spec-engine-1.24.1.tgz
 ```
 
-**待完成** (后续迭代):
-- ⏳ AI 分析和建议
-- ⏳ 知识整合功能
-- ⏳ 导入/导出
-- ⏳ 单元测试
+**Windows 问题**: npm 不可用时运行 `$env:Path = "C:\Program Files\nodejs;$env:Path"`
 
-**新需求记录**:
-- 自动依赖安装功能 (当缺少解析器时自动安装)
+## ✅ 已完成功能
 
-**下一步**:
-1. 发布 v1.24.0
+**Spec 25-00**: 嵌套 Git 仓库支持  
+**Spec 34-00**: 用户知识管理系统（MVP）
+
+## 📝 待办事项
+
+1. 分发离线安装包给用户
 2. 收集用户反馈
-3. 后续迭代完善高级功能
+3. 规划下一个 Spec
 
 ---
 
-v2.0 | 2026-02-03 | MVP 完成
+v3.0 | 2026-02-03 | v1.24.1 发布

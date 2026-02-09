@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.26.0] - 2026-02-10
+
+### Added
+- **Scene Template Instantiation**: Complete `kse scene instantiate` command for template package instantiation
+  - `--package <name>` select template package, `--values <json|file>` supply variables
+  - `--out <dir>` output directory, `--template-dir <dir>` custom template root
+  - `--list` list available packages, `--dry-run` preview without writing
+  - `--interactive` prompt for missing required variables
+  - `--json` structured JSON output for all modes
+  - Builds instantiation registry, manifest, and log
+  - Post-instantiate hook execution via `post-instantiate` script in scene-package.json
+  - Implements Spec 76-00-scene-template-instantiation
+
+- **Default Agent Hooks in Adopt**: `kse adopt` now creates 3 default hooks in `.kiro/hooks/`
+  - `run-tests-on-save.kiro.hook` - Manual trigger to run tests (userTriggered)
+  - `check-spec-on-create.kiro.hook` - Validate spec structure on creation (fileCreated)
+  - `sync-tasks-on-edit.kiro.hook` - Sync workspace on tasks.md edit (fileEdited)
+  - Hooks directory added to all adoption strategies (fresh/partial/full)
+
+- **Kiro IDE MCP Auto-Configuration**: When Kiro IDE is detected during `kse adopt`, automatically creates `.kiro/settings/mcp.json` with shell MCP server (`mcp-server-commands`). Skips if config already exists.
+
 ## [1.25.0] - 2026-02-09
 
 ### Added

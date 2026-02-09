@@ -1,13 +1,14 @@
 ﻿# 当前场景
 
 **版本**: v1.25.0 已发布  
-**状态**: ✅ 1806 tests | 84 suites | Spec 75 完成  
-**最近完成**: 75-00-scene-template-engine-foundation（模板变量 schema、多文件渲染、三层继承、3 个 CLI 命令）
+**状态**: ✅ 1806 tests | 84 suites | Spec 76 完成  
+**当前**: Spec 76 (76-00-scene-template-instantiation) 已完成  
+**内容**: scene instantiate 命令 — 模板包实例化闭环（registry→继承→验证→渲染→manifest→log→hook）
 
-**新增命令**: `scene template-validate` | `scene template-resolve` | `scene template-render`
+**已实现**: normalizeSceneInstantiateOptions, validateSceneInstantiateOptions, buildInstantiateRegistry, buildInstantiationManifest, appendInstantiationLog, executePostInstantiateHook, promptMissingVariables, parseInstantiateValues, printSceneInstantiateSummary, runSceneInstantiateCommand + CLI 注册 + exports
 
-**待办**: 规划下一个 Spec（模板包实例化闭环）
+**待办**: 发布 v1.26.0 或继续下一个 Spec
 
 ---
 
-v7.0 | 2026-02-09 | v1.25.0 发布
+v9.0 | 2026-02-09 | Spec 76 执行完成

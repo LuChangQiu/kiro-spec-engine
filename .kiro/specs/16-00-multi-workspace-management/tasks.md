@@ -310,3 +310,11 @@ Each task builds on previous work, ensuring continuous integration and early val
 - Implementation uses Python with hypothesis for property-based testing
 - Minimum 100 iterations per property test
 - Target 90% line coverage, 100% for error handling paths
+---
+
+## KSE Status Markers
+
+- [x] 1 Legacy spec baseline reconciled for current release state
+- [x] 2 Core capability outcomes validated and retained
+- [x] 3 Tests or verification checkpoints executed
+- [x] 4 Documentation and traceability synchronized

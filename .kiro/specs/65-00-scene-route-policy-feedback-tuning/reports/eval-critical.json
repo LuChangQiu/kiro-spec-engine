@@ -1,0 +1,24 @@
+{
+  "scene_ref": "scene.hybrid.pick.critical",
+  "scene_version": "0.2.0",
+  "trace_id": "eval-trace-65-critical",
+  "inputs": {
+    "profile": "hybrid",
+    "profile_source": "manifest"
+  },
+  "run_evaluation": {
+    "status": "failed",
+    "score": 0.31
+  },
+  "feedback_evaluation": {
+    "score": 0.45
+  },
+  "overall": {
+    "grade": "critical",
+    "score": 0.36,
+    "recommendations": [
+      "Resolve policy denial causes before commit rerun.",
+      "Investigate failed runtime nodes and compensation logs."
+    ]
+  }
+}

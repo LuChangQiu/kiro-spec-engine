@@ -1,0 +1,35 @@
+apiVersion: kse.scene/v0.2
+kind: scene
+metadata:
+  obj_id: scene.erp.69-00-scene-package-registry-and-quality-gate
+  obj_version: 0.2.0
+  title: Scene Package Registry and Quality Gate
+spec:
+  domain: erp
+  intent:
+    goal: Build template registry governance and quality gate for scene package library
+  model_scope:
+    read:
+      - kse.SceneTemplate.templateId
+      - kse.SceneTemplate.kind
+      - kse.SceneTemplate.status
+    write:
+      - kse.SceneTemplateRegistry.reportId
+      - kse.SceneTemplateRegistry.generatedAt
+  capability_contract:
+    bindings:
+      - type: query
+        ref: spec.erp.scene-template-registry.query
+        timeout_ms: 2000
+        retry: 0
+      - type: command
+        ref: spec.erp.scene-template-registry.audit
+        timeout_ms: 2500
+        retry: 0
+  governance_contract:
+    risk_level: low
+    approval:
+      required: false
+    idempotency:
+      required: true
+      key: templateRegistryReportId

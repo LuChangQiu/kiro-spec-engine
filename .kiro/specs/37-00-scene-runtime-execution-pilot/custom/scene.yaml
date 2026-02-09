@@ -1,0 +1,34 @@
+apiVersion: kse.scene/v0.2
+kind: scene
+metadata:
+  obj_id: scene.hybrid.37-00-scene-runtime-execution-pilot
+  obj_version: 0.2.0
+  title: Scene Runtime Execution Pilot
+spec:
+  domain: hybrid
+  intent:
+    goal: Simulate ERP reserve and robot mission dispatch in dry_run
+  model_scope:
+    read:
+      - moqui.OrderHeader.orderId
+    write:
+      - moqui.OrderItem.statusId
+  capability_contract:
+    bindings:
+      - type: service
+        ref: spec.erp.reserve-pick-items
+        side_effect: true
+        timeout_ms: 3000
+        retry: 0
+      - type: adapter
+        ref: spec.robot.dispatch-pick-mission
+        side_effect: true
+        timeout_ms: 6000
+        retry: 0
+  governance_contract:
+    risk_level: high
+    approval:
+      required: true
+    idempotency:
+      required: true
+      key: orderId

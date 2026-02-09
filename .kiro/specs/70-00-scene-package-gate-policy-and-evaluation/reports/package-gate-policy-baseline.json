@@ -1,0 +1,10 @@
+{
+  "apiVersion": "kse.scene.package-gate/v0.1",
+  "profile": "baseline",
+  "rules": {
+    "max_invalid_templates": 0,
+    "min_valid_templates": 1,
+    "required_layers": [],
+    "forbid_unknown_layer": false
+  }
+}

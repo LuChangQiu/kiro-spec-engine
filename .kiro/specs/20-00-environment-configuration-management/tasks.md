@@ -401,4 +401,11 @@ Each task builds on previous work, ensuring continuous integration and early val
 **Phase 3**: Valuable for validation - SHOULD complete before release
 **Phase 4**: Important for multi-workspace users - CAN defer to v2
 **Phase 5**: Essential for usability - MUST complete before release
+---
 
+## KSE Status Markers
+
+- [x] 1 Legacy spec baseline reconciled for current release state
+- [x] 2 Core capability outcomes validated and retained
+- [x] 3 Tests or verification checkpoints executed
+- [x] 4 Documentation and traceability synchronized

@@ -1,0 +1,23 @@
+{
+  "scene_ref": "scene.hybrid.pick.at-risk",
+  "scene_version": "0.2.0",
+  "trace_id": "eval-trace-65-atrisk",
+  "inputs": {
+    "profile": "hybrid",
+    "profile_source": "manifest"
+  },
+  "run_evaluation": {
+    "status": "denied",
+    "score": 0.52
+  },
+  "feedback_evaluation": {
+    "score": 0.62
+  },
+  "overall": {
+    "grade": "at_risk",
+    "score": 0.56,
+    "recommendations": [
+      "Resolve policy denial causes before commit rerun."
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "apiVersion": "kse.scene.package/v0.1",
+  "kind": "scene-template",
+  "metadata": {
+    "group": "kse.scene",
+    "name": "scene-package-contract-declaration",
+    "version": "0.2.0",
+    "summary": "Template contract for scene-package-contract-declaration"
+  },
+  "compatibility": {
+    "kse_version": ">=1.24.0",
+    "scene_api_version": "kse.scene/v0.2",
+    "moqui_model_version": "3.x",
+    "adapter_api_version": "v1"
+  },
+  "capabilities": {
+    "provides": [
+      "scene.scene-template.core"
+    ],
+    "requires": [
+      "binding:http",
+      "profile:erp"
+    ]
+  },
+  "parameters": [
+    {
+      "id": "entity_name",
+      "type": "string",
+      "required": true,
+      "description": "Primary entity name for generated scene flow"
+    },
+    {
+      "id": "service_name",
+      "type": "string",
+      "required": false,
+      "default": "queryService",
+      "description": "Optional service binding reference"
+    }
+  ],
+  "artifacts": {
+    "entry_scene": "custom/scene.yaml",
+    "generates": [
+      "requirements.md",
+      "design.md",
+      "tasks.md",
+      "custom/scene.yaml"
+    ]
+  },
+  "governance": {
+    "risk_level": "low",
+    "approval_required": false,
+    "rollback_supported": true
+  }
+}

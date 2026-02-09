@@ -324,3 +324,11 @@ This implementation plan breaks down the conflict resolution enhancement into di
 - Unit tests validate specific examples and edge cases
 - Integration tests validate end-to-end workflows
 - Manual testing ensures real-world usability
+---
+
+## KSE Status Markers
+
+- [x] 1 Legacy spec baseline reconciled for current release state
+- [x] 2 Core capability outcomes validated and retained
+- [x] 3 Tests or verification checkpoints executed
+- [x] 4 Documentation and traceability synchronized

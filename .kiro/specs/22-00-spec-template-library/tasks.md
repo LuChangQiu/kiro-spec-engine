@@ -331,3 +331,11 @@ This implementation plan breaks down the Spec Template Library feature into disc
 - The implementation follows a bottom-up approach: utilities → components → integration → CLI
 - Template repository creation (Task 15) can be done in parallel with CLI implementation
 - Cross-platform testing (Task 17.2) should be done on actual platforms, not just simulated
+---
+
+## KSE Status Markers
+
+- [x] 1 Legacy spec baseline reconciled for current release state
+- [x] 2 Core capability outcomes validated and retained
+- [x] 3 Tests or verification checkpoints executed
+- [x] 4 Documentation and traceability synchronized

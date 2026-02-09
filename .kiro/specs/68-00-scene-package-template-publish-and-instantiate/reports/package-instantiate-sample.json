@@ -1,0 +1,23 @@
+{
+  "instantiated": true,
+  "overwritten": true,
+  "template": {
+    "id": "kse.scene--scene-package-contract-declaration--0.2.0",
+    "manifest_path": ".kiro/templates/scene-packages/kse.scene--scene-package-contract-declaration--0.2.0/template.manifest.json",
+    "package_contract_path": ".kiro/templates/scene-packages/kse.scene--scene-package-contract-declaration--0.2.0/scene-package.json",
+    "scene_template_path": ".kiro/templates/scene-packages/kse.scene--scene-package-contract-declaration--0.2.0/scene.template.yaml"
+  },
+  "target": {
+    "spec": "68-00-scene-package-template-publish-and-instantiate",
+    "scene_manifest_path": ".kiro/specs/68-00-scene-package-template-publish-and-instantiate/custom/scene.yaml",
+    "package_contract_path": ".kiro/specs/68-00-scene-package-template-publish-and-instantiate/custom/scene-package.json"
+  },
+  "parameters": {
+    "entity_name": "Enumeration",
+    "service_name": "enumQueryService"
+  },
+  "summary": {
+    "missing_parameters": [],
+    "parameter_count": 2
+  }
+}

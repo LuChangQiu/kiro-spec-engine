@@ -1,0 +1,68 @@
+{
+  "generated_at": "2026-02-09T08:10:00.000Z",
+  "inputs": {
+    "eval": [
+      ".kiro/specs/65-00-scene-route-policy-feedback-tuning/reports/eval-critical.json",
+      ".kiro/specs/65-00-scene-route-policy-feedback-tuning/reports/eval-at-risk.json"
+    ],
+    "eval_dir": null,
+    "route_policy": ".kiro/specs/65-00-scene-route-policy-feedback-tuning/reports/route-policy-base.json",
+    "profile": "default",
+    "max_adjustment": 6
+  },
+  "baseline": {
+    "source": ".kiro/specs/65-00-scene-route-policy-feedback-tuning/reports/route-policy-base.json",
+    "profile": "default",
+    "policy": {
+      "weights": {
+        "valid_manifest": 5,
+        "invalid_manifest": -9,
+        "scene_ref_exact": 100,
+        "scene_ref_contains": 45,
+        "scene_ref_mismatch": -14,
+        "query_token_match": 8
+      },
+      "mode_bias": {
+        "commit": {
+          "low": 2,
+          "medium": 0,
+          "high": -4,
+          "critical": -6
+        }
+      },
+      "max_alternatives": 4
+    }
+  },
+  "analysis": {
+    "total_reports": 2,
+    "dominant_profile": "hybrid"
+  },
+  "adjustments": [
+    {
+      "path": "mode_bias.commit.high",
+      "from": -4,
+      "to": -10,
+      "delta": -6,
+      "rationale": "stress_rate=1"
+    }
+  ],
+  "suggested_policy": {
+    "weights": {
+      "valid_manifest": 5,
+      "invalid_manifest": -12,
+      "scene_ref_exact": 100,
+      "scene_ref_contains": 45,
+      "scene_ref_mismatch": -19,
+      "query_token_match": 8
+    },
+    "mode_bias": {
+      "commit": {
+        "low": 2,
+        "medium": -5,
+        "high": -10,
+        "critical": -12
+      }
+    },
+    "max_alternatives": 4
+  }
+}

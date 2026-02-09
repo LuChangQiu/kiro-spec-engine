@@ -1,0 +1,61 @@
+{
+  "generated_at": "2026-02-09T08:11:56.939Z",
+  "rollout_name": "hybrid-wave-01",
+  "source_suggestion": ".kiro/specs/66-00-scene-route-policy-rollout-package/reports/route-policy-suggest-input.json",
+  "source_suggestion_abs_path": "E:\\workspace\\kiro-spec-engine\\.kiro\\specs\\66-00-scene-route-policy-rollout-package\\reports\\route-policy-suggest-input.json",
+  "baseline_source": ".kiro/specs/65-00-scene-route-policy-feedback-tuning/reports/route-policy-base.json",
+  "target_policy_path": ".kiro/config/scene-route-policy.json",
+  "rollout_dir": ".kiro/specs/66-00-scene-route-policy-rollout-package/reports/rollouts/hybrid-wave-01",
+  "summary": {
+    "changed_fields": 5,
+    "adjustment_records": 1
+  },
+  "changed_fields": [
+    {
+      "path": "weights.invalid_manifest",
+      "from": -9,
+      "to": -12,
+      "delta": -3
+    },
+    {
+      "path": "weights.scene_ref_mismatch",
+      "from": -14,
+      "to": -19,
+      "delta": -5
+    },
+    {
+      "path": "mode_bias.commit.medium",
+      "from": 0,
+      "to": -5,
+      "delta": -5
+    },
+    {
+      "path": "mode_bias.commit.high",
+      "from": -4,
+      "to": -10,
+      "delta": -6
+    },
+    {
+      "path": "mode_bias.commit.critical",
+      "from": -6,
+      "to": -12,
+      "delta": -6
+    }
+  ],
+  "commands": {
+    "verify_candidate_route": "kse scene route --query routing --mode dry_run --route-policy .kiro/specs/66-00-scene-route-policy-rollout-package/reports/rollouts/hybrid-wave-01/route-policy.next.json",
+    "verify_target_route": "kse scene route --query routing --mode dry_run --route-policy .kiro/config/scene-route-policy.json",
+    "apply": "Replace .kiro/config/scene-route-policy.json with .kiro/specs/66-00-scene-route-policy-rollout-package/reports/rollouts/hybrid-wave-01/route-policy.next.json after verification.",
+    "rollback": "Replace .kiro/config/scene-route-policy.json with .kiro/specs/66-00-scene-route-policy-rollout-package/reports/rollouts/hybrid-wave-01/route-policy.rollback.json if regression appears."
+  },
+  "files": {
+    "plan": ".kiro/specs/66-00-scene-route-policy-rollout-package/reports/rollouts/hybrid-wave-01/rollout-plan.json",
+    "next_policy": ".kiro/specs/66-00-scene-route-policy-rollout-package/reports/rollouts/hybrid-wave-01/route-policy.next.json",
+    "rollback_policy": ".kiro/specs/66-00-scene-route-policy-rollout-package/reports/rollouts/hybrid-wave-01/route-policy.rollback.json",
+    "runbook": ".kiro/specs/66-00-scene-route-policy-rollout-package/reports/rollouts/hybrid-wave-01/runbook.md"
+  },
+  "analysis": {
+    "total_reports": 2,
+    "dominant_profile": "hybrid"
+  }
+}

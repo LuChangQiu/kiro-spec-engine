@@ -203,3 +203,11 @@ The implementation is organized to maximize efficiency: shared utilities first, 
 - Include clear error messages for debugging test failures
 - All test fixtures should be created in `tests/fixtures/integration-test/` subdirectories
 - Use unique directory names per test to enable parallel execution
+---
+
+## KSE Status Markers
+
+- [x] 1 Legacy spec baseline reconciled for current release state
+- [x] 2 Core capability outcomes validated and retained
+- [x] 3 Tests or verification checkpoints executed
+- [x] 4 Documentation and traceability synchronized

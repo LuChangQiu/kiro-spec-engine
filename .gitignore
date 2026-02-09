@@ -57,6 +57,9 @@ test-project/
 .kiro/contexts/.active
 .kiro/contexts/*/CURRENT_CONTEXT.md
 
+# Machine identifier (DO NOT commit - user-specific)
+.kiro/config/machine-id.json
+
 # Environment configuration (DO NOT commit - user-specific)
 .kiro/environments.json
 .kiro/env-backups/
@@ -74,6 +77,9 @@ test-project/
 .kiro/specs/**/TEMP-*.md
 .kiro/specs/**/WIP-*.md
 .kiro/specs/**/MVP-*.md
+
+# Spec lock files (DO NOT commit - local machine state)
+.kiro/specs/**/.lock
 
 # Core rules (COMMIT - team shared)
 # CORE_PRINCIPLES.md, ENVIRONMENT.md, RULES_GUIDE.md are committed

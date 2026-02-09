@@ -294,3 +294,11 @@ This implementation plan establishes a complete release pipeline for the kiro-sp
 - Integration tests validate end-to-end workflows
 - Manual testing is required for final validation before release
 - GitHub repository setup and first release require manual steps outside of code
+---
+
+## KSE Status Markers
+
+- [x] 1 Legacy spec baseline reconciled for current release state
+- [x] 2 Core capability outcomes validated and retained
+- [x] 3 Tests or verification checkpoints executed
+- [x] 4 Documentation and traceability synchronized

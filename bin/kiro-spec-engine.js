@@ -559,6 +559,14 @@ registerCollabCommands(program);
 const { registerAutoCommands } = require('../lib/commands/auto');
 registerAutoCommands(program);
 
+// Scene runtime commands
+const { registerSceneCommands } = require('../lib/commands/scene');
+registerSceneCommands(program);
+
+// Lock commands for multi-user collaboration
+const { registerLockCommands } = require('../lib/commands/lock');
+registerLockCommands(program);
+
 // Knowledge management commands
 const { registerKnowledgeCommands } = require('../lib/commands/knowledge');
 registerKnowledgeCommands(program);

@@ -174,3 +174,11 @@ This implementation plan breaks down the steering directory compliance check fea
 - Unit tests validate specific examples and edge cases
 - Integration tests verify end-to-end CLI behavior
 - Performance target: <50ms for compliance check
+---
+
+## KSE Status Markers
+
+- [x] 1 Legacy spec baseline reconciled for current release state
+- [x] 2 Core capability outcomes validated and retained
+- [x] 3 Tests or verification checkpoints executed
+- [x] 4 Documentation and traceability synchronized

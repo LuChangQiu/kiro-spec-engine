@@ -1,0 +1,35 @@
+apiVersion: kse.scene/v0.2
+kind: scene
+metadata:
+  obj_id: scene.erp.71-00-scene-package-gate-task-draft-and-sync
+  obj_version: 0.2.0
+  title: Scene Package Gate Task Draft and Sync
+spec:
+  domain: erp
+  intent:
+    goal: Transform failed scene package gate checks into actionable task closure
+  model_scope:
+    read:
+      - kse.SceneTemplateGate.checkId
+      - kse.SceneTemplateGate.expected
+      - kse.SceneTemplateGate.actual
+    write:
+      - kse.SceneTemplateGateTask.taskId
+      - kse.SceneTemplateGateTask.status
+  capability_contract:
+    bindings:
+      - type: query
+        ref: spec.erp.scene-template-gate-check.query
+        timeout_ms: 2000
+        retry: 0
+      - type: command
+        ref: spec.erp.scene-template-gate-task.sync
+        timeout_ms: 2500
+        retry: 0
+  governance_contract:
+    risk_level: low
+    approval:
+      required: false
+    idempotency:
+      required: true
+      key: sceneTemplateGateTaskSyncRequestId

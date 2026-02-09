@@ -266,6 +266,12 @@ sequenceDiagram
 - **命令执行**：在特定环境上下文中运行命令
 - **跨平台**：在 Windows、Linux 和 macOS 上无缝工作
 
+### 场景模板引擎 🚀 v1.25.0 新增
+- **模板变量 Schema**: 在 scene-package.json 中定义类型化变量（string, number, boolean, enum, array）及验证规则
+- **多文件渲染**: 递归模板处理，支持 `{{variable}}` 替换、`{{#if}}` 条件、`{{#each}}` 循环
+- **三层继承**: L1-能力层 / L2-领域层 / L3-实例层包层级结构，支持 schema 和文件合并
+- **CLI 命令**: `scene template-validate`、`scene template-resolve`、`scene template-render`，支持 `--json` 输出
+
 ### DevOps 集成基础 🚀
 - **运维 Spec 管理**：标准化运维文档（部署、监控、故障排查等）
 - **渐进式 AI 自主**：L1-L5 接管级别，逐步实现 AI 运维控制
@@ -329,6 +335,11 @@ kse env unregister <name>          # 删除环境
 kse env rollback                   # 回滚到上一个环境
 kse env verify                     # 验证当前环境
 kse env run "<command>"            # 在环境上下文中运行命令
+
+# 场景模板引擎 (v1.25.0 新增)
+kse scene template-validate --package <path>   # 验证模板变量 schema
+kse scene template-resolve --package <name>    # 解析继承链和合并 schema
+kse scene template-render --package <name> --values <json> --out <dir>  # 渲染模板文件
 
 # DevOps 运维
 kse ops init <project-name>        # 初始化运维 specs

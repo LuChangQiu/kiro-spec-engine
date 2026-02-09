@@ -329,13 +329,20 @@ describe('Status Command - Document Compliance Integration', () => {
         return [];
       });
       
+      const parseTasks = jest.fn().mockResolvedValue([
+        { status: 'completed', taskId: '1', title: 'Task 1' }
+      ]);
+
       TaskClaimer.mockImplementation(() => ({
-        parseTasks: jest.fn().mockResolvedValue([
-          { status: 'completed', taskId: '1', title: 'Task 1' }
-        ])
+        parseTasks
       }));
       
       await statusCommand({});
+
+      expect(parseTasks).toHaveBeenCalledTimes(1);
+      expect(parseTasks.mock.calls[0][0]).toContain('test-spec');
+      expect(parseTasks.mock.calls[0][0]).toContain('tasks.md');
+      expect(parseTasks.mock.calls[0][1]).toEqual({ preferStatusMarkers: true });
       
       const output = logOutput.join('\n');
       

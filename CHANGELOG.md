@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.25.0] - 2026-02-09
+
+### Added
+- **Scene Template Engine Foundation**: Complete template engine subsystem for scene packages
+  - **Template Variable Schema Validation**: Typed variable declarations (string, number, boolean, enum, array) with validation rules (regex, enum_values, min/max) in scene-package.json
+  - **Template Variable Value Validation**: Validate user-supplied values against schema with default filling, type checking, and comprehensive error collection (no early exit)
+  - **Multi-File Template Rendering**: Recursive file processing with `{{variable}}` substitution, `{{#if}}` conditionals, `{{#each}}` loops, and unresolved placeholder passthrough
+  - **Three-Layer Inheritance Resolution**: L1-Capability / L2-Domain / L3-Instance package hierarchy with variable schema and file merging, cycle detection
+  - **CLI Commands**:
+    - `kse scene template-validate --package <path>` - Validate template variable schema in scene-package.json
+    - `kse scene template-resolve --package <name>` - Resolve full inheritance chain and display merged schema
+    - `kse scene template-render --package <name> --values <json> --out <dir>` - Render template package with variable substitution
+  - All commands support `--json` output mode
+  - Reuses existing package registry and contract validation infrastructure
+
+### Technical Details
+- All template engine code in `lib/commands/scene.js` following existing normalize → validate → execute → print pattern
+- Pure JS string processing for template rendering (no new dependencies)
+- Dependency injection for file system operations in command runners
+- Implements Spec 75-00-scene-template-engine-foundation
+
 ## [1.24.2] - 2026-02-05
 
 ### Changed

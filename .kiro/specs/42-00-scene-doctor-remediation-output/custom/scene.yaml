@@ -1,0 +1,28 @@
+apiVersion: kse.scene/v0.2
+kind: scene
+metadata:
+  obj_id: scene.erp.42-00-scene-doctor-remediation-output
+  obj_version: 0.2.0
+  title: Scene Doctor Remediation Output
+spec:
+  domain: erp
+  intent:
+    goal: Query order detail and return normalized response
+  model_scope:
+    read:
+      - moqui.OrderHeader.orderId
+      - moqui.OrderHeader.statusId
+    write: []
+  capability_contract:
+    bindings:
+      - type: query
+        ref: spec.erp.order-query-service
+        timeout_ms: 2000
+        retry: 0
+  governance_contract:
+    risk_level: low
+    approval:
+      required: false
+    idempotency:
+      required: true
+      key: orderId

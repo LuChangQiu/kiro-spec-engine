@@ -1,0 +1,34 @@
+apiVersion: kse.scene/v0.2
+kind: scene
+metadata:
+  obj_id: scene.erp.70-00-scene-package-gate-policy-and-evaluation
+  obj_version: 0.2.0
+  title: Scene Package Gate Policy and Evaluation
+spec:
+  domain: erp
+  intent:
+    goal: Enforce template quality gate policy on scene package registry
+  model_scope:
+    read:
+      - kse.SceneTemplateRegistry.totalTemplates
+      - kse.SceneTemplateRegistry.invalidTemplates
+    write:
+      - kse.SceneTemplateGate.resultId
+      - kse.SceneTemplateGate.status
+  capability_contract:
+    bindings:
+      - type: query
+        ref: spec.erp.scene-template-gate.query
+        timeout_ms: 1800
+        retry: 0
+      - type: command
+        ref: spec.erp.scene-template-gate.evaluate
+        timeout_ms: 2500
+        retry: 0
+  governance_contract:
+    risk_level: low
+    approval:
+      required: false
+    idempotency:
+      required: true
+      key: sceneTemplateGateRequestId

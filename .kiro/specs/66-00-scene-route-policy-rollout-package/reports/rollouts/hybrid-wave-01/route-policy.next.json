@@ -1,0 +1,19 @@
+{
+  "weights": {
+    "valid_manifest": 5,
+    "invalid_manifest": -12,
+    "scene_ref_exact": 100,
+    "scene_ref_contains": 45,
+    "scene_ref_mismatch": -19,
+    "query_token_match": 8
+  },
+  "mode_bias": {
+    "commit": {
+      "low": 2,
+      "medium": -5,
+      "high": -10,
+      "critical": -12
+    }
+  },
+  "max_alternatives": 4
+}

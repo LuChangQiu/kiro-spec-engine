@@ -198,6 +198,22 @@ kse repo exec "<command>" [--dry-run]
 kse repo health [--json]
 ```
 
+### Scene Template Engine
+
+```bash
+# Validate template variable schema in a scene package
+kse scene template-validate --package <path>
+kse scene template-validate --package ./my-package --json
+
+# Resolve inheritance chain and display merged variable schema
+kse scene template-resolve --package <name>
+kse scene template-resolve --package scene-erp-inventory --json
+
+# Render template package with variable substitution
+kse scene template-render --package <name> --values <json-or-path> --out <dir>
+kse scene template-render --package scene-erp --values '{"entity_name":"Order"}' --out ./output --json
+```
+
 ### Version & Upgrade
 
 ```bash

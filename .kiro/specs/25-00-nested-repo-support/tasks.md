@@ -303,3 +303,11 @@ This implementation plan breaks down the nested repository support feature into 
 - Integration tests validate end-to-end workflows
 - The implementation uses JavaScript (Node.js) as specified in the design
 - Fast-check library will be used for property-based testing with minimum 100 iterations per test
+---
+
+## KSE Status Markers
+
+- [x] 1 Legacy spec baseline reconciled for current release state
+- [x] 2 Core capability outcomes validated and retained
+- [x] 3 Tests or verification checkpoints executed
+- [x] 4 Documentation and traceability synchronized

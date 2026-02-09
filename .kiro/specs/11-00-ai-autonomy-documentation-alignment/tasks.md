@@ -291,3 +291,11 @@ This plan systematically transforms all kiro-spec-engine documentation from manu
 - Transformation follows phased approach: high-impact files first, validation between phases
 - Backup system ensures safe rollback if needed
 - Style guide ensures future documentation maintains AI autonomy standards
+---
+
+## KSE Status Markers
+
+- [x] 1 Legacy spec baseline reconciled for current release state
+- [x] 2 Core capability outcomes validated and retained
+- [x] 3 Tests or verification checkpoints executed
+- [x] 4 Documentation and traceability synchronized

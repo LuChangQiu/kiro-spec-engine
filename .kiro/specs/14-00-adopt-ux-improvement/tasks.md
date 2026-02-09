@@ -711,3 +711,12 @@ Follow the phase order strictly:
 | Date | Version | Changes | Author |
 |------|---------|---------|--------|
 | 2026-01-27 | 1.0 | Initial task list created | Kiro AI |
+
+---
+
+## KSE Status Markers
+
+- [x] 1 Smart adoption orchestrator capability delivered
+- [x] 2 Strategy selector and project-state detection delivered
+- [x] 3 Zero-interaction adoption flow integrated and validated
+- [x] 4 Documentation and rollout notes synchronized

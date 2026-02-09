@@ -310,6 +310,12 @@ Structure your work with Requirements → Design → Tasks workflow
 - **Cross-Platform**: Consistent path handling across Windows/Linux/macOS
 - **Smart Exclusions**: Automatically skip common non-repository directories (node_modules, build, etc.)
 
+### Scene Template Engine 🚀 NEW in v1.25.0
+- **Template Variable Schema**: Define typed variables (string, number, boolean, enum, array) with validation rules in scene-package.json
+- **Multi-File Rendering**: Recursive template processing with `{{variable}}` substitution, `{{#if}}` conditionals, `{{#each}}` loops
+- **Three-Layer Inheritance**: L1-Capability / L2-Domain / L3-Instance package hierarchy with schema and file merging
+- **CLI Commands**: `scene template-validate`, `scene template-resolve`, `scene template-render` with `--json` support
+
 ### Spec-Level Collaboration 🚀 NEW in v1.22.0
 - **Parallel Development**: Enable multiple AI instances to work on different Specs simultaneously
 - **Dependency Management**: Define and track dependencies between Specs with circular dependency detection
@@ -320,6 +326,32 @@ Structure your work with Requirements → Design → Tasks workflow
 - **Backward Compatible**: Opt-in system that doesn't affect existing single-Spec workflows
 
 [Learn more about Spec-Level Collaboration →](docs/spec-collaboration-guide.md)
+
+### Spec Locking Mechanism 🚀 NEW
+- **Multi-User Coordination**: Prevent conflicts when multiple developers work on the same Spec
+- **Machine Identification**: Unique machine IDs for accurate lock ownership tracking
+- **Stale Lock Detection**: Automatic detection and cleanup of abandoned locks (default: 24h timeout)
+- **Lock Status Integration**: View lock status in `kse status` output
+- **Force Unlock**: Override locks when necessary with `--force` flag
+- **Backward Compatible**: Locking is optional and doesn't affect existing workflows
+
+**Quick Start**:
+```bash
+# Acquire a lock before editing
+kse lock acquire my-feature --reason "Implementing auth module"
+
+# Check lock status
+kse lock status
+
+# Release when done
+kse unlock my-feature
+
+# Clean up stale locks
+kse lock cleanup
+
+# View your machine ID
+kse lock whoami
+```
 
 ### DevOps Integration Foundation 🚀
 - **Operations Spec Management**: Standardized operations documentation (deployment, monitoring, troubleshooting, etc.)
@@ -400,6 +432,11 @@ kse collab integrate <specs...>    # Run integration tests
 kse collab migrate <spec>          # Convert standalone Spec to collaborative
 kse repo health                    # Check repository health
 
+# Scene template engine (NEW in v1.25.0)
+kse scene template-validate --package <path>   # Validate template variable schema
+kse scene template-resolve --package <name>    # Resolve inheritance chain and merged schema
+kse scene template-render --package <name> --values <json> --out <dir>  # Render template files
+
 # DevOps operations
 kse ops init <project-name>        # Initialize operations specs
 kse ops validate [<project>]       # Validate operations completeness
@@ -410,6 +447,14 @@ kse ops feedback <action>          # Manage user feedback
 # Task management
 kse task claim <spec> <task-id>    # Claim a task
 kse task list <spec>               # List claimed tasks
+
+# Spec locking (multi-user collaboration)
+kse lock acquire <spec-name>       # Acquire lock on a Spec
+kse lock release <spec-name>       # Release lock (or use: kse unlock)
+kse lock status [spec-name]        # Show lock status
+kse lock cleanup                   # Remove stale locks
+kse lock whoami                    # Show machine identifier
+kse unlock <spec-name> [--force]   # Release lock (alias)
 
 # Document governance
 kse docs diagnose                  # Check document compliance
@@ -515,5 +560,5 @@ A deep conversation about AI development trends, Neo-Confucian philosophy, and s
 
 ---
 
-**Version**: 1.4.0  
-**Last Updated**: 2026-01-23
+**Version**: 1.25.0  
+**Last Updated**: 2026-02-09

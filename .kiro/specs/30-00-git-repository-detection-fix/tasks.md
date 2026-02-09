@@ -56,3 +56,11 @@ Fix the repository scanning logic to only detect actual Git repositories (direct
 - Task 2 ensures existing tests continue to work
 - Task 3 validates the fix works correctly
 - Tasks 4-5 prepare for release
+---
+
+## KSE Status Markers
+
+- [x] 1 Legacy spec baseline reconciled for current release state
+- [x] 2 Core capability outcomes validated and retained
+- [x] 3 Tests or verification checkpoints executed
+- [x] 4 Documentation and traceability synchronized

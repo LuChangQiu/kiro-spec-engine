@@ -1,0 +1,147 @@
+{
+  "generated_at": "2026-02-09T07:59:19.890Z",
+  "inputs": {
+    "eval": [
+      ".kiro/specs/65-00-scene-route-policy-feedback-tuning/reports/eval-critical.json",
+      ".kiro/specs/65-00-scene-route-policy-feedback-tuning/reports/eval-at-risk.json"
+    ],
+    "eval_dir": null,
+    "route_policy": ".kiro/specs/65-00-scene-route-policy-feedback-tuning/reports/route-policy-base.json",
+    "profile": "default",
+    "max_adjustment": 6
+  },
+  "eval_reports": [
+    {
+      "source_path": ".kiro/specs/65-00-scene-route-policy-feedback-tuning/reports/eval-critical.json",
+      "scene_ref": "scene.hybrid.pick.critical",
+      "overall_grade": "critical",
+      "run_status": "failed",
+      "profile": "hybrid"
+    },
+    {
+      "source_path": ".kiro/specs/65-00-scene-route-policy-feedback-tuning/reports/eval-at-risk.json",
+      "scene_ref": "scene.hybrid.pick.at-risk",
+      "overall_grade": "at_risk",
+      "run_status": "denied",
+      "profile": "hybrid"
+    }
+  ],
+  "baseline": {
+    "source": ".kiro/specs/65-00-scene-route-policy-feedback-tuning/reports/route-policy-base.json",
+    "profile": "default",
+    "policy": {
+      "weights": {
+        "valid_manifest": 5,
+        "invalid_manifest": -9,
+        "scene_ref_exact": 100,
+        "scene_ref_contains": 45,
+        "scene_ref_mismatch": -14,
+        "query_token_match": 8
+      },
+      "mode_bias": {
+        "commit": {
+          "low": 2,
+          "medium": 0,
+          "high": -4,
+          "critical": -6
+        }
+      },
+      "max_alternatives": 4
+    }
+  },
+  "analysis": {
+    "total_reports": 2,
+    "grade_counts": {
+      "good": 0,
+      "watch": 0,
+      "at_risk": 1,
+      "critical": 1,
+      "insufficient_data": 0,
+      "unknown": 0
+    },
+    "run_status_counts": {
+      "success": 0,
+      "denied": 1,
+      "failed": 1,
+      "blocked": 0,
+      "unknown": 0
+    },
+    "profile_counts": {
+      "default": 0,
+      "erp": 0,
+      "hybrid": 2,
+      "robot": 0
+    },
+    "dominant_profile": "hybrid",
+    "recommendation_signals": {
+      "policy_denial": 2,
+      "runtime_failure": 1,
+      "manual_takeover": 0
+    },
+    "rates": {
+      "severe_rate": 1,
+      "unstable_rate": 1,
+      "insufficient_rate": 0,
+      "good_rate": 0,
+      "denied_rate": 0.5,
+      "failed_rate": 0.5
+    }
+  },
+  "max_adjustment": 6,
+  "adjustments": [
+    {
+      "path": "mode_bias.commit.high",
+      "from": -4,
+      "to": -10,
+      "delta": -6,
+      "rationale": "stress_rate=1"
+    },
+    {
+      "path": "mode_bias.commit.critical",
+      "from": -6,
+      "to": -12,
+      "delta": -6,
+      "rationale": "stress_rate=1"
+    },
+    {
+      "path": "weights.scene_ref_mismatch",
+      "from": -14,
+      "to": -19,
+      "delta": -5,
+      "rationale": "stress_rate=1; runtime_failure_signal_rate=0.5"
+    },
+    {
+      "path": "weights.invalid_manifest",
+      "from": -9,
+      "to": -12,
+      "delta": -3,
+      "rationale": "stress_rate=1"
+    },
+    {
+      "path": "mode_bias.commit.medium",
+      "from": 0,
+      "to": -5,
+      "delta": -5,
+      "rationale": "policy_denial_rate=1"
+    }
+  ],
+  "suggested_policy": {
+    "weights": {
+      "valid_manifest": 5,
+      "invalid_manifest": -12,
+      "scene_ref_exact": 100,
+      "scene_ref_contains": 45,
+      "scene_ref_mismatch": -19,
+      "query_token_match": 8
+    },
+    "mode_bias": {
+      "commit": {
+        "low": 2,
+        "medium": -5,
+        "high": -10,
+        "critical": -12
+      }
+    },
+    "max_alternatives": 4
+  }
+}

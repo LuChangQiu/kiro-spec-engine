@@ -1,0 +1,14 @@
+{
+  "apiVersion": "kse.scene.package-gate/v0.1",
+  "profile": "three-layer",
+  "rules": {
+    "max_invalid_templates": 0,
+    "min_valid_templates": 3,
+    "required_layers": [
+      "l1-capability",
+      "l2-domain",
+      "l3-instance"
+    ],
+    "forbid_unknown_layer": true
+  }
+}

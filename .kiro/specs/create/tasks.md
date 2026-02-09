@@ -149,3 +149,11 @@ This plan breaks down the create REST API implementation into incremental, testa
 **Version**: 1.0.0  
 **Created**: 2026-01-30  
 **Author**: FallingAKS
+---
+
+## KSE Status Markers
+
+- [x] 1 Legacy spec baseline reconciled for current release state
+- [x] 2 Core capability outcomes validated and retained
+- [x] 3 Tests or verification checkpoints executed
+- [x] 4 Documentation and traceability synchronized

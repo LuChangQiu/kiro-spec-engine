@@ -1,0 +1,229 @@
+# Implementation Plan: Scene Package Publish
+
+## Overview
+
+Implement `kse scene publish` and `kse scene unpublish` commands that bundle scene packages into `.tgz` tarballs and manage a local registry with a central index. All code goes in `lib/commands/scene.js` following existing patterns. Tests in `tests/unit/commands/scene.test.js`.
+
+## Tasks
+
+- [x] 1. Implement tar buffer creation and tarball bundling
+  - [x] 1.1 Implement `createTarBuffer(files)` function
+    - Accept array of `{ relativePath, content: Buffer }` objects
+    - Create POSIX ustar 512-byte headers with name, size, mode, checksum
+    - Pad file content to 512-byte boundaries
+    - Append two 512-byte zero blocks as end-of-archive marker
+    - _Requirements: 2.2_
+  - [x] 1.2 Implement `extractTarBuffer(buffer)` function
+    - Parse tar buffer back into array of `{ relativePath, content: Buffer }`
+    - Skip zero-block end markers
+    - Used for testing round-trip and potential future registry inspection
+    - _Requirements: 2.2_
+  - [x] 1.3 Implement `bundlePackageTarball(files)` function
+    - Call `createTarBuffer(files)` to build tar archive
+    - Compress with `zlib.gzipSync()`
+    - Compute SHA-256 hash of compressed buffer using `crypto.createHash('sha256')`
+    - Return `{ tarball: Buffer, integrity: string, fileCount: number, size: number }`
+    - _Requirements: 2.2, 2.4_
+  - [ ]* 1.4 Write property test: Tarball round-trip integrity
+    - **Property 1: Tarball round-trip integrity**
+    - Generate random file sets (name + content), create tar, extract, compare
+    - **Validates: Requirements 2.1, 2.2**
+  - [ ]* 1.5 Write property test: SHA-256 hash determinism
+    - **Property 3: SHA-256 hash determinism**
+    - Generate random buffers, compute hash twice, verify equality
+    - **Validates: Requirements 2.4**
+
+- [x] 2. Implement path construction and semver utilities
+  - [x] 2.1 Implement `buildRegistryTarballPath(name, version)` function
+    - Return `packages/{name}/{version}/{name}-{version}.tgz`
+    - _Requirements: 2.3, 3.1_
+  - [x] 2.2 Implement `buildTarballFilename(name, version)` function
+    - Return `{name}-{version}.tgz`
+    - _Requirements: 2.3_
+  - [x] 2.3 Implement `resolveLatestVersion(versions)` function
+    - Accept object keys (version strings), sort with `semver.rcompare`
+    - Return highest version string, or null if empty
+    - _Requirements: 5.2, 5.3_
+  - [ ]* 2.4 Write property test: Tarball naming and registry path construction
+    - **Property 2: Tarball naming and registry path construction**
+    - Generate random valid names and semver versions, verify path format
+    - **Validates: Requirements 2.3, 3.1**
+  - [ ]* 2.5 Write property test: Semver validation consistency
+    - **Property 4: Semver validation consistency**
+    - Generate random strings, compare publish validation with `semver.valid()`
+    - **Validates: Requirements 1.5, 5.1**
+  - [ ]* 2.6 Write property test: Latest pointer equals highest semver
+    - **Property 10: Latest pointer equals highest semver**
+    - Generate random sets of valid semver strings, verify `resolveLatestVersion` returns max
+    - **Validates: Requirements 5.2, 5.3**
+
+- [x] 3. Implement package validation for publish
+  - [x] 3.1 Implement `validatePackageForPublish(packageDir, fileSystem)` function
+    - Read `scene-package.json` from packageDir
+    - Call existing `validateScenePackageContract()`
+    - Verify `metadata.version` is valid semver via `semver.valid()`
+    - Verify `artifacts.entry_scene` file exists relative to packageDir
+    - Verify all `artifacts.generates` files exist relative to packageDir
+    - Return `{ valid, contract, errors, files: [{ relativePath, absolutePath }] }`
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
+  - [ ]* 3.2 Write property test: File existence verification
+    - **Property 5: File existence verification**
+    - Generate contracts with random file refs, mock filesystem with subset existing
+    - Verify validation fails iff at least one referenced file is missing
+    - **Validates: Requirements 1.3, 1.4**
+
+- [x] 4. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 5. Implement registry index management
+  - [x] 5.1 Implement `loadRegistryIndex(registryRoot, fileSystem)` function
+    - Read `registry-index.json` from registryRoot
+    - If file doesn't exist, return default `{ apiVersion: 'kse.scene.registry/v0.1', packages: {} }`
+    - If invalid JSON, throw parse error
+    - Validate structure has `packages` object
+    - _Requirements: 9.2, 9.3_
+  - [x] 5.2 Implement `saveRegistryIndex(registryRoot, index, fileSystem)` function
+    - Write `registry-index.json` with 2-space indentation
+    - _Requirements: 9.1_
+  - [x] 5.3 Implement `addVersionToIndex(index, contract, integrity, publishedAt)` function
+    - Add or update package entry in `index.packages[name]`
+    - Set name, group, description from contract metadata
+    - Add version entry with `published_at` and `integrity`
+    - Call `resolveLatestVersion()` to update `latest` pointer
+    - Return updated index
+    - _Requirements: 4.1, 4.2, 5.3_
+  - [x] 5.4 Implement `removeVersionFromIndex(index, name, version)` function
+    - Remove version entry from `index.packages[name].versions`
+    - Update `latest` pointer via `resolveLatestVersion()`
+    - If no versions remain, delete the package entry entirely
+    - Return `{ index, removed: boolean }`
+    - _Requirements: 4.4, 4.5_
+  - [ ]* 5.5 Write property test: Index entry completeness after publish
+    - **Property 8: Index entry completeness after publish**
+    - Generate random contracts, call addVersionToIndex, verify all required fields present
+    - **Validates: Requirements 4.1, 4.2, 9.2**
+  - [ ]* 5.6 Write property test: Unpublish removes version and updates index
+    - **Property 9: Unpublish removes version and updates index**
+    - Generate index with multiple versions, remove one, verify version absent and latest updated
+    - **Validates: Requirements 4.4, 7.1, 7.3**
+  - [ ]* 5.7 Write property test: Registry index JSON round-trip
+    - **Property 13: Registry index JSON round-trip**
+    - Generate random valid index objects, serialize with JSON.stringify, parse back, deep equal
+    - **Validates: Requirements 9.4**
+
+- [x] 6. Implement registry storage
+  - [x] 6.1 Implement `storeToRegistry(name, version, tarball, registryRoot, options, fileSystem)` function
+    - Resolve target path using `buildRegistryTarballPath()`
+    - Check if version directory already exists
+    - If exists and `!options.force`, throw duplicate error
+    - `ensureDir` for target directory
+    - Write tarball buffer to `.tgz` file
+    - Return `{ path, overwritten }`
+    - _Requirements: 3.1, 3.2, 3.3, 3.4_
+  - [x] 6.2 Implement `removeFromRegistry(name, version, registryRoot, fileSystem)` function
+    - Resolve tarball path, remove file
+    - Attempt to remove empty version directory and package directory
+    - Return `{ removed: boolean }`
+    - _Requirements: 7.1_
+  - [ ]* 6.3 Write property test: Duplicate version detection without force
+    - **Property 6: Duplicate version detection without force**
+    - Generate index with existing entry, attempt publish same name@version without force, verify error
+    - **Validates: Requirements 3.3**
+  - [ ]* 6.4 Write property test: Force overwrite succeeds
+    - **Property 7: Force overwrite succeeds**
+    - Generate index with existing entry, publish same name@version with force, verify success and updated entry
+    - **Validates: Requirements 3.4, 6.4**
+
+- [x] 7. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 8. Implement publish command runner and CLI registration
+  - [x] 8.1 Refactor `normalizeScenePackagePublishOptions` for new publish flow
+    - Update to accept `package` (path to package directory), `registry`, `dryRun`, `force`, `json`
+    - Default registry to `.kiro/registry`
+    - _Requirements: 6.1, 6.2_
+  - [x] 8.2 Refactor `validateScenePackagePublishOptions` for new publish flow
+    - Validate `--package` is required non-empty string
+    - _Requirements: 6.1_
+  - [x] 8.3 Implement new `runScenePackagePublishCommand` function
+    - Normalize & validate options
+    - Call `validatePackageForPublish()` to validate package
+    - Read all referenced files into buffers
+    - Call `bundlePackageTarball()` to create archive
+    - If `--dry-run`: build payload with `published: false`, print, return (no writes)
+    - Call `storeToRegistry()` to write tarball
+    - Call `loadRegistryIndex()` → `addVersionToIndex()` → `saveRegistryIndex()`
+    - Build payload, call `printScenePublishSummary()`, return
+    - _Requirements: 6.1, 6.3, 6.4, 6.5, 6.6, 8.1, 8.2, 8.3_
+  - [x] 8.4 Implement `printScenePublishSummary(options, payload, projectRoot)` function
+    - JSON mode: output payload as JSON
+    - Human mode: chalk-formatted coordinate, tarball path, file count, size, integrity
+    - Handle dry-run indicator in output
+    - _Requirements: 6.5, 6.6_
+  - [x] 8.5 Update CLI registration for `scene publish` command
+    - Register `scene publish` command with `--package`, `--registry`, `--dry-run`, `--force`, `--json` options
+    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
+  - [ ]* 8.6 Write property test: Dry-run produces no side effects
+    - **Property 11: Dry-run produces no side effects**
+    - Generate valid package, run publish with dry-run, verify no files written to registry
+    - **Validates: Requirements 6.3, 8.1, 8.2, 8.3**
+
+- [x] 9. Implement unpublish command runner and CLI registration
+  - [x] 9.1 Implement `normalizeSceneUnpublishOptions(options)` function
+    - Normalize `name`, `version`, `registry`, `json` options
+    - Default registry to `.kiro/registry`
+    - _Requirements: 7.1_
+  - [x] 9.2 Implement `validateSceneUnpublishOptions(options)` function
+    - Validate `--name` and `--version` are required non-empty strings
+    - Validate `--version` is valid semver
+    - _Requirements: 7.1, 7.2_
+  - [x] 9.3 Implement `runSceneUnpublishCommand(rawOptions, dependencies)` function
+    - Normalize & validate options
+    - Call `loadRegistryIndex()` to load current index
+    - Check package/version exists in index, error if not found
+    - Call `removeFromRegistry()` to delete tarball
+    - Call `removeVersionFromIndex()` → `saveRegistryIndex()`
+    - Build payload, call `printSceneUnpublishSummary()`, return
+    - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
+  - [x] 9.4 Implement `printSceneUnpublishSummary(options, payload, projectRoot)` function
+    - JSON mode: output payload as JSON
+    - Human mode: chalk-formatted removed coordinate, remaining versions count
+    - _Requirements: 7.4, 7.5_
+  - [x] 9.5 Register `scene unpublish` CLI command
+    - Register with `--name`, `--version`, `--registry`, `--json` options
+    - _Requirements: 7.1_
+  - [ ]* 9.6 Write property test: Not-found error on unpublish
+    - **Property 12: Not-found error on unpublish**
+    - Generate random name/version not in index, verify unpublish fails and index unchanged
+    - **Validates: Requirements 7.2**
+
+- [x] 10. Wire exports and integration
+  - [x] 10.1 Add all new functions to module.exports
+    - Export: createTarBuffer, extractTarBuffer, bundlePackageTarball, buildRegistryTarballPath, buildTarballFilename, resolveLatestVersion, validatePackageForPublish, loadRegistryIndex, saveRegistryIndex, addVersionToIndex, removeVersionFromIndex, storeToRegistry, removeFromRegistry, normalizeSceneUnpublishOptions, validateSceneUnpublishOptions, runSceneUnpublishCommand, printScenePublishSummary (updated), printSceneUnpublishSummary
+    - _Requirements: 6.1, 7.1_
+  - [ ]* 10.2 Write unit tests for option normalization and validation
+    - Test normalizeScenePackagePublishOptions defaults
+    - Test validateScenePackagePublishOptions error cases
+    - Test normalizeSceneUnpublishOptions defaults
+    - Test validateSceneUnpublishOptions error cases
+    - _Requirements: 6.1, 7.1_
+  - [ ]* 10.3 Write unit tests for edge cases
+    - First publish (no existing registry-index.json)
+    - Unpublish last version of a package (removes package entry)
+    - Invalid JSON in registry-index.json
+    - Pre-release versions like "1.0.0-beta.1"
+    - Empty artifacts.generates array
+    - _Requirements: 4.3, 4.5, 9.3_
+
+- [x] 11. Final checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+## Notes
+
+- Tasks marked with `*` are optional and can be skipped for faster MVP
+- Each task references specific requirements for traceability
+- Checkpoints ensure incremental validation
+- Property tests validate universal correctness properties (fast-check, min 100 iterations)
+- Unit tests validate specific examples and edge cases
+- All code in `lib/commands/scene.js`, tests in `tests/unit/commands/scene.test.js`
+- Tag format: `Feature: scene-package-publish, Property N: {property_text}`

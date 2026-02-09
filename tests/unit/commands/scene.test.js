@@ -44,7 +44,28 @@ const {
   runSceneCatalogCommand,
   runSceneRouteCommand,
   runSceneScaffoldCommand,
-  runSceneCommand
+  runSceneCommand,
+  createTarBuffer,
+  extractTarBuffer,
+  bundlePackageTarball,
+  buildRegistryTarballPath,
+  buildTarballFilename,
+  resolveLatestVersion,
+  validatePackageForPublish,
+  loadRegistryIndex,
+  saveRegistryIndex,
+  addVersionToIndex,
+  removeVersionFromIndex,
+  storeToRegistry,
+  removeFromRegistry,
+  normalizeScenePackageRegistryPublishOptions,
+  validateScenePackageRegistryPublishOptions,
+  printScenePackageRegistryPublishSummary,
+  runScenePackageRegistryPublishCommand,
+  normalizeSceneUnpublishOptions,
+  validateSceneUnpublishOptions,
+  printSceneUnpublishSummary,
+  runSceneUnpublishCommand
 } = require('../../../lib/commands/scene');
 
 function normalizePath(targetPath) {
@@ -3738,5 +3759,1562 @@ spec:
     expect(result).toBeNull();
     expect(console.error).toHaveBeenCalled();
     expect(process.exitCode).toBe(1);
+  });
+
+  // ---------------------------------------------------------------------------
+  // createTarBuffer / extractTarBuffer / bundlePackageTarball (Spec 77-00)
+  // ---------------------------------------------------------------------------
+
+  test('createTarBuffer creates valid tar with single file', () => {
+    const files = [
+      { relativePath: 'hello.txt', content: Buffer.from('Hello, world!') }
+    ];
+    const tarBuffer = createTarBuffer(files);
+
+    // Must be multiple of 512
+    expect(tarBuffer.length % 512).toBe(0);
+
+    // Check ustar magic at offset 257
+    const magic = tarBuffer.slice(257, 263).toString('utf8');
+    expect(magic).toBe('ustar\0');
+
+    // Check file name at offset 0
+    const name = tarBuffer.slice(0, 9).toString('utf8');
+    expect(name).toBe('hello.txt');
+
+    // Check type flag at offset 156
+    expect(tarBuffer[156]).toBe(0x30); // '0'
+
+    // Minimum size: 1 header (512) + 1 content block (512) + 2 end blocks (1024) = 2048
+    expect(tarBuffer.length).toBe(2048);
+  });
+
+  test('createTarBuffer creates valid tar with empty file', () => {
+    const files = [
+      { relativePath: 'empty.txt', content: Buffer.alloc(0) }
+    ];
+    const tarBuffer = createTarBuffer(files);
+
+    // 1 header (512) + 0 content + 2 end blocks (1024) = 1536
+    expect(tarBuffer.length).toBe(1536);
+    expect(tarBuffer.length % 512).toBe(0);
+  });
+
+  test('createTarBuffer creates valid tar with multiple files', () => {
+    const files = [
+      { relativePath: 'a.txt', content: Buffer.from('AAA') },
+      { relativePath: 'b.txt', content: Buffer.from('BBB') }
+    ];
+    const tarBuffer = createTarBuffer(files);
+
+    // 2 headers (1024) + 2 content blocks (1024) + 2 end blocks (1024) = 3072
+    expect(tarBuffer.length).toBe(3072);
+  });
+
+  test('createTarBuffer handles content larger than 512 bytes', () => {
+    const largeContent = Buffer.alloc(1000, 0x41); // 1000 bytes of 'A'
+    const files = [
+      { relativePath: 'large.bin', content: largeContent }
+    ];
+    const tarBuffer = createTarBuffer(files);
+
+    // 1 header (512) + 2 content blocks (1024, padded from 1000) + 2 end blocks (1024) = 2560
+    expect(tarBuffer.length).toBe(2560);
+  });
+
+  test('createTarBuffer with no files produces only end-of-archive markers', () => {
+    const tarBuffer = createTarBuffer([]);
+
+    // 2 end blocks (1024)
+    expect(tarBuffer.length).toBe(1024);
+
+    // All zeros
+    for (let i = 0; i < tarBuffer.length; i++) {
+      expect(tarBuffer[i]).toBe(0);
+    }
+  });
+
+  test('extractTarBuffer extracts single file correctly', () => {
+    const originalContent = Buffer.from('Hello, world!');
+    const files = [
+      { relativePath: 'hello.txt', content: originalContent }
+    ];
+    const tarBuffer = createTarBuffer(files);
+    const extracted = extractTarBuffer(tarBuffer);
+
+    expect(extracted).toHaveLength(1);
+    expect(extracted[0].relativePath).toBe('hello.txt');
+    expect(Buffer.compare(extracted[0].content, originalContent)).toBe(0);
+  });
+
+  test('extractTarBuffer extracts multiple files correctly', () => {
+    const files = [
+      { relativePath: 'a.txt', content: Buffer.from('AAA') },
+      { relativePath: 'b.txt', content: Buffer.from('BBB') }
+    ];
+    const tarBuffer = createTarBuffer(files);
+    const extracted = extractTarBuffer(tarBuffer);
+
+    expect(extracted).toHaveLength(2);
+    expect(extracted[0].relativePath).toBe('a.txt');
+    expect(extracted[0].content.toString()).toBe('AAA');
+    expect(extracted[1].relativePath).toBe('b.txt');
+    expect(extracted[1].content.toString()).toBe('BBB');
+  });
+
+  test('extractTarBuffer handles empty file', () => {
+    const files = [
+      { relativePath: 'empty.txt', content: Buffer.alloc(0) }
+    ];
+    const tarBuffer = createTarBuffer(files);
+    const extracted = extractTarBuffer(tarBuffer);
+
+    expect(extracted).toHaveLength(1);
+    expect(extracted[0].relativePath).toBe('empty.txt');
+    expect(extracted[0].content.length).toBe(0);
+  });
+
+  test('extractTarBuffer returns empty array for empty archive', () => {
+    const tarBuffer = createTarBuffer([]);
+    const extracted = extractTarBuffer(tarBuffer);
+
+    expect(extracted).toHaveLength(0);
+  });
+
+  test('extractTarBuffer round-trips content larger than 512 bytes', () => {
+    const largeContent = Buffer.alloc(1500, 0x42);
+    const files = [
+      { relativePath: 'large.bin', content: largeContent }
+    ];
+    const tarBuffer = createTarBuffer(files);
+    const extracted = extractTarBuffer(tarBuffer);
+
+    expect(extracted).toHaveLength(1);
+    expect(extracted[0].relativePath).toBe('large.bin');
+    expect(Buffer.compare(extracted[0].content, largeContent)).toBe(0);
+  });
+
+  test('bundlePackageTarball returns correct structure', () => {
+    const files = [
+      { relativePath: 'scene-package.json', content: Buffer.from('{"name":"test"}') },
+      { relativePath: 'template.yaml', content: Buffer.from('kind: scene') }
+    ];
+    const result = bundlePackageTarball(files);
+
+    expect(result).toHaveProperty('tarball');
+    expect(result).toHaveProperty('integrity');
+    expect(result).toHaveProperty('fileCount');
+    expect(result).toHaveProperty('size');
+
+    expect(Buffer.isBuffer(result.tarball)).toBe(true);
+    expect(result.fileCount).toBe(2);
+    expect(result.size).toBe(result.tarball.length);
+    expect(result.integrity).toMatch(/^sha256-[0-9a-f]{64}$/);
+  });
+
+  test('bundlePackageTarball produces gzip-compressed output', () => {
+    const zlib = require('zlib');
+    const files = [
+      { relativePath: 'test.txt', content: Buffer.from('test content') }
+    ];
+    const result = bundlePackageTarball(files);
+
+    // Gzip magic bytes: 0x1f 0x8b
+    expect(result.tarball[0]).toBe(0x1f);
+    expect(result.tarball[1]).toBe(0x8b);
+
+    // Decompress and extract to verify round-trip
+    const decompressed = zlib.gunzipSync(result.tarball);
+    const extracted = extractTarBuffer(decompressed);
+
+    expect(extracted).toHaveLength(1);
+    expect(extracted[0].relativePath).toBe('test.txt');
+    expect(extracted[0].content.toString()).toBe('test content');
+  });
+
+  test('bundlePackageTarball SHA-256 hash is deterministic', () => {
+    const files = [
+      { relativePath: 'a.txt', content: Buffer.from('deterministic') }
+    ];
+    const result1 = bundlePackageTarball(files);
+    const result2 = bundlePackageTarball(files);
+
+    expect(result1.integrity).toBe(result2.integrity);
+  });
+
+  test('bundlePackageTarball with empty file list', () => {
+    const result = bundlePackageTarball([]);
+
+    expect(result.fileCount).toBe(0);
+    expect(result.size).toBeGreaterThan(0); // gzip header even for empty tar
+    expect(result.integrity).toMatch(/^sha256-[0-9a-f]{64}$/);
+  });
+
+  // ---------------------------------------------------------------------------
+  // buildRegistryTarballPath / buildTarballFilename / resolveLatestVersion (Spec 77-00)
+  // ---------------------------------------------------------------------------
+
+  test('buildRegistryTarballPath returns correct path format', () => {
+    const result = buildRegistryTarballPath('my-package', '1.0.0');
+    expect(result).toBe('packages/my-package/1.0.0/my-package-1.0.0.tgz');
+  });
+
+  test('buildRegistryTarballPath handles scoped-like names', () => {
+    const result = buildRegistryTarballPath('cool-scene', '2.3.1');
+    expect(result).toBe('packages/cool-scene/2.3.1/cool-scene-2.3.1.tgz');
+  });
+
+  test('buildRegistryTarballPath handles pre-release versions', () => {
+    const result = buildRegistryTarballPath('pkg', '1.0.0-beta.1');
+    expect(result).toBe('packages/pkg/1.0.0-beta.1/pkg-1.0.0-beta.1.tgz');
+  });
+
+  test('buildTarballFilename returns correct filename format', () => {
+    const result = buildTarballFilename('my-package', '1.0.0');
+    expect(result).toBe('my-package-1.0.0.tgz');
+  });
+
+  test('buildTarballFilename handles pre-release versions', () => {
+    const result = buildTarballFilename('pkg', '2.0.0-alpha.3');
+    expect(result).toBe('pkg-2.0.0-alpha.3.tgz');
+  });
+
+  test('buildTarballFilename consistency with buildRegistryTarballPath', () => {
+    const name = 'test-pkg';
+    const version = '3.2.1';
+    const filename = buildTarballFilename(name, version);
+    const fullPath = buildRegistryTarballPath(name, version);
+    expect(fullPath.endsWith(filename)).toBe(true);
+  });
+
+  test('resolveLatestVersion returns highest semver from multiple versions', () => {
+    const versions = {
+      '1.0.0': { published_at: '2025-01-01' },
+      '2.0.0': { published_at: '2025-01-02' },
+      '1.5.0': { published_at: '2025-01-03' }
+    };
+    expect(resolveLatestVersion(versions)).toBe('2.0.0');
+  });
+
+  test('resolveLatestVersion returns null for empty object', () => {
+    expect(resolveLatestVersion({})).toBeNull();
+  });
+
+  test('resolveLatestVersion returns null for null/undefined', () => {
+    expect(resolveLatestVersion(null)).toBeNull();
+    expect(resolveLatestVersion(undefined)).toBeNull();
+  });
+
+  test('resolveLatestVersion returns single version when only one exists', () => {
+    const versions = { '1.0.0': { published_at: '2025-01-01' } };
+    expect(resolveLatestVersion(versions)).toBe('1.0.0');
+  });
+
+  test('resolveLatestVersion handles pre-release versions correctly', () => {
+    const versions = {
+      '1.0.0': {},
+      '1.1.0-beta.1': {},
+      '1.0.1': {}
+    };
+    // 1.1.0-beta.1 < 1.1.0 but > 1.0.1 per semver
+    expect(resolveLatestVersion(versions)).toBe('1.1.0-beta.1');
+  });
+
+  test('resolveLatestVersion sorts by semver not lexicographic order', () => {
+    const versions = {
+      '1.9.0': {},
+      '1.10.0': {},
+      '1.2.0': {}
+    };
+    // Lexicographic: 1.9.0 > 1.2.0 > 1.10.0, but semver: 1.10.0 > 1.9.0 > 1.2.0
+    expect(resolveLatestVersion(versions)).toBe('1.10.0');
+  });
+
+  // ---------------------------------------------------------------------------
+  // validatePackageForPublish (Spec 77-00, Task 3.1)
+  // ---------------------------------------------------------------------------
+
+  test('validatePackageForPublish returns valid result for well-formed package', async () => {
+    const mockContract = {
+      apiVersion: 'kse.scene.package/v0.1',
+      kind: 'scene-template',
+      metadata: {
+        group: 'kse.scene',
+        name: 'test-pkg',
+        version: '1.0.0',
+        description: 'A test package'
+      },
+      compatibility: {
+        kse_version: '>=1.0.0',
+        scene_api_version: 'v0.1'
+      },
+      capabilities: {
+        provides: ['test-capability'],
+        requires: []
+      },
+      parameters: [],
+      artifacts: {
+        entry_scene: 'scene.yaml',
+        generates: ['output.txt']
+      },
+      governance: {
+        risk_level: 'low',
+        approval_required: false,
+        rollback_supported: true
+      }
+    };
+
+    const mockFileSystem = {
+      readJson: jest.fn().mockResolvedValue(mockContract),
+      pathExists: jest.fn().mockResolvedValue(true)
+    };
+
+    const result = await validatePackageForPublish('/fake/dir', mockFileSystem);
+
+    expect(result.valid).toBe(true);
+    expect(result.contract).toEqual(mockContract);
+    expect(result.errors).toEqual([]);
+    expect(result.files).toHaveLength(2); // entry_scene + 1 generates
+    expect(result.files[0].relativePath).toBe('scene.yaml');
+    expect(result.files[1].relativePath).toBe('output.txt');
+  });
+
+  test('validatePackageForPublish returns errors when scene-package.json cannot be read', async () => {
+    const mockFileSystem = {
+      readJson: jest.fn().mockRejectedValue(new Error('ENOENT: no such file')),
+      pathExists: jest.fn().mockResolvedValue(false)
+    };
+
+    const result = await validatePackageForPublish('/missing/dir', mockFileSystem);
+
+    expect(result.valid).toBe(false);
+    expect(result.contract).toBeNull();
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0]).toMatch(/failed to read scene-package.json/);
+    expect(result.files).toEqual([]);
+  });
+
+  test('validatePackageForPublish reports contract validation errors', async () => {
+    const invalidContract = {
+      apiVersion: 'wrong-version',
+      kind: 'invalid-kind'
+    };
+
+    const mockFileSystem = {
+      readJson: jest.fn().mockResolvedValue(invalidContract),
+      pathExists: jest.fn().mockResolvedValue(true)
+    };
+
+    const result = await validatePackageForPublish('/fake/dir', mockFileSystem);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors.length).toBeGreaterThan(0);
+    expect(result.errors.some(e => e.includes('apiVersion'))).toBe(true);
+  });
+
+  test('validatePackageForPublish reports invalid semver version', async () => {
+    const mockContract = {
+      apiVersion: 'kse.scene.package/v0.1',
+      kind: 'scene-template',
+      metadata: {
+        group: 'kse.scene',
+        name: 'test-pkg',
+        version: 'not-a-version',
+        description: 'A test package'
+      },
+      compatibility: {
+        kse_version: '>=1.0.0',
+        scene_api_version: 'v0.1'
+      },
+      capabilities: {
+        provides: ['test'],
+        requires: []
+      },
+      parameters: [],
+      artifacts: {
+        entry_scene: 'scene.yaml',
+        generates: ['output.txt']
+      },
+      governance: {
+        risk_level: 'low',
+        approval_required: false,
+        rollback_supported: true
+      }
+    };
+
+    const mockFileSystem = {
+      readJson: jest.fn().mockResolvedValue(mockContract),
+      pathExists: jest.fn().mockResolvedValue(true)
+    };
+
+    const result = await validatePackageForPublish('/fake/dir', mockFileSystem);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors.some(e => e.includes('not valid semver'))).toBe(true);
+  });
+
+  test('validatePackageForPublish reports missing entry_scene file', async () => {
+    const mockContract = {
+      apiVersion: 'kse.scene.package/v0.1',
+      kind: 'scene-template',
+      metadata: {
+        group: 'kse.scene',
+        name: 'test-pkg',
+        version: '1.0.0',
+        description: 'A test package'
+      },
+      compatibility: {
+        kse_version: '>=1.0.0',
+        scene_api_version: 'v0.1'
+      },
+      capabilities: {
+        provides: ['test'],
+        requires: []
+      },
+      parameters: [],
+      artifacts: {
+        entry_scene: 'missing-scene.yaml',
+        generates: ['output.txt']
+      },
+      governance: {
+        risk_level: 'low',
+        approval_required: false,
+        rollback_supported: true
+      }
+    };
+
+    const mockFileSystem = {
+      readJson: jest.fn().mockResolvedValue(mockContract),
+      pathExists: jest.fn().mockImplementation(async (filePath) => {
+        return !filePath.includes('missing-scene.yaml');
+      })
+    };
+
+    const result = await validatePackageForPublish('/fake/dir', mockFileSystem);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors.some(e => e.includes('entry_scene file not found'))).toBe(true);
+  });
+
+  test('validatePackageForPublish reports missing generates files', async () => {
+    const mockContract = {
+      apiVersion: 'kse.scene.package/v0.1',
+      kind: 'scene-template',
+      metadata: {
+        group: 'kse.scene',
+        name: 'test-pkg',
+        version: '1.0.0',
+        description: 'A test package'
+      },
+      compatibility: {
+        kse_version: '>=1.0.0',
+        scene_api_version: 'v0.1'
+      },
+      capabilities: {
+        provides: ['test'],
+        requires: []
+      },
+      parameters: [],
+      artifacts: {
+        entry_scene: 'scene.yaml',
+        generates: ['exists.txt', 'missing.txt']
+      },
+      governance: {
+        risk_level: 'low',
+        approval_required: false,
+        rollback_supported: true
+      }
+    };
+
+    const mockFileSystem = {
+      readJson: jest.fn().mockResolvedValue(mockContract),
+      pathExists: jest.fn().mockImplementation(async (filePath) => {
+        return !filePath.includes('missing.txt');
+      })
+    };
+
+    const result = await validatePackageForPublish('/fake/dir', mockFileSystem);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors.some(e => e.includes('generates file not found: missing.txt'))).toBe(true);
+    // entry_scene + exists.txt should be in files
+    expect(result.files).toHaveLength(2);
+  });
+
+  test('validatePackageForPublish handles empty generates array', async () => {
+    const mockContract = {
+      apiVersion: 'kse.scene.package/v0.1',
+      kind: 'scene-template',
+      metadata: {
+        group: 'kse.scene',
+        name: 'test-pkg',
+        version: '1.0.0',
+        description: 'A test package'
+      },
+      compatibility: {
+        kse_version: '>=1.0.0',
+        scene_api_version: 'v0.1'
+      },
+      capabilities: {
+        provides: ['test'],
+        requires: []
+      },
+      parameters: [],
+      artifacts: {
+        entry_scene: 'scene.yaml',
+        generates: []
+      },
+      governance: {
+        risk_level: 'low',
+        approval_required: false,
+        rollback_supported: true
+      }
+    };
+
+    const mockFileSystem = {
+      readJson: jest.fn().mockResolvedValue(mockContract),
+      pathExists: jest.fn().mockResolvedValue(true)
+    };
+
+    const result = await validatePackageForPublish('/fake/dir', mockFileSystem);
+
+    // Contract validation will report generates must contain at least one output path
+    expect(result.valid).toBe(false);
+    expect(result.errors.some(e => e.includes('generates must contain at least one output path'))).toBe(true);
+    // Only entry_scene in files
+    expect(result.files).toHaveLength(1);
+  });
+
+  test('validatePackageForPublish accepts pre-release semver versions', async () => {
+    const mockContract = {
+      apiVersion: 'kse.scene.package/v0.1',
+      kind: 'scene-template',
+      metadata: {
+        group: 'kse.scene',
+        name: 'test-pkg',
+        version: '1.0.0-beta.1',
+        description: 'A test package'
+      },
+      compatibility: {
+        kse_version: '>=1.0.0',
+        scene_api_version: 'v0.1'
+      },
+      capabilities: {
+        provides: ['test'],
+        requires: []
+      },
+      parameters: [],
+      artifacts: {
+        entry_scene: 'scene.yaml',
+        generates: ['output.txt']
+      },
+      governance: {
+        risk_level: 'low',
+        approval_required: false,
+        rollback_supported: true
+      }
+    };
+
+    const mockFileSystem = {
+      readJson: jest.fn().mockResolvedValue(mockContract),
+      pathExists: jest.fn().mockResolvedValue(true)
+    };
+
+    const result = await validatePackageForPublish('/fake/dir', mockFileSystem);
+
+    expect(result.valid).toBe(true);
+    expect(result.errors).toEqual([]);
+    expect(result.errors.some(e => e.includes('semver'))).toBe(false);
+  });
+
+  test('validatePackageForPublish uses default fs when no fileSystem provided', async () => {
+    // Calling with a non-existent directory should fail gracefully
+    const result = await validatePackageForPublish('/definitely/not/a/real/path/12345');
+
+    expect(result.valid).toBe(false);
+    expect(result.contract).toBeNull();
+    expect(result.errors[0]).toMatch(/failed to read scene-package.json/);
+  });
+
+  test('validatePackageForPublish collects files with correct absolutePath', async () => {
+    const mockContract = {
+      apiVersion: 'kse.scene.package/v0.1',
+      kind: 'scene-template',
+      metadata: {
+        group: 'kse.scene',
+        name: 'test-pkg',
+        version: '2.0.0',
+        description: 'A test package'
+      },
+      compatibility: {
+        kse_version: '>=1.0.0',
+        scene_api_version: 'v0.1'
+      },
+      capabilities: {
+        provides: ['test'],
+        requires: []
+      },
+      parameters: [],
+      artifacts: {
+        entry_scene: 'templates/scene.yaml',
+        generates: ['templates/a.txt', 'templates/b.txt']
+      },
+      governance: {
+        risk_level: 'low',
+        approval_required: false,
+        rollback_supported: true
+      }
+    };
+
+    const mockFileSystem = {
+      readJson: jest.fn().mockResolvedValue(mockContract),
+      pathExists: jest.fn().mockResolvedValue(true)
+    };
+
+    const packageDir = '/my/package';
+    const result = await validatePackageForPublish(packageDir, mockFileSystem);
+
+    expect(result.valid).toBe(true);
+    expect(result.files).toHaveLength(3);
+    for (const file of result.files) {
+      expect(normalizePath(file.absolutePath)).toContain(normalizePath(packageDir));
+      expect(normalizePath(file.absolutePath)).toContain(normalizePath(file.relativePath));
+    }
+  });
+
+  // ---------------------------------------------------------------------------
+  // loadRegistryIndex (Spec 77-00, Task 5.1)
+  // ---------------------------------------------------------------------------
+
+  test('loadRegistryIndex returns default index when file does not exist', async () => {
+    const mockFileSystem = {
+      pathExists: jest.fn().mockResolvedValue(false),
+      readJson: jest.fn()
+    };
+
+    const result = await loadRegistryIndex('/fake/registry', mockFileSystem);
+
+    expect(result).toEqual({ apiVersion: 'kse.scene.registry/v0.1', packages: {} });
+    expect(mockFileSystem.readJson).not.toHaveBeenCalled();
+  });
+
+  test('loadRegistryIndex returns parsed index when file exists', async () => {
+    const existingIndex = {
+      apiVersion: 'kse.scene.registry/v0.1',
+      packages: {
+        'my-pkg': { name: 'my-pkg', latest: '1.0.0', versions: { '1.0.0': {} } }
+      }
+    };
+    const mockFileSystem = {
+      pathExists: jest.fn().mockResolvedValue(true),
+      readJson: jest.fn().mockResolvedValue(existingIndex)
+    };
+
+    const result = await loadRegistryIndex('/fake/registry', mockFileSystem);
+
+    expect(result).toEqual(existingIndex);
+    expect(mockFileSystem.readJson).toHaveBeenCalledWith(
+      expect.stringContaining('registry-index.json')
+    );
+  });
+
+  test('loadRegistryIndex throws on invalid JSON', async () => {
+    const mockFileSystem = {
+      pathExists: jest.fn().mockResolvedValue(true),
+      readJson: jest.fn().mockRejectedValue(new Error('Unexpected token'))
+    };
+
+    await expect(loadRegistryIndex('/fake/registry', mockFileSystem))
+      .rejects.toThrow('failed to parse registry-index.json');
+  });
+
+  test('loadRegistryIndex throws when packages object is missing', async () => {
+    const mockFileSystem = {
+      pathExists: jest.fn().mockResolvedValue(true),
+      readJson: jest.fn().mockResolvedValue({ apiVersion: 'kse.scene.registry/v0.1' })
+    };
+
+    await expect(loadRegistryIndex('/fake/registry', mockFileSystem))
+      .rejects.toThrow('missing required "packages" object');
+  });
+
+  test('loadRegistryIndex throws when index is null', async () => {
+    const mockFileSystem = {
+      pathExists: jest.fn().mockResolvedValue(true),
+      readJson: jest.fn().mockResolvedValue(null)
+    };
+
+    await expect(loadRegistryIndex('/fake/registry', mockFileSystem))
+      .rejects.toThrow('missing required "packages" object');
+  });
+
+  // ---------------------------------------------------------------------------
+  // saveRegistryIndex (Spec 77-00, Task 5.2)
+  // ---------------------------------------------------------------------------
+
+  test('saveRegistryIndex writes index with 2-space indentation', async () => {
+    const index = {
+      apiVersion: 'kse.scene.registry/v0.1',
+      packages: { 'test-pkg': { name: 'test-pkg' } }
+    };
+    const mockFileSystem = {
+      writeJson: jest.fn().mockResolvedValue(undefined)
+    };
+
+    await saveRegistryIndex('/fake/registry', index, mockFileSystem);
+
+    expect(mockFileSystem.writeJson).toHaveBeenCalledWith(
+      expect.stringContaining('registry-index.json'),
+      index,
+      { spaces: 2 }
+    );
+  });
+
+  test('saveRegistryIndex writes to correct path', async () => {
+    const mockFileSystem = {
+      writeJson: jest.fn().mockResolvedValue(undefined)
+    };
+
+    await saveRegistryIndex('/my/registry', { packages: {} }, mockFileSystem);
+
+    const calledPath = mockFileSystem.writeJson.mock.calls[0][0];
+    expect(normalizePath(calledPath)).toBe(normalizePath('/my/registry/registry-index.json'));
+  });
+
+  // ---------------------------------------------------------------------------
+  // addVersionToIndex (Spec 77-00, Task 5.3)
+  // ---------------------------------------------------------------------------
+
+  test('addVersionToIndex adds new package entry to empty index', () => {
+    const index = { apiVersion: 'kse.scene.registry/v0.1', packages: {} };
+    const contract = {
+      metadata: {
+        name: 'my-scene',
+        group: 'kse.scene',
+        description: 'A test scene',
+        version: '1.0.0'
+      }
+    };
+
+    const result = addVersionToIndex(index, contract, 'sha256-abc123', '2025-01-01T00:00:00.000Z');
+
+    expect(result.packages['my-scene']).toBeDefined();
+    expect(result.packages['my-scene'].name).toBe('my-scene');
+    expect(result.packages['my-scene'].group).toBe('kse.scene');
+    expect(result.packages['my-scene'].description).toBe('A test scene');
+    expect(result.packages['my-scene'].latest).toBe('1.0.0');
+    expect(result.packages['my-scene'].versions['1.0.0']).toEqual({
+      published_at: '2025-01-01T00:00:00.000Z',
+      integrity: 'sha256-abc123',
+      tarball: 'packages/my-scene/1.0.0/my-scene-1.0.0.tgz'
+    });
+  });
+
+  test('addVersionToIndex adds second version and updates latest', () => {
+    const index = {
+      apiVersion: 'kse.scene.registry/v0.1',
+      packages: {
+        'my-scene': {
+          name: 'my-scene',
+          group: 'kse.scene',
+          description: 'A test scene',
+          latest: '1.0.0',
+          versions: {
+            '1.0.0': {
+              published_at: '2025-01-01T00:00:00.000Z',
+              integrity: 'sha256-old',
+              tarball: 'packages/my-scene/1.0.0/my-scene-1.0.0.tgz'
+            }
+          }
+        }
+      }
+    };
+    const contract = {
+      metadata: {
+        name: 'my-scene',
+        group: 'kse.scene',
+        description: 'A test scene updated',
+        version: '2.0.0'
+      }
+    };
+
+    const result = addVersionToIndex(index, contract, 'sha256-new', '2025-02-01T00:00:00.000Z');
+
+    expect(result.packages['my-scene'].latest).toBe('2.0.0');
+    expect(Object.keys(result.packages['my-scene'].versions)).toHaveLength(2);
+    expect(result.packages['my-scene'].versions['2.0.0']).toEqual({
+      published_at: '2025-02-01T00:00:00.000Z',
+      integrity: 'sha256-new',
+      tarball: 'packages/my-scene/2.0.0/my-scene-2.0.0.tgz'
+    });
+    // Old version still present
+    expect(result.packages['my-scene'].versions['1.0.0']).toBeDefined();
+  });
+
+  test('addVersionToIndex sets latest to highest semver not latest published', () => {
+    const index = { apiVersion: 'kse.scene.registry/v0.1', packages: {} };
+    const contract1 = {
+      metadata: { name: 'pkg', group: 'g', description: 'd', version: '2.0.0' }
+    };
+    const contract2 = {
+      metadata: { name: 'pkg', group: 'g', description: 'd', version: '1.5.0' }
+    };
+
+    addVersionToIndex(index, contract1, 'sha256-a', '2025-01-01T00:00:00.000Z');
+    const result = addVersionToIndex(index, contract2, 'sha256-b', '2025-02-01T00:00:00.000Z');
+
+    // latest should still be 2.0.0 even though 1.5.0 was published later
+    expect(result.packages['pkg'].latest).toBe('2.0.0');
+  });
+
+  test('addVersionToIndex overwrites existing version entry', () => {
+    const index = {
+      apiVersion: 'kse.scene.registry/v0.1',
+      packages: {
+        'pkg': {
+          name: 'pkg', group: 'g', description: 'd', latest: '1.0.0',
+          versions: {
+            '1.0.0': { published_at: '2025-01-01T00:00:00.000Z', integrity: 'sha256-old', tarball: 'packages/pkg/1.0.0/pkg-1.0.0.tgz' }
+          }
+        }
+      }
+    };
+    const contract = {
+      metadata: { name: 'pkg', group: 'g', description: 'd', version: '1.0.0' }
+    };
+
+    const result = addVersionToIndex(index, contract, 'sha256-new', '2025-03-01T00:00:00.000Z');
+
+    expect(result.packages['pkg'].versions['1.0.0'].integrity).toBe('sha256-new');
+    expect(result.packages['pkg'].versions['1.0.0'].published_at).toBe('2025-03-01T00:00:00.000Z');
+  });
+
+  // ---------------------------------------------------------------------------
+  // removeVersionFromIndex (Spec 77-00, Task 5.4)
+  // ---------------------------------------------------------------------------
+
+  test('removeVersionFromIndex removes version and updates latest', () => {
+    const index = {
+      apiVersion: 'kse.scene.registry/v0.1',
+      packages: {
+        'pkg': {
+          name: 'pkg', group: 'g', description: 'd', latest: '2.0.0',
+          versions: {
+            '1.0.0': { published_at: '2025-01-01T00:00:00.000Z', integrity: 'sha256-a' },
+            '2.0.0': { published_at: '2025-02-01T00:00:00.000Z', integrity: 'sha256-b' }
+          }
+        }
+      }
+    };
+
+    const result = removeVersionFromIndex(index, 'pkg', '2.0.0');
+
+    expect(result.removed).toBe(true);
+    expect(result.index.packages['pkg'].versions['2.0.0']).toBeUndefined();
+    expect(result.index.packages['pkg'].latest).toBe('1.0.0');
+    expect(Object.keys(result.index.packages['pkg'].versions)).toHaveLength(1);
+  });
+
+  test('removeVersionFromIndex deletes package entry when last version removed', () => {
+    const index = {
+      apiVersion: 'kse.scene.registry/v0.1',
+      packages: {
+        'pkg': {
+          name: 'pkg', group: 'g', description: 'd', latest: '1.0.0',
+          versions: {
+            '1.0.0': { published_at: '2025-01-01T00:00:00.000Z', integrity: 'sha256-a' }
+          }
+        }
+      }
+    };
+
+    const result = removeVersionFromIndex(index, 'pkg', '1.0.0');
+
+    expect(result.removed).toBe(true);
+    expect(result.index.packages['pkg']).toBeUndefined();
+  });
+
+  test('removeVersionFromIndex returns removed false for non-existent package', () => {
+    const index = { apiVersion: 'kse.scene.registry/v0.1', packages: {} };
+
+    const result = removeVersionFromIndex(index, 'no-such-pkg', '1.0.0');
+
+    expect(result.removed).toBe(false);
+    expect(result.index).toBe(index);
+  });
+
+  test('removeVersionFromIndex returns removed false for non-existent version', () => {
+    const index = {
+      apiVersion: 'kse.scene.registry/v0.1',
+      packages: {
+        'pkg': {
+          name: 'pkg', group: 'g', description: 'd', latest: '1.0.0',
+          versions: {
+            '1.0.0': { published_at: '2025-01-01T00:00:00.000Z', integrity: 'sha256-a' }
+          }
+        }
+      }
+    };
+
+    const result = removeVersionFromIndex(index, 'pkg', '9.9.9');
+
+    expect(result.removed).toBe(false);
+    expect(result.index.packages['pkg'].versions['1.0.0']).toBeDefined();
+  });
+
+  test('removeVersionFromIndex updates latest to next highest semver', () => {
+    const index = {
+      apiVersion: 'kse.scene.registry/v0.1',
+      packages: {
+        'pkg': {
+          name: 'pkg', group: 'g', description: 'd', latest: '3.0.0',
+          versions: {
+            '1.0.0': { published_at: '2025-01-01T00:00:00.000Z', integrity: 'sha256-a' },
+            '2.5.0': { published_at: '2025-02-01T00:00:00.000Z', integrity: 'sha256-b' },
+            '3.0.0': { published_at: '2025-03-01T00:00:00.000Z', integrity: 'sha256-c' }
+          }
+        }
+      }
+    };
+
+    const result = removeVersionFromIndex(index, 'pkg', '3.0.0');
+
+    expect(result.removed).toBe(true);
+    expect(result.index.packages['pkg'].latest).toBe('2.5.0');
+  });
+
+  // ---------------------------------------------------------------------------
+  // storeToRegistry (Spec 77-00, Task 6.1)
+  // ---------------------------------------------------------------------------
+
+  test('storeToRegistry writes tarball to correct path', async () => {
+    const mockFileSystem = {
+      pathExists: jest.fn().mockResolvedValue(false),
+      ensureDir: jest.fn().mockResolvedValue(undefined),
+      writeFile: jest.fn().mockResolvedValue(undefined)
+    };
+    const tarball = Buffer.from('fake-tarball-data');
+
+    const result = await storeToRegistry('my-pkg', '1.0.0', tarball, '/registry', {}, mockFileSystem);
+
+    expect(normalizePath(result.path)).toContain('packages/my-pkg/1.0.0/my-pkg-1.0.0.tgz');
+    expect(result.overwritten).toBe(false);
+    expect(mockFileSystem.ensureDir).toHaveBeenCalledTimes(1);
+    expect(mockFileSystem.writeFile).toHaveBeenCalledWith(
+      expect.stringContaining('my-pkg-1.0.0.tgz'),
+      tarball
+    );
+  });
+
+  test('storeToRegistry throws duplicate error when version exists and force is false', async () => {
+    const mockFileSystem = {
+      pathExists: jest.fn().mockResolvedValue(true),
+      ensureDir: jest.fn().mockResolvedValue(undefined),
+      writeFile: jest.fn().mockResolvedValue(undefined)
+    };
+    const tarball = Buffer.from('fake-tarball-data');
+
+    await expect(storeToRegistry('my-pkg', '1.0.0', tarball, '/registry', {}, mockFileSystem))
+      .rejects.toThrow('already exists in registry');
+    expect(mockFileSystem.writeFile).not.toHaveBeenCalled();
+  });
+
+  test('storeToRegistry throws duplicate error when options is undefined (no force)', async () => {
+    const mockFileSystem = {
+      pathExists: jest.fn().mockResolvedValue(true),
+      ensureDir: jest.fn().mockResolvedValue(undefined),
+      writeFile: jest.fn().mockResolvedValue(undefined)
+    };
+    const tarball = Buffer.from('fake-tarball-data');
+
+    await expect(storeToRegistry('my-pkg', '1.0.0', tarball, '/registry', undefined, mockFileSystem))
+      .rejects.toThrow('already exists in registry');
+  });
+
+  test('storeToRegistry overwrites when force is true and version exists', async () => {
+    const mockFileSystem = {
+      pathExists: jest.fn().mockResolvedValue(true),
+      ensureDir: jest.fn().mockResolvedValue(undefined),
+      writeFile: jest.fn().mockResolvedValue(undefined)
+    };
+    const tarball = Buffer.from('new-tarball-data');
+
+    const result = await storeToRegistry('my-pkg', '1.0.0', tarball, '/registry', { force: true }, mockFileSystem);
+
+    expect(result.overwritten).toBe(true);
+    expect(mockFileSystem.writeFile).toHaveBeenCalledWith(
+      expect.stringContaining('my-pkg-1.0.0.tgz'),
+      tarball
+    );
+  });
+
+  test('storeToRegistry creates directory structure for new package', async () => {
+    const mockFileSystem = {
+      pathExists: jest.fn().mockResolvedValue(false),
+      ensureDir: jest.fn().mockResolvedValue(undefined),
+      writeFile: jest.fn().mockResolvedValue(undefined)
+    };
+    const tarball = Buffer.from('data');
+
+    await storeToRegistry('new-pkg', '0.1.0', tarball, '/my/registry', {}, mockFileSystem);
+
+    const ensuredDir = normalizePath(mockFileSystem.ensureDir.mock.calls[0][0]);
+    expect(ensuredDir).toContain('packages/new-pkg/0.1.0');
+  });
+
+  // ---------------------------------------------------------------------------
+  // removeFromRegistry (Spec 77-00, Task 6.2)
+  // ---------------------------------------------------------------------------
+
+  test('removeFromRegistry removes tarball and cleans empty directories', async () => {
+    const mockFileSystem = {
+      remove: jest.fn().mockResolvedValue(undefined),
+      readdir: jest.fn().mockResolvedValue([])
+    };
+
+    const result = await removeFromRegistry('my-pkg', '1.0.0', '/registry', mockFileSystem);
+
+    expect(result.removed).toBe(true);
+    // Should have called remove 3 times: tarball file, empty version dir, empty package dir
+    expect(mockFileSystem.remove).toHaveBeenCalledTimes(3);
+    expect(normalizePath(mockFileSystem.remove.mock.calls[0][0])).toContain('my-pkg-1.0.0.tgz');
+  });
+
+  test('removeFromRegistry does not remove non-empty directories', async () => {
+    const mockFileSystem = {
+      remove: jest.fn().mockResolvedValue(undefined),
+      readdir: jest.fn().mockResolvedValue(['other-file.txt'])
+    };
+
+    const result = await removeFromRegistry('my-pkg', '1.0.0', '/registry', mockFileSystem);
+
+    expect(result.removed).toBe(true);
+    // Should only remove the tarball file, not the directories (they have entries)
+    expect(mockFileSystem.remove).toHaveBeenCalledTimes(1);
+  });
+
+  test('removeFromRegistry returns removed false when file removal fails', async () => {
+    const mockFileSystem = {
+      remove: jest.fn().mockRejectedValue(new Error('ENOENT')),
+      readdir: jest.fn().mockResolvedValue([])
+    };
+
+    const result = await removeFromRegistry('no-pkg', '9.9.9', '/registry', mockFileSystem);
+
+    expect(result.removed).toBe(false);
+  });
+
+  test('removeFromRegistry handles readdir failure gracefully', async () => {
+    const mockFileSystem = {
+      remove: jest.fn().mockResolvedValue(undefined),
+      readdir: jest.fn().mockRejectedValue(new Error('ENOENT'))
+    };
+
+    const result = await removeFromRegistry('my-pkg', '1.0.0', '/registry', mockFileSystem);
+
+    expect(result.removed).toBe(true);
+    // Only the tarball remove should succeed, readdir failures are caught
+    expect(mockFileSystem.remove).toHaveBeenCalledTimes(1);
+  });
+
+  // ---------------------------------------------------------------------------
+  // Registry Publish Command (Spec 77-00, Task 8)
+  // ---------------------------------------------------------------------------
+
+  test('normalizeScenePackageRegistryPublishOptions returns defaults', () => {
+    const result = normalizeScenePackageRegistryPublishOptions({});
+    expect(result).toEqual({
+      package: undefined,
+      registry: '.kiro/registry',
+      dryRun: false,
+      force: false,
+      json: false
+    });
+  });
+
+  test('normalizeScenePackageRegistryPublishOptions trims and converts values', () => {
+    const result = normalizeScenePackageRegistryPublishOptions({
+      package: '  my-pkg  ',
+      registry: '  custom/registry  ',
+      dryRun: true,
+      force: true,
+      json: true
+    });
+    expect(result).toEqual({
+      package: 'my-pkg',
+      registry: 'custom/registry',
+      dryRun: true,
+      force: true,
+      json: true
+    });
+  });
+
+  test('normalizeScenePackageRegistryPublishOptions coerces non-boolean flags to false', () => {
+    const result = normalizeScenePackageRegistryPublishOptions({
+      package: 'pkg',
+      dryRun: 'yes',
+      force: 1,
+      json: 'true'
+    });
+    expect(result.dryRun).toBe(false);
+    expect(result.force).toBe(false);
+    expect(result.json).toBe(false);
+  });
+
+  test('validateScenePackageRegistryPublishOptions returns error when package is missing', () => {
+    expect(validateScenePackageRegistryPublishOptions({})).toBe('--package is required');
+    expect(validateScenePackageRegistryPublishOptions({ package: '' })).toBe('--package is required');
+    expect(validateScenePackageRegistryPublishOptions({ package: 123 })).toBe('--package is required');
+  });
+
+  test('validateScenePackageRegistryPublishOptions returns null for valid options', () => {
+    expect(validateScenePackageRegistryPublishOptions({ package: 'my-pkg' })).toBeNull();
+  });
+
+  test('printScenePackageRegistryPublishSummary outputs JSON in json mode', () => {
+    const payload = {
+      published: true,
+      dry_run: false,
+      overwritten: false,
+      coordinate: 'kse.scene/test-pkg@1.0.0',
+      package: { name: 'test-pkg', group: 'kse.scene', version: '1.0.0', kind: 'scene-template' },
+      tarball: { path: '.kiro/registry/packages/test-pkg/1.0.0/test-pkg-1.0.0.tgz', size: 512, file_count: 2, integrity: 'sha256-abc' },
+      registry: { index_path: '.kiro/registry/registry-index.json', total_packages: 1, total_versions: 1 }
+    };
+    printScenePackageRegistryPublishSummary({ json: true }, payload, '/project');
+    expect(console.log).toHaveBeenCalled();
+    const output = console.log.mock.calls.map(c => c[0]).join('\n');
+    const parsed = JSON.parse(output);
+    expect(parsed.coordinate).toBe('kse.scene/test-pkg@1.0.0');
+  });
+
+  test('printScenePackageRegistryPublishSummary outputs human-readable summary', () => {
+    const payload = {
+      published: true,
+      dry_run: false,
+      overwritten: false,
+      coordinate: 'kse.scene/test-pkg@1.0.0',
+      package: { name: 'test-pkg', group: 'kse.scene', version: '1.0.0', kind: 'scene-template' },
+      tarball: { path: '.kiro/registry/packages/test-pkg/1.0.0/test-pkg-1.0.0.tgz', size: 512, file_count: 2, integrity: 'sha256-abc' },
+      registry: { index_path: '.kiro/registry/registry-index.json', total_packages: 1, total_versions: 1 }
+    };
+    printScenePackageRegistryPublishSummary({ json: false }, payload, '/project');
+    const output = console.log.mock.calls.map(c => c[0]).join('\n');
+    expect(output).toContain('Scene Package Publish');
+    expect(output).toContain('kse.scene/test-pkg@1.0.0');
+    expect(output).toContain('512 bytes');
+    expect(output).toContain('sha256-abc');
+  });
+
+  test('printScenePackageRegistryPublishSummary shows dry-run indicator', () => {
+    const payload = {
+      published: false,
+      dry_run: true,
+      overwritten: false,
+      coordinate: 'kse.scene/test-pkg@1.0.0',
+      package: { name: 'test-pkg', group: 'kse.scene', version: '1.0.0', kind: 'scene-template' },
+      tarball: { path: '.kiro/registry/packages/test-pkg/1.0.0/test-pkg-1.0.0.tgz', size: 512, file_count: 2, integrity: 'sha256-abc' },
+      registry: { index_path: '.kiro/registry/registry-index.json', total_packages: 0, total_versions: 0 }
+    };
+    printScenePackageRegistryPublishSummary({ json: false }, payload, '/project');
+    const output = console.log.mock.calls.map(c => c[0]).join('\n');
+    expect(output).toContain('dry-run');
+  });
+
+  test('runScenePackageRegistryPublishCommand returns null when --package is missing', async () => {
+    const result = await runScenePackageRegistryPublishCommand({}, { projectRoot: '/project' });
+    expect(result).toBeNull();
+    expect(process.exitCode).toBe(1);
+  });
+
+  test('runScenePackageRegistryPublishCommand returns null when package validation fails', async () => {
+    const mockFileSystem = {
+      readJson: jest.fn().mockRejectedValue(new Error('ENOENT: no such file')),
+      pathExists: jest.fn().mockResolvedValue(false)
+    };
+
+    const result = await runScenePackageRegistryPublishCommand(
+      { package: 'nonexistent-pkg' },
+      { projectRoot: '/project', fileSystem: mockFileSystem }
+    );
+
+    expect(result).toBeNull();
+    expect(process.exitCode).toBe(1);
+  });
+
+  test('runScenePackageRegistryPublishCommand dry-run returns payload without writing', async () => {
+    const contractJson = {
+      apiVersion: 'kse.scene.package/v0.1',
+      kind: 'scene-template',
+      metadata: { name: 'test-pkg', group: 'kse.scene', version: '1.0.0', description: 'Test' },
+      compatibility: { kse_version: '>=1.0.0', scene_api_version: 'kse.scene/v0.2' },
+      capabilities: { provides: ['test-cap'], requires: [] },
+      artifacts: { entry_scene: 'scene.yaml', generates: ['template.yaml'] },
+      governance: { risk_level: 'low', approval_required: false, rollback_supported: true },
+      parameters: []
+    };
+
+    const mockFileSystem = {
+      readJson: jest.fn().mockResolvedValue(contractJson),
+      readFile: jest.fn().mockResolvedValue(Buffer.from('file-content')),
+      pathExists: jest.fn().mockResolvedValue(true),
+      ensureDir: jest.fn().mockResolvedValue(undefined),
+      writeFile: jest.fn().mockResolvedValue(undefined),
+      writeJson: jest.fn().mockResolvedValue(undefined)
+    };
+
+    const result = await runScenePackageRegistryPublishCommand(
+      { package: 'packages/test-pkg', dryRun: true, json: true },
+      { projectRoot: '/project', fileSystem: mockFileSystem }
+    );
+
+    expect(result).not.toBeNull();
+    expect(result.published).toBe(false);
+    expect(result.dry_run).toBe(true);
+    expect(result.coordinate).toBe('kse.scene/test-pkg@1.0.0');
+    expect(result.tarball.file_count).toBe(3); // scene-package.json + entry_scene + 1 generates
+    expect(result.tarball.size).toBeGreaterThan(0);
+    expect(result.tarball.integrity).toMatch(/^sha256-/);
+    // Verify no writes happened
+    expect(mockFileSystem.ensureDir).not.toHaveBeenCalled();
+    expect(mockFileSystem.writeFile).not.toHaveBeenCalled();
+  });
+
+  test('runScenePackageRegistryPublishCommand full publish stores tarball and updates index', async () => {
+    const contractJson = {
+      apiVersion: 'kse.scene.package/v0.1',
+      kind: 'scene-template',
+      metadata: { name: 'my-pkg', group: 'kse.scene', version: '2.0.0', description: 'My package' },
+      compatibility: { kse_version: '>=1.0.0', scene_api_version: 'kse.scene/v0.2' },
+      capabilities: { provides: ['my-cap'], requires: [] },
+      artifacts: { entry_scene: 'scene.yaml', generates: ['output.yaml'] },
+      governance: { risk_level: 'low', approval_required: false, rollback_supported: true },
+      parameters: []
+    };
+
+    const existingIndex = {
+      apiVersion: 'kse.scene.registry/v0.1',
+      packages: {}
+    };
+
+    let savedIndex = null;
+    const mockFileSystem = {
+      readJson: jest.fn().mockImplementation((filePath) => {
+        if (String(filePath).endsWith('scene-package.json')) {
+          return Promise.resolve(contractJson);
+        }
+        if (String(filePath).endsWith('registry-index.json')) {
+          return Promise.resolve(JSON.parse(JSON.stringify(existingIndex)));
+        }
+        return Promise.reject(new Error('not found'));
+      }),
+      readFile: jest.fn().mockResolvedValue(Buffer.from('scene-content')),
+      pathExists: jest.fn().mockImplementation((filePath) => {
+        // registry version dir does not exist yet (no duplicate)
+        if (String(filePath).includes('packages') && String(filePath).includes('2.0.0')) {
+          return Promise.resolve(false);
+        }
+        return Promise.resolve(true);
+      }),
+      ensureDir: jest.fn().mockResolvedValue(undefined),
+      writeFile: jest.fn().mockResolvedValue(undefined),
+      writeJson: jest.fn().mockImplementation((filePath, data) => {
+        if (String(filePath).endsWith('registry-index.json')) {
+          savedIndex = data;
+        }
+        return Promise.resolve(undefined);
+      })
+    };
+
+    const result = await runScenePackageRegistryPublishCommand(
+      { package: 'packages/my-pkg', json: true },
+      { projectRoot: '/project', fileSystem: mockFileSystem }
+    );
+
+    expect(result).not.toBeNull();
+    expect(result.published).toBe(true);
+    expect(result.dry_run).toBe(false);
+    expect(result.coordinate).toBe('kse.scene/my-pkg@2.0.0');
+    expect(result.package.name).toBe('my-pkg');
+    expect(result.package.version).toBe('2.0.0');
+    expect(result.tarball.file_count).toBe(3); // scene-package.json + entry_scene + 1 generates
+    expect(result.tarball.integrity).toMatch(/^sha256-/);
+    expect(result.registry.total_packages).toBe(1);
+    expect(result.registry.total_versions).toBe(1);
+
+    // Verify index was saved with the new package
+    expect(savedIndex).not.toBeNull();
+    expect(savedIndex.packages['my-pkg']).toBeDefined();
+    expect(savedIndex.packages['my-pkg'].latest).toBe('2.0.0');
+  });
+
+  // ---------------------------------------------------------------------------
+  // Scene Unpublish Command
+  // ---------------------------------------------------------------------------
+
+  test('normalizeSceneUnpublishOptions returns defaults', () => {
+    const result = normalizeSceneUnpublishOptions({});
+    expect(result).toEqual({
+      name: undefined,
+      version: undefined,
+      registry: '.kiro/registry',
+      json: false
+    });
+  });
+
+  test('normalizeSceneUnpublishOptions trims and converts values', () => {
+    const result = normalizeSceneUnpublishOptions({
+      name: '  my-pkg  ',
+      version: '  1.0.0  ',
+      registry: '  custom/registry  ',
+      json: true
+    });
+    expect(result).toEqual({
+      name: 'my-pkg',
+      version: '1.0.0',
+      registry: 'custom/registry',
+      json: true
+    });
+  });
+
+  test('normalizeSceneUnpublishOptions coerces non-boolean json to false', () => {
+    const result = normalizeSceneUnpublishOptions({
+      name: 'pkg',
+      version: '1.0.0',
+      json: 'true'
+    });
+    expect(result.json).toBe(false);
+  });
+
+  test('validateSceneUnpublishOptions returns error when name is missing', () => {
+    expect(validateSceneUnpublishOptions({})).toBe('--name is required');
+    expect(validateSceneUnpublishOptions({ name: '' })).toBe('--name is required');
+    expect(validateSceneUnpublishOptions({ name: 123 })).toBe('--name is required');
+  });
+
+  test('validateSceneUnpublishOptions returns error when version is missing', () => {
+    expect(validateSceneUnpublishOptions({ name: 'pkg' })).toBe('--version is required');
+    expect(validateSceneUnpublishOptions({ name: 'pkg', version: '' })).toBe('--version is required');
+  });
+
+  test('validateSceneUnpublishOptions returns error for invalid semver', () => {
+    expect(validateSceneUnpublishOptions({ name: 'pkg', version: 'not-semver' }))
+      .toBe('--version "not-semver" is not valid semver');
+  });
+
+  test('validateSceneUnpublishOptions returns null for valid options', () => {
+    expect(validateSceneUnpublishOptions({ name: 'pkg', version: '1.0.0' })).toBeNull();
+    expect(validateSceneUnpublishOptions({ name: 'pkg', version: '1.0.0-beta.1' })).toBeNull();
+  });
+
+  test('printSceneUnpublishSummary outputs JSON in json mode', () => {
+    const payload = {
+      unpublished: true,
+      coordinate: 'kse.scene/test-pkg@1.0.0',
+      package: { name: 'test-pkg', version: '1.0.0' },
+      remaining_versions: 2,
+      new_latest: '0.9.0',
+      registry: { index_path: '.kiro/registry/registry-index.json' }
+    };
+    printSceneUnpublishSummary({ json: true }, payload, '/project');
+    expect(console.log).toHaveBeenCalled();
+    const output = console.log.mock.calls.map(c => c[0]).join('\n');
+    const parsed = JSON.parse(output);
+    expect(parsed.unpublished).toBe(true);
+    expect(parsed.coordinate).toBe('kse.scene/test-pkg@1.0.0');
+    expect(parsed.remaining_versions).toBe(2);
+  });
+
+  test('printSceneUnpublishSummary outputs human-readable summary', () => {
+    const payload = {
+      unpublished: true,
+      coordinate: 'kse.scene/test-pkg@1.0.0',
+      package: { name: 'test-pkg', version: '1.0.0' },
+      remaining_versions: 2,
+      new_latest: '0.9.0',
+      registry: { index_path: '.kiro/registry/registry-index.json' }
+    };
+    printSceneUnpublishSummary({ json: false }, payload, '/project');
+    const output = console.log.mock.calls.map(c => c[0]).join('\n');
+    expect(output).toContain('Scene Package Unpublish');
+    expect(output).toContain('kse.scene/test-pkg@1.0.0');
+    expect(output).toContain('Remaining versions: 2');
+    expect(output).toContain('New latest: 0.9.0');
+  });
+
+  test('printSceneUnpublishSummary omits new_latest when null', () => {
+    const payload = {
+      unpublished: true,
+      coordinate: 'kse.scene/test-pkg@1.0.0',
+      package: { name: 'test-pkg', version: '1.0.0' },
+      remaining_versions: 0,
+      new_latest: null,
+      registry: { index_path: '.kiro/registry/registry-index.json' }
+    };
+    printSceneUnpublishSummary({ json: false }, payload, '/project');
+    const output = console.log.mock.calls.map(c => c[0]).join('\n');
+    expect(output).toContain('Remaining versions: 0');
+    expect(output).not.toContain('New latest');
+  });
+
+  test('runSceneUnpublishCommand returns null when --name is missing', async () => {
+    const result = await runSceneUnpublishCommand({}, { projectRoot: '/project' });
+    expect(result).toBeNull();
+    expect(process.exitCode).toBe(1);
+  });
+
+  test('runSceneUnpublishCommand returns null when --version is invalid semver', async () => {
+    const result = await runSceneUnpublishCommand(
+      { name: 'pkg', version: 'bad' },
+      { projectRoot: '/project' }
+    );
+    expect(result).toBeNull();
+    expect(process.exitCode).toBe(1);
+  });
+
+  test('runSceneUnpublishCommand returns null when package not found in index', async () => {
+    const existingIndex = {
+      apiVersion: 'kse.scene.registry/v0.1',
+      packages: {}
+    };
+
+    const mockFileSystem = {
+      readJson: jest.fn().mockResolvedValue(existingIndex),
+      writeJson: jest.fn().mockResolvedValue(undefined)
+    };
+
+    const result = await runSceneUnpublishCommand(
+      { name: 'nonexistent', version: '1.0.0' },
+      { projectRoot: '/project', fileSystem: mockFileSystem }
+    );
+
+    expect(result).toBeNull();
+    expect(process.exitCode).toBe(1);
+  });
+
+  test('runSceneUnpublishCommand returns null when version not found for package', async () => {
+    const existingIndex = {
+      apiVersion: 'kse.scene.registry/v0.1',
+      packages: {
+        'my-pkg': {
+          name: 'my-pkg',
+          group: 'kse.scene',
+          latest: '1.0.0',
+          versions: {
+            '1.0.0': { published_at: '2025-01-01T00:00:00.000Z', integrity: 'sha256-abc' }
+          }
+        }
+      }
+    };
+
+    const mockFileSystem = {
+      readJson: jest.fn().mockResolvedValue(JSON.parse(JSON.stringify(existingIndex))),
+      writeJson: jest.fn().mockResolvedValue(undefined)
+    };
+
+    const result = await runSceneUnpublishCommand(
+      { name: 'my-pkg', version: '2.0.0' },
+      { projectRoot: '/project', fileSystem: mockFileSystem }
+    );
+
+    expect(result).toBeNull();
+    expect(process.exitCode).toBe(1);
+  });
+
+  test('runSceneUnpublishCommand successfully removes version and updates index', async () => {
+    const existingIndex = {
+      apiVersion: 'kse.scene.registry/v0.1',
+      packages: {
+        'my-pkg': {
+          name: 'my-pkg',
+          group: 'kse.scene',
+          description: 'Test package',
+          latest: '2.0.0',
+          versions: {
+            '1.0.0': { published_at: '2025-01-01T00:00:00.000Z', integrity: 'sha256-aaa', tarball: 'packages/my-pkg/1.0.0/my-pkg-1.0.0.tgz' },
+            '2.0.0': { published_at: '2025-01-15T00:00:00.000Z', integrity: 'sha256-bbb', tarball: 'packages/my-pkg/2.0.0/my-pkg-2.0.0.tgz' }
+          }
+        }
+      }
+    };
+
+    let savedIndex = null;
+    const mockFileSystem = {
+      pathExists: jest.fn().mockResolvedValue(true),
+      readJson: jest.fn().mockResolvedValue(JSON.parse(JSON.stringify(existingIndex))),
+      writeJson: jest.fn().mockImplementation((filePath, data) => {
+        if (String(filePath).endsWith('registry-index.json')) {
+          savedIndex = data;
+        }
+        return Promise.resolve(undefined);
+      }),
+      remove: jest.fn().mockResolvedValue(undefined),
+      readdir: jest.fn().mockResolvedValue([])
+    };
+
+    const result = await runSceneUnpublishCommand(
+      { name: 'my-pkg', version: '2.0.0', json: true },
+      { projectRoot: '/project', fileSystem: mockFileSystem }
+    );
+
+    expect(result).not.toBeNull();
+    expect(result.unpublished).toBe(true);
+    expect(result.coordinate).toBe('kse.scene/my-pkg@2.0.0');
+    expect(result.package.name).toBe('my-pkg');
+    expect(result.package.version).toBe('2.0.0');
+    expect(result.remaining_versions).toBe(1);
+    expect(result.new_latest).toBe('1.0.0');
+
+    // Verify index was saved without the removed version
+    expect(savedIndex).not.toBeNull();
+    expect(savedIndex.packages['my-pkg']).toBeDefined();
+    expect(savedIndex.packages['my-pkg'].versions['2.0.0']).toBeUndefined();
+    expect(savedIndex.packages['my-pkg'].versions['1.0.0']).toBeDefined();
+    expect(savedIndex.packages['my-pkg'].latest).toBe('1.0.0');
+  });
+
+  test('runSceneUnpublishCommand removes package entry when last version is unpublished', async () => {
+    const existingIndex = {
+      apiVersion: 'kse.scene.registry/v0.1',
+      packages: {
+        'solo-pkg': {
+          name: 'solo-pkg',
+          group: 'kse.scene',
+          description: 'Solo package',
+          latest: '1.0.0',
+          versions: {
+            '1.0.0': { published_at: '2025-01-01T00:00:00.000Z', integrity: 'sha256-solo', tarball: 'packages/solo-pkg/1.0.0/solo-pkg-1.0.0.tgz' }
+          }
+        }
+      }
+    };
+
+    let savedIndex = null;
+    const mockFileSystem = {
+      pathExists: jest.fn().mockResolvedValue(true),
+      readJson: jest.fn().mockResolvedValue(JSON.parse(JSON.stringify(existingIndex))),
+      writeJson: jest.fn().mockImplementation((filePath, data) => {
+        if (String(filePath).endsWith('registry-index.json')) {
+          savedIndex = data;
+        }
+        return Promise.resolve(undefined);
+      }),
+      remove: jest.fn().mockResolvedValue(undefined),
+      readdir: jest.fn().mockResolvedValue([])
+    };
+
+    const result = await runSceneUnpublishCommand(
+      { name: 'solo-pkg', version: '1.0.0', json: true },
+      { projectRoot: '/project', fileSystem: mockFileSystem }
+    );
+
+    expect(result).not.toBeNull();
+    expect(result.unpublished).toBe(true);
+    expect(result.remaining_versions).toBe(0);
+    expect(result.new_latest).toBeNull();
+
+    // Verify package entry was removed entirely
+    expect(savedIndex).not.toBeNull();
+    expect(savedIndex.packages['solo-pkg']).toBeUndefined();
   });
 });

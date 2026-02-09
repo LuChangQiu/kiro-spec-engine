@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.27.0] - 2026-02-10
+
+### Added
+- **Scene Package Registry Publish/Unpublish**: Local registry-based publish and unpublish for scene packages
+  - `kse scene publish --package <path>` publish scene package to local registry
+    - `--registry <dir>` custom registry directory
+    - `--dry-run` preview without writing
+    - `--force` overwrite existing version
+    - `--json` structured JSON output
+  - `kse scene unpublish --name <name> --version <version>` remove published version
+    - `--registry <dir>` custom registry directory
+    - `--json` structured JSON output
+  - Tarball bundling with SHA-256 integrity verification
+  - Directory-based local registry storage (`{registry}/{name}/{version}/`)
+  - Registry index management via `registry-index.json` (add/remove versions)
+  - Package validation: scene-package.json required fields, semver version check
+  - Path construction utilities for registry layout
+  - Implements Spec 77-00-scene-package-publish
+
 ## [1.26.0] - 2026-02-10
 
 ### Added

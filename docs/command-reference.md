@@ -214,6 +214,23 @@ kse scene template-render --package <name> --values <json-or-path> --out <dir>
 kse scene template-render --package scene-erp --values '{"entity_name":"Order"}' --out ./output --json
 ```
 
+### Moqui ERP Integration
+
+```bash
+# Test connectivity and authentication to Moqui ERP instance
+kse scene connect --config <path>
+kse scene connect --config ./moqui-config.json --json
+
+# Discover available entities, services, and screens from Moqui ERP
+kse scene discover --config <path>
+kse scene discover --config ./moqui-config.json --type entities --json
+
+# Extract scene templates from Moqui ERP instance
+kse scene extract --config <path> --out <dir>
+kse scene extract --config ./moqui-config.json --type entities --pattern crud --out ./templates --json
+kse scene extract --config ./moqui-config.json --dry-run --json
+```
+
 ### Version & Upgrade
 
 ```bash

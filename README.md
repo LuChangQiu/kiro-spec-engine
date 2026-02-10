@@ -310,6 +310,15 @@ Structure your work with Requirements → Design → Tasks workflow
 - **Cross-Platform**: Consistent path handling across Windows/Linux/macOS
 - **Smart Exclusions**: Automatically skip common non-repository directories (node_modules, build, etc.)
 
+### Moqui ERP Integration 🚀 NEW in v1.39.0
+- **Moqui ERP Adapter**: Connect KSE scene runtime to live Moqui ERP instances
+  - `MoquiClient` — HTTP client with JWT auth lifecycle (login, refresh, re-login, logout) and retry logic
+  - `MoquiAdapter` — Binding handler for `spec.erp.*` and `moqui.*` refs, entity CRUD, service invocation, screen discovery
+- **Scene Template Extractor** (v1.40.0): Analyze Moqui resources, identify business patterns, generate reusable scene templates
+  - Entity grouping by Header/Item suffix patterns (e.g., OrderHeader + OrderItem → composite)
+  - Pattern-based manifest generation with governance contracts
+- **CLI Commands**: `scene connect`, `scene discover`, `scene extract` with `--json` support
+
 ### Scene Template Engine 🚀 NEW in v1.25.0
 - **Template Variable Schema**: Define typed variables (string, number, boolean, enum, array) with validation rules in scene-package.json
 - **Multi-File Rendering**: Recursive template processing with `{{variable}}` substitution, `{{#if}}` conditionals, `{{#each}}` loops
@@ -436,6 +445,11 @@ kse repo health                    # Check repository health
 kse scene template-validate --package <path>   # Validate template variable schema
 kse scene template-resolve --package <name>    # Resolve inheritance chain and merged schema
 kse scene template-render --package <name> --values <json> --out <dir>  # Render template files
+
+# Moqui ERP integration (NEW in v1.39.0)
+kse scene connect --config <path>              # Test connectivity to Moqui ERP instance
+kse scene discover --config <path>             # Discover entities, services, screens from Moqui
+kse scene extract --config <path> --out <dir>  # Extract scene templates from Moqui (v1.40.0)
 
 # DevOps operations
 kse ops init <project-name>        # Initialize operations specs

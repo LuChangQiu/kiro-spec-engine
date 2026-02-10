@@ -266,6 +266,15 @@ sequenceDiagram
 - **命令执行**：在特定环境上下文中运行命令
 - **跨平台**：在 Windows、Linux 和 macOS 上无缝工作
 
+### Moqui ERP 集成 🚀 v1.39.0 新增
+- **Moqui ERP 适配器**: 将 KSE 场景运行时连接到 Moqui ERP 实例
+  - `MoquiClient` — 支持 JWT 认证生命周期（登录、刷新、重登录、登出）和重试逻辑的 HTTP 客户端
+  - `MoquiAdapter` — 处理 `spec.erp.*` 和 `moqui.*` 引用的绑定处理器，支持实体 CRUD、服务调用、屏幕发现
+- **场景模板提取器**（v1.40.0）: 分析 Moqui 资源，识别业务模式，生成可复用场景模板
+  - 按 Header/Item 后缀模式分组实体（如 OrderHeader + OrderItem → 复合模式）
+  - 基于模式的清单生成，包含治理合约
+- **CLI 命令**: `scene connect`、`scene discover`、`scene extract`，支持 `--json` 输出
+
 ### 场景模板引擎 🚀 v1.25.0 新增
 - **模板变量 Schema**: 在 scene-package.json 中定义类型化变量（string, number, boolean, enum, array）及验证规则
 - **多文件渲染**: 递归模板处理，支持 `{{variable}}` 替换、`{{#if}}` 条件、`{{#each}}` 循环
@@ -340,6 +349,11 @@ kse env run "<command>"            # 在环境上下文中运行命令
 kse scene template-validate --package <path>   # 验证模板变量 schema
 kse scene template-resolve --package <name>    # 解析继承链和合并 schema
 kse scene template-render --package <name> --values <json> --out <dir>  # 渲染模板文件
+
+# Moqui ERP 集成 (v1.39.0 新增)
+kse scene connect --config <path>              # 测试 Moqui ERP 实例连接
+kse scene discover --config <path>             # 发现 Moqui 实体、服务、屏幕
+kse scene extract --config <path> --out <dir>  # 从 Moqui 提取场景模板 (v1.40.0)
 
 # DevOps 运维
 kse ops init <project-name>        # 初始化运维 specs

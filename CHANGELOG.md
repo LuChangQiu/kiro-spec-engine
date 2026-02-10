@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.37.0] - 2026-02-10
+
+### Added
+- **Scene Distribution Tags**: Manage distribution tags on scene packages in local registry
+  - `kse scene tag add --name <pkg> --tag <tag> --version <ver>` add a distribution tag
+  - `kse scene tag rm --name <pkg> --tag <tag>` remove a distribution tag
+  - `kse scene tag ls --name <pkg>` list all tags and latest version
+    - `--registry <dir>` custom registry directory
+    - `--json` structured JSON output
+  - Tags stored as `tags` object on package entry, separate from `latest` field
+  - "latest" tag is protected — managed automatically by publish
+
 ## [1.36.0] - 2026-02-10
 
 ### Added

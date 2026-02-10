@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.40.0] - 2026-02-10
+
+### Added
+- **Moqui Scene Template Extractor**: Extract reusable scene templates from live Moqui ERP instances
+  - `MoquiExtractor` — Analyze discovered Moqui resources, identify business patterns (crud/query/workflow), generate scene template bundles
+  - Built-in YAML serializer for scene manifests (`kse.scene/v0.2` apiVersion)
+  - Entity grouping by Header/Item suffix patterns (e.g., OrderHeader + OrderItem → composite pattern)
+  - Pattern-based manifest generation with governance contracts (risk_level, approval, idempotency)
+  - Package contract generation (`kse.scene.package/v0.1` apiVersion) with template parameters
+  - Template bundle file writing with partial failure resilience
+  - `kse scene extract` — Extract scene templates from Moqui ERP instance
+    - `--config <path>` custom adapter config path
+    - `--type <type>` filter discovery by resource type (entities|services|screens)
+    - `--pattern <pattern>` filter by business pattern (crud|query|workflow)
+    - `--out <dir>` output directory for template bundles
+    - `--dry-run` preview extraction without writing files
+    - `--json` structured JSON output
+
+### Fixed
+- **scene discover**: Fixed `response.body.data` → `response.data` property access for Moqui catalog endpoint responses
+
 ## [1.39.0] - 2026-02-10
 
 ### Added

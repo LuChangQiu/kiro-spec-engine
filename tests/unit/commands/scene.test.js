@@ -65,7 +65,11 @@ const {
   normalizeSceneUnpublishOptions,
   validateSceneUnpublishOptions,
   printSceneUnpublishSummary,
-  runSceneUnpublishCommand
+  runSceneUnpublishCommand,
+  normalizeSceneExtractOptions,
+  validateSceneExtractOptions,
+  printSceneExtractSummary,
+  runSceneExtractCommand
 } = require('../../../lib/commands/scene');
 
 function normalizePath(targetPath) {
@@ -5316,5 +5320,145 @@ spec:
     // Verify package entry was removed entirely
     expect(savedIndex).not.toBeNull();
     expect(savedIndex.packages['solo-pkg']).toBeUndefined();
+  });
+});
+
+// ─── Scene Extract CLI Tests ──────────────────────────────────────
+
+describe('Scene Extract CLI', () => {
+  // ─── normalizeSceneExtractOptions ─────────────────────────────
+
+  test('normalizeSceneExtractOptions returns defaults', () => {
+    const result = normalizeSceneExtractOptions({});
+    expect(result.config).toBeUndefined();
+    expect(result.type).toBeUndefined();
+    expect(result.pattern).toBeUndefined();
+    expect(result.out).toBe('.kiro/templates/extracted');
+    expect(result.dryRun).toBe(false);
+    expect(result.json).toBe(false);
+  });
+
+  test('normalizeSceneExtractOptions trims and converts values', () => {
+    const result = normalizeSceneExtractOptions({
+      config: '  my-config.json  ',
+      type: '  entities  ',
+      pattern: '  crud  ',
+      out: '  /custom/out  ',
+      dryRun: true,
+      json: true
+    });
+    expect(result.config).toBe('my-config.json');
+    expect(result.type).toBe('entities');
+    expect(result.pattern).toBe('crud');
+    expect(result.out).toBe('/custom/out');
+    expect(result.dryRun).toBe(true);
+    expect(result.json).toBe(true);
+  });
+
+  test('normalizeSceneExtractOptions coerces non-boolean dryRun/json to false', () => {
+    const result = normalizeSceneExtractOptions({ dryRun: 'yes', json: 1 });
+    expect(result.dryRun).toBe(false);
+    expect(result.json).toBe(false);
+  });
+
+  // ─── validateSceneExtractOptions ──────────────────────────────
+
+  test('validateSceneExtractOptions returns null for valid options', () => {
+    expect(validateSceneExtractOptions({ type: 'entities', pattern: 'crud' })).toBeNull();
+    expect(validateSceneExtractOptions({ type: 'services', pattern: 'query' })).toBeNull();
+    expect(validateSceneExtractOptions({ type: 'screens', pattern: 'workflow' })).toBeNull();
+    expect(validateSceneExtractOptions({})).toBeNull();
+  });
+
+  test('validateSceneExtractOptions returns error for invalid type', () => {
+    const err = validateSceneExtractOptions({ type: 'invalid' });
+    expect(err).not.toBeNull();
+    expect(err).toContain('invalid --type');
+    expect(err).toContain('invalid');
+  });
+
+  test('validateSceneExtractOptions returns error for invalid pattern', () => {
+    const err = validateSceneExtractOptions({ pattern: 'unknown' });
+    expect(err).not.toBeNull();
+    expect(err).toContain('invalid --pattern');
+    expect(err).toContain('unknown');
+  });
+
+  // ─── printSceneExtractSummary ─────────────────────────────────
+
+  test('printSceneExtractSummary outputs JSON in json mode', () => {
+    const spy = jest.spyOn(console, 'log').mockImplementation();
+    const payload = {
+      success: true,
+      templates: [],
+      summary: { totalTemplates: 2, patterns: { crud: 1, query: 1, workflow: 0 }, outputDir: '/out' },
+      warnings: []
+    };
+    printSceneExtractSummary({ json: true }, payload);
+    expect(spy).toHaveBeenCalledWith(JSON.stringify(payload, null, 2));
+    spy.mockRestore();
+  });
+
+  test('printSceneExtractSummary outputs human-readable summary', () => {
+    const spy = jest.spyOn(console, 'log').mockImplementation();
+    const payload = {
+      success: true,
+      templates: [],
+      summary: { totalTemplates: 3, patterns: { crud: 2, query: 1, workflow: 0 }, outputDir: '/out' },
+      warnings: []
+    };
+    printSceneExtractSummary({ json: false }, payload);
+    const output = spy.mock.calls.map(c => c[0]).join('\n');
+    expect(output).toContain('3');
+    expect(output).toContain('CRUD');
+    expect(output).toContain('Query');
+    spy.mockRestore();
+  });
+
+  test('printSceneExtractSummary shows dry-run indicator', () => {
+    const spy = jest.spyOn(console, 'log').mockImplementation();
+    const payload = {
+      success: true,
+      templates: [],
+      summary: { totalTemplates: 0, patterns: { crud: 0, query: 0, workflow: 0 }, outputDir: '/out' },
+      warnings: []
+    };
+    printSceneExtractSummary({ json: false, dryRun: true }, payload);
+    const output = spy.mock.calls.map(c => c[0]).join('\n');
+    expect(output).toContain('dry-run');
+    spy.mockRestore();
+  });
+
+  test('printSceneExtractSummary shows error on failure', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation();
+    const payload = {
+      success: false,
+      error: { code: 'AUTH_FAILED', message: 'Login failed' }
+    };
+    printSceneExtractSummary({ json: false }, payload);
+    expect(spy).toHaveBeenCalled();
+    const output = spy.mock.calls.map(c => c[0]).join('\n');
+    expect(output).toContain('Login failed');
+    spy.mockRestore();
+  });
+
+  // ─── runSceneExtractCommand ───────────────────────────────────
+
+  test('runSceneExtractCommand returns null when --type is invalid', async () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation();
+    const result = await runSceneExtractCommand({ type: 'badtype' });
+    expect(result).toBeNull();
+    expect(process.exitCode).toBe(1);
+    spy.mockRestore();
+    process.exitCode = 0;
+  });
+
+  test('runSceneExtractCommand returns null when --pattern is invalid', async () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation();
+    const result = await runSceneExtractCommand({ pattern: 'badpattern' });
+    expect(result).toBeNull();
+    expect(process.exitCode).toBe(1);
+    spy.mockRestore();
+    process.exitCode = 0;
   });
 });

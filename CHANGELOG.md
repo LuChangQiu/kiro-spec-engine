@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.28.0] - 2026-02-10
+
+### Added
+- **Scene Package Install**: Install published scene packages from local registry
+  - `kse scene install --name <packageName>` install scene package from registry
+    - `--version <version>` exact version or omit for latest
+    - `--out <dir>` custom target directory (default: `./{packageName}`)
+    - `--registry <dir>` custom registry directory
+    - `--force` overwrite existing installation
+    - `--dry-run` preview without writing files
+    - `--json` structured JSON output
+  - SHA-256 integrity verification before extraction
+  - Tarball decompression and file extraction preserving relative paths
+  - Install manifest (`scene-install-manifest.json`) with package metadata, timestamp, file list
+  - Automatic latest version resolution from registry index
+  - Completes publish → install lifecycle for scene packages
+  - Implements Spec 78-00-scene-package-install
+
 ## [1.27.0] - 2026-02-10
 
 ### Added

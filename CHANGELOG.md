@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.29.0] - 2026-02-10
+
+### Added
+- **Scene Registry Query**: List and search scene packages in local registry
+  - `kse scene list` list all packages in registry
+    - `--registry <dir>` custom registry directory
+    - `--json` structured JSON output
+  - `kse scene search --query <term>` search packages by keyword
+    - Case-insensitive substring matching on name, description, and group
+    - `--registry <dir>` custom registry directory
+    - `--json` structured JSON output
+  - Shared helpers: `buildRegistryPackageList`, `filterRegistryPackages`
+  - Follows normalize → validate → run → print pattern
+  - Implements Spec 79-00-scene-registry-query
+
 ## [1.28.0] - 2026-02-10
 
 ### Added

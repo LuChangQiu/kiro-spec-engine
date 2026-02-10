@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.33.0] - 2026-02-10
+
+### Added
+- **Scene Package Directory Validation**: Comprehensive validation for scene package directories
+  - `kse scene package-validate --package <dir>` now supports directory-level validation
+    - `--strict` treat warnings as errors (exit code 1)
+    - `--json` structured JSON output
+  - Validates `scene-package.json` existence and required fields
+  - Contract-level validation via `validateScenePackageContract`
+  - Semver validation for `metadata.version` using `semver.valid`
+  - File existence checks for `artifacts.entry_scene` and `artifacts.generates`
+  - Template variable schema validation if `variables` present
+  - Collects all errors/warnings (no early exit)
+  - New `validateScenePackageDirectory` helper for programmatic use
+  - Follows normalize → validate → run → print pattern
+  - Implements Spec 83-00-scene-validate
+
 ## [1.32.0] - 2026-02-10
 
 ### Added

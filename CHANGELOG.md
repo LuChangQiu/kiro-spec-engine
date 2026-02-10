@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.31.0] - 2026-02-10
+
+### Added
+- **Scene Package Diff**: Compare two versions of a scene package in the local registry
+  - `kse scene diff --name <pkg> --from <v1> --to <v2>` compare package versions
+    - `--registry <dir>` custom registry directory
+    - `--json` structured JSON output
+    - `--stat` show only file change summary
+  - Extracts and decompresses tarballs from registry
+  - Categorizes files as added, removed, modified, or unchanged
+  - Shows changed line counts for modified text files
+  - Shared helper: `buildPackageDiff`
+  - Follows normalize → validate → run → print pattern
+  - Implements Spec 81-00-scene-diff
+
 ## [1.30.0] - 2026-02-10
 
 ### Added

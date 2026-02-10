@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.39.0] - 2026-02-10
+
+### Added
+- **Moqui ERP Adapter**: Integrate Moqui ERP instance into KSE scene runtime
+  - `MoquiClient` — HTTP client with JWT auth lifecycle (login, refresh, re-login, logout), retry logic using Node.js built-in `http`/`https`
+  - `MoquiAdapter` — Binding handler for `spec.erp.*` and `moqui.*` refs, entity CRUD, service invocation, screen discovery
+  - `kse scene connect` — Test connectivity and authentication to Moqui ERP instance
+    - `--config <path>` custom adapter config path
+    - `--json` structured JSON output
+  - `kse scene discover` — Discover available entities, services, and screens from Moqui ERP
+    - `--config <path>` custom adapter config path
+    - `--type <type>` filter by catalog type (entities|services|screens)
+    - `--json` structured JSON output
+
+### Fixed
+- **Jest forceExit**: Added `forceExit: true` to jest configs to prevent CI hang from leaked worker processes
+
 ## [1.38.0] - 2026-02-10
 
 ### Added

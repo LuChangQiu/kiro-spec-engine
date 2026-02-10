@@ -39,5 +39,8 @@ module.exports = {
   verbose: true,
   
   // Test timeout
-  testTimeout: 10000
+  testTimeout: 10000,
+
+  // Force exit after all tests complete to prevent worker hang from leaked timers/handles
+  forceExit: true
 };

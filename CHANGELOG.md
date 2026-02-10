@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.34.0] - 2026-02-10
+
+### Added
+- **Scene Package Deprecation**: Mark/unmark package versions as deprecated in local registry
+  - `kse scene deprecate --name <pkg> --message <msg>` deprecate all versions
+    - `--version <v>` target specific version
+    - `--undo` remove deprecation marker
+    - `--registry <dir>` custom registry directory
+    - `--json` structured JSON output
+  - Adds `deprecated` field to version entries in `registry-index.json`
+  - `scene install` now prints yellow warning when installing deprecated versions
+  - `scene info` now shows `[DEPRECATED]` marker with message for deprecated versions
+  - Follows normalize → validate → run → print pattern
+  - Implements Spec 84-00-scene-deprecate
+
 ## [1.33.0] - 2026-02-10
 
 ### Added

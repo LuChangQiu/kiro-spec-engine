@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.36.0] - 2026-02-10
+
+### Added
+- **Scene Package Ownership**: Manage package ownership metadata in local registry
+  - `kse scene owner set --name <pkg> --owner <owner>` set package owner
+  - `kse scene owner show --name <pkg>` display current owner
+  - `kse scene owner list --owner <owner>` list packages by owner (case-insensitive)
+  - `kse scene owner transfer --name <pkg> --from <old> --to <new>` transfer ownership
+    - `--remove` clear owner field
+    - `--registry <dir>` custom registry directory
+    - `--json` structured JSON output
+  - Owner stored at package level in `registry-index.json`
+  - Case-insensitive matching for list and transfer validation
+
 ## [1.35.0] - 2026-02-10
 
 ### Added

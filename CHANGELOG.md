@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.38.0] - 2026-02-10
+
+### Added
+- **Scene Registry Statistics**: Dashboard for local scene package registry metrics
+  - `kse scene stats` show aggregate statistics (packages, versions, tags, ownership, deprecation, last publish)
+    - `--registry <dir>` custom registry directory
+    - `--json` structured JSON output
+- **Scene Version Locking**: Protect specific package versions from accidental unpublish
+  - `kse scene lock set --name <pkg> --version <ver>` lock a version
+  - `kse scene lock rm --name <pkg> --version <ver>` unlock a version
+  - `kse scene lock ls --name <pkg>` list locked versions
+    - `--registry <dir>` custom registry directory
+    - `--json` structured JSON output
+  - Lock state stored as `locked: true` on version entries in `registry-index.json`
+
 ## [1.37.0] - 2026-02-10
 
 ### Added

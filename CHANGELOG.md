@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.32.0] - 2026-02-10
+
+### Added
+- **Scene Package Info**: Display detailed package information from local registry
+  - `kse scene info --name <packageName>` show package details
+    - `--registry <dir>` custom registry directory
+    - `--json` structured JSON output
+    - `--versions-only` show only version list
+  - Displays package metadata, description, group, all published versions
+  - Shows latest version, total version count, publish dates
+  - Sorted version list (newest first) using `semver.rcompare`
+  - Follows normalize → validate → run → print pattern
+  - Implements Spec 82-00-scene-info
+
 ## [1.31.0] - 2026-02-10
 
 ### Added

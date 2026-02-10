@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.30.0] - 2026-02-10
+
+### Added
+- **Scene Version Bump**: Bump version in scene-package.json following semver
+  - `kse scene version --bump <major|minor|patch|x.y.z>` bump scene package version
+    - `--package <dir>` scene package directory (default: current directory)
+    - `--dry-run` preview without writing
+    - `--json` structured JSON output
+  - Supports major, minor, patch increments and explicit semver strings
+  - Validates explicit version is greater than current version
+  - Follows normalize → validate → run → print pattern
+  - Implements Spec 80-00-scene-version-bump
+
 ## [1.29.0] - 2026-02-10
 
 ### Added

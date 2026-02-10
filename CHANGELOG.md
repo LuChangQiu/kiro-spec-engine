@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.35.0] - 2026-02-10
+
+### Added
+- **Scene Registry Audit**: Health check for local scene package registry
+  - `kse scene audit` scan registry index, verify tarball existence and SHA-256 integrity
+    - `--registry <dir>` custom registry directory (default `.kiro/registry`)
+    - `--fix` auto-remove orphaned tarballs and clean missing-tarball index entries
+    - `--json` structured JSON output
+  - Detects missing tarballs, integrity mismatches, orphaned tarballs, deprecated versions
+  - Summary report with grouped issue lists and fix results
+
 ## [1.34.0] - 2026-02-10
 
 ### Added

@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.41.0] - 2026-02-11
+
+### Added
+- **Scene Template Quality Pipeline**: Comprehensive quality assurance for scene template packages
+  - **Lint Engine** (`scene-template-linter.js`): 7-category quality checks
+    - Manifest completeness (required fields, apiVersion, metadata)
+    - Scene manifest completeness (capability_contract, governance_contract)
+    - Binding ref format validation (`spec.*` / `moqui.*` patterns)
+    - Governance reasonableness (risk_level, approval, idempotency)
+    - Package consistency (name/version match between package and manifest)
+    - Template variable validation (type, required, default values)
+    - Documentation checks (README, inline comments)
+  - **Quality Score Calculator**: 4-dimension scoring with 0-100 scale
+    - Contract validity, lint pass rate, documentation quality, governance completeness
+    - Configurable dimension weights
+  - `kse scene lint` — Lint scene package for quality issues
+    - `--package <path>` scene package directory
+    - `--strict` treat warnings as errors
+    - `--json` structured JSON output
+  - `kse scene score` — Calculate quality score (0-100)
+    - `--package <path>` scene package directory
+    - `--strict` fail if score below threshold (default 60)
+    - `--json` structured JSON output
+  - `kse scene contribute` — One-stop contribute pipeline: validate → lint → score → publish
+    - `--package <path>` scene package directory
+    - `--registry <dir>` custom registry directory
+    - `--skip-lint` skip lint step
+    - `--dry-run` preview without publishing
+    - `--json` structured JSON output
+
 ## [1.40.0] - 2026-02-10
 
 ### Added

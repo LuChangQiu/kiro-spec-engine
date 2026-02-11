@@ -275,6 +275,12 @@ sequenceDiagram
   - 基于模式的清单生成，包含治理合约
 - **CLI 命令**: `scene connect`、`scene discover`、`scene extract`，支持 `--json` 输出
 
+### 场景模板质量流水线 🚀 v1.41.0 新增
+- **模板 Lint 引擎**: 7 类质量检查（清单完整性、绑定引用、治理合约、一致性、变量、文档）
+- **质量评分计算器**: 4 维度评分（合约有效性、lint 通过率、文档质量、治理完整性），0-100 分制
+- **一站式贡献流水线**: 验证 → Lint → 评分 → 预览 → 发布，一条命令完成
+- **CLI 命令**: `scene lint`、`scene score`、`scene contribute`，支持 `--strict`、`--dry-run`、`--skip-lint`、`--json`
+
 ### 场景模板引擎 🚀 v1.25.0 新增
 - **模板变量 Schema**: 在 scene-package.json 中定义类型化变量（string, number, boolean, enum, array）及验证规则
 - **多文件渲染**: 递归模板处理，支持 `{{variable}}` 替换、`{{#if}}` 条件、`{{#each}}` 循环
@@ -354,6 +360,11 @@ kse scene template-render --package <name> --values <json> --out <dir>  # 渲染
 kse scene connect --config <path>              # 测试 Moqui ERP 实例连接
 kse scene discover --config <path>             # 发现 Moqui 实体、服务、屏幕
 kse scene extract --config <path> --out <dir>  # 从 Moqui 提取场景模板 (v1.40.0)
+
+# 场景模板质量流水线 (v1.41.0 新增)
+kse scene lint --package <path>                # Lint 场景包质量检查
+kse scene score --package <path>               # 计算质量评分 (0-100)
+kse scene contribute --package <path>          # 一站式验证 → lint → 评分 → 发布
 
 # DevOps 运维
 kse ops init <project-name>        # 初始化运维 specs

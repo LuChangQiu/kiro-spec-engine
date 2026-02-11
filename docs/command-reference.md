@@ -2,8 +2,8 @@
 
 > Quick reference for all kse commands
 
-**Version**: 1.19.0  
-**Last Updated**: 2026-01-31
+**Version**: 1.41.0  
+**Last Updated**: 2026-02-11
 
 ---
 
@@ -229,6 +229,26 @@ kse scene discover --config ./moqui-config.json --type entities --json
 kse scene extract --config <path> --out <dir>
 kse scene extract --config ./moqui-config.json --type entities --pattern crud --out ./templates --json
 kse scene extract --config ./moqui-config.json --dry-run --json
+```
+
+### Scene Template Quality Pipeline
+
+```bash
+# Lint scene package for quality issues (7-category checks)
+kse scene lint --package <path>
+kse scene lint --package ./my-scene-package --json
+kse scene lint --package ./my-scene-package --strict
+
+# Calculate quality score (0-100, 4-dimension scoring)
+kse scene score --package <path>
+kse scene score --package ./my-scene-package --json
+kse scene score --package ./my-scene-package --strict
+
+# One-stop contribute pipeline: validate → lint → score → preview → publish
+kse scene contribute --package <path>
+kse scene contribute --package ./my-scene-package --registry ./registry --json
+kse scene contribute --package ./my-scene-package --dry-run
+kse scene contribute --package ./my-scene-package --skip-lint --json
 ```
 
 ### Version & Upgrade

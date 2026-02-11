@@ -319,6 +319,12 @@ Structure your work with Requirements → Design → Tasks workflow
   - Pattern-based manifest generation with governance contracts
 - **CLI Commands**: `scene connect`, `scene discover`, `scene extract` with `--json` support
 
+### Scene Template Quality Pipeline 🚀 NEW in v1.41.0
+- **Template Lint Engine**: 7-category quality checks for scene packages (manifest completeness, binding refs, governance, consistency, variables, documentation)
+- **Quality Score Calculator**: 4-dimension scoring (contract validity, lint pass rate, documentation quality, governance completeness) with 0-100 scale
+- **One-Stop Contribute Pipeline**: Validate → Lint → Score → Preview → Publish in a single command
+- **CLI Commands**: `scene lint`, `scene score`, `scene contribute` with `--strict`, `--dry-run`, `--skip-lint`, `--json` support
+
 ### Scene Template Engine 🚀 NEW in v1.25.0
 - **Template Variable Schema**: Define typed variables (string, number, boolean, enum, array) with validation rules in scene-package.json
 - **Multi-File Rendering**: Recursive template processing with `{{variable}}` substitution, `{{#if}}` conditionals, `{{#each}}` loops
@@ -450,6 +456,11 @@ kse scene template-render --package <name> --values <json> --out <dir>  # Render
 kse scene connect --config <path>              # Test connectivity to Moqui ERP instance
 kse scene discover --config <path>             # Discover entities, services, screens from Moqui
 kse scene extract --config <path> --out <dir>  # Extract scene templates from Moqui (v1.40.0)
+
+# Scene template quality pipeline (NEW in v1.41.0)
+kse scene lint --package <path>                # Lint scene package for quality issues
+kse scene score --package <path>               # Calculate quality score (0-100)
+kse scene contribute --package <path>          # One-stop validate → lint → score → publish
 
 # DevOps operations
 kse ops init <project-name>        # Initialize operations specs

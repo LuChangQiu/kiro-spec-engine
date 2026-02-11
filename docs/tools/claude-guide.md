@@ -4,8 +4,8 @@
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-01-23  
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11  
 **Tool**: Claude Code (Anthropic)  
 **Integration Mode**: Manual Export  
 **Estimated Setup Time**: 3 minutes
@@ -649,5 +649,5 @@ kse-clip 01-00-my-feature
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-01-23
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11

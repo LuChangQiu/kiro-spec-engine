@@ -4,8 +4,8 @@
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-01-23  
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11  
 **Audience**: Intermediate  
 **Estimated Time**: 8 minutes
 
@@ -525,5 +525,5 @@ Manual Export → Watch Mode → Native Integration
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-01-23
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11

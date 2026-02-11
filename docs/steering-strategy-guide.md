@@ -191,6 +191,6 @@ A: Yes, but you'll need to manually manage the steering files and update the con
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-01-23  
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11  
 **Spec**: 03-00-multi-user-and-cross-tool-support

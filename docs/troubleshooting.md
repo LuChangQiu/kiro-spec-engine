@@ -4,8 +4,8 @@
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-01-23  
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11  
 **Audience**: All Users  
 **Estimated Time**: Reference as needed
 
@@ -1130,5 +1130,5 @@ kse docs cleanup --dry-run
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-01-23
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11

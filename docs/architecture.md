@@ -21,7 +21,8 @@ This document provides detailed architecture diagrams and explanations for Kiro 
 ┌─────────────────────────────────────────────────────────────────────┐
 │                          User Interface                              │
 │                    (CLI Commands: kse adopt,                        │
-│                     kse upgrade, kse rollback)                      │
+│                     kse upgrade, kse rollback,                      │
+│                     kse scene ...)                                   │
 └─────────────────────────────────────────────────────────────────────┘
                                   │
                                   ▼
@@ -30,6 +31,32 @@ This document provides detailed architecture diagrams and explanations for Kiro 
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐             │
 │  │   adopt.js   │  │  upgrade.js  │  │ rollback.js  │             │
 │  └──────────────┘  └──────────────┘  └──────────────┘             │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐             │
+│  │   scene.js   │  │ workspace.js │  │    env.js    │             │
+│  └──────────────┘  └──────────────┘  └──────────────┘             │
+└─────────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                      Scene Runtime Layer                             │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐ │
+│  │ scene-ontology   │  │ scene-template-  │  │ moqui-adapter    │ │
+│  │                  │  │ linter           │  │                  │ │
+│  │ - OntologyGraph  │  │ - lintPackage()  │  │ - MoquiClient    │ │
+│  │ - buildFromManif │  │ - scoreQuality() │  │ - MoquiAdapter   │ │
+│  │ - validateGraph  │  │ - contribute()   │  │ - MoquiExtractor │ │
+│  │ - queryDeps      │  │ - scoreAgent()   │  │                  │ │
+│  │ - getActionInfo  │  │                  │  │                  │ │
+│  │ - parseLineage   │  │                  │  │                  │ │
+│  │ - getAgentHints  │  │                  │  │                  │ │
+│  └──────────────────┘  └──────────────────┘  └──────────────────┘ │
+│  ┌──────────────────┐  ┌──────────────────┐                        │
+│  │ scene-template-  │  │ scene-template-  │                        │
+│  │ validator        │  │ renderer         │                        │
+│  │                  │  │                  │                        │
+│  │ - validateSchema │  │ - renderPackage()│                        │
+│  │ - resolveChain() │  │ - resolveVars()  │                        │
+│  └──────────────────┘  └──────────────────┘                        │
 └─────────────────────────────────────────────────────────────────────┘
                                   │
                                   ▼
@@ -702,5 +729,5 @@ START
 
 ---
 
-**Version**: 1.0  
-**Last Updated**: 2026-01-23
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11

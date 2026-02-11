@@ -89,5 +89,5 @@ You're now using Spec-driven development. Your AI understands the methodology an
 
 ---
 
-**Version**: 2.0.0  
-**Last Updated**: 2026-01-24
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11

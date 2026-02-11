@@ -4,7 +4,7 @@
 
 ---
 
-**Version**: 1.0.0  
+**Version**: 1.42.0  
 **Last Updated**: 2026-01-24  
 **Audience**: All Users  
 **Estimated Time**: 15 minutes
@@ -860,5 +860,5 @@ kse docs diagnose
 
 ---
 
-**Version**: 1.0.0  
+**Version**: 1.42.0  
 **Last Updated**: 2026-01-24

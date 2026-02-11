@@ -31,6 +31,10 @@ Kiro Spec Engine follows a modular architecture with clear separation of concern
 │  │  Adoption    │  │   Upgrade    │  │   Backup     │     │
 │  │  System      │  │   System     │  │   System     │     │
 │  └──────────────┘  └──────────────┘  └──────────────┘     │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
+│  │  Scene       │  │  Workspace   │  │ Environment  │     │
+│  │  Runtime     │  │  Manager     │  │  Manager     │     │
+│  └──────────────┘  └──────────────┘  └──────────────┘     │
 └─────────────────────────────────────────────────────────────┘
                             │
                             ▼
@@ -611,5 +615,5 @@ test: add property tests for backup system
 
 ---
 
-**Version**: 1.0  
-**Last Updated**: 2026-01-23
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11

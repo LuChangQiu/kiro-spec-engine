@@ -344,5 +344,5 @@ kse workflows --suggest-next
 - [Quick Start Guide](./quick-start.md)
 - [FAQ](./faq.md)
 
-**Version**: 1.0  
+**Version**: 1.42.0  
 **Last Updated**: 2026-01-24

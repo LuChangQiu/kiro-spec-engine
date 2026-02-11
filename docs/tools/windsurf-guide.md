@@ -4,8 +4,8 @@
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-01-23  
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11  
 **Tool**: Windsurf  
 **Integration Mode**: Native + Manual Export + Watch Mode  
 **Estimated Setup Time**: 10 minutes
@@ -386,5 +386,5 @@ kse create-spec 01-00-my-feature
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-01-23
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11

@@ -4,8 +4,8 @@
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-01-23  
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11  
 **Tool**: VS Code + GitHub Copilot  
 **Integration Mode**: Manual Export + Inline Context  
 **Estimated Setup Time**: 5 minutes
@@ -440,5 +440,5 @@ kse create-spec 01-00-my-feature
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-01-23
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11

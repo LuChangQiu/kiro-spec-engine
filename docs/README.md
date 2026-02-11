@@ -4,8 +4,8 @@
 
 ---
 
-**Version**: 1.17.0  
-**Last Updated**: 2026-01-31
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11
 
 ---
 
@@ -80,6 +80,7 @@ Detailed technical documentation:
 - **[Command Reference](command-reference.md)** - All kse commands with examples
 - **[Environment Management Guide](environment-management-guide.md)** - Multi-environment configuration management
 - **[Multi-Repository Management Guide](multi-repo-management-guide.md)** - Managing multiple Git repositories
+- **[Scene Runtime Guide](scene-runtime-guide.md)** - Scene template engine, quality pipeline, ontology, and Moqui ERP integration
 - **[Troubleshooting](troubleshooting.md)** - Solutions to common problems
 - **[FAQ](faq.md)** - Answers to frequently asked questions
 
@@ -91,6 +92,7 @@ Detailed technical documentation:
 - **[Upgrade Guide](upgrade-guide.md)** - Upgrading kse to newer versions
 - **[Environment Management Guide](environment-management-guide.md)** - Managing multiple environments
 - **[Multi-Repository Management Guide](multi-repo-management-guide.md)** - Managing multiple Git repositories
+- **[Scene Runtime Guide](scene-runtime-guide.md)** - Scene template engine, quality pipeline, ontology, and Moqui ERP integration
 - **[Developer Guide](developer-guide.md)** - Contributing to kse development
 - **[Architecture](architecture.md)** - kse system architecture
 
@@ -165,6 +167,13 @@ Detailed technical documentation:
 - [Repository Commands](command-reference.md#multi-repository-management)
 - [Multi-Repo Workflows](multi-repo-management-guide.md#common-workflows)
 
+### Scene Runtime
+- [Scene Runtime Guide](scene-runtime-guide.md)
+- [Scene Template Engine](command-reference.md#scene-template-engine)
+- [Scene Quality Pipeline](command-reference.md#scene-template-quality-pipeline)
+- [Scene Ontology](command-reference.md#scene-ontology-enhancement)
+- [Moqui ERP Integration](command-reference.md#moqui-erp-integration)
+
 ### Context Export
 - [Manual Export Mode](integration-modes.md#mode-2-manual-export)
 - [Export Commands](command-reference.md#context--prompts)
@@ -211,11 +220,12 @@ Detailed technical documentation:
 | Integration Modes | ✅ Complete | 2026-01-23 |
 | Tool Guides (6) | ✅ Complete | 2026-01-23 |
 | Examples (3) | ✅ Complete | 2026-01-23 |
-| FAQ | ✅ Complete | 2026-01-23 |
+| FAQ | ✅ Complete | 2026-02-11 |
 | Troubleshooting | ✅ Complete | 2026-01-23 |
-| Command Reference | ✅ Complete | 2026-01-31 |
+| Command Reference | ✅ Complete | 2026-02-11 |
 | Environment Management | ✅ Complete | 2026-01-31 |
 | Multi-Repository Management | ✅ Complete | 2026-01-31 |
+| Scene Runtime Guide | ✅ Complete | 2026-02-11 |
 
 ---
 

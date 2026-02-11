@@ -460,6 +460,6 @@ git commit -m "spec: add new feature specification"
 
 ---
 
-**Version**: 1.0  
-**Last Updated**: 2026-01-30  
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11  
 **Related**: [Environment Management Guide](environment-management-guide.md), [.kiro/README.md](../.kiro/README.md)

@@ -222,6 +222,7 @@ sequenceDiagram
 - 📄 **[Document Governance](docs/document-governance.md)** - Automated document management
 - 🌍 **[Environment Management](docs/environment-management-guide.md)** - Multi-environment configuration
 - 📦 **[Multi-Repository Management](docs/multi-repo-management-guide.md)** - Manage multiple Git repositories
+- 🎭 **[Scene Runtime](docs/scene-runtime-guide.md)** - Template engine, quality pipeline, ontology, Moqui ERP
 - 🔌 **[Integration Modes](docs/integration-modes.md)** - Three ways to integrate kse
 - 📝 **[Command Reference](docs/command-reference.md)** - All kse commands
 
@@ -328,8 +329,8 @@ Structure your work with Requirements → Design → Tasks workflow
 - **CLI Commands**: `scene ontology show|deps|validate|actions|lineage|agent-info` with `--json` support
 
 ### Scene Template Quality Pipeline 🚀 NEW in v1.41.0
-- **Template Lint Engine**: 7-category quality checks for scene packages (manifest completeness, binding refs, governance, consistency, variables, documentation)
-- **Quality Score Calculator**: 4-dimension scoring (contract validity, lint pass rate, documentation quality, governance completeness) with 0-100 scale
+- **Template Lint Engine**: 10-category quality checks for scene packages (manifest completeness, binding refs, governance, consistency, variables, documentation, action abstraction, data lineage, agent hints)
+- **Quality Score Calculator**: 4-dimension scoring + agent_readiness bonus (contract validity, lint pass rate, documentation quality, governance completeness + agent readiness max +10) with 0-100+ scale
 - **One-Stop Contribute Pipeline**: Validate → Lint → Score → Preview → Publish in a single command
 - **CLI Commands**: `scene lint`, `scene score`, `scene contribute` with `--strict`, `--dry-run`, `--skip-lint`, `--json` support
 
@@ -602,5 +603,5 @@ A deep conversation about AI development trends, Neo-Confucian philosophy, and s
 
 ---
 
-**Version**: 1.25.0  
-**Last Updated**: 2026-02-09
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11

@@ -4,8 +4,8 @@
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-01-23  
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11  
 **Tool**: Any AI Tool  
 **Integration Mode**: Manual Export  
 **Estimated Setup Time**: 2 minutes
@@ -441,5 +441,5 @@ kse context export 01-00-my-feature
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-01-23
+**Version**: 1.42.0  
+**Last Updated**: 2026-02-11

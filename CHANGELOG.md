@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.43.0] - 2026-02-11
+
+### Added
+- **Multi-Agent Parallel Coordination**: Infrastructure for multiple AI agents working on the same project simultaneously
+  - **MultiAgentConfig** (`lib/collab/multi-agent-config.js`): Configuration management for multi-agent mode via `.kiro/config/multi-agent.json`
+  - **AgentRegistry** (`lib/collab/agent-registry.js`): Agent lifecycle management with MachineIdentifier-based ID generation, heartbeat monitoring, and inactive agent cleanup
+  - **TaskLockManager** (`lib/lock/task-lock-manager.js`): File-based task locking with atomic lock files (`.kiro/specs/{specName}/locks/{taskId}.lock`), single-agent backward compatibility
+  - **TaskStatusStore** (`lib/task/task-status-store.js`): Concurrent-safe task status updates with file locking, exponential backoff retry, and line-content validation
+  - **SteeringFileLock** (`lib/lock/steering-file-lock.js`): Steering file write serialization with pending-file degradation fallback
+  - **MergeCoordinator** (`lib/collab/merge-coordinator.js`): Git branch management for agent isolation (`agent/{agentId}/{specName}`), conflict detection, auto-merge
+  - **Coordinator** (`lib/collab/coordinator.js`): Central task assignment based on dependency-driven ready task computation, progress tracking, coordination logging
+  - **Module Exports**: New `lib/collab/index.js` and `lib/task/index.js`; updated `lib/lock/index.js` with TaskLockManager and SteeringFileLock
+  - All components are no-ops in single-agent mode (zero overhead, full backward compatibility)
+
 ## [1.42.0] - 2026-02-11
 
 ### Added

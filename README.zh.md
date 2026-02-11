@@ -276,6 +276,15 @@ sequenceDiagram
   - 基于模式的清单生成，包含治理合约
 - **CLI 命令**: `scene connect`、`scene discover`、`scene extract`，支持 `--json` 输出
 
+### 多 Agent 并行协调 🚀 v1.43.0 新增
+- **Agent 注册表**: 基于 MachineIdentifier 的 Agent 生命周期管理，心跳监控和不活跃清理
+- **任务锁管理器**: 基于文件的任务锁定，原子操作，单 Agent 向后兼容
+- **任务状态存储**: 并发安全的任务状态更新，指数退避重试
+- **Steering 文件锁**: 写入串行化，pending 文件降级回退
+- **合并协调器**: 每个 Agent 独立 Git 分支（`agent/{agentId}/{specName}`），冲突检测，自动合并
+- **中央协调器**: 基于依赖的就绪任务计算，任务分配，进度跟踪
+- **零开销**: 单 Agent 模式下所有组件为无操作（完全向后兼容）
+
 ### 场景 Ontology 增强 🚀 v1.42.0 新增
 - **OntologyGraph**: 绑定引用语义关系图（depends_on、composes、extends、produces）
 - **Action Abstraction**: 每个绑定的 intent、preconditions、postconditions，提升 AI 可读性

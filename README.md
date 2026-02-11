@@ -320,6 +320,15 @@ Structure your work with Requirements → Design → Tasks workflow
   - Pattern-based manifest generation with governance contracts
 - **CLI Commands**: `scene connect`, `scene discover`, `scene extract` with `--json` support
 
+### Multi-Agent Parallel Coordination 🚀 NEW in v1.43.0
+- **Agent Registry**: MachineIdentifier-based agent lifecycle with heartbeat monitoring and inactive cleanup
+- **Task Lock Manager**: File-based task locking with atomic operations, single-agent backward compatibility
+- **Task Status Store**: Concurrent-safe task status updates with exponential backoff retry
+- **Steering File Lock**: Write serialization with pending-file degradation fallback
+- **Merge Coordinator**: Git branch isolation per agent (`agent/{agentId}/{specName}`), conflict detection, auto-merge
+- **Central Coordinator**: Dependency-driven ready task computation, task assignment, progress tracking
+- **Zero Overhead**: All components are no-ops in single-agent mode (full backward compatibility)
+
 ### Scene Ontology Enhancement 🚀 NEW in v1.42.0
 - **OntologyGraph**: Semantic relationship graph for binding refs (depends_on, composes, extends, produces)
 - **Action Abstraction**: Intent, preconditions, postconditions per binding for AI agent understanding

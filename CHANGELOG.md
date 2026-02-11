@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.43.1] - 2026-02-11
+
+### Changed
+- **Agent Onboarding Document** (`template/.kiro/README.md`, `.kiro/README.md`): Comprehensive rewrite of "kse Capabilities" section listing all commands and features (Core, Task, Spec Locking, Workspace, Environment, Multi-Repo, Collab, Multi-Agent Coordination, Autonomous Control, Scene Runtime, Document Governance, DevOps, Knowledge Management)
+- **CORE_PRINCIPLES Principle 9**: Strengthened version sync and steering refresh principle — `.kiro/README.md` is now the authoritative agent onboarding entry point for understanding all kse capabilities
+
 ## [1.43.0] - 2026-02-11
 
 ### Added

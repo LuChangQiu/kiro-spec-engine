@@ -2,7 +2,7 @@
 
 > Quick reference for all kse commands
 
-**Version**: 1.41.0  
+**Version**: 1.42.0  
 **Last Updated**: 2026-02-11
 
 ---
@@ -234,12 +234,12 @@ kse scene extract --config ./moqui-config.json --dry-run --json
 ### Scene Template Quality Pipeline
 
 ```bash
-# Lint scene package for quality issues (7-category checks)
+# Lint scene package for quality issues (10-category checks)
 kse scene lint --package <path>
 kse scene lint --package ./my-scene-package --json
 kse scene lint --package ./my-scene-package --strict
 
-# Calculate quality score (0-100, 4-dimension scoring)
+# Calculate quality score (0-100, 5-dimension scoring with agent_readiness)
 kse scene score --package <path>
 kse scene score --package ./my-scene-package --json
 kse scene score --package ./my-scene-package --strict
@@ -249,6 +249,34 @@ kse scene contribute --package <path>
 kse scene contribute --package ./my-scene-package --registry ./registry --json
 kse scene contribute --package ./my-scene-package --dry-run
 kse scene contribute --package ./my-scene-package --skip-lint --json
+```
+
+### Scene Ontology Enhancement
+
+```bash
+# Show ontology graph (nodes and edges) from scene manifest
+kse scene ontology show --package <path>
+kse scene ontology show --package ./my-scene-package --json
+
+# Query dependency chain for a specific node reference
+kse scene ontology deps --package <path> --ref <node-ref>
+kse scene ontology deps --package ./my-scene-package --ref entity:Order --json
+
+# Validate ontology graph (detect dangling edges, cycles)
+kse scene ontology validate --package <path>
+kse scene ontology validate --package ./my-scene-package --json
+
+# Show action abstraction info (inputs, outputs, side-effects)
+kse scene ontology actions --package <path>
+kse scene ontology actions --package ./my-scene-package --ref service:createOrder --json
+
+# Parse and display data lineage (source → transform → sink)
+kse scene ontology lineage --package <path>
+kse scene ontology lineage --package ./my-scene-package --ref entity:Order --json
+
+# Show agent hints (autonomous operation guidance)
+kse scene ontology agent-info --package <path>
+kse scene ontology agent-info --package ./my-scene-package --json
 ```
 
 ### Version & Upgrade

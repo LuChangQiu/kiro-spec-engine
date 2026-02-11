@@ -69,7 +69,21 @@ const {
   normalizeSceneExtractOptions,
   validateSceneExtractOptions,
   printSceneExtractSummary,
-  runSceneExtractCommand
+  runSceneExtractCommand,
+  normalizeOntologyOptions,
+  validateOntologyOptions,
+  runSceneOntologyShowCommand,
+  runSceneOntologyDepsCommand,
+  runSceneOntologyValidateCommand,
+  runSceneOntologyActionsCommand,
+  runSceneOntologyLineageCommand,
+  runSceneOntologyAgentInfoCommand,
+  printSceneOntologyShowSummary,
+  printSceneOntologyDepsSummary,
+  printSceneOntologyValidateSummary,
+  printSceneOntologyActionsSummary,
+  printSceneOntologyLineageSummary,
+  printSceneOntologyAgentInfoSummary
 } = require('../../../lib/commands/scene');
 
 function normalizePath(targetPath) {
@@ -5460,5 +5474,330 @@ describe('Scene Extract CLI', () => {
     expect(process.exitCode).toBe(1);
     spy.mockRestore();
     process.exitCode = 0;
+  });
+});
+
+// ─── Scene Ontology CLI Tests ──────────────────────────────────────
+
+describe('Scene Ontology CLI', () => {
+  // ─── normalizeOntologyOptions ─────────────────────────────────
+
+  test('normalizeOntologyOptions returns defaults for empty input', () => {
+    const result = normalizeOntologyOptions();
+    expect(result).toEqual({ package: '.', json: false, ref: null });
+  });
+
+  test('normalizeOntologyOptions trims and preserves values', () => {
+    const result = normalizeOntologyOptions({ package: '  ./pkg  ', json: true, ref: '  moqui.Order.list  ' });
+    expect(result).toEqual({ package: './pkg', json: true, ref: 'moqui.Order.list' });
+  });
+
+  test('normalizeOntologyOptions handles non-boolean json', () => {
+    const result = normalizeOntologyOptions({ json: 'yes' });
+    expect(result.json).toBe(false);
+  });
+
+  // ─── validateOntologyOptions ──────────────────────────────────
+
+  test('validateOntologyOptions returns null when ref not required', () => {
+    expect(validateOntologyOptions({ ref: null }, false)).toBeNull();
+  });
+
+  test('validateOntologyOptions returns error when ref required but missing', () => {
+    expect(validateOntologyOptions({ ref: null }, true)).toBe('--ref is required');
+  });
+
+  test('validateOntologyOptions returns null when ref required and present', () => {
+    expect(validateOntologyOptions({ ref: 'a.b.c' }, true)).toBeNull();
+  });
+
+  // ─── runSceneOntologyShowCommand ──────────────────────────────
+
+  test('runSceneOntologyShowCommand returns graph payload on success', async () => {
+    const spy = jest.spyOn(console, 'log').mockImplementation();
+    const contract = {
+      capability_contract: {
+        bindings: [
+          { ref: 'moqui.Order.list', type: 'query' },
+          { ref: 'moqui.Order.update', type: 'mutation' }
+        ]
+      }
+    };
+    const mockFs = { readJson: jest.fn().mockResolvedValue(contract) };
+    const result = await runSceneOntologyShowCommand(
+      { package: '.' },
+      { fileSystem: mockFs, projectRoot: '/test' }
+    );
+    expect(result).not.toBeNull();
+    expect(result.success).toBe(true);
+    expect(result.graph.nodes.length).toBe(2);
+    spy.mockRestore();
+  });
+
+  test('runSceneOntologyShowCommand returns null on file read error', async () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation();
+    const mockFs = { readJson: jest.fn().mockRejectedValue(new Error('ENOENT')) };
+    const result = await runSceneOntologyShowCommand(
+      { package: './missing' },
+      { fileSystem: mockFs, projectRoot: '/test' }
+    );
+    expect(result).toBeNull();
+    expect(process.exitCode).toBe(1);
+    spy.mockRestore();
+    process.exitCode = 0;
+  });
+
+  test('runSceneOntologyShowCommand outputs JSON when --json', async () => {
+    const logs = [];
+    const spy = jest.spyOn(console, 'log').mockImplementation((...args) => logs.push(args.join(' ')));
+    const contract = { capability_contract: { bindings: [{ ref: 'a.b', type: 'query' }] } };
+    const mockFs = { readJson: jest.fn().mockResolvedValue(contract) };
+    await runSceneOntologyShowCommand(
+      { package: '.', json: true },
+      { fileSystem: mockFs, projectRoot: '/test' }
+    );
+    const parsed = JSON.parse(logs[0]);
+    expect(parsed.success).toBe(true);
+    expect(parsed.graph).toBeDefined();
+    spy.mockRestore();
+  });
+
+  // ─── runSceneOntologyDepsCommand ──────────────────────────────
+
+  test('runSceneOntologyDepsCommand returns null when --ref missing', async () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation();
+    const result = await runSceneOntologyDepsCommand({ package: '.' });
+    expect(result).toBeNull();
+    expect(process.exitCode).toBe(1);
+    spy.mockRestore();
+    process.exitCode = 0;
+  });
+
+  test('runSceneOntologyDepsCommand returns dependency chain', async () => {
+    const spy = jest.spyOn(console, 'log').mockImplementation();
+    const contract = {
+      capability_contract: {
+        bindings: [
+          { ref: 'a.b.list', type: 'query' },
+          { ref: 'a.b.update', type: 'mutation', depends_on: 'a.b.list' }
+        ]
+      }
+    };
+    const mockFs = { readJson: jest.fn().mockResolvedValue(contract) };
+    const result = await runSceneOntologyDepsCommand(
+      { package: '.', ref: 'a.b.update' },
+      { fileSystem: mockFs, projectRoot: '/test' }
+    );
+    expect(result).not.toBeNull();
+    expect(result.result.chain).toContain('a.b.list');
+    spy.mockRestore();
+  });
+
+  // ─── runSceneOntologyValidateCommand ──────────────────────────
+
+  test('runSceneOntologyValidateCommand returns valid result for consistent graph', async () => {
+    const spy = jest.spyOn(console, 'log').mockImplementation();
+    const contract = {
+      capability_contract: {
+        bindings: [
+          { ref: 'x.y.a', type: 'query' },
+          { ref: 'x.y.b', type: 'mutation' }
+        ]
+      }
+    };
+    const mockFs = { readJson: jest.fn().mockResolvedValue(contract) };
+    const result = await runSceneOntologyValidateCommand(
+      { package: '.' },
+      { fileSystem: mockFs, projectRoot: '/test' }
+    );
+    expect(result).not.toBeNull();
+    expect(result.success).toBe(true);
+    expect(result.result.valid).toBe(true);
+    spy.mockRestore();
+  });
+
+  test('runSceneOntologyValidateCommand returns null on error', async () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation();
+    const mockFs = { readJson: jest.fn().mockRejectedValue(new Error('bad')) };
+    const result = await runSceneOntologyValidateCommand(
+      { package: '.' },
+      { fileSystem: mockFs, projectRoot: '/test' }
+    );
+    expect(result).toBeNull();
+    expect(process.exitCode).toBe(1);
+    spy.mockRestore();
+    process.exitCode = 0;
+  });
+
+  // ─── runSceneOntologyActionsCommand ───────────────────────────
+
+  test('runSceneOntologyActionsCommand returns null when --ref missing', async () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation();
+    const result = await runSceneOntologyActionsCommand({ package: '.' });
+    expect(result).toBeNull();
+    expect(process.exitCode).toBe(1);
+    spy.mockRestore();
+    process.exitCode = 0;
+  });
+
+  test('runSceneOntologyActionsCommand returns action info', async () => {
+    const spy = jest.spyOn(console, 'log').mockImplementation();
+    const contract = {
+      capability_contract: {
+        bindings: [{
+          ref: 'moqui.Order.list',
+          type: 'query',
+          intent: 'Fetch orders',
+          preconditions: ['user.isAuth'],
+          postconditions: ['result.length >= 0']
+        }]
+      }
+    };
+    const mockFs = { readJson: jest.fn().mockResolvedValue(contract) };
+    const result = await runSceneOntologyActionsCommand(
+      { package: '.', ref: 'moqui.Order.list' },
+      { fileSystem: mockFs, projectRoot: '/test' }
+    );
+    expect(result).not.toBeNull();
+    expect(result.result.intent).toBe('Fetch orders');
+    expect(result.result.preconditions).toEqual(['user.isAuth']);
+    spy.mockRestore();
+  });
+
+  // ─── runSceneOntologyLineageCommand ───────────────────────────
+
+  test('runSceneOntologyLineageCommand returns null when --ref missing', async () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation();
+    const result = await runSceneOntologyLineageCommand({ package: '.' });
+    expect(result).toBeNull();
+    expect(process.exitCode).toBe(1);
+    spy.mockRestore();
+    process.exitCode = 0;
+  });
+
+  test('runSceneOntologyLineageCommand returns lineage info', async () => {
+    const spy = jest.spyOn(console, 'log').mockImplementation();
+    const contract = {
+      capability_contract: { bindings: [{ ref: 'a.b', type: 'query' }] },
+      governance_contract: {
+        data_lineage: {
+          sources: [{ ref: 'a.b', fields: ['id'] }],
+          transforms: [],
+          sinks: []
+        }
+      }
+    };
+    const mockFs = { readJson: jest.fn().mockResolvedValue(contract) };
+    const result = await runSceneOntologyLineageCommand(
+      { package: '.', ref: 'a.b' },
+      { fileSystem: mockFs, projectRoot: '/test' }
+    );
+    expect(result).not.toBeNull();
+    expect(result.result.asSource.length).toBe(1);
+    spy.mockRestore();
+  });
+
+  // ─── runSceneOntologyAgentInfoCommand ─────────────────────────
+
+  test('runSceneOntologyAgentInfoCommand returns null agent_hints when not defined', async () => {
+    const spy = jest.spyOn(console, 'log').mockImplementation();
+    const contract = { capability_contract: { bindings: [] } };
+    const mockFs = { readJson: jest.fn().mockResolvedValue(contract) };
+    const result = await runSceneOntologyAgentInfoCommand(
+      { package: '.' },
+      { fileSystem: mockFs, projectRoot: '/test' }
+    );
+    expect(result).not.toBeNull();
+    expect(result.result).toBeNull();
+    spy.mockRestore();
+  });
+
+  test('runSceneOntologyAgentInfoCommand returns agent hints', async () => {
+    const spy = jest.spyOn(console, 'log').mockImplementation();
+    const contract = {
+      capability_contract: { bindings: [] },
+      agent_hints: {
+        summary: 'Order workflow',
+        complexity: 'medium',
+        estimated_duration_ms: 5000,
+        required_permissions: ['order.read'],
+        suggested_sequence: ['step1'],
+        rollback_strategy: 'reverse'
+      }
+    };
+    const mockFs = { readJson: jest.fn().mockResolvedValue(contract) };
+    const result = await runSceneOntologyAgentInfoCommand(
+      { package: '.' },
+      { fileSystem: mockFs, projectRoot: '/test' }
+    );
+    expect(result).not.toBeNull();
+    expect(result.result.summary).toBe('Order workflow');
+    expect(result.result.complexity).toBe('medium');
+    spy.mockRestore();
+  });
+
+  test('runSceneOntologyAgentInfoCommand returns null on file error', async () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation();
+    const mockFs = { readJson: jest.fn().mockRejectedValue(new Error('ENOENT')) };
+    const result = await runSceneOntologyAgentInfoCommand(
+      { package: './missing' },
+      { fileSystem: mockFs, projectRoot: '/test' }
+    );
+    expect(result).toBeNull();
+    expect(process.exitCode).toBe(1);
+    spy.mockRestore();
+    process.exitCode = 0;
+  });
+
+  // ─── print functions ─────────────────────────────────────────
+
+  test('printSceneOntologyShowSummary outputs JSON when json=true', () => {
+    const logs = [];
+    const spy = jest.spyOn(console, 'log').mockImplementation((...args) => logs.push(args.join(' ')));
+    printSceneOntologyShowSummary({ json: true }, { success: true, packageDir: '.', graph: { nodes: [], edges: [] } });
+    const parsed = JSON.parse(logs[0]);
+    expect(parsed.success).toBe(true);
+    spy.mockRestore();
+  });
+
+  test('printSceneOntologyDepsSummary shows error message', () => {
+    const logs = [];
+    const spy = jest.spyOn(console, 'log').mockImplementation((...args) => logs.push(args.join(' ')));
+    printSceneOntologyDepsSummary({ json: false }, { result: { error: 'ref not found' } });
+    expect(logs.some(l => l.includes('ref not found'))).toBe(true);
+    spy.mockRestore();
+  });
+
+  test('printSceneOntologyValidateSummary shows valid message', () => {
+    const logs = [];
+    const spy = jest.spyOn(console, 'log').mockImplementation((...args) => logs.push(args.join(' ')));
+    printSceneOntologyValidateSummary({ json: false }, { packageDir: '.', result: { valid: true, errors: [] } });
+    expect(logs.some(l => l.includes('consistent'))).toBe(true);
+    spy.mockRestore();
+  });
+
+  test('printSceneOntologyActionsSummary outputs JSON when json=true', () => {
+    const logs = [];
+    const spy = jest.spyOn(console, 'log').mockImplementation((...args) => logs.push(args.join(' ')));
+    printSceneOntologyActionsSummary({ json: true }, { result: { ref: 'a', intent: null, preconditions: [], postconditions: [] } });
+    const parsed = JSON.parse(logs[0]);
+    expect(parsed.result.ref).toBe('a');
+    spy.mockRestore();
+  });
+
+  test('printSceneOntologyLineageSummary shows no lineage message', () => {
+    const logs = [];
+    const spy = jest.spyOn(console, 'log').mockImplementation((...args) => logs.push(args.join(' ')));
+    printSceneOntologyLineageSummary({ json: false }, { result: { ref: 'x', asSource: [], asSink: [] } });
+    expect(logs.some(l => l.includes('No lineage'))).toBe(true);
+    spy.mockRestore();
+  });
+
+  test('printSceneOntologyAgentInfoSummary shows no hints message', () => {
+    const logs = [];
+    const spy = jest.spyOn(console, 'log').mockImplementation((...args) => logs.push(args.join(' ')));
+    printSceneOntologyAgentInfoSummary({ json: false }, { packageDir: '.', result: null });
+    expect(logs.some(l => l.includes('No agent_hints'))).toBe(true);
+    spy.mockRestore();
   });
 });

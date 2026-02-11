@@ -319,6 +319,14 @@ Structure your work with Requirements → Design → Tasks workflow
   - Pattern-based manifest generation with governance contracts
 - **CLI Commands**: `scene connect`, `scene discover`, `scene extract` with `--json` support
 
+### Scene Ontology Enhancement 🚀 NEW in v1.42.0
+- **OntologyGraph**: Semantic relationship graph for binding refs (depends_on, composes, extends, produces)
+- **Action Abstraction**: Intent, preconditions, postconditions per binding for AI agent understanding
+- **Data Lineage**: Source → transform → sink tracking in governance_contract
+- **Agent-Ready Metadata**: `agent_hints` field with summary, complexity, duration, permissions, sequence
+- **Agent Readiness Score**: Bonus quality dimension (max +10 points)
+- **CLI Commands**: `scene ontology show|deps|validate|actions|lineage|agent-info` with `--json` support
+
 ### Scene Template Quality Pipeline 🚀 NEW in v1.41.0
 - **Template Lint Engine**: 7-category quality checks for scene packages (manifest completeness, binding refs, governance, consistency, variables, documentation)
 - **Quality Score Calculator**: 4-dimension scoring (contract validity, lint pass rate, documentation quality, governance completeness) with 0-100 scale
@@ -460,6 +468,15 @@ kse scene extract --config <path> --out <dir>  # Extract scene templates from Mo
 # Scene template quality pipeline (NEW in v1.41.0)
 kse scene lint --package <path>                # Lint scene package for quality issues
 kse scene score --package <path>               # Calculate quality score (0-100)
+kse scene contribute --package <path>          # One-stop validate → lint → score → publish
+
+# Scene ontology (NEW in v1.42.0)
+kse scene ontology show --package <path>       # Show ontology graph
+kse scene ontology deps --ref <ref>            # Query dependency chain
+kse scene ontology validate --package <path>   # Validate graph consistency
+kse scene ontology actions --ref <ref>         # Show action abstraction
+kse scene ontology lineage --ref <ref>         # Show data lineage
+kse scene ontology agent-info --package <path> # Show agent hints
 kse scene contribute --package <path>          # One-stop validate → lint → score → publish
 
 # DevOps operations

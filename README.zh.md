@@ -275,6 +275,14 @@ sequenceDiagram
   - 基于模式的清单生成，包含治理合约
 - **CLI 命令**: `scene connect`、`scene discover`、`scene extract`，支持 `--json` 输出
 
+### 场景 Ontology 增强 🚀 v1.42.0 新增
+- **OntologyGraph**: 绑定引用语义关系图（depends_on、composes、extends、produces）
+- **Action Abstraction**: 每个绑定的 intent、preconditions、postconditions，提升 AI 可读性
+- **Data Lineage**: governance_contract 中的数据血缘追踪（source → transform → sink）
+- **Agent-Ready Metadata**: `agent_hints` 字段（summary、complexity、duration、permissions、sequence）
+- **Agent Readiness 评分**: 质量评分新增可选加分维度（最高 +10 分）
+- **CLI 命令**: `scene ontology show|deps|validate|actions|lineage|agent-info`，支持 `--json`
+
 ### 场景模板质量流水线 🚀 v1.41.0 新增
 - **模板 Lint 引擎**: 7 类质量检查（清单完整性、绑定引用、治理合约、一致性、变量、文档）
 - **质量评分计算器**: 4 维度评分（合约有效性、lint 通过率、文档质量、治理完整性），0-100 分制
@@ -365,6 +373,14 @@ kse scene extract --config <path> --out <dir>  # 从 Moqui 提取场景模板 (v
 kse scene lint --package <path>                # Lint 场景包质量检查
 kse scene score --package <path>               # 计算质量评分 (0-100)
 kse scene contribute --package <path>          # 一站式验证 → lint → 评分 → 发布
+
+# 场景 Ontology (v1.42.0 新增)
+kse scene ontology show --package <path>       # 显示 Ontology 图
+kse scene ontology deps --ref <ref>            # 查询依赖链
+kse scene ontology validate --package <path>   # 验证图一致性
+kse scene ontology actions --ref <ref>         # 显示 Action Abstraction
+kse scene ontology lineage --ref <ref>         # 显示数据血缘
+kse scene ontology agent-info --package <path> # 显示 Agent Hints
 
 # DevOps 运维
 kse ops init <project-name>        # 初始化运维 specs

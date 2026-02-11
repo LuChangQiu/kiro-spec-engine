@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.42.0] - 2026-02-11
+
+### Added
+- **Scene Ontology Enhancement** (Palantir Foundry-inspired): Semantic relationship graph, action abstraction, data lineage, agent-ready metadata
+  - **OntologyGraph** (`scene-ontology.js`): Graph data structure for binding ref relationships
+    - Node/edge CRUD with relation type validation (`depends_on`, `composes`, `extends`, `produces`)
+    - JSON serialization/deserialization round-trip
+    - Automatic relationship inference from shared ref prefixes
+    - Dependency chain query (BFS) with cycle detection
+  - **Action Abstraction**: Intent, preconditions, postconditions per binding
+  - **Data Lineage**: Source → transform → sink tracking in governance_contract
+  - **Agent-Ready Metadata**: `agent_hints` field (summary, complexity, duration, permissions, sequence, rollback)
+  - **Lint Extensions**: 8 new lint codes
+    - `EMPTY_INTENT`, `INVALID_PRECONDITIONS`, `INVALID_POSTCONDITIONS`
+    - `LINEAGE_SOURCE_NOT_IN_BINDINGS`, `LINEAGE_SINK_NOT_IN_BINDINGS`
+    - `EMPTY_AGENT_SUMMARY`, `INVALID_AGENT_COMPLEXITY`, `INVALID_AGENT_DURATION`
+  - **Agent Readiness Score**: New bonus dimension (max +10) in quality score calculator
+  - **CLI Commands** (`kse scene ontology`):
+    - `kse scene ontology show` — Display ontology graph
+    - `kse scene ontology deps --ref <ref>` — Query dependency chain
+    - `kse scene ontology validate` — Validate graph consistency
+    - `kse scene ontology actions --ref <ref>` — Show action abstraction
+    - `kse scene ontology lineage --ref <ref>` — Show data lineage
+    - `kse scene ontology agent-info` — Show agent hints
+
 ## [1.41.0] - 2026-02-11
 
 ### Added

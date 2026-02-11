@@ -4,7 +4,7 @@
 
 ---
 
-**Version**: 1.42.0  
+**Version**: 1.43.0  
 **Last Updated**: 2026-02-11
 
 ---
@@ -81,6 +81,7 @@ Detailed technical documentation:
 - **[Environment Management Guide](environment-management-guide.md)** - Multi-environment configuration management
 - **[Multi-Repository Management Guide](multi-repo-management-guide.md)** - Managing multiple Git repositories
 - **[Scene Runtime Guide](scene-runtime-guide.md)** - Scene template engine, quality pipeline, ontology, and Moqui ERP integration
+- **[Multi-Agent Coordination Guide](multi-agent-coordination-guide.md)** - Multi-agent parallel coordination for concurrent development
 - **[Troubleshooting](troubleshooting.md)** - Solutions to common problems
 - **[FAQ](faq.md)** - Answers to frequently asked questions
 
@@ -93,6 +94,7 @@ Detailed technical documentation:
 - **[Environment Management Guide](environment-management-guide.md)** - Managing multiple environments
 - **[Multi-Repository Management Guide](multi-repo-management-guide.md)** - Managing multiple Git repositories
 - **[Scene Runtime Guide](scene-runtime-guide.md)** - Scene template engine, quality pipeline, ontology, and Moqui ERP integration
+- **[Multi-Agent Coordination Guide](multi-agent-coordination-guide.md)** - Multi-agent parallel coordination for concurrent development
 - **[Developer Guide](developer-guide.md)** - Contributing to kse development
 - **[Architecture](architecture.md)** - kse system architecture
 
@@ -226,6 +228,7 @@ Detailed technical documentation:
 | Environment Management | ✅ Complete | 2026-01-31 |
 | Multi-Repository Management | ✅ Complete | 2026-01-31 |
 | Scene Runtime Guide | ✅ Complete | 2026-02-11 |
+| Multi-Agent Coordination | ✅ Complete | 2026-02-11 |
 
 ---
 

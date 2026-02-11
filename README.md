@@ -223,6 +223,7 @@ sequenceDiagram
 - 🌍 **[Environment Management](docs/environment-management-guide.md)** - Multi-environment configuration
 - 📦 **[Multi-Repository Management](docs/multi-repo-management-guide.md)** - Manage multiple Git repositories
 - 🎭 **[Scene Runtime](docs/scene-runtime-guide.md)** - Template engine, quality pipeline, ontology, Moqui ERP
+- 🤖 **[Multi-Agent Coordination](docs/multi-agent-coordination-guide.md)** - Parallel agent coordination
 - 🔌 **[Integration Modes](docs/integration-modes.md)** - Three ways to integrate kse
 - 📝 **[Command Reference](docs/command-reference.md)** - All kse commands
 
@@ -328,6 +329,8 @@ Structure your work with Requirements → Design → Tasks workflow
 - **Merge Coordinator**: Git branch isolation per agent (`agent/{agentId}/{specName}`), conflict detection, auto-merge
 - **Central Coordinator**: Dependency-driven ready task computation, task assignment, progress tracking
 - **Zero Overhead**: All components are no-ops in single-agent mode (full backward compatibility)
+
+[Learn more about Multi-Agent Coordination →](docs/multi-agent-coordination-guide.md)
 
 ### Scene Ontology Enhancement 🚀 NEW in v1.42.0
 - **OntologyGraph**: Semantic relationship graph for binding refs (depends_on, composes, extends, produces)
@@ -612,5 +615,5 @@ A deep conversation about AI development trends, Neo-Confucian philosophy, and s
 
 ---
 
-**Version**: 1.42.0  
+**Version**: 1.43.0  
 **Last Updated**: 2026-02-11

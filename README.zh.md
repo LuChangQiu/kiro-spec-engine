@@ -219,6 +219,7 @@ sequenceDiagram
 - 🔢 **[Spec 编号策略](docs/zh/spec-numbering-guide.md)** - 如何为 Spec 编号
 - 📄 **[文档治理](docs/document-governance.md)** - 自动化文档管理
 - 🎭 **[场景运行时指南](docs/scene-runtime-guide.md)** - 模板引擎、质量流水线、Ontology、Moqui ERP
+- 🤖 **[多 Agent 协调指南](docs/multi-agent-coordination-guide.md)** - 多 Agent 并行协调
 - 🔌 **[集成模式](docs/integration-modes.md)** - 三种集成 kse 的方式
 - 📝 **[命令参考](docs/command-reference.md)** - 所有 kse 命令
 
@@ -284,6 +285,8 @@ sequenceDiagram
 - **合并协调器**: 每个 Agent 独立 Git 分支（`agent/{agentId}/{specName}`），冲突检测，自动合并
 - **中央协调器**: 基于依赖的就绪任务计算，任务分配，进度跟踪
 - **零开销**: 单 Agent 模式下所有组件为无操作（完全向后兼容）
+
+[了解更多多 Agent 协调 →](docs/multi-agent-coordination-guide.md)
 
 ### 场景 Ontology 增强 🚀 v1.42.0 新增
 - **OntologyGraph**: 绑定引用语义关系图（depends_on、composes、extends、produces）
@@ -475,5 +478,5 @@ kse create-spec 01-00-my-first-feature
 
 ---
 
-**版本**：1.42.0  
+**版本**：1.43.0  
 **最后更新**：2026-02-11

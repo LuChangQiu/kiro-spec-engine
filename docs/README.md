@@ -4,8 +4,8 @@
 
 ---
 
-**Version**: 1.43.0  
-**Last Updated**: 2026-02-11
+**Version**: 1.44.0  
+**Last Updated**: 2026-02-12
 
 ---
 
@@ -228,7 +228,7 @@ Detailed technical documentation:
 | Environment Management | ✅ Complete | 2026-01-31 |
 | Multi-Repository Management | ✅ Complete | 2026-01-31 |
 | Scene Runtime Guide | ✅ Complete | 2026-02-11 |
-| Multi-Agent Coordination | ✅ Complete | 2026-02-11 |
+| Multi-Agent Coordination | ✅ Complete | 2026-02-12 |
 
 ---
 

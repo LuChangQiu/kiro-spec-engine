@@ -1,6 +1,7 @@
 const PromptGenerator = require('../../lib/context/prompt-generator');
 const fs = require('fs-extra');
 const path = require('path');
+const os = require('os');
 
 describe('PromptGenerator', () => {
   let generator;
@@ -9,7 +10,7 @@ describe('PromptGenerator', () => {
 
   beforeEach(async () => {
     generator = new PromptGenerator();
-    testProjectPath = path.join(__dirname, '../fixtures/test-project');
+    testProjectPath = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-prompt-gen-'));
     testSpecPath = path.join(testProjectPath, '.kiro/specs/test-spec');
 
     // Create test directory structure

@@ -2,8 +2,8 @@
 
 > Enable multiple AI agents to work on the same kse project simultaneously without conflicts.
 
-**Version**: 1.43.0  
-**Last Updated**: 2026-02-11
+**Version**: 1.44.0  
+**Last Updated**: 2026-02-12
 
 ---
 
@@ -19,6 +19,11 @@ The Multi-Agent Parallel Coordination system solves this with six layers of prot
 4. **Steering File Lock** — Safe concurrent updates to steering files
 5. **Merge Coordinator** — Git branch isolation per agent
 6. **Central Coordinator** — Intelligent task assignment (optional)
+7. **Spec-Level Steering (L4)** — Per-Spec constraints and notes (v1.44.0)
+8. **Steering Loader** — Unified L1-L4 four-layer steering merge (v1.44.0)
+9. **Context Sync Manager** — Multi-agent CURRENT_CONTEXT.md maintenance (v1.44.0)
+10. **Spec Lifecycle Manager** — Spec state machine and auto-completion (v1.44.0)
+11. **Sync Barrier** — Agent Spec-switch synchronization (v1.44.0)
 
 All components are **zero overhead in single-agent mode** — they become no-ops when multi-agent mode is not enabled.
 
@@ -92,6 +97,7 @@ await registry.deregister(agentId);
 ┌─────────────────────────────────────────────────────┐
 │                   Coordinator (optional)             │
 │         Ready task computation + assignment          │
+│    v1.44.0: auto Spec completion + sync barrier     │
 ├──────────┬──────────┬──────────┬────────────────────┤
 │  Agent   │  Task    │  Task    │  Steering  │ Merge  │
 │ Registry │  Lock    │  Status  │  File Lock │ Coord  │
@@ -99,6 +105,10 @@ await registry.deregister(agentId);
 ├──────────┴──────────┴──────────┴────────────┴────────┤
 │              MultiAgentConfig                        │
 │         .kiro/config/multi-agent.json                │
+├──────────────────────────────────────────────────────┤
+│  v1.44.0: Spec-Level Steering & Context Sync        │
+│  SpecSteering │ SteeringLoader │ ContextSyncManager  │
+│  SpecLifecycleManager │ SyncBarrier                  │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -278,10 +288,134 @@ const assignment = await coordinator.assignTask(agentId);
 // assignment: { specName, taskId, task } or null
 
 // Mark task complete (releases lock, computes newly ready tasks)
+// v1.44.0: also auto-checks Spec completion via SpecLifecycleManager
 const { newReadyTasks } = await coordinator.completeTask(specName, taskId, agentId);
 
 // Get progress across all specs
 const { specs, agents } = await coordinator.getProgress();
+```
+
+### Spec-Level Steering (L4) — v1.44.0
+
+Per-Spec `steering.md` providing independent constraints, notes, and decisions for each Spec. Eliminates cross-agent write conflicts on global steering files.
+
+**File**: `lib/steering/spec-steering.js`  
+**Storage**: `.kiro/specs/{spec-name}/steering.md`
+
+```javascript
+const { SpecSteering } = require('kiro-spec-engine/lib/steering');
+const specSteering = new SpecSteering(workspaceRoot);
+
+// Create a steering template for a new Spec
+await specSteering.createTemplate(specName, { description: 'My feature' });
+
+// Read Spec-level steering
+const steering = await specSteering.read(specName);
+// steering: { specName, description, constraints: [], notes: [], decisions: [] }
+
+// Write updated steering
+await specSteering.write(specName, updatedSteering);
+
+// Parse raw Markdown to structured object
+const parsed = specSteering.parse(markdownContent);
+
+// Format structured object back to Markdown
+const markdown = specSteering.format(steeringObj);
+```
+
+### Steering Loader — v1.44.0
+
+Unified loader that merges all four steering layers (L1-L4) into a single context.
+
+**File**: `lib/steering/steering-loader.js`
+
+```javascript
+const { SteeringLoader } = require('kiro-spec-engine/lib/steering');
+const loader = new SteeringLoader(workspaceRoot);
+
+// Load a specific layer
+const l1 = await loader.loadL1();  // CORE_PRINCIPLES.md
+const l2 = await loader.loadL2();  // ENVIRONMENT.md
+const l3 = await loader.loadL3();  // CURRENT_CONTEXT.md
+const l4 = await loader.loadL4(specName);  // specs/{specName}/steering.md
+
+// Load all layers merged (L4 only in multi-agent mode)
+const merged = await loader.loadMerged(specName);
+// merged: { l1, l2, l3, l4, merged: "combined content" }
+```
+
+### Context Sync Manager — v1.44.0
+
+Multi-agent friendly maintenance of `CURRENT_CONTEXT.md` with structured Spec progress table format.
+
+**File**: `lib/steering/context-sync-manager.js`
+
+```javascript
+const { ContextSyncManager } = require('kiro-spec-engine/lib/steering');
+const syncManager = new ContextSyncManager(workspaceRoot);
+
+// Read current context
+const context = await syncManager.readContext();
+
+// Update Spec progress entry (SteeringFileLock-protected)
+await syncManager.updateSpecProgress(specName, {
+  status: 'in-progress',
+  progress: '3/8 tasks',
+  agent: 'a1b2c3d4:0'
+});
+
+// Compute progress from tasks.md
+const progress = await syncManager.computeProgress(specName);
+// progress: { total: 8, completed: 3, percentage: 37.5 }
+
+// Write full context (SteeringFileLock-protected)
+await syncManager.writeContext(newContext);
+```
+
+### Spec Lifecycle Manager — v1.44.0
+
+State machine managing Spec lifecycle transitions with auto-completion detection.
+
+**File**: `lib/collab/spec-lifecycle-manager.js`  
+**Storage**: `.kiro/specs/{spec-name}/lifecycle.json`
+
+Valid transitions: `planned → assigned → in-progress → completed → released`
+
+```javascript
+const { SpecLifecycleManager } = require('kiro-spec-engine/lib/collab');
+const lifecycle = new SpecLifecycleManager(workspaceRoot);
+
+// Get current Spec status
+const status = await lifecycle.getStatus(specName);
+// status: "planned" | "assigned" | "in-progress" | "completed" | "released"
+
+// Transition to next state
+await lifecycle.transition(specName, 'in-progress');
+
+// Check if all tasks are completed (auto-transitions to "completed")
+const isComplete = await lifecycle.checkCompletion(specName);
+
+// Read full lifecycle data
+const data = await lifecycle.readLifecycle(specName);
+// data: { status, transitions: [...], completedAt, ... }
+```
+
+### Sync Barrier — v1.44.0
+
+Ensures agents synchronize state before switching between Specs.
+
+**File**: `lib/collab/sync-barrier.js`
+
+```javascript
+const { SyncBarrier } = require('kiro-spec-engine/lib/collab');
+const barrier = new SyncBarrier(workspaceRoot);
+
+// Check before switching Specs
+const ready = await barrier.prepareSwitch(agentId, fromSpec, toSpec);
+// Checks: uncommitted changes, reloads steering
+
+// Check for uncommitted changes
+const hasChanges = await barrier.hasUncommittedChanges();
 ```
 
 ---
@@ -385,6 +519,8 @@ All components check `MultiAgentConfig.isEnabled()` before doing anything:
 | `.kiro/config/coordination-log.json` | Coordinator assignment log |
 | `.kiro/specs/{spec}/locks/{taskId}.lock` | Task lock files |
 | `.kiro/specs/{spec}/tasks.md.lock` | tasks.md file lock |
+| `.kiro/specs/{spec}/steering.md` | Spec-level steering (L4) |
+| `.kiro/specs/{spec}/lifecycle.json` | Spec lifecycle state |
 | `.kiro/steering/{file}.lock` | Steering file locks |
 | `.kiro/steering/{file}.pending.{agentId}` | Pending steering writes |
 
@@ -396,7 +532,10 @@ All components check `MultiAgentConfig.isEnabled()` before doing anything:
 
 ```javascript
 // Collaboration modules
-const { AgentRegistry, Coordinator, MergeCoordinator, MultiAgentConfig } = require('kiro-spec-engine/lib/collab');
+const { AgentRegistry, Coordinator, MergeCoordinator, MultiAgentConfig, SpecLifecycleManager, SyncBarrier } = require('kiro-spec-engine/lib/collab');
+
+// Steering modules
+const { SpecSteering, SteeringLoader, ContextSyncManager } = require('kiro-spec-engine/lib/steering');
 
 // Lock modules
 const { TaskLockManager, SteeringFileLock } = require('kiro-spec-engine/lib/lock');

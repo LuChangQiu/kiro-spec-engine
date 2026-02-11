@@ -288,6 +288,14 @@ sequenceDiagram
 
 [了解更多多 Agent 协调 →](docs/multi-agent-coordination-guide.md)
 
+### Spec 级 Steering 与上下文同步 🚀 v1.44.0 新增
+- **Spec Steering (L4)**: 每个 Spec 独立的 `steering.md`，包含约束、注意事项、决策记录 — 跨 Agent 零冲突
+- **Steering 加载器**: 统一 L1-L4 四层 Steering 加载，优先级合并
+- **上下文同步管理器**: 多 Agent 友好的 CURRENT_CONTEXT.md，结构化 Spec 进度表，并发安全更新
+- **Spec 生命周期管理器**: 状态机（planned → assigned → in-progress → completed → released），自动完成检测
+- **同步屏障**: Agent 切换 Spec 时的同步检查 — 未提交更改检测 + Steering 重新加载
+- **Coordinator 集成**: 任务完成时自动检测 Spec 完成，任务分配时运行同步屏障
+
 ### 场景 Ontology 增强 🚀 v1.42.0 新增
 - **OntologyGraph**: 绑定引用语义关系图（depends_on、composes、extends、produces）
 - **Action Abstraction**: 每个绑定的 intent、preconditions、postconditions，提升 AI 可读性

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.44.0] - 2026-02-12
+
+### Added
+- **Spec-Level Steering & Multi-Agent Context Sync**: Fourth steering layer (L4) and Spec lifecycle coordination
+  - **SpecSteering** (`lib/steering/spec-steering.js`): Spec-level `steering.md` CRUD with template generation, Markdown ↔ structured object roundtrip, atomic write. Each Spec gets independent constraints/notes/decisions — zero cross-agent conflict
+  - **SteeringLoader** (`lib/steering/steering-loader.js`): Unified L1-L4 four-layer steering loader with merged output. L4 loaded via SpecSteering in multi-agent mode, skipped in single-agent mode
+  - **ContextSyncManager** (`lib/steering/context-sync-manager.js`): Multi-agent friendly CURRENT_CONTEXT.md maintenance with structured Spec progress table format, SteeringFileLock-protected concurrent writes, tasks.md-based progress computation
+  - **SpecLifecycleManager** (`lib/collab/spec-lifecycle-manager.js`): Spec state machine (planned → assigned → in-progress → completed → released) with lifecycle.json persistence, auto-completion detection, ContextSyncManager update and AgentRegistry notification on completion
+  - **SyncBarrier** (`lib/collab/sync-barrier.js`): Agent Spec-switch synchronization barrier — checks for uncommitted changes, reloads steering before switching
+  - **Coordinator Integration**: `completeTask` now auto-checks Spec completion via SpecLifecycleManager; `assignTask` runs SyncBarrier before task access
+  - All components are no-ops in single-agent mode (zero overhead, full backward compatibility)
+
 ## [1.43.1] - 2026-02-11
 
 ### Changed

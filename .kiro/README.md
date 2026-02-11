@@ -19,7 +19,7 @@ This project uses **Spec-driven development** - a structured approach where:
 
 ---
 
-## 🚀 kse Capabilities (v1.43.x)
+## 🚀 kse Capabilities (v1.44.x)
 
 **IMPORTANT**: After installing or updating kse, read this section to understand all available capabilities. Using the right tool for the job ensures efficient, high-quality development.
 
@@ -71,6 +71,17 @@ When multiple AI agents work on the same project simultaneously:
 - **MergeCoordinator** (`lib/collab`) — Git branch isolation per agent
 - **Coordinator** (`lib/collab`) — Central task assignment (optional)
 - Config: `.kiro/config/multi-agent.json` (`enabled: true` to activate)
+- All components are no-ops in single-agent mode (zero overhead)
+- See `docs/multi-agent-coordination-guide.md` for full API reference
+
+### Spec-Level Steering & Context Sync (v1.44.0)
+Fourth steering layer (L4) and Spec lifecycle coordination for multi-agent scenarios:
+- **SpecSteering** (`lib/steering`) — Per-Spec `steering.md` CRUD with template generation, Markdown ↔ structured object roundtrip
+- **SteeringLoader** (`lib/steering`) — Unified L1-L4 four-layer steering loader with merged output
+- **ContextSyncManager** (`lib/steering`) — Multi-agent CURRENT_CONTEXT.md maintenance with Spec progress table, SteeringFileLock-protected writes
+- **SpecLifecycleManager** (`lib/collab`) — Spec state machine (planned → assigned → in-progress → completed → released) with auto-completion detection
+- **SyncBarrier** (`lib/collab`) — Agent Spec-switch synchronization barrier (uncommitted changes check, steering reload)
+- **Coordinator Integration** — `completeTask` auto-checks Spec completion; `assignTask` runs SyncBarrier
 - All components are no-ops in single-agent mode (zero overhead)
 - See `docs/multi-agent-coordination-guide.md` for full API reference
 
@@ -145,6 +156,8 @@ If `.kiro/config/multi-agent.json` exists with `enabled: true`:
 │       ├── requirements.md    # What we're building
 │       ├── design.md          # How we'll build it
 │       ├── tasks.md           # Implementation steps
+│       ├── steering.md        # Spec-level steering (L4, multi-agent)
+│       ├── lifecycle.json     # Spec lifecycle state (multi-agent)
 │       └── locks/             # Task lock files (multi-agent)
 ├── steering/                  # Development rules (auto-loaded by AI)
 │   ├── CORE_PRINCIPLES.md     # Core development principles
@@ -216,6 +229,6 @@ A Spec is a complete feature definition with three parts:
 ---
 
 **Project Type**: Spec-driven development  
-**kse Version**: 1.43.x  
-**Last Updated**: 2026-02-11  
+**kse Version**: 1.44.x  
+**Last Updated**: 2026-02-12  
 **Purpose**: Guide AI tools to work effectively with this project

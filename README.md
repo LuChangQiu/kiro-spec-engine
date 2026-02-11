@@ -332,6 +332,14 @@ Structure your work with Requirements → Design → Tasks workflow
 
 [Learn more about Multi-Agent Coordination →](docs/multi-agent-coordination-guide.md)
 
+### Spec-Level Steering & Context Sync 🚀 NEW in v1.44.0
+- **Spec Steering (L4)**: Independent `steering.md` per Spec with constraints, notes, and decisions — zero cross-agent conflict
+- **Steering Loader**: Unified L1-L4 four-layer steering loader with priority-based merging
+- **Context Sync Manager**: Multi-agent friendly CURRENT_CONTEXT.md with structured Spec progress table, concurrent-safe updates
+- **Spec Lifecycle Manager**: State machine (planned → assigned → in-progress → completed → released) with auto-completion detection
+- **Sync Barrier**: Agent Spec-switch synchronization — uncommitted change check + steering reload
+- **Coordinator Integration**: Auto Spec completion check on task complete, SyncBarrier on task assign
+
 ### Scene Ontology Enhancement 🚀 NEW in v1.42.0
 - **OntologyGraph**: Semantic relationship graph for binding refs (depends_on, composes, extends, produces)
 - **Action Abstraction**: Intent, preconditions, postconditions per binding for AI agent understanding

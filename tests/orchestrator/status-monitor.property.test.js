@@ -30,7 +30,7 @@ describe('Property 8: JSON Lines 事件解析 (JSON Lines Event Parsing)', () =>
   /** Generator for valid Codex event objects */
   const validEventObjectArb = fc.record({
     type: codexEventTypeArb,
-    timestamp: fc.date({ min: new Date('2000-01-01'), max: new Date('2100-01-01') }).map((d) => d.toISOString()),
+    timestamp: fc.integer({ min: 946684800000, max: 4102444800000 }).map((ms) => new Date(ms).toISOString()),
     message: fc.option(fc.string(), { nil: undefined }),
   });
 

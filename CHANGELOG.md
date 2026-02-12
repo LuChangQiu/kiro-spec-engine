@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.45.2] - 2026-02-13
+
+### Fixed
+- **AgentSpawner auth fallback**: Added `~/.codex/auth.json` fallback when `CODEX_API_KEY` env var is not set, supporting users who configured auth via `codex auth`
+- **AgentSpawner codex command**: Added `codexCommand` config option (e.g. `"npx @openai/codex"`) for users without global Codex CLI install
+- **OrchestratorConfig**: Added `codexCommand` to known config keys and defaults
+
 ## [1.45.1] - 2026-02-12
 
 ### Fixed

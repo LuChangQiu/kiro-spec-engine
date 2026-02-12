@@ -150,13 +150,36 @@ describe('AgentSpawner', () => {
       expect(agent.startedAt).toBeDefined();
     });
 
-    test('throws when API key env var is not set', async () => {
+    test('throws when API key is not available from env or auth file', async () => {
       delete process.env.CODEX_API_KEY;
+      spawner._readCodexAuthFile = jest.fn().mockReturnValue(null);
 
       await expect(spawner.spawn('my-spec')).rejects.toThrow(
-        'Environment variable CODEX_API_KEY is not set'
+        'Cannot find API key'
       );
       expect(mockSpawn).not.toHaveBeenCalled();
+    });
+
+    test('reads API key from ~/.codex/auth.json when env var is missing', async () => {
+      delete process.env.CODEX_API_KEY;
+
+      // Mock the _readCodexAuthFile method to return a key
+      spawner._readCodexAuthFile = jest.fn().mockReturnValue('auth-file-key-789');
+
+      await spawner.spawn('my-spec');
+
+      const [, , opts] = mockSpawn.mock.calls[0];
+      expect(opts.env.CODEX_API_KEY).toBe('auth-file-key-789');
+    });
+
+    test('prefers env var over auth file', async () => {
+      spawner._readCodexAuthFile = jest.fn().mockReturnValue('auth-file-key');
+
+      await spawner.spawn('my-spec');
+
+      const [, , opts] = mockSpawn.mock.calls[0];
+      expect(opts.env.CODEX_API_KEY).toBe('test-api-key-123');
+      expect(spawner._readCodexAuthFile).not.toHaveBeenCalled();
     });
 
     test('uses custom apiKeyEnvVar from config', async () => {
@@ -202,6 +225,34 @@ describe('AgentSpawner', () => {
 
       const [, , opts] = mockSpawn.mock.calls[0];
       expect(opts.cwd).toBe('/workspace');
+    });
+
+    test('uses codexCommand from config when specified', async () => {
+      mockConfig.getConfig.mockResolvedValue({
+        agentBackend: 'codex',
+        maxParallel: 3,
+        timeoutSeconds: 600,
+        maxRetries: 2,
+        apiKeyEnvVar: 'CODEX_API_KEY',
+        bootstrapTemplate: null,
+        codexArgs: [],
+        codexCommand: 'npx @openai/codex',
+      });
+
+      await spawner.spawn('my-spec');
+
+      const [cmd, args] = mockSpawn.mock.calls[0];
+      expect(cmd).toBe('npx');
+      expect(args[0]).toBe('@openai/codex');
+      expect(args).toContain('exec');
+      expect(args).toContain('--json');
+    });
+
+    test('defaults to "codex" when codexCommand is not set', async () => {
+      await spawner.spawn('my-spec');
+
+      const [cmd] = mockSpawn.mock.calls[0];
+      expect(cmd).toBe('codex');
     });
   });
 

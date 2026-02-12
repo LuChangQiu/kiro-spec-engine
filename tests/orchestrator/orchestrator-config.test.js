@@ -40,6 +40,7 @@ describe('OrchestratorConfig', () => {
         apiKeyEnvVar: 'CODEX_API_KEY',
         bootstrapTemplate: null,
         codexArgs: [],
+        codexCommand: null,
       });
     });
 
@@ -53,6 +54,7 @@ describe('OrchestratorConfig', () => {
       const expected = [
         'agentBackend', 'maxParallel', 'timeoutSeconds',
         'maxRetries', 'apiKeyEnvVar', 'bootstrapTemplate', 'codexArgs',
+        'codexCommand',
       ];
       for (const key of expected) {
         expect(KNOWN_KEYS.has(key)).toBe(true);
@@ -104,6 +106,7 @@ describe('OrchestratorConfig', () => {
         apiKeyEnvVar: 'CLAUDE_API_KEY',
         bootstrapTemplate: 'templates/custom.md',
         codexArgs: ['--model', 'gpt-4'],
+        codexCommand: 'npx @openai/codex',
       };
       fs.writeJsonSync(path.join(configDir, 'orchestrator.json'), customConfig);
 

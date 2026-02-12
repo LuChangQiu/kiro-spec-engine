@@ -19,7 +19,7 @@ This project uses **Spec-driven development** - a structured approach where:
 
 ---
 
-## 🚀 kse Capabilities (v1.44.x)
+## 🚀 kse Capabilities (v1.45.x)
 
 **IMPORTANT**: After installing or updating kse, read this section to understand all available capabilities. Using the right tool for the job ensures efficient, high-quality development.
 
@@ -90,6 +90,19 @@ Fourth steering layer (L4) and Spec lifecycle coordination for multi-agent scena
 - `kse auto run <spec>` — Execute existing Spec tasks autonomously
 - `kse auto status/resume/stop/config` — Manage autonomous execution
 - Intelligent error recovery, checkpoint system, learning from history
+
+### Agent Orchestrator — Multi-Agent Spec Execution (v1.45.0)
+Automate parallel Spec execution via Codex CLI sub-agents (replaces manual multi-terminal workflow):
+- `kse orchestrate run --specs "spec-a,spec-b,spec-c" --max-parallel 3` — Start multi-agent orchestration
+- `kse orchestrate status` — View orchestration progress (per-Spec status, overall state)
+- `kse orchestrate stop` — Gracefully stop all sub-agents
+- **OrchestratorConfig** (`lib/orchestrator`) — Configuration management (agent backend, parallelism, timeout, retries) via `.kiro/config/orchestrator.json`
+- **BootstrapPromptBuilder** (`lib/orchestrator`) — Builds bootstrap prompts with Spec path, steering context, execution instructions
+- **AgentSpawner** (`lib/orchestrator`) — Process manager for Codex CLI sub-agents with timeout detection, graceful termination (SIGTERM → SIGKILL)
+- **StatusMonitor** (`lib/orchestrator`) — Codex JSON Lines event parsing, per-Spec status tracking, orchestration-level aggregation
+- **OrchestrationEngine** (`lib/orchestrator`) — DAG-based dependency analysis, batch scheduling, parallel execution (≤ maxParallel), failure propagation, retry mechanism
+- Prerequisites: Codex CLI installed, `CODEX_API_KEY` environment variable set
+- 11 correctness properties verified via property-based testing
 
 ### Scene Runtime (Template Engine + Quality + ERP)
 - **Template Engine**: `kse scene template-validate/resolve/render` — Variable schema, multi-file rendering, 3-layer inheritance

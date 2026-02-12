@@ -288,6 +288,28 @@ sequenceDiagram
 
 [了解更多多 Agent 协调 →](docs/multi-agent-coordination-guide.md)
 
+### Agent 编排器 🚀 v1.45.0 新增
+- **自动化多 Agent Spec 执行**: 一条命令替代手工开多个终端分配 Spec 给 Codex Agent
+- **DAG 依赖调度**: 分析 Spec 间依赖关系，拓扑排序计算执行批次
+- **并行执行**: 通过 Codex CLI 子进程同时运行多个 Spec（`--max-parallel` 控制并行度）
+- **失败传播**: 失败 Spec 的下游依赖自动标记为 skipped
+- **重试机制**: 可配置的失败自动重试
+- **实时监控**: 跟踪每个 Spec 状态和整体编排进度
+- **优雅终止**: 干净停止所有子 Agent（SIGTERM → SIGKILL）
+- **可配置**: 通过 `.kiro/config/orchestrator.json` 配置 Agent 后端、并行度、超时、重试次数
+
+**快速开始**:
+```bash
+# 并行运行 3 个 Spec
+kse orchestrate run --specs "spec-a,spec-b,spec-c" --max-parallel 3
+
+# 查看编排进度
+kse orchestrate status
+
+# 停止所有子 Agent
+kse orchestrate stop
+```
+
 ### Spec 级 Steering 与上下文同步 🚀 v1.44.0 新增
 - **Spec Steering (L4)**: 每个 Spec 独立的 `steering.md`，包含约束、注意事项、决策记录 — 跨 Agent 零冲突
 - **Steering 加载器**: 统一 L1-L4 四层 Steering 加载，优先级合并
@@ -403,6 +425,11 @@ kse scene ontology actions --ref <ref>         # 显示 Action Abstraction
 kse scene ontology lineage --ref <ref>         # 显示数据血缘
 kse scene ontology agent-info --package <path> # 显示 Agent Hints
 
+# Agent 编排 (v1.45.0 新增)
+kse orchestrate run --specs "<spec列表>" --max-parallel <N>  # 启动多 Agent 编排
+kse orchestrate status                         # 查看编排进度
+kse orchestrate stop                           # 停止所有子 Agent
+
 # DevOps 运维
 kse ops init <project-name>        # 初始化运维 specs
 kse ops validate [<project>]       # 验证运维完整性
@@ -486,5 +513,5 @@ kse create-spec 01-00-my-first-feature
 
 ---
 
-**版本**：1.43.0  
-**最后更新**：2026-02-11
+**版本**：1.45.0  
+**最后更新**：2026-02-12

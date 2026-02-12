@@ -332,6 +332,28 @@ Structure your work with Requirements → Design → Tasks workflow
 
 [Learn more about Multi-Agent Coordination →](docs/multi-agent-coordination-guide.md)
 
+### Agent Orchestrator 🚀 NEW in v1.45.0
+- **Automated Multi-Agent Spec Execution**: Replace manual multi-terminal workflows with a single command
+- **DAG-Based Scheduling**: Analyze Spec dependencies, compute execution batches via topological sort
+- **Parallel Execution**: Run up to N Specs simultaneously via Codex CLI sub-agents (`--max-parallel`)
+- **Failure Propagation**: Failed Spec's dependents automatically marked as skipped
+- **Retry Mechanism**: Configurable automatic retry for failed Specs
+- **Real-Time Monitoring**: Track per-Spec status and overall orchestration progress
+- **Graceful Termination**: Stop all sub-agents cleanly (SIGTERM → SIGKILL)
+- **Configurable**: Agent backend, parallelism, timeout, retries via `.kiro/config/orchestrator.json`
+
+**Quick Start**:
+```bash
+# Run 3 Specs in parallel via Codex CLI
+kse orchestrate run --specs "spec-a,spec-b,spec-c" --max-parallel 3
+
+# Check orchestration progress
+kse orchestrate status
+
+# Stop all sub-agents
+kse orchestrate stop
+```
+
 ### Spec-Level Steering & Context Sync 🚀 NEW in v1.44.0
 - **Spec Steering (L4)**: Independent `steering.md` per Spec with constraints, notes, and decisions — zero cross-agent conflict
 - **Steering Loader**: Unified L1-L4 four-layer steering loader with priority-based merging
@@ -500,6 +522,11 @@ kse scene ontology lineage --ref <ref>         # Show data lineage
 kse scene ontology agent-info --package <path> # Show agent hints
 kse scene contribute --package <path>          # One-stop validate → lint → score → publish
 
+# Agent orchestration (NEW in v1.45.0)
+kse orchestrate run --specs "<spec-list>" --max-parallel <N>  # Start multi-agent orchestration
+kse orchestrate status                         # View orchestration progress
+kse orchestrate stop                           # Stop all sub-agents
+
 # DevOps operations
 kse ops init <project-name>        # Initialize operations specs
 kse ops validate [<project>]       # Validate operations completeness
@@ -623,5 +650,5 @@ A deep conversation about AI development trends, Neo-Confucian philosophy, and s
 
 ---
 
-**Version**: 1.43.0  
-**Last Updated**: 2026-02-11
+**Version**: 1.45.0  
+**Last Updated**: 2026-02-12

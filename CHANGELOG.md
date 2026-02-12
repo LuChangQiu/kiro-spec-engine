@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.45.4] - 2026-02-13
+
+### Fixed
+- **Version upgrade path fallback**: `checkCompatibility()` and `calculateUpgradePath()` now use semver-based logic for versions not in the legacy compatibility matrix, fixing `Unknown source version: 1.45.2` error when running `kse upgrade`
+
 ## [1.45.3] - 2026-02-13
 
 ### Fixed

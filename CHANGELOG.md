@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.45.3] - 2026-02-13
+
+### Fixed
+- **Self-dependency removed**: Removed erroneous `kiro-spec-engine` self-dependency from `package.json` that caused npm to install stale old versions inside the package, resulting in `error: unknown command 'orchestrate'` and other missing commands in target projects
+
 ## [1.45.2] - 2026-02-13
 
 ### Fixed

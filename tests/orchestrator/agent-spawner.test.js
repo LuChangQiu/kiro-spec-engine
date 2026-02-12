@@ -124,7 +124,14 @@ describe('AgentSpawner', () => {
       await spawner.spawn('my-spec');
 
       const [, args] = mockSpawn.mock.calls[0];
-      expect(args[args.length - 1]).toBe('Execute Spec test-spec with full context.');
+      const promptArg = args[args.length - 1];
+      // On Windows (shell: true), the prompt is quoted to prevent shell splitting
+      const expectedPrompt = 'Execute Spec test-spec with full context.';
+      if (process.platform === 'win32') {
+        expect(promptArg).toBe(`"${expectedPrompt}"`);
+      } else {
+        expect(promptArg).toBe(expectedPrompt);
+      }
       expect(mockPromptBuilder.buildPrompt).toHaveBeenCalledWith('my-spec');
     });
 
@@ -263,6 +270,27 @@ describe('AgentSpawner', () => {
         await spawner.spawn('my-spec');
         const [, , opts] = mockSpawn.mock.calls[0];
         expect(opts.shell).toBe(true);
+      } finally {
+        if (originalPlatform) {
+          Object.defineProperty(process, 'platform', originalPlatform);
+        }
+      }
+    });
+
+    test('quotes args containing spaces when shell: true on Windows', async () => {
+      const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
+      Object.defineProperty(process, 'platform', { value: 'win32' });
+
+      try {
+        await spawner.spawn('my-spec');
+        const [, spawnArgs] = mockSpawn.mock.calls[0];
+        // The prompt (last arg) contains spaces and must be quoted
+        const promptArg = spawnArgs[spawnArgs.length - 1];
+        expect(promptArg.startsWith('"')).toBe(true);
+        expect(promptArg.endsWith('"')).toBe(true);
+        // Args without spaces should NOT be quoted
+        const execArg = spawnArgs.find(a => a === 'exec');
+        expect(execArg).toBe('exec');
       } finally {
         if (originalPlatform) {
           Object.defineProperty(process, 'platform', originalPlatform);

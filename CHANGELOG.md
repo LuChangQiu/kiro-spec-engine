@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.45.6] - 2026-02-13
+
+### Fixed
+- **Windows shell argument escaping**: `AgentSpawner.spawn()` now quotes arguments containing spaces when `shell: true`, preventing the shell from splitting the bootstrap prompt into separate tokens (fixes `error: unrecognized subcommand` on Windows)
+
 ## [1.45.5] - 2026-02-13
 
 ### Fixed

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.45.5] - 2026-02-13
+
+### Fixed
+- **Windows spawn ENOENT/EINVAL**: `AgentSpawner.spawn()` now sets `shell: true` on Windows platform, fixing inability to execute `.cmd`/`.ps1` wrapper scripts for globally installed CLI tools like `codex`
+
 ## [1.45.4] - 2026-02-13
 
 ### Fixed

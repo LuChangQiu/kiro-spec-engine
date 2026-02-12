@@ -254,6 +254,21 @@ describe('AgentSpawner', () => {
       const [cmd] = mockSpawn.mock.calls[0];
       expect(cmd).toBe('codex');
     });
+
+    test('sets shell: true on Windows platform', async () => {
+      const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
+      Object.defineProperty(process, 'platform', { value: 'win32' });
+
+      try {
+        await spawner.spawn('my-spec');
+        const [, , opts] = mockSpawn.mock.calls[0];
+        expect(opts.shell).toBe(true);
+      } finally {
+        if (originalPlatform) {
+          Object.defineProperty(process, 'platform', originalPlatform);
+        }
+      }
+    });
   });
 
   // -------------------------------------------------------------------------

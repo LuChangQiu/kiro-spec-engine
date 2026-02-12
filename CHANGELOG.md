@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.45.1] - 2026-02-12
+
+### Fixed
+- **StatusMonitor property test**: Replaced `fc.date()` with `fc.integer`-based timestamp generator to prevent `Invalid Date` during fast-check shrinking
+- **ExecutionLogger rotation test**: Replaced `Array(200000).fill() + JSON.stringify` with string repeat for large file generation, fixing CI timeout (10s → 45ms)
+
 ## [1.45.0] - 2026-02-12
 
 ### Added

@@ -12,6 +12,11 @@ module.exports = {
   transformIgnorePatterns: [
     'node_modules/(?!(chokidar)/)'
   ],
+
+  // Map fast-check to its CJS build (fast-check v4 is ESM-first, Jest 27 needs CJS)
+  moduleNameMapper: {
+    '^fast-check$': '<rootDir>/node_modules/fast-check/lib/cjs/fast-check.js',
+  },
   
   // Coverage configuration
   collectCoverageFrom: [

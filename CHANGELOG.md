@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.45.0] - 2026-02-12
+
+### Added
+- **Agent Orchestrator**: Multi-agent parallel Spec execution via Codex CLI
+  - **OrchestratorConfig** (`lib/orchestrator/orchestrator-config.js`): Configuration management for orchestrator settings (agent backend, parallelism, timeout, retries)
+  - **BootstrapPromptBuilder** (`lib/orchestrator/bootstrap-prompt-builder.js`): Builds bootstrap prompts with Spec path, steering context, and execution instructions for sub-agents
+  - **AgentSpawner** (`lib/orchestrator/agent-spawner.js`): Process manager for Codex CLI sub-agents with timeout detection, graceful termination (SIGTERM → SIGKILL), and event emission
+  - **StatusMonitor** (`lib/orchestrator/status-monitor.js`): Codex JSON Lines event parsing, per-Spec status tracking, orchestration-level status aggregation
+  - **OrchestrationEngine** (`lib/orchestrator/orchestration-engine.js`): Core engine with DAG-based dependency analysis, batch scheduling, parallel execution (≤ maxParallel), failure propagation, and retry mechanism
+  - **CLI Commands** (`kse orchestrate`):
+    - `kse orchestrate run --specs "spec-a,spec-b" --max-parallel 3` — Start multi-agent orchestration
+    - `kse orchestrate status` — View orchestration progress
+    - `kse orchestrate stop` — Gracefully stop all sub-agents
+  - 11 correctness properties verified via property-based testing (fast-check)
+  - 236+ new tests across unit, property, and integration test suites
+
+### Fixed
+- **StatusMonitor property test**: Fixed `fc.date()` generating invalid dates causing `RangeError: Invalid time value` in `toISOString()` — constrained date range to 2000-2100
+
 ## [1.44.0] - 2026-02-12
 
 ### Added

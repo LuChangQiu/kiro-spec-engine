@@ -571,6 +571,10 @@ registerLockCommands(program);
 const { registerKnowledgeCommands } = require('../lib/commands/knowledge');
 registerKnowledgeCommands(program);
 
+// Orchestration commands
+const { registerOrchestrateCommands } = require('../lib/commands/orchestrate');
+registerOrchestrateCommands(program);
+
 // Template management commands
 const templatesCommand = require('../lib/commands/templates');
 

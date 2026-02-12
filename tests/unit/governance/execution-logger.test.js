@@ -229,16 +229,11 @@ describe('ExecutionLogger', () => {
     });
     
     test('should rotate if log file exceeds max size', async () => {
-      // Create a large log file (> 10MB)
-      const largeData = Array(200000).fill({ 
-        timestamp: new Date().toISOString(),
-        tool: 'diagnostic',
-        operation: 'scan',
-        results: { violations: Array(50).fill({ path: 'test.md' }) }
-      });
-      
+      // Create a large log file (> 10MB) using repeated string instead of JSON.stringify on huge array
       await fs.ensureDir(logger.logDir);
-      await fs.writeFile(logger.logFile, JSON.stringify(largeData), 'utf8');
+      const chunk = '{"timestamp":"2026-01-01T00:00:00.000Z","tool":"diagnostic","operation":"scan","results":{"violations":[{"path":"test.md"}]}},\n';
+      const repeatCount = Math.ceil((logger.maxLogSize + 1024) / chunk.length);
+      await fs.writeFile(logger.logFile, '[' + chunk.repeat(repeatCount).slice(0, -2) + ']', 'utf8');
       
       // Verify file is large enough
       const stats = await fs.stat(logger.logFile);

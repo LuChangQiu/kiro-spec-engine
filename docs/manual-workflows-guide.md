@@ -351,7 +351,7 @@ done
 
 ### Spec Creation Checklist
 
-- [ ] Create spec: `kse create-spec <name>`
+- [ ] Create spec: `kse spec bootstrap --name <name> --non-interactive`
 - [ ] Write requirements.md
 - [ ] Write design.md
 - [ ] Generate tasks.md
@@ -415,3 +415,4 @@ done
 **Version:** 1.0  
 **Last Updated:** 2026-01-23  
 **Spec:** 05-00-agent-hooks-and-automation
+

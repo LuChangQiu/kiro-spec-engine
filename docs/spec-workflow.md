@@ -251,7 +251,7 @@ Response: { ... }
 
 **1. Create the Spec:**
 ```bash
-kse create-spec 01-00-user-login
+kse spec bootstrap --name 01-00-user-login --non-interactive
 ```
 
 **2. Write Requirements** (`.kiro/specs/01-00-user-login/requirements.md`):
@@ -509,10 +509,11 @@ The Spec workflow is:
 
 **Start your next Spec:** 🚀
 ```bash
-kse create-spec 02-00-your-feature
+kse spec bootstrap --name 02-00-your-feature --non-interactive
 ```
 
 ---
 
 **Version**: 1.42.0  
 **Last Updated**: 2026-02-11
+

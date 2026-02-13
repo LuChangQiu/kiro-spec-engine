@@ -202,7 +202,7 @@ kse watch start
 
 **1. Create Spec**
 ```bash
-kse create-spec 01-00-user-login
+kse spec bootstrap --name 01-00-user-login --non-interactive
 # Edit requirements.md, design.md, tasks.md
 ```
 
@@ -380,7 +380,7 @@ to:
 **Start using:** 🚀
 ```bash
 kse adopt
-kse create-spec 01-00-my-feature
+kse spec bootstrap --name 01-00-my-feature --non-interactive
 # Tell Windsurf: "Use kse to implement 01-00-my-feature"
 ```
 
@@ -388,3 +388,4 @@ kse create-spec 01-00-my-feature
 
 **Version**: 1.42.0  
 **Last Updated**: 2026-02-11
+

@@ -4,8 +4,8 @@
 
 ---
 
-**版本**: 1.42.0  
-**最后更新**: 2026-02-11  
+**版本**: 1.46.0  
+**最后更新**: 2026-02-13  
 **预计时间**: 5 分钟  
 **目标读者**: 初学者
 
@@ -100,7 +100,7 @@ kse adopt
 ✅ 项目成功采用 kse！
 
 下一步：
-  1. 创建你的第一个 Spec：kse create-spec 01-00-my-feature
+  1. 创建你的第一个 Spec：kse spec bootstrap --name 01-00-my-feature --non-interactive
   2. 阅读指南：.kiro/README.md
 ```
 
@@ -130,26 +130,34 @@ Status: Ready
 
 ---
 
-## 步骤 3：创建你的第一个 Spec（2 分钟）
+## 步骤 3：生成你的第一个 Spec 初稿（2 分钟）
 
-让我们为用户登录功能创建一个 Spec：
+让我们为用户登录功能生成一个 Spec 初稿：
 
 ```bash
-kse create-spec 01-00-user-login
+kse spec bootstrap --name 01-00-user-login --non-interactive
 ```
 
 **预期输出：**
 ```
-✓ 创建 spec：01-00-user-login
-✓ 创建 requirements.md
-✓ 创建 design.md
-✓ 创建 tasks.md
+✓ 生成 Spec 初稿：01-00-user-login
+✓ 生成 requirements.md
+✓ 生成 design.md
+✓ 生成 tasks.md
 
 📝 下一步：
   1. 编辑 requirements.md 定义你要构建什么
   2. 编辑 design.md 定义你将如何构建
   3. 编辑 tasks.md 分解实现步骤
 ```
+
+多 Spec 场景下可直接使用：
+
+```bash
+kse spec bootstrap --specs "01-00-user-login,01-01-user-session" --max-parallel 3
+```
+
+上述命令会默认切换到 orchestrate 模式并并行推进。
 
 ### 3.1 编写需求
 
@@ -477,6 +485,13 @@ graph TD
 
 现在你的 Spec 已完成，为你的 AI 工具导出它：
 
+（可选）先执行标准化流程和闸口检查：
+
+```bash
+kse spec pipeline run --spec 01-00-user-login
+kse spec gate run --spec 01-00-user-login --json
+```
+
 ```bash
 kse context export 01-00-user-login
 ```
@@ -696,16 +711,17 @@ ls .kiro/specs/
 
 **kse 工作流：**
 ```
-创建 Spec → 导出上下文 → AI 实现 → 更新任务 → 重复
+bootstrap Spec → pipeline/gate → 导出上下文 → AI 实现 → 更新任务 → 重复
 ```
 
 **准备好构建你的下一个功能了吗？** 🚀
 
 ```bash
-kse create-spec 02-00-your-next-feature
+kse spec bootstrap --name 02-00-your-next-feature --non-interactive
 ```
 
 ---
 
-**版本**: 1.42.0  
-**最后更新**: 2026-02-11
+**版本**: 1.46.0  
+**最后更新**: 2026-02-13
+

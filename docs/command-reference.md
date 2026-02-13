@@ -2,7 +2,7 @@
 
 > Quick reference for all kse commands
 
-**Version**: 1.45.13  
+**Version**: 1.46.0  
 **Last Updated**: 2026-02-13
 
 ---
@@ -48,14 +48,25 @@ kse doctor
 ### Spec Management
 
 ```bash
-# Create new spec (interactive)
-kse create-spec
-
-# Create spec with name
+# Legacy low-level: create spec directory only
 kse create-spec 01-00-feature-name
 
-# List all specs
-kse list-specs
+# Bootstrap full Spec draft (requirements/design/tasks)
+kse spec bootstrap --name 01-00-feature-name --non-interactive
+
+# Run pipeline for one Spec
+kse spec pipeline run --spec 01-00-feature-name
+
+# Run gate for one Spec
+kse spec gate run --spec 01-00-feature-name --json
+
+# Multi-Spec mode defaults to orchestrate routing
+kse spec bootstrap --specs "spec-a,spec-b" --max-parallel 3
+kse spec pipeline run --specs "spec-a,spec-b" --max-parallel 3
+kse spec gate run --specs "spec-a,spec-b" --max-parallel 3
+
+# Show Spec progress
+kse status --verbose
 ```
 
 ### Task Management
@@ -211,6 +222,8 @@ kse orchestrate status [--json]
 kse orchestrate stop
 ```
 
+When you pass `--specs` to `kse spec bootstrap|pipeline run|gate run`, kse now defaults to this orchestrate mode automatically.
+
 Recommended `.kiro/config/orchestrator.json`:
 
 ```json
@@ -343,15 +356,18 @@ kse --version
 ### Starting a New Feature
 
 ```bash
-# 1. Create spec
-kse create-spec 01-00-my-feature
+# 1. Bootstrap spec draft
+kse spec bootstrap --name 01-00-my-feature --non-interactive
 
-# 2. Export context
+# 2. Run spec pipeline
+kse spec pipeline run --spec 01-00-my-feature
+
+# 3. Export context
 kse context export 01-00-my-feature
 
-# 3. Work on tasks...
+# 4. Work on tasks...
 
-# 4. Sync progress
+# 5. Sync progress
 kse workspace sync
 ```
 
@@ -662,3 +678,5 @@ Overall Health: 2 healthy, 1 unhealthy
 - Run `kse --help` for command reference
 - Check [GitHub Issues](https://github.com/heguangyong/kiro-spec-engine/issues)
 - Review [Documentation](../README.md)
+
+

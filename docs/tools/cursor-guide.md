@@ -213,7 +213,7 @@ class AuthController {
 
 **1. Create and write Spec**
 ```bash
-kse create-spec 01-00-user-login
+kse spec bootstrap --name 01-00-user-login --non-interactive
 # Edit requirements.md, design.md, tasks.md
 ```
 
@@ -694,7 +694,7 @@ Please help debug and fix the issue.
 **Start using kse with Cursor:** 🚀
 ```bash
 kse adopt
-kse create-spec 01-00-my-feature
+kse spec bootstrap --name 01-00-my-feature --non-interactive
 kse context export 01-00-my-feature
 # Open Cursor Composer (Cmd+K) and paste context
 ```
@@ -703,3 +703,4 @@ kse context export 01-00-my-feature
 
 **Version**: 1.42.0  
 **Last Updated**: 2026-02-11
+

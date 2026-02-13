@@ -632,7 +632,7 @@ kse docs archive --spec your-spec
 **When creating a Spec:**
 ```bash
 # 1. Create Spec
-kse create-spec 01-00-new-feature
+kse spec bootstrap --name 01-00-new-feature --non-interactive
 
 # 2. Verify structure
 kse docs validate --spec 01-00-new-feature
@@ -862,3 +862,4 @@ kse docs diagnose
 
 **Version**: 1.42.0  
 **Last Updated**: 2026-01-24
+

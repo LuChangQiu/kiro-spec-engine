@@ -394,7 +394,15 @@ kse orchestrate stop
 ```bash
 # 项目设置
 kse adopt                          # 在现有项目中采用 kse
-kse create-spec <name>             # 创建新 Spec
+kse create-spec <name>             # 兼容旧版：仅创建空 Spec 目录
+
+# Spec 工作流（推荐）
+kse spec bootstrap --name <spec> --non-interactive          # 生成 requirements/design/tasks 初稿
+kse spec pipeline run --spec <spec>                         # 对单个 Spec 执行分阶段流程
+kse spec gate run --spec <spec> --json                      # 执行标准化 Spec 闸口检查
+kse spec bootstrap --specs "<spec-a,spec-b>" --max-parallel <N>  # 多 Spec 默认转 orchestrate
+kse spec pipeline run --specs "<spec-a,spec-b>" --max-parallel <N> # 多 Spec 默认转 orchestrate
+kse spec gate run --specs "<spec-a,spec-b>" --max-parallel <N>     # 多 Spec 默认转 orchestrate
 
 # 上下文管理
 kse context export <spec-name>     # 为 AI 工具导出上下文
@@ -444,6 +452,8 @@ kse scene ontology agent-info --package <path> # 显示 Agent Hints
 kse orchestrate run --specs "<spec列表>" --max-parallel <N>  # 启动多 Agent 编排
 kse orchestrate status                         # 查看编排进度
 kse orchestrate stop                           # 停止所有子 Agent
+
+# 说明：当使用 --specs 调用 kse spec bootstrap/pipeline run/gate run 时，会默认转到 orchestrate 模式
 
 # DevOps 运维
 kse ops init <project-name>        # 初始化运维 specs
@@ -523,10 +533,12 @@ MIT 许可证 - 详见 [LICENSE](LICENSE) 文件。
 ```bash
 npm install -g kiro-spec-engine
 kse adopt
-kse create-spec 01-00-my-first-feature
+kse spec bootstrap --name 01-00-my-first-feature --non-interactive
 ```
 
 ---
 
-**版本**：1.45.13  
+**版本**：1.46.0  
 **最后更新**：2026-02-13
+
+

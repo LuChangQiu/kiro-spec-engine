@@ -143,7 +143,7 @@ See [Integration Modes Guide](integration-modes.md) for details.
 
 1. **Create Spec:**
 ```bash
-kse create-spec 01-00-user-login
+kse spec bootstrap --name 01-00-user-login --non-interactive
 # Edit requirements.md, design.md, tasks.md
 ```
 
@@ -356,7 +356,7 @@ Progress: 1/2 tasks complete (50%)
 **Yes!** Create a Spec for the bug:
 
 ```bash
-kse create-spec 01-01-fix-login-timeout
+kse spec bootstrap --name 01-01-fix-login-timeout --non-interactive
 ```
 
 **requirements.md:**
@@ -398,7 +398,7 @@ JWT token expiration set to 300 seconds instead of 1800 seconds
 **Absolutely!** Specs are great for refactoring:
 
 ```bash
-kse create-spec 02-00-refactor-auth-module
+kse spec bootstrap --name 02-00-refactor-auth-module --non-interactive
 ```
 
 **requirements.md:**
@@ -477,12 +477,12 @@ vim .kiro/templates/tasks.md
 # Project 1
 cd ~/projects/project1
 kse adopt
-kse create-spec 01-00-feature-a
+kse spec bootstrap --name 01-00-feature-a --non-interactive
 
 # Project 2
 cd ~/projects/project2
 kse adopt
-kse create-spec 01-00-feature-b
+kse spec bootstrap --name 01-00-feature-b --non-interactive
 ```
 
 **Each project has:**
@@ -526,13 +526,13 @@ kse context export 01-00-user-login
 
 ```bash
 # Main feature
-kse create-spec 01-00-user-management
+kse spec bootstrap --name 01-00-user-management --non-interactive
 
 # Sub-features
-kse create-spec 01-01-user-registration
-kse create-spec 01-02-user-login
-kse create-spec 01-03-user-profile
-kse create-spec 01-04-password-reset
+kse spec bootstrap --name 01-01-user-registration --non-interactive
+kse spec bootstrap --name 01-02-user-login --non-interactive
+kse spec bootstrap --name 01-03-user-profile --non-interactive
+kse spec bootstrap --name 01-04-password-reset --non-interactive
 ```
 
 **Or use phases in tasks.md:**
@@ -558,17 +558,17 @@ kse create-spec 01-04-password-reset
 
 **Documentation project:**
 ```bash
-kse create-spec 01-00-api-documentation
+kse spec bootstrap --name 01-00-api-documentation --non-interactive
 ```
 
 **Design project:**
 ```bash
-kse create-spec 02-00-ui-redesign
+kse spec bootstrap --name 02-00-ui-redesign --non-interactive
 ```
 
 **Process improvement:**
 ```bash
-kse create-spec 03-00-ci-cd-pipeline
+kse spec bootstrap --name 03-00-ci-cd-pipeline --non-interactive
 ```
 
 **Specs provide structure for any project** with requirements, design, and tasks.
@@ -694,3 +694,4 @@ kse create-spec 03-00-ci-cd-pipeline
 
 **Version**: 1.42.0  
 **Last Updated**: 2026-02-11
+

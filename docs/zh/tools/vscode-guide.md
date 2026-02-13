@@ -211,7 +211,7 @@
 
 ```bash
 # 1. 创建 Spec
-kse create-spec 01-00-user-login
+kse spec bootstrap --name 01-00-user-login --non-interactive
 
 # 2. 在 VS Code 中编写 Spec
 # - 打开 requirements.md
@@ -446,3 +446,4 @@ Copilot 使用所有打开文件的上下文。
 
 **版本**: 1.42.0  
 **最后更新**: 2026-02-11
+

@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.46.0] - 2026-02-13
+
+### Added
+- **Spec bootstrap command**: Added `kse spec bootstrap` to generate `requirements.md`, `design.md`, and `tasks.md` drafts in one step.
+- **Spec pipeline command**: Added `kse spec pipeline run` for staged Spec workflow execution with structured progress output.
+- **Spec gate command**: Added `kse spec gate run` to standardize gate checks and produce machine-readable gate reports.
+- **Multi-spec orchestrate helper**: Added shared helper logic for parsing multi-spec targets and routing execution through orchestrate runtime.
+- **Coverage for new spec workflow**: Added unit tests for bootstrap/pipeline/gate commands and multi-spec orchestrate default behavior.
+
+### Changed
+- **Default multi-spec execution mode**: `kse spec bootstrap`, `kse spec pipeline run`, and `kse spec gate run` now default to orchestrate mode when `--specs` is provided.
+- **CLI spec command routing**: Improved `kse spec` command routing for new subcommands while preserving backward compatibility for legacy paths.
+- **Documentation alignment**: Updated EN/ZH docs to promote the new spec-first workflow and document multi-spec default orchestrate behavior.
+
 ## [1.45.13] - 2026-02-13
 
 ### Fixed

@@ -174,7 +174,7 @@ Please help me implement the AuthController.
 
 **1. Create Spec**
 ```bash
-kse create-spec 01-00-user-login
+kse spec bootstrap --name 01-00-user-login --non-interactive
 # Edit requirements.md, design.md, tasks.md
 ```
 
@@ -434,7 +434,7 @@ Copilot considers all referenced files.
 **Start using:** 🚀
 ```bash
 kse adopt
-kse create-spec 01-00-my-feature
+kse spec bootstrap --name 01-00-my-feature --non-interactive
 # Open VS Code and start coding with Spec references
 ```
 
@@ -442,3 +442,4 @@ kse create-spec 01-00-my-feature
 
 **Version**: 1.42.0  
 **Last Updated**: 2026-02-11
+

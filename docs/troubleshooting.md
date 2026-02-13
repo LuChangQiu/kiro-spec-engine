@@ -249,7 +249,7 @@ No Specs found in .kiro/specs/
 
 **Create your first Spec:**
 ```bash
-kse create-spec 01-00-my-feature
+kse spec bootstrap --name 01-00-my-feature --non-interactive
 ```
 
 **Or check if Specs exist:**
@@ -263,7 +263,7 @@ ls -la .kiro/specs/
 
 **Symptoms:**
 ```bash
-$ kse create-spec my-feature
+$ kse spec bootstrap --name my-feature --non-interactive
 Error: Invalid Spec name format
 Expected: {number}-{number}-{kebab-case-name}
 ```
@@ -275,13 +275,13 @@ Expected: {number}-{number}-{kebab-case-name}
 **Use correct format:**
 ```bash
 # ✅ Correct
-kse create-spec 01-00-user-login
-kse create-spec 02-01-fix-auth-bug
+kse spec bootstrap --name 01-00-user-login --non-interactive
+kse spec bootstrap --name 02-01-fix-auth-bug --non-interactive
 
 # ❌ Wrong
-kse create-spec user-login
-kse create-spec 01-user-login
-kse create-spec UserLogin
+kse spec bootstrap --name user-login --non-interactive
+kse spec bootstrap --name 01-user-login --non-interactive
+kse spec bootstrap --name UserLogin --non-interactive
 ```
 
 ---
@@ -302,7 +302,7 @@ Error: Failed to export context
 ls .kiro/specs/01-00-user-login/
 
 # If not, create it
-kse create-spec 01-00-user-login
+kse spec bootstrap --name 01-00-user-login --non-interactive
 ```
 
 **2. Missing Spec files:**
@@ -1063,7 +1063,7 @@ ls -la .kiro/
 Context export fails for Spec with Chinese characters in filename
 
 ## Steps to Reproduce
-1. Create Spec: kse create-spec 01-00-用户登录
+1. Create Spec: kse spec bootstrap --name 01-00-用户登录 --non-interactive
 2. Run: kse context export 01-00-用户登录
 3. Error occurs
 
@@ -1132,3 +1132,4 @@ kse docs cleanup --dry-run
 
 **Version**: 1.42.0  
 **Last Updated**: 2026-02-11
+

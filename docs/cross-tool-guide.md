@@ -75,7 +75,7 @@ kse adopt
 
 2. **Create spec**:
    ```bash
-   kse create-spec 01-00-user-authentication
+   kse spec bootstrap --name 01-00-user-authentication --non-interactive
    ```
 
 3. **Work with AI**:
@@ -552,3 +552,4 @@ For other tools: Manual coordination required
 
 **Version History**:
 - v1.0 (2026-01-23): Initial cross-tool guide
+

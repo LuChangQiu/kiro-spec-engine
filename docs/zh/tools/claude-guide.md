@@ -129,7 +129,7 @@ Claude 通过 Web 界面工作，无需特殊配置。只需导出上下文并�
 
 ```bash
 # 1. 创建 Spec
-kse create-spec 01-00-user-login
+kse spec bootstrap --name 01-00-user-login --non-interactive
 
 # 2. 编写 requirements.md、design.md、tasks.md
 
@@ -346,3 +346,4 @@ Claude 擅长解释。询问：
 
 **版本**: 1.42.0  
 **最后更新**: 2026-02-11
+

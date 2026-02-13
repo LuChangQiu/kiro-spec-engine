@@ -1,6 +1,6 @@
 {
   "name": "kiro-spec-engine",
-  "version": "1.45.13",
+  "version": "1.46.0",
   "description": "kiro-spec-engine (kse) - A CLI tool and npm package for spec-driven development with AI coding assistants. NOT the Kiro IDE desktop application.",
   "main": "index.js",
   "bin": {
@@ -84,3 +84,4 @@
     "jest": "^27.5.1"
   }
 }
+

@@ -174,7 +174,7 @@ $ kse adopt
 No changes needed.
 
 💡 Next steps:
-   - Create a spec: kse create-spec 01-00-my-feature
+   - Create a spec: kse spec bootstrap --name 01-00-my-feature --non-interactive
    - Check status: kse status
 ```
 
@@ -585,7 +585,7 @@ After successful adoption:
 
 2. **Create your first spec**:
    ```bash
-   kse create-spec 01-00-my-feature
+   kse spec bootstrap --name 01-00-my-feature --non-interactive
    ```
 
 3. **Check project status**:
@@ -613,3 +613,4 @@ After successful adoption:
 ---
 
 **Happy adopting! 🔥**
+

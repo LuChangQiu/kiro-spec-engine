@@ -173,7 +173,7 @@
 
 ```bash
 # 1. 创建 Spec
-kse create-spec 01-00-user-login
+kse spec bootstrap --name 01-00-user-login --non-interactive
 
 # 2. 编写 requirements.md、design.md、tasks.md
 
@@ -278,3 +278,4 @@ kse prompt generate 01-00-user-login 1.1
 
 **版本**: 1.42.0  
 **最后更新**: 2026-02-11
+

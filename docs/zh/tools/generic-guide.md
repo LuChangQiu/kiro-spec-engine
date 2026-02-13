@@ -50,7 +50,7 @@ kse --version
 kse adopt
 
 # 创建 Spec
-kse create-spec 01-00-my-feature
+kse spec bootstrap --name 01-00-my-feature --non-interactive
 ```
 
 **使用：**
@@ -79,7 +79,7 @@ npm install -g kiro-spec-engine
 kse adopt
 
 # 创建 Spec
-kse create-spec 01-00-my-feature
+kse spec bootstrap --name 01-00-my-feature --non-interactive
 ```
 
 **使用：**
@@ -128,7 +128,7 @@ kse watch add --pattern ".kiro/specs/*/design.md" --action "kse context export {
 ### 步骤 1：创建 Spec
 
 ```bash
-kse create-spec 01-00-my-feature
+kse spec bootstrap --name 01-00-my-feature --non-interactive
 ```
 
 ### 步骤 2：编写 Spec
@@ -292,7 +292,7 @@ kse prompt generate 01-00-my-feature 1.1
 
 ```bash
 # 1. 创建并编写 Spec
-kse create-spec 01-00-user-login
+kse spec bootstrap --name 01-00-user-login --non-interactive
 # 编辑 requirements.md、design.md、tasks.md
 
 # 2. 导出上下文
@@ -315,7 +315,7 @@ cat .kiro/specs/01-00-user-login/context-export.md | pbcopy
 
 ```bash
 # 1. 创建并编写 Spec
-kse create-spec 01-00-user-login
+kse spec bootstrap --name 01-00-user-login --non-interactive
 
 # 2. 生成任务特定提示
 kse prompt generate 01-00-user-login 1.1
@@ -334,7 +334,7 @@ kse prompt generate 01-00-user-login 1.1
 
 ```bash
 # 1. 创建并编写 Spec
-kse create-spec 01-00-user-login
+kse spec bootstrap --name 01-00-user-login --non-interactive
 
 # 2. 在 Windsurf 中告诉 AI：
 "使用 kse 检查 01-00-user-login 的 spec 并实现任务 1.1"
@@ -352,7 +352,7 @@ kse create-spec 01-00-user-login
 
 ```bash
 # 1. 创建并编写 Spec
-kse create-spec 01-00-user-login
+kse spec bootstrap --name 01-00-user-login --non-interactive
 
 # 2. 创建实现文件
 # src/auth/AuthController.js
@@ -496,3 +496,4 @@ cp -r .kiro/templates/api-feature-template .kiro/specs/02-00-new-feature
 
 **版本**: 1.42.0  
 **最后更新**: 2026-02-11
+

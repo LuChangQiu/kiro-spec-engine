@@ -63,11 +63,24 @@ I need a user login feature with email and password.
 ```
 
 **Your AI will:**
-1. Suggest creating a Spec first
-2. Help you define requirements
-3. Design the solution
-4. Break down into tasks
-5. Implement according to the Spec
+1. Bootstrap a Spec draft (`requirements/design/tasks`)
+2. Refine requirements and design with you
+3. Run the staged Spec workflow
+4. Implement according to the Spec
+
+**If you want to run commands manually:**
+
+```bash
+# Single-Spec recommended flow
+kse spec bootstrap --name 01-00-user-login --non-interactive
+kse spec pipeline run --spec 01-00-user-login
+kse spec gate run --spec 01-00-user-login --json
+
+# Multi-Spec flow (defaults to orchestrate mode)
+kse spec bootstrap --specs "01-00-user-login,01-01-user-session" --max-parallel 3
+kse spec pipeline run --specs "01-00-user-login,01-01-user-session" --max-parallel 3
+kse spec gate run --specs "01-00-user-login,01-01-user-session" --max-parallel 3
+```
 
 **The AI uses kse commands automatically** - you don't need to learn them.
 
@@ -89,5 +102,6 @@ You're now using Spec-driven development. Your AI understands the methodology an
 
 ---
 
-**Version**: 1.42.0  
-**Last Updated**: 2026-02-11
+**Version**: 1.46.0  
+**Last Updated**: 2026-02-13
+

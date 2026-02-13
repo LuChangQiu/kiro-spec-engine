@@ -1,4 +1,4 @@
-﻿# kse - Kiro Spec Engine
+# kse - Kiro Spec Engine
 
 [![npm version](https://badge.fury.io/js/kiro-spec-engine.svg)](https://badge.fury.io/js/kiro-spec-engine)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -354,6 +354,8 @@ kse orchestrate status
 kse orchestrate stop
 ```
 
+Tip: `kse spec bootstrap|pipeline run|gate run --specs ...` now defaults to this orchestrate mode automatically.
+
 **Recommended Codex-Orchestrator config (`.kiro/config/orchestrator.json`)**:
 ```json
 {
@@ -475,7 +477,15 @@ English and Chinese interfaces
 ```bash
 # Project setup
 kse adopt                          # Adopt kse in existing project
-kse create-spec <name>             # Create new Spec
+kse create-spec <name>             # Legacy: create empty Spec folder only
+
+# Spec workflow (recommended)
+kse spec bootstrap --name <spec> --non-interactive         # Generate requirements/design/tasks draft
+kse spec pipeline run --spec <spec>                         # Run staged workflow for one Spec
+kse spec gate run --spec <spec> --json                      # Run standardized Spec gate checks
+kse spec bootstrap --specs "<spec-a,spec-b>" --max-parallel <N>  # Multi-Spec defaults to orchestrate
+kse spec pipeline run --specs "<spec-a,spec-b>" --max-parallel <N> # Multi-Spec defaults to orchestrate
+kse spec gate run --specs "<spec-a,spec-b>" --max-parallel <N>     # Multi-Spec defaults to orchestrate
 
 # Context management
 kse context export <spec-name>     # Export context for AI tools
@@ -629,7 +639,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ```bash
 npm install -g kiro-spec-engine
 kse adopt
-kse create-spec 01-00-my-first-feature
+kse spec bootstrap --name 01-00-my-first-feature --non-interactive
 ```
 
 ---
@@ -665,5 +675,6 @@ A deep conversation about AI development trends, Neo-Confucian philosophy, and s
 
 ---
 
-**Version**: 1.45.13  
+**Version**: 1.46.0  
 **Last Updated**: 2026-02-13
+

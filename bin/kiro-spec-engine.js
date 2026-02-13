@@ -14,6 +14,9 @@ const rollbackCommand = require('../lib/commands/rollback');
 const watchCommands = require('../lib/commands/watch');
 const workflowsCommand = require('../lib/commands/workflows');
 const registerCollabCommands = require('../lib/commands/collab');
+const { registerSpecBootstrapCommand } = require('../lib/commands/spec-bootstrap');
+const { registerSpecPipelineCommand } = require('../lib/commands/spec-pipeline');
+const { registerSpecGateCommand } = require('../lib/commands/spec-gate');
 const VersionChecker = require('../lib/version/version-checker');
 
 const i18n = getI18n();
@@ -36,6 +39,76 @@ async function checkVersionBeforeCommand(options = {}) {
 }
 
 const program = new Command();
+
+/**
+ * Normalize `kse spec ...` compatibility routes.
+ *
+ * Supported routes:
+ * - `kse spec bootstrap ...` -> `kse spec-bootstrap ...`
+ * - `kse spec pipeline ...` -> `kse spec-pipeline ...`
+ * - `kse spec gate ...` -> `kse spec-gate ...`
+ * - `kse spec create <name> ...` -> `kse create-spec <name> ...`
+ * - `kse spec <name> ...` -> `kse create-spec <name> ...` (legacy)
+ *
+ * @param {string[]} argv
+ * @returns {string[]}
+ */
+function normalizeSpecCommandArgs(argv) {
+  if (!Array.isArray(argv) || argv.length === 0) {
+    return argv;
+  }
+
+  const normalized = [...argv];
+  const commandIndex = findCommandIndex(normalized);
+  if (commandIndex < 0 || normalized[commandIndex] !== 'spec') {
+    return normalized;
+  }
+
+  const commandToken = normalized[commandIndex + 1];
+
+  if (commandToken === 'bootstrap') {
+    normalized.splice(commandIndex, 2, 'spec-bootstrap');
+    return normalized;
+  }
+
+  if (commandToken === 'pipeline') {
+    normalized.splice(commandIndex, 2, 'spec-pipeline');
+    return normalized;
+  }
+
+  if (commandToken === 'gate') {
+    normalized.splice(commandIndex, 2, 'spec-gate');
+    return normalized;
+  }
+
+  if (commandToken === 'create') {
+    normalized.splice(commandIndex, 2, 'create-spec');
+    return normalized;
+  }
+
+  normalized.splice(commandIndex, 1, 'create-spec');
+  return normalized;
+}
+
+/**
+ * Find command token index after global options.
+ * @param {string[]} args
+ * @returns {number}
+ */
+function findCommandIndex(args) {
+  for (let index = 0; index < args.length; index += 1) {
+    const token = args[index];
+    if (!token.startsWith('-')) {
+      return index;
+    }
+
+    if (token === '-l' || token === '--lang') {
+      index += 1;
+    }
+  }
+
+  return -1;
+}
 
 // 版本和基本信息
 program
@@ -207,6 +280,15 @@ program
       process.exit(1);
     }
   });
+
+// Spec bootstrap wizard command
+registerSpecBootstrapCommand(program);
+
+// Spec workflow pipeline command
+registerSpecPipelineCommand(program);
+
+// Spec gate command
+registerSpecGateCommand(program);
 
 // 系统诊断命令
 program
@@ -687,6 +769,8 @@ async function updateProjectConfig(projectName) {
 // Run steering directory compliance check before parsing commands
 (async function() {
   const { runSteeringComplianceCheck } = require('../lib/steering');
+  const normalizedArgs = normalizeSpecCommandArgs(process.argv.slice(2));
+  process.argv = [process.argv[0], process.argv[1], ...normalizedArgs];
   
   // Check for bypass flags
   const args = process.argv.slice(2);

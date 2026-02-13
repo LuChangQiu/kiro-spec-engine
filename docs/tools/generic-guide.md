@@ -68,7 +68,7 @@ kse exports plain text that any AI can understand.
 ### Step 1: Create Your Spec
 
 ```bash
-kse create-spec 01-00-user-login
+kse spec bootstrap --name 01-00-user-login --non-interactive
 # Edit requirements.md, design.md, tasks.md
 ```
 
@@ -434,7 +434,7 @@ If you're building an AI coding tool, consider:
 **Start using:** 🚀
 ```bash
 kse adopt
-kse create-spec 01-00-my-feature
+kse spec bootstrap --name 01-00-my-feature --non-interactive
 kse context export 01-00-my-feature
 # Provide context to your AI tool
 ```
@@ -443,3 +443,4 @@ kse context export 01-00-my-feature
 
 **Version**: 1.42.0  
 **Last Updated**: 2026-02-11
+

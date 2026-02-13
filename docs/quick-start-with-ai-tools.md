@@ -95,7 +95,7 @@ kse adopt
 ### 步骤 3：创建你的第一个 Spec
 
 ```bash
-kse create-spec 01-00-user-login
+kse spec bootstrap --name 01-00-user-login --non-interactive
 ```
 
 然后编辑生成的文件：
@@ -157,7 +157,7 @@ kse context export 01-00-user-login
 ### 1. 创建 Spec
 
 ```bash
-kse create-spec 01-00-user-login
+kse spec bootstrap --name 01-00-user-login --non-interactive
 ```
 
 ### 2. 编写需求（requirements.md）
@@ -370,5 +370,6 @@ kse context export 01-00-user-login
 ```bash
 npm install -g kiro-spec-engine
 kse adopt
-kse create-spec 01-00-my-feature
+kse spec bootstrap --name 01-00-my-feature --non-interactive
 ```
+

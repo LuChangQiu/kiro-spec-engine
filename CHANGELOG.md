@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.45.8] - 2026-02-13
+
+### Fixed
+- **PowerShell UTF-8 encoding for Chinese prompts**: `AgentSpawner.spawn()` now uses `-Encoding UTF8` parameter in PowerShell `Get-Content` command, fixing garbled Chinese characters in bootstrap prompt when steering files contain non-ASCII text (fixes `unexpected argument '鑷富瀹屾垚...'` error)
+
 ## [1.45.7] - 2026-02-13
 
 ### Fixed

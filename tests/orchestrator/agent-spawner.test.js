@@ -12,6 +12,7 @@
  */
 
 const { EventEmitter } = require('events');
+const path = require('path');
 
 // --- Mock child_process.spawn ---
 let mockChildProcess;
@@ -32,9 +33,10 @@ jest.mock('child_process', () => ({
     mockChildProcess = mockCreateChildProcess();
     return mockChildProcess;
   }),
+  spawnSync: jest.fn(() => ({ status: 0 })),
 }));
 
-const { spawn: mockSpawn } = require('child_process');
+const { spawn: mockSpawn, spawnSync: mockSpawnSync } = require('child_process');
 const { AgentSpawner } = require('../../lib/orchestrator/agent-spawner');
 
 // Helper: flush microtask queue
@@ -84,6 +86,8 @@ describe('AgentSpawner', () => {
 
     spawner = new AgentSpawner('/workspace', mockConfig, mockRegistry, mockPromptBuilder);
     mockSpawn.mockClear();
+    mockSpawnSync.mockClear();
+    mockSpawnSync.mockReturnValue({ status: 0 });
   });
 
   afterEach(() => {
@@ -160,6 +164,15 @@ describe('AgentSpawner', () => {
       expect(agent.stderr).toBe('');
       expect(agent.events).toEqual([]);
       expect(agent.startedAt).toBeDefined();
+    });
+
+    test('throws when bootstrap prompt is undefined and does not spawn process', async () => {
+      mockPromptBuilder.buildPrompt.mockResolvedValue(undefined);
+
+      await expect(spawner.spawn('my-spec')).rejects.toThrow(
+        'Invalid bootstrap prompt'
+      );
+      expect(mockSpawn).not.toHaveBeenCalled();
     });
 
     test('throws when API key is not available from env or auth file', async () => {
@@ -267,6 +280,31 @@ describe('AgentSpawner', () => {
       expect(cmd).toBe('codex');
     });
 
+    test('falls back to npx @openai/codex when codex is unavailable', async () => {
+      mockSpawnSync.mockImplementation((_lookupCmd, args) => {
+        const target = args[0];
+        if (target === 'codex') return { status: 1 };
+        if (target === 'npx') return { status: 0 };
+        return { status: 1 };
+      });
+
+      await spawner.spawn('my-spec');
+
+      const [cmd, args, opts] = mockSpawn.mock.calls[0];
+      expect(cmd).toBe('npx');
+      expect(args[0]).toBe('@openai/codex');
+      expect(opts.shell).toBe(true);
+    });
+
+    test('keeps codex as final fallback when neither codex nor npx is available', async () => {
+      mockSpawnSync.mockReturnValue({ status: 1 });
+
+      await spawner.spawn('my-spec');
+
+      const [cmd] = mockSpawn.mock.calls[0];
+      expect(cmd).toBe('codex');
+    });
+
     test('on Windows, spawns via powershell.exe with temp file prompt', async () => {
       Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
 
@@ -298,6 +336,44 @@ describe('AgentSpawner', () => {
         expect(capturedTmpPath).toMatch(/kse-prompt-/);
       } finally {
         require('fs').writeFileSync = originalWriteFileSync;
+      }
+    });
+
+    test('on Windows, sanitizes agentId before creating prompt temp file', async () => {
+      Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
+      mockRegistry.register.mockResolvedValue({ agentId: 'zeno-v4/uuid:1\\child*?' });
+
+      const fsModule = require('fs');
+      const originalWriteFileSync = fsModule.writeFileSync;
+      let capturedTmpPath = null;
+      fsModule.writeFileSync = jest.fn((p) => { capturedTmpPath = p; });
+
+      try {
+        await spawner.spawn('my-spec');
+        const tmpFilename = path.basename(capturedTmpPath);
+        expect(tmpFilename).toMatch(/^kse-prompt-/);
+        expect(tmpFilename).not.toMatch(/[<>:"/\\|?*]/);
+      } finally {
+        fsModule.writeFileSync = originalWriteFileSync;
+      }
+    });
+
+    test('on Windows, throws on empty prompt before temp file write', async () => {
+      Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
+      mockPromptBuilder.buildPrompt.mockResolvedValue('   ');
+
+      const fsModule = require('fs');
+      const originalWriteFileSync = fsModule.writeFileSync;
+      fsModule.writeFileSync = jest.fn();
+
+      try {
+        await expect(spawner.spawn('my-spec')).rejects.toThrow(
+          'Invalid bootstrap prompt'
+        );
+        expect(fsModule.writeFileSync).not.toHaveBeenCalled();
+        expect(mockSpawn).not.toHaveBeenCalled();
+      } finally {
+        fsModule.writeFileSync = originalWriteFileSync;
       }
     });
 

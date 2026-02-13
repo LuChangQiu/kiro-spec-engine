@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.45.13] - 2026-02-13
+
+### Fixed
+- **Windows prompt guard hardening**: `AgentSpawner.spawn()` now validates bootstrap prompt both right after prompt build and after Windows prompt extraction, failing fast before any temp file write when prompt is missing/empty.
+- **Windows temp filename safety**: prompt temp filename generation now sanitizes full Windows-invalid character set (including `/`, `\`, control chars, and trailing dot/space cases) to prevent invalid path/stream edge cases.
+- **Codex command fallback**: when `codexCommand` is not configured, spawner now auto-detects `codex` and falls back to `npx @openai/codex` when global `codex` is unavailable.
+
+### Added
+- **Regression tests**: added unit tests for undefined/empty prompt guardrails, Windows agentId filename sanitization, and codex→npx command fallback path.
+- **Codex orchestration docs**: added recommended Codex-only orchestrator configuration examples in README, README.zh, `.kiro/README.md`, and command reference.
+
 ## [1.45.12] - 2026-02-13
 
 ### Fixed

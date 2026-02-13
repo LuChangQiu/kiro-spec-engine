@@ -340,7 +340,7 @@ Structure your work with Requirements → Design → Tasks workflow
 - **Retry Mechanism**: Configurable automatic retry for failed Specs
 - **Real-Time Monitoring**: Track per-Spec status and overall orchestration progress
 - **Graceful Termination**: Stop all sub-agents cleanly (SIGTERM → SIGKILL)
-- **Configurable**: Agent backend, parallelism, timeout, retries via `.kiro/config/orchestrator.json`
+- **Configurable**: Codex command, args, parallelism, timeout, retries via `.kiro/config/orchestrator.json`
 
 **Quick Start**:
 ```bash
@@ -353,6 +353,21 @@ kse orchestrate status
 # Stop all sub-agents
 kse orchestrate stop
 ```
+
+**Recommended Codex-Orchestrator config (`.kiro/config/orchestrator.json`)**:
+```json
+{
+  "agentBackend": "codex",
+  "maxParallel": 3,
+  "timeoutSeconds": 900,
+  "maxRetries": 2,
+  "apiKeyEnvVar": "CODEX_API_KEY",
+  "codexArgs": ["--skip-git-repo-check"],
+  "codexCommand": "npx @openai/codex"
+}
+```
+
+If Codex CLI is globally installed, you can set `"codexCommand": "codex"`.
 
 ### Spec-Level Steering & Context Sync 🚀 NEW in v1.44.0
 - **Spec Steering (L4)**: Independent `steering.md` per Spec with constraints, notes, and decisions — zero cross-agent conflict
@@ -650,5 +665,5 @@ A deep conversation about AI development trends, Neo-Confucian philosophy, and s
 
 ---
 
-**Version**: 1.45.0  
-**Last Updated**: 2026-02-12
+**Version**: 1.45.13  
+**Last Updated**: 2026-02-13

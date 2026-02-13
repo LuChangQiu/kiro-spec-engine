@@ -296,7 +296,7 @@ sequenceDiagram
 - **重试机制**: 可配置的失败自动重试
 - **实时监控**: 跟踪每个 Spec 状态和整体编排进度
 - **优雅终止**: 干净停止所有子 Agent（SIGTERM → SIGKILL）
-- **可配置**: 通过 `.kiro/config/orchestrator.json` 配置 Agent 后端、并行度、超时、重试次数
+- **可配置**: 通过 `.kiro/config/orchestrator.json` 配置 Codex 命令、参数、并行度、超时、重试次数
 
 **快速开始**:
 ```bash
@@ -309,6 +309,21 @@ kse orchestrate status
 # 停止所有子 Agent
 kse orchestrate stop
 ```
+
+**推荐 Codex 编排配置（`.kiro/config/orchestrator.json`）**:
+```json
+{
+  "agentBackend": "codex",
+  "maxParallel": 3,
+  "timeoutSeconds": 900,
+  "maxRetries": 2,
+  "apiKeyEnvVar": "CODEX_API_KEY",
+  "codexArgs": ["--skip-git-repo-check"],
+  "codexCommand": "npx @openai/codex"
+}
+```
+
+如果你已全局安装 Codex CLI，可将 `"codexCommand"` 改为 `"codex"`。
 
 ### Spec 级 Steering 与上下文同步 🚀 v1.44.0 新增
 - **Spec Steering (L4)**: 每个 Spec 独立的 `steering.md`，包含约束、注意事项、决策记录 — 跨 Agent 零冲突
@@ -513,5 +528,5 @@ kse create-spec 01-00-my-first-feature
 
 ---
 
-**版本**：1.45.0  
-**最后更新**：2026-02-12
+**版本**：1.45.13  
+**最后更新**：2026-02-13

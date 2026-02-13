@@ -27,6 +27,7 @@ jest.mock('child_process', () => ({
     mockChildProcess = mockCreateChildProcess();
     return mockChildProcess;
   }),
+  spawnSync: jest.fn(() => ({ status: 0 })),
 }));
 
 const { spawn: mockSpawn } = require('child_process');

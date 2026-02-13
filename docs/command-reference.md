@@ -2,8 +2,8 @@
 
 > Quick reference for all kse commands
 
-**Version**: 1.42.0  
-**Last Updated**: 2026-02-11
+**Version**: 1.45.13  
+**Last Updated**: 2026-02-13
 
 ---
 
@@ -196,6 +196,33 @@ kse repo exec "<command>" [--dry-run]
 
 # Check repository health
 kse repo health [--json]
+```
+
+### Agent Orchestration (Codex)
+
+```bash
+# Start orchestration for multiple specs
+kse orchestrate run --specs "spec-a,spec-b,spec-c" --max-parallel 3
+
+# Show orchestration status
+kse orchestrate status [--json]
+
+# Stop all running sub-agents
+kse orchestrate stop
+```
+
+Recommended `.kiro/config/orchestrator.json`:
+
+```json
+{
+  "agentBackend": "codex",
+  "maxParallel": 3,
+  "timeoutSeconds": 900,
+  "maxRetries": 2,
+  "apiKeyEnvVar": "CODEX_API_KEY",
+  "codexArgs": ["--skip-git-repo-check"],
+  "codexCommand": "npx @openai/codex"
+}
 ```
 
 ### Scene Template Engine

@@ -96,12 +96,20 @@ Automate parallel Spec execution via Codex CLI sub-agents (replaces manual multi
 - `kse orchestrate run --specs "spec-a,spec-b,spec-c" --max-parallel 3` — Start multi-agent orchestration
 - `kse orchestrate status` — View orchestration progress (per-Spec status, overall state)
 - `kse orchestrate stop` — Gracefully stop all sub-agents
-- **OrchestratorConfig** (`lib/orchestrator`) — Configuration management (agent backend, parallelism, timeout, retries) via `.kiro/config/orchestrator.json`
+- **OrchestratorConfig** (`lib/orchestrator`) — Configuration management (Codex command, parallelism, timeout, retries) via `.kiro/config/orchestrator.json`
 - **BootstrapPromptBuilder** (`lib/orchestrator`) — Builds bootstrap prompts with Spec path, steering context, execution instructions
 - **AgentSpawner** (`lib/orchestrator`) — Process manager for Codex CLI sub-agents with timeout detection, graceful termination (SIGTERM → SIGKILL)
 - **StatusMonitor** (`lib/orchestrator`) — Codex JSON Lines event parsing, per-Spec status tracking, orchestration-level aggregation
 - **OrchestrationEngine** (`lib/orchestrator`) — DAG-based dependency analysis, batch scheduling, parallel execution (≤ maxParallel), failure propagation, retry mechanism
 - Prerequisites: Codex CLI installed, `CODEX_API_KEY` environment variable set
+- Recommended config:
+```json
+{
+  "agentBackend": "codex",
+  "codexCommand": "npx @openai/codex",
+  "codexArgs": ["--skip-git-repo-check"]
+}
+```
 - 11 correctness properties verified via property-based testing
 
 ### Scene Runtime (Template Engine + Quality + ERP)
@@ -242,6 +250,6 @@ A Spec is a complete feature definition with three parts:
 ---
 
 **Project Type**: Spec-driven development  
-**kse Version**: 1.44.x  
-**Last Updated**: 2026-02-12  
+**kse Version**: 1.45.13  
+**Last Updated**: 2026-02-13  
 **Purpose**: Guide AI tools to work effectively with this project

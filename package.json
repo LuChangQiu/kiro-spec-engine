@@ -4,8 +4,8 @@
   "description": "kiro-spec-engine (kse) - A CLI tool and npm package for spec-driven development with AI coding assistants. NOT the Kiro IDE desktop application.",
   "main": "index.js",
   "bin": {
-    "kiro-spec-engine": "./bin/kiro-spec-engine.js",
-    "kse": "./bin/kiro-spec-engine.js"
+    "kiro-spec-engine": "bin/kiro-spec-engine.js",
+    "kse": "bin/kiro-spec-engine.js"
   },
   "files": [
     "bin/",
@@ -56,7 +56,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/heguangyong/kiro-spec-engine.git"
+    "url": "git+https://github.com/heguangyong/kiro-spec-engine.git"
   },
   "bugs": {
     "url": "https://github.com/heguangyong/kiro-spec-engine/issues"

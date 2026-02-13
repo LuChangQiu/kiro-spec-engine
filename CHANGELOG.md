@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.45.12] - 2026-02-13
+
+### Fixed
+- **Windows prompt validation**: `AgentSpawner.spawn()` now validates `stdinPrompt` after `finalArgs.pop()` to ensure it's a non-empty string before writing to temp file, preventing undefined/null values from causing silent failures (fixes issue where bootstrap prompt generation failures weren't caught, leading to empty temp files and `error: unexpected argument` errors)
+
 ## [1.45.11] - 2026-02-13
 
 ### Fixed

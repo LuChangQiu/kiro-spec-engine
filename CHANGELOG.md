@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.45.7] - 2026-02-13
+
+### Fixed
+- **Windows CMD 8191 character limit**: `AgentSpawner.spawn()` now writes bootstrap prompt to temp file and spawns via PowerShell on Windows, bypassing cmd.exe's 8191 character command line limit (fixes `The command line is too long` error when bootstrap prompt exceeds 8K characters)
+
 ## [1.45.6] - 2026-02-13
 
 ### Fixed

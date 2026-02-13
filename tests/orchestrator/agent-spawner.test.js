@@ -48,12 +48,18 @@ describe('AgentSpawner', () => {
   let mockRegistry;
   let mockPromptBuilder;
   let savedApiKey;
+  let savedPlatform;
 
   beforeEach(() => {
     savedApiKey = process.env.CODEX_API_KEY;
     process.env.CODEX_API_KEY = 'test-api-key-123';
     mockChildren.length = 0;
     mockChildProcess = null;
+
+    // Force non-Windows platform for most tests so they exercise the direct
+    // codex spawn path.  Windows-specific tests override this explicitly.
+    savedPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
+    Object.defineProperty(process, 'platform', { value: 'linux', configurable: true });
 
     mockConfig = {
       getConfig: jest.fn().mockResolvedValue({
@@ -81,6 +87,11 @@ describe('AgentSpawner', () => {
   });
 
   afterEach(() => {
+    // Restore platform
+    if (savedPlatform) {
+      Object.defineProperty(process, 'platform', savedPlatform);
+    }
+
     if (savedApiKey !== undefined) {
       process.env.CODEX_API_KEY = savedApiKey;
     } else {
@@ -125,13 +136,7 @@ describe('AgentSpawner', () => {
 
       const [, args] = mockSpawn.mock.calls[0];
       const promptArg = args[args.length - 1];
-      // On Windows (shell: true), the prompt is quoted to prevent shell splitting
-      const expectedPrompt = 'Execute Spec test-spec with full context.';
-      if (process.platform === 'win32') {
-        expect(promptArg).toBe(`"${expectedPrompt}"`);
-      } else {
-        expect(promptArg).toBe(expectedPrompt);
-      }
+      expect(promptArg).toBe('Execute Spec test-spec with full context.');
       expect(mockPromptBuilder.buildPrompt).toHaveBeenCalledWith('my-spec');
     });
 
@@ -262,39 +267,64 @@ describe('AgentSpawner', () => {
       expect(cmd).toBe('codex');
     });
 
-    test('sets shell: true on Windows platform', async () => {
-      const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
-      Object.defineProperty(process, 'platform', { value: 'win32' });
+    test('on Windows, spawns via powershell.exe with temp file prompt', async () => {
+      Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
+
+      // Mock fs.writeFileSync to capture temp file write
+      const originalWriteFileSync = require('fs').writeFileSync;
+      let capturedTmpPath = null;
+      let capturedTmpContent = null;
+      require('fs').writeFileSync = jest.fn((p, c) => {
+        capturedTmpPath = p;
+        capturedTmpContent = c;
+      });
 
       try {
         await spawner.spawn('my-spec');
-        const [, , opts] = mockSpawn.mock.calls[0];
-        expect(opts.shell).toBe(true);
+        const [cmd, args, opts] = mockSpawn.mock.calls[0];
+
+        // Should spawn powershell.exe, not codex
+        expect(cmd).toBe('powershell.exe');
+        expect(args[0]).toBe('-NoProfile');
+        expect(args[1]).toBe('-Command');
+        // The PowerShell command should contain the codex invocation
+        expect(args[2]).toContain('codex');
+        expect(args[2]).toContain('exec');
+        expect(args[2]).toContain('Get-Content');
+        // shell should be false (spawning powershell directly)
+        expect(opts.shell).toBe(false);
+        // Temp file should have been written with the prompt
+        expect(capturedTmpContent).toBe('Execute Spec test-spec with full context.');
+        expect(capturedTmpPath).toMatch(/kse-prompt-/);
       } finally {
-        if (originalPlatform) {
-          Object.defineProperty(process, 'platform', originalPlatform);
-        }
+        require('fs').writeFileSync = originalWriteFileSync;
       }
     });
 
-    test('quotes args containing spaces when shell: true on Windows', async () => {
-      const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
-      Object.defineProperty(process, 'platform', { value: 'win32' });
+    test('on Windows, cleans up temp file on process close', async () => {
+      Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
+
+      const fsModule = require('fs');
+      const originalWriteFileSync = fsModule.writeFileSync;
+      const originalUnlinkSync = fsModule.unlinkSync;
+      let capturedTmpPath = null;
+      fsModule.writeFileSync = jest.fn((p) => { capturedTmpPath = p; });
+      fsModule.unlinkSync = jest.fn();
 
       try {
-        await spawner.spawn('my-spec');
-        const [, spawnArgs] = mockSpawn.mock.calls[0];
-        // The prompt (last arg) contains spaces and must be quoted
-        const promptArg = spawnArgs[spawnArgs.length - 1];
-        expect(promptArg.startsWith('"')).toBe(true);
-        expect(promptArg.endsWith('"')).toBe(true);
-        // Args without spaces should NOT be quoted
-        const execArg = spawnArgs.find(a => a === 'exec');
-        expect(execArg).toBe('exec');
+        const agent = await spawner.spawn('my-spec');
+        expect(agent._promptTmpFile).toBeTruthy();
+        expect(capturedTmpPath).toBeTruthy();
+
+        // Simulate process close
+        mockChildProcess.emit('close', 0);
+        await flushPromises();
+
+        expect(fsModule.unlinkSync).toHaveBeenCalledWith(capturedTmpPath);
+        expect(agent._promptTmpFile).toBeNull();
       } finally {
-        if (originalPlatform) {
-          Object.defineProperty(process, 'platform', originalPlatform);
-        }
+        fsModule.writeFileSync = originalWriteFileSync;
+        fsModule.unlinkSync = originalUnlinkSync;
       }
     });
   });

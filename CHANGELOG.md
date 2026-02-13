@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.46.1] - 2026-02-13
+
+### Fixed
+- **NPM publish metadata normalization**: Updated `package.json` `bin` entries to use `bin/kiro-spec-engine.js` (without `./`) so npm no longer strips CLI bin mappings during publish.
+- **Repository metadata format**: Normalized `repository.url` to `git+https://github.com/heguangyong/kiro-spec-engine.git` to remove npm publish auto-correction warnings.
+
 ## [1.46.0] - 2026-02-13
 
 ### Added

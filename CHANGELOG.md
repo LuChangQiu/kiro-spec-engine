@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.45.9] - 2026-02-13
+
+### Fixed
+- **PowerShell parameter expansion error**: `AgentSpawner.spawn()` now stores prompt in `$prompt` variable before passing to codex command, preventing PowerShell from splitting multi-word prompts into separate arguments (fixes `error: unexpected argument 'Spec' found` when bootstrap prompt contains spaces)
+
 ## [1.45.8] - 2026-02-13
 
 ### Fixed

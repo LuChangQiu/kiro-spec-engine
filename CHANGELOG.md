@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.45.11] - 2026-02-13
+
+### Fixed
+- **Windows filename special characters**: `AgentSpawner.spawn()` now sanitizes agentId by removing Windows reserved characters `[:<>"|?*]` before using in temp file path, fixing file path parsing errors when agentId contains colon (e.g., `"zeno-v4-uuid:1"` format)
+
 ## [1.45.10] - 2026-02-13
 
 ### Fixed

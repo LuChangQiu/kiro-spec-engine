@@ -321,6 +321,28 @@ describe('ArchiveTool', () => {
       expect(artifacts[0].targetSubdir).toBe('docs');
       expect(artifacts[1].targetSubdir).toBe('docs');
     });
+
+    test('should fallback to custom when preferred subdir is not allowed', () => {
+      const constrainedTool = new ArchiveTool(testDir, {
+        ...config,
+        specSubdirs: ['reports', 'scripts', 'custom']
+      });
+
+      expect(constrainedTool.determineTargetSubdir('notes.md')).toBe('custom');
+      expect(constrainedTool.determineTargetSubdir('feature.test.js')).toBe('custom');
+      expect(constrainedTool.determineTargetSubdir('test-results.json')).toBe('custom');
+    });
+
+    test('should fallback to mapped subdirs when custom is unavailable', () => {
+      const constrainedTool = new ArchiveTool(testDir, {
+        ...config,
+        specSubdirs: ['reports', 'scripts']
+      });
+
+      expect(constrainedTool.determineTargetSubdir('notes.md')).toBe('reports');
+      expect(constrainedTool.determineTargetSubdir('feature.test.js')).toBe('scripts');
+      expect(constrainedTool.determineTargetSubdir('test-results.json')).toBe('reports');
+    });
   });
   
   describe('generateReport', () => {

@@ -269,7 +269,6 @@
 ### 社区
 - 💬 [GitHub Discussions](https://github.com/heguangyong/kiro-spec-engine/discussions)
 - 🐛 [GitHub Issues](https://github.com/heguangyong/kiro-spec-engine/issues)
-- 📧 support@example.com
 
 ---
 

@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **npm package hygiene**: Excluded transient Python bytecode artifacts (`__pycache__`, `*.pyc/pyo/pyd`) from published package contents to reduce package noise and size.
+- **Documentation contact placeholders**: Replaced `yourusername` placeholder repository links in onboarding docs with the canonical project URL and removed stale example email contact.
 
 ## [1.46.2] - 2026-02-14
 

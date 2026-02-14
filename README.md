@@ -636,9 +636,8 @@ See [Command Reference](docs/command-reference.md) for complete documentation.
 ### Getting Help
 
 - 📖 **Documentation**: Start with the [Quick Start Guide](docs/quick-start.md)
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/yourusername/kiro-spec-engine/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/kiro-spec-engine/discussions)
-- 📧 **Email**: support@example.com
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/heguangyong/kiro-spec-engine/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/heguangyong/kiro-spec-engine/discussions)
 
 ### Contributing
 
@@ -651,7 +650,7 @@ We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for:
 ### Development Setup
 
 ```bash
-git clone https://github.com/yourusername/kiro-spec-engine.git
+git clone https://github.com/heguangyong/kiro-spec-engine.git
 cd kiro-spec-engine
 npm install
 npm link  # For local development

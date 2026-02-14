@@ -100,6 +100,7 @@ Detailed technical documentation:
 
 - **[Adoption Guide](adoption-guide.md)** - Adopting kse in existing projects
 - **[Upgrade Guide](upgrade-guide.md)** - Upgrading kse to newer versions
+- **[Release Notes v1.46.2](releases/v1.46.2.md)** - Summary of value observability and onboarding improvements
 - **[Environment Management Guide](environment-management-guide.md)** - Managing multiple environments
 - **[Multi-Repository Management Guide](multi-repo-management-guide.md)** - Managing multiple Git repositories
 - **[Scene Runtime Guide](scene-runtime-guide.md)** - Scene template engine, quality pipeline, ontology, and Moqui ERP integration

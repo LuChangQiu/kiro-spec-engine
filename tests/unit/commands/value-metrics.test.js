@@ -142,6 +142,12 @@ threshold_policy:
       .toThrow('--input <path> is required');
   });
 
+  test('snapshot missing input error includes sample tip', async () => {
+    await expect(runValueMetricsSnapshot({}, { projectPath: tempDir }))
+      .rejects
+      .toThrow('kse value metrics sample');
+  });
+
   test('generates sample input using default path', async () => {
     const result = await runValueMetricsSample({
       json: true

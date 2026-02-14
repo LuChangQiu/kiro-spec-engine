@@ -10,6 +10,12 @@
 - ✅ Tell your AI about the methodology
 - ✅ Let AI work according to Spec-driven approach
 
+## Why This Is Better Than Ad-hoc AI Prompting
+
+- Specs reduce ambiguity before coding starts.
+- Orchestrate mode scales from single feature to multi-Spec parallel delivery.
+- KPI commands make progress and risk measurable, not just "looks done".
+
 ---
 
 ## Step 1: Install kse (30 seconds)
@@ -86,6 +92,33 @@ kse spec gate run --specs "01-00-user-login,01-01-user-session" --max-parallel 3
 
 ---
 
+## Optional Step 5: Verify Measurable Delivery (30 seconds)
+
+Create a minimal KPI input file:
+
+```json
+{
+  "period": "2026-W10",
+  "metrics": {
+    "ttfv_minutes": 25,
+    "batch_success_rate": 0.86,
+    "cycle_reduction_rate": 0.34,
+    "manual_takeover_rate": 0.16
+  },
+  "notes": "quick-start smoke run"
+}
+```
+
+Run:
+
+```bash
+kse value metrics snapshot --input ./kpi-input.json --json
+```
+
+This gives you a machine-readable snapshot with risk level and output paths.
+
+---
+
 ## That's It!
 
 You're now using Spec-driven development. Your AI understands the methodology and will follow it.
@@ -103,5 +136,5 @@ You're now using Spec-driven development. Your AI understands the methodology an
 ---
 
 **Version**: 1.46.2  
-**Last Updated**: 2026-02-13
+**Last Updated**: 2026-02-14
 

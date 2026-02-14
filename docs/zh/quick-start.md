@@ -5,7 +5,7 @@
 ---
 
 **版本**: 1.46.2  
-**最后更新**: 2026-02-13  
+**最后更新**: 2026-02-14  
 **预计时间**: 5 分钟  
 **目标读者**: 初学者
 
@@ -19,6 +19,12 @@
 - ✅ 为你的 AI 工具导出上下文
 - ✅ 使用 AI 基于 Spec 实现功能
 - ✅ 跟踪任务进度
+
+## 为什么它比“随手提示词开发”更稳
+
+- 先 Spec 后编码，减少需求歧义和返工。
+- 多 Spec 可直接切换到编排模式，并行推进。
+- KPI 命令可输出机器可读结果，让“完成度”可衡量、可审计。
 
 ---
 
@@ -58,7 +64,7 @@ kse --version
 
 **预期输出：**
 ```
-1.3.0
+1.46.2
 ```
 
 **故障排除：**
@@ -158,6 +164,31 @@ kse spec bootstrap --specs "01-00-user-login,01-01-user-session" --max-parallel 
 ```
 
 上述命令会默认切换到 orchestrate 模式并并行推进。
+
+### 3.0（可选）：30 秒验证可量化交付
+
+先创建最小输入文件 `kpi-input.json`：
+
+```json
+{
+  "period": "2026-W10",
+  "metrics": {
+    "ttfv_minutes": 25,
+    "batch_success_rate": 0.86,
+    "cycle_reduction_rate": 0.34,
+    "manual_takeover_rate": 0.16
+  },
+  "notes": "quick-start smoke run"
+}
+```
+
+执行：
+
+```bash
+kse value metrics snapshot --input ./kpi-input.json --json
+```
+
+该命令会输出机器可读快照、风险等级和产物路径，可直接用于周度跟踪。
 
 ### 3.1 编写需求
 
@@ -723,5 +754,5 @@ kse spec bootstrap --name 02-00-your-next-feature --non-interactive
 ---
 
 **版本**: 1.46.2  
-**最后更新**: 2026-02-13
+**最后更新**: 2026-02-14
 

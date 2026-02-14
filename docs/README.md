@@ -4,8 +4,8 @@
 
 ---
 
-**Version**: 1.44.0  
-**Last Updated**: 2026-02-12
+**Version**: 1.46.2  
+**Last Updated**: 2026-02-14
 
 ---
 
@@ -16,6 +16,14 @@
 - **[Quick Start Guide](quick-start.md)** - Get up and running in 5 minutes
 - **[FAQ](faq.md)** - Frequently asked questions
 - **[Troubleshooting](troubleshooting.md)** - Common issues and solutions
+
+## ⭐ Why Teams Choose kse
+
+- **Structured AI delivery**: Specs enforce Requirements → Design → Tasks before implementation.
+- **Parallel execution at scale**: Orchestrate multiple Specs with dependency-aware scheduling.
+- **Measurable outcomes**: KPI snapshot/baseline/trend commands make delivery quality auditable.
+- **Tool-agnostic workflow**: Works across Claude, Cursor, Windsurf, Copilot, and Kiro.
+- **Built-in governance**: Locks, document governance, environment/workspace controls, and audit trails.
 
 ---
 
@@ -176,6 +184,11 @@ Detailed technical documentation:
 - [Scene Ontology](command-reference.md#scene-ontology-enhancement)
 - [Moqui ERP Integration](command-reference.md#moqui-erp-integration)
 
+### KPI Observability
+- [Value Metrics Commands](command-reference.md#value-metrics)
+- [Spec Workflow](spec-workflow.md)
+- [Quick Start Guide](quick-start.md)
+
 ### Context Export
 - [Manual Export Mode](integration-modes.md#mode-2-manual-export)
 - [Export Commands](command-reference.md#context--prompts)
@@ -217,14 +230,14 @@ Detailed technical documentation:
 
 | Document | Status | Last Updated |
 |----------|--------|--------------|
-| Quick Start | ✅ Complete | 2026-01-23 |
+| Quick Start | ✅ Complete | 2026-02-14 |
 | Spec Workflow | ✅ Complete | 2026-01-23 |
 | Integration Modes | ✅ Complete | 2026-01-23 |
 | Tool Guides (6) | ✅ Complete | 2026-01-23 |
 | Examples (3) | ✅ Complete | 2026-01-23 |
 | FAQ | ✅ Complete | 2026-02-11 |
 | Troubleshooting | ✅ Complete | 2026-01-23 |
-| Command Reference | ✅ Complete | 2026-02-11 |
+| Command Reference | ✅ Complete | 2026-02-14 |
 | Environment Management | ✅ Complete | 2026-01-31 |
 | Multi-Repository Management | ✅ Complete | 2026-01-31 |
 | Scene Runtime Guide | ✅ Complete | 2026-02-11 |

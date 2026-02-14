@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0",
+  "type": "sub",
+  "masterSpec": "115-00-kse-quality-hardening-program",
+  "dependencies": [],
+  "status": {
+    "current": "not-started",
+    "updatedAt": "2026-02-14T10:32:44.167Z"
+  },
+  "interfaces": {
+    "provides": [
+      "watch-logs-follow-contract-v1"
+    ],
+    "consumes": [
+      "master-quality-gate-input-v1"
+    ]
+  },
+  "assignment": {
+    "kiroInstance": "agent-watch",
+    "assignedAt": "2026-02-14T10:36:58.646Z"
+  }
+}

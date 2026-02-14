@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "type": "master",
+  "subSpecs": [
+    "115-01-ci-test-trust-hardening",
+    "115-02-jest-open-handle-governance",
+    "115-03-watch-logs-follow-completion",
+    "115-04-doc-link-canonicalization"
+  ],
+  "dependencies": [],
+  "status": {
+    "current": "in-progress",
+    "updatedAt": "2026-02-14T10:32:44.158Z"
+  },
+  "interfaces": {
+    "provides": [
+      "integration-gate-report-v1",
+      "release-recommendation-v1"
+    ],
+    "consumes": [
+      "ci-test-trust-contract-v1",
+      "jest-open-handle-report-v1",
+      "watch-logs-follow-contract-v1",
+      "doc-canonical-link-policy-v1"
+    ]
+  },
+  "assignment": {
+    "kiroInstance": "agent-master",
+    "assignedAt": "2026-02-14T10:36:58.634Z"
+  }
+}

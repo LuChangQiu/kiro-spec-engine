@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "type": "sub",
+  "masterSpec": "115-00-kse-quality-hardening-program",
+  "dependencies": [
+    {
+      "spec": "115-01-ci-test-trust-hardening",
+      "type": "requires-completion"
+    }
+  ],
+  "status": {
+    "current": "not-started",
+    "updatedAt": "2026-02-14T10:32:44.164Z"
+  },
+  "interfaces": {
+    "provides": [
+      "jest-open-handle-report-v1"
+    ],
+    "consumes": [
+      "ci-test-trust-contract-v1",
+      "master-quality-gate-input-v1"
+    ]
+  },
+  "assignment": {
+    "kiroInstance": "agent-runtime",
+    "assignedAt": "2026-02-14T10:36:58.641Z"
+  }
+}

@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Release validation artifacts**: Added release-readiness evidence reports in EN/ZH (`docs/releases/v1.46.2-validation.md`, `docs/zh/releases/v1.46.2-validation.md`) with test and package dry-run results.
 - **Release archive indexes**: Added release archive index pages (`docs/releases/README.md`, `docs/zh/releases/README.md`) and wired links from documentation indexes for faster release artifact discovery.
 - **Value metrics helper test coverage**: Added deterministic tests for ISO week period derivation and sample payload structure in command-level unit tests.
+- **Spec 115 quality hardening program**: Added a master/sub-spec collaboration portfolio (`115-00` + `115-01..115-04`) to parallelize CI trust, Jest open-handle governance, watch follow completion, and doc link canonicalization.
 
 ### Changed
 - **Positioning and onboarding messaging**: Strengthened EN/ZH README and quick-start docs with explicit kse advantage matrix, 90-second value proof, and KPI observability positioning to improve first-contact clarity.

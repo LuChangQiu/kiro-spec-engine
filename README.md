@@ -270,6 +270,8 @@ sequenceDiagram
 ### Advanced Topics
 - [Adoption Guide](docs/adoption-guide.md) - Adopting kse in existing projects
 - [Upgrade Guide](docs/upgrade-guide.md) - Version upgrade instructions
+- [Release Notes v1.46.2](docs/releases/v1.46.2.md) - Current release highlights and impact
+- [Release Checklist](docs/release-checklist.md) - Repeatable pre-release verification flow
 - [Manual Workflows](docs/manual-workflows-guide.md) - Step-by-step workflows
 - [Developer Guide](docs/developer-guide.md) - Contributing and extending kse
 

@@ -266,6 +266,8 @@ sequenceDiagram
 ### 高级主题
 - [采用指南](docs/adoption-guide.md) - 在现有项目中采用 kse
 - [升级指南](docs/upgrade-guide.md) - 版本升级说明
+- [发布说明 v1.46.2](docs/zh/releases/v1.46.2.md) - 当前版本更新亮点
+- [发布检查清单](docs/release-checklist.md) - 可重复执行的发版前核验流程
 - [手动工作流](docs/manual-workflows-guide.md) - 分步工作流
 - [开发者指南](docs/developer-guide.md) - 贡献和扩展 kse
 

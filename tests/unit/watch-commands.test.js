@@ -124,5 +124,63 @@ describe('Watch Commands', () => {
       const output = consoleOutput.join('\n');
       expect(output).toContain('No logs found');
     });
+
+    it('should display existing logs from execution log file', async () => {
+      const logDir = path.join(testDir, '.kiro/watch/logs');
+      const logPath = path.join(logDir, 'execution.log');
+
+      await fs.ensureDir(logDir);
+      await fs.writeFile(logPath, [
+        JSON.stringify({
+          timestamp: '2026-02-14T10:00:00.000Z',
+          level: 'info',
+          message: 'first log entry'
+        }),
+        JSON.stringify({
+          timestamp: '2026-02-14T10:00:01.000Z',
+          level: 'warn',
+          message: 'second log entry'
+        })
+      ].join('\n'), 'utf8');
+
+      await watchCommands.logsWatch({ tail: 1 });
+
+      const output = consoleOutput.join('\n');
+      expect(output).toContain('Showing last');
+      expect(output).toContain('second log entry');
+      expect(output).not.toContain('first log entry');
+    });
+
+    it('should follow and print appended logs', async () => {
+      const logDir = path.join(testDir, '.kiro/watch/logs');
+      const logPath = path.join(logDir, 'execution.log');
+
+      await fs.ensureDir(logDir);
+      await fs.writeFile(logPath, JSON.stringify({
+        timestamp: '2026-02-14T10:00:00.000Z',
+        level: 'info',
+        message: 'initial'
+      }) + '\n', 'utf8');
+
+      const followPromise = watchCommands.logsWatch({
+        tail: 1,
+        follow: true,
+        pollIntervalMs: 50,
+        followDurationMs: 350
+      });
+
+      await new Promise(resolve => setTimeout(resolve, 100));
+      await fs.appendFile(logPath, JSON.stringify({
+        timestamp: '2026-02-14T10:00:01.000Z',
+        level: 'info',
+        message: 'appended'
+      }) + '\n', 'utf8');
+
+      await followPromise;
+
+      const output = consoleOutput.join('\n');
+      expect(output).toContain('Following logs...');
+      expect(output).toContain('appended');
+    });
   });
 });

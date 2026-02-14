@@ -101,7 +101,7 @@ See [Integration Modes](integration-modes.md) for details.
 **Yes!** kse is open source and free to use.
 
 - **License:** MIT
-- **Source code:** https://github.com/kiro-spec-engine/kse
+- **Source code:** https://github.com/heguangyong/kiro-spec-engine
 - **No subscription** required
 - **No usage limits**
 
@@ -680,12 +680,12 @@ kse spec bootstrap --name 03-00-ci-cd-pipeline --non-interactive
 ## Still Have Questions?
 
 **Ask the community:**
-- GitHub Discussions: https://github.com/kiro-spec-engine/kse/discussions
+- GitHub Discussions: https://github.com/heguangyong/kiro-spec-engine/discussions
 - Discord: [Join our Discord](https://discord.gg/kse)
 - Twitter: [@kse_dev](https://twitter.com/kse_dev)
 
 **Report issues:**
-- GitHub Issues: https://github.com/kiro-spec-engine/kse/issues
+- GitHub Issues: https://github.com/heguangyong/kiro-spec-engine/issues
 
 **Contribute:**
 - Contributing Guide: [CONTRIBUTING.md](../CONTRIBUTING.md)

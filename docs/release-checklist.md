@@ -7,8 +7,14 @@
 ## 1. Functional Verification
 
 ```bash
-# Core CI suite
-npm run test:ci
+# Fast CI smoke suite (integration-focused)
+npm run test:smoke
+
+# Full regression suite (unit + integration + properties)
+npm run test:full
+
+# Guardrail: fail on newly introduced .skip tests
+npm run test:skip-audit
 
 # Unit tests for value observability commands
 npm test -- tests/unit/commands/value-metrics.test.js
@@ -62,6 +68,9 @@ Optional sanity scan:
 
 ```bash
 rg -n "yourusername|support@example.com" README.md README.zh.md docs docs/zh -S
+
+# Canonical repository link check (should return no matches)
+rg -n "github.com/kiro-spec-engine/kse" README.md README.zh.md docs START_HERE.txt INSTALL_OFFLINE.txt -S -g "!docs/release-checklist.md" -g "!docs/zh/release-checklist.md"
 ```
 
 ---

@@ -7,8 +7,14 @@
 ## 1. 功能验证
 
 ```bash
-# 核心 CI 测试
-npm run test:ci
+# 快速 CI 冒烟（integration 为主）
+npm run test:smoke
+
+# 全量回归（unit + integration + properties）
+npm run test:full
+
+# 防回归：禁止新增 .skip 测试
+npm run test:skip-audit
 
 # Value 可观测命令单测
 npm test -- tests/unit/commands/value-metrics.test.js
@@ -62,6 +68,9 @@ npm pack --dry-run
 
 ```bash
 rg -n "yourusername|support@example.com" README.md README.zh.md docs docs/zh -S
+
+# canonical 仓库链接扫描（应返回空）
+rg -n "github.com/kiro-spec-engine/kse" README.md README.zh.md docs START_HERE.txt INSTALL_OFFLINE.txt -S -g "!docs/release-checklist.md" -g "!docs/zh/release-checklist.md"
 ```
 
 ---

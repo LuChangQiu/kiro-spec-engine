@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Release archive indexes**: Added release archive index pages (`docs/releases/README.md`, `docs/zh/releases/README.md`) and wired links from documentation indexes for faster release artifact discovery.
 - **Value metrics helper test coverage**: Added deterministic tests for ISO week period derivation and sample payload structure in command-level unit tests.
 - **Spec 115 quality hardening program**: Added a master/sub-spec collaboration portfolio (`115-00` + `115-01..115-04`) to parallelize CI trust, Jest open-handle governance, watch follow completion, and doc link canonicalization.
+- **Test governance scripts**: Added `test:smoke`, `test:full`, `test:handles`, `test:skip-audit`, plus `scripts/check-skip-allowlist.js` and `tests/skip-allowlist.txt` for skip-test regression guardrails.
 
 ### Changed
 - **Positioning and onboarding messaging**: Strengthened EN/ZH README and quick-start docs with explicit kse advantage matrix, 90-second value proof, and KPI observability positioning to improve first-contact clarity.
@@ -23,10 +24,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Value metrics operator guidance**: Enhanced snapshot/baseline/trend failure messages with actionable follow-up commands (including `kse value metrics sample`) to reduce first-run friction.
 - **Top-level release navigation**: Updated EN/ZH root READMEs to expose release archive and validation report links directly from Advanced Topics for faster proof-of-value discovery.
 - **Observability guide usability**: Added EN/ZH expected JSON output examples for `snapshot --json` and `trend --json` to speed up first-run verification and integration scripting.
+- **Watch log operator flow**: Implemented `kse watch logs --follow` streaming behavior and documented follow examples in command reference.
+- **Canonical documentation links**: Standardized mixed repository links to `https://github.com/heguangyong/kiro-spec-engine` and wired canonical-link scan commands into EN/ZH release checklists.
 
 ### Fixed
 - **npm package hygiene**: Excluded transient Python bytecode artifacts (`__pycache__`, `*.pyc/pyo/pyd`) from published package contents to reduce package noise and size.
 - **Documentation contact placeholders**: Replaced `yourusername` placeholder repository links in onboarding docs with the canonical project URL and removed stale example email contact.
+- **Jest force-exit dependency**: Removed `forceExit` from `jest.config.js` and `jest.config.ci.js`; test scripts now complete without explicit force-exit configuration.
 
 ## [1.46.2] - 2026-02-14
 

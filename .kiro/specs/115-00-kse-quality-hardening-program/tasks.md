@@ -8,10 +8,10 @@
   - [x] 1.3 输出初始依赖图并确认可并行集合
 
 - [ ] 2. 并行推进子 Spec
-  - [ ] 2.1 推进 `115-01-ci-test-trust-hardening`
+  - [x] 2.1 推进 `115-01-ci-test-trust-hardening`
   - [ ] 2.2 推进 `115-02-jest-open-handle-governance`
-  - [ ] 2.3 推进 `115-03-watch-logs-follow-completion`
-  - [ ] 2.4 推进 `115-04-doc-link-canonicalization`
+  - [x] 2.3 推进 `115-03-watch-logs-follow-completion`
+  - [x] 2.4 推进 `115-04-doc-link-canonicalization`
 
 - [ ] 3. 主 Agent 集成收敛
   - [ ] 3.1 汇总各子 Spec 提供的交付物与验证证据

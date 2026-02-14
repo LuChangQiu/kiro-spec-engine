@@ -24,13 +24,17 @@
   ],
   "scripts": {
     "test": "npx jest",
+    "test:smoke": "npm run test:ci",
+    "test:full": "npx jest --config=jest.config.js",
     "test:ci": "npx jest --config=jest.config.ci.js",
     "test:unit": "npx jest tests/unit",
     "test:integration": "npx jest tests/integration",
     "test:properties": "npx jest tests/properties",
+    "test:handles": "npx jest --config=jest.config.js --runInBand --detectOpenHandles",
+    "test:skip-audit": "node scripts/check-skip-allowlist.js",
     "test:watch": "npx jest --watch",
     "coverage": "npx jest --coverage",
-    "prepublishOnly": "npm run test:ci",
+    "prepublishOnly": "npm run test:full && npm run test:skip-audit",
     "publish:manual": "npm publish --access public",
     "install-global": "npm install -g .",
     "uninstall-global": "npm uninstall -g kiro-spec-engine"

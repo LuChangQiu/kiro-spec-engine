@@ -1,0 +1,11 @@
+# Allowed skipped tests (temporary quality debt).
+# Format: <relative-path>::<test-title>
+
+tests/unit/context-exporter.test.js::should export spec context successfully
+tests/unit/context-exporter.test.js::should include steering rules when requested
+tests/unit/context-exporter.test.js::should handle missing optional files gracefully
+tests/unit/context-exporter.test.js::should generate task-specific context
+tests/unit/context-exporter.test.js::should include multiple steering files
+tests/unit/context-exporter.test.js::should handle missing steering files gracefully
+tests/unit/action-executor.test.js::should timeout long-running commands
+tests/unit/adoption/smart-orchestrator.test.js::should abort adoption if backup validation fails

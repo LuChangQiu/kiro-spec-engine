@@ -29,8 +29,5 @@ module.exports = {
   testTimeout: 10000,
   
   // Coverage not needed in CI (run separately)
-  collectCoverage: false,
-
-  // Force exit to prevent CI hang from leaked timers/handles
-  forceExit: true
+  collectCoverage: false
 };

@@ -3,7 +3,7 @@
 > Quick reference for all kse commands
 
 **Version**: 1.46.2  
-**Last Updated**: 2026-02-13
+**Last Updated**: 2026-02-14
 
 ---
 
@@ -151,6 +151,12 @@ kse watch status
 
 # View watch logs
 kse watch logs
+
+# Follow log stream in real time (tail -f behavior)
+kse watch logs --follow
+
+# Show last 100 entries, then continue following
+kse watch logs --tail 100 --follow
 
 # Show automation metrics
 kse watch metrics

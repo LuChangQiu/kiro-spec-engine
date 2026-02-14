@@ -101,6 +101,7 @@ Detailed technical documentation:
 - **[Adoption Guide](adoption-guide.md)** - Adopting kse in existing projects
 - **[Upgrade Guide](upgrade-guide.md)** - Upgrading kse to newer versions
 - **[Release Checklist](release-checklist.md)** - Repeatable pre-release verification flow
+- **[Release Archive](releases/README.md)** - Index of release notes and validation reports
 - **[Release Notes v1.46.2](releases/v1.46.2.md)** - Summary of value observability and onboarding improvements
 - **[Validation Report v1.46.2](releases/v1.46.2-validation.md)** - Test and package verification evidence
 - **[Environment Management Guide](environment-management-guide.md)** - Managing multiple environments

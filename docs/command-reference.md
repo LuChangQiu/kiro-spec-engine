@@ -72,6 +72,9 @@ kse status --verbose
 ### Value Metrics
 
 ```bash
+# Generate sample KPI input JSON
+kse value metrics sample --out ./kpi-input.json --period 2026-W10 --json
+
 # Generate weekly KPI snapshot + gate summary
 kse value metrics snapshot \
   --input .kiro/specs/112-00-spec-value-realization-program/custom/weekly-metrics/2026-W09.sample.json \

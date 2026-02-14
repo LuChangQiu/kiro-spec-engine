@@ -281,7 +281,7 @@ sequenceDiagram
 - **周快照流水线**：生成包含风险级别和审计原因的 machine-readable 快照
 - **基线与趋势分析**：基于历史快照生成 baseline，并自动识别连续恶化趋势
 - **门禁可复用摘要**：输出 Day30/Day60 可直接消费的 summary 与证据路径
-- **CLI 命令**：`value metrics snapshot`、`value metrics baseline`、`value metrics trend`，支持 `--json`
+- **CLI 命令**：`value metrics sample`、`value metrics snapshot`、`value metrics baseline`、`value metrics trend`，支持 `--json`
 
 ### 多工作区管理 🚀 v1.11.0 新功能
 - **工作区注册表**：从单一位置管理多个 kse 项目
@@ -440,6 +440,7 @@ kse context export <spec-name>     # 为 AI 工具导出上下文
 kse prompt generate <spec> <task>  # 生成任务特定提示
 
 # KPI 自动化与可观测（v1.46.2 新增）
+kse value metrics sample --out <path> --json               # 生成 KPI 输入样例 JSON
 kse value metrics snapshot --input <path> --json          # 生成周度 KPI 快照 + gate 摘要
 kse value metrics baseline --from-history <N> --json      # 从最早 N 个快照生成 baseline
 kse value metrics trend --window <N> --json               # 基于最近 N 个快照分析趋势与风险

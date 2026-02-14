@@ -16,9 +16,12 @@ kse solves this with machine-readable KPI snapshots, baseline derivation, trend 
 
 ---
 
-## KPI Workflow in 3 Commands
+## KPI Workflow in 4 Commands
 
 ```bash
+# 0) Generate sample input (first-time setup)
+kse value metrics sample --out ./kpi-input.json --period 2026-W10 --json
+
 # 1) Snapshot this week
 kse value metrics snapshot --input ./kpi-input.json --period 2026-W10 --checkpoint day-60 --json
 
@@ -33,7 +36,7 @@ kse value metrics trend --window 6 --json
 
 ## Minimal Input Example
 
-Create `kpi-input.json`:
+If you do not use the `sample` command, create `kpi-input.json` manually:
 
 ```json
 {
@@ -73,4 +76,3 @@ Create `kpi-input.json`:
 - [Command Reference](command-reference.md#value-metrics)
 - [Quick Start Guide](quick-start.md)
 - [Spec Workflow](spec-workflow.md)
-

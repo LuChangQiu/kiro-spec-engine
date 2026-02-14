@@ -16,9 +16,12 @@ kse 通过机器可读 KPI 快照、基线生成、趋势分析和门禁摘要�
 
 ---
 
-## 三条命令跑通 KPI 流程
+## 四条命令跑通 KPI 流程
 
 ```bash
+# 0) 首次使用先生成输入样例
+kse value metrics sample --out ./kpi-input.json --period 2026-W10 --json
+
 # 1) 生成当周快照
 kse value metrics snapshot --input ./kpi-input.json --period 2026-W10 --checkpoint day-60 --json
 
@@ -33,7 +36,7 @@ kse value metrics trend --window 6 --json
 
 ## 最小输入示例
 
-创建 `kpi-input.json`：
+如果不使用 `sample` 命令，也可以手工创建 `kpi-input.json`：
 
 ```json
 {

@@ -3,6 +3,7 @@ const os = require('os');
 const path = require('path');
 
 const {
+  runValueMetricsSample,
   runValueMetricsSnapshot,
   runValueMetricsBaseline,
   runValueMetricsTrend
@@ -139,6 +140,41 @@ threshold_policy:
     await expect(runValueMetricsSnapshot({}, { projectPath: tempDir }))
       .rejects
       .toThrow('--input <path> is required');
+  });
+
+  test('generates sample input using default path', async () => {
+    const result = await runValueMetricsSample({
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.sample_path).toBe('kpi-input.json');
+    expect(result.period).toMatch(/^\d{4}-W\d{2}$/);
+
+    const samplePayload = await fs.readJson(path.join(tempDir, result.sample_path));
+    expect(samplePayload.period).toBe(result.period);
+    expect(samplePayload.metrics.ttfv_minutes).toBe(25);
+    expect(samplePayload.metrics.batch_success_rate).toBe(0.86);
+  });
+
+  test('generates sample input with custom output and period', async () => {
+    const result = await runValueMetricsSample({
+      period: '2026-W10',
+      out: 'custom/kpi-sample.json',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.period).toBe('2026-W10');
+    expect(result.sample_path).toBe('custom/kpi-sample.json');
+
+    const samplePayload = await fs.readJson(path.join(tempDir, result.sample_path));
+    expect(samplePayload.period).toBe('2026-W10');
+    expect(samplePayload.notes).toContain('sample metrics input');
   });
 
   test('generates baseline from earliest history snapshots', async () => {

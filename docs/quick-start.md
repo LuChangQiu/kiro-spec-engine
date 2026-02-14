@@ -94,7 +94,19 @@ kse spec gate run --specs "01-00-user-login,01-01-user-session" --max-parallel 3
 
 ## Optional Step 5: Verify Measurable Delivery (30 seconds)
 
-Create a minimal KPI input file:
+Generate a sample KPI input file:
+
+```bash
+kse value metrics sample --out ./kpi-input.json --period 2026-W10 --json
+```
+
+Then run:
+
+```bash
+kse value metrics snapshot --input ./kpi-input.json --json
+```
+
+If you prefer manual input, use:
 
 ```json
 {
@@ -107,12 +119,6 @@ Create a minimal KPI input file:
   },
   "notes": "quick-start smoke run"
 }
-```
-
-Run:
-
-```bash
-kse value metrics snapshot --input ./kpi-input.json --json
 ```
 
 This gives you a machine-readable snapshot with risk level and output paths.

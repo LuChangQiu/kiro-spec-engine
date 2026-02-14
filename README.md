@@ -314,7 +314,7 @@ Structure your work with Requirements → Design → Tasks workflow
 - **Weekly Snapshot Pipeline**: Generate machine-readable snapshots with risk level and audit reasons
 - **Baseline and Trend Analysis**: Build baseline from historical data and detect worsening trends automatically
 - **Gate-Ready Summary**: Emit Day30/Day60-consumable summary payloads with evidence paths
-- **CLI Commands**: `value metrics snapshot`, `value metrics baseline`, `value metrics trend` with `--json` support
+- **CLI Commands**: `value metrics sample`, `value metrics snapshot`, `value metrics baseline`, `value metrics trend` with `--json` support
 
 ### Multi-Workspace Management 🚀 NEW in v1.11.0
 - **Workspace Registry**: Manage multiple kse projects from a single location
@@ -523,6 +523,7 @@ kse context export <spec-name>     # Export context for AI tools
 kse prompt generate <spec> <task>  # Generate task-specific prompt
 
 # KPI automation and observability (NEW in v1.46.2)
+kse value metrics sample --out <path> --json               # Generate sample KPI input JSON
 kse value metrics snapshot --input <path> --json          # Generate weekly KPI snapshot + gate summary
 kse value metrics baseline --from-history <N> --json      # Build baseline from earliest N snapshots
 kse value metrics trend --window <N> --json               # Analyze trend/risk from latest N snapshots

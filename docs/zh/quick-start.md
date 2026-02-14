@@ -167,7 +167,19 @@ kse spec bootstrap --specs "01-00-user-login,01-01-user-session" --max-parallel 
 
 ### 3.0（可选）：30 秒验证可量化交付
 
-先创建最小输入文件 `kpi-input.json`：
+先生成输入样例：
+
+```bash
+kse value metrics sample --out ./kpi-input.json --period 2026-W10 --json
+```
+
+再执行：
+
+```bash
+kse value metrics snapshot --input ./kpi-input.json --json
+```
+
+如果你想手工编辑输入，也可以创建 `kpi-input.json`：
 
 ```json
 {
@@ -180,12 +192,6 @@ kse spec bootstrap --specs "01-00-user-login,01-01-user-session" --max-parallel 
   },
   "notes": "quick-start smoke run"
 }
-```
-
-执行：
-
-```bash
-kse value metrics snapshot --input ./kpi-input.json --json
 ```
 
 该命令会输出机器可读快照、风险等级和产物路径，可直接用于周度跟踪。

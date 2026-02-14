@@ -243,6 +243,7 @@ sequenceDiagram
 - 📄 **[文档治理](docs/document-governance.md)** - 自动化文档管理
 - 🎭 **[场景运行时指南](docs/scene-runtime-guide.md)** - 模板引擎、质量流水线、Ontology、Moqui ERP
 - 🤖 **[多 Agent 协调指南](docs/multi-agent-coordination-guide.md)** - 多 Agent 并行协调
+- 📈 **[Value 可观测指南](docs/zh/value-observability-guide.md)** - KPI 快照、基线、趋势与门禁证据
 - 🔌 **[集成模式](docs/integration-modes.md)** - 三种集成 kse 的方式
 - 📝 **[命令参考](docs/command-reference.md)** - 所有 kse 命令
 

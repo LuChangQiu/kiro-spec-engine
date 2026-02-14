@@ -71,7 +71,7 @@
 - Watch 模式（所有工具）
 - 每种模式的优缺点
 
-### [命令参考](command-reference.md)
+### [命令参考](../command-reference.md)
 **完整命令列表** - 所有 kse 命令及示例
 - 项目设置命令
 - 上下文管理命令
@@ -171,6 +171,12 @@
 - Ontology 图、Action Abstraction、Data Lineage、Agent Hints
 - Moqui ERP 连接、发现、模板提取
 
+### [Value 可观测指南](value-observability-guide.md)
+**KPI 量化交付指南** - 快照、基线、趋势、门禁证据
+- 周度 KPI 快照生成
+- baseline 与趋势风险分析
+- Day30/Day60 门禁输入复用
+
 ### [升级指南](upgrade-guide.md)
 **版本升级** - 保持 kse 最新
 - 升级过程
@@ -239,11 +245,12 @@
 - [通用指南](tools/generic-guide.md)
 
 ### 任务管理
-- [命令参考 - 任务命令](command-reference.md)
+- [命令参考 - 任务命令](../command-reference.md)
 - [Spec 工作流 - 任务](spec-workflow.md)
 
 ### KPI 可观测
-- [命令参考 - Value Metrics](command-reference.md#value-metrics)
+- [命令参考 - Value Metrics](../command-reference.md#value-metrics)
+- [Value 可观测指南](value-observability-guide.md)
 - [快速入门指南](quick-start.md)
 
 ### 自动化

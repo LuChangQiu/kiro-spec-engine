@@ -88,6 +88,7 @@ Detailed technical documentation:
 - **[Command Reference](command-reference.md)** - All kse commands with examples
 - **[Environment Management Guide](environment-management-guide.md)** - Multi-environment configuration management
 - **[Multi-Repository Management Guide](multi-repo-management-guide.md)** - Managing multiple Git repositories
+- **[Value Observability Guide](value-observability-guide.md)** - KPI snapshot, baseline, trend, and gate evidence workflow
 - **[Scene Runtime Guide](scene-runtime-guide.md)** - Scene template engine, quality pipeline, ontology, and Moqui ERP integration
 - **[Multi-Agent Coordination Guide](multi-agent-coordination-guide.md)** - Multi-agent parallel coordination for concurrent development
 - **[Troubleshooting](troubleshooting.md)** - Solutions to common problems
@@ -186,6 +187,7 @@ Detailed technical documentation:
 
 ### KPI Observability
 - [Value Metrics Commands](command-reference.md#value-metrics)
+- [Value Observability Guide](value-observability-guide.md)
 - [Spec Workflow](spec-workflow.md)
 - [Quick Start Guide](quick-start.md)
 
@@ -238,6 +240,7 @@ Detailed technical documentation:
 | FAQ | ✅ Complete | 2026-02-11 |
 | Troubleshooting | ✅ Complete | 2026-01-23 |
 | Command Reference | ✅ Complete | 2026-02-14 |
+| Value Observability Guide | ✅ Complete | 2026-02-14 |
 | Environment Management | ✅ Complete | 2026-01-31 |
 | Multi-Repository Management | ✅ Complete | 2026-01-31 |
 | Scene Runtime Guide | ✅ Complete | 2026-02-11 |

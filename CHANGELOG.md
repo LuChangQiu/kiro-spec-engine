@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Value observability documentation track**: Added dedicated EN/ZH guides for KPI snapshot/baseline/trend workflow (`docs/value-observability-guide.md`, `docs/zh/value-observability-guide.md`) and wired entry links from README + docs indexes for faster discovery of measurable delivery capabilities.
+
+### Changed
+- **Positioning and onboarding messaging**: Strengthened EN/ZH README and quick-start docs with explicit kse advantage matrix, 90-second value proof, and KPI observability positioning to improve first-contact clarity.
+- **CLI first-screen positioning text**: Updated `kse --help` top description in EN/ZH locales to reflect current core strengths: Spec workflow, orchestration, and KPI observability.
+
+### Fixed
+- **npm package hygiene**: Excluded transient Python bytecode artifacts (`__pycache__`, `*.pyc/pyo/pyd`) from published package contents to reduce package noise and size.
+
 ## [1.46.2] - 2026-02-14
 
 ### Added

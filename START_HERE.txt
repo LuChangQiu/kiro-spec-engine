@@ -1,129 +1,78 @@
 ===============================================================
-  kiro-spec-engine v1.24.1 离线安装包
-  Offline Installation Package
+  kiro-spec-engine (kse) - Start Here
 ===============================================================
 
-📦 文件说明
+Version: v1.46.2
+Last Updated: 2026-02-14
+
+This file is the fastest way to understand what kse does and how to
+validate value in minutes.
+
+
+1) Why kse is different
 ---------------------------------------------------------------
 
-1. kiro-spec-engine-1.24.1.tgz (709 KB)
-   → npm 标准安装包，直接安装使用
+kse is not just "AI prompt helpers". It gives you:
 
-2. kse-v1.24.1-offline.zip (725 KB)
-   → 完整离线包，包含所有文档
-
-3. OFFLINE_INSTALL.md
-   → 详细安装指南（推荐阅读）
-
-4. INSTALL_OFFLINE.txt
-   → 快速安装说明
-
-5. 交付清单.md
-   → 完整交付清单和功能说明
+- Structured delivery: Requirements -> Design -> Tasks
+- Multi-Spec orchestration: run multiple specs in parallel safely
+- Measurable outcomes: KPI snapshot/baseline/trend for weekly review
+- Built-in governance: lock/doc/env/workspace controls for teams
+- Tool-agnostic usage: works with Claude/Cursor/Windsurf/Copilot/Kiro
 
 
-🚀 快速安装（推荐）
+2) 90-second value proof
 ---------------------------------------------------------------
 
-方式 1: 直接使用 .tgz 文件
----------------------------------------------------------------
-npm install -g kiro-spec-engine-1.24.1.tgz
+Run these commands in your project:
+
+  kse adopt
+  kse spec bootstrap --name 01-00-demo-feature --non-interactive
+  kse value metrics snapshot --input ./kpi-input.json --json
+
+If command 3 succeeds, you get machine-readable KPI output with risk
+signal and evidence paths.
 
 
-方式 2: 使用完整压缩包
----------------------------------------------------------------
-1. 解压 kse-v1.24.1-offline.zip
-2. 进入解压目录
-3. 运行: npm install -g kiro-spec-engine-1.24.1.tgz
-
-
-⚠️ Windows 用户必读
+3) Recommended workflow (single Spec)
 ---------------------------------------------------------------
 
-如果提示 "npm 命令不可用"，请先运行：
-
-    $env:Path = "C:\Program Files\nodejs;$env:Path"
-
-然后再执行安装命令。
-
-这是因为 PowerShell 会话未刷新环境变量。
+  kse spec bootstrap --name 01-00-user-login --non-interactive
+  kse spec pipeline run --spec 01-00-user-login
+  kse spec gate run --spec 01-00-user-login --json
 
 
-✅ 验证安装
+4) Recommended workflow (multi Spec / parallel)
 ---------------------------------------------------------------
 
-kse --version
+  kse orchestrate run --specs "spec-a,spec-b,spec-c" --max-parallel 3
+  kse orchestrate status
+  kse orchestrate stop
 
-应该显示: 1.24.1
+Note: `kse spec bootstrap|pipeline run|gate run --specs ...` defaults
+to orchestrate mode.
 
 
-🎯 新功能
+5) KPI observability quick commands
 ---------------------------------------------------------------
 
-1. 嵌套 Git 仓库支持
-   kse repo init              # 自动发现嵌套仓库
-   kse repo init --no-nested  # 只扫描顶层
-
-2. 用户知识管理系统
-   kse knowledge init         # 初始化知识库
-   kse knowledge add          # 添加知识
-   kse knowledge search       # 搜索知识
-
-3. 跨平台路径处理改进
-   Windows/Unix 完全兼容
+  kse value metrics snapshot --input ./kpi-input.json --json
+  kse value metrics baseline --from-history 3 --json
+  kse value metrics trend --window 6 --json
 
 
-📖 详细文档
+6) Where to read next
 ---------------------------------------------------------------
 
-- OFFLINE_INSTALL.md  → 完整安装指南
-- 交付清单.md         → 功能清单和演示
-- README.md           → 项目说明（英文）
-- README.zh.md        → 项目说明（中文）
+- README.md / README.zh.md
+- docs/README.md
+- docs/value-observability-guide.md
+- docs/command-reference.md
 
 
-💡 使用示例
----------------------------------------------------------------
-
-# 初始化项目
-cd your-project
-kse adopt
-
-# 扫描 Git 仓库
-kse repo init
-
-# 查看仓库状态
-kse repo status --verbose
-
-# 初始化知识库
-kse knowledge init
-
-# 查看所有命令
-kse --help
-
-
-🐛 故障排除
----------------------------------------------------------------
-
-问题: npm 命令不可用
-解决: $env:Path = "C:\Program Files\nodejs;$env:Path"
-
-问题: 权限错误
-解决: 以管理员身份运行 PowerShell
-
-问题: 依赖安装失败
-解决: npm install --registry=https://registry.npmmirror.com
-
-
-📧 支持
+7) Support
 ---------------------------------------------------------------
 
 GitHub: https://github.com/heguangyong/kiro-spec-engine
-文档: docs/README.md
 
-
-===============================================================
-发布日期: 2026-02-03
-版本: v1.24.1
-测试: 1689 tests passing ✅
 ===============================================================

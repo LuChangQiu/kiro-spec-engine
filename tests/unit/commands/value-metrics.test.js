@@ -6,7 +6,9 @@ const {
   runValueMetricsSample,
   runValueMetricsSnapshot,
   runValueMetricsBaseline,
-  runValueMetricsTrend
+  runValueMetricsTrend,
+  _getIsoWeekPeriod,
+  _createSampleMetricsInput
 } = require('../../../lib/commands/value');
 
 describe('value metrics snapshot command', () => {
@@ -286,5 +288,22 @@ threshold_policy:
     }, {
       projectPath: tempDir
     })).rejects.toThrow('At least 2 snapshots are required');
+  });
+
+  test('calculates ISO week period deterministically', () => {
+    const period = _getIsoWeekPeriod(new Date('2026-02-14T12:00:00.000Z'));
+    expect(period).toBe('2026-W07');
+  });
+
+  test('builds sample input payload with expected metrics', () => {
+    const payload = _createSampleMetricsInput('2026-W10');
+    expect(payload.period).toBe('2026-W10');
+    expect(payload.metrics).toEqual({
+      ttfv_minutes: 25,
+      batch_success_rate: 0.86,
+      cycle_reduction_rate: 0.34,
+      manual_takeover_rate: 0.16
+    });
+    expect(payload.notes).toContain('sample metrics input');
   });
 });

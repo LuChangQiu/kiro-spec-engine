@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.46.2] - 2026-02-14
+
+### Added
+- **Spec 112 value realization program**: Added `112-00-spec-value-realization-program` with full requirements/design/tasks and reusable assets for positioning, KPI baselines, weekly review, risk policy, pilot evidence, and day-30/day-60 gate reviews.
+
+### Fixed
+- **Windows orchestrate prompt delivery**: `AgentSpawner` now pipes bootstrap prompt via stdin (`-`) in the PowerShell path to avoid Windows argument splitting that caused `error: unexpected argument 'Spec' found`.
+- **Windows orchestrate regression coverage**: Added assertions in orchestrator unit tests to verify PowerShell command composition for stdin-piped prompt mode.
+
 ## [1.46.1] - 2026-02-13
 
 ### Fixed

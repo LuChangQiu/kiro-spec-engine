@@ -538,7 +538,7 @@ kse spec bootstrap --name 01-00-my-first-feature --non-interactive
 
 ---
 
-**版本**：1.46.1  
+**版本**：1.46.2  
 **最后更新**：2026-02-13
 
 

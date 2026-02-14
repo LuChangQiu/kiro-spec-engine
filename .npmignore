@@ -1,0 +1,5 @@
+# Exclude transient Python bytecode from packaged templates
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd

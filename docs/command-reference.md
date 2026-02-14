@@ -85,6 +85,21 @@ kse value metrics snapshot \
   --definitions .kiro/specs/112-00-spec-value-realization-program/custom/metric-definition.yaml \
   --history-dir .kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics \
   --out .kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/2026-W10.json
+
+# Generate baseline from earliest 3 history snapshots
+kse value metrics baseline \
+  --definitions .kiro/specs/112-00-spec-value-realization-program/custom/metric-definition.yaml \
+  --history-dir .kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics \
+  --from-history 3 \
+  --period 2026-W10 \
+  --json
+
+# Generate trend report from latest 6 snapshots
+kse value metrics trend \
+  --definitions .kiro/specs/112-00-spec-value-realization-program/custom/metric-definition.yaml \
+  --history-dir .kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics \
+  --window 6 \
+  --json
 ```
 
 ### Task Management

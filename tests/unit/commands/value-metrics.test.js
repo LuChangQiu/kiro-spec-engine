@@ -2,7 +2,11 @@ const fs = require('fs-extra');
 const os = require('os');
 const path = require('path');
 
-const { runValueMetricsSnapshot } = require('../../../lib/commands/value');
+const {
+  runValueMetricsSnapshot,
+  runValueMetricsBaseline,
+  runValueMetricsTrend
+} = require('../../../lib/commands/value');
 
 describe('value metrics snapshot command', () => {
   let tempDir;
@@ -136,5 +140,109 @@ threshold_policy:
       .rejects
       .toThrow('--input <path> is required');
   });
-});
 
+  test('generates baseline from earliest history snapshots', async () => {
+    await writeContract('config/metric-definition.yaml');
+
+    const historyDir = path.join(tempDir, 'history');
+    await fs.ensureDir(historyDir);
+    await fs.writeJson(path.join(historyDir, '2026-W07.json'), {
+      period: '2026-W07',
+      ttfv_minutes: 20,
+      batch_success_rate: 0.80,
+      cycle_reduction_rate: 0.30,
+      manual_takeover_rate: 0.20
+    }, { spaces: 2 });
+    await fs.writeJson(path.join(historyDir, '2026-W08.json'), {
+      period: '2026-W08',
+      ttfv_minutes: 24,
+      batch_success_rate: 0.84,
+      cycle_reduction_rate: 0.32,
+      manual_takeover_rate: 0.18
+    }, { spaces: 2 });
+
+    const result = await runValueMetricsBaseline({
+      definitions: 'config/metric-definition.yaml',
+      historyDir: 'history',
+      fromHistory: 2,
+      period: '2026-W09',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.period).toBe('2026-W09');
+    expect(result.baseline_source).toBe('history:2026-W07-2026-W08');
+
+    const baseline = await fs.readJson(path.join(tempDir, result.baseline_path));
+    expect(baseline.is_baseline).toBe(true);
+    expect(baseline.ttfv_minutes).toBe(22);
+    expect(baseline.batch_success_rate).toBe(0.82);
+  });
+
+  test('calculates trend summary from history snapshots', async () => {
+    await writeContract('config/metric-definition.yaml');
+
+    const historyDir = path.join(tempDir, 'history');
+    await fs.ensureDir(historyDir);
+    await fs.writeJson(path.join(historyDir, '2026-W07.json'), {
+      period: '2026-W07',
+      ttfv_minutes: 20,
+      batch_success_rate: 0.85,
+      cycle_reduction_rate: 0.33,
+      manual_takeover_rate: 0.18
+    }, { spaces: 2 });
+    await fs.writeJson(path.join(historyDir, '2026-W08.json'), {
+      period: '2026-W08',
+      ttfv_minutes: 23,
+      batch_success_rate: 0.83,
+      cycle_reduction_rate: 0.32,
+      manual_takeover_rate: 0.19
+    }, { spaces: 2 });
+    await fs.writeJson(path.join(historyDir, '2026-W09.json'), {
+      period: '2026-W09',
+      ttfv_minutes: 26,
+      batch_success_rate: 0.81,
+      cycle_reduction_rate: 0.31,
+      manual_takeover_rate: 0.21
+    }, { spaces: 2 });
+
+    const result = await runValueMetricsTrend({
+      definitions: 'config/metric-definition.yaml',
+      historyDir: 'history',
+      window: 3,
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.period).toBe('2026-W09');
+    expect(result.risk_level).toBe('high');
+    expect(result.triggered_metrics).toContain('ttfv_minutes');
+    expect(result.metrics).toHaveLength(4);
+    expect(await fs.pathExists(path.join(tempDir, result.trend_path))).toBe(true);
+  });
+
+  test('fails trend calculation when snapshots are insufficient', async () => {
+    await writeContract('config/metric-definition.yaml');
+
+    const historyDir = path.join(tempDir, 'history');
+    await fs.ensureDir(historyDir);
+    await fs.writeJson(path.join(historyDir, '2026-W07.json'), {
+      period: '2026-W07',
+      ttfv_minutes: 20,
+      batch_success_rate: 0.85,
+      cycle_reduction_rate: 0.33,
+      manual_takeover_rate: 0.18
+    }, { spaces: 2 });
+
+    await expect(runValueMetricsTrend({
+      definitions: 'config/metric-definition.yaml',
+      historyDir: 'history'
+    }, {
+      projectPath: tempDir
+    })).rejects.toThrow('At least 2 snapshots are required');
+  });
+});

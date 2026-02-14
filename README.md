@@ -48,6 +48,29 @@ graph LR
 - ✅ Anyone building features that need clear requirements and design
 - ✅ Projects that benefit from spec-driven development
 
+## Why kse Wins in AI Delivery
+
+| Advantage | kse Capability | Practical Impact |
+| --- | --- | --- |
+| Structure-first execution | Requirements → Design → Tasks + gate checks | Lower rework and fewer requirement drifts |
+| Multi-agent scale-out | DAG orchestration (`orchestrate run/status/stop`) | Parallel delivery without manual terminal juggling |
+| Measurable outcomes | KPI automation (`value metrics snapshot/baseline/trend`) | Delivery quality can be tracked week-over-week |
+| Tool-agnostic adoption | Works across Claude/Cursor/Windsurf/Copilot/Kiro | No lock-in to a single AI IDE |
+| Built-in governance | Docs governance, lock management, audit, env/workspace controls | Team collaboration stays auditable and stable |
+
+### 90-Second Value Proof
+
+```bash
+# 1) Adopt kse in current repo
+kse adopt
+
+# 2) Generate Spec workflow draft
+kse spec bootstrap --name 01-00-demo-feature --non-interactive
+
+# 3) Produce machine-readable KPI snapshot
+kse value metrics snapshot --input ./kpi-input.json --json
+```
+
 ---
 
 ## Quick Start
@@ -285,6 +308,13 @@ kse auto resume
 ### Spec-Driven Development
 Structure your work with Requirements → Design → Tasks workflow
 
+### KPI Automation & Observability 🚀 NEW in v1.46.2
+- **Unified Metric Contract**: Load and validate KPI definitions from `metric-definition.yaml`
+- **Weekly Snapshot Pipeline**: Generate machine-readable snapshots with risk level and audit reasons
+- **Baseline and Trend Analysis**: Build baseline from historical data and detect worsening trends automatically
+- **Gate-Ready Summary**: Emit Day30/Day60-consumable summary payloads with evidence paths
+- **CLI Commands**: `value metrics snapshot`, `value metrics baseline`, `value metrics trend` with `--json` support
+
 ### Multi-Workspace Management 🚀 NEW in v1.11.0
 - **Workspace Registry**: Manage multiple kse projects from a single location
 - **Quick Switching**: Switch between projects without directory navigation
@@ -490,6 +520,11 @@ kse spec gate run --specs "<spec-a,spec-b>" --max-parallel <N>     # Multi-Spec 
 # Context management
 kse context export <spec-name>     # Export context for AI tools
 kse prompt generate <spec> <task>  # Generate task-specific prompt
+
+# KPI automation and observability (NEW in v1.46.2)
+kse value metrics snapshot --input <path> --json          # Generate weekly KPI snapshot + gate summary
+kse value metrics baseline --from-history <N> --json      # Build baseline from earliest N snapshots
+kse value metrics trend --window <N> --json               # Analyze trend/risk from latest N snapshots
 
 # Workspace management (NEW in v1.11.0)
 kse workspace create <name> [path] # Register a new workspace

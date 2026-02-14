@@ -1,7 +1,7 @@
 {
   "cli": {
     "name": "kiro-spec-engine",
-    "description": "🔥 Kiro Spec 引擎 - 基于 Spec 的驱动规则引擎",
+    "description": "🔥 Kiro Spec 引擎 - 以 Spec、编排与 KPI 可观测驱动 AI 交付",
     "commands": {
       "init": {
         "description": "初始化新的 Kiro Spec Engine 项目",

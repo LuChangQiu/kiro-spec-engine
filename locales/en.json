@@ -1,7 +1,7 @@
 {
   "cli": {
     "name": "kiro-spec-engine",
-    "description": "🔥 Kiro Spec Engine - Spec-driven development with steering rules",
+    "description": "🔥 Kiro Spec Engine - Structured AI delivery with Specs, orchestration, and KPI observability",
     "commands": {
       "init": {
         "description": "Initialize a new Kiro Ultrawork project",

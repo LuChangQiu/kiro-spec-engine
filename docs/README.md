@@ -102,6 +102,7 @@ Detailed technical documentation:
 - **[Upgrade Guide](upgrade-guide.md)** - Upgrading kse to newer versions
 - **[Release Checklist](release-checklist.md)** - Repeatable pre-release verification flow
 - **[Release Notes v1.46.2](releases/v1.46.2.md)** - Summary of value observability and onboarding improvements
+- **[Validation Report v1.46.2](releases/v1.46.2-validation.md)** - Test and package verification evidence
 - **[Environment Management Guide](environment-management-guide.md)** - Managing multiple environments
 - **[Multi-Repository Management Guide](multi-repo-management-guide.md)** - Managing multiple Git repositories
 - **[Scene Runtime Guide](scene-runtime-guide.md)** - Scene template engine, quality pipeline, ontology, and Moqui ERP integration

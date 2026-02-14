@@ -1,0 +1,11 @@
+{
+  "period": "2026-W07",
+  "spec": "112-00-spec-value-realization-program",
+  "is_baseline": true,
+  "ttfv_minutes": 36,
+  "batch_success_rate": 0.68,
+  "cycle_reduction_rate": 0.12,
+  "manual_takeover_rate": 0.34,
+  "risk_level": "high",
+  "notes": "D+7 baseline snapshot before focused optimization"
+}

@@ -1,0 +1,11 @@
+{
+  "period": "2026-W07",
+  "spec": "112-00-spec-value-realization-program",
+  "is_sample": true,
+  "ttfv_minutes": 30,
+  "batch_success_rate": 0.8,
+  "cycle_reduction_rate": 0.3,
+  "manual_takeover_rate": 0.2,
+  "risk_level": "medium",
+  "notes": "sample snapshot for schema and automation wiring"
+}

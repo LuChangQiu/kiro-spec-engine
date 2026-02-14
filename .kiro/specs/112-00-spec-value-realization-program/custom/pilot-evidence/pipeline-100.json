@@ -1,0 +1,50 @@
+{
+  "spec_id": "100-00-moqui-screen-endpoint-expansion",
+  "run_id": "f7fb2d4a-c4cc-4fc5-9768-b81db16c7b46",
+  "status": "completed",
+  "stage_results": [
+    {
+      "name": "requirements",
+      "status": "completed",
+      "warnings": [],
+      "error": null,
+      "output": {
+        "action": "requirements-existing"
+      }
+    },
+    {
+      "name": "design",
+      "status": "completed",
+      "warnings": [],
+      "error": null,
+      "output": {
+        "action": "design-existing"
+      }
+    },
+    {
+      "name": "tasks",
+      "status": "completed",
+      "warnings": [],
+      "error": null,
+      "output": {
+        "action": "tasks-existing"
+      }
+    },
+    {
+      "name": "gate",
+      "status": "completed",
+      "warnings": [],
+      "error": null,
+      "output": {
+        "decision": "go",
+        "score": 100,
+        "failed_checks": []
+      }
+    }
+  ],
+  "failure": null,
+  "next_actions": [
+    "Review pipeline output and continue implementation on completed Spec stages."
+  ],
+  "state_file": ".kiro\\state\\spec-pipeline\\100-00-moqui-screen-endpoint-expansion\\f7fb2d4a-c4cc-4fc5-9768-b81db16c7b46.json"
+}

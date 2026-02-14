@@ -329,6 +329,8 @@ describe('AgentSpawner', () => {
         expect(args[2]).toContain('codex');
         expect(args[2]).toContain('exec');
         expect(args[2]).toContain('Get-Content');
+        expect(args[2]).toContain('| &');
+        expect(args[2].trim().endsWith(' -')).toBe(true);
         // shell should be false (spawning powershell directly)
         expect(opts.shell).toBe(false);
         // Temp file should have been written with the prompt

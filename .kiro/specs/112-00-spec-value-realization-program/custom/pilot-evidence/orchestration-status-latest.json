@@ -1,0 +1,20 @@
+{
+  "status": "failed",
+  "startedAt": "2026-02-14T02:36:52.726Z",
+  "completedAt": "2026-02-14T02:36:54.051Z",
+  "totalSpecs": 1,
+  "completedSpecs": 0,
+  "failedSpecs": 1,
+  "runningSpecs": 0,
+  "currentBatch": 1,
+  "totalBatches": 1,
+  "specs": {
+    "100-00-moqui-screen-endpoint-expansion": {
+      "status": "failed",
+      "batch": 0,
+      "agentId": "zeno-v4-f2bbb591-e897-457c-95e6-6c0ae2ab33c0:1",
+      "retryCount": 2,
+      "error": "error: unexpected argument 'Spec' found\n\nUsage: codex exec [OPTIONS] [PROMPT] [COMMAND]\n\nFor more information, try '--help'.\n"
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "spec_id": "100-00-moqui-screen-endpoint-expansion",
+  "run_id": "b88a4fd3-3a86-417d-b5eb-8b7fb4391c05",
+  "decision": "go",
+  "score": 100,
+  "rules": [
+    {
+      "id": "mandatory",
+      "passed": true,
+      "score": 30,
+      "max_score": 30,
+      "hard_fail": true,
+      "warnings": [],
+      "details": {
+        "requiredFiles": [
+          "requirements.md",
+          "design.md",
+          "tasks.md"
+        ],
+        "missing": []
+      }
+    },
+    {
+      "id": "tests",
+      "passed": true,
+      "score": 25,
+      "max_score": 25,
+      "hard_fail": true,
+      "warnings": [],
+      "details": {
+        "hasValidationHints": true
+      }
+    },
+    {
+      "id": "docs",
+      "passed": true,
+      "score": 15,
+      "max_score": 15,
+      "hard_fail": false,
+      "warnings": [],
+      "details": {
+        "exitCode": 0
+      }
+    },
+    {
+      "id": "config_consistency",
+      "passed": true,
+      "score": 15,
+      "max_score": 15,
+      "hard_fail": false,
+      "warnings": [],
+      "details": {
+        "hasKiro": true,
+        "hasConfig": true
+      }
+    },
+    {
+      "id": "traceability",
+      "passed": true,
+      "score": 15,
+      "max_score": 15,
+      "hard_fail": false,
+      "warnings": [],
+      "details": {
+        "hasMapping": true,
+        "hasTaskReferences": true
+      }
+    }
+  ],
+  "failed_checks": [],
+  "warnings": [],
+  "next_actions": [
+    "Proceed to implementation and keep evidence attached to Spec artifacts."
+  ],
+  "policy_snapshot": {
+    "thresholds": {
+      "go": 90,
+      "conditional_go": 70
+    },
+    "strict_mode": {
+      "warning_as_failure": true
+    }
+  },
+  "started_at": "2026-02-14T02:35:39.797Z",
+  "ended_at": "2026-02-14T02:35:39.810Z"
+}

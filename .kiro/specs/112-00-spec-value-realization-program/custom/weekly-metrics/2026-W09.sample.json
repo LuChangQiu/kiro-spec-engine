@@ -1,0 +1,11 @@
+{
+  "period": "2026-W09",
+  "spec": "112-00-spec-value-realization-program",
+  "is_sample": true,
+  "ttfv_minutes": 38,
+  "batch_success_rate": 0.65,
+  "cycle_reduction_rate": 0.09,
+  "manual_takeover_rate": 0.36,
+  "risk_level": "high",
+  "notes": "sample week 2 consecutive deterioration, should trigger high risk"
+}

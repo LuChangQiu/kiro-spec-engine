@@ -1,0 +1,48 @@
+version: 1
+owner: kse-core
+updated_at: 2026-02-13
+
+metrics:
+  - id: ttfv_minutes
+    name: Time To First Value
+    target: "<= 30"
+    unit: minutes
+    definition: "从开始执行主路径到首次获得可验证产出（如通过 gate 或可复放结果）的耗时"
+    sampling_window: weekly
+    source:
+      - orchestrate logs
+      - spec gate reports
+
+  - id: batch_success_rate
+    name: Batch Execution Success Rate
+    target: ">= 0.80"
+    unit: ratio
+    definition: "批次执行中成功完成的 Spec 数 / 总 Spec 数"
+    sampling_window: weekly
+    source:
+      - orchestrate status snapshots
+
+  - id: cycle_reduction_rate
+    name: Spec Cycle Reduction Rate
+    target: ">= 0.30"
+    unit: ratio
+    definition: "相对基线，Spec 从创建到验收完成周期的缩短比例"
+    sampling_window: bi-weekly
+    source:
+      - spec timestamps
+      - gate completion records
+
+  - id: manual_takeover_rate
+    name: Manual Takeover Rate
+    target: "<= 0.20"
+    unit: ratio
+    definition: "执行批次中需要人工介入/接管的任务数占比"
+    sampling_window: weekly
+    source:
+      - orchestrate run notes
+      - incident logs
+
+threshold_policy:
+  high_risk_condition: "any metric worsens for 2 consecutive weeks"
+  go_no_go:
+    day_60_min_passed_metrics: 3

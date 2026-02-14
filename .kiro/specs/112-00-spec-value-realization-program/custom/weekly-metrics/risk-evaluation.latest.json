@@ -1,0 +1,46 @@
+{
+  "evaluated_period": "2026-W09",
+  "snapshots": [
+    {
+      "period": "2026-W07",
+      "file": "2026-W07.baseline.json"
+    },
+    {
+      "period": "2026-W08",
+      "file": "2026-W08.sample.json"
+    },
+    {
+      "period": "2026-W09",
+      "file": "2026-W09.sample.json"
+    }
+  ],
+  "triggered_metrics": [
+    "ttfv_minutes",
+    "batch_success_rate",
+    "cycle_reduction_rate",
+    "manual_takeover_rate"
+  ],
+  "risk_level": "high",
+  "details": {
+    "ttfv_minutes": {
+      "consecutive_worse_weeks": 2,
+      "triggered": true,
+      "better_direction": "lower"
+    },
+    "batch_success_rate": {
+      "consecutive_worse_weeks": 2,
+      "triggered": true,
+      "better_direction": "higher"
+    },
+    "cycle_reduction_rate": {
+      "consecutive_worse_weeks": 2,
+      "triggered": true,
+      "better_direction": "higher"
+    },
+    "manual_takeover_rate": {
+      "consecutive_worse_weeks": 2,
+      "triggered": true,
+      "better_direction": "lower"
+    }
+  }
+}

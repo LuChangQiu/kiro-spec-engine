@@ -1,0 +1,20 @@
+{
+  "status": "completed",
+  "startedAt": "2026-02-14T02:53:59.138Z",
+  "completedAt": "2026-02-14T02:53:59.543Z",
+  "totalSpecs": 1,
+  "completedSpecs": 1,
+  "failedSpecs": 0,
+  "runningSpecs": 0,
+  "currentBatch": 1,
+  "totalBatches": 1,
+  "specs": {
+    "100-00-moqui-screen-endpoint-expansion": {
+      "status": "completed",
+      "batch": 0,
+      "agentId": "zeno-v4-f2bbb591-e897-457c-95e6-6c0ae2ab33c0:4",
+      "retryCount": 0,
+      "error": null
+    }
+  }
+}

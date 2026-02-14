@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **KPI sample generator command**: Added `kse value metrics sample` to generate a ready-to-use KPI input JSON scaffold (`kpi-input.json`) for first-time observability runs.
 - **Value observability documentation track**: Added dedicated EN/ZH guides for KPI snapshot/baseline/trend workflow (`docs/value-observability-guide.md`, `docs/zh/value-observability-guide.md`) and wired entry links from README + docs indexes for faster discovery of measurable delivery capabilities.
+- **Release communication assets**: Added bilingual v1.46.2 release notes (`docs/releases/v1.46.2.md`, `docs/zh/releases/v1.46.2.md`) and a reusable pre-release checklist (`docs/release-checklist.md`).
 
 ### Changed
 - **Positioning and onboarding messaging**: Strengthened EN/ZH README and quick-start docs with explicit kse advantage matrix, 90-second value proof, and KPI observability positioning to improve first-contact clarity.

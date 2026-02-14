@@ -53,6 +53,55 @@ If you do not use the `sample` command, create `kpi-input.json` manually:
 
 ---
 
+## Expected JSON Output
+
+`snapshot --json` returns a compact machine-readable summary:
+
+```json
+{
+  "success": true,
+  "period": "2026-W10",
+  "risk_level": "medium",
+  "triggered_metrics": [
+    "manual_takeover_rate"
+  ],
+  "snapshot_path": ".kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/2026-W10.json",
+  "gate_summary_path": ".kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/gate-summary.2026-W10.day-60.json",
+  "contract_path": "metric-definition.yaml"
+}
+```
+
+`trend --json` returns range, risk, and per-metric direction:
+
+```json
+{
+  "success": true,
+  "period": "2026-W10",
+  "window_size": 3,
+  "range": {
+    "from": "2026-W08",
+    "to": "2026-W10"
+  },
+  "risk_level": "high",
+  "triggered_metrics": [
+    "ttfv_minutes"
+  ],
+  "metrics": [
+    {
+      "metric_id": "ttfv_minutes",
+      "delta": 3,
+      "trend": "up",
+      "better_direction": "lower",
+      "status": "degraded",
+      "target_passed": true
+    }
+  ],
+  "trend_path": ".kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/trend.latest.json"
+}
+```
+
+---
+
 ## Weekly Operating Cadence
 
 1. Run `snapshot` once per week after major delivery batch.

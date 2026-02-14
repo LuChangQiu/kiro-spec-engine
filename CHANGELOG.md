@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Offline onboarding consistency**: Refreshed `START_HERE.txt`, `INSTALL_OFFLINE.txt`, and `docs/OFFLINE_INSTALL.md` to v1.46.2 guidance and aligned quick-start prerequisites with current runtime requirement (Node.js >= 16).
 - **Value metrics operator guidance**: Enhanced snapshot/baseline/trend failure messages with actionable follow-up commands (including `kse value metrics sample`) to reduce first-run friction.
 - **Top-level release navigation**: Updated EN/ZH root READMEs to expose release archive and validation report links directly from Advanced Topics for faster proof-of-value discovery.
+- **Observability guide usability**: Added EN/ZH expected JSON output examples for `snapshot --json` and `trend --json` to speed up first-run verification and integration scripting.
 
 ### Fixed
 - **npm package hygiene**: Excluded transient Python bytecode artifacts (`__pycache__`, `*.pyc/pyo/pyd`) from published package contents to reduce package noise and size.

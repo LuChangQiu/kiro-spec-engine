@@ -53,6 +53,55 @@ kse value metrics trend --window 6 --json
 
 ---
 
+## 预期 JSON 输出示例
+
+`snapshot --json` 会返回可机器读取的摘要结果：
+
+```json
+{
+  "success": true,
+  "period": "2026-W10",
+  "risk_level": "medium",
+  "triggered_metrics": [
+    "manual_takeover_rate"
+  ],
+  "snapshot_path": ".kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/2026-W10.json",
+  "gate_summary_path": ".kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/gate-summary.2026-W10.day-60.json",
+  "contract_path": "metric-definition.yaml"
+}
+```
+
+`trend --json` 会返回时间窗口、风险和指标方向信息：
+
+```json
+{
+  "success": true,
+  "period": "2026-W10",
+  "window_size": 3,
+  "range": {
+    "from": "2026-W08",
+    "to": "2026-W10"
+  },
+  "risk_level": "high",
+  "triggered_metrics": [
+    "ttfv_minutes"
+  ],
+  "metrics": [
+    {
+      "metric_id": "ttfv_minutes",
+      "delta": 3,
+      "trend": "up",
+      "better_direction": "lower",
+      "status": "degraded",
+      "target_passed": true
+    }
+  ],
+  "trend_path": ".kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/trend.latest.json"
+}
+```
+
+---
+
 ## 周度运行节奏（建议）
 
 1. 每周主要交付批次完成后执行一次 `snapshot`。

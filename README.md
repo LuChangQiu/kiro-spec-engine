@@ -270,7 +270,9 @@ sequenceDiagram
 ### Advanced Topics
 - [Adoption Guide](docs/adoption-guide.md) - Adopting kse in existing projects
 - [Upgrade Guide](docs/upgrade-guide.md) - Version upgrade instructions
+- [Release Archive](docs/releases/README.md) - Versioned release notes and validation report index
 - [Release Notes v1.46.2](docs/releases/v1.46.2.md) - Current release highlights and impact
+- [Validation Report v1.46.2](docs/releases/v1.46.2-validation.md) - Release-readiness evidence and verification results
 - [Release Checklist](docs/release-checklist.md) - Repeatable pre-release verification flow
 - [Manual Workflows](docs/manual-workflows-guide.md) - Step-by-step workflows
 - [Developer Guide](docs/developer-guide.md) - Contributing and extending kse
@@ -717,5 +719,5 @@ A deep conversation about AI development trends, Neo-Confucian philosophy, and s
 ---
 
 **Version**: 1.46.2  
-**Last Updated**: 2026-02-13
+**Last Updated**: 2026-02-14
 

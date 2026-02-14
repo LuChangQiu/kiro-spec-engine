@@ -1,0 +1,11 @@
+{
+  "period": "2026-W09",
+  "ttfv_minutes": 38,
+  "batch_success_rate": 0.65,
+  "cycle_reduction_rate": 0.09,
+  "manual_takeover_rate": 0.36,
+  "risk_level": "medium",
+  "reasons": [],
+  "notes": "sample week 2 consecutive deterioration, should trigger high risk",
+  "generated_at": "2026-02-14T04:09:53.623Z"
+}

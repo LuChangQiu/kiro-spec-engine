@@ -69,6 +69,24 @@ kse spec gate run --specs "spec-a,spec-b" --max-parallel 3
 kse status --verbose
 ```
 
+### Value Metrics
+
+```bash
+# Generate weekly KPI snapshot + gate summary
+kse value metrics snapshot \
+  --input .kiro/specs/112-00-spec-value-realization-program/custom/weekly-metrics/2026-W09.sample.json \
+  --period 2026-W09 \
+  --checkpoint day-60 \
+  --json
+
+# Use custom metric contract and output paths
+kse value metrics snapshot \
+  --input ./metrics-input.json \
+  --definitions .kiro/specs/112-00-spec-value-realization-program/custom/metric-definition.yaml \
+  --history-dir .kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics \
+  --out .kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/2026-W10.json
+```
+
 ### Task Management
 
 ```bash

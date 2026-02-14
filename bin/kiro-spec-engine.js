@@ -17,6 +17,7 @@ const registerCollabCommands = require('../lib/commands/collab');
 const { registerSpecBootstrapCommand } = require('../lib/commands/spec-bootstrap');
 const { registerSpecPipelineCommand } = require('../lib/commands/spec-pipeline');
 const { registerSpecGateCommand } = require('../lib/commands/spec-gate');
+const { registerValueCommands } = require('../lib/commands/value');
 const VersionChecker = require('../lib/version/version-checker');
 
 const i18n = getI18n();
@@ -656,6 +657,9 @@ registerKnowledgeCommands(program);
 // Orchestration commands
 const { registerOrchestrateCommands } = require('../lib/commands/orchestrate');
 registerOrchestrateCommands(program);
+
+// Value realization and observability commands
+registerValueCommands(program);
 
 // Template management commands
 const templatesCommand = require('../lib/commands/templates');

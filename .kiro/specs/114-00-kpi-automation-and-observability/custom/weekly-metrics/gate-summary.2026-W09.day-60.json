@@ -1,0 +1,44 @@
+{
+  "checkpoint": "day-60",
+  "passed_metrics": 0,
+  "total_metrics": 4,
+  "required_passed_metrics": 3,
+  "decision": "no-go",
+  "checks": [
+    {
+      "metric_id": "ttfv_minutes",
+      "value": 38,
+      "target": "<= 30",
+      "operator": "<=",
+      "target_value": 30,
+      "passed": false
+    },
+    {
+      "metric_id": "batch_success_rate",
+      "value": 0.65,
+      "target": ">= 0.80",
+      "operator": ">=",
+      "target_value": 0.8,
+      "passed": false
+    },
+    {
+      "metric_id": "cycle_reduction_rate",
+      "value": 0.09,
+      "target": ">= 0.30",
+      "operator": ">=",
+      "target_value": 0.3,
+      "passed": false
+    },
+    {
+      "metric_id": "manual_takeover_rate",
+      "value": 0.36,
+      "target": "<= 0.20",
+      "operator": "<=",
+      "target_value": 0.2,
+      "passed": false
+    }
+  ],
+  "evidence": [
+    ".kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/2026-W09.json"
+  ]
+}

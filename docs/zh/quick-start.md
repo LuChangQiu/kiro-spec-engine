@@ -31,15 +31,15 @@
 ## 前置条件
 
 开始之前，请确保你有：
-- **Node.js** 14 或更高版本（[下载](https://nodejs.org/)）
-- **npm** 6 或更高版本（随 Node.js 一起安装）
+- **Node.js** 16 或更高版本（[下载](https://nodejs.org/)）
+- **npm** 8 或更高版本（随 Node.js 一起安装）
 - 基本的命令行知识
 - 一个 AI 编码工具（Claude、Cursor、Windsurf、Copilot 等）
 
 检查你的版本：
 ```bash
-node --version  # 应显示 v14.0.0 或更高
-npm --version   # 应显示 6.0.0 或更高
+node --version  # 应显示 v16.0.0 或更高
+npm --version   # 应显示 8.0.0 或更高
 ```
 
 ---

@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Positioning and onboarding messaging**: Strengthened EN/ZH README and quick-start docs with explicit kse advantage matrix, 90-second value proof, and KPI observability positioning to improve first-contact clarity.
 - **CLI first-screen positioning text**: Updated `kse --help` top description in EN/ZH locales to reflect current core strengths: Spec workflow, orchestration, and KPI observability.
+- **Offline onboarding consistency**: Refreshed `START_HERE.txt`, `INSTALL_OFFLINE.txt`, and `docs/OFFLINE_INSTALL.md` to v1.46.2 guidance and aligned quick-start prerequisites with current runtime requirement (Node.js >= 16).
 
 ### Fixed
 - **npm package hygiene**: Excluded transient Python bytecode artifacts (`__pycache__`, `*.pyc/pyo/pyd`) from published package contents to reduce package noise and size.

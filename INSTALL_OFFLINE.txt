@@ -1,45 +1,43 @@
-kiro-spec-engine v1.24.1 离线安装包
+kiro-spec-engine (kse) 离线安装说明
 ========================================
 
-📦 包含文件
------------
-1. kiro-spec-engine-1.24.1.tgz - npm 安装包 (709 KB)
-2. OFFLINE_INSTALL.md - 详细安装指南
-3. README.md - 项目说明（英文）
-4. README.zh.md - 项目说明（中文）
+版本: v1.46.2
+更新时间: 2026-02-14
+
+📦 包含文件（示例）
+-------------------
+1. kiro-spec-engine-<version>.tgz  - npm 离线安装包
+2. docs/OFFLINE_INSTALL.md         - 详细离线安装指南
+3. README.md / README.zh.md        - 项目说明
 
 🚀 快速安装（推荐）
 -------------------
-npm install -g kiro-spec-engine-1.24.1.tgz
-
-⚠️ Windows 用户注意
--------------------
-如果提示 "npm 命令不可用"，请先运行：
-$env:Path = "C:\Program Files\nodejs;$env:Path"
-
-然后再执行安装命令。
+npm install -g kiro-spec-engine-<version>.tgz
 
 ✅ 验证安装
 -----------
 kse --version
-# 应显示: 1.24.1
+# 应显示当前安装版本（例如 1.46.2）
 
-📖 详细说明
------------
-查看 OFFLINE_INSTALL.md 获取完整安装指南和故障排除。
+⚠️ Windows 用户注意
+-------------------
+如果提示 "npm 命令不可用"，请先运行：
+$env:Path = "C:\\Program Files\\nodejs;$env:Path"
 
-🎯 新功能
----------
-- 嵌套 Git 仓库支持
-- 多仓库管理增强
-- 用户知识管理系统
+然后重试安装命令。
 
-💡 快速开始
------------
+🎯 安装后 90 秒价值验证
+-----------------------
 cd your-project
-kse adopt              # 初始化项目
-kse repo init          # 扫描仓库
-kse knowledge init     # 初始化知识库
+kse adopt
+kse spec bootstrap --name 01-00-demo-feature --non-interactive
+kse value metrics snapshot --input ./kpi-input.json --json
+
+📖 详细文档
+-----------
+- docs/OFFLINE_INSTALL.md
+- docs/README.md
+- docs/value-observability-guide.md
 
 📧 支持
 -------

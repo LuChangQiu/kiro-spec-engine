@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Value observability documentation track**: Added dedicated EN/ZH guides for KPI snapshot/baseline/trend workflow (`docs/value-observability-guide.md`, `docs/zh/value-observability-guide.md`) and wired entry links from README + docs indexes for faster discovery of measurable delivery capabilities.
 - **Release communication assets**: Added bilingual v1.46.2 release notes (`docs/releases/v1.46.2.md`, `docs/zh/releases/v1.46.2.md`) and a reusable pre-release checklist (`docs/release-checklist.md`).
 - **Release validation artifacts**: Added release-readiness evidence reports in EN/ZH (`docs/releases/v1.46.2-validation.md`, `docs/zh/releases/v1.46.2-validation.md`) with test and package dry-run results.
+- **Value metrics helper test coverage**: Added deterministic tests for ISO week period derivation and sample payload structure in command-level unit tests.
 
 ### Changed
 - **Positioning and onboarding messaging**: Strengthened EN/ZH README and quick-start docs with explicit kse advantage matrix, 90-second value proof, and KPI observability positioning to improve first-contact clarity.

@@ -80,6 +80,7 @@ npm --version
 cd your-project
 kse adopt
 kse spec bootstrap --name 01-00-demo-feature --non-interactive
+kse value metrics sample --out ./kpi-input.json --json
 kse value metrics snapshot --input ./kpi-input.json --json
 ```
 

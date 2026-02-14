@@ -67,7 +67,10 @@ kse adopt
 # 2) Generate Spec workflow draft
 kse spec bootstrap --name 01-00-demo-feature --non-interactive
 
-# 3) Produce machine-readable KPI snapshot
+# 3) Generate KPI input sample
+kse value metrics sample --out ./kpi-input.json --json
+
+# 4) Produce machine-readable KPI snapshot
 kse value metrics snapshot --input ./kpi-input.json --json
 ```
 

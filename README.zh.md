@@ -65,7 +65,10 @@ kse adopt
 # 2) 生成 Spec 工作流草稿
 kse spec bootstrap --name 01-00-demo-feature --non-interactive
 
-# 3) 产出机器可读 KPI 快照
+# 3) 生成 KPI 输入样例
+kse value metrics sample --out ./kpi-input.json --json
+
+# 4) 产出机器可读 KPI 快照
 kse value metrics snapshot --input ./kpi-input.json --json
 ```
 

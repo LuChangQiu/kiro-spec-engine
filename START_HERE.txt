@@ -28,9 +28,10 @@ Run these commands in your project:
 
   kse adopt
   kse spec bootstrap --name 01-00-demo-feature --non-interactive
+  kse value metrics sample --out ./kpi-input.json --json
   kse value metrics snapshot --input ./kpi-input.json --json
 
-If command 3 succeeds, you get machine-readable KPI output with risk
+If command 4 succeeds, you get machine-readable KPI output with risk
 signal and evidence paths.
 
 
@@ -56,6 +57,7 @@ to orchestrate mode.
 5) KPI observability quick commands
 ---------------------------------------------------------------
 
+  kse value metrics sample --out ./kpi-input.json --json
   kse value metrics snapshot --input ./kpi-input.json --json
   kse value metrics baseline --from-history 3 --json
   kse value metrics trend --window 6 --json

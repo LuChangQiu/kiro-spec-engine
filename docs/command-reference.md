@@ -473,6 +473,8 @@ kse auto governance stats
 kse auto governance stats --days 14 --status completed,partial-failed --json
 kse auto governance maintain --session-keep 50 --batch-session-keep 50 --controller-session-keep 50 --json
 kse auto governance maintain --apply --session-keep 20 --batch-session-keep 20 --controller-session-keep 20 --recovery-memory-older-than-days 90 --json
+kse auto governance close-loop --plan-only --max-rounds 3 --target-risk low --json
+kse auto governance close-loop --max-rounds 3 --target-risk low --session-keep 20 --batch-session-keep 20 --controller-session-keep 20 --json
 
 # Recovery memory maintenance
 kse auto recovery-memory show --json
@@ -671,6 +673,9 @@ Cross-archive autonomous governance maintenance:
 - `kse auto governance maintain [--days <n>] [--status <csv>] [--session-keep <n>] [--batch-session-keep <n>] [--controller-session-keep <n>] [--recovery-memory-older-than-days <n>] [--apply] [--dry-run] [--json]`: run governance-maintenance planning and optional execution in one command.
   - Plan-only mode is default; add `--apply` to execute maintenance actions (`session prune`, `batch-session prune`, `controller-session prune`, `recovery-memory prune`).
   - JSON output includes `assessment` (pre-maintenance governance snapshot), `plan`, `executed_actions`, `summary`, and `after_assessment` (only when `--apply` without `--dry-run`).
+- `kse auto governance close-loop [--days <n>] [--status <csv>] [--session-keep <n>] [--batch-session-keep <n>] [--controller-session-keep <n>] [--recovery-memory-older-than-days <n>] [--max-rounds <n>] [--target-risk <low|medium|high>] [--plan-only] [--dry-run] [--json]`: run governance rounds until stop condition (target risk reached, no actionable maintenance, non-mutating mode, or max rounds).
+  - `--plan-only` runs a single non-mutating planning round.
+  - JSON output includes round-by-round risk/action telemetry (`rounds`) plus `initial_assessment`, `final_assessment`, and convergence metadata.
 
 Close-loop recovery memory maintenance:
 - `kse auto recovery-memory show [--scope <scope>] [--json]`: inspect persisted recovery signatures/actions and aggregate stats (optionally scoped)

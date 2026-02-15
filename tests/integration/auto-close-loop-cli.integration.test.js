@@ -1977,4 +1977,36 @@ describe('auto close-loop CLI integration', () => {
     expect(await fs.pathExists(batchNew)).toBe(true);
     expect(await fs.pathExists(controllerNew)).toBe(true);
   });
+
+  test('runs governance close-loop in plan-only mode through CLI', async () => {
+    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    await fs.ensureDir(closeLoopSessionDir);
+    const failedSession = path.join(closeLoopSessionDir, 'integration-governance-close-loop-plan-failed.json');
+    await fs.writeJson(failedSession, {
+      session_id: 'integration-governance-close-loop-plan-failed',
+      status: 'failed',
+      portfolio: { master_spec: '121-00-integration-plan', sub_specs: [] }
+    }, { spaces: 2 });
+
+    const closedLoop = await runCli([
+      'auto',
+      'governance',
+      'close-loop',
+      '--plan-only',
+      '--max-rounds',
+      '3',
+      '--target-risk',
+      'low',
+      '--json'
+    ], { cwd: tempDir });
+    expect(closedLoop.exitCode).toBe(0);
+    const payload = parseJsonOutput(closedLoop.stdout);
+    expect(payload.mode).toBe('auto-governance-close-loop');
+    expect(payload.plan_only).toBe(true);
+    expect(payload.apply).toBe(false);
+    expect(payload.performed_rounds).toBe(1);
+    expect(payload.stop_reason).toBe('non-mutating-mode');
+    expect(Array.isArray(payload.rounds)).toBe(true);
+    expect(payload.rounds).toHaveLength(1);
+  });
 });

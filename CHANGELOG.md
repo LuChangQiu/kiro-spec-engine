@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Governance close-loop rounds command**: Added `kse auto governance close-loop` to run bounded governance-maintenance rounds toward a target risk (`--target-risk`) with convergence telemetry (`rounds`, `initial_assessment`, `final_assessment`, `stop_reason`, `converged`) and non-mutating planning support (`--plan-only`, `--dry-run`).
 - **Governance maintenance close-loop command**: Added `kse auto governance maintain` to combine governance assessment and optional maintenance execution (`--apply`) across session/batch/controller archives and recovery memory, with policy knobs (`--session-keep`, `--batch-session-keep`, `--controller-session-keep`, `--recovery-memory-older-than-days`), dry-run support, and before/after telemetry.
 - **Cross-archive governance stats command**: Added `kse auto governance stats` with optional `--days` / `--status` filters to unify session/batch-session/controller-session telemetry and recovery-memory state into one governance snapshot (`totals`, `throughput`, `health` risk diagnostics, `top_master_specs`, and per-archive detail payloads).
 - **Session and batch session stats commands**: Added `kse auto session stats` and `kse auto batch-session stats` with optional `--days` / `--status` filters and JSON telemetry (completion/failure rates, volume aggregates, composition breakdowns, latest-session snapshots) for autonomous archive observability.

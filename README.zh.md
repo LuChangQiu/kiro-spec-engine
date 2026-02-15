@@ -55,6 +55,7 @@ graph LR
 | 多 Agent 扩展 | DAG 编排（`orchestrate run/status/stop`） | 并行交付，不再手工开多终端 |
 | 自动主从拆分 | 目标自动拆成 Master/Sub Spec 并建立依赖 | 复杂需求自动转成可并行执行计划 |
 | 程序级自愈闭环 | `auto close-loop-program` 自动恢复 + 策略记忆 | 失败/部分失败会自动续跑，直到有界收敛 |
+| 队列驱动自治执行 | `auto close-loop-controller` 持续消费目标队列 | 程序级积压目标无需人工反复触发 |
 | 自治收敛治理 | Program Gate（最小成功率 + 最大风险）+ 审计 JSON 导出 | 完成结果可按策略验收且全程可追溯 |
 | 结果可量化 | KPI 自动化（`value metrics snapshot/baseline/trend`） | 周度趋势可追踪、可审计 |
 | 工具无锁定 | 兼容 Claude/Cursor/Windsurf/Copilot/Kiro | 团队可保留现有 AI 工具链 |
@@ -449,6 +450,7 @@ kse create-spec <name>             # 兼容旧版：仅创建空 Spec 目录
 kse auto close-loop "<目标>"        # 自动拆分 Master/Sub Spec 并推进到完成态
 kse auto close-loop "<目标>" --dry-run --json  # 仅预览拆分与依赖计划
 kse auto close-loop-program "<目标>" --program-govern-until-stable --program-govern-use-action 1 --json # 程序级自动恢复 + 治理循环（含 remediation action 执行）直到稳定
+kse auto close-loop-controller .kiro/auto/program-queue.lines --wait-on-empty --dequeue-limit 2 --json # 队列驱动自治控制器，持续处理广义目标积压
 
 # Spec 工作流（推荐）
 kse spec bootstrap --name <spec> --non-interactive          # 生成 requirements/design/tasks 初稿
@@ -600,7 +602,7 @@ kse spec bootstrap --name 01-00-my-first-feature --non-interactive
 
 ---
 
-**版本**：1.46.2  
-**最后更新**：2026-02-14
+**版本**：1.47.2  
+**最后更新**：2026-02-15
 
 

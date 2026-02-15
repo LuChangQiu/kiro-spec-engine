@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Persistent close-loop queue controller**: Added `kse auto close-loop-controller [queue-file]` with queue drain/poll runtime (`--queue-format`, `--dequeue-limit`, `--wait-on-empty`, `--poll-seconds`, runtime budgets, done/failed archives) so broad goals can be continuously executed through `close-loop-program` without manual re-invocation.
 - **KPI sample generator command**: Added `kse value metrics sample` to generate a ready-to-use KPI input JSON scaffold (`kpi-input.json`) for first-time observability runs.
 - **Value observability documentation track**: Added dedicated EN/ZH guides for KPI snapshot/baseline/trend workflow (`docs/value-observability-guide.md`, `docs/zh/value-observability-guide.md`) and wired entry links from README + docs indexes for faster discovery of measurable delivery capabilities.
 - **Release communication assets**: Added bilingual v1.46.2 release notes (`docs/releases/v1.46.2.md`, `docs/zh/releases/v1.46.2.md`) and a reusable pre-release checklist (`docs/release-checklist.md`).
@@ -100,6 +101,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Autonomous operator UX**: Expanded docs with semantic decomposition and live stream behavior for close-loop command usage.
 
 ### Fixed
+- **Controller summary semantics**: `close-loop-controller` now reports final `pending_goals` from the persisted queue snapshot and only marks `cycle-limit-reached` as exhausted when pending work remains (or empty-polling mode explicitly consumes cycle budget).
 - **npm package hygiene**: Excluded transient Python bytecode artifacts (`__pycache__`, `*.pyc/pyo/pyd`) from published package contents to reduce package noise and size.
 - **Documentation contact placeholders**: Replaced `yourusername` placeholder repository links in onboarding docs with the canonical project URL and removed stale example email contact.
 - **Jest force-exit dependency**: Removed `forceExit` from `jest.config.js` and `jest.config.ci.js`; test scripts now complete without explicit force-exit configuration.

@@ -57,6 +57,7 @@ graph LR
 | Multi-agent scale-out | DAG orchestration (`orchestrate run/status/stop`) | Parallel delivery without manual terminal juggling |
 | Auto portfolio decomposition | Master/Sub spec split + dependency wiring | Complex goals become executable parallel plans automatically |
 | Program self-healing closure | `auto close-loop-program` auto recovery + learned remediation memory | Failed/partial runs continue autonomously until bounded convergence |
+| Queue-driven autonomous runtime | `auto close-loop-controller` persistent queue drain | Program-scale backlogs continue without manual re-triggering |
 | Autonomous convergence governance | Program gate (`min-success-rate` + `max-risk-level`) + audit JSON output | Program completion is policy-verified and traceable |
 | Measurable outcomes | KPI automation (`value metrics snapshot/baseline/trend`) | Delivery quality can be tracked week-over-week |
 | Tool-agnostic adoption | Works across Claude/Cursor/Windsurf/Copilot/Kiro | No lock-in to a single AI IDE |
@@ -532,6 +533,7 @@ kse create-spec <name>             # Legacy: create empty Spec folder only
 kse auto close-loop "<goal>"       # Auto split goal into master/sub specs and execute to closure
 kse auto close-loop "<goal>" --dry-run --json  # Preview decomposition plan only
 kse auto close-loop-program "<goal>" --program-govern-until-stable --program-govern-use-action 1 --json # Program-level recovery + governance with remediation action execution
+kse auto close-loop-controller .kiro/auto/program-queue.lines --wait-on-empty --dequeue-limit 2 --json # Queue-driven autonomous controller for broad-goal backlogs
 
 # Spec workflow (recommended)
 kse spec bootstrap --name <spec> --non-interactive         # Generate requirements/design/tasks draft
@@ -736,6 +738,6 @@ A deep conversation about AI development trends, Neo-Confucian philosophy, and s
 
 ---
 
-**Version**: 1.46.2  
-**Last Updated**: 2026-02-14
+**Version**: 1.47.2  
+**Last Updated**: 2026-02-15
 

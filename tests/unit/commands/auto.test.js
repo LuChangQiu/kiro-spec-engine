@@ -1146,6 +1146,69 @@ describe('auto close-loop command', () => {
     }));
   });
 
+  test('validates --dequeue-limit range in close-loop-controller', async () => {
+    const queueFile = path.join(tempDir, 'controller-goals.lines');
+    await fs.writeFile(queueFile, 'deliver goal one\n', 'utf8');
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'close-loop-controller',
+        queueFile,
+        '--dequeue-limit',
+        '0'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const errorOutput = errorSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    expect(errorOutput).toContain('--dequeue-limit must be an integer between 1 and 100.');
+  });
+
+  test('drains controller queue and runs close-loop-program autonomously', async () => {
+    runAutoCloseLoop
+      .mockResolvedValue({ status: 'completed', portfolio: { master_spec: '200-00-controller', sub_specs: [] } });
+
+    const queueFile = path.join(tempDir, 'controller-goals.lines');
+    await fs.writeFile(queueFile, 'deliver goal one\ndeliver goal two\n', 'utf8');
+    const doneFile = path.join(tempDir, 'controller-done.lines');
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'close-loop-controller',
+      queueFile,
+      '--program-goals',
+      '2',
+      '--dequeue-limit',
+      '2',
+      '--max-cycles',
+      '1',
+      '--controller-done-file',
+      doneFile,
+      '--json'
+    ]);
+
+    expect(runAutoCloseLoop).toHaveBeenCalledTimes(4);
+    const queueAfter = await fs.readFile(queueFile, 'utf8');
+    expect(queueAfter.trim()).toBe('');
+
+    const summary = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(summary).toEqual(expect.objectContaining({
+      mode: 'auto-close-loop-controller',
+      status: 'completed',
+      processed_goals: 2,
+      completed_goals: 2,
+      failed_goals: 0,
+      pending_goals: 0
+    }));
+    expect(summary.done_archive_file).toBeTruthy();
+    expect(await fs.pathExists(doneFile)).toBe(true);
+  });
+
   test('applies program gate profile defaults when explicit thresholds are omitted', async () => {
     runAutoCloseLoop
       .mockResolvedValueOnce({ status: 'failed', portfolio: { master_spec: '122-12-prof-r1', sub_specs: [] } })

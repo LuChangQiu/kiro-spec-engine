@@ -622,6 +622,42 @@ describe('auto close-loop CLI integration', () => {
     }));
   });
 
+  test('drains close-loop-controller queue through CLI', async () => {
+    const queueFile = path.join(tempDir, 'controller-goals.lines');
+    await fs.writeFile(queueFile, [
+      'deliver autonomous controller goal one',
+      'deliver autonomous controller goal two'
+    ].join('\n'), 'utf8');
+
+    const run = await runCli([
+      'auto',
+      'close-loop-controller',
+      queueFile,
+      '--program-goals',
+      '2',
+      '--dequeue-limit',
+      '2',
+      '--max-cycles',
+      '1',
+      '--dry-run',
+      '--json'
+    ], { cwd: tempDir });
+
+    expect(run.exitCode).toBe(0);
+    const payload = parseJsonOutput(run.stdout);
+    expect(payload).toEqual(expect.objectContaining({
+      mode: 'auto-close-loop-controller',
+      status: 'completed',
+      processed_goals: 2,
+      completed_goals: 2,
+      failed_goals: 0,
+      pending_goals: 0
+    }));
+
+    const queueAfter = await fs.readFile(queueFile, 'utf8');
+    expect(queueAfter.trim()).toBe('');
+  });
+
   test('supports close-loop-program gate fallback profile through CLI', async () => {
     const run = await runCli([
       'auto',

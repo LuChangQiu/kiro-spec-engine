@@ -337,6 +337,8 @@ kse auto close-loop-program \
   --program-gate-fallback-profile prod \
   --program-min-success-rate 95 \
   --program-max-risk-level medium \
+  --program-govern-until-stable \
+  --program-govern-max-rounds 3 \
   --program-kpi-out .kiro/reports/close-loop-program-kpi.json \
   --program-audit-out .kiro/reports/close-loop-program-audit.json \
   --json
@@ -521,6 +523,12 @@ Close-loop program (`kse auto close-loop-program "<goal>"`) options:
 - `--program-max-agent-budget <n>`: convergence gate max allowed agent budget/effective parallel budget (`1-500`)
 - `--program-max-total-sub-specs <n>`: convergence gate max total sub-specs across program goals (`1-500000`)
 - `--no-program-gate-auto-remediate`: disable automatic remediation hints/prune attempts after gate failure
+- `--program-govern-until-stable`: enable post-run governance loop that keeps replaying/recovering until gate/anomaly stability
+- `--program-govern-max-rounds <n>`: max governance rounds (`1-20`, default `3`)
+- `--program-govern-max-minutes <n>`: elapsed-time budget for governance loop (`1-10080`, default `60`)
+- `--program-govern-anomaly-weeks <n>`: KPI lookback weeks for anomaly-triggered governance (`1-260`, default `8`)
+- `--program-govern-anomaly-period <week|day>`: KPI bucket period for anomaly governance checks (default `week`)
+- `--no-program-govern-anomaly`: disable anomaly-triggered governance and only govern by gate/budget failures
 - `--program-min-quality-score <n>`: minimum semantic decomposition quality score before automatic refinement (`0-100`, default `70`)
 - `--program-quality-gate`: fail run when final decomposition quality remains below `--program-min-quality-score`
 - `--recovery-memory-scope <scope>`: scope key for recovery memory isolation (default auto: project + git branch)
@@ -530,6 +538,9 @@ Close-loop program (`kse auto close-loop-program "<goal>"`) options:
 - Program summary includes `program_kpi`, `program_gate`, `program_gate_fallbacks`, `program_gate_effective`, and optional `program_kpi_file` / `program_audit_file` for portfolio-level observability pipelines.
   - `program_gate` now supports unified budget checks (success/risk + elapsed time + agent budget + total sub-spec ceiling).
   - On gate/budget failure, summary can include `program_gate_auto_remediation` with auto patch/prune actions.
+- With `--program-govern-until-stable`, summary additionally includes:
+  - `program_governance` (round history, stop reason, exhausted/converged state)
+  - `program_kpi_trend` and `program_kpi_anomalies` (anomaly-aware governance context)
 - Program summary includes `program_diagnostics` with `failure_clusters` and `remediation_actions` (prioritized follow-up commands for convergence).
 - Program summary includes `program_coordination` (master/sub topology, unresolved goal indexes, scheduler snapshot) and `auto_recovery` metadata.
 

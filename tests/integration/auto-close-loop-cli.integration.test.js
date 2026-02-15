@@ -546,6 +546,39 @@ describe('auto close-loop CLI integration', () => {
     }));
   });
 
+  test('stabilizes close-loop-program via governance replay loop through CLI', async () => {
+    const run = await runCli([
+      'auto',
+      'close-loop-program',
+      'kse should deliver autonomous close-loop progression, master/sub decomposition and quality rollout',
+      '--program-goals',
+      '2',
+      '--batch-agent-budget',
+      '4',
+      '--program-max-agent-budget',
+      '2',
+      '--program-govern-until-stable',
+      '--program-govern-max-rounds',
+      '2',
+      '--dry-run',
+      '--json'
+    ], { cwd: tempDir });
+
+    expect(run.exitCode).toBe(0);
+    const payload = parseJsonOutput(run.stdout);
+    expect(payload.program_gate_effective).toEqual(expect.objectContaining({
+      passed: true
+    }));
+    expect(payload.program_governance).toEqual(expect.objectContaining({
+      enabled: true,
+      performed_rounds: 1,
+      converged: true
+    }));
+    expect(payload.program_governance.history[0]).toEqual(expect.objectContaining({
+      execution_mode: 'program-replay'
+    }));
+  });
+
   test('supports close-loop-program gate fallback profile through CLI', async () => {
     const run = await runCli([
       'auto',

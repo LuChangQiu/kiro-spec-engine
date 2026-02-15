@@ -976,6 +976,72 @@ describe('auto close-loop command', () => {
     expect(runAutoCloseLoop).not.toHaveBeenCalled();
   });
 
+  test('validates --program-govern-max-rounds range in close-loop-program', async () => {
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'close-loop-program',
+        'deliver resilient autonomous rollout',
+        '--program-govern-until-stable',
+        '--program-govern-max-rounds',
+        '0'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const errorOutput = errorSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    expect(errorOutput).toContain('--program-govern-max-rounds must be an integer between 1 and 20.');
+    expect(runAutoCloseLoop).not.toHaveBeenCalled();
+  });
+
+  test('governance loop replays program with remediation patch until gate is stable', async () => {
+    runAutoCloseLoop
+      .mockResolvedValueOnce({ status: 'completed', portfolio: { master_spec: '122-12-govern-r1a', sub_specs: [] } })
+      .mockResolvedValueOnce({ status: 'completed', portfolio: { master_spec: '122-12-govern-r1b', sub_specs: [] } })
+      .mockResolvedValueOnce({ status: 'completed', portfolio: { master_spec: '122-12-govern-r2a', sub_specs: [] } })
+      .mockResolvedValueOnce({ status: 'completed', portfolio: { master_spec: '122-12-govern-r2b', sub_specs: [] } });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'close-loop-program',
+      'deliver resilient autonomous rollout',
+      '--program-goals',
+      '2',
+      '--batch-agent-budget',
+      '2',
+      '--program-max-agent-budget',
+      '1',
+      '--program-govern-until-stable',
+      '--program-govern-max-rounds',
+      '2',
+      '--program-govern-max-minutes',
+      '10',
+      '--json'
+    ]);
+
+    expect(runAutoCloseLoop).toHaveBeenCalledTimes(4);
+    const summary = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(summary.program_gate_effective).toEqual(expect.objectContaining({
+      passed: true
+    }));
+    expect(summary.program_governance).toEqual(expect.objectContaining({
+      enabled: true,
+      performed_rounds: 1,
+      converged: true
+    }));
+    expect(summary.program_governance.history[0]).toEqual(expect.objectContaining({
+      execution_mode: 'program-replay',
+      applied_patch: expect.objectContaining({
+        batchAgentBudget: 1
+      })
+    }));
+  });
+
   test('applies program gate profile defaults when explicit thresholds are omitted', async () => {
     runAutoCloseLoop
       .mockResolvedValueOnce({ status: 'failed', portfolio: { master_spec: '122-12-prof-r1', sub_specs: [] } })

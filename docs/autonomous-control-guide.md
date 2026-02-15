@@ -300,6 +300,13 @@ Close-loop recovery command:
 - `--program-audit-out <path>` exports full recovery/program audit JSON.
 - Output includes `recovered_from_summary`, `recovery_plan` (including `selection_explain`), `recovery_cycle` (with elapsed/budget metadata), and `recovery_memory` (including scope + selection explanation) for full auditability of applied strategy changes.
 
+Program governance loop (for `close-loop-program`):
+- `--program-govern-until-stable` enables bounded post-run governance rounds.
+- `--program-govern-max-rounds <n>` and `--program-govern-max-minutes <n>` bound governance loop cost.
+- `--program-govern-anomaly-weeks <n>` + `--program-govern-anomaly-period <week|day>` make governance anomaly-aware using autonomous KPI trend.
+- `--no-program-govern-anomaly` limits governance trigger to gate/budget failures only.
+- Output includes `program_governance`, `program_kpi_trend`, and `program_kpi_anomalies` for traceable autonomous stabilization history.
+
 KPI trend command:
 - `kse auto kpi trend --weeks <n> --mode <all|batch|program|recover> --period <week|day> --json` aggregates periodic success/completion, failure, sub-spec, and spec-growth telemetry from persisted autonomous session summaries.
 - Add `--csv` to print/export trend buckets as CSV (`--out` writes CSV when `--csv` is enabled).

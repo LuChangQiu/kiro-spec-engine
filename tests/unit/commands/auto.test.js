@@ -3704,6 +3704,102 @@ describe('auto close-loop command', () => {
     expect(parsed.sessions[0].id).toBe('controller-partial-failed');
   });
 
+  test('aggregates close-loop-controller session stats in json mode', async () => {
+    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    await fs.ensureDir(sessionDir);
+    const completedSession = path.join(sessionDir, 'controller-stats-completed.json');
+    const failedSession = path.join(sessionDir, 'controller-stats-partial-failed.json');
+    await fs.writeJson(completedSession, {
+      mode: 'auto-close-loop-controller',
+      status: 'completed',
+      queue_format: 'lines',
+      processed_goals: 3,
+      pending_goals: 0,
+      controller_session: { id: 'controller-stats-completed', file: completedSession }
+    }, { spaces: 2 });
+    await fs.writeJson(failedSession, {
+      mode: 'auto-close-loop-controller',
+      status: 'partial-failed',
+      queue_format: 'json',
+      processed_goals: 1,
+      pending_goals: 2,
+      controller_session: { id: 'controller-stats-partial-failed', file: failedSession }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync(['node', 'kse', 'auto', 'controller-session', 'stats', '--json']);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-controller-session-stats');
+    expect(parsed.total_sessions).toBe(2);
+    expect(parsed.completed_sessions).toBe(1);
+    expect(parsed.failed_sessions).toBe(1);
+    expect(parsed.completion_rate_percent).toBe(50);
+    expect(parsed.failure_rate_percent).toBe(50);
+    expect(parsed.processed_goals_sum).toBe(4);
+    expect(parsed.pending_goals_sum).toBe(2);
+    expect(parsed.status_counts).toEqual(expect.objectContaining({
+      completed: 1,
+      'partial-failed': 1
+    }));
+    expect(parsed.queue_format_counts).toEqual(expect.objectContaining({
+      lines: 1,
+      json: 1
+    }));
+    expect(Array.isArray(parsed.latest_sessions)).toBe(true);
+    expect(parsed.latest_sessions.length).toBe(2);
+  });
+
+  test('filters close-loop-controller session stats by days and status', async () => {
+    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    await fs.ensureDir(sessionDir);
+    const oldSession = path.join(sessionDir, 'controller-stats-old.json');
+    const freshSession = path.join(sessionDir, 'controller-stats-fresh.json');
+    await fs.writeJson(oldSession, {
+      mode: 'auto-close-loop-controller',
+      status: 'completed',
+      processed_goals: 2,
+      pending_goals: 0,
+      controller_session: { id: 'controller-stats-old', file: oldSession }
+    }, { spaces: 2 });
+    await fs.writeJson(freshSession, {
+      mode: 'auto-close-loop-controller',
+      status: 'completed',
+      processed_goals: 5,
+      pending_goals: 1,
+      controller_session: { id: 'controller-stats-fresh', file: freshSession }
+    }, { spaces: 2 });
+    await fs.utimes(oldSession, new Date('2020-01-01T00:00:00.000Z'), new Date('2020-01-01T00:00:00.000Z'));
+    const now = new Date();
+    await fs.utimes(freshSession, now, now);
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'controller-session',
+      'stats',
+      '--days',
+      '30',
+      '--status',
+      'completed',
+      '--json'
+    ]);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-controller-session-stats');
+    expect(parsed.criteria.days).toBe(30);
+    expect(parsed.criteria.status_filter).toEqual(['completed']);
+    expect(parsed.total_sessions).toBe(1);
+    expect(parsed.processed_goals_sum).toBe(5);
+    expect(parsed.pending_goals_sum).toBe(1);
+    expect(parsed.status_counts).toEqual(expect.objectContaining({ completed: 1 }));
+    expect(parsed.latest_sessions[0].id).toBe('controller-stats-fresh');
+  });
+
   test('prunes close-loop-controller summary sessions with keep policy', async () => {
     const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(sessionDir);

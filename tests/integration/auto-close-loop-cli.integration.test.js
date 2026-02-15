@@ -1695,6 +1695,24 @@ describe('auto close-loop CLI integration', () => {
     expect(listPayload.sessions).toHaveLength(1);
     expect(listPayload.sessions[0].id).toBe('new-controller-session');
 
+    const stats = await runCli([
+      'auto',
+      'controller-session',
+      'stats',
+      '--status',
+      'partial-failed',
+      '--json'
+    ], { cwd: tempDir });
+    expect(stats.exitCode).toBe(0);
+    const statsPayload = parseJsonOutput(stats.stdout);
+    expect(statsPayload.mode).toBe('auto-controller-session-stats');
+    expect(statsPayload.total_sessions).toBe(1);
+    expect(statsPayload.status_counts).toEqual(expect.objectContaining({
+      'partial-failed': 1
+    }));
+    expect(statsPayload.latest_sessions).toHaveLength(1);
+    expect(statsPayload.latest_sessions[0].id).toBe('new-controller-session');
+
     const pruned = await runCli([
       'auto',
       'controller-session',

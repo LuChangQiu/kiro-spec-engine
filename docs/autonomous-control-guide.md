@@ -213,8 +213,10 @@ Controller summary session persistence and maintenance:
 - `--controller-session-older-than-days <n>`: when pruning, only delete summaries older than `n` days
 - `--no-controller-session`: disable controller summary archive for the current run
 - `kse auto controller-session list [--limit <n>] [--status <csv>]`: inspect persisted controller summary sessions (`--status` supports comma-separated, case-insensitive filters)
+- `kse auto controller-session stats [--days <n>] [--status <csv>] [--json]`: aggregate controller session status/throughput telemetry in an optional recent-day window
 - `kse auto controller-session prune --keep <n> [--older-than-days <n>]`: enforce controller summary retention policy
-  - JSON output includes `status_filter` and `status_counts` for filtered status composition.
+  - List JSON output includes `status_filter` and `status_counts` for filtered status composition.
+  - Stats JSON output includes `criteria`, `status_counts`, `queue_format_counts`, completion/failure rates, goal-volume sums, and `latest_sessions`.
 
 Recovery memory maintenance:
 - Default recovery memory file: `.kiro/auto/close-loop-recovery-memory.json`

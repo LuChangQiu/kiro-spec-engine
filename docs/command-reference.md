@@ -452,6 +452,10 @@ kse auto controller-session list
 kse auto controller-session list --status partial-failed
 kse auto controller-session list --limit 50 --json
 
+# Aggregate close-loop-controller summary session telemetry
+kse auto controller-session stats
+kse auto controller-session stats --days 14 --status partial-failed --json
+
 # Prune old close-loop-controller summary sessions
 kse auto controller-session prune --keep 50
 kse auto controller-session prune --keep 20 --older-than-days 14 --dry-run
@@ -638,8 +642,10 @@ Close-loop batch session maintenance:
 
 Close-loop controller session maintenance:
 - `kse auto controller-session list [--limit <n>] [--status <csv>] [--json]`: list persisted close-loop-controller summary sessions (`--status` supports comma-separated, case-insensitive filters)
+- `kse auto controller-session stats [--days <n>] [--status <csv>] [--json]`: aggregate persisted close-loop-controller status/throughput telemetry within an optional recent-day window
 - `kse auto controller-session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune old persisted controller summaries
-  - JSON output includes `status_filter` and `status_counts` over filtered sessions.
+  - List JSON output includes `status_filter` and `status_counts` over filtered sessions.
+  - Stats JSON output includes `criteria`, `status_counts`, `queue_format_counts`, completion/failure rates, goal-volume sums, and `latest_sessions`.
 
 Close-loop recovery memory maintenance:
 - `kse auto recovery-memory show [--scope <scope>] [--json]`: inspect persisted recovery signatures/actions and aggregate stats (optionally scoped)

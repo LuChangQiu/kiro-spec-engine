@@ -1663,7 +1663,7 @@ describe('auto close-loop CLI integration', () => {
     }, { spaces: 2 });
     await fs.writeJson(newSession, {
       mode: 'auto-close-loop-controller',
-      status: 'completed',
+      status: 'partial-failed',
       processed_goals: 1,
       pending_goals: 0,
       controller_session: {
@@ -1678,6 +1678,8 @@ describe('auto close-loop CLI integration', () => {
       'auto',
       'controller-session',
       'list',
+      '--status',
+      'partial-failed',
       '--limit',
       '1',
       '--json'
@@ -1685,8 +1687,13 @@ describe('auto close-loop CLI integration', () => {
     expect(listed.exitCode).toBe(0);
     const listPayload = parseJsonOutput(listed.stdout);
     expect(listPayload.mode).toBe('auto-controller-session-list');
-    expect(listPayload.total).toBe(2);
+    expect(listPayload.total).toBe(1);
+    expect(listPayload.status_filter).toEqual(['partial-failed']);
+    expect(listPayload.status_counts).toEqual(expect.objectContaining({
+      'partial-failed': 1
+    }));
     expect(listPayload.sessions).toHaveLength(1);
+    expect(listPayload.sessions[0].id).toBe('new-controller-session');
 
     const pruned = await runCli([
       'auto',

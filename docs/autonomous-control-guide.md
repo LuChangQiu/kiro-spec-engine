@@ -186,8 +186,9 @@ Session persistence and resume:
 - `--no-session`: disable session snapshot persistence
 - `--session-keep <n>`: automatically prune old snapshots and keep newest `n` after each close-loop run
 - `--session-older-than-days <n>`: when pruning, only delete snapshots older than `n` days
-- `kse auto session list [--limit <n>]`: inspect persisted sessions
+- `kse auto session list [--limit <n>] [--status <csv>]`: inspect persisted sessions (`--status` supports comma-separated, case-insensitive filters)
 - `kse auto session prune --keep <n> [--older-than-days <n>]`: enforce retention policy
+  - JSON output includes `status_filter` and `status_counts` for filtered session distributions.
 
 Spec directory maintenance:
 - `kse auto spec-session list [--limit <n>] [--json]`: inspect spec directory inventory under `.kiro/specs`
@@ -201,8 +202,9 @@ Batch summary session persistence and maintenance:
 - `--batch-session-keep <n>`: auto-prune archive and keep newest `n` summaries after each batch run
 - `--batch-session-older-than-days <n>`: when pruning, only delete summaries older than `n` days
 - `--no-batch-session`: disable batch summary archive for the current run
-- `kse auto batch-session list [--limit <n>]`: inspect persisted batch summary sessions
+- `kse auto batch-session list [--limit <n>] [--status <csv>]`: inspect persisted batch summary sessions (`--status` supports comma-separated, case-insensitive filters)
 - `kse auto batch-session prune --keep <n> [--older-than-days <n>]`: enforce batch summary retention policy
+  - JSON output includes `status_filter` and `status_counts` for filtered status composition.
 
 Controller summary session persistence and maintenance:
 - Default controller summary archive: `.kiro/auto/close-loop-controller-sessions/*.json`
@@ -210,8 +212,9 @@ Controller summary session persistence and maintenance:
 - `--controller-session-keep <n>`: auto-prune archive and keep newest `n` summaries after each controller run
 - `--controller-session-older-than-days <n>`: when pruning, only delete summaries older than `n` days
 - `--no-controller-session`: disable controller summary archive for the current run
-- `kse auto controller-session list [--limit <n>]`: inspect persisted controller summary sessions
+- `kse auto controller-session list [--limit <n>] [--status <csv>]`: inspect persisted controller summary sessions (`--status` supports comma-separated, case-insensitive filters)
 - `kse auto controller-session prune --keep <n> [--older-than-days <n>]`: enforce controller summary retention policy
+  - JSON output includes `status_filter` and `status_counts` for filtered status composition.
 
 Recovery memory maintenance:
 - Default recovery memory file: `.kiro/auto/close-loop-recovery-memory.json`

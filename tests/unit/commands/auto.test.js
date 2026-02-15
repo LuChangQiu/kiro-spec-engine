@@ -2947,8 +2947,39 @@ describe('auto close-loop command', () => {
     const parsed = JSON.parse(output.trim());
     expect(parsed.mode).toBe('auto-session-list');
     expect(parsed.total).toBe(1);
+    expect(parsed.status_filter).toEqual([]);
+    expect(parsed.status_counts).toEqual(expect.objectContaining({ completed: 1 }));
     expect(parsed.sessions[0].id).toBe('demo-session');
     expect(parsed.sessions[0].master_spec).toBe('121-00-demo');
+  });
+
+  test('filters close-loop sessions by status in json mode', async () => {
+    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    await fs.ensureDir(sessionDir);
+    const completedSession = path.join(sessionDir, 'session-completed.json');
+    const failedSession = path.join(sessionDir, 'session-failed.json');
+    await fs.writeJson(completedSession, {
+      session_id: 'session-completed',
+      status: 'completed',
+      portfolio: { sub_specs: [] }
+    }, { spaces: 2 });
+    await fs.writeJson(failedSession, {
+      session_id: 'session-failed',
+      status: 'failed',
+      portfolio: { sub_specs: [] }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync(['node', 'kse', 'auto', 'session', 'list', '--status', 'completed', '--json']);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-session-list');
+    expect(parsed.total).toBe(1);
+    expect(parsed.status_filter).toEqual(['completed']);
+    expect(parsed.status_counts).toEqual(expect.objectContaining({ completed: 1 }));
+    expect(parsed.sessions).toHaveLength(1);
+    expect(parsed.sessions[0].id).toBe('session-completed');
   });
 
   test('lists spec-session directories in json mode', async () => {
@@ -3483,8 +3514,48 @@ describe('auto close-loop command', () => {
     const parsed = JSON.parse(output.trim());
     expect(parsed.mode).toBe('auto-batch-session-list');
     expect(parsed.total).toBe(1);
+    expect(parsed.status_filter).toEqual([]);
+    expect(parsed.status_counts).toEqual(expect.objectContaining({ completed: 1 }));
     expect(parsed.sessions[0].id).toBe('demo-batch-session');
     expect(parsed.sessions[0].status).toBe('completed');
+  });
+
+  test('filters close-loop-batch summary sessions by status in json mode', async () => {
+    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    await fs.ensureDir(sessionDir);
+    const completedSession = path.join(sessionDir, 'batch-completed.json');
+    const failedSession = path.join(sessionDir, 'batch-failed.json');
+    await fs.writeJson(completedSession, {
+      mode: 'auto-close-loop-batch',
+      status: 'completed',
+      batch_session: { id: 'batch-completed', file: completedSession }
+    }, { spaces: 2 });
+    await fs.writeJson(failedSession, {
+      mode: 'auto-close-loop-batch',
+      status: 'failed',
+      batch_session: { id: 'batch-failed', file: failedSession }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'batch-session',
+      'list',
+      '--status',
+      'failed',
+      '--json'
+    ]);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-batch-session-list');
+    expect(parsed.total).toBe(1);
+    expect(parsed.status_filter).toEqual(['failed']);
+    expect(parsed.status_counts).toEqual(expect.objectContaining({ failed: 1 }));
+    expect(parsed.sessions).toHaveLength(1);
+    expect(parsed.sessions[0].id).toBe('batch-failed');
   });
 
   test('prunes sessions with keep policy', async () => {
@@ -3589,8 +3660,48 @@ describe('auto close-loop command', () => {
     const parsed = JSON.parse(output.trim());
     expect(parsed.mode).toBe('auto-controller-session-list');
     expect(parsed.total).toBe(1);
+    expect(parsed.status_filter).toEqual([]);
+    expect(parsed.status_counts).toEqual(expect.objectContaining({ completed: 1 }));
     expect(parsed.sessions[0].id).toBe('demo-controller-session');
     expect(parsed.sessions[0].status).toBe('completed');
+  });
+
+  test('filters close-loop-controller summary sessions by status in json mode', async () => {
+    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    await fs.ensureDir(sessionDir);
+    const completedSession = path.join(sessionDir, 'controller-completed.json');
+    const partialFailedSession = path.join(sessionDir, 'controller-partial-failed.json');
+    await fs.writeJson(completedSession, {
+      mode: 'auto-close-loop-controller',
+      status: 'completed',
+      controller_session: { id: 'controller-completed', file: completedSession }
+    }, { spaces: 2 });
+    await fs.writeJson(partialFailedSession, {
+      mode: 'auto-close-loop-controller',
+      status: 'partial-failed',
+      controller_session: { id: 'controller-partial-failed', file: partialFailedSession }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'controller-session',
+      'list',
+      '--status',
+      'partial-failed',
+      '--json'
+    ]);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-controller-session-list');
+    expect(parsed.total).toBe(1);
+    expect(parsed.status_filter).toEqual(['partial-failed']);
+    expect(parsed.status_counts).toEqual(expect.objectContaining({ 'partial-failed': 1 }));
+    expect(parsed.sessions).toHaveLength(1);
+    expect(parsed.sessions[0].id).toBe('controller-partial-failed');
   });
 
   test('prunes close-loop-controller summary sessions with keep policy', async () => {

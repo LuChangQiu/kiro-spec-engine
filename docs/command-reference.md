@@ -422,6 +422,7 @@ kse auto close-loop-batch --resume-from-summary .kiro/reports/close-loop-batch.j
 
 # List persisted close-loop sessions
 kse auto session list
+kse auto session list --status completed,partial-failed
 kse auto session list --limit 50 --json
 
 # Prune old close-loop sessions
@@ -439,6 +440,7 @@ kse auto spec-session prune --keep 100 --older-than-days 30 --show-protection-re
 
 # List persisted close-loop-batch summary sessions
 kse auto batch-session list
+kse auto batch-session list --status failed
 kse auto batch-session list --limit 50 --json
 
 # Prune old close-loop-batch summary sessions
@@ -447,6 +449,7 @@ kse auto batch-session prune --keep 20 --older-than-days 14 --dry-run
 
 # List persisted close-loop-controller summary sessions
 kse auto controller-session list
+kse auto controller-session list --status partial-failed
 kse auto controller-session list --limit 50 --json
 
 # Prune old close-loop-controller summary sessions
@@ -617,8 +620,9 @@ Close-loop recovery (`kse auto close-loop-recover [summary]`) options:
 - Output includes `recovered_from_summary`, `recovery_plan` (`applied_patch`, available remediation actions, `selection_source`, `selection_explain`), `recovery_cycle` (round history, convergence/exhausted state, elapsed/budget metadata), and `recovery_memory` (signature, scope, action stats, selection explanation).
 
 Close-loop session maintenance:
-- `kse auto session list [--limit <n>] [--json]`: list persisted close-loop sessions
+- `kse auto session list [--limit <n>] [--status <csv>] [--json]`: list persisted close-loop sessions (`--status` supports comma-separated, case-insensitive filters)
 - `kse auto session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune old session snapshots
+  - JSON output includes `status_filter` and `status_counts` over filtered sessions.
 
 Spec directory maintenance:
 - `kse auto spec-session list [--limit <n>] [--json]`: list persisted spec directories under `.kiro/specs`
@@ -628,12 +632,14 @@ Spec directory maintenance:
 - Batch/program/recover summaries can include `spec_session_budget` telemetry when `--spec-session-max-total` is configured.
 
 Close-loop batch session maintenance:
-- `kse auto batch-session list [--limit <n>] [--json]`: list persisted close-loop-batch summary sessions
+- `kse auto batch-session list [--limit <n>] [--status <csv>] [--json]`: list persisted close-loop-batch summary sessions (`--status` supports comma-separated, case-insensitive filters)
 - `kse auto batch-session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune old persisted batch summaries
+  - JSON output includes `status_filter` and `status_counts` over filtered sessions.
 
 Close-loop controller session maintenance:
-- `kse auto controller-session list [--limit <n>] [--json]`: list persisted close-loop-controller summary sessions
+- `kse auto controller-session list [--limit <n>] [--status <csv>] [--json]`: list persisted close-loop-controller summary sessions (`--status` supports comma-separated, case-insensitive filters)
 - `kse auto controller-session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune old persisted controller summaries
+  - JSON output includes `status_filter` and `status_counts` over filtered sessions.
 
 Close-loop recovery memory maintenance:
 - `kse auto recovery-memory show [--scope <scope>] [--json]`: inspect persisted recovery signatures/actions and aggregate stats (optionally scoped)

@@ -826,6 +826,9 @@ describe('auto close-loop CLI integration', () => {
       mode_filter: 'controller',
       total_runs: 1
     }));
+    expect(payload.mode_breakdown).toEqual(expect.objectContaining({
+      controller: 1
+    }));
     expect(payload.overall).toEqual(expect.objectContaining({
       success_rate_percent: 50,
       average_total_sub_specs: 4,

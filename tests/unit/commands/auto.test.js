@@ -3685,6 +3685,10 @@ describe('auto close-loop command', () => {
     const parsed = JSON.parse(`${logSpy.mock.calls[0][0]}`);
     expect(parsed.mode).toBe('auto-kpi-trend');
     expect(parsed.total_runs).toBe(2);
+    expect(parsed.mode_breakdown).toEqual(expect.objectContaining({
+      program: 1,
+      recover: 1
+    }));
     expect(parsed.overall).toEqual(expect.objectContaining({
       runs: 2,
       success_rate_percent: 75
@@ -3822,6 +3826,9 @@ describe('auto close-loop command', () => {
     expect(parsed.mode).toBe('auto-kpi-trend');
     expect(parsed.mode_filter).toBe('controller');
     expect(parsed.total_runs).toBe(1);
+    expect(parsed.mode_breakdown).toEqual(expect.objectContaining({
+      controller: 1
+    }));
     expect(parsed.overall).toEqual(expect.objectContaining({
       success_rate_percent: 50,
       completion_rate_percent: 100,

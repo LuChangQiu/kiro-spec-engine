@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **KPI mode composition telemetry**: `kse auto kpi trend` JSON output now includes `mode_breakdown` (batch/program/recover/controller/other) to expose mixed-run trend composition.
 - **Spec protection source expansion**: `spec-session prune` now protects specs referenced by recent/incomplete controller sessions (via nested batch summary references), reducing accidental cleanup during controller-driven autonomous runs.
 - **Controller session maintenance commands**: Added `kse auto controller-session list` / `kse auto controller-session prune` (retention + age filters + dry-run/json) for persisted close-loop-controller summary archives.
 - **Controller-aware autonomous KPI trend mode**: `kse auto kpi trend` now supports `--mode controller` and includes persisted controller session telemetry in trend aggregation (including nested program sub-spec/spec-growth rollups when available).

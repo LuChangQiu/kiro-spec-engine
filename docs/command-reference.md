@@ -645,7 +645,7 @@ Autonomous KPI trend:
 - `kse auto kpi trend [--weeks <n>] [--mode <all|batch|program|recover|controller>] [--period <week|day>] [--csv] [--out <path>] [--json]`: aggregate periodic KPI trend from persisted autonomous summary sessions.
   - `--period <week|day>` selects weekly (default) or daily buckets.
   - `--csv` prints CSV rows to stdout and writes CSV when used with `--out` (JSON remains default).
-  - JSON output includes `anomaly_detection` and flattened `anomalies` (latest-period regression checks against historical baseline).
+  - JSON output includes `mode_breakdown` (batch/program/recover/controller/other run distribution), `anomaly_detection`, and flattened `anomalies` (latest-period regression checks against historical baseline).
 
 Recommended `.kiro/config/orchestrator.json`:
 

@@ -357,7 +357,7 @@ Program governance loop (for `close-loop-program`):
 KPI trend command:
 - `kse auto kpi trend --weeks <n> --mode <all|batch|program|recover|controller> --period <week|day> --json` aggregates periodic success/completion, failure, sub-spec, and spec-growth telemetry from persisted autonomous session summaries.
 - Add `--csv` to print/export trend buckets as CSV (`--out` writes CSV when `--csv` is enabled).
-- JSON output now includes `anomaly_detection` + `anomalies` for latest-period regression signals (success-rate drop, failed-goal spike, spec-growth spike).
+- JSON output now includes `mode_breakdown` (batch/program/recover/controller/other distribution), `anomaly_detection`, and `anomalies` for latest-period regression signals (success-rate drop, failed-goal spike, spec-growth spike).
 
 ### Create and Run a Feature Autonomously
 

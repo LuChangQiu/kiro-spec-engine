@@ -476,6 +476,7 @@ kse auto governance maintain --apply --session-keep 20 --batch-session-keep 20 -
 kse auto governance close-loop --plan-only --max-rounds 3 --target-risk low --json
 kse auto governance close-loop --max-rounds 3 --target-risk low --session-keep 20 --batch-session-keep 20 --controller-session-keep 20 --json
 kse auto governance close-loop --max-rounds 3 --target-risk low --execute-advisory --advisory-recover-max-rounds 3 --advisory-controller-max-cycles 20 --dry-run --json
+kse auto governance close-loop --governance-resume latest --max-rounds 5 --json
 
 # Recovery memory maintenance
 kse auto recovery-memory show --json
@@ -674,8 +675,9 @@ Cross-archive autonomous governance maintenance:
 - `kse auto governance maintain [--days <n>] [--status <csv>] [--session-keep <n>] [--batch-session-keep <n>] [--controller-session-keep <n>] [--recovery-memory-older-than-days <n>] [--apply] [--dry-run] [--json]`: run governance-maintenance planning and optional execution in one command.
   - Plan-only mode is default; add `--apply` to execute maintenance actions (`session prune`, `batch-session prune`, `controller-session prune`, `recovery-memory prune`).
   - JSON output includes `assessment` (pre-maintenance governance snapshot), `plan`, `executed_actions`, `summary`, and `after_assessment` (only when `--apply` without `--dry-run`).
-- `kse auto governance close-loop [--days <n>] [--status <csv>] [--session-keep <n>] [--batch-session-keep <n>] [--controller-session-keep <n>] [--recovery-memory-older-than-days <n>] [--max-rounds <n>] [--target-risk <low|medium|high>] [--execute-advisory] [--advisory-recover-max-rounds <n>] [--advisory-controller-max-cycles <n>] [--plan-only] [--dry-run] [--json]`: run governance rounds until stop condition (target risk reached, no actionable maintenance/advisory, non-mutating mode, maintenance/advisory failures, or max rounds).
+- `kse auto governance close-loop [--days <n>] [--status <csv>] [--session-keep <n>] [--batch-session-keep <n>] [--controller-session-keep <n>] [--recovery-memory-older-than-days <n>] [--max-rounds <n>] [--target-risk <low|medium|high>] [--governance-resume <session|latest|file>] [--governance-session-id <id>] [--no-governance-session] [--execute-advisory] [--advisory-recover-max-rounds <n>] [--advisory-controller-max-cycles <n>] [--plan-only] [--dry-run] [--json]`: run governance rounds until stop condition (target risk reached, no actionable maintenance/advisory, non-mutating mode, maintenance/advisory failures, or max rounds).
   - `--plan-only` runs a single non-mutating planning round.
+  - Governance close-loop sessions are persisted by default at `.kiro/auto/governance-close-loop-sessions/*.json`; use `--governance-resume` to continue interrupted governance loops.
   - `--execute-advisory` enables automatic advisory action execution (`recover-latest`, `controller-resume-latest`) when governance assessment detects failed sessions or controller pending goals; KSE auto-selects the latest actionable advisory source and reports `skipped` (not `failed`) when no actionable source exists.
   - JSON output includes round-by-round risk/action telemetry (`rounds`), advisory telemetry (`execute_advisory`, `advisory_policy`, `advisory_summary`, `rounds[*].advisory_actions`), plus `initial_assessment`, `final_assessment`, and convergence metadata.
 

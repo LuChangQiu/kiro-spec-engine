@@ -2078,4 +2078,59 @@ describe('auto close-loop CLI integration', () => {
       expect.objectContaining({ id: 'controller-resume-latest', status: 'applied' })
     ]));
   });
+
+  test('persists and resumes governance close-loop session through CLI', async () => {
+    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    await fs.ensureDir(closeLoopSessionDir);
+    await fs.writeJson(path.join(closeLoopSessionDir, 'integration-governance-resume-failed-session.json'), {
+      session_id: 'integration-governance-resume-failed-session',
+      status: 'failed',
+      portfolio: { master_spec: '121-00-integration-governance-resume', sub_specs: [] }
+    }, { spaces: 2 });
+
+    const firstRun = await runCli([
+      'auto',
+      'governance',
+      'close-loop',
+      '--plan-only',
+      '--max-rounds',
+      '3',
+      '--governance-session-id',
+      'integration-gov-resume',
+      '--json'
+    ], { cwd: tempDir });
+    expect(firstRun.exitCode).toBe(0);
+    const firstPayload = parseJsonOutput(firstRun.stdout);
+    expect(firstPayload.mode).toBe('auto-governance-close-loop');
+    expect(firstPayload.governance_session).toEqual(expect.objectContaining({
+      id: 'integration-gov-resume'
+    }));
+    expect(firstPayload.performed_rounds).toBe(1);
+    expect(await fs.pathExists(firstPayload.governance_session.file)).toBe(true);
+
+    const resumedRun = await runCli([
+      'auto',
+      'governance',
+      'close-loop',
+      '--governance-resume',
+      'integration-gov-resume',
+      '--plan-only',
+      '--max-rounds',
+      '3',
+      '--json'
+    ], { cwd: tempDir });
+    expect(resumedRun.exitCode).toBe(0);
+    const resumedPayload = parseJsonOutput(resumedRun.stdout);
+    expect(resumedPayload.mode).toBe('auto-governance-close-loop');
+    expect(resumedPayload.resumed_from_governance_session).toEqual(expect.objectContaining({
+      id: 'integration-gov-resume'
+    }));
+    expect(resumedPayload.governance_session).toEqual(expect.objectContaining({
+      id: 'integration-gov-resume'
+    }));
+    expect(resumedPayload.performed_rounds).toBe(2);
+    expect(Array.isArray(resumedPayload.rounds)).toBe(true);
+    expect(resumedPayload.rounds).toHaveLength(2);
+    expect(resumedPayload.stop_reason).toBe('non-mutating-mode');
+  });
 });

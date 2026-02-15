@@ -4674,6 +4674,72 @@ describe('auto close-loop command', () => {
     ]));
   });
 
+  test('persists and resumes governance close-loop session', async () => {
+    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    await fs.ensureDir(closeLoopSessionDir);
+    await fs.writeJson(path.join(closeLoopSessionDir, 'governance-resume-failed-session.json'), {
+      session_id: 'governance-resume-failed-session',
+      status: 'failed',
+      portfolio: { master_spec: '121-00-governance-resume', sub_specs: [] }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'governance',
+      'close-loop',
+      '--plan-only',
+      '--max-rounds',
+      '3',
+      '--governance-session-id',
+      'gov-resume-session',
+      '--json'
+    ]);
+
+    const firstOutput = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const firstPayload = JSON.parse(firstOutput.trim());
+    expect(firstPayload.mode).toBe('auto-governance-close-loop');
+    expect(firstPayload.governance_session).toEqual(expect.objectContaining({
+      id: 'gov-resume-session'
+    }));
+    expect(firstPayload.performed_rounds).toBe(1);
+    expect(firstPayload.stop_reason).toBe('non-mutating-mode');
+
+    const governanceSessionFile = firstPayload.governance_session.file;
+    expect(await fs.pathExists(governanceSessionFile)).toBe(true);
+
+    logSpy.mockClear();
+    const resumedProgram = buildProgram();
+    await resumedProgram.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'governance',
+      'close-loop',
+      '--governance-resume',
+      'gov-resume-session',
+      '--plan-only',
+      '--max-rounds',
+      '3',
+      '--json'
+    ]);
+
+    const resumedOutput = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const resumedPayload = JSON.parse(resumedOutput.trim());
+    expect(resumedPayload.mode).toBe('auto-governance-close-loop');
+    expect(resumedPayload.resumed_from_governance_session).toEqual(expect.objectContaining({
+      id: 'gov-resume-session'
+    }));
+    expect(resumedPayload.governance_session).toEqual(expect.objectContaining({
+      id: 'gov-resume-session'
+    }));
+    expect(resumedPayload.performed_rounds).toBe(2);
+    expect(resumedPayload.rounds).toHaveLength(2);
+    expect(resumedPayload.stop_reason).toBe('non-mutating-mode');
+  });
+
   test('prunes close-loop-controller summary sessions with keep policy', async () => {
     const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(sessionDir);

@@ -3492,6 +3492,62 @@ describe('auto close-loop command', () => {
     expect(await fs.pathExists(oldSession)).toBe(false);
   });
 
+  test('lists close-loop-controller summary sessions in json mode', async () => {
+    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    await fs.ensureDir(sessionDir);
+    const sessionPath = path.join(sessionDir, 'demo-controller-session.json');
+    await fs.writeJson(sessionPath, {
+      mode: 'auto-close-loop-controller',
+      status: 'completed',
+      queue_file: '.kiro/auto/controller-goals.lines',
+      queue_format: 'lines',
+      processed_goals: 2,
+      pending_goals: 0,
+      updated_at: '2026-02-14T10:00:00.000Z',
+      controller_session: {
+        id: 'demo-controller-session',
+        file: sessionPath
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync(['node', 'kse', 'auto', 'controller-session', 'list', '--json']);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-controller-session-list');
+    expect(parsed.total).toBe(1);
+    expect(parsed.sessions[0].id).toBe('demo-controller-session');
+    expect(parsed.sessions[0].status).toBe('completed');
+  });
+
+  test('prunes close-loop-controller summary sessions with keep policy', async () => {
+    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    await fs.ensureDir(sessionDir);
+    const oldSession = path.join(sessionDir, 'old-controller-session.json');
+    const newSession = path.join(sessionDir, 'new-controller-session.json');
+    await fs.writeJson(oldSession, {
+      mode: 'auto-close-loop-controller',
+      controller_session: { id: 'old-controller-session', file: oldSession }
+    }, { spaces: 2 });
+    await fs.writeJson(newSession, {
+      mode: 'auto-close-loop-controller',
+      controller_session: { id: 'new-controller-session', file: newSession }
+    }, { spaces: 2 });
+    await fs.utimes(oldSession, new Date('2020-01-01T00:00:00.000Z'), new Date('2020-01-01T00:00:00.000Z'));
+    await fs.utimes(newSession, new Date('2026-01-01T00:00:00.000Z'), new Date('2026-01-01T00:00:00.000Z'));
+
+    const program = buildProgram();
+    await program.parseAsync(['node', 'kse', 'auto', 'controller-session', 'prune', '--keep', '1', '--json']);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-controller-session-prune');
+    expect(parsed.deleted_count).toBe(1);
+    expect(await fs.pathExists(newSession)).toBe(true);
+    expect(await fs.pathExists(oldSession)).toBe(false);
+  });
+
   test('aggregates weekly autonomous KPI trend in json mode', async () => {
     const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
     await fs.ensureDir(sessionDir);

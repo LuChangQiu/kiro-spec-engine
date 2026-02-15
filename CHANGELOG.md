@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Controller session maintenance commands**: Added `kse auto controller-session list` / `kse auto controller-session prune` (retention + age filters + dry-run/json) for persisted close-loop-controller summary archives.
 - **Controller-aware autonomous KPI trend mode**: `kse auto kpi trend` now supports `--mode controller` and includes persisted controller session telemetry in trend aggregation (including nested program sub-spec/spec-growth rollups when available).
 - **Controller checkpoint resume**: `close-loop-controller` now supports `--controller-resume <latest|id|file>` plus persisted controller session snapshots (`.kiro/auto/close-loop-controller-sessions`) with retention controls (`--controller-session-id`, `--controller-session-keep`, `--controller-session-older-than-days`, `--no-controller-session`).
 - **Controller concurrency lease lock**: Added queue lease lock controls (`--controller-lock-file`, `--controller-lock-ttl-seconds`, `--no-controller-lock`) to prevent concurrent queue corruption and allow stale-lock takeover under bounded TTL.

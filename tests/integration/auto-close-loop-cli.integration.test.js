@@ -1573,4 +1573,71 @@ describe('auto close-loop CLI integration', () => {
     const listAfterPayload = parseJsonOutput(listedAfter.stdout);
     expect(listAfterPayload.total).toBe(1);
   });
+
+  test('supports controller-session list and prune lifecycle through CLI', async () => {
+    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    await fs.ensureDir(sessionDir);
+    const oldSession = path.join(sessionDir, 'old-controller-session.json');
+    const newSession = path.join(sessionDir, 'new-controller-session.json');
+    await fs.writeJson(oldSession, {
+      mode: 'auto-close-loop-controller',
+      status: 'completed',
+      processed_goals: 1,
+      pending_goals: 0,
+      controller_session: {
+        id: 'old-controller-session',
+        file: oldSession
+      }
+    }, { spaces: 2 });
+    await fs.writeJson(newSession, {
+      mode: 'auto-close-loop-controller',
+      status: 'completed',
+      processed_goals: 1,
+      pending_goals: 0,
+      controller_session: {
+        id: 'new-controller-session',
+        file: newSession
+      }
+    }, { spaces: 2 });
+    await fs.utimes(oldSession, new Date('2020-01-01T00:00:00.000Z'), new Date('2020-01-01T00:00:00.000Z'));
+    await fs.utimes(newSession, new Date('2026-01-01T00:00:00.000Z'), new Date('2026-01-01T00:00:00.000Z'));
+
+    const listed = await runCli([
+      'auto',
+      'controller-session',
+      'list',
+      '--limit',
+      '1',
+      '--json'
+    ], { cwd: tempDir });
+    expect(listed.exitCode).toBe(0);
+    const listPayload = parseJsonOutput(listed.stdout);
+    expect(listPayload.mode).toBe('auto-controller-session-list');
+    expect(listPayload.total).toBe(2);
+    expect(listPayload.sessions).toHaveLength(1);
+
+    const pruned = await runCli([
+      'auto',
+      'controller-session',
+      'prune',
+      '--keep',
+      '1',
+      '--json'
+    ], { cwd: tempDir });
+    expect(pruned.exitCode).toBe(0);
+    const prunePayload = parseJsonOutput(pruned.stdout);
+    expect(prunePayload.mode).toBe('auto-controller-session-prune');
+    expect(prunePayload.deleted_count).toBe(1);
+    expect(prunePayload.errors).toEqual([]);
+
+    const listedAfter = await runCli([
+      'auto',
+      'controller-session',
+      'list',
+      '--json'
+    ], { cwd: tempDir });
+    expect(listedAfter.exitCode).toBe(0);
+    const listAfterPayload = parseJsonOutput(listedAfter.stdout);
+    expect(listAfterPayload.total).toBe(1);
+  });
 });

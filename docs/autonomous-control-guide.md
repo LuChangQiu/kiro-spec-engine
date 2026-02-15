@@ -203,6 +203,15 @@ Batch summary session persistence and maintenance:
 - `kse auto batch-session list [--limit <n>]`: inspect persisted batch summary sessions
 - `kse auto batch-session prune --keep <n> [--older-than-days <n>]`: enforce batch summary retention policy
 
+Controller summary session persistence and maintenance:
+- Default controller summary archive: `.kiro/auto/close-loop-controller-sessions/*.json`
+- `--controller-session-id <id>`: override generated controller session id
+- `--controller-session-keep <n>`: auto-prune archive and keep newest `n` summaries after each controller run
+- `--controller-session-older-than-days <n>`: when pruning, only delete summaries older than `n` days
+- `--no-controller-session`: disable controller summary archive for the current run
+- `kse auto controller-session list [--limit <n>]`: inspect persisted controller summary sessions
+- `kse auto controller-session prune --keep <n> [--older-than-days <n>]`: enforce controller summary retention policy
+
 Recovery memory maintenance:
 - Default recovery memory file: `.kiro/auto/close-loop-recovery-memory.json`
 - `kse auto recovery-memory show [--scope <scope>] [--json]`: inspect learned failure signatures and action stats (optionally by scope)

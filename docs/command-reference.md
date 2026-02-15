@@ -445,6 +445,14 @@ kse auto batch-session list --limit 50 --json
 kse auto batch-session prune --keep 50
 kse auto batch-session prune --keep 20 --older-than-days 14 --dry-run
 
+# List persisted close-loop-controller summary sessions
+kse auto controller-session list
+kse auto controller-session list --limit 50 --json
+
+# Prune old close-loop-controller summary sessions
+kse auto controller-session prune --keep 50
+kse auto controller-session prune --keep 20 --older-than-days 14 --dry-run
+
 # Recovery memory maintenance
 kse auto recovery-memory show --json
 kse auto recovery-memory scopes --json
@@ -621,6 +629,10 @@ Spec directory maintenance:
 Close-loop batch session maintenance:
 - `kse auto batch-session list [--limit <n>] [--json]`: list persisted close-loop-batch summary sessions
 - `kse auto batch-session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune old persisted batch summaries
+
+Close-loop controller session maintenance:
+- `kse auto controller-session list [--limit <n>] [--json]`: list persisted close-loop-controller summary sessions
+- `kse auto controller-session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune old persisted controller summaries
 
 Close-loop recovery memory maintenance:
 - `kse auto recovery-memory show [--scope <scope>] [--json]`: inspect persisted recovery signatures/actions and aggregate stats (optionally scoped)

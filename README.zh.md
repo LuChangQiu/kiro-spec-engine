@@ -289,7 +289,7 @@ sequenceDiagram
 - **自动闭环推进**：`kse auto close-loop "<目标>"` 从目标拆分到编排完成全程自动推进
 - **自动主从拆分**：自动生成 Master/Sub Spec 组合、依赖关系与 Agent 分配
 - **语义分解 + 实时状态流**：按目标语义自动归类拆分，并实时输出编排进度（可用 `--no-stream` 关闭）
-- **会话恢复与归档治理**：支持 `--resume latest` 续跑，并可用 `kse auto session list/prune` 管理会话归档
+- **会话恢复与归档治理**：支持 `--resume latest` 续跑，并可用 `kse auto session list/prune`、`kse auto batch-session list/prune`、`kse auto controller-session list/prune` 管理会话归档
 - **终态收敛**：输出统一执行结果（completed/failed/stopped），避免中途等待人工逐步确认
 
 ### Spec 驱动开发
@@ -452,6 +452,8 @@ kse auto close-loop "<目标>" --dry-run --json  # 仅预览拆分与依赖计�
 kse auto close-loop-program "<目标>" --program-govern-until-stable --program-govern-use-action 1 --json # 程序级自动恢复 + 治理循环（含 remediation action 执行）直到稳定
 kse auto close-loop-controller .kiro/auto/program-queue.lines --wait-on-empty --dequeue-limit 2 --json # 队列驱动自治控制器，持续处理广义目标积压
 kse auto close-loop-controller --controller-resume latest --json # 从最近一次 controller 检查点恢复自治推进
+kse auto controller-session list --limit 50 --json # 查看持久化 close-loop-controller 摘要会话
+kse auto controller-session prune --keep 20 --older-than-days 14 --dry-run --json # 按保留策略清理旧 controller 摘要
 
 # Spec 工作流（推荐）
 kse spec bootstrap --name <spec> --non-interactive          # 生成 requirements/design/tasks 初稿
@@ -472,6 +474,7 @@ kse value metrics baseline --from-history <N> --json      # 从最早 N 个快�
 kse value metrics trend --window <N> --json               # 基于最近 N 个快照分析趋势与风险
 kse auto kpi trend --weeks 8 --period week --json         # 聚合自动交付 KPI 趋势（支持周/日桶 + 异常信号）
 kse auto kpi trend --weeks 8 --period day --csv --out <path> # 以 CSV 导出自动 KPI 趋势
+kse auto kpi trend --weeks 8 --mode controller --json     # 仅查看 close-loop-controller 会话趋势
 
 # 工作区管理（v1.11.0 新增）
 kse workspace create <name> [path] # 注册新工作区

@@ -294,7 +294,7 @@ sequenceDiagram
 - **Closed-Loop Program Execution**: `kse auto close-loop "<goal>"` runs from goal decomposition to terminal orchestration state without manual confirmation gates
 - **Automatic Master/Sub Portfolio Split**: Large goals are auto-split into dependency-wired sub-specs and coordinated by a master spec
 - **Semantic Decomposition + Live Stream**: Clause/category-aware goal parsing plus live orchestration status stream (disable via `--no-stream`)
-- **Session Resume + Retention Hygiene**: Resume interrupted runs with `--resume latest` and maintain archives via `kse auto session list/prune`
+- **Session Resume + Retention Hygiene**: Resume interrupted runs with `--resume latest` and maintain archives via `kse auto session list/prune`, `kse auto batch-session list/prune`, and `kse auto controller-session list/prune`
 - **Intelligent Error Recovery**: Automatically diagnose and fix errors with 3 retry attempts and learning system
 - **Strategic Checkpoints**: Pause only at meaningful milestones (phase boundaries, fatal errors, external resources)
 - **Continuous Task Execution**: Execute multiple tasks without interruption between individual tasks
@@ -535,6 +535,8 @@ kse auto close-loop "<goal>" --dry-run --json  # Preview decomposition plan only
 kse auto close-loop-program "<goal>" --program-govern-until-stable --program-govern-use-action 1 --json # Program-level recovery + governance with remediation action execution
 kse auto close-loop-controller .kiro/auto/program-queue.lines --wait-on-empty --dequeue-limit 2 --json # Queue-driven autonomous controller for broad-goal backlogs
 kse auto close-loop-controller --controller-resume latest --json # Resume autonomous controller from latest persisted checkpoint
+kse auto controller-session list --limit 50 --json # Inspect persisted close-loop-controller summary sessions
+kse auto controller-session prune --keep 20 --older-than-days 14 --dry-run --json # Prune old controller summaries by retention policy
 
 # Spec workflow (recommended)
 kse spec bootstrap --name <spec> --non-interactive         # Generate requirements/design/tasks draft
@@ -555,6 +557,7 @@ kse value metrics baseline --from-history <N> --json      # Build baseline from 
 kse value metrics trend --window <N> --json               # Analyze trend/risk from latest N snapshots
 kse auto kpi trend --weeks 8 --period week --json         # Aggregate autonomous delivery KPI trend (weekly/daily buckets + anomalies)
 kse auto kpi trend --weeks 8 --period day --csv --out <path> # Export autonomous KPI trend as CSV
+kse auto kpi trend --weeks 8 --mode controller --json     # Filter trend to close-loop-controller sessions only
 
 # Workspace management (NEW in v1.11.0)
 kse workspace create <name> [path] # Register a new workspace

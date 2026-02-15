@@ -4524,6 +4524,110 @@ describe('auto close-loop command', () => {
     expect(await fs.pathExists(controllerNew)).toBe(true);
   });
 
+  test('runs governance close-loop with advisory execution enabled', async () => {
+    runAutoCloseLoop.mockResolvedValue({
+      status: 'completed',
+      portfolio: { master_spec: '121-00-advisory', sub_specs: ['121-01-advisory'] }
+    });
+
+    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const controllerQueueFile = path.join(tempDir, '.kiro', 'auto', 'controller-queue.lines');
+    await fs.ensureDir(closeLoopSessionDir);
+    await fs.ensureDir(batchSessionDir);
+    await fs.ensureDir(controllerSessionDir);
+    await fs.ensureDir(path.dirname(controllerQueueFile));
+
+    await fs.writeJson(path.join(closeLoopSessionDir, 'governance-advisory-failed-session.json'), {
+      session_id: 'governance-advisory-failed-session',
+      status: 'failed',
+      portfolio: { master_spec: '121-00-advisory-master', sub_specs: [] }
+    }, { spaces: 2 });
+
+    const failedSummary = path.join(batchSessionDir, 'governance-advisory-failed-summary.json');
+    await fs.writeJson(failedSummary, {
+      mode: 'auto-close-loop-batch',
+      status: 'failed',
+      total_goals: 1,
+      processed_goals: 1,
+      completed_goals: 0,
+      failed_goals: 1,
+      results: [
+        {
+          index: 1,
+          goal: 'governance advisory recover goal',
+          status: 'failed',
+          error: 'timeout'
+        }
+      ],
+      batch_session: {
+        id: 'governance-advisory-failed-summary',
+        file: failedSummary
+      }
+    }, { spaces: 2 });
+
+    const controllerSessionFile = path.join(controllerSessionDir, 'governance-advisory-controller.json');
+    await fs.writeJson(controllerSessionFile, {
+      mode: 'auto-close-loop-controller',
+      status: 'partial-failed',
+      queue_file: controllerQueueFile,
+      queue_format: 'lines',
+      processed_goals: 0,
+      pending_goals: 1,
+      controller_session: {
+        id: 'governance-advisory-controller',
+        file: controllerSessionFile
+      }
+    }, { spaces: 2 });
+    await fs.writeFile(controllerQueueFile, 'controller advisory queued goal\n', 'utf8');
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'governance',
+      'close-loop',
+      '--max-rounds',
+      '1',
+      '--target-risk',
+      'high',
+      '--execute-advisory',
+      '--advisory-recover-max-rounds',
+      '2',
+      '--advisory-controller-max-cycles',
+      '1',
+      '--dry-run',
+      '--json'
+    ]);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-governance-close-loop');
+    expect(parsed.execute_advisory).toBe(true);
+    expect(parsed.stop_reason).toBe('non-mutating-mode');
+    expect(parsed.advisory_policy).toEqual(expect.objectContaining({
+      recover_max_rounds: 2,
+      controller_max_cycles: 1
+    }));
+    expect(parsed.advisory_summary).toEqual(expect.objectContaining({
+      planned_actions: 2,
+      executed_actions: 2,
+      failed_actions: 0
+    }));
+    expect(parsed.rounds[0]).toEqual(expect.objectContaining({
+      advisory_planned_actions: 2,
+      advisory_executed_actions: 2,
+      advisory_failed_actions: 0
+    }));
+    expect(Array.isArray(parsed.rounds[0].advisory_actions)).toBe(true);
+    expect(parsed.rounds[0].advisory_actions).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'recover-latest', status: 'applied' }),
+      expect.objectContaining({ id: 'controller-resume-latest', status: 'applied' })
+    ]));
+  });
+
   test('prunes close-loop-controller summary sessions with keep policy', async () => {
     const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(sessionDir);

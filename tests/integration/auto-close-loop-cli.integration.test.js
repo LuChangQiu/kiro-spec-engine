@@ -2009,4 +2009,73 @@ describe('auto close-loop CLI integration', () => {
     expect(Array.isArray(payload.rounds)).toBe(true);
     expect(payload.rounds).toHaveLength(1);
   });
+
+  test('runs governance close-loop with advisory execution through CLI', async () => {
+    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const controllerQueueFile = path.join(tempDir, '.kiro', 'auto', 'integration-governance-controller-queue.lines');
+    await fs.ensureDir(closeLoopSessionDir);
+    await fs.ensureDir(controllerSessionDir);
+    await fs.ensureDir(path.dirname(controllerQueueFile));
+
+    const completedSession = path.join(closeLoopSessionDir, 'integration-governance-advisory-session.json');
+    await fs.writeJson(completedSession, {
+      session_id: 'integration-governance-advisory-session',
+      status: 'completed',
+      portfolio: { master_spec: '121-00-integration-advisory', sub_specs: [] }
+    }, { spaces: 2 });
+
+    const controllerSessionFile = path.join(controllerSessionDir, 'integration-governance-advisory-controller.json');
+    await fs.writeJson(controllerSessionFile, {
+      mode: 'auto-close-loop-controller',
+      status: 'completed',
+      queue_file: controllerQueueFile,
+      queue_format: 'lines',
+      processed_goals: 0,
+      pending_goals: 1,
+      controller_session: {
+        id: 'integration-governance-advisory-controller',
+        file: controllerSessionFile
+      }
+    }, { spaces: 2 });
+    await fs.writeFile(controllerQueueFile, '', 'utf8');
+
+    const closedLoop = await runCli([
+      'auto',
+      'governance',
+      'close-loop',
+      '--max-rounds',
+      '1',
+      '--target-risk',
+      'high',
+      '--execute-advisory',
+      '--advisory-controller-max-cycles',
+      '1',
+      '--dry-run',
+      '--json'
+    ], { cwd: tempDir });
+    expect(closedLoop.exitCode).toBe(0);
+    const payload = parseJsonOutput(closedLoop.stdout);
+    expect(payload.mode).toBe('auto-governance-close-loop');
+    expect(payload.execute_advisory).toBe(true);
+    expect(payload.stop_reason).toBe('non-mutating-mode');
+    expect(payload.advisory_policy).toEqual(expect.objectContaining({
+      controller_max_cycles: 1
+    }));
+    expect(payload.advisory_summary).toEqual(expect.objectContaining({
+      planned_actions: 1,
+      executed_actions: 1,
+      failed_actions: 0
+    }));
+    expect(Array.isArray(payload.rounds)).toBe(true);
+    expect(payload.rounds).toHaveLength(1);
+    expect(payload.rounds[0]).toEqual(expect.objectContaining({
+      advisory_planned_actions: 1,
+      advisory_executed_actions: 1,
+      advisory_failed_actions: 0
+    }));
+    expect(payload.rounds[0].advisory_actions).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'controller-resume-latest', status: 'applied' })
+    ]));
+  });
 });

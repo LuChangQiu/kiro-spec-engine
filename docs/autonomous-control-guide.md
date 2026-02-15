@@ -229,9 +229,10 @@ Cross-archive governance snapshot:
   - Default is plan-only (`assessment` + `plan`).
   - `--apply` executes maintenance actions for archive hygiene (session/batch/controller pruning + recovery-memory stale-entry pruning).
   - `--dry-run` can be combined with `--apply` to validate maintenance impact before deletion.
-- `kse auto governance close-loop [--max-rounds <n>] [--target-risk <low|medium|high>] [--plan-only] [--dry-run] [--json]`: governance round-loop runner.
+- `kse auto governance close-loop [--max-rounds <n>] [--target-risk <low|medium|high>] [--execute-advisory] [--advisory-recover-max-rounds <n>] [--advisory-controller-max-cycles <n>] [--plan-only] [--dry-run] [--json]`: governance round-loop runner.
   - Orchestrates repeated `governance maintain` rounds until target risk or stop condition is reached.
-  - Emits round history (`risk_before`/`risk_after`, planned/applicable/applied/failed actions), plus initial/final assessments for auditable autonomous governance convergence.
+  - `--execute-advisory` enables automatic advisory action execution when detected (`recover-latest`, `controller-resume-latest`).
+  - Emits round history (`risk_before`/`risk_after`, planned/applicable/applied/failed actions), advisory telemetry (`advisory_*` fields), plus initial/final assessments for auditable autonomous governance convergence.
 
 Recovery memory maintenance:
 - Default recovery memory file: `.kiro/auto/close-loop-recovery-memory.json`

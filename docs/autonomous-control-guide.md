@@ -102,6 +102,9 @@ kse auto close-loop-controller .kiro/auto/program-queue.lines \
   --max-cycles 1000 \
   --max-minutes 240
 
+# Resume from latest persisted controller session
+kse auto close-loop-controller --controller-resume latest --json
+
 # Recovery command: consume diagnostics and auto-recover unresolved goals
 kse auto close-loop-recover latest --json
 kse auto close-loop-recover .kiro/auto/close-loop-batch-summaries/batch-20260215090000.json \
@@ -301,14 +304,18 @@ Close-loop controller command:
 - Command: `kse auto close-loop-controller [queue-file]`
 - Runs a queue-driven autonomous loop: dequeue broad goals, execute each by `close-loop-program`, persist remaining queue, and continue until stop condition.
 - Queue file defaults to `.kiro/auto/close-loop-controller-goals.lines`; supports `auto|json|lines` parsing via `--queue-format`.
+- `--controller-resume <session-or-file>` resumes queue/controller context from persisted controller session (`latest`, session id, or file path).
+- Duplicate broad goals are deduped by default; use `--no-controller-dedupe` to preserve raw queue duplicates.
 - `--dequeue-limit <n>` controls how many queued goals are consumed in one cycle (`1-100`, default `1`).
 - `--wait-on-empty` + `--poll-seconds <n>` enables long-running poll mode for continuously appended program queues.
 - `--max-cycles <n>` + `--max-minutes <n>` bound controller runtime to prevent unbounded loops.
+- Controller lease lock is enabled by default to prevent concurrent queue corruption (`--controller-lock-file`, `--controller-lock-ttl-seconds`, `--no-controller-lock`).
 - `--stop-on-goal-failure` stops controller immediately on the first failed dequeued goal.
 - `--controller-done-file` / `--controller-failed-file` append per-goal archive lines for downstream ops and replay.
+- Controller summaries are persisted by default (`.kiro/auto/close-loop-controller-sessions`); use `--controller-session-id`, `--controller-session-keep`, `--controller-session-older-than-days`, `--no-controller-session` as needed.
 - `--controller-print-program-summary` prints each nested program summary in realtime during controller execution.
 - Supports full program governance/gate/recovery policy controls (`--program-*`, `--batch-*`, `--continue-on-error`, `--recovery-memory-scope`, `--dry-run`, `--json`).
-- Output summary includes `history`, `results`, final `pending_goals`, `stop_reason`, and `exhausted` telemetry.
+- Output summary includes `history`, `results`, final `pending_goals`, `stop_reason`, `exhausted`, dedupe/lock/session, and resume-source telemetry.
 
 Close-loop recovery command:
 - Command: `kse auto close-loop-recover [summary]` (defaults to `latest` if summary is omitted).

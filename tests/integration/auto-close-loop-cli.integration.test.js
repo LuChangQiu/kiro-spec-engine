@@ -658,6 +658,50 @@ describe('auto close-loop CLI integration', () => {
     expect(queueAfter.trim()).toBe('');
   });
 
+  test('supports close-loop-controller --controller-resume latest through CLI', async () => {
+    const queueFile = path.join(tempDir, 'controller-resume-goals.lines');
+    await fs.writeFile(queueFile, 'deliver autonomous resumed controller goal\n', 'utf8');
+    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    await fs.ensureDir(controllerSessionDir);
+    const controllerSessionFile = path.join(controllerSessionDir, 'controller-resume.json');
+    await fs.writeJson(controllerSessionFile, {
+      mode: 'auto-close-loop-controller',
+      status: 'partial-failed',
+      queue_file: queueFile,
+      queue_format: 'lines',
+      controller_session: {
+        id: 'controller-resume',
+        file: controllerSessionFile
+      },
+      updated_at: new Date().toISOString()
+    }, { spaces: 2 });
+
+    const run = await runCli([
+      'auto',
+      'close-loop-controller',
+      '--controller-resume',
+      'latest',
+      '--dequeue-limit',
+      '1',
+      '--max-cycles',
+      '1',
+      '--dry-run',
+      '--json'
+    ], { cwd: tempDir });
+
+    expect(run.exitCode).toBe(0);
+    const payload = parseJsonOutput(run.stdout);
+    expect(payload).toEqual(expect.objectContaining({
+      mode: 'auto-close-loop-controller',
+      status: 'completed',
+      processed_goals: 1,
+      pending_goals: 0
+    }));
+    expect(payload.resumed_from_controller_session).toEqual(expect.objectContaining({
+      id: 'controller-resume'
+    }));
+  });
+
   test('supports close-loop-program gate fallback profile through CLI', async () => {
     const run = await runCli([
       'auto',

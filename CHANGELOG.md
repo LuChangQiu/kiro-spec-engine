@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Controller checkpoint resume**: `close-loop-controller` now supports `--controller-resume <latest|id|file>` plus persisted controller session snapshots (`.kiro/auto/close-loop-controller-sessions`) with retention controls (`--controller-session-id`, `--controller-session-keep`, `--controller-session-older-than-days`, `--no-controller-session`).
+- **Controller concurrency lease lock**: Added queue lease lock controls (`--controller-lock-file`, `--controller-lock-ttl-seconds`, `--no-controller-lock`) to prevent concurrent queue corruption and allow stale-lock takeover under bounded TTL.
 - **Persistent close-loop queue controller**: Added `kse auto close-loop-controller [queue-file]` with queue drain/poll runtime (`--queue-format`, `--dequeue-limit`, `--wait-on-empty`, `--poll-seconds`, runtime budgets, done/failed archives) so broad goals can be continuously executed through `close-loop-program` without manual re-invocation.
 - **KPI sample generator command**: Added `kse value metrics sample` to generate a ready-to-use KPI input JSON scaffold (`kpi-input.json`) for first-time observability runs.
 - **Value observability documentation track**: Added dedicated EN/ZH guides for KPI snapshot/baseline/trend workflow (`docs/value-observability-guide.md`, `docs/zh/value-observability-guide.md`) and wired entry links from README + docs indexes for faster discovery of measurable delivery capabilities.
@@ -89,6 +91,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Live orchestration status streaming**: Added event/interval-driven status persistence callback support in `runOrchestration()` and wired `auto close-loop` live progress output (`--no-stream` to disable).
 
 ### Changed
+- **Controller queue hygiene default**: `close-loop-controller` now deduplicates duplicate broad goals by default (`--no-controller-dedupe` to preserve raw duplicates), and summary telemetry includes dedupe/lock/session metadata.
 - **Positioning and onboarding messaging**: Strengthened EN/ZH README and quick-start docs with explicit kse advantage matrix, 90-second value proof, and KPI observability positioning to improve first-contact clarity.
 - **CLI first-screen positioning text**: Updated `kse --help` top description in EN/ZH locales to reflect current core strengths: Spec workflow, orchestration, and KPI observability.
 - **Offline onboarding consistency**: Refreshed `START_HERE.txt`, `INSTALL_OFFLINE.txt`, and `docs/OFFLINE_INSTALL.md` to v1.46.2 guidance and aligned quick-start prerequisites with current runtime requirement (Node.js >= 16).

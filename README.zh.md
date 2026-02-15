@@ -451,6 +451,7 @@ kse auto close-loop "<目标>"        # 自动拆分 Master/Sub Spec 并推进�
 kse auto close-loop "<目标>" --dry-run --json  # 仅预览拆分与依赖计划
 kse auto close-loop-program "<目标>" --program-govern-until-stable --program-govern-use-action 1 --json # 程序级自动恢复 + 治理循环（含 remediation action 执行）直到稳定
 kse auto close-loop-controller .kiro/auto/program-queue.lines --wait-on-empty --dequeue-limit 2 --json # 队列驱动自治控制器，持续处理广义目标积压
+kse auto close-loop-controller --controller-resume latest --json # 从最近一次 controller 检查点恢复自治推进
 
 # Spec 工作流（推荐）
 kse spec bootstrap --name <spec> --non-interactive          # 生成 requirements/design/tasks 初稿

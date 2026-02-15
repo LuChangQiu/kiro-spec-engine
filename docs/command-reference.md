@@ -359,6 +359,9 @@ kse auto close-loop-controller .kiro/auto/program-queue.lines \
   --max-cycles 1000 \
   --max-minutes 240
 
+# Resume from latest persisted controller session
+kse auto close-loop-controller --controller-resume latest --json
+
 # Recovery command: replay unresolved goals from summary using remediation action strategy
 kse auto close-loop-recover latest --json
 kse auto close-loop-recover .kiro/auto/close-loop-batch-summaries/batch-20260215090000.json \
@@ -565,18 +568,26 @@ Close-loop program (`kse auto close-loop-program "<goal>"`) options:
 
 Close-loop controller (`kse auto close-loop-controller [queue-file]`) options:
 - `queue-file`: optional queue file path (default `.kiro/auto/close-loop-controller-goals.lines`)
+- `--controller-resume <session-or-file>`: resume from persisted controller session (`latest`, session id, or file path)
 - `--queue-format <auto|json|lines>`: queue parser mode (default `auto`)
+- `--no-controller-dedupe`: disable duplicate broad-goal deduplication (default dedupe enabled)
 - `--dequeue-limit <n>`: consume up to `n` goals per controller cycle (`1-100`, default `1`)
 - `--wait-on-empty`: keep polling when queue is empty instead of stopping
 - `--poll-seconds <n>`: polling interval for `--wait-on-empty` (`1-3600`, default `30`)
 - `--max-cycles <n>`: max controller cycles (`1-100000`, default `1000`)
 - `--max-minutes <n>`: elapsed-time budget in minutes (`1-10080`, default `120`)
+- `--controller-lock-file <path>`: explicit lease lock file (default `<queue-file>.lock`)
+- `--controller-lock-ttl-seconds <n>`: stale lock takeover threshold (`10-86400`, default `1800`)
+- `--no-controller-lock`: disable controller lease lock (unsafe for concurrent controllers)
 - `--stop-on-goal-failure`: stop immediately when one dequeued goal fails
+- `--controller-session-id <id>`: set explicit persisted controller session id
+- `--controller-session-keep <n>` / `--controller-session-older-than-days <n>`: retention policy for persisted controller sessions
+- `--no-controller-session`: disable controller session persistence
 - `--controller-out <path>`: write controller summary JSON
 - `--controller-done-file <path>` / `--controller-failed-file <path>`: append completed/failed goals into line archives
 - `--controller-print-program-summary`: print each nested `close-loop-program` summary during controller execution
 - Supports program execution controls (`--program-*`, `--batch-*`, `--continue-on-error`, `--recovery-memory-scope`, `--dry-run`, `--json`) and runs each dequeued queue goal through full autonomous program flow.
-- Summary includes controller telemetry (`history`, `results`, final `pending_goals`, `stop_reason`, `exhausted`) plus optional done/failed archive file paths.
+- Summary includes controller telemetry (`history`, `results`, final `pending_goals`, `stop_reason`, `exhausted`, dedupe/lock/session metadata) plus optional done/failed archive file paths.
 
 Close-loop recovery (`kse auto close-loop-recover [summary]`) options:
 - `summary`: optional summary file path; defaults to `latest` persisted batch summary

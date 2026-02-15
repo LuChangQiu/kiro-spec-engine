@@ -534,6 +534,7 @@ kse auto close-loop "<goal>"       # Auto split goal into master/sub specs and e
 kse auto close-loop "<goal>" --dry-run --json  # Preview decomposition plan only
 kse auto close-loop-program "<goal>" --program-govern-until-stable --program-govern-use-action 1 --json # Program-level recovery + governance with remediation action execution
 kse auto close-loop-controller .kiro/auto/program-queue.lines --wait-on-empty --dequeue-limit 2 --json # Queue-driven autonomous controller for broad-goal backlogs
+kse auto close-loop-controller --controller-resume latest --json # Resume autonomous controller from latest persisted checkpoint
 
 # Spec workflow (recommended)
 kse spec bootstrap --name <spec> --non-interactive         # Generate requirements/design/tasks draft

@@ -1209,6 +1209,112 @@ describe('auto close-loop command', () => {
     expect(await fs.pathExists(doneFile)).toBe(true);
   });
 
+  test('deduplicates duplicate controller goals by default', async () => {
+    runAutoCloseLoop
+      .mockResolvedValue({ status: 'completed', portfolio: { master_spec: '200-00-controller', sub_specs: [] } });
+
+    const queueFile = path.join(tempDir, 'controller-goals.lines');
+    await fs.writeFile(queueFile, 'deliver goal one\ndeliver goal one\n', 'utf8');
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'close-loop-controller',
+      queueFile,
+      '--dequeue-limit',
+      '10',
+      '--max-cycles',
+      '1',
+      '--json'
+    ]);
+
+    const summary = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(summary).toEqual(expect.objectContaining({
+      mode: 'auto-close-loop-controller',
+      processed_goals: 1,
+      pending_goals: 0,
+      dedupe_enabled: true
+    }));
+    expect(summary.dedupe_dropped_goals).toBeGreaterThanOrEqual(1);
+  });
+
+  test('supports --controller-resume latest to continue queue from persisted controller session', async () => {
+    runAutoCloseLoop
+      .mockResolvedValue({ status: 'completed', portfolio: { master_spec: '200-00-controller', sub_specs: [] } });
+
+    const queueFile = path.join(tempDir, 'resume-controller-goals.lines');
+    await fs.writeFile(queueFile, 'deliver resume goal one\n', 'utf8');
+    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    await fs.ensureDir(sessionDir);
+    const sessionFile = path.join(sessionDir, 'controller-resume.json');
+    await fs.writeJson(sessionFile, {
+      mode: 'auto-close-loop-controller',
+      status: 'partial-failed',
+      queue_file: queueFile,
+      queue_format: 'lines',
+      controller_session: {
+        id: 'controller-resume',
+        file: sessionFile
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'close-loop-controller',
+      '--controller-resume',
+      'latest',
+      '--dequeue-limit',
+      '1',
+      '--max-cycles',
+      '1',
+      '--json'
+    ]);
+
+    const summary = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(summary).toEqual(expect.objectContaining({
+      mode: 'auto-close-loop-controller',
+      processed_goals: 1,
+      pending_goals: 0
+    }));
+    expect(summary.resumed_from_controller_session).toEqual(expect.objectContaining({
+      id: 'controller-resume'
+    }));
+  });
+
+  test('fails close-loop-controller when queue lock is already held', async () => {
+    runAutoCloseLoop
+      .mockResolvedValue({ status: 'completed', portfolio: { master_spec: '200-00-controller', sub_specs: [] } });
+
+    const queueFile = path.join(tempDir, 'controller-goals.lines');
+    await fs.writeFile(queueFile, 'deliver goal one\n', 'utf8');
+    await fs.writeJson(`${queueFile}.lock`, {
+      token: 'existing-token',
+      pid: 12345,
+      host: 'test-host',
+      acquired_at: new Date().toISOString(),
+      touched_at: new Date().toISOString()
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'close-loop-controller',
+        queueFile
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const errorOutput = errorSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    expect(errorOutput).toContain('Controller lock is held');
+  });
+
   test('applies program gate profile defaults when explicit thresholds are omitted', async () => {
     runAutoCloseLoop
       .mockResolvedValueOnce({ status: 'failed', portfolio: { master_spec: '122-12-prof-r1', sub_specs: [] } })

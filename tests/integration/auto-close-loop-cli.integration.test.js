@@ -1761,4 +1761,97 @@ describe('auto close-loop CLI integration', () => {
     const listAfterPayload = parseJsonOutput(listedAfter.stdout);
     expect(listAfterPayload.total).toBe(1);
   });
+
+  test('aggregates governance stats across archives through CLI', async () => {
+    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    await fs.ensureDir(closeLoopSessionDir);
+    await fs.ensureDir(batchSessionDir);
+    await fs.ensureDir(controllerSessionDir);
+
+    const closeLoopFile = path.join(closeLoopSessionDir, 'integration-governance-session.json');
+    await fs.writeJson(closeLoopFile, {
+      session_id: 'integration-governance-session',
+      status: 'completed',
+      portfolio: {
+        master_spec: '121-00-integration',
+        sub_specs: ['121-01-integration-a']
+      }
+    }, { spaces: 2 });
+
+    const batchFile = path.join(batchSessionDir, 'integration-governance-batch.json');
+    await fs.writeJson(batchFile, {
+      mode: 'auto-close-loop-batch',
+      status: 'failed',
+      total_goals: 3,
+      processed_goals: 1,
+      batch_session: {
+        id: 'integration-governance-batch',
+        file: batchFile
+      }
+    }, { spaces: 2 });
+
+    const controllerFile = path.join(controllerSessionDir, 'integration-governance-controller.json');
+    await fs.writeJson(controllerFile, {
+      mode: 'auto-close-loop-controller',
+      status: 'completed',
+      queue_format: 'lines',
+      processed_goals: 2,
+      pending_goals: 0,
+      controller_session: {
+        id: 'integration-governance-controller',
+        file: controllerFile
+      }
+    }, { spaces: 2 });
+
+    const recoveryMemoryFile = path.join(tempDir, '.kiro', 'auto', 'close-loop-recovery-memory.json');
+    await fs.ensureDir(path.dirname(recoveryMemoryFile));
+    await fs.writeJson(recoveryMemoryFile, {
+      version: 1,
+      signatures: {
+        'integration-signature': {
+          signature: 'integration-signature',
+          scope: 'integration',
+          attempts: 1,
+          successes: 1,
+          failures: 0,
+          last_used_at: '2026-02-14T10:00:00.000Z',
+          actions: {
+            '1': {
+              index: 1,
+              title: 'retry once',
+              attempts: 1,
+              successes: 1,
+              failures: 0,
+              last_used_at: '2026-02-14T10:00:00.000Z'
+            }
+          }
+        }
+      }
+    }, { spaces: 2 });
+
+    const stats = await runCli([
+      'auto',
+      'governance',
+      'stats',
+      '--json'
+    ], { cwd: tempDir });
+    expect(stats.exitCode).toBe(0);
+    const statsPayload = parseJsonOutput(stats.stdout);
+    expect(statsPayload.mode).toBe('auto-governance-stats');
+    expect(statsPayload.totals).toEqual(expect.objectContaining({
+      total_sessions: 3,
+      completed_sessions: 2,
+      failed_sessions: 1
+    }));
+    expect(statsPayload.recovery_memory).toEqual(expect.objectContaining({
+      signature_count: 1,
+      action_count: 1
+    }));
+    expect(statsPayload.archives.session.total_sessions).toBe(1);
+    expect(statsPayload.archives.batch_session.total_sessions).toBe(1);
+    expect(statsPayload.archives.controller_session.total_sessions).toBe(1);
+    expect(statsPayload.health.risk_level).toBe('medium');
+  });
 });

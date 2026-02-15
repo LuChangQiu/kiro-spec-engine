@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Cross-archive governance stats command**: Added `kse auto governance stats` with optional `--days` / `--status` filters to unify session/batch-session/controller-session telemetry and recovery-memory state into one governance snapshot (`totals`, `throughput`, `health` risk diagnostics, `top_master_specs`, and per-archive detail payloads).
 - **Session and batch session stats commands**: Added `kse auto session stats` and `kse auto batch-session stats` with optional `--days` / `--status` filters and JSON telemetry (completion/failure rates, volume aggregates, composition breakdowns, latest-session snapshots) for autonomous archive observability.
 - **Controller session stats command**: Added `kse auto controller-session stats` with optional `--days` / `--status` filters and JSON telemetry (`status_counts`, `queue_format_counts`, completion/failure rates, goal-volume sums, and latest-session snapshot) for controller archive observability.
 - **Session list status filtering + composition telemetry**: `kse auto session list`, `kse auto batch-session list`, and `kse auto controller-session list` now support `--status <csv>` (case-insensitive) and emit `status_filter` / `status_counts` in JSON output for faster archive triage.

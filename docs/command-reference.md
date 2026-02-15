@@ -468,6 +468,10 @@ kse auto controller-session stats --days 14 --status partial-failed --json
 kse auto controller-session prune --keep 50
 kse auto controller-session prune --keep 20 --older-than-days 14 --dry-run
 
+# Aggregate cross-archive autonomous governance telemetry
+kse auto governance stats
+kse auto governance stats --days 14 --status completed,partial-failed --json
+
 # Recovery memory maintenance
 kse auto recovery-memory show --json
 kse auto recovery-memory scopes --json
@@ -658,6 +662,10 @@ Close-loop controller session maintenance:
 - `kse auto controller-session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune old persisted controller summaries
   - List JSON output includes `status_filter` and `status_counts` over filtered sessions.
   - Stats JSON output includes `criteria`, `status_counts`, `queue_format_counts`, completion/failure rates, goal-volume sums, and `latest_sessions`.
+
+Cross-archive autonomous governance maintenance:
+- `kse auto governance stats [--days <n>] [--status <csv>] [--json]`: aggregate a unified governance snapshot from session/batch-session/controller-session archives plus recovery memory state.
+  - JSON output includes `totals`, `throughput`, `health` (`risk_level`, `concerns`, `recommendations`), `top_master_specs`, `recovery_memory`, and full per-archive stats under `archives`.
 
 Close-loop recovery memory maintenance:
 - `kse auto recovery-memory show [--scope <scope>] [--json]`: inspect persisted recovery signatures/actions and aggregate stats (optionally scoped)

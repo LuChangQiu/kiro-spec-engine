@@ -2,7 +2,7 @@
 
 > Quick reference for all kse commands
 
-**Version**: 1.47.3  
+**Version**: 1.47.4
 **Last Updated**: 2026-02-15
 
 ---

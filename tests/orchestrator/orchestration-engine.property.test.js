@@ -737,8 +737,8 @@ describe('Property 4: 并行度不变量 (Parallel Invariant)', () => {
     engine._executeSpec = async (specName) => {
       currentConcurrent++;
       tracker.max = Math.max(tracker.max, currentConcurrent);
-      // Simulate async work — small delay allows Promise.race interleaving
-      await new Promise(resolve => setTimeout(resolve, 1));
+      // Simulate async work without leaving real timer handles behind.
+      await Promise.resolve();
       currentConcurrent--;
       engine._completedSpecs.add(specName);
     };

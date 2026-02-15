@@ -115,7 +115,7 @@ describe('AgentSpawner → StatusMonitor event integration', () => {
       getConfig: jest.fn().mockResolvedValue({
         agentBackend: 'codex',
         maxParallel: 3,
-        timeoutSeconds: 600,
+        timeoutSeconds: 0,
         maxRetries: 2,
         apiKeyEnvVar: 'CODEX_API_KEY',
         bootstrapTemplate: null,
@@ -317,7 +317,7 @@ describe('OrchestrationEngine component coordination', () => {
       getConfig: jest.fn().mockResolvedValue({
         maxParallel: 3,
         maxRetries: 0,
-        timeoutSeconds: 600,
+        timeoutSeconds: 0,
       }),
     };
 
@@ -447,7 +447,7 @@ describe('Failure isolation', () => {
       specLifecycleManager: failingSLM,
       statusMonitor: mockStatusMonitor,
       orchestratorConfig: {
-        getConfig: jest.fn().mockResolvedValue({ maxParallel: 3, maxRetries: 0, timeoutSeconds: 600 }),
+        getConfig: jest.fn().mockResolvedValue({ maxParallel: 3, maxRetries: 0, timeoutSeconds: 0 }),
       },
       agentRegistry: {
         register: jest.fn().mockResolvedValue({ agentId: 'iso-agent-1' }),
@@ -494,7 +494,7 @@ describe('Failure isolation', () => {
       },
       statusMonitor: failingSyncMonitor,
       orchestratorConfig: {
-        getConfig: jest.fn().mockResolvedValue({ maxParallel: 3, maxRetries: 0, timeoutSeconds: 600 }),
+        getConfig: jest.fn().mockResolvedValue({ maxParallel: 3, maxRetries: 0, timeoutSeconds: 0 }),
       },
       agentRegistry: {
         register: jest.fn().mockResolvedValue({ agentId: 'iso-agent-2' }),
@@ -520,7 +520,7 @@ describe('Failure isolation', () => {
     const { AgentSpawner } = require('../../lib/orchestrator/agent-spawner');
     const spawner = new AgentSpawner('/workspace', {
       getConfig: jest.fn().mockResolvedValue({
-        agentBackend: 'codex', maxParallel: 3, timeoutSeconds: 600,
+        agentBackend: 'codex', maxParallel: 3, timeoutSeconds: 0,
         maxRetries: 2, apiKeyEnvVar: 'CODEX_API_KEY',
         bootstrapTemplate: null, codexArgs: [],
       }),

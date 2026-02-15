@@ -3,7 +3,7 @@
 > Quick reference for all kse commands
 
 **Version**: 1.46.2  
-**Last Updated**: 2026-02-14
+**Last Updated**: 2026-02-15
 
 ---
 
@@ -265,6 +265,318 @@ kse orchestrate stop
 ```
 
 When you pass `--specs` to `kse spec bootstrap|pipeline run|gate run`, kse now defaults to this orchestrate mode automatically.
+
+### Autonomous Close-Loop Program
+
+```bash
+# One-command close-loop execution:
+# goal -> auto master/sub decomposition -> collab metadata -> orchestration -> terminal result
+kse auto close-loop "build autonomous close-loop and master/sub orchestration"
+# default sub-spec count is auto-selected by goal complexity (typically 3-5)
+
+# Preview decomposition only
+kse auto close-loop "build autonomous close-loop and master/sub orchestration" --dry-run --json
+
+# Generate plan but skip orchestration run
+kse auto close-loop "build autonomous close-loop and master/sub orchestration" --no-run
+
+# Run without live status stream output
+kse auto close-loop "build autonomous close-loop and master/sub orchestration" --no-stream
+
+# Add Definition-of-Done (DoD) test gate
+kse auto close-loop "build autonomous close-loop and master/sub orchestration" \
+  --dod-tests "npm run test:smoke"
+
+# Strict DoD: require all tasks.md checklists are closed
+kse auto close-loop "build autonomous close-loop and master/sub orchestration" \
+  --dod-tasks-closed
+
+# Write DoD evidence to custom report path
+kse auto close-loop "build autonomous close-loop and master/sub orchestration" \
+  --dod-report ".kiro/reports/close-loop-dod.json"
+
+# Resume from the latest close-loop session snapshot
+kse auto close-loop --resume latest
+
+# Resume from a specific session id
+kse auto close-loop --resume 117-20260214230000
+
+# Apply session retention automatically after close-loop execution
+kse auto close-loop "build autonomous close-loop and master/sub orchestration" \
+  --session-keep 50 \
+  --session-older-than-days 14
+
+# Allow up to 2 automatic replan cycles on orchestration failures
+kse auto close-loop "build autonomous close-loop and master/sub orchestration" \
+  --replan-attempts 2
+
+# Use adaptive replan budget strategy (default) or fixed
+kse auto close-loop "build autonomous close-loop and master/sub orchestration" \
+  --replan-strategy adaptive
+
+# Run multiple goals in one autonomous batch (one master/sub portfolio per goal)
+kse auto close-loop-batch .kiro/goals.txt
+kse auto close-loop-batch .kiro/goals.json --dry-run --json
+
+# Generate batch goals from one broad program goal (no goals file needed)
+kse auto close-loop-batch \
+  --decompose-goal "build autonomous close-loop, master/sub decomposition, orchestration and quality rollout" \
+  --program-goals 4 \
+  --program-min-quality-score 85 \
+  --json
+
+# Program command: broad goal -> auto split -> autonomous batch closed-loop execution
+kse auto close-loop-program \
+  "build autonomous close-loop, master/sub decomposition, orchestration and quality rollout" \
+  --program-goals 4 \
+  --program-quality-gate \
+  --program-recover-max-rounds 6 \
+  --program-recover-max-minutes 30 \
+  --program-gate-profile staging \
+  --program-gate-fallback-chain staging,prod \
+  --program-gate-fallback-profile prod \
+  --program-min-success-rate 95 \
+  --program-max-risk-level medium \
+  --program-kpi-out .kiro/reports/close-loop-program-kpi.json \
+  --program-audit-out .kiro/reports/close-loop-program-audit.json \
+  --json
+
+# Recovery command: replay unresolved goals from summary using remediation action strategy
+kse auto close-loop-recover latest --json
+kse auto close-loop-recover .kiro/auto/close-loop-batch-summaries/batch-20260215090000.json \
+  --use-action 2 \
+  --recover-until-complete \
+  --recover-max-rounds 3 \
+  --recover-max-minutes 20 \
+  --recovery-memory-ttl-days 30 \
+  --recovery-memory-scope release-main \
+  --program-audit-out .kiro/reports/close-loop-recover-audit.json \
+  --dry-run --json
+
+# Continue processing later goals even if one goal fails
+kse auto close-loop-batch .kiro/goals.json --continue-on-error --json
+
+# Run batch goals with concurrent close-loop workers
+kse auto close-loop-batch .kiro/goals.json --batch-parallel 3 --continue-on-error --json
+
+# Apply global agent budget across all concurrent goals
+kse auto close-loop-batch .kiro/goals.json \
+  --batch-parallel 3 \
+  --batch-agent-budget 6 \
+  --continue-on-error --json
+
+# Prioritize complex goals first and enable anti-starvation aging
+kse auto close-loop-batch .kiro/goals.json \
+  --batch-priority critical-first \
+  --batch-aging-factor 3 \
+  --continue-on-error --json
+
+# Automatically retry failed/stopped goals for one extra round
+kse auto close-loop-batch .kiro/goals.json \
+  --continue-on-error \
+  --batch-retry-rounds 1 \
+  --batch-retry-strategy adaptive \
+  --json
+
+# Retry until all goals complete (bounded by max rounds)
+kse auto close-loop-batch .kiro/goals.json \
+  --batch-retry-until-complete \
+  --batch-retry-max-rounds 10 \
+  --json
+
+# Enable autonomous batch policy (closed-loop defaults for program-scale runs)
+kse auto close-loop-batch .kiro/goals.json \
+  --batch-autonomous \
+  --json
+
+# Resume only pending goals from a previous batch summary
+kse auto close-loop-batch --resume-from-summary .kiro/reports/close-loop-batch.json --json
+
+# Resume pending goals from latest persisted batch session summary
+kse auto close-loop-batch --resume-from-summary latest --json
+
+# Resume only failed/error goals from summary (ignore unprocessed goals)
+kse auto close-loop-batch --resume-from-summary .kiro/reports/close-loop-batch.json \
+  --resume-strategy failed-only --json
+
+# List persisted close-loop sessions
+kse auto session list
+kse auto session list --limit 50 --json
+
+# Prune old close-loop sessions
+kse auto session prune --keep 50
+kse auto session prune --keep 20 --older-than-days 14 --dry-run
+
+# List persisted spec directories
+kse auto spec-session list
+kse auto spec-session list --limit 100 --json
+
+# Prune old spec directories
+kse auto spec-session prune --keep 200
+kse auto spec-session prune --keep 100 --older-than-days 30 --dry-run --json
+kse auto spec-session prune --keep 100 --older-than-days 30 --show-protection-reasons --json
+
+# List persisted close-loop-batch summary sessions
+kse auto batch-session list
+kse auto batch-session list --limit 50 --json
+
+# Prune old close-loop-batch summary sessions
+kse auto batch-session prune --keep 50
+kse auto batch-session prune --keep 20 --older-than-days 14 --dry-run
+
+# Recovery memory maintenance
+kse auto recovery-memory show --json
+kse auto recovery-memory scopes --json
+kse auto recovery-memory prune --older-than-days 30 --dry-run --json
+kse auto recovery-memory clear --json
+
+# Autonomous KPI trend (weekly/daily buckets + CSV export)
+kse auto kpi trend --weeks 12 --period week --mode all --json
+kse auto kpi trend --weeks 8 --period day --mode program --csv --out ./auto-kpi-trend.csv
+``` 
+
+DoD-related options:
+- `--dod-tests <command>`: run a final shell command as a completion gate
+- `--dod-tests-timeout <ms>`: timeout for `--dod-tests` (default `600000`)
+- `--dod-tasks-closed`: require no unchecked `- [ ]` items in generated `tasks.md`
+- `--no-dod-docs`: skip doc completeness gate
+- `--no-dod-collab`: skip collaboration completion gate
+- `--no-dod`: disable all DoD gates
+- `--dod-report <path>`: write DoD evidence report JSON to custom path
+- `--no-dod-report`: disable automatic DoD report archive
+- `--resume <session-or-file>`: resume from prior session id, `latest`, or JSON path
+- `--session-id <id>`: set explicit session id for persistence
+- `--no-session`: disable close-loop session persistence
+- `--session-keep <n>`: prune sessions after run and keep newest `n` snapshots
+- `--session-older-than-days <n>`: when pruning, only delete sessions older than `n` days
+- `--subs <n>`: override automatic decomposition count (`2-5`)
+- `--replan-strategy <strategy>`: `adaptive` or `fixed` replan budget strategy
+- `--replan-attempts <n>`: max automatic replan cycles after failed orchestration (`0-5`, default `1`)
+- `--replan-no-progress-window <n>`: stop replan when no progress repeats for `n` failed cycles (`1-10`, default `3`)
+- `--no-replan`: disable automatic replan cycle
+
+Close-loop batch (`kse auto close-loop-batch <goals-file>`) options:
+- supports shared close-loop execution options (for example: `--subs`, `--max-parallel`, `--dod*`, `--replan*`, `--dry-run`, `--json`)
+- `--format <format>`: parse goals file as `auto`, `json`, or `lines` (default `auto`)
+- `--decompose-goal <goal>`: auto-split one broad goal into multiple batch goals using semantic clauses/categories
+- `--program-goals <n>`: target generated-goal count for `--decompose-goal` (`2-12`, default adaptive)
+- `--program-min-quality-score <n>`: minimum decomposition quality score before auto-refinement (`0-100`, default `70`)
+- `--program-quality-gate`: fail fast if final decomposition quality is still below `--program-min-quality-score`
+- `--resume-from-summary <path>`: derive pending goals from an existing batch summary (reruns failed/error and previously unprocessed goals)
+- `--resume-from-summary latest`: load the most recent persisted batch session summary automatically
+- `--resume-strategy <strategy>`: `pending` (default) or `failed-only` for summary resume scope
+- `--batch-parallel <n>`: run up to `n` goals concurrently (`1-20`, default `1`)
+- `--batch-agent-budget <n>`: global agent parallel budget shared by all running goals (`1-500`)
+- `--batch-priority <strategy>`: scheduling strategy `fifo` (default), `complex-first`, `complex-last`, or `critical-first`
+- `--batch-aging-factor <n>`: waiting-goal aging boost per scheduling cycle (`0-100`, default `0`)
+- `--batch-retry-rounds <n>`: retry failed/stopped goals for `n` additional rounds (`0-5`, default `0`)
+- `--batch-retry-strategy <strategy>`: retry strategy `adaptive` (default) or `strict`
+- `--batch-retry-until-complete`: keep retrying until no failed/stopped goals remain or max rounds reached
+- `--batch-retry-max-rounds <n>`: max extra rounds for `--batch-retry-until-complete` (`1-20`, default `10`)
+- `--batch-autonomous`: apply autonomous closed-loop defaults (`continue-on-error`, adaptive `batch-parallel`, `complex-first`, aging `2`, retry-until-complete)
+- `--batch-session-id <id>`: set explicit persisted batch session id
+- `--batch-session-keep <n>`: keep newest `n` persisted batch summaries after each run (`0-1000`)
+- `--batch-session-older-than-days <n>`: when pruning persisted batch summaries, only delete sessions older than `n` days (`0-36500`)
+- `--spec-session-keep <n>`: keep newest `n` spec directories under `.kiro/specs` after run (`0-5000`)
+- `--spec-session-older-than-days <n>`: when pruning specs, only delete directories older than `n` days (`0-36500`)
+- `--no-spec-session-protect-active`: allow pruning active/recently referenced spec directories
+- `--spec-session-protect-window-days <n>`: protection window (days) for recent session references during spec pruning (`0-36500`, default `7`)
+- `--spec-session-max-total <n>`: spec directory budget ceiling under `.kiro/specs` (`1-500000`)
+- `--spec-session-max-created <n>`: spec growth guard for maximum estimated created directories per run (`0-500000`)
+- `--spec-session-max-created-per-goal <n>`: spec growth guard for estimated created directories per processed goal (`0-1000`)
+- `--spec-session-max-duplicate-goals <n>`: goal-input duplicate guard for batch runs (`0-500000`)
+- `--spec-session-budget-hard-fail`: fail run when spec count exceeds `--spec-session-max-total` before/after execution
+- `--no-batch-session`: disable automatic persisted batch summary session archive
+- `--batch-retry-max-rounds` requires `--batch-retry-until-complete`
+- `--continue-on-error`: continue remaining goals after a failed/error goal
+- `--out <path>`: write batch summary JSON output file
+- `--resume` and `--session-id` are not supported in batch mode (sessions are per-goal)
+- `--program-goals` requires `--decompose-goal`
+- `<goals-file>`, `--resume-from-summary`, and `--decompose-goal` are mutually exclusive goal sources
+- Batch summary includes `resource_plan` (budget/effective parallel/per-goal maxParallel/scheduling strategy/aging/starvation wait metrics/criticality summary) and `metrics` (`success_rate_percent`, `status_breakdown`, `average_sub_specs_per_goal`, `average_replan_cycles_per_goal`)
+  - Under budget mode, scheduler is complexity-weighted (`goal_weight`/`scheduling_weight`) so higher-complexity goals consume more shared slots and can reduce same-batch concurrency.
+  - Batch summary includes `batch_retry` telemetry (strategy, until-complete mode, configured/max/performed rounds, exhausted flag, per-round history).
+  - Batch summary includes `batch_session` metadata when persisted (session id + file path).
+  - When using `--decompose-goal`, summary includes `generated_from_goal` metadata (strategy, target count, produced count, clause/category diagnostics, decomposition `quality`, and refinement telemetry).
+
+Close-loop program (`kse auto close-loop-program "<goal>"`) options:
+- Automatically enables autonomous batch policy (hands-off closed-loop defaults) and uses semantic decomposition from one broad goal.
+- `--program-goals <n>`: target generated-goal count (`2-12`, default adaptive)
+- Supports batch execution controls (`--batch-parallel`, `--batch-agent-budget`, `--batch-priority`, `--batch-aging-factor`, `--batch-retry*`)
+- Supports batch summary persistence controls (`--batch-session-id`, `--batch-session-keep`, `--batch-session-older-than-days`, `--no-batch-session`)
+- Supports spec retention controls (`--spec-session-keep`, `--spec-session-older-than-days`, `--no-spec-session-protect-active`)
+  - Includes `--spec-session-protect-window-days` to tune recent-reference protection window.
+  - Includes `--spec-session-max-total` and optional `--spec-session-budget-hard-fail` for spec-count budget governance.
+- `--no-program-auto-recover`: disable built-in recovery loop after non-completed program runs
+- `--program-recover-use-action <n>`: pin remediation action for auto recovery (otherwise KSE uses learned memory or default action `1`)
+- `--program-recover-resume-strategy <pending|failed-only>`: resume scope for built-in program recovery (default `pending`)
+- `--program-recover-max-rounds <n>`: bounded recovery rounds for built-in program recovery (`1-20`, default `5`)
+- `--program-recover-max-minutes <n>`: elapsed-time budget for built-in program recovery loop (minutes, default unlimited)
+- `--program-gate-profile <profile>`: convergence gate profile (`default|dev|staging|prod`) to set baseline success/risk policy
+- `--program-gate-fallback-profile <profile>`: fallback gate profile (`none|default|dev|staging|prod`, default `none`) used only when primary gate fails
+- `--program-gate-fallback-chain <profiles>`: ordered fallback profiles (comma-separated) evaluated after primary gate failure
+- `--program-min-success-rate <n>`: convergence gate minimum success rate percent (`0-100`, default `100`)
+- `--program-max-risk-level <low|medium|high>`: convergence gate risk ceiling (default `high`)
+- `--program-max-elapsed-minutes <n>`: convergence gate elapsed-time budget in minutes (`1-10080`, default unlimited)
+- `--program-max-agent-budget <n>`: convergence gate max allowed agent budget/effective parallel budget (`1-500`)
+- `--program-max-total-sub-specs <n>`: convergence gate max total sub-specs across program goals (`1-500000`)
+- `--no-program-gate-auto-remediate`: disable automatic remediation hints/prune attempts after gate failure
+- `--program-min-quality-score <n>`: minimum semantic decomposition quality score before automatic refinement (`0-100`, default `70`)
+- `--program-quality-gate`: fail run when final decomposition quality remains below `--program-min-quality-score`
+- `--recovery-memory-scope <scope>`: scope key for recovery memory isolation (default auto: project + git branch)
+- Supports shared close-loop options (`--subs`, `--max-parallel`, `--dod*`, `--replan*`, `--dry-run`, `--json`, `--out`)
+- `--program-kpi-out <path>`: write a standalone program KPI snapshot JSON (`convergence_state`, `risk_level`, retry recovery, complexity ratio, wait profile)
+- `--program-audit-out <path>`: write a program audit JSON (`program_coordination`, `recovery_cycle`, `program_gate`, and selected strategy metadata)
+- Program summary includes `program_kpi`, `program_gate`, `program_gate_fallbacks`, `program_gate_effective`, and optional `program_kpi_file` / `program_audit_file` for portfolio-level observability pipelines.
+  - `program_gate` now supports unified budget checks (success/risk + elapsed time + agent budget + total sub-spec ceiling).
+  - On gate/budget failure, summary can include `program_gate_auto_remediation` with auto patch/prune actions.
+- Program summary includes `program_diagnostics` with `failure_clusters` and `remediation_actions` (prioritized follow-up commands for convergence).
+- Program summary includes `program_coordination` (master/sub topology, unresolved goal indexes, scheduler snapshot) and `auto_recovery` metadata.
+
+Close-loop recovery (`kse auto close-loop-recover [summary]`) options:
+- `summary`: optional summary file path; defaults to `latest` persisted batch summary
+- `--use-action <n>`: choose remediation action index from diagnostics (`1` by default)
+- `--resume-strategy <pending|failed-only>`: control recovery goal scope from source summary
+- `--recover-until-complete`: keep running recovery rounds until converged or max rounds reached
+- `--recover-max-rounds <n>`: max recovery rounds for until-complete mode (`1-20`, default `5`)
+- `--recover-max-minutes <n>`: elapsed-time budget for recovery loop (minutes, default unlimited)
+- `--recovery-memory-ttl-days <n>`: prune stale recovery memory entries before auto action selection (`0-36500`)
+- `--recovery-memory-scope <scope>`: scope key for recovery memory isolation (default auto: project + git branch)
+- Supports batch controls (`--batch-parallel`, `--batch-agent-budget`, `--batch-priority`, `--batch-aging-factor`, `--batch-retry*`, `--batch-autonomous`)
+- Supports spec retention controls (`--spec-session-keep`, `--spec-session-older-than-days`, `--no-spec-session-protect-active`)
+  - Includes `--spec-session-protect-window-days` to tune recent-reference protection window.
+  - Includes `--spec-session-max-total` and optional `--spec-session-budget-hard-fail` for spec-count budget governance.
+- Supports program gate controls (`--program-gate-profile`, `--program-gate-fallback-*`, `--program-min-success-rate`, `--program-max-risk-level`, `--program-max-elapsed-minutes`, `--program-max-agent-budget`, `--program-max-total-sub-specs`)
+  - Includes `--no-program-gate-auto-remediate` to disable automatic remediation hints/prune attempts.
+- Supports quality/session controls (`--dod*`, `--replan*`, `--batch-session*`, `--program-kpi-out`, `--program-audit-out`, `--out`, `--dry-run`, `--json`)
+- If `--use-action` is omitted, KSE automatically selects remediation action from learned recovery memory when available.
+- Output includes `recovered_from_summary`, `recovery_plan` (`applied_patch`, available remediation actions, `selection_source`, `selection_explain`), `recovery_cycle` (round history, convergence/exhausted state, elapsed/budget metadata), and `recovery_memory` (signature, scope, action stats, selection explanation).
+
+Close-loop session maintenance:
+- `kse auto session list [--limit <n>] [--json]`: list persisted close-loop sessions
+- `kse auto session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune old session snapshots
+
+Spec directory maintenance:
+- `kse auto spec-session list [--limit <n>] [--json]`: list persisted spec directories under `.kiro/specs`
+- `kse auto spec-session prune [--keep <n>] [--older-than-days <n>] [--no-protect-active] [--protect-window-days <n>] [--show-protection-reasons] [--dry-run] [--json]`: prune old spec directories by retention policy (default protects active/recent specs)
+  - JSON output always includes `protection_ranking_top` (top protected specs by reason count); `--show-protection-reasons` additionally includes per-spec `reasons` and full `protection_ranking`.
+- Batch/program/recover summaries can include `spec_session_budget` telemetry when `--spec-session-max-total` is configured.
+
+Close-loop batch session maintenance:
+- `kse auto batch-session list [--limit <n>] [--json]`: list persisted close-loop-batch summary sessions
+- `kse auto batch-session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune old persisted batch summaries
+
+Close-loop recovery memory maintenance:
+- `kse auto recovery-memory show [--scope <scope>] [--json]`: inspect persisted recovery signatures/actions and aggregate stats (optionally scoped)
+- `kse auto recovery-memory scopes [--json]`: inspect aggregated recovery-memory statistics grouped by scope
+- `kse auto recovery-memory prune [--older-than-days <n>] [--scope <scope>] [--dry-run] [--json]`: prune stale recovery memory entries (optionally scoped)
+- `kse auto recovery-memory clear [--json]`: clear persisted recovery memory state
+
+Autonomous KPI trend:
+- `kse auto kpi trend [--weeks <n>] [--mode <all|batch|program|recover>] [--period <week|day>] [--csv] [--out <path>] [--json]`: aggregate periodic KPI trend from persisted autonomous summary sessions.
+  - `--period <week|day>` selects weekly (default) or daily buckets.
+  - `--csv` prints CSV rows to stdout and writes CSV when used with `--out` (JSON remains default).
+  - JSON output includes `anomaly_detection` and flattened `anomalies` (latest-period regression checks against historical baseline).
 
 Recommended `.kiro/config/orchestrator.json`:
 

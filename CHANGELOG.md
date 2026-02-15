@@ -16,6 +16,75 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Value metrics helper test coverage**: Added deterministic tests for ISO week period derivation and sample payload structure in command-level unit tests.
 - **Spec 115 quality hardening program**: Added a master/sub-spec collaboration portfolio (`115-00` + `115-01..115-04`) to parallelize CI trust, Jest open-handle governance, watch follow completion, and doc link canonicalization.
 - **Test governance scripts**: Added `test:smoke`, `test:full`, `test:handles`, `test:skip-audit`, plus `scripts/check-skip-allowlist.js` and `tests/skip-allowlist.txt` for skip-test regression guardrails.
+- **Autonomous close-loop command**: Added `kse auto close-loop "<goal>"` to perform one-command goal decomposition (master/sub specs), collaboration bootstrap, and orchestration until terminal state.
+- **Definition-of-Done gates for close-loop**: Added configurable completion gates for `kse auto close-loop` (`--dod-tests`, `--dod-tasks-closed`, `--no-dod*`) so autonomous runs only report success when required evidence checks pass.
+- **DoD evidence archive for close-loop**: Added automatic DoD report persistence to `.kiro/specs/<master>/custom/dod-report.json` with CLI controls (`--dod-report`, `--no-dod-report`) for audit-ready closure evidence.
+- **Close-loop session resume**: Added session snapshot persistence for `kse auto close-loop` (`.kiro/auto/close-loop-sessions`) plus resume controls (`--resume`, `--session-id`, `--no-session`) to continue interrupted master/sub executions.
+- **Close-loop session hygiene commands**: Added `kse auto session list` and `kse auto session prune` (retention + age filters + dry-run/json) so long-running autonomous programs can maintain session archives without manual file cleanup.
+- **Spec directory retention commands**: Added `kse auto spec-session list|prune` (retention + age filters + dry-run/json) to control `.kiro/specs` growth for continuous autonomous runs.
+- **Active spec protection in retention prune**: `kse auto spec-session prune` now protects active/recently referenced specs by default (`--no-protect-active` to override).
+- **Automatic spec retention policy for program/batch/recover**: Added `--spec-session-keep` / `--spec-session-older-than-days` (`--no-spec-session-protect-active` optional) so autonomous multi-goal runs can auto-prune `.kiro/specs` after execution.
+- **Configurable spec protection window**: Added `--spec-session-protect-window-days` (and `spec-session prune --protect-window-days`) so teams can tune recent-reference protection horizon for retention safety.
+- **Spec protection reason observability**: `spec-session prune` now emits `protection_ranking_top` by default and supports `--show-protection-reasons` for per-spec reason detail (`protected_specs[*].reasons`, `protection_ranking`) during retention audits.
+- **Spec directory budget guardrail**: Added `--spec-session-max-total` with optional `--spec-session-budget-hard-fail` for batch/program/recover flows, including `spec_session_budget` telemetry in summaries to prevent uncontrolled `.kiro/specs` growth.
+- **Unified program budget gate**: Added `--program-max-elapsed-minutes`, `--program-max-agent-budget`, and `--program-max-total-sub-specs` so `close-loop-program` convergence gate can enforce time/concurrency/sub-spec budgets together with success/risk policy.
+- **Program/recover gate policy parity + auto-remediation hooks**: `close-loop-recover` now supports the same gate/fallback/budget policy flags as program mode and can emit `program_gate_auto_remediation` (auto patch/prune hints) when gate/budget checks fail.
+- **Spec growth/duplicate guardrails**: Added `--spec-session-max-created`, `--spec-session-max-created-per-goal`, and `--spec-session-max-duplicate-goals` (with hard-fail option) plus summary telemetry (`goal_input_guard`, `spec_session_growth_guard`) to reduce runaway autonomous portfolio expansion.
+- **Autonomous KPI trend command**: Added `kse auto kpi trend` to aggregate weekly success/completion, failure, sub-spec, and spec-growth telemetry from persisted autonomous summary sessions.
+- **Autonomous KPI trend period/csv/anomaly enhancement**: Extended `kse auto kpi trend` with `--period week|day`, `--csv` export mode, and JSON anomaly diagnostics (`anomaly_detection`, `anomalies`) for latest-period regression checks.
+- **Close-loop multi-goal batch command**: Added `kse auto close-loop-batch <goals-file>` with file-format autodetect (`json|lines`), `--continue-on-error`, and per-goal summary output so autonomous master/sub execution can scale across multiple goals in one run.
+- **Close-loop batch global scheduler**: Added `--batch-parallel` (`1-20`) to execute multiple goals concurrently in `close-loop-batch`, enabling master/sub portfolios to progress in parallel without manual orchestration handoffs.
+- **Close-loop batch resume from summary**: Added `--resume-from-summary <path>` to recover pending goals from a prior batch run and continue autonomous delivery without rebuilding the entire goal queue manually.
+- **Close-loop batch resume strategy selector**: Added `--resume-strategy pending|failed-only` so operators can choose whether summary resume should include unprocessed goals (`pending`) or only failed/error goals (`failed-only`).
+- **Close-loop batch global agent budget**: Added `--batch-agent-budget` and `resource_plan` output so multi-goal autonomous runs can enforce a shared concurrency budget with automatic per-goal `maxParallel` throttling.
+- **Close-loop batch complexity-weighted scheduler**: Added weighted slot scheduling (`goal_weight`/`scheduling_weight`) under batch budget mode so higher-complexity goals consume more shared budget and automatically lower same-batch concurrency.
+- **Close-loop batch priority + aging scheduler controls**: Added `--batch-priority` (`fifo|complex-first|complex-last`) and `--batch-aging-factor` (`0-100`) with `resource_plan` wait/starvation telemetry so autonomous multi-goal runs can tune ordering and fairness without manual intervention.
+- **Close-loop batch program decomposition mode**: Added `--decompose-goal` + `--program-goals` so one broad goal can be auto-split into multiple batch goals and executed as a master batch without manually authoring a goals file.
+- **Close-loop batch automatic retry rounds**: Added `--batch-retry-rounds` + `--batch-retry-strategy` (`adaptive|strict`) with `batch_retry` summary telemetry so failed/stopped goals can be retried in the same autonomous batch run without manual re-invocation.
+- **Close-loop batch session archive + latest resume**: Added automatic batch summary session persistence (`.kiro/auto/close-loop-batch-summaries`) with controls (`--batch-session-id`, `--batch-session-keep`, `--no-batch-session`) and support for `--resume-from-summary latest`.
+- **Close-loop batch session maintenance commands**: Added `kse auto batch-session list` / `kse auto batch-session prune` plus age-based retention control (`--batch-session-older-than-days`) for persisted batch summary archives.
+- **Close-loop batch until-complete retry mode**: Added `--batch-retry-until-complete` + `--batch-retry-max-rounds` so multi-goal runs can auto-drain failed/stopped goals to completion within one command invocation under bounded retry policy.
+- **Close-loop batch autonomous policy mode**: Added `--batch-autonomous` to apply closed-loop defaults automatically (continue-on-error, adaptive parallelism, complexity-first scheduling, aging boost, retry-until-complete) for hands-off program execution.
+- **Close-loop program command**: Added `kse auto close-loop-program "<goal>"` to auto-decompose one broad objective into multi-goal autonomous execution (master/sub portfolios) with closed-loop batch policy enabled by default.
+- **Close-loop program KPI snapshot**: Added `program_kpi` in `close-loop-program` summary plus `--program-kpi-out` for standalone KPI export (convergence state, risk level, retry recovery, complexity/wait profile).
+- **Close-loop program convergence gate + audit output**: Added policy gates (`--program-min-success-rate`, `--program-max-risk-level`) plus `--program-audit-out` for governance-grade audit JSON; program exits non-zero when gate policy is not met.
+- **Close-loop program gate profiles**: Added `--program-gate-profile` (`default|dev|staging|prod`) so teams can switch convergence policy baselines by environment while still allowing explicit threshold overrides.
+- **Close-loop program gate fallback tier**: Added `--program-gate-fallback-profile` (`none|default|dev|staging|prod`) so gate evaluation can use a controlled fallback policy tier when the primary gate fails.
+- **Close-loop program gate fallback chain**: Added `--program-gate-fallback-chain <profiles>` so gate evaluation can try multiple fallback policy profiles in order after primary gate failure.
+- **Close-loop program recovery time budget**: Added `--program-recover-max-minutes` so built-in auto recovery loops can stop on elapsed-time limits, with `recovery_cycle` budget telemetry.
+- **Close-loop program remediation diagnostics**: Added `program_diagnostics` (`failure_clusters` + prioritized `remediation_actions`) to turn program KPI output into actionable convergence guidance.
+- **Close-loop recovery command**: Added `kse auto close-loop-recover [summary]` with remediation-action selection (`--use-action`) to automatically replay unresolved goals using strategy patches derived from diagnostics.
+- **Close-loop recovery self-healing rounds**: Added `--recover-until-complete` + `--recover-max-rounds` with `recovery_cycle` history so recovery can run multiple rounds autonomously until convergence or bounded exhaustion.
+- **Close-loop recovery time/memory governance**: Added `--recover-max-minutes` and `--recovery-memory-ttl-days` so recovery loops can enforce elapsed-time budgets and stale-memory pruning during action selection.
+- **Recovery memory lifecycle commands**: Added `kse auto recovery-memory show|prune|clear` to inspect, prune, and reset persisted recovery strategy memory.
+- **Recovery memory scope analytics command**: Added `kse auto recovery-memory scopes` to inspect aggregate recovery-memory statistics grouped by scope.
+- **Criticality-priority scheduler mode**: Added `--batch-priority critical-first` with per-goal criticality telemetry in `resource_plan` and result summaries.
+- **Goal decomposition quality diagnostics**: Added `generated_from_goal.quality` (score, coverage ratio, warnings) for program/batch semantic decomposition observability.
+- **Goal decomposition quality auto-refinement**: Added `--program-min-quality-score` with automatic second-pass goal refinement and `quality.refinement` telemetry, so weak decompositions are improved before execution.
+- **Goal decomposition hard quality gate**: Added `--program-quality-gate` to fail execution when final decomposition quality remains below threshold after refinement.
+- **Recovery memory scope isolation + explainability**: Added `--recovery-memory-scope` and selection explanation metadata (`selection_explain`) so remediation memory can be isolated by scope and action selection is auditable.
+- **Scoped recovery memory maintenance**: `kse auto recovery-memory show|prune` now support `--scope <scope>` for targeted inspection and cleanup.
+- **Program gate fallback observability**: Program outputs now include `program_gate_fallbacks` and `program_gate_effective` fields for full fallback decision traceability.
+- **Program-level auto recovery loop**: `kse auto close-loop-program` now auto-enters bounded recovery rounds by default (`--program-recover-max-rounds`, `--no-program-auto-recover`) so one command can drive program execution to closure without manual follow-up.
+- **Recovery strategy memory**: Added persisted recovery memory (`.kiro/auto/close-loop-recovery-memory.json`) so `close-loop-recover` and program auto-recovery can reuse previously successful remediation actions when `--use-action` is omitted.
+- **Program coordination telemetry**: Added `program_coordination` output (master/sub topology, unresolved goals, scheduler snapshot) for multi-spec orchestration observability in both program and recover summaries.
+- **Close-loop batch KPI summary**: Added aggregate `metrics` in batch output (success rate, status breakdown, average sub-spec count, average replan cycles) for portfolio-level observability.
+- **Close-loop auto session retention policy**: Added `--session-keep` and `--session-older-than-days` to `kse auto close-loop` so each autonomous run can prune stale session snapshots automatically.
+- **Automatic replan loop for close-loop failures**: Added remediation replan cycles (`--replan-attempts`, `--no-replan`) so failed orchestration runs can auto-generate recovery specs and retry autonomously.
+- **Replan stall guard**: Added failed-spec signature deduplication so close-loop auto-replan stops early when the same failure set repeats, preventing low-value remediation loops.
+- **Replan no-progress stall guard**: Added `--replan-no-progress-window` so close-loop retries terminate when consecutive failed cycles show no net progress, improving autonomous convergence and reducing retry noise.
+- **Goal decomposition engine**: Added heuristic portfolio planner for automatic sub-spec splitting, dependency wiring, and deterministic spec prefix allocation.
+- **Complex-goal auto-split scaling**: Enhanced decomposition heuristic to auto-escalate sub-spec count up to 5 for high-complexity goals, strengthening master/sub parallel delivery for larger feature sets.
+- **Autonomous close-loop tests**: Added unit coverage for decomposition strategy and close-loop runner behavior (plan-only and execution paths).
+- **Autonomous CLI end-to-end regression**: Added integration coverage for `kse auto close-loop --resume latest`, `kse auto close-loop-batch --dry-run --json`, and `kse auto session list/prune` via real `bin/kiro-spec-engine.js` execution.
+- **Program gate fallback-chain integration fixture**: Added deterministic non-dry-run CLI integration coverage for primary-gate failure + fallback-chain acceptance to harden convergence policy regression checks.
+- **Spec 116 autonomous-closure portfolio**: Added `116-00` master with `116-01..116-03` sub-specs as a live master/sub example generated through the close-loop workflow, including `custom/agent-sync-plan.md`.
+- **Spec 117 autonomous hardening portfolio**: Added `117-00` master with `117-01..117-04` sub-specs to continue parallel delivery on no-confirmation closed-loop execution, master/sub decomposition, orchestration runtime, and observability gates.
+- **Spec 118 resilience/replan portfolio**: Added `118-00` master with `118-01..118-04` sub-specs for interrupted-session resume and dynamic master/sub dependency replanning hardening.
+- **Spec 119 dynamic-replanning portfolio**: Added `119-00` master with `119-01..119-04` sub-specs to drive remediation-spec generation and autonomous continuation after orchestration failures.
+- **Spec 120 replan-governance portfolio**: Added `120-00` master with `120-01..120-04` sub-specs to enforce adaptive replan policy, remediation spec governance, and autonomous convergence hardening.
+- **Semantic decomposition engine**: Added clause/category analysis (`semantic-decomposer`) and integrated it into portfolio planning for mixed-language goals.
+- **Live orchestration status streaming**: Added event/interval-driven status persistence callback support in `runOrchestration()` and wired `auto close-loop` live progress output (`--no-stream` to disable).
 
 ### Changed
 - **Positioning and onboarding messaging**: Strengthened EN/ZH README and quick-start docs with explicit kse advantage matrix, 90-second value proof, and KPI observability positioning to improve first-contact clarity.
@@ -26,11 +95,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Observability guide usability**: Added EN/ZH expected JSON output examples for `snapshot --json` and `trend --json` to speed up first-run verification and integration scripting.
 - **Watch log operator flow**: Implemented `kse watch logs --follow` streaming behavior and documented follow examples in command reference.
 - **Canonical documentation links**: Standardized mixed repository links to `https://github.com/heguangyong/kiro-spec-engine` and wired canonical-link scan commands into EN/ZH release checklists.
+- **Autonomy positioning clarity**: Strengthened EN/ZH docs and command reference to emphasize closed-loop delivery and automatic master/sub spec decomposition as kse core strengths.
+- **Autonomous operator UX**: Expanded docs with semantic decomposition and live stream behavior for close-loop command usage.
 
 ### Fixed
 - **npm package hygiene**: Excluded transient Python bytecode artifacts (`__pycache__`, `*.pyc/pyo/pyd`) from published package contents to reduce package noise and size.
 - **Documentation contact placeholders**: Replaced `yourusername` placeholder repository links in onboarding docs with the canonical project URL and removed stale example email contact.
 - **Jest force-exit dependency**: Removed `forceExit` from `jest.config.js` and `jest.config.ci.js`; test scripts now complete without explicit force-exit configuration.
+- **Agent termination timer leak**: `AgentSpawner._terminateProcess()` now clears both SIGKILL and safety timers on process close/settle, preventing lingering timer handles after `kill()`/`killAll()`.
+- **Validation python-check timer leak**: `checkPythonVersion()` now clears and `unref()`s its timeout with single-settle semantics, preventing post-test open-handle warnings.
+- **Orchestrator/unit test stability**: Reduced timer-based flakiness in orchestration property tests and aligned orchestrator integration defaults to avoid long-lived test timers.
+- **Recovery loop action stability**: `close-loop-recover --recover-until-complete` now pins the selected remediation action from round 1, avoiding later-round `--use-action` out-of-range aborts when diagnostics action counts change.
+- **Summary-derived goal recovery robustness**: Recovery now skips synthetic `goals_file` placeholders (for example `"(derived-from-summary)"`) when rebuilding pending goals, preventing false "goals file not found" failures in multi-round loops.
+- **Program gate dry-run correctness**: `close-loop-program` convergence gate now derives success rate from program KPI completion rate (with fallback), preventing false gate failures in dry-run program executions.
 
 ## [1.46.2] - 2026-02-14
 

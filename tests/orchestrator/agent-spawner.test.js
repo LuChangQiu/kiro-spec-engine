@@ -67,7 +67,7 @@ describe('AgentSpawner', () => {
       getConfig: jest.fn().mockResolvedValue({
         agentBackend: 'codex',
         maxParallel: 3,
-        timeoutSeconds: 600,
+        timeoutSeconds: 0,
         maxRetries: 2,
         apiKeyEnvVar: 'CODEX_API_KEY',
         bootstrapTemplate: null,
@@ -212,7 +212,7 @@ describe('AgentSpawner', () => {
       mockConfig.getConfig.mockResolvedValue({
         agentBackend: 'codex',
         maxParallel: 3,
-        timeoutSeconds: 600,
+        timeoutSeconds: 0,
         maxRetries: 2,
         apiKeyEnvVar: 'MY_CUSTOM_KEY',
         bootstrapTemplate: null,
@@ -231,7 +231,7 @@ describe('AgentSpawner', () => {
       mockConfig.getConfig.mockResolvedValue({
         agentBackend: 'codex',
         maxParallel: 3,
-        timeoutSeconds: 600,
+        timeoutSeconds: 0,
         maxRetries: 2,
         apiKeyEnvVar: 'CODEX_API_KEY',
         bootstrapTemplate: null,
@@ -256,7 +256,7 @@ describe('AgentSpawner', () => {
       mockConfig.getConfig.mockResolvedValue({
         agentBackend: 'codex',
         maxParallel: 3,
-        timeoutSeconds: 600,
+        timeoutSeconds: 0,
         maxRetries: 2,
         apiKeyEnvVar: 'CODEX_API_KEY',
         bootstrapTemplate: null,
@@ -531,6 +531,7 @@ describe('AgentSpawner', () => {
     });
 
     afterEach(() => {
+      jest.clearAllTimers();
       jest.useRealTimers();
     });
 
@@ -671,6 +672,22 @@ describe('AgentSpawner', () => {
       // Simulate process closing so the promise resolves
       mockChildProcess.emit('close', 0);
       await killPromise;
+    });
+
+    test('clears terminate timers after close to avoid timer leaks', async () => {
+      jest.useFakeTimers({ legacyFakeTimers: true });
+      try {
+        await spawner.spawn('my-spec');
+
+        const killPromise = spawner.kill('test-agent-1');
+        mockChildProcess.emit('close', 0);
+        await killPromise;
+
+        expect(jest.getTimerCount()).toBe(0);
+      } finally {
+        jest.clearAllTimers();
+        jest.useRealTimers();
+      }
     });
 
     test('does nothing for non-existent agent', async () => {

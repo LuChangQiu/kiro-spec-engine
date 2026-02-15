@@ -53,7 +53,11 @@ graph LR
 | Advantage | kse Capability | Practical Impact |
 | --- | --- | --- |
 | Structure-first execution | Requirements → Design → Tasks + gate checks | Lower rework and fewer requirement drifts |
+| Autonomous close-loop delivery | One-command close loop (`auto close-loop`) | No step-by-step confirmation waits |
 | Multi-agent scale-out | DAG orchestration (`orchestrate run/status/stop`) | Parallel delivery without manual terminal juggling |
+| Auto portfolio decomposition | Master/Sub spec split + dependency wiring | Complex goals become executable parallel plans automatically |
+| Program self-healing closure | `auto close-loop-program` auto recovery + learned remediation memory | Failed/partial runs continue autonomously until bounded convergence |
+| Autonomous convergence governance | Program gate (`min-success-rate` + `max-risk-level`) + audit JSON output | Program completion is policy-verified and traceable |
 | Measurable outcomes | KPI automation (`value metrics snapshot/baseline/trend`) | Delivery quality can be tracked week-over-week |
 | Tool-agnostic adoption | Works across Claude/Cursor/Windsurf/Copilot/Kiro | No lock-in to a single AI IDE |
 | Built-in governance | Docs governance, lock management, audit, env/workspace controls | Team collaboration stays auditable and stable |
@@ -286,6 +290,10 @@ sequenceDiagram
 
 ### Autonomous Control 🚀 NEW in v1.23.0
 - **Fully Autonomous Execution**: AI independently manages entire development workflows from requirements to delivery
+- **Closed-Loop Program Execution**: `kse auto close-loop "<goal>"` runs from goal decomposition to terminal orchestration state without manual confirmation gates
+- **Automatic Master/Sub Portfolio Split**: Large goals are auto-split into dependency-wired sub-specs and coordinated by a master spec
+- **Semantic Decomposition + Live Stream**: Clause/category-aware goal parsing plus live orchestration status stream (disable via `--no-stream`)
+- **Session Resume + Retention Hygiene**: Resume interrupted runs with `--resume latest` and maintain archives via `kse auto session list/prune`
 - **Intelligent Error Recovery**: Automatically diagnose and fix errors with 3 retry attempts and learning system
 - **Strategic Checkpoints**: Pause only at meaningful milestones (phase boundaries, fatal errors, external resources)
 - **Continuous Task Execution**: Execute multiple tasks without interruption between individual tasks
@@ -298,6 +306,9 @@ sequenceDiagram
 
 **Quick Start**:
 ```bash
+# Decompose one broad goal into master/sub specs and run to closure
+kse auto close-loop "build autonomous close-loop and master/sub multi-spec execution for kse"
+
 # Create and execute a feature autonomously
 kse auto create "user authentication with JWT tokens"
 
@@ -517,6 +528,10 @@ English and Chinese interfaces
 kse adopt                          # Adopt kse in existing project
 kse create-spec <name>             # Legacy: create empty Spec folder only
 
+# Autonomous close-loop program (one command, no confirmation loop)
+kse auto close-loop "<goal>"       # Auto split goal into master/sub specs and execute to closure
+kse auto close-loop "<goal>" --dry-run --json  # Preview decomposition plan only
+
 # Spec workflow (recommended)
 kse spec bootstrap --name <spec> --non-interactive         # Generate requirements/design/tasks draft
 kse spec pipeline run --spec <spec>                         # Run staged workflow for one Spec
@@ -534,6 +549,8 @@ kse value metrics sample --out <path> --json               # Generate sample KPI
 kse value metrics snapshot --input <path> --json          # Generate weekly KPI snapshot + gate summary
 kse value metrics baseline --from-history <N> --json      # Build baseline from earliest N snapshots
 kse value metrics trend --window <N> --json               # Analyze trend/risk from latest N snapshots
+kse auto kpi trend --weeks 8 --period week --json         # Aggregate autonomous delivery KPI trend (weekly/daily buckets + anomalies)
+kse auto kpi trend --weeks 8 --period day --csv --out <path> # Export autonomous KPI trend as CSV
 
 # Workspace management (NEW in v1.11.0)
 kse workspace create <name> [path] # Register a new workspace

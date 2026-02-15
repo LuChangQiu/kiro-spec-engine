@@ -339,6 +339,7 @@ kse auto close-loop-program \
   --program-max-risk-level medium \
   --program-govern-until-stable \
   --program-govern-max-rounds 3 \
+  --program-govern-use-action 1 \
   --program-kpi-out .kiro/reports/close-loop-program-kpi.json \
   --program-audit-out .kiro/reports/close-loop-program-audit.json \
   --json
@@ -529,6 +530,8 @@ Close-loop program (`kse auto close-loop-program "<goal>"`) options:
 - `--program-govern-anomaly-weeks <n>`: KPI lookback weeks for anomaly-triggered governance (`1-260`, default `8`)
 - `--program-govern-anomaly-period <week|day>`: KPI bucket period for anomaly governance checks (default `week`)
 - `--no-program-govern-anomaly`: disable anomaly-triggered governance and only govern by gate/budget failures
+- `--program-govern-use-action <n>`: pin remediation action index (`1-20`) used in governance rounds
+- `--no-program-govern-auto-action`: disable automatic remediation action selection/execution in governance rounds
 - `--program-min-quality-score <n>`: minimum semantic decomposition quality score before automatic refinement (`0-100`, default `70`)
 - `--program-quality-gate`: fail run when final decomposition quality remains below `--program-min-quality-score`
 - `--recovery-memory-scope <scope>`: scope key for recovery memory isolation (default auto: project + git branch)
@@ -540,6 +543,7 @@ Close-loop program (`kse auto close-loop-program "<goal>"`) options:
   - On gate/budget failure, summary can include `program_gate_auto_remediation` with auto patch/prune actions.
 - With `--program-govern-until-stable`, summary additionally includes:
   - `program_governance` (round history, stop reason, exhausted/converged state)
+  - `program_governance` includes action-selection metadata (`auto_action_enabled`, `action_selection_enabled`, `pinned_action_index`, per-round `selected_action*`).
   - `program_kpi_trend` and `program_kpi_anomalies` (anomaly-aware governance context)
 - Program summary includes `program_diagnostics` with `failure_clusters` and `remediation_actions` (prioritized follow-up commands for convergence).
 - Program summary includes `program_coordination` (master/sub topology, unresolved goal indexes, scheduler snapshot) and `auto_recovery` metadata.

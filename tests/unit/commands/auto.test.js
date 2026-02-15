@@ -996,6 +996,26 @@ describe('auto close-loop command', () => {
     expect(runAutoCloseLoop).not.toHaveBeenCalled();
   });
 
+  test('validates --program-govern-use-action range in close-loop-program', async () => {
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'close-loop-program',
+        'deliver resilient autonomous rollout',
+        '--program-govern-until-stable',
+        '--program-govern-use-action',
+        '0'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const errorOutput = errorSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    expect(errorOutput).toContain('--program-govern-use-action must be an integer between 1 and 20.');
+    expect(runAutoCloseLoop).not.toHaveBeenCalled();
+  });
+
   test('governance loop replays program with remediation patch until gate is stable', async () => {
     runAutoCloseLoop
       .mockResolvedValueOnce({ status: 'completed', portfolio: { master_spec: '122-12-govern-r1a', sub_specs: [] } })
@@ -1038,6 +1058,50 @@ describe('auto close-loop command', () => {
       execution_mode: 'program-replay',
       applied_patch: expect.objectContaining({
         batchAgentBudget: 1
+      })
+    }));
+  });
+
+  test('governance loop auto-selects remediation action and applies strategy patch in recover cycle', async () => {
+    runAutoCloseLoop
+      .mockResolvedValueOnce({ status: 'failed', portfolio: { master_spec: '122-12-govern-act-r1a', sub_specs: [] } })
+      .mockResolvedValueOnce({ status: 'completed', portfolio: { master_spec: '122-12-govern-act-r1b', sub_specs: [] } })
+      .mockResolvedValueOnce({ status: 'completed', portfolio: { master_spec: '122-12-govern-act-r2a', sub_specs: [] } });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'close-loop-program',
+      'deliver resilient autonomous rollout',
+      '--program-goals',
+      '2',
+      '--batch-retry-rounds',
+      '0',
+      '--no-program-auto-recover',
+      '--program-govern-until-stable',
+      '--program-govern-use-action',
+      '1',
+      '--program-govern-max-rounds',
+      '2',
+      '--json'
+    ]);
+
+    expect(runAutoCloseLoop).toHaveBeenCalledTimes(3);
+    const summary = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(summary.program_governance).toEqual(expect.objectContaining({
+      enabled: true,
+      action_selection_enabled: true,
+      pinned_action_index: 1,
+      performed_rounds: 1
+    }));
+    expect(summary.program_governance.history[0]).toEqual(expect.objectContaining({
+      execution_mode: 'recover-cycle',
+      selected_action_index: 1,
+      selected_action: expect.stringContaining('Resume unresolved goals'),
+      applied_patch: expect.objectContaining({
+        batchRetryUntilComplete: true
       })
     }));
   });

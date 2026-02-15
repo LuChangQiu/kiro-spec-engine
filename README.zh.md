@@ -448,7 +448,7 @@ kse create-spec <name>             # 兼容旧版：仅创建空 Spec 目录
 # 自动闭环主从编排（单命令）
 kse auto close-loop "<目标>"        # 自动拆分 Master/Sub Spec 并推进到完成态
 kse auto close-loop "<目标>" --dry-run --json  # 仅预览拆分与依赖计划
-kse auto close-loop-program "<目标>" --program-govern-until-stable --json # 程序级自动恢复 + 治理循环直到稳定
+kse auto close-loop-program "<目标>" --program-govern-until-stable --program-govern-use-action 1 --json # 程序级自动恢复 + 治理循环（含 remediation action 执行）直到稳定
 
 # Spec 工作流（推荐）
 kse spec bootstrap --name <spec> --non-interactive          # 生成 requirements/design/tasks 初稿

@@ -579,6 +579,49 @@ describe('auto close-loop CLI integration', () => {
     }));
   });
 
+  test('applies governance remediation action selection through recover cycle via CLI', async () => {
+    const hookPath = path.join(__dirname, 'fixtures', 'program-gate-fallback-hook.js');
+    const run = await runCli([
+      'auto',
+      'close-loop-program',
+      'kse should deliver autonomous close-loop progression, master/sub decomposition and quality rollout',
+      '--program-goals',
+      '2',
+      '--batch-retry-rounds',
+      '0',
+      '--no-program-auto-recover',
+      '--program-govern-until-stable',
+      '--program-govern-use-action',
+      '1',
+      '--program-govern-max-rounds',
+      '2',
+      '--json'
+    ], {
+      cwd: tempDir,
+      nodeArgs: ['--require', hookPath],
+      env: {
+        KSE_TEST_MOCK_CLOSE_LOOP_RUNNER: '1'
+      }
+    });
+
+    expect(run.exitCode).toBe(0);
+    const payload = parseJsonOutput(run.stdout);
+    expect(payload.program_governance).toEqual(expect.objectContaining({
+      enabled: true,
+      action_selection_enabled: true,
+      pinned_action_index: 1,
+      performed_rounds: 1
+    }));
+    expect(payload.program_governance.history[0]).toEqual(expect.objectContaining({
+      execution_mode: 'recover-cycle',
+      selected_action_index: 1,
+      selected_action: expect.stringContaining('Resume unresolved goals'),
+      applied_patch: expect.objectContaining({
+        batchRetryUntilComplete: true
+      })
+    }));
+  });
+
   test('supports close-loop-program gate fallback profile through CLI', async () => {
     const run = await runCli([
       'auto',

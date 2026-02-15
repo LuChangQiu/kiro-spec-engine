@@ -531,7 +531,7 @@ kse create-spec <name>             # Legacy: create empty Spec folder only
 # Autonomous close-loop program (one command, no confirmation loop)
 kse auto close-loop "<goal>"       # Auto split goal into master/sub specs and execute to closure
 kse auto close-loop "<goal>" --dry-run --json  # Preview decomposition plan only
-kse auto close-loop-program "<goal>" --program-govern-until-stable --json # Program-level auto recovery + governance loop to stable state
+kse auto close-loop-program "<goal>" --program-govern-until-stable --program-govern-use-action 1 --json # Program-level recovery + governance with remediation action execution
 
 # Spec workflow (recommended)
 kse spec bootstrap --name <spec> --non-interactive         # Generate requirements/design/tasks draft

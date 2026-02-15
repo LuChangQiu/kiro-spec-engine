@@ -305,6 +305,8 @@ Program governance loop (for `close-loop-program`):
 - `--program-govern-max-rounds <n>` and `--program-govern-max-minutes <n>` bound governance loop cost.
 - `--program-govern-anomaly-weeks <n>` + `--program-govern-anomaly-period <week|day>` make governance anomaly-aware using autonomous KPI trend.
 - `--no-program-govern-anomaly` limits governance trigger to gate/budget failures only.
+- `--program-govern-use-action <n>` pins remediation action index for governance rounds.
+- `--no-program-govern-auto-action` disables automatic remediation action selection/execution inside governance.
 - Output includes `program_governance`, `program_kpi_trend`, and `program_kpi_anomalies` for traceable autonomous stabilization history.
 
 KPI trend command:

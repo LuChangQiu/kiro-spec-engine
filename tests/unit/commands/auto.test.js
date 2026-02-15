@@ -4628,6 +4628,52 @@ describe('auto close-loop command', () => {
     ]));
   });
 
+  test('skips unavailable advisory sources without failing governance close-loop', async () => {
+    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    await fs.ensureDir(closeLoopSessionDir);
+    await fs.writeJson(path.join(closeLoopSessionDir, 'governance-advisory-skip-failed-session.json'), {
+      session_id: 'governance-advisory-skip-failed-session',
+      status: 'failed',
+      portfolio: { master_spec: '121-00-advisory-skip', sub_specs: [] }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'governance',
+      'close-loop',
+      '--max-rounds',
+      '2',
+      '--target-risk',
+      'low',
+      '--execute-advisory',
+      '--json'
+    ]);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-governance-close-loop');
+    expect(parsed.execute_advisory).toBe(true);
+    expect(parsed.stop_reason).toBe('no-applicable-actions');
+    expect(parsed.advisory_summary).toEqual(expect.objectContaining({
+      planned_actions: 1,
+      executed_actions: 0,
+      failed_actions: 0,
+      skipped_actions: 1
+    }));
+    expect(parsed.rounds[0]).toEqual(expect.objectContaining({
+      advisory_planned_actions: 1,
+      advisory_executed_actions: 0,
+      advisory_failed_actions: 0,
+      advisory_skipped_actions: 1
+    }));
+    expect(parsed.rounds[0].advisory_actions).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'recover-latest', status: 'skipped' })
+    ]));
+  });
+
   test('prunes close-loop-controller summary sessions with keep policy', async () => {
     const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(sessionDir);

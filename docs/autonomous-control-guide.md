@@ -231,7 +231,7 @@ Cross-archive governance snapshot:
   - `--dry-run` can be combined with `--apply` to validate maintenance impact before deletion.
 - `kse auto governance close-loop [--max-rounds <n>] [--target-risk <low|medium|high>] [--execute-advisory] [--advisory-recover-max-rounds <n>] [--advisory-controller-max-cycles <n>] [--plan-only] [--dry-run] [--json]`: governance round-loop runner.
   - Orchestrates repeated `governance maintain` rounds until target risk or stop condition is reached.
-  - `--execute-advisory` enables automatic advisory action execution when detected (`recover-latest`, `controller-resume-latest`).
+  - `--execute-advisory` enables automatic advisory action execution when detected (`recover-latest`, `controller-resume-latest`), with autonomous source selection (latest recoverable summary / latest pending controller session) and `skipped` telemetry when no actionable source exists.
   - Emits round history (`risk_before`/`risk_after`, planned/applicable/applied/failed actions), advisory telemetry (`advisory_*` fields), plus initial/final assessments for auditable autonomous governance convergence.
 
 Recovery memory maintenance:

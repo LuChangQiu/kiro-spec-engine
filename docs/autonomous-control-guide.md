@@ -192,6 +192,7 @@ Session persistence and resume:
 Spec directory maintenance:
 - `kse auto spec-session list [--limit <n>] [--json]`: inspect spec directory inventory under `.kiro/specs`
 - `kse auto spec-session prune --keep <n> [--older-than-days <n>] [--no-protect-active] [--protect-window-days <n>] [--show-protection-reasons] [--dry-run] [--json]`: prune old spec directories by retention policy (default protects active/recent specs)
+  - Protection sources include collaboration state, close-loop sessions, batch summaries, and controller sessions (via nested batch summary references).
   - JSON output always includes `protection_ranking_top`; enable `--show-protection-reasons` for full `protection_ranking` and per-spec reason payload.
 
 Batch summary session persistence and maintenance:

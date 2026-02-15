@@ -295,6 +295,75 @@ describe('auto close-loop CLI integration', () => {
     expect(await fs.pathExists(staleSpec)).toBe(false);
   });
 
+  test('protects controller-referenced specs in spec-session prune through CLI', async () => {
+    const specsDir = path.join(tempDir, '.kiro', 'specs');
+    const activeSpec = path.join(specsDir, '121-00-controller-active');
+    const staleSpec = path.join(specsDir, '121-01-stale');
+    await fs.ensureDir(activeSpec);
+    await fs.ensureDir(staleSpec);
+    await fs.utimes(activeSpec, new Date('2020-01-01T00:00:00.000Z'), new Date('2020-01-01T00:00:00.000Z'));
+    await fs.utimes(staleSpec, new Date('2020-01-01T00:00:00.000Z'), new Date('2020-01-01T00:00:00.000Z'));
+
+    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    await fs.ensureDir(batchSessionDir);
+    const nestedBatchSummary = path.join(batchSessionDir, 'controller-protected-summary.json');
+    await fs.writeJson(nestedBatchSummary, {
+      mode: 'auto-close-loop-program',
+      status: 'partial-failed',
+      results: [
+        {
+          index: 1,
+          goal: 'controller derived goal',
+          status: 'failed',
+          master_spec: '121-00-controller-active'
+        }
+      ]
+    }, { spaces: 2 });
+
+    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    await fs.ensureDir(controllerSessionDir);
+    const controllerSessionFile = path.join(controllerSessionDir, 'controller-protected-session.json');
+    await fs.writeJson(controllerSessionFile, {
+      mode: 'auto-close-loop-controller',
+      status: 'partial-failed',
+      results: [
+        {
+          goal: 'controller goal',
+          status: 'failed',
+          batch_session_file: nestedBatchSummary
+        }
+      ],
+      controller_session: {
+        id: 'controller-protected-session',
+        file: controllerSessionFile
+      }
+    }, { spaces: 2 });
+
+    const pruned = await runCli([
+      'auto',
+      'spec-session',
+      'prune',
+      '--keep',
+      '0',
+      '--older-than-days',
+      '1',
+      '--show-protection-reasons',
+      '--json'
+    ], { cwd: tempDir });
+    expect(pruned.exitCode).toBe(0);
+    const prunePayload = parseJsonOutput(pruned.stdout);
+    expect(prunePayload.protected_specs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: '121-00-controller-active',
+        reasons: expect.objectContaining({
+          controller_session_recent_or_incomplete: 1
+        })
+      })
+    ]));
+    expect(await fs.pathExists(activeSpec)).toBe(true);
+    expect(await fs.pathExists(staleSpec)).toBe(false);
+  });
+
   test('applies automatic spec-session retention policy in close-loop-batch CLI', async () => {
     const specsDir = path.join(tempDir, '.kiro', 'specs');
     const oldSpec = path.join(specsDir, '121-00-old');

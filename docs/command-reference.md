@@ -623,6 +623,7 @@ Close-loop session maintenance:
 Spec directory maintenance:
 - `kse auto spec-session list [--limit <n>] [--json]`: list persisted spec directories under `.kiro/specs`
 - `kse auto spec-session prune [--keep <n>] [--older-than-days <n>] [--no-protect-active] [--protect-window-days <n>] [--show-protection-reasons] [--dry-run] [--json]`: prune old spec directories by retention policy (default protects active/recent specs)
+  - Protection sources include collaboration state, close-loop sessions, batch summaries, and controller sessions (via nested batch summary references).
   - JSON output always includes `protection_ranking_top` (top protected specs by reason count); `--show-protection-reasons` additionally includes per-spec `reasons` and full `protection_ranking`.
 - Batch/program/recover summaries can include `spec_session_budget` telemetry when `--spec-session-max-total` is configured.
 

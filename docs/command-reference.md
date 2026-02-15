@@ -425,6 +425,10 @@ kse auto session list
 kse auto session list --status completed,partial-failed
 kse auto session list --limit 50 --json
 
+# Aggregate close-loop session telemetry
+kse auto session stats
+kse auto session stats --days 14 --status completed --json
+
 # Prune old close-loop sessions
 kse auto session prune --keep 50
 kse auto session prune --keep 20 --older-than-days 14 --dry-run
@@ -442,6 +446,10 @@ kse auto spec-session prune --keep 100 --older-than-days 30 --show-protection-re
 kse auto batch-session list
 kse auto batch-session list --status failed
 kse auto batch-session list --limit 50 --json
+
+# Aggregate close-loop-batch summary telemetry
+kse auto batch-session stats
+kse auto batch-session stats --days 14 --status failed --json
 
 # Prune old close-loop-batch summary sessions
 kse auto batch-session prune --keep 50
@@ -625,8 +633,10 @@ Close-loop recovery (`kse auto close-loop-recover [summary]`) options:
 
 Close-loop session maintenance:
 - `kse auto session list [--limit <n>] [--status <csv>] [--json]`: list persisted close-loop sessions (`--status` supports comma-separated, case-insensitive filters)
+- `kse auto session stats [--days <n>] [--status <csv>] [--json]`: aggregate persisted close-loop session telemetry within an optional recent-day window
 - `kse auto session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune old session snapshots
-  - JSON output includes `status_filter` and `status_counts` over filtered sessions.
+  - List JSON output includes `status_filter` and `status_counts` over filtered sessions.
+  - Stats JSON output includes `criteria`, completion/failure rates, `sub_spec_count_sum`, `master_spec_counts`, and `latest_sessions`.
 
 Spec directory maintenance:
 - `kse auto spec-session list [--limit <n>] [--json]`: list persisted spec directories under `.kiro/specs`
@@ -637,8 +647,10 @@ Spec directory maintenance:
 
 Close-loop batch session maintenance:
 - `kse auto batch-session list [--limit <n>] [--status <csv>] [--json]`: list persisted close-loop-batch summary sessions (`--status` supports comma-separated, case-insensitive filters)
+- `kse auto batch-session stats [--days <n>] [--status <csv>] [--json]`: aggregate persisted close-loop-batch summary telemetry within an optional recent-day window
 - `kse auto batch-session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune old persisted batch summaries
-  - JSON output includes `status_filter` and `status_counts` over filtered sessions.
+  - List JSON output includes `status_filter` and `status_counts` over filtered sessions.
+  - Stats JSON output includes `criteria`, completion/failure rates, goal-volume sums, processed ratio, and `latest_sessions`.
 
 Close-loop controller session maintenance:
 - `kse auto controller-session list [--limit <n>] [--status <csv>] [--json]`: list persisted close-loop-controller summary sessions (`--status` supports comma-separated, case-insensitive filters)

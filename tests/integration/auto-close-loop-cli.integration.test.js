@@ -146,6 +146,18 @@ describe('auto close-loop CLI integration', () => {
     expect(listPayload.total).toBe(2);
     expect(listPayload.sessions).toHaveLength(1);
 
+    const stats = await runCli([
+      'auto',
+      'session',
+      'stats',
+      '--json'
+    ], { cwd: tempDir });
+    expect(stats.exitCode).toBe(0);
+    const statsPayload = parseJsonOutput(stats.stdout);
+    expect(statsPayload.mode).toBe('auto-session-stats');
+    expect(statsPayload.total_sessions).toBe(2);
+    expect(statsPayload.latest_sessions).toHaveLength(2);
+
     const pruned = await runCli([
       'auto',
       'session',
@@ -1620,6 +1632,18 @@ describe('auto close-loop CLI integration', () => {
     expect(listPayload.mode).toBe('auto-batch-session-list');
     expect(listPayload.total).toBe(2);
     expect(listPayload.sessions).toHaveLength(1);
+
+    const stats = await runCli([
+      'auto',
+      'batch-session',
+      'stats',
+      '--json'
+    ], { cwd: tempDir });
+    expect(stats.exitCode).toBe(0);
+    const statsPayload = parseJsonOutput(stats.stdout);
+    expect(statsPayload.mode).toBe('auto-batch-session-stats');
+    expect(statsPayload.total_sessions).toBe(2);
+    expect(statsPayload.latest_sessions).toHaveLength(2);
 
     const pruned = await runCli([
       'auto',

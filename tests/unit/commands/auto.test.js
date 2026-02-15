@@ -2982,6 +2982,98 @@ describe('auto close-loop command', () => {
     expect(parsed.sessions[0].id).toBe('session-completed');
   });
 
+  test('aggregates close-loop session stats in json mode', async () => {
+    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    await fs.ensureDir(sessionDir);
+    const completedSession = path.join(sessionDir, 'session-stats-completed.json');
+    const failedSession = path.join(sessionDir, 'session-stats-failed.json');
+    await fs.writeJson(completedSession, {
+      session_id: 'session-stats-completed',
+      status: 'completed',
+      goal: 'completed goal',
+      portfolio: {
+        master_spec: '121-00-completed',
+        sub_specs: ['121-01-a', '121-02-b']
+      }
+    }, { spaces: 2 });
+    await fs.writeJson(failedSession, {
+      session_id: 'session-stats-failed',
+      status: 'failed',
+      goal: 'failed goal',
+      portfolio: {
+        master_spec: '121-00-failed',
+        sub_specs: ['121-03-c']
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync(['node', 'kse', 'auto', 'session', 'stats', '--json']);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-session-stats');
+    expect(parsed.total_sessions).toBe(2);
+    expect(parsed.completed_sessions).toBe(1);
+    expect(parsed.failed_sessions).toBe(1);
+    expect(parsed.completion_rate_percent).toBe(50);
+    expect(parsed.failure_rate_percent).toBe(50);
+    expect(parsed.sub_spec_count_sum).toBe(3);
+    expect(parsed.unique_master_spec_count).toBe(2);
+    expect(parsed.status_counts).toEqual(expect.objectContaining({
+      completed: 1,
+      failed: 1
+    }));
+    expect(parsed.master_spec_counts).toEqual(expect.objectContaining({
+      '121-00-completed': 1,
+      '121-00-failed': 1
+    }));
+    expect(Array.isArray(parsed.latest_sessions)).toBe(true);
+    expect(parsed.latest_sessions.length).toBe(2);
+  });
+
+  test('filters close-loop session stats by days and status', async () => {
+    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    await fs.ensureDir(sessionDir);
+    const oldSession = path.join(sessionDir, 'session-stats-old.json');
+    const freshSession = path.join(sessionDir, 'session-stats-fresh.json');
+    await fs.writeJson(oldSession, {
+      session_id: 'session-stats-old',
+      status: 'completed',
+      portfolio: { master_spec: '121-00-old', sub_specs: [] }
+    }, { spaces: 2 });
+    await fs.writeJson(freshSession, {
+      session_id: 'session-stats-fresh',
+      status: 'completed',
+      portfolio: { master_spec: '121-00-fresh', sub_specs: ['121-01-a'] }
+    }, { spaces: 2 });
+    await fs.utimes(oldSession, new Date('2020-01-01T00:00:00.000Z'), new Date('2020-01-01T00:00:00.000Z'));
+    const now = new Date();
+    await fs.utimes(freshSession, now, now);
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'session',
+      'stats',
+      '--days',
+      '30',
+      '--status',
+      'completed',
+      '--json'
+    ]);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-session-stats');
+    expect(parsed.criteria.days).toBe(30);
+    expect(parsed.criteria.status_filter).toEqual(['completed']);
+    expect(parsed.total_sessions).toBe(1);
+    expect(parsed.sub_spec_count_sum).toBe(1);
+    expect(parsed.latest_sessions[0].id).toBe('session-stats-fresh');
+  });
+
   test('lists spec-session directories in json mode', async () => {
     const specsDir = path.join(tempDir, '.kiro', 'specs');
     const specA = path.join(specsDir, '121-00-demo-a');
@@ -3556,6 +3648,97 @@ describe('auto close-loop command', () => {
     expect(parsed.status_counts).toEqual(expect.objectContaining({ failed: 1 }));
     expect(parsed.sessions).toHaveLength(1);
     expect(parsed.sessions[0].id).toBe('batch-failed');
+  });
+
+  test('aggregates close-loop-batch summary session stats in json mode', async () => {
+    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    await fs.ensureDir(sessionDir);
+    const completedSession = path.join(sessionDir, 'batch-stats-completed.json');
+    const failedSession = path.join(sessionDir, 'batch-stats-failed.json');
+    await fs.writeJson(completedSession, {
+      mode: 'auto-close-loop-batch',
+      status: 'completed',
+      total_goals: 4,
+      processed_goals: 4,
+      batch_session: { id: 'batch-stats-completed', file: completedSession }
+    }, { spaces: 2 });
+    await fs.writeJson(failedSession, {
+      mode: 'auto-close-loop-batch',
+      status: 'failed',
+      total_goals: 3,
+      processed_goals: 1,
+      batch_session: { id: 'batch-stats-failed', file: failedSession }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync(['node', 'kse', 'auto', 'batch-session', 'stats', '--json']);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-batch-session-stats');
+    expect(parsed.total_sessions).toBe(2);
+    expect(parsed.completed_sessions).toBe(1);
+    expect(parsed.failed_sessions).toBe(1);
+    expect(parsed.completion_rate_percent).toBe(50);
+    expect(parsed.failure_rate_percent).toBe(50);
+    expect(parsed.total_goals_sum).toBe(7);
+    expect(parsed.processed_goals_sum).toBe(5);
+    expect(parsed.unprocessed_goals_sum).toBe(2);
+    expect(parsed.average_processed_ratio_percent).toBeCloseTo(71.43, 2);
+    expect(parsed.status_counts).toEqual(expect.objectContaining({
+      completed: 1,
+      failed: 1
+    }));
+    expect(Array.isArray(parsed.latest_sessions)).toBe(true);
+    expect(parsed.latest_sessions.length).toBe(2);
+  });
+
+  test('filters close-loop-batch summary session stats by days and status', async () => {
+    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    await fs.ensureDir(sessionDir);
+    const oldSession = path.join(sessionDir, 'batch-stats-old.json');
+    const freshSession = path.join(sessionDir, 'batch-stats-fresh.json');
+    await fs.writeJson(oldSession, {
+      mode: 'auto-close-loop-batch',
+      status: 'failed',
+      total_goals: 5,
+      processed_goals: 2,
+      batch_session: { id: 'batch-stats-old', file: oldSession }
+    }, { spaces: 2 });
+    await fs.writeJson(freshSession, {
+      mode: 'auto-close-loop-batch',
+      status: 'failed',
+      total_goals: 6,
+      processed_goals: 1,
+      batch_session: { id: 'batch-stats-fresh', file: freshSession }
+    }, { spaces: 2 });
+    await fs.utimes(oldSession, new Date('2020-01-01T00:00:00.000Z'), new Date('2020-01-01T00:00:00.000Z'));
+    const now = new Date();
+    await fs.utimes(freshSession, now, now);
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'batch-session',
+      'stats',
+      '--days',
+      '30',
+      '--status',
+      'failed',
+      '--json'
+    ]);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-batch-session-stats');
+    expect(parsed.criteria.days).toBe(30);
+    expect(parsed.criteria.status_filter).toEqual(['failed']);
+    expect(parsed.total_sessions).toBe(1);
+    expect(parsed.total_goals_sum).toBe(6);
+    expect(parsed.processed_goals_sum).toBe(1);
+    expect(parsed.latest_sessions[0].id).toBe('batch-stats-fresh');
   });
 
   test('prunes sessions with keep policy', async () => {

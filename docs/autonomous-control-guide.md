@@ -187,8 +187,10 @@ Session persistence and resume:
 - `--session-keep <n>`: automatically prune old snapshots and keep newest `n` after each close-loop run
 - `--session-older-than-days <n>`: when pruning, only delete snapshots older than `n` days
 - `kse auto session list [--limit <n>] [--status <csv>]`: inspect persisted sessions (`--status` supports comma-separated, case-insensitive filters)
+- `kse auto session stats [--days <n>] [--status <csv>] [--json]`: aggregate session status/topology telemetry in an optional recent-day window
 - `kse auto session prune --keep <n> [--older-than-days <n>]`: enforce retention policy
-  - JSON output includes `status_filter` and `status_counts` for filtered session distributions.
+  - List JSON output includes `status_filter` and `status_counts` for filtered session distributions.
+  - Stats JSON output includes `criteria`, completion/failure rates, `sub_spec_count_sum`, `master_spec_counts`, and `latest_sessions`.
 
 Spec directory maintenance:
 - `kse auto spec-session list [--limit <n>] [--json]`: inspect spec directory inventory under `.kiro/specs`
@@ -203,8 +205,10 @@ Batch summary session persistence and maintenance:
 - `--batch-session-older-than-days <n>`: when pruning, only delete summaries older than `n` days
 - `--no-batch-session`: disable batch summary archive for the current run
 - `kse auto batch-session list [--limit <n>] [--status <csv>]`: inspect persisted batch summary sessions (`--status` supports comma-separated, case-insensitive filters)
+- `kse auto batch-session stats [--days <n>] [--status <csv>] [--json]`: aggregate batch session status/goal-volume telemetry in an optional recent-day window
 - `kse auto batch-session prune --keep <n> [--older-than-days <n>]`: enforce batch summary retention policy
-  - JSON output includes `status_filter` and `status_counts` for filtered status composition.
+  - List JSON output includes `status_filter` and `status_counts` for filtered status composition.
+  - Stats JSON output includes `criteria`, completion/failure rates, goal-volume sums, processed ratio, and `latest_sessions`.
 
 Controller summary session persistence and maintenance:
 - Default controller summary archive: `.kiro/auto/close-loop-controller-sessions/*.json`

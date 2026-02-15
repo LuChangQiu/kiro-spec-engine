@@ -702,6 +702,68 @@ describe('auto close-loop CLI integration', () => {
     }));
   });
 
+  test('supports auto kpi trend controller mode through CLI', async () => {
+    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    await fs.ensureDir(batchSessionDir);
+    await fs.ensureDir(controllerSessionDir);
+
+    const nestedProgramSummary = path.join(batchSessionDir, 'nested-program-summary.json');
+    await fs.writeJson(nestedProgramSummary, {
+      mode: 'auto-close-loop-program',
+      status: 'completed',
+      metrics: {
+        total_sub_specs: 4
+      },
+      spec_session_budget: {
+        estimated_created: 2
+      }
+    }, { spaces: 2 });
+
+    const controllerSummary = path.join(controllerSessionDir, 'controller-kpi-summary.json');
+    await fs.writeJson(controllerSummary, {
+      mode: 'auto-close-loop-controller',
+      status: 'partial-failed',
+      updated_at: '2026-02-14T10:00:00.000Z',
+      processed_goals: 2,
+      completed_goals: 1,
+      failed_goals: 1,
+      pending_goals: 0,
+      results: [
+        {
+          goal: 'controller-kpi-goal',
+          status: 'failed',
+          batch_session_file: nestedProgramSummary
+        }
+      ]
+    }, { spaces: 2 });
+    await fs.utimes(controllerSummary, new Date('2026-02-14T10:00:00.000Z'), new Date('2026-02-14T10:00:00.000Z'));
+
+    const run = await runCli([
+      'auto',
+      'kpi',
+      'trend',
+      '--weeks',
+      '52',
+      '--mode',
+      'controller',
+      '--json'
+    ], { cwd: tempDir });
+
+    expect(run.exitCode).toBe(0);
+    const payload = parseJsonOutput(run.stdout);
+    expect(payload).toEqual(expect.objectContaining({
+      mode: 'auto-kpi-trend',
+      mode_filter: 'controller',
+      total_runs: 1
+    }));
+    expect(payload.overall).toEqual(expect.objectContaining({
+      success_rate_percent: 50,
+      average_total_sub_specs: 4,
+      average_estimated_spec_created: 2
+    }));
+  });
+
   test('supports close-loop-program gate fallback profile through CLI', async () => {
     const run = await runCli([
       'auto',

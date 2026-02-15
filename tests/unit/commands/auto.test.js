@@ -3639,6 +3639,70 @@ describe('auto close-loop command', () => {
     ]));
   });
 
+  test('aggregates controller autonomous KPI trend in controller mode', async () => {
+    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    await fs.ensureDir(batchSessionDir);
+    await fs.ensureDir(controllerSessionDir);
+
+    const nestedProgramSummary = path.join(batchSessionDir, 'nested-program-summary.json');
+    await fs.writeJson(nestedProgramSummary, {
+      mode: 'auto-close-loop-program',
+      status: 'completed',
+      metrics: {
+        total_sub_specs: 6
+      },
+      spec_session_budget: {
+        estimated_created: 3
+      }
+    }, { spaces: 2 });
+
+    const controllerSummary = path.join(controllerSessionDir, 'controller-a.json');
+    await fs.writeJson(controllerSummary, {
+      mode: 'auto-close-loop-controller',
+      status: 'partial-failed',
+      updated_at: '2026-02-14T10:00:00.000Z',
+      processed_goals: 2,
+      completed_goals: 1,
+      failed_goals: 1,
+      pending_goals: 0,
+      results: [
+        {
+          goal: 'deliver one controller goal',
+          status: 'failed',
+          batch_session_file: nestedProgramSummary
+        }
+      ]
+    }, { spaces: 2 });
+    await fs.utimes(controllerSummary, new Date('2026-02-14T10:00:00.000Z'), new Date('2026-02-14T10:00:00.000Z'));
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'kpi',
+      'trend',
+      '--weeks',
+      '52',
+      '--mode',
+      'controller',
+      '--json'
+    ]);
+
+    const parsed = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(parsed.mode).toBe('auto-kpi-trend');
+    expect(parsed.mode_filter).toBe('controller');
+    expect(parsed.total_runs).toBe(1);
+    expect(parsed.overall).toEqual(expect.objectContaining({
+      success_rate_percent: 50,
+      completion_rate_percent: 100,
+      average_failed_goals: 1,
+      average_total_sub_specs: 6,
+      average_estimated_spec_created: 3
+    }));
+  });
+
   test('supports autonomous KPI trend csv output and csv file export', async () => {
     const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
     await fs.ensureDir(sessionDir);
@@ -3707,6 +3771,24 @@ describe('auto close-loop command', () => {
 
     const errorOutput = errorSpy.mock.calls.map(call => call.join(' ')).join('\n');
     expect(errorOutput).toContain('--period must be one of: week, day.');
+  });
+
+  test('validates kpi trend mode option', async () => {
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'kpi',
+        'trend',
+        '--mode',
+        'unknown'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const errorOutput = errorSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    expect(errorOutput).toContain('--mode must be one of: all, batch, program, recover, controller.');
   });
 
   test('shows recovery memory stats in json mode', async () => {

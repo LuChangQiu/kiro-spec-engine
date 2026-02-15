@@ -471,6 +471,8 @@ kse auto controller-session prune --keep 20 --older-than-days 14 --dry-run
 # Aggregate cross-archive autonomous governance telemetry
 kse auto governance stats
 kse auto governance stats --days 14 --status completed,partial-failed --json
+kse auto governance maintain --session-keep 50 --batch-session-keep 50 --controller-session-keep 50 --json
+kse auto governance maintain --apply --session-keep 20 --batch-session-keep 20 --controller-session-keep 20 --recovery-memory-older-than-days 90 --json
 
 # Recovery memory maintenance
 kse auto recovery-memory show --json
@@ -666,6 +668,9 @@ Close-loop controller session maintenance:
 Cross-archive autonomous governance maintenance:
 - `kse auto governance stats [--days <n>] [--status <csv>] [--json]`: aggregate a unified governance snapshot from session/batch-session/controller-session archives plus recovery memory state.
   - JSON output includes `totals`, `throughput`, `health` (`risk_level`, `concerns`, `recommendations`), `top_master_specs`, `recovery_memory`, and full per-archive stats under `archives`.
+- `kse auto governance maintain [--days <n>] [--status <csv>] [--session-keep <n>] [--batch-session-keep <n>] [--controller-session-keep <n>] [--recovery-memory-older-than-days <n>] [--apply] [--dry-run] [--json]`: run governance-maintenance planning and optional execution in one command.
+  - Plan-only mode is default; add `--apply` to execute maintenance actions (`session prune`, `batch-session prune`, `controller-session prune`, `recovery-memory prune`).
+  - JSON output includes `assessment` (pre-maintenance governance snapshot), `plan`, `executed_actions`, `summary`, and `after_assessment` (only when `--apply` without `--dry-run`).
 
 Close-loop recovery memory maintenance:
 - `kse auto recovery-memory show [--scope <scope>] [--json]`: inspect persisted recovery signatures/actions and aggregate stats (optionally scoped)

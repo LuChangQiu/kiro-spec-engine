@@ -1854,4 +1854,127 @@ describe('auto close-loop CLI integration', () => {
     expect(statsPayload.archives.controller_session.total_sessions).toBe(1);
     expect(statsPayload.health.risk_level).toBe('medium');
   });
+
+  test('applies governance maintenance actions through CLI', async () => {
+    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    await fs.ensureDir(closeLoopSessionDir);
+    await fs.ensureDir(batchSessionDir);
+    await fs.ensureDir(controllerSessionDir);
+
+    const sessionOld = path.join(closeLoopSessionDir, 'integration-maintain-old-session.json');
+    const sessionNew = path.join(closeLoopSessionDir, 'integration-maintain-new-session.json');
+    await fs.writeJson(sessionOld, {
+      session_id: 'integration-maintain-old-session',
+      status: 'completed',
+      portfolio: { master_spec: '121-00-old', sub_specs: [] }
+    }, { spaces: 2 });
+    await fs.writeJson(sessionNew, {
+      session_id: 'integration-maintain-new-session',
+      status: 'completed',
+      portfolio: { master_spec: '121-00-new', sub_specs: [] }
+    }, { spaces: 2 });
+
+    const batchOld = path.join(batchSessionDir, 'integration-maintain-old-batch.json');
+    const batchNew = path.join(batchSessionDir, 'integration-maintain-new-batch.json');
+    await fs.writeJson(batchOld, {
+      mode: 'auto-close-loop-batch',
+      status: 'completed',
+      total_goals: 2,
+      processed_goals: 2,
+      batch_session: { id: 'integration-maintain-old-batch', file: batchOld }
+    }, { spaces: 2 });
+    await fs.writeJson(batchNew, {
+      mode: 'auto-close-loop-batch',
+      status: 'completed',
+      total_goals: 2,
+      processed_goals: 2,
+      batch_session: { id: 'integration-maintain-new-batch', file: batchNew }
+    }, { spaces: 2 });
+
+    const controllerOld = path.join(controllerSessionDir, 'integration-maintain-old-controller.json');
+    const controllerNew = path.join(controllerSessionDir, 'integration-maintain-new-controller.json');
+    await fs.writeJson(controllerOld, {
+      mode: 'auto-close-loop-controller',
+      status: 'completed',
+      processed_goals: 1,
+      pending_goals: 0,
+      controller_session: { id: 'integration-maintain-old-controller', file: controllerOld }
+    }, { spaces: 2 });
+    await fs.writeJson(controllerNew, {
+      mode: 'auto-close-loop-controller',
+      status: 'completed',
+      processed_goals: 1,
+      pending_goals: 0,
+      controller_session: { id: 'integration-maintain-new-controller', file: controllerNew }
+    }, { spaces: 2 });
+
+    const oldDate = new Date('2020-01-01T00:00:00.000Z');
+    await fs.utimes(sessionOld, oldDate, oldDate);
+    await fs.utimes(batchOld, oldDate, oldDate);
+    await fs.utimes(controllerOld, oldDate, oldDate);
+    const now = new Date();
+    await fs.utimes(sessionNew, now, now);
+    await fs.utimes(batchNew, now, now);
+    await fs.utimes(controllerNew, now, now);
+
+    const recoveryMemoryFile = path.join(tempDir, '.kiro', 'auto', 'close-loop-recovery-memory.json');
+    await fs.ensureDir(path.dirname(recoveryMemoryFile));
+    await fs.writeJson(recoveryMemoryFile, {
+      version: 1,
+      signatures: {
+        'integration-maintain-signature': {
+          signature: 'integration-maintain-signature',
+          scope: 'integration-maintain',
+          attempts: 1,
+          successes: 0,
+          failures: 1,
+          last_used_at: '2020-01-01T00:00:00.000Z',
+          actions: {
+            '1': {
+              index: 1,
+              title: 'legacy',
+              attempts: 1,
+              successes: 0,
+              failures: 1,
+              last_used_at: '2020-01-01T00:00:00.000Z'
+            }
+          }
+        }
+      }
+    }, { spaces: 2 });
+
+    const maintained = await runCli([
+      'auto',
+      'governance',
+      'maintain',
+      '--apply',
+      '--session-keep',
+      '1',
+      '--batch-session-keep',
+      '1',
+      '--controller-session-keep',
+      '1',
+      '--recovery-memory-older-than-days',
+      '30',
+      '--json'
+    ], { cwd: tempDir });
+    expect(maintained.exitCode).toBe(0);
+    const maintainPayload = parseJsonOutput(maintained.stdout);
+    expect(maintainPayload.mode).toBe('auto-governance-maintain');
+    expect(maintainPayload.apply).toBe(true);
+    expect(maintainPayload.summary.applied_actions).toBe(4);
+    expect(maintainPayload.after_assessment.archives.session.total_sessions).toBe(1);
+    expect(maintainPayload.after_assessment.archives.batch_session.total_sessions).toBe(1);
+    expect(maintainPayload.after_assessment.archives.controller_session.total_sessions).toBe(1);
+    expect(maintainPayload.after_assessment.recovery_memory.signature_count).toBe(0);
+
+    expect(await fs.pathExists(sessionOld)).toBe(false);
+    expect(await fs.pathExists(batchOld)).toBe(false);
+    expect(await fs.pathExists(controllerOld)).toBe(false);
+    expect(await fs.pathExists(sessionNew)).toBe(true);
+    expect(await fs.pathExists(batchNew)).toBe(true);
+    expect(await fs.pathExists(controllerNew)).toBe(true);
+  });
 });

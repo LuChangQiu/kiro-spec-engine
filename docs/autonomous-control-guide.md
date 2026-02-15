@@ -225,6 +225,10 @@ Controller summary session persistence and maintenance:
 Cross-archive governance snapshot:
 - `kse auto governance stats [--days <n>] [--status <csv>] [--json]`: aggregate a unified governance cockpit over session/batch/controller archives plus recovery memory state.
   - JSON output includes `totals`, `throughput`, `top_master_specs`, per-archive `archives.*` stats payloads, and `health` diagnostics (`risk_level`, `concerns`, `recommendations`) for one-command close-loop governance checks.
+- `kse auto governance maintain [--days <n>] [--status <csv>] [--session-keep <n>] [--batch-session-keep <n>] [--controller-session-keep <n>] [--recovery-memory-older-than-days <n>] [--apply] [--dry-run] [--json]`: close-loop governance maintenance entrypoint.
+  - Default is plan-only (`assessment` + `plan`).
+  - `--apply` executes maintenance actions for archive hygiene (session/batch/controller pruning + recovery-memory stale-entry pruning).
+  - `--dry-run` can be combined with `--apply` to validate maintenance impact before deletion.
 
 Recovery memory maintenance:
 - Default recovery memory file: `.kiro/auto/close-loop-recovery-memory.json`

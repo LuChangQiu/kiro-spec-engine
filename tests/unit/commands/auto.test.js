@@ -1106,6 +1106,46 @@ describe('auto close-loop command', () => {
     }));
   });
 
+  test('governance replay can run without action selection when --no-program-govern-auto-action is set', async () => {
+    runAutoCloseLoop
+      .mockResolvedValueOnce({ status: 'completed', portfolio: { master_spec: '122-12-govern-noact-r1a', sub_specs: [] } })
+      .mockResolvedValueOnce({ status: 'completed', portfolio: { master_spec: '122-12-govern-noact-r1b', sub_specs: [] } })
+      .mockResolvedValueOnce({ status: 'completed', portfolio: { master_spec: '122-12-govern-noact-r2a', sub_specs: [] } })
+      .mockResolvedValueOnce({ status: 'completed', portfolio: { master_spec: '122-12-govern-noact-r2b', sub_specs: [] } });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'close-loop-program',
+      'deliver resilient autonomous rollout',
+      '--program-goals',
+      '2',
+      '--batch-agent-budget',
+      '2',
+      '--program-max-agent-budget',
+      '1',
+      '--program-govern-until-stable',
+      '--no-program-govern-auto-action',
+      '--program-govern-max-rounds',
+      '2',
+      '--json'
+    ]);
+
+    const summary = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(summary.program_governance).toEqual(expect.objectContaining({
+      enabled: true,
+      action_selection_enabled: false,
+      performed_rounds: 1
+    }));
+    expect(summary.program_governance.history[0]).toEqual(expect.objectContaining({
+      execution_mode: 'program-replay',
+      selected_action_index: null,
+      action_selection_source: null
+    }));
+  });
+
   test('applies program gate profile defaults when explicit thresholds are omitted', async () => {
     runAutoCloseLoop
       .mockResolvedValueOnce({ status: 'failed', portfolio: { master_spec: '122-12-prof-r1', sub_specs: [] } })

@@ -294,7 +294,7 @@ sequenceDiagram
 - **Closed-Loop Program Execution**: `kse auto close-loop "<goal>"` runs from goal decomposition to terminal orchestration state without manual confirmation gates
 - **Automatic Master/Sub Portfolio Split**: Large goals are auto-split into dependency-wired sub-specs and coordinated by a master spec
 - **Semantic Decomposition + Live Stream**: Clause/category-aware goal parsing plus live orchestration status stream (disable via `--no-stream`)
-- **Session Resume + Retention Hygiene**: Resume interrupted runs with `--resume latest` and maintain archives via `kse auto session list/prune`, `kse auto batch-session list/prune`, and `kse auto controller-session list/prune`
+- **Session Resume + Retention Hygiene**: Resume interrupted runs with `--resume interrupted` (or `--resume latest`) and maintain archives via `kse auto session list/prune`, `kse auto batch-session list/prune`, and `kse auto controller-session list/prune`
 - **Intelligent Error Recovery**: Automatically diagnose and fix errors with 3 retry attempts and learning system
 - **Strategic Checkpoints**: Pause only at meaningful milestones (phase boundaries, fatal errors, external resources)
 - **Continuous Task Execution**: Execute multiple tasks without interruption between individual tasks
@@ -531,6 +531,9 @@ kse create-spec <name>             # Legacy: create empty Spec folder only
 
 # Autonomous close-loop program (one command, no confirmation loop)
 kse auto close-loop "<goal>"       # Auto split goal into master/sub specs and execute to closure
+kse auto close-loop --resume interrupted # Resume from latest non-completed close-loop session
+kse auto close-loop continue       # Shorthand: continue latest interrupted close-loop session
+kse auto continue                  # Shortcut command: continue latest interrupted close-loop session
 kse auto close-loop "<goal>" --dry-run --json  # Preview decomposition plan only
 kse auto close-loop-program "<goal>" --program-govern-until-stable --program-govern-use-action 1 --json # Program-level recovery + governance with remediation action execution
 kse auto close-loop-controller .kiro/auto/program-queue.lines --wait-on-empty --dequeue-limit 2 --json # Queue-driven autonomous controller for broad-goal backlogs

@@ -5777,6 +5777,10 @@ describe('Scene Ontology CLI', () => {
     expect(result).not.toBeNull();
     expect(result.success).toBe(true);
     expect(result.result.valid).toBe(true);
+    expect(result.semantic_quality).toEqual(expect.objectContaining({
+      score: expect.any(Number),
+      level: expect.any(String)
+    }));
     spy.mockRestore();
   });
 

@@ -1495,3 +1495,113 @@ describe('getAgentHints', () => {
     expect(result.rollback_strategy).toBe('manual-review');
   });
 });
+
+const {
+  parseEntityRelationshipModel,
+  parseBusinessRules,
+  parseDecisionLogic,
+  evaluateOntologySemanticQuality
+} = require('../../../lib/scene-runtime/scene-ontology');
+
+describe('parseEntityRelationshipModel', () => {
+  test('parses entities and relations from ontology_model', () => {
+    const contract = {
+      ontology_model: {
+        entities: [
+          { id: 'entity:OrderHeader' },
+          { ref: 'entity:OrderItem' }
+        ],
+        relations: [
+          { source: 'entity:OrderItem', target: 'entity:OrderHeader', type: 'belongs_to' }
+        ]
+      }
+    };
+    const result = parseEntityRelationshipModel(contract);
+    expect(result.summary.entity_count).toBe(2);
+    expect(result.summary.relation_count).toBe(1);
+  });
+
+  test('supports relation aliases from/to', () => {
+    const contract = {
+      semantic_model: {
+        entities: [{ name: 'entity:Product' }, { name: 'entity:Category' }],
+        relations: [{ from: 'entity:Product', to: 'entity:Category', relation: 'belongs_to' }]
+      }
+    };
+    const result = parseEntityRelationshipModel(contract);
+    expect(result.relations[0]).toEqual(expect.objectContaining({
+      source: 'entity:Product',
+      target: 'entity:Category',
+      type: 'belongs_to'
+    }));
+  });
+});
+
+describe('parseBusinessRules', () => {
+  test('parses rule mapping and pass status', () => {
+    const contract = {
+      governance_contract: {
+        business_rules: [
+          { id: 'rule-1', entity_ref: 'entity:Order', status: 'enforced' },
+          { id: 'rule-2', status: 'draft' }
+        ]
+      }
+    };
+    const result = parseBusinessRules(contract);
+    expect(result.summary.total).toBe(2);
+    expect(result.summary.mapped).toBe(1);
+    expect(result.summary.unmapped).toBe(1);
+    expect(result.summary.passed).toBe(1);
+    expect(result.summary.failed).toBe(1);
+  });
+});
+
+describe('parseDecisionLogic', () => {
+  test('parses decision resolved and automated status', () => {
+    const contract = {
+      governance_contract: {
+        decision_logic: [
+          { id: 'decision-1', status: 'resolved', tested: true },
+          { id: 'decision-2', status: 'pending' }
+        ]
+      }
+    };
+    const result = parseDecisionLogic(contract);
+    expect(result.summary.total).toBe(2);
+    expect(result.summary.resolved).toBe(1);
+    expect(result.summary.pending).toBe(1);
+    expect(result.summary.automated).toBe(1);
+  });
+});
+
+describe('evaluateOntologySemanticQuality', () => {
+  test('returns semantic quality score and metrics', () => {
+    const contract = {
+      ontology_model: {
+        entities: [{ id: 'entity:Order' }, { id: 'entity:OrderItem' }],
+        relations: [{ source: 'entity:OrderItem', target: 'entity:Order' }]
+      },
+      governance_contract: {
+        business_rules: [
+          { id: 'rule-1', entity_ref: 'entity:Order', status: 'enforced' },
+          { id: 'rule-2', entity_ref: 'entity:OrderItem', status: 'active' }
+        ],
+        decision_logic: [
+          { id: 'decision-1', status: 'resolved' }
+        ]
+      }
+    };
+    const result = evaluateOntologySemanticQuality(contract);
+    expect(result.score).toBeGreaterThanOrEqual(0);
+    expect(result.score).toBeLessThanOrEqual(100);
+    expect(result.level).toBe('high');
+    expect(result.metrics).toEqual(expect.objectContaining({
+      entity_count: 2,
+      relation_count: 1,
+      business_rule_total: 2,
+      business_rule_unmapped: 0,
+      decision_total: 1,
+      decision_undecided: 0
+    }));
+  });
+});

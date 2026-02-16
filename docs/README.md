@@ -21,7 +21,7 @@
 
 - **Structured AI delivery**: Specs enforce Requirements → Design → Tasks before implementation.
 - **Parallel execution at scale**: Orchestrate multiple Specs with dependency-aware scheduling.
-- **Dual-track handoff closure**: `kse auto handoff run` executes plan/queue/batch/observability in one closed loop.
+- **Dual-track handoff closure**: `kse auto handoff run` executes plan/queue/batch/observability in one closed loop, supports `--continue-from` resume, and emits executable follow-up recommendations.
 - **Measurable outcomes**: KPI snapshot/baseline/trend commands make delivery quality auditable.
 - **Tool-agnostic workflow**: Works across Claude, Cursor, Windsurf, Copilot, and Kiro.
 - **Built-in governance**: Locks, document governance, environment/workspace controls, and audit trails.

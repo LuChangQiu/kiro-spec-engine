@@ -289,7 +289,7 @@ sequenceDiagram
 - **自动闭环推进**：`kse auto close-loop "<目标>"` 从目标拆分到编排完成全程自动推进
 - **自动主从拆分**：自动生成 Master/Sub Spec 组合、依赖关系与 Agent 分配
 - **语义分解 + 实时状态流**：按目标语义自动归类拆分，并实时输出编排进度（可用 `--no-stream` 关闭）
-- **会话恢复与归档治理**：支持 `--resume latest` 续跑，并可用 `kse auto session list/prune`、`kse auto batch-session list/prune`、`kse auto controller-session list/prune` 管理会话归档
+- **会话恢复与归档治理**：支持 `--resume interrupted`（或 `--resume latest`）续跑，并可用 `kse auto session list/prune`、`kse auto batch-session list/prune`、`kse auto controller-session list/prune` 管理会话归档
 - **终态收敛**：输出统一执行结果（completed/failed/stopped），避免中途等待人工逐步确认
 
 ### Spec 驱动开发
@@ -448,6 +448,9 @@ kse create-spec <name>             # 兼容旧版：仅创建空 Spec 目录
 
 # 自动闭环主从编排（单命令）
 kse auto close-loop "<目标>"        # 自动拆分 Master/Sub Spec 并推进到完成态
+kse auto close-loop --resume interrupted # 从最近一个未完成 close-loop 会话续跑
+kse auto close-loop 继续           # 简写：续跑最近一个未完成 close-loop 会话
+kse auto continue                  # 快捷命令：续跑最近一个未完成 close-loop 会话
 kse auto close-loop "<目标>" --dry-run --json  # 仅预览拆分与依赖计划
 kse auto close-loop-program "<目标>" --program-govern-until-stable --program-govern-use-action 1 --json # 程序级自动恢复 + 治理循环（含 remediation action 执行）直到稳定
 kse auto close-loop-controller .kiro/auto/program-queue.lines --wait-on-empty --dequeue-limit 2 --json # 队列驱动自治控制器，持续处理广义目标积压

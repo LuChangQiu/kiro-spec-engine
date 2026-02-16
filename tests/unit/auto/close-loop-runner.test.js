@@ -429,6 +429,87 @@ describe('close-loop-runner', () => {
     expect(resumed.resumed_from_session.id).toBe('latest-source');
   });
 
+  test('supports resume from latest interrupted close-loop session', async () => {
+    await runAutoCloseLoop(
+      'Close-loop interrupted session source',
+      {
+        run: false,
+        sessionId: 'interrupted-source'
+      },
+      {
+        projectPath: tempDir
+      }
+    );
+
+    const completedOrchestration = jest.fn(async ({ specNames }) => ({
+      status: 'completed',
+      completed: specNames,
+      failed: [],
+      skipped: []
+    }));
+    await runAutoCloseLoop(
+      'Close-loop completed newer source',
+      {
+        sessionId: 'completed-source'
+      },
+      {
+        projectPath: tempDir,
+        runOrchestration: completedOrchestration
+      }
+    );
+
+    const resumed = await runAutoCloseLoop(
+      undefined,
+      {
+        run: false,
+        resume: 'interrupted'
+      },
+      {
+        projectPath: tempDir
+      }
+    );
+
+    expect(resumed.resumed).toBe(true);
+    expect(resumed.resumed_from_session).toEqual(expect.objectContaining({
+      id: 'interrupted-source'
+    }));
+  });
+
+  test('writes running session checkpoint before orchestration for interruption resume', async () => {
+    const failOnOrchestration = jest.fn(async () => {
+      throw new Error('upstream account quota exhausted');
+    });
+
+    await expect(
+      runAutoCloseLoop(
+        'Close-loop interruption checkpoint',
+        {
+          sessionId: 'interruption-checkpoint'
+        },
+        {
+          projectPath: tempDir,
+          runOrchestration: failOnOrchestration
+        }
+      )
+    ).rejects.toThrow('upstream account quota exhausted');
+
+    const sessionFile = path.join(
+      tempDir,
+      '.kiro',
+      'auto',
+      'close-loop-sessions',
+      'interruption-checkpoint.json'
+    );
+    expect(await fs.pathExists(sessionFile)).toBe(true);
+    const payload = await fs.readJson(sessionFile);
+    expect(payload.session_id).toBe('interruption-checkpoint');
+    expect(payload.status).toBe('running');
+    expect(payload.portfolio).toEqual(expect.objectContaining({
+      master_spec: expect.any(String),
+      sub_specs: expect.any(Array)
+    }));
+  });
+
   test('throws clear error when resume session is missing', async () => {
     await expect(
       runAutoCloseLoop(
@@ -442,6 +523,21 @@ describe('close-loop-runner', () => {
         }
       )
     ).rejects.toThrow('Close-loop session not found');
+  });
+
+  test('throws clear error when interrupted resume session is missing', async () => {
+    await expect(
+      runAutoCloseLoop(
+        'Resume missing interrupted session',
+        {
+          run: false,
+          resume: 'interrupted'
+        },
+        {
+          projectPath: tempDir
+        }
+      )
+    ).rejects.toThrow('Close-loop interrupted session not found');
   });
 
   test('supports disabling close-loop session persistence', async () => {

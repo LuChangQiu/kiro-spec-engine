@@ -59,6 +59,62 @@ describe('auto close-loop command', () => {
     );
   });
 
+  test('allows --resume interrupted without goal argument', async () => {
+    runAutoCloseLoop.mockResolvedValue({ status: 'prepared' });
+    const program = buildProgram();
+
+    await program.parseAsync(['node', 'kse', 'auto', 'close-loop', '--resume', 'interrupted']);
+
+    expect(runAutoCloseLoop).toHaveBeenCalledWith(
+      undefined,
+      expect.objectContaining({
+        resume: 'interrupted'
+      })
+    );
+  });
+
+  test('supports close-loop continue shorthand without --resume', async () => {
+    runAutoCloseLoop.mockResolvedValue({ status: 'prepared' });
+    const program = buildProgram();
+
+    await program.parseAsync(['node', 'kse', 'auto', 'close-loop', 'continue']);
+
+    expect(runAutoCloseLoop).toHaveBeenCalledWith(
+      undefined,
+      expect.objectContaining({
+        resume: 'interrupted'
+      })
+    );
+  });
+
+  test('supports close-loop 继续 shorthand without --resume', async () => {
+    runAutoCloseLoop.mockResolvedValue({ status: 'prepared' });
+    const program = buildProgram();
+
+    await program.parseAsync(['node', 'kse', 'auto', 'close-loop', '继续']);
+
+    expect(runAutoCloseLoop).toHaveBeenCalledWith(
+      undefined,
+      expect.objectContaining({
+        resume: 'interrupted'
+      })
+    );
+  });
+
+  test('supports auto continue command as interrupted resume', async () => {
+    runAutoCloseLoop.mockResolvedValue({ status: 'prepared' });
+    const program = buildProgram();
+
+    await program.parseAsync(['node', 'kse', 'auto', 'continue']);
+
+    expect(runAutoCloseLoop).toHaveBeenCalledWith(
+      undefined,
+      expect.objectContaining({
+        resume: 'interrupted'
+      })
+    );
+  });
+
   test('requires goal when --resume is not provided', async () => {
     runAutoCloseLoop.mockResolvedValue({ status: 'prepared' });
     const program = buildProgram();
@@ -6040,6 +6096,8 @@ describe('auto close-loop command', () => {
     expect(payload.gates.passed).toBe(true);
     expect(payload.queue.output_file).toBe(queueFile);
     expect(payload.output_file).toContain(path.join('.kiro', 'reports', 'handoff-runs'));
+    expect(Array.isArray(payload.recommendations)).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('kse auto handoff regression --session-id'))).toBe(true);
     expect(await fs.pathExists(payload.output_file)).toBe(true);
     expect(await fs.pathExists(queueFile)).toBe(true);
     expect(runAutoCloseLoop).toHaveBeenCalledTimes(payload.queue.goal_count);
@@ -6091,6 +6149,306 @@ describe('auto close-loop command', () => {
     expect(payload.dependency_execution.dependency_plan.batch_count).toBe(2);
     expect(runAutoCloseLoop.mock.calls[0][0]).toContain('integrate handoff spec 60-30-base-spec');
     expect(runAutoCloseLoop.mock.calls[1][0]).toContain('integrate handoff spec 60-31-dependent-spec');
+  });
+
+  test('continues handoff run from latest report with pending goals only', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-40-base-spec', '60-41-dependent-spec'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    await fs.ensureDir(reportDir);
+    await fs.writeJson(path.join(reportDir, 'handoff-previous.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-previous',
+      manifest_path: manifestFile,
+      status: 'failed',
+      batch_summary: {
+        status: 'partial-failed',
+        total_goals: 4,
+        processed_goals: 4,
+        completed_goals: 2,
+        failed_goals: 1,
+        results: [
+          {
+            index: 1,
+            goal: 'integrate handoff spec 60-40-base-spec with scene package validation, ontology consistency checks, and close-loop completion',
+            status: 'completed'
+          },
+          {
+            index: 2,
+            goal: 'integrate handoff spec 60-41-dependent-spec with scene package validation, ontology consistency checks, and close-loop completion',
+            status: 'failed'
+          },
+          {
+            index: 3,
+            goal: 'validate handoff template moqui-domain-extension for template registry compatibility and release readiness',
+            status: 'completed'
+          },
+          {
+            index: 4,
+            goal: 'generate unified observability snapshot and governance follow-up recommendations for this handoff batch',
+            status: 'planned'
+          }
+        ]
+      }
+    }, { spaces: 2 });
+
+    runAutoCloseLoop.mockResolvedValue({
+      status: 'completed',
+      portfolio: {
+        master_spec: '162-00-handoff-continue',
+        sub_specs: []
+      }
+    });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'run',
+      '--manifest',
+      manifestFile,
+      '--continue-from',
+      'latest',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('completed');
+    expect(payload.continued_from).toEqual(expect.objectContaining({
+      session_id: 'handoff-previous',
+      strategy: 'pending'
+    }));
+    expect(payload.recommendations.some(item => item.includes(`--continue-from ${payload.session_id}`))).toBe(false);
+    expect(payload.queue.goal_count).toBe(2);
+    expect(runAutoCloseLoop).toHaveBeenCalledTimes(2);
+    expect(runAutoCloseLoop.mock.calls[0][0]).toContain('integrate handoff spec 60-41-dependent-spec');
+    expect(runAutoCloseLoop.mock.calls[1][0]).toContain('generate unified observability snapshot');
+  });
+
+  test('supports failed-only continue strategy for handoff run', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-42-service-spec'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    await fs.ensureDir(reportDir);
+    await fs.writeJson(path.join(reportDir, 'handoff-failed-only.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-failed-only',
+      manifest_path: manifestFile,
+      status: 'failed',
+      batch_summary: {
+        status: 'partial-failed',
+        total_goals: 2,
+        processed_goals: 2,
+        completed_goals: 0,
+        failed_goals: 1,
+        results: [
+          {
+            index: 1,
+            goal: 'integrate handoff spec 60-42-service-spec with scene package validation, ontology consistency checks, and close-loop completion',
+            status: 'failed'
+          },
+          {
+            index: 2,
+            goal: 'generate unified observability snapshot and governance follow-up recommendations for this handoff batch',
+            status: 'planned'
+          }
+        ]
+      }
+    }, { spaces: 2 });
+
+    runAutoCloseLoop.mockResolvedValue({
+      status: 'completed',
+      portfolio: {
+        master_spec: '163-00-handoff-continue',
+        sub_specs: []
+      }
+    });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'run',
+      '--manifest',
+      manifestFile,
+      '--continue-from',
+      'handoff-failed-only',
+      '--continue-strategy',
+      'failed-only',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('completed');
+    expect(payload.queue.goal_count).toBe(1);
+    expect(payload.continued_from).toEqual(expect.objectContaining({
+      session_id: 'handoff-failed-only',
+      strategy: 'failed-only'
+    }));
+    expect(runAutoCloseLoop).toHaveBeenCalledTimes(1);
+    expect(runAutoCloseLoop.mock.calls[0][0]).toContain('integrate handoff spec 60-42-service-spec');
+  });
+
+  test('auto continue strategy resolves to failed-only when only failed goals remain', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-44-only-failed'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    await fs.ensureDir(reportDir);
+    await fs.writeJson(path.join(reportDir, 'handoff-auto-failed-only.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-auto-failed-only',
+      manifest_path: manifestFile,
+      status: 'failed',
+      batch_summary: {
+        status: 'failed',
+        total_goals: 1,
+        processed_goals: 1,
+        completed_goals: 0,
+        failed_goals: 1,
+        results: [
+          {
+            index: 1,
+            goal: 'integrate handoff spec 60-44-only-failed with scene package validation, ontology consistency checks, and close-loop completion',
+            status: 'failed'
+          }
+        ]
+      }
+    }, { spaces: 2 });
+
+    runAutoCloseLoop.mockResolvedValue({
+      status: 'completed',
+      portfolio: {
+        master_spec: '164-00-handoff-continue',
+        sub_specs: []
+      }
+    });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'run',
+      '--manifest',
+      manifestFile,
+      '--continue-from',
+      'handoff-auto-failed-only',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('completed');
+    expect(payload.queue.goal_count).toBe(1);
+    expect(payload.continued_from).toEqual(expect.objectContaining({
+      session_id: 'handoff-auto-failed-only',
+      strategy: 'failed-only',
+      strategy_requested: 'auto'
+    }));
+    expect(runAutoCloseLoop).toHaveBeenCalledTimes(1);
+    expect(runAutoCloseLoop.mock.calls[0][0]).toContain('integrate handoff spec 60-44-only-failed');
+  });
+
+  test('fails handoff continue-from when manifest does not match previous run', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    const anotherManifest = path.join(tempDir, 'handoff-manifest-other.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-43-current-spec'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+    await fs.writeJson(anotherManifest, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-43-previous-spec'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    await fs.ensureDir(reportDir);
+    await fs.writeJson(path.join(reportDir, 'handoff-mismatch.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-mismatch',
+      manifest_path: anotherManifest,
+      status: 'failed',
+      batch_summary: {
+        status: 'failed',
+        total_goals: 1,
+        processed_goals: 1,
+        completed_goals: 0,
+        failed_goals: 1,
+        results: [
+          {
+            index: 1,
+            goal: 'integrate handoff spec 60-43-previous-spec with scene package validation, ontology consistency checks, and close-loop completion',
+            status: 'failed'
+          }
+        ]
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--continue-from',
+        'handoff-mismatch',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('failed');
+    expect(payload.error).toContain('--continue-from manifest mismatch');
+    expect(runAutoCloseLoop).not.toHaveBeenCalled();
   });
 
   test('supports handoff run dry-run without executing close-loop-batch', async () => {
@@ -6158,6 +6516,102 @@ describe('auto close-loop command', () => {
     expect(payload.mode).toBe('auto-handoff-run');
     expect(payload.status).toBe('failed');
     expect(payload.error).toContain('handoff ontology validation gate failed');
+    expect(payload.recommendations.some(item => item.includes('--require-ontology-validation'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('--continue-from'))).toBe(false);
+    expect(runAutoCloseLoop).not.toHaveBeenCalled();
+  });
+
+  test('fails handoff run early when ontology quality score is below threshold', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-11-ontology-quality'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed',
+        quality_score: 62,
+        business_rules: {
+          total: 4,
+          mapped: 3
+        },
+        decision_logic: {
+          total: 3,
+          resolved: 2
+        }
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--min-ontology-score',
+        '80',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('failed');
+    expect(payload.error).toContain('ontology_quality_score');
+    expect(payload.recommendations.some(item => item.includes('--min-ontology-score 80'))).toBe(true);
+    expect(runAutoCloseLoop).not.toHaveBeenCalled();
+  });
+
+  test('fails handoff run early when unmapped rules and undecided decisions exceed thresholds', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-11-ontology-governance'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed',
+        quality_score: 88,
+        business_rules: {
+          total: 5,
+          mapped: 4
+        },
+        decision_logic: {
+          total: 4,
+          resolved: 3
+        }
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--max-unmapped-rules',
+        '0',
+        '--max-undecided-decisions',
+        '0',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('failed');
+    expect(payload.error).toContain('business_rule_unmapped');
+    expect(payload.error).toContain('decision_undecided');
+    expect(payload.recommendations.some(item => item.includes('--max-unmapped-rules 0'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('--max-undecided-decisions 0'))).toBe(true);
     expect(runAutoCloseLoop).not.toHaveBeenCalled();
   });
 
@@ -6214,7 +6668,58 @@ describe('auto close-loop command', () => {
     expect(payload.status).toBe('failed');
     expect(payload.gates.passed).toBe(false);
     expect(payload.gates.reasons.join(' ')).toContain('spec_success_rate_percent');
+    expect(payload.recommendations.some(item => item.includes(`--continue-from ${payload.session_id}`))).toBe(true);
     expect(runAutoCloseLoop).toHaveBeenCalled();
+  });
+
+  test('validates handoff ontology gate option ranges', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-11-ontology-validation-options'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--min-ontology-score',
+        '120',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+    let payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.error).toContain('--min-ontology-score must be a number between 0 and 100.');
+
+    logSpy.mockClear();
+    const secondProgram = buildProgram();
+    await expect(
+      secondProgram.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--max-unmapped-rules',
+        '-1',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+    payload = JSON.parse(`${logSpy.mock.calls[logSpy.mock.calls.length - 1][0]}`);
+    expect(payload.error).toContain('--max-unmapped-rules must be an integer >= 0.');
   });
 
   test('builds handoff regression by comparing latest run report with previous one', async () => {
@@ -6277,5 +6782,405 @@ describe('auto close-loop command', () => {
     expect(payload.trend).toBe('improved');
     expect(payload.delta.spec_success_rate_percent).toBe(20);
     expect(payload.delta.risk_level_rank).toBe(-1);
+  });
+
+  test('includes ontology quality and rule/decision metrics in handoff regression output', async () => {
+    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    await fs.ensureDir(reportDir);
+    await fs.writeJson(path.join(reportDir, 'handoff-old-ontology.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-old-ontology',
+      status: 'completed',
+      generated_at: '2026-02-16T00:00:00.000Z',
+      spec_status: {
+        success_rate_percent: 90
+      },
+      ontology_validation: {
+        quality_score: 72,
+        metrics: {
+          business_rule_unmapped: 2,
+          decision_undecided: 1,
+          business_rule_pass_rate_percent: 75,
+          decision_resolved_rate_percent: 70
+        }
+      },
+      batch_summary: {
+        failed_goals: 1
+      }
+    }, { spaces: 2 });
+    await new Promise(resolve => setTimeout(resolve, 20));
+    await fs.writeJson(path.join(reportDir, 'handoff-new-ontology.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-new-ontology',
+      status: 'completed',
+      generated_at: '2026-02-16T01:00:00.000Z',
+      spec_status: {
+        success_rate_percent: 96
+      },
+      ontology_validation: {
+        quality_score: 88,
+        metrics: {
+          business_rule_unmapped: 0,
+          decision_undecided: 0,
+          business_rule_pass_rate_percent: 100,
+          decision_resolved_rate_percent: 100
+        }
+      },
+      batch_summary: {
+        failed_goals: 0
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'regression',
+      '--session-id',
+      'latest',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-regression');
+    expect(payload.current.ontology_quality_score).toBe(88);
+    expect(payload.current.ontology_unmapped_rules).toBe(0);
+    expect(payload.current.ontology_undecided_decisions).toBe(0);
+    expect(payload.delta.ontology_quality_score).toBe(16);
+    expect(payload.delta.ontology_unmapped_rules).toBe(-2);
+    expect(payload.delta.ontology_undecided_decisions).toBe(-1);
+    expect(payload.aggregates.avg_ontology_quality_score).toBe(80);
+  });
+
+  test('builds handoff regression trend series within custom window', async () => {
+    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    await fs.ensureDir(reportDir);
+    await fs.writeJson(path.join(reportDir, 'handoff-oldest.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-oldest',
+      status: 'completed',
+      generated_at: '2026-02-15T22:00:00.000Z',
+      elapsed_ms: 7000,
+      spec_status: {
+        success_rate_percent: 70
+      },
+      gates: {
+        actual: {
+          risk_level: 'high'
+        }
+      },
+      batch_summary: {
+        failed_goals: 3
+      }
+    }, { spaces: 2 });
+    await new Promise(resolve => setTimeout(resolve, 20));
+    await fs.writeJson(path.join(reportDir, 'handoff-middle.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-middle',
+      status: 'completed',
+      generated_at: '2026-02-15T23:00:00.000Z',
+      elapsed_ms: 5200,
+      spec_status: {
+        success_rate_percent: 80
+      },
+      gates: {
+        actual: {
+          risk_level: 'medium'
+        }
+      },
+      batch_summary: {
+        failed_goals: 1
+      }
+    }, { spaces: 2 });
+    await new Promise(resolve => setTimeout(resolve, 20));
+    await fs.writeJson(path.join(reportDir, 'handoff-latest.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-latest',
+      status: 'completed',
+      generated_at: '2026-02-16T00:00:00.000Z',
+      elapsed_ms: 4300,
+      spec_status: {
+        success_rate_percent: 90
+      },
+      gates: {
+        actual: {
+          risk_level: 'low'
+        }
+      },
+      batch_summary: {
+        failed_goals: 0
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'regression',
+      '--session-id',
+      'latest',
+      '--window',
+      '3',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-regression');
+    expect(payload.window).toEqual(expect.objectContaining({
+      requested: 3,
+      actual: 3
+    }));
+    expect(payload.series).toHaveLength(3);
+    expect(payload.current.session_id).toBe('handoff-latest');
+    expect(payload.previous.session_id).toBe('handoff-middle');
+    expect(payload.window_trend.trend).toBe('improved');
+    expect(payload.window_trend.delta.spec_success_rate_percent).toBe(20);
+    expect(payload.window_trend.delta.risk_level_rank).toBe(-2);
+    expect(payload.aggregates).toEqual(expect.objectContaining({
+      avg_spec_success_rate_percent: 80,
+      min_spec_success_rate_percent: 70,
+      max_spec_success_rate_percent: 90
+    }));
+    expect(payload.aggregates.risk_levels).toEqual(expect.objectContaining({
+      low: 1,
+      medium: 1,
+      high: 1
+    }));
+  });
+
+  test('validates regression window range', async () => {
+    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    await fs.ensureDir(reportDir);
+    await fs.writeJson(path.join(reportDir, 'handoff-one.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-one',
+      status: 'completed',
+      generated_at: '2026-02-16T00:00:00.000Z',
+      spec_status: {
+        success_rate_percent: 100
+      },
+      batch_summary: {
+        failed_goals: 0
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'regression',
+        '--window',
+        '1',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.error).toContain('--window must be an integer between 2 and 50.');
+  });
+
+  test('adds regression recommendations when trend degrades', async () => {
+    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    await fs.ensureDir(reportDir);
+    await fs.writeJson(path.join(reportDir, 'handoff-good.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-good',
+      status: 'completed',
+      generated_at: '2026-02-16T00:00:00.000Z',
+      spec_status: {
+        success_rate_percent: 100
+      },
+      gates: {
+        actual: {
+          risk_level: 'low'
+        }
+      },
+      batch_summary: {
+        failed_goals: 0
+      }
+    }, { spaces: 2 });
+    await new Promise(resolve => setTimeout(resolve, 20));
+    await fs.writeJson(path.join(reportDir, 'handoff-bad.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-bad',
+      status: 'failed',
+      generated_at: '2026-02-16T01:00:00.000Z',
+      spec_status: {
+        success_rate_percent: 80
+      },
+      gates: {
+        actual: {
+          risk_level: 'high'
+        }
+      },
+      batch_summary: {
+        failed_goals: 3
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'regression',
+      '--session-id',
+      'latest',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-regression');
+    expect(payload.trend).toBe('degraded');
+    expect(payload.recommendations.some(item => item.includes('--continue-from handoff-bad'))).toBe(true);
+    expect(payload.recommendations).toContain('kse auto governance stats --days 14 --json');
+  });
+
+  test('supports handoff regression out file option', async () => {
+    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    const outFile = path.join(tempDir, '.kiro', 'reports', 'handoff-regression.json');
+    await fs.ensureDir(reportDir);
+    await fs.writeJson(path.join(reportDir, 'handoff-old.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-old',
+      status: 'completed',
+      generated_at: '2026-02-16T00:00:00.000Z',
+      spec_status: {
+        success_rate_percent: 90
+      },
+      batch_summary: {
+        failed_goals: 1
+      }
+    }, { spaces: 2 });
+    await new Promise(resolve => setTimeout(resolve, 20));
+    await fs.writeJson(path.join(reportDir, 'handoff-new.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-new',
+      status: 'completed',
+      generated_at: '2026-02-16T01:00:00.000Z',
+      spec_status: {
+        success_rate_percent: 100
+      },
+      batch_summary: {
+        failed_goals: 0
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'regression',
+      '--out',
+      outFile,
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-regression');
+    expect(payload.output_file).toBe(outFile);
+    expect(await fs.pathExists(outFile)).toBe(true);
+    const saved = await fs.readJson(outFile);
+    expect(saved.mode).toBe('auto-handoff-regression');
+    expect(saved.current.session_id).toBe('handoff-new');
+  });
+
+  test('supports handoff regression markdown format output file', async () => {
+    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    const outFile = path.join(tempDir, '.kiro', 'reports', 'handoff-regression.md');
+    await fs.ensureDir(reportDir);
+    await fs.writeJson(path.join(reportDir, 'handoff-old.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-old',
+      status: 'completed',
+      generated_at: '2026-02-16T00:00:00.000Z',
+      spec_status: {
+        success_rate_percent: 90
+      },
+      batch_summary: {
+        failed_goals: 1
+      }
+    }, { spaces: 2 });
+    await new Promise(resolve => setTimeout(resolve, 20));
+    await fs.writeJson(path.join(reportDir, 'handoff-new.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-new',
+      status: 'completed',
+      generated_at: '2026-02-16T01:00:00.000Z',
+      spec_status: {
+        success_rate_percent: 100
+      },
+      batch_summary: {
+        failed_goals: 0
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'regression',
+      '--format',
+      'markdown',
+      '--out',
+      outFile,
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-regression');
+    expect(payload.report_format).toBe('markdown');
+    expect(payload.output_file).toBe(outFile);
+    expect(await fs.pathExists(outFile)).toBe(true);
+    const markdown = await fs.readFile(outFile, 'utf8');
+    expect(markdown).toContain('# Auto Handoff Regression Report');
+    expect(markdown).toContain('- Session: handoff-new');
+    expect(markdown).toContain('## Recommendations');
+  });
+
+  test('validates regression format option', async () => {
+    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    await fs.ensureDir(reportDir);
+    await fs.writeJson(path.join(reportDir, 'handoff-one.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-one',
+      status: 'completed',
+      generated_at: '2026-02-16T00:00:00.000Z',
+      spec_status: {
+        success_rate_percent: 100
+      },
+      batch_summary: {
+        failed_goals: 0
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'regression',
+        '--format',
+        'html',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.error).toContain('--format must be one of: json, markdown.');
   });
 });

@@ -37,6 +37,12 @@ describe('OrchestratorConfig', () => {
         maxParallel: 3,
         timeoutSeconds: 600,
         maxRetries: 2,
+        rateLimitMaxRetries: 6,
+        rateLimitBackoffBaseMs: 1000,
+        rateLimitBackoffMaxMs: 30000,
+        rateLimitAdaptiveParallel: true,
+        rateLimitParallelFloor: 1,
+        rateLimitCooldownMs: 30000,
         apiKeyEnvVar: 'CODEX_API_KEY',
         bootstrapTemplate: null,
         codexArgs: [],
@@ -53,7 +59,9 @@ describe('OrchestratorConfig', () => {
     test('contains all expected config keys', () => {
       const expected = [
         'agentBackend', 'maxParallel', 'timeoutSeconds',
-        'maxRetries', 'apiKeyEnvVar', 'bootstrapTemplate', 'codexArgs',
+        'maxRetries', 'rateLimitMaxRetries', 'rateLimitBackoffBaseMs', 'rateLimitBackoffMaxMs',
+        'rateLimitAdaptiveParallel', 'rateLimitParallelFloor', 'rateLimitCooldownMs',
+        'apiKeyEnvVar', 'bootstrapTemplate', 'codexArgs',
         'codexCommand',
       ];
       for (const key of expected) {
@@ -90,6 +98,12 @@ describe('OrchestratorConfig', () => {
       // Other fields should be defaults
       expect(result.agentBackend).toBe('codex');
       expect(result.maxRetries).toBe(2);
+      expect(result.rateLimitMaxRetries).toBe(6);
+      expect(result.rateLimitBackoffBaseMs).toBe(1000);
+      expect(result.rateLimitBackoffMaxMs).toBe(30000);
+      expect(result.rateLimitAdaptiveParallel).toBe(true);
+      expect(result.rateLimitParallelFloor).toBe(1);
+      expect(result.rateLimitCooldownMs).toBe(30000);
       expect(result.apiKeyEnvVar).toBe('CODEX_API_KEY');
       expect(result.bootstrapTemplate).toBeNull();
       expect(result.codexArgs).toEqual([]);
@@ -103,6 +117,12 @@ describe('OrchestratorConfig', () => {
         maxParallel: 8,
         timeoutSeconds: 300,
         maxRetries: 5,
+        rateLimitMaxRetries: 9,
+        rateLimitBackoffBaseMs: 1500,
+        rateLimitBackoffMaxMs: 45000,
+        rateLimitAdaptiveParallel: false,
+        rateLimitParallelFloor: 2,
+        rateLimitCooldownMs: 120000,
         apiKeyEnvVar: 'CLAUDE_API_KEY',
         bootstrapTemplate: 'templates/custom.md',
         codexArgs: ['--model', 'gpt-4'],

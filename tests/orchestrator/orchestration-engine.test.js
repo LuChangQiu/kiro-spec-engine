@@ -273,6 +273,45 @@ describe('OrchestrationEngine', () => {
 
       expect(maxConcurrent).toBeLessThanOrEqual(1);
     });
+
+    test('adaptive parallel throttles on rate limit and recovers after cooldown', () => {
+      let now = 0;
+      engine._now = () => now;
+      engine._applyRetryPolicyConfig({
+        rateLimitAdaptiveParallel: true,
+        rateLimitParallelFloor: 1,
+        rateLimitCooldownMs: 1000,
+      });
+      engine._initializeAdaptiveParallel(8);
+
+      engine._onRateLimitSignal();
+      expect(engine._effectiveMaxParallel).toBe(4);
+      expect(engine._getEffectiveMaxParallel(8)).toBe(4);
+
+      engine._onRateLimitSignal();
+      expect(engine._effectiveMaxParallel).toBe(2);
+      expect(engine._getEffectiveMaxParallel(8)).toBe(2);
+
+      now = 1001;
+      expect(engine._getEffectiveMaxParallel(8)).toBe(3);
+
+      now = 2002;
+      expect(engine._getEffectiveMaxParallel(8)).toBe(4);
+    });
+
+    test('adaptive parallel can be disabled', () => {
+      engine._applyRetryPolicyConfig({
+        rateLimitAdaptiveParallel: false,
+        rateLimitParallelFloor: 1,
+        rateLimitCooldownMs: 1000,
+      });
+      engine._initializeAdaptiveParallel(5);
+
+      engine._onRateLimitSignal();
+
+      expect(engine._effectiveMaxParallel).toBe(5);
+      expect(engine._getEffectiveMaxParallel(5)).toBe(5);
+    });
   });
 
   // -------------------------------------------------------------------------
@@ -429,6 +468,119 @@ describe('OrchestrationEngine', () => {
       await engine.start(['spec-a']);
 
       expect(mockStatusMonitor.incrementRetry).toHaveBeenCalledWith('spec-a');
+    });
+
+    test('rate-limit errors use backoff before retry', async () => {
+      mockDependencyManager.buildDependencyGraph.mockResolvedValue({
+        nodes: ['spec-a'],
+        edges: [],
+      });
+      mockConfig.getConfig.mockResolvedValue({
+        maxParallel: 3,
+        maxRetries: 1,
+        rateLimitBackoffBaseMs: 200,
+        rateLimitBackoffMaxMs: 5000,
+      });
+
+      engine._random = () => 0; // deterministic jitter floor (50%)
+      const sleepSpy = jest.spyOn(engine, '_sleep').mockResolvedValue(undefined);
+
+      let callCount = 0;
+      mockSpawner.spawn.mockImplementation((specName) => {
+        callCount++;
+        const agentId = `agent-${specName}-${callCount}`;
+        process.nextTick(() => {
+          if (callCount === 1) {
+            mockSpawner.emit('agent:failed', {
+              agentId, specName, exitCode: 1, stderr: '429 Too Many Requests',
+            });
+          } else {
+            mockSpawner.emit('agent:completed', { agentId, specName, exitCode: 0 });
+          }
+        });
+        return Promise.resolve({ agentId, specName, status: 'running' });
+      });
+
+      const result = await engine.start(['spec-a']);
+
+      expect(mockSpawner.spawn).toHaveBeenCalledTimes(2);
+      expect(sleepSpy).toHaveBeenCalledTimes(1);
+      expect(sleepSpy).toHaveBeenCalledWith(100);
+      expect(result.completed).toContain('spec-a');
+      sleepSpy.mockRestore();
+    });
+
+    test('non-rate-limit retries do not apply backoff sleep', async () => {
+      mockDependencyManager.buildDependencyGraph.mockResolvedValue({
+        nodes: ['spec-a'],
+        edges: [],
+      });
+      mockConfig.getConfig.mockResolvedValue({
+        maxParallel: 3,
+        maxRetries: 1,
+        rateLimitBackoffBaseMs: 200,
+        rateLimitBackoffMaxMs: 5000,
+      });
+
+      const sleepSpy = jest.spyOn(engine, '_sleep').mockResolvedValue(undefined);
+
+      let callCount = 0;
+      mockSpawner.spawn.mockImplementation((specName) => {
+        callCount++;
+        const agentId = `agent-${specName}-${callCount}`;
+        process.nextTick(() => {
+          if (callCount === 1) {
+            mockSpawner.emit('agent:failed', {
+              agentId, specName, exitCode: 1, stderr: 'build error',
+            });
+          } else {
+            mockSpawner.emit('agent:completed', { agentId, specName, exitCode: 0 });
+          }
+        });
+        return Promise.resolve({ agentId, specName, status: 'running' });
+      });
+
+      const result = await engine.start(['spec-a']);
+
+      expect(mockSpawner.spawn).toHaveBeenCalledTimes(2);
+      expect(sleepSpy).not.toHaveBeenCalled();
+      expect(result.completed).toContain('spec-a');
+      sleepSpy.mockRestore();
+    });
+
+    test('rate-limit retries use rateLimitMaxRetries when maxRetries is lower', async () => {
+      mockDependencyManager.buildDependencyGraph.mockResolvedValue({
+        nodes: ['spec-a'],
+        edges: [],
+      });
+      mockConfig.getConfig.mockResolvedValue({
+        maxParallel: 3,
+        maxRetries: 0,
+        rateLimitMaxRetries: 2,
+        rateLimitBackoffBaseMs: 200,
+        rateLimitBackoffMaxMs: 5000,
+      });
+
+      const sleepSpy = jest.spyOn(engine, '_sleep').mockResolvedValue(undefined);
+
+      let callCount = 0;
+      mockSpawner.spawn.mockImplementation((specName) => {
+        callCount++;
+        const agentId = `agent-${specName}-${callCount}`;
+        process.nextTick(() => {
+          mockSpawner.emit('agent:failed', {
+            agentId, specName, exitCode: 1, stderr: 'rate limit exceeded',
+          });
+        });
+        return Promise.resolve({ agentId, specName, status: 'running' });
+      });
+
+      const result = await engine.start(['spec-a']);
+
+      expect(result.status).toBe('failed');
+      expect(mockSpawner.spawn).toHaveBeenCalledTimes(3); // initial + 2 rate-limit retries
+      expect(sleepSpy).toHaveBeenCalledTimes(2);
+      sleepSpy.mockRestore();
     });
   });
 

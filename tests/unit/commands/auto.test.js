@@ -4740,6 +4740,121 @@ describe('auto close-loop command', () => {
     expect(resumedPayload.stop_reason).toBe('non-mutating-mode');
   });
 
+  test('inherits persisted governance policy defaults on resume', async () => {
+    const firstProgram = buildProgram();
+    await firstProgram.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'governance',
+      'close-loop',
+      '--plan-only',
+      '--max-rounds',
+      '3',
+      '--target-risk',
+      'medium',
+      '--execute-advisory',
+      '--advisory-recover-max-rounds',
+      '5',
+      '--advisory-controller-max-cycles',
+      '30',
+      '--governance-session-id',
+      'gov-resume-policy-defaults',
+      '--json'
+    ]);
+
+    logSpy.mockClear();
+    const resumedProgram = buildProgram();
+    await resumedProgram.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'governance',
+      'close-loop',
+      '--governance-resume',
+      'gov-resume-policy-defaults',
+      '--plan-only',
+      '--max-rounds',
+      '4',
+      '--json'
+    ]);
+
+    const resumedOutput = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const resumedPayload = JSON.parse(resumedOutput.trim());
+    expect(resumedPayload.mode).toBe('auto-governance-close-loop');
+    expect(resumedPayload.target_risk).toBe('medium');
+    expect(resumedPayload.execute_advisory).toBe(true);
+    expect(resumedPayload.advisory_policy).toEqual(expect.objectContaining({
+      recover_max_rounds: 5,
+      controller_max_cycles: 30
+    }));
+  });
+
+  test('guards governance resume option drift unless override is enabled', async () => {
+    const firstProgram = buildProgram();
+    await firstProgram.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'governance',
+      'close-loop',
+      '--plan-only',
+      '--max-rounds',
+      '3',
+      '--target-risk',
+      'low',
+      '--governance-session-id',
+      'gov-resume-drift-guard',
+      '--json'
+    ]);
+
+    logSpy.mockClear();
+    errorSpy.mockClear();
+    const rejectedProgram = buildProgram();
+    await expect(
+      rejectedProgram.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'governance',
+        'close-loop',
+        '--governance-resume',
+        'gov-resume-drift-guard',
+        '--plan-only',
+        '--target-risk',
+        'high',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+    const driftOutput = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const driftPayload = JSON.parse(driftOutput.trim());
+    expect(driftPayload.success).toBe(false);
+    expect(driftPayload.error).toContain('Governance resume option drift detected');
+    expect(driftPayload.error).toContain('--governance-resume-allow-drift');
+
+    logSpy.mockClear();
+    errorSpy.mockClear();
+    const overrideProgram = buildProgram();
+    await overrideProgram.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'governance',
+      'close-loop',
+      '--governance-resume',
+      'gov-resume-drift-guard',
+      '--governance-resume-allow-drift',
+      '--plan-only',
+      '--target-risk',
+      'high',
+      '--json'
+    ]);
+    const overrideOutput = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const overridePayload = JSON.parse(overrideOutput.trim());
+    expect(overridePayload.target_risk).toBe('high');
+    expect(overridePayload.mode).toBe('auto-governance-close-loop');
+  });
+
   test('lists, stats, and prunes governance close-loop sessions in json mode', async () => {
     const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
     await fs.ensureDir(governanceSessionDir);

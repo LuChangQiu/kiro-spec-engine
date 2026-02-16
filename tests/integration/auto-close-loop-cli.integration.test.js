@@ -2134,6 +2134,57 @@ describe('auto close-loop CLI integration', () => {
     expect(resumedPayload.stop_reason).toBe('non-mutating-mode');
   });
 
+  test('guards governance resume option drift through CLI unless override is enabled', async () => {
+    const firstRun = await runCli([
+      'auto',
+      'governance',
+      'close-loop',
+      '--plan-only',
+      '--max-rounds',
+      '3',
+      '--target-risk',
+      'low',
+      '--governance-session-id',
+      'integration-governance-resume-drift',
+      '--json'
+    ], { cwd: tempDir });
+    expect(firstRun.exitCode).toBe(0);
+
+    const rejected = await runCli([
+      'auto',
+      'governance',
+      'close-loop',
+      '--governance-resume',
+      'integration-governance-resume-drift',
+      '--plan-only',
+      '--target-risk',
+      'high',
+      '--json'
+    ], { cwd: tempDir });
+    expect(rejected.exitCode).toBe(1);
+    const rejectedPayload = parseJsonOutput(rejected.stdout);
+    expect(rejectedPayload.success).toBe(false);
+    expect(rejectedPayload.error).toContain('Governance resume option drift detected');
+    expect(rejectedPayload.error).toContain('--governance-resume-allow-drift');
+
+    const overridden = await runCli([
+      'auto',
+      'governance',
+      'close-loop',
+      '--governance-resume',
+      'integration-governance-resume-drift',
+      '--governance-resume-allow-drift',
+      '--plan-only',
+      '--target-risk',
+      'high',
+      '--json'
+    ], { cwd: tempDir });
+    expect(overridden.exitCode).toBe(0);
+    const overriddenPayload = parseJsonOutput(overridden.stdout);
+    expect(overriddenPayload.mode).toBe('auto-governance-close-loop');
+    expect(overriddenPayload.target_risk).toBe('high');
+  });
+
   test('supports governance session list/stats/prune lifecycle through CLI', async () => {
     const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
     await fs.ensureDir(governanceSessionDir);

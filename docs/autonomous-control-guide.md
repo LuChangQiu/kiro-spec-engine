@@ -236,8 +236,8 @@ Cross-archive governance snapshot:
   - `--governance-session-keep` enables automatic post-run governance session pruning (optional age window via `--governance-session-older-than-days`) while preserving the current run session file.
   - `--execute-advisory` enables automatic advisory action execution when detected (`recover-latest`, `controller-resume-latest`), with autonomous source selection (latest recoverable summary / latest pending controller session) and `skipped` telemetry when no actionable source exists.
   - Emits round history (`risk_before`/`risk_after`, planned/applicable/applied/failed actions), advisory telemetry (`advisory_*` fields), plus initial/final assessments for auditable autonomous governance convergence.
-- `kse auto governance session list [--limit <n>] [--status <csv>] [--json]`: inspect persisted governance close-loop session archive.
-- `kse auto governance session stats [--days <n>] [--status <csv>] [--json]`: aggregate governance session completion/failure/convergence/risk telemetry.
+- `kse auto governance session list [--limit <n>] [--status <csv>] [--resume-only] [--json]`: inspect persisted governance close-loop session archive (optional resumed-chain filter).
+- `kse auto governance session stats [--days <n>] [--status <csv>] [--resume-only] [--json]`: aggregate governance session completion/failure/convergence/risk telemetry with resumed-session ratio/source breakdown.
 - `kse auto governance session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: enforce governance session retention policy.
 
 Recovery memory maintenance:

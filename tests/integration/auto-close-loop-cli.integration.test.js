@@ -2272,6 +2272,10 @@ describe('auto close-loop CLI integration', () => {
       governance_session: {
         id: 'integration-governance-session-new',
         file: newSession
+      },
+      resumed_from_governance_session: {
+        id: 'integration-governance-session-old',
+        file: oldSession
       }
     }, { spaces: 2 });
 
@@ -2292,8 +2296,29 @@ describe('auto close-loop CLI integration', () => {
     const listPayload = parseJsonOutput(listed.stdout);
     expect(listPayload.mode).toBe('auto-governance-session-list');
     expect(listPayload.total).toBe(1);
+    expect(listPayload.resume_only).toBe(false);
+    expect(listPayload.resumed_sessions).toBe(0);
+    expect(listPayload.fresh_sessions).toBe(1);
     expect(listPayload.sessions).toHaveLength(1);
     expect(listPayload.sessions[0].id).toBe('integration-governance-session-old');
+
+    const resumedListed = await runCli([
+      'auto',
+      'governance',
+      'session',
+      'list',
+      '--resume-only',
+      '--json'
+    ], { cwd: tempDir });
+    expect(resumedListed.exitCode).toBe(0);
+    const resumedListPayload = parseJsonOutput(resumedListed.stdout);
+    expect(resumedListPayload.mode).toBe('auto-governance-session-list');
+    expect(resumedListPayload.total).toBe(1);
+    expect(resumedListPayload.resume_only).toBe(true);
+    expect(resumedListPayload.resumed_sessions).toBe(1);
+    expect(resumedListPayload.fresh_sessions).toBe(0);
+    expect(resumedListPayload.sessions).toHaveLength(1);
+    expect(resumedListPayload.sessions[0].id).toBe('integration-governance-session-new');
 
     const stats = await runCli([
       'auto',
@@ -2306,9 +2331,15 @@ describe('auto close-loop CLI integration', () => {
     const statsPayload = parseJsonOutput(stats.stdout);
     expect(statsPayload.mode).toBe('auto-governance-session-stats');
     expect(statsPayload.total_sessions).toBe(2);
+    expect(statsPayload.resumed_sessions).toBe(1);
+    expect(statsPayload.fresh_sessions).toBe(1);
+    expect(statsPayload.resumed_rate_percent).toBe(50);
     expect(statsPayload.completed_sessions).toBe(1);
     expect(statsPayload.failed_sessions).toBe(1);
     expect(statsPayload.converged_sessions).toBe(1);
+    expect(statsPayload.resumed_from_counts).toEqual(expect.objectContaining({
+      'integration-governance-session-old': 1
+    }));
     expect(statsPayload.final_risk_counts).toEqual(expect.objectContaining({
       high: 1,
       low: 1

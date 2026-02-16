@@ -513,6 +513,10 @@ kse auto schema migrate --only close-loop-session,batch-session --apply --json
 kse auto handoff plan --manifest ../331-poc/docs/handoffs/handoff-manifest.json --json
 kse auto handoff plan --manifest ../331-poc/docs/handoffs/handoff-manifest.json --strict --out .kiro/reports/handoff-plan.json --json
 kse auto handoff queue --manifest ../331-poc/docs/handoffs/handoff-manifest.json --out .kiro/auto/handoff-goals.lines --json
+kse auto handoff template-diff --manifest ../331-poc/docs/handoffs/handoff-manifest.json --json
+kse auto handoff run --manifest ../331-poc/docs/handoffs/handoff-manifest.json --json
+kse auto handoff run --manifest ../331-poc/docs/handoffs/handoff-manifest.json --require-ontology-validation --min-spec-success-rate 95 --max-risk-level medium --json
+kse auto handoff regression --session-id latest --json
 kse auto close-loop-batch .kiro/auto/handoff-goals.lines --format lines --batch-autonomous --continue-on-error --json
 ``` 
 
@@ -747,6 +751,12 @@ Autonomous archive schema compatibility:
 Dual-track handoff integration:
 - `kse auto handoff plan --manifest <path> [--out <path>] [--strict] [--strict-warnings] [--json]`: parse handoff manifest (source project, specs, templates, known gaps) and generate an executable KSE integration phase plan.
 - `kse auto handoff queue --manifest <path> [--out <path>] [--append] [--no-include-known-gaps] [--dry-run] [--json]`: generate close-loop batch goal queue from handoff manifest and optionally persist line-based queue file (default `.kiro/auto/handoff-goals.lines`).
+- `kse auto handoff template-diff --manifest <path> [--json]`: compare manifest templates against local template exports/registry and report `missing_in_local` and `extra_in_local`.
+- `kse auto handoff run --manifest <path> [--out <path>] [--queue-out <path>] [--append] [--no-include-known-gaps] [--dry-run] [--strict] [--strict-warnings] [--no-dependency-batching] [--min-spec-success-rate <n>] [--max-risk-level <level>] [--require-ontology-validation] [--json]`: execute handoff end-to-end (`plan -> queue -> close-loop-batch -> observability`) with automatic report archive to `.kiro/reports/handoff-runs/<session>.json`.
+  - Default mode is dependency-aware: spec integration goals are grouped into dependency batches and executed in topological order.
+  - Gate defaults: `--min-spec-success-rate` defaults to `100`, `--max-risk-level` defaults to `high`.
+  - When `--require-ontology-validation` is enabled, run fails fast at precheck if manifest ontology evidence is missing or not passed.
+- `kse auto handoff regression [--session-id <id|latest>] [--json]`: compare one handoff run report with its previous run and output trend deltas (success-rate/risk/failed-goals/elapsed time).
 
 Recommended `.kiro/config/orchestrator.json`:
 

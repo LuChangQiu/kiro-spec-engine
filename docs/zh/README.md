@@ -20,6 +20,7 @@
 
 - **结构化交付**：先需求、后设计、再任务，实现路径可追踪。
 - **可并行扩展**：支持依赖感知的多 Spec 编排，减少串行等待。
+- **双轨交接闭环**：`kse auto handoff run` 一条命令完成 plan/queue/batch/observability。
 - **结果可量化**：通过 KPI 快照、基线、趋势命令持续度量交付质量。
 - **工具无锁定**：可与 Claude、Cursor、Windsurf、Copilot、Kiro 协作。
 - **治理能力内建**：文档治理、锁管理、环境/工作区控制和审计链路。

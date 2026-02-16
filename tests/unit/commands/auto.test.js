@@ -5850,6 +5850,42 @@ describe('auto close-loop command', () => {
     ]));
   });
 
+  test('builds dependency batches from handoff spec descriptors in plan output', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: [
+        {
+          name: '60-21-dependent-spec',
+          depends_on: ['60-20-base-spec']
+        },
+        {
+          name: '60-20-base-spec'
+        }
+      ],
+      templates: ['moqui-domain-extension']
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'plan',
+      '--manifest',
+      manifestFile,
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-plan');
+    expect(payload.handoff.dependency_batches.batch_count).toBe(2);
+    expect(payload.handoff.dependency_batches.batches[0].specs).toEqual(['60-20-base-spec']);
+    expect(payload.handoff.dependency_batches.batches[1].specs).toEqual(['60-21-dependent-spec']);
+  });
+
   test('generates handoff queue goals and writes queue file', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
     const queueFile = path.join(tempDir, '.kiro', 'auto', 'handoff-goals.lines');
@@ -5917,5 +5953,329 @@ describe('auto close-loop command', () => {
     expect(payload.include_known_gaps).toBe(false);
     expect(payload.goals.join('\n')).not.toContain('auditing KPI mismatch');
     expect(await fs.pathExists(queueFile)).toBe(false);
+  });
+
+  test('diffs handoff templates against local template registry', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-22-template-diff-spec'],
+      templates: ['tpl-a', 'tpl-b']
+    }, { spaces: 2 });
+
+    await fs.ensureDir(path.join(tempDir, '.kiro', 'templates', 'exports', 'tpl-a'));
+    await fs.ensureDir(path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-c'));
+    await fs.writeJson(
+      path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'registry.json'),
+      {
+        templates: [
+          { name: 'tpl-c' },
+          { name: 'tpl-d' }
+        ]
+      },
+      { spaces: 2 }
+    );
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'template-diff',
+      '--manifest',
+      manifestFile,
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-template-diff');
+    expect(payload.compatibility).toBe('needs-sync');
+    expect(payload.diff.matched).toContain('tpl-a');
+    expect(payload.diff.missing_in_local).toContain('tpl-b');
+    expect(payload.diff.extra_in_local).toEqual(expect.arrayContaining(['tpl-c', 'tpl-d']));
+  });
+
+  test('runs handoff pipeline end-to-end and archives run report', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    const queueFile = path.join(tempDir, '.kiro', 'auto', 'handoff-goals.lines');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-08-inventory-procurement'],
+      templates: ['moqui-domain-extension'],
+      known_gaps: ['inventory reconciliation pending'],
+      ontology_validation: {
+        status: 'passed',
+        executed_at: '2026-02-16T08:00:00.000Z'
+      }
+    }, { spaces: 2 });
+
+    runAutoCloseLoop.mockResolvedValue({
+      status: 'completed',
+      portfolio: {
+        master_spec: '160-00-handoff',
+        sub_specs: ['160-01-sub']
+      }
+    });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'run',
+      '--manifest',
+      manifestFile,
+      '--queue-out',
+      queueFile,
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('completed');
+    expect(payload.gates.passed).toBe(true);
+    expect(payload.queue.output_file).toBe(queueFile);
+    expect(payload.output_file).toContain(path.join('.kiro', 'reports', 'handoff-runs'));
+    expect(await fs.pathExists(payload.output_file)).toBe(true);
+    expect(await fs.pathExists(queueFile)).toBe(true);
+    expect(runAutoCloseLoop).toHaveBeenCalledTimes(payload.queue.goal_count);
+  });
+
+  test('runs handoff by dependency batches before post-spec goals', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: [
+        {
+          name: '60-31-dependent-spec',
+          depends_on: ['60-30-base-spec']
+        },
+        {
+          name: '60-30-base-spec'
+        }
+      ],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    runAutoCloseLoop.mockResolvedValue({
+      status: 'completed',
+      portfolio: {
+        master_spec: '161-00-handoff',
+        sub_specs: []
+      }
+    });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'run',
+      '--manifest',
+      manifestFile,
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('completed');
+    expect(payload.dependency_execution.dependency_plan.batch_count).toBe(2);
+    expect(runAutoCloseLoop.mock.calls[0][0]).toContain('integrate handoff spec 60-30-base-spec');
+    expect(runAutoCloseLoop.mock.calls[1][0]).toContain('integrate handoff spec 60-31-dependent-spec');
+  });
+
+  test('supports handoff run dry-run without executing close-loop-batch', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    const queueFile = path.join(tempDir, '.kiro', 'auto', 'handoff-goals.lines');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-09-order-fulfillment'],
+      templates: ['moqui-domain-extension'],
+      known_gaps: ['delivery anomaly triage']
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'run',
+      '--manifest',
+      manifestFile,
+      '--queue-out',
+      queueFile,
+      '--dry-run',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('dry-run');
+    expect(payload.phases.find(item => item.id === 'execution').status).toBe('skipped');
+    expect(payload.phases.find(item => item.id === 'observability').status).toBe('skipped');
+    expect(await fs.pathExists(queueFile)).toBe(false);
+    expect(runAutoCloseLoop).not.toHaveBeenCalled();
+    expect(await fs.pathExists(payload.output_file)).toBe(true);
+  });
+
+  test('fails handoff run early when ontology validation gate is required but missing', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-10-service-quality'],
+      templates: ['moqui-domain-extension'],
+      known_gaps: ['quality baseline missing']
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--require-ontology-validation',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('failed');
+    expect(payload.error).toContain('handoff ontology validation gate failed');
+    expect(runAutoCloseLoop).not.toHaveBeenCalled();
+  });
+
+  test('fails handoff run gate when spec success rate is below threshold', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-12-warranty-claims'],
+      templates: ['moqui-domain-extension'],
+      known_gaps: ['claims SLA overdue'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    runAutoCloseLoop.mockImplementation(async goal => {
+      if (`${goal}`.startsWith('integrate handoff spec 60-12-warranty-claims')) {
+        return {
+          status: 'failed',
+          portfolio: {
+            master_spec: '160-00-warranty',
+            sub_specs: []
+          }
+        };
+      }
+      return {
+        status: 'completed',
+        portfolio: {
+          master_spec: '160-00-generic',
+          sub_specs: []
+        }
+      };
+    });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--min-spec-success-rate',
+        '90',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('failed');
+    expect(payload.gates.passed).toBe(false);
+    expect(payload.gates.reasons.join(' ')).toContain('spec_success_rate_percent');
+    expect(runAutoCloseLoop).toHaveBeenCalled();
+  });
+
+  test('builds handoff regression by comparing latest run report with previous one', async () => {
+    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    await fs.ensureDir(reportDir);
+    await fs.writeJson(path.join(reportDir, 'handoff-old.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-old',
+      status: 'completed',
+      generated_at: '2026-02-16T00:00:00.000Z',
+      elapsed_ms: 5000,
+      spec_status: {
+        success_rate_percent: 80
+      },
+      gates: {
+        actual: {
+          risk_level: 'medium'
+        }
+      },
+      batch_summary: {
+        failed_goals: 2
+      }
+    }, { spaces: 2 });
+    await new Promise(resolve => setTimeout(resolve, 20));
+    await fs.writeJson(path.join(reportDir, 'handoff-new.json'), {
+      mode: 'auto-handoff-run',
+      session_id: 'handoff-new',
+      status: 'completed',
+      generated_at: '2026-02-16T01:00:00.000Z',
+      elapsed_ms: 4000,
+      spec_status: {
+        success_rate_percent: 100
+      },
+      gates: {
+        actual: {
+          risk_level: 'low'
+        }
+      },
+      batch_summary: {
+        failed_goals: 0
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'regression',
+      '--session-id',
+      'latest',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-regression');
+    expect(payload.current.session_id).toBe('handoff-new');
+    expect(payload.previous.session_id).toBe('handoff-old');
+    expect(payload.trend).toBe('improved');
+    expect(payload.delta.spec_success_rate_percent).toBe(20);
+    expect(payload.delta.risk_level_rank).toBe(-1);
   });
 });

@@ -11,28 +11,30 @@
 3. 将 handoff manifest 生成 close-loop-batch 目标队列（支持 dry-run、append、known-gaps 开关）。
 4. 补齐单测覆盖（plan/queue/dry-run 分支）。
 5. 更新命令参考与中英文文档入口。
-
-## 下一阶段（P1）
-
-1. 新增 `kse auto handoff run`：
+6. 新增 `kse auto handoff run`：
    - 一条命令串行执行 `plan -> queue -> close-loop-batch -> observability`。
    - 支持 `--dry-run` 与失败自动中断。
-2. 新增 handoff 结果归档：
-   - 输出 `.kiro/reports/handoff-runs/<session>.json`。
-   - 汇总每个 spec 的校验状态与阻塞项。
-3. 增加 handoff 门禁策略：
+7. 新增 handoff 结果归档：
+   - 默认输出 `.kiro/reports/handoff-runs/<session>.json`。
+   - 汇总每个 spec 的执行状态与阻塞项。
+8. 新增 handoff 门禁策略：
    - `--min-spec-success-rate`
    - `--max-risk-level`
    - `--require-ontology-validation`
+9. 新增主从依赖批次执行：
+   - 从 manifest `specs[].depends_on` 构建依赖拓扑批次。
+   - `handoff run` 默认按依赖批次顺序执行 spec 集成目标。
+10. 新增模板差异检测：
+   - `kse auto handoff template-diff` 对比 manifest 模板与本地模板库。
+11. 新增跨轮次回归分析：
+   - `kse auto handoff regression` 对比相邻批次成功率/风险/失败目标/耗时变化。
+   - `handoff run` 结果中自动附加 regression 摘要。
 
-## 中期增强（P2）
+## 下一阶段（P2）
 
-1. 将 handoff 批次映射为主从 agent 编排输入：
-   - 根据 spec 依赖自动分批并发。
-2. 引入 template 差异检测：
-   - 对比 handoff 模板与本地模板库差异。
-3. 增加跨轮次回归分析：
-   - 对比本轮与上轮 handoff 的质量、风险与收敛速度。
+1. 让 `handoff run` 输出与 release evidence 自动合并，形成可发布证据包。
+2. 增加 `handoff run --continue-from <session>` 断点续跑能力。
+3. 增加回归对比可视化报表（多轮趋势图 + 风险分层视图）。
 
 ## 长期目标（P3）
 

@@ -16,12 +16,27 @@
 
 ## 2.0 一键化入口（推荐）
 
-先基于 handoff manifest 生成计划和队列，再执行批次：
+推荐直接使用一条命令闭环执行：
 
 ```bash
-npx kse auto handoff plan --manifest ../331-poc/docs/handoffs/handoff-manifest.json --out .kiro/reports/handoff-plan.json --json
-npx kse auto handoff queue --manifest ../331-poc/docs/handoffs/handoff-manifest.json --out .kiro/auto/handoff-goals.lines --json
-npx kse auto close-loop-batch .kiro/auto/handoff-goals.lines --format lines --batch-autonomous --continue-on-error --json
+npx kse auto handoff run --manifest ../331-poc/docs/handoffs/handoff-manifest.json --json
+```
+
+需要更严格门禁时：
+
+```bash
+npx kse auto handoff run --manifest ../331-poc/docs/handoffs/handoff-manifest.json \
+  --require-ontology-validation \
+  --min-spec-success-rate 95 \
+  --max-risk-level medium \
+  --json
+```
+
+建议每轮执行后追加两条诊断命令：
+
+```bash
+npx kse auto handoff template-diff --manifest ../331-poc/docs/handoffs/handoff-manifest.json --json
+npx kse auto handoff regression --session-id latest --json
 ```
 
 ## 2.1 批次 1：输入预检

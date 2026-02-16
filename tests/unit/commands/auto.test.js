@@ -4855,6 +4855,51 @@ describe('auto close-loop command', () => {
     expect(overridePayload.mode).toBe('auto-governance-close-loop');
   });
 
+  test('applies governance session retention policy after close-loop run', async () => {
+    const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
+    await fs.ensureDir(governanceSessionDir);
+    const staleFile = path.join(governanceSessionDir, 'governance-retention-stale.json');
+    await fs.writeJson(staleFile, {
+      mode: 'auto-governance-close-loop',
+      status: 'stopped',
+      governance_session: {
+        id: 'governance-retention-stale',
+        file: staleFile
+      }
+    }, { spaces: 2 });
+
+    const oldDate = new Date('2020-01-01T00:00:00.000Z');
+    await fs.utimes(staleFile, oldDate, oldDate);
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'governance',
+      'close-loop',
+      '--plan-only',
+      '--governance-session-id',
+      'governance-retention-current',
+      '--governance-session-keep',
+      '0',
+      '--json'
+    ]);
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-governance-close-loop');
+    expect(parsed.governance_session_prune).toEqual(expect.objectContaining({
+      mode: 'auto-governance-session-prune',
+      deleted_count: 1
+    }));
+    expect(parsed.governance_session_prune.candidates).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'governance-retention-stale' })
+    ]));
+    expect(await fs.pathExists(staleFile)).toBe(false);
+    const currentFile = path.join(governanceSessionDir, 'governance-retention-current.json');
+    expect(await fs.pathExists(currentFile)).toBe(true);
+  });
+
   test('lists, stats, and prunes governance close-loop sessions in json mode', async () => {
     const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
     await fs.ensureDir(governanceSessionDir);

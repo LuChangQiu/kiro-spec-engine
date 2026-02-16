@@ -2185,6 +2185,47 @@ describe('auto close-loop CLI integration', () => {
     expect(overriddenPayload.target_risk).toBe('high');
   });
 
+  test('applies governance session retention policy through CLI', async () => {
+    const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
+    await fs.ensureDir(governanceSessionDir);
+    const staleFile = path.join(governanceSessionDir, 'integration-governance-retention-stale.json');
+    await fs.writeJson(staleFile, {
+      mode: 'auto-governance-close-loop',
+      status: 'stopped',
+      governance_session: {
+        id: 'integration-governance-retention-stale',
+        file: staleFile
+      }
+    }, { spaces: 2 });
+    const oldDate = new Date('2020-01-01T00:00:00.000Z');
+    await fs.utimes(staleFile, oldDate, oldDate);
+
+    const run = await runCli([
+      'auto',
+      'governance',
+      'close-loop',
+      '--plan-only',
+      '--governance-session-id',
+      'integration-governance-retention-current',
+      '--governance-session-keep',
+      '0',
+      '--json'
+    ], { cwd: tempDir });
+    expect(run.exitCode).toBe(0);
+    const payload = parseJsonOutput(run.stdout);
+    expect(payload.mode).toBe('auto-governance-close-loop');
+    expect(payload.governance_session_prune).toEqual(expect.objectContaining({
+      mode: 'auto-governance-session-prune',
+      deleted_count: 1
+    }));
+    expect(payload.governance_session_prune.candidates).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'integration-governance-retention-stale' })
+    ]));
+    expect(await fs.pathExists(staleFile)).toBe(false);
+    const currentFile = path.join(governanceSessionDir, 'integration-governance-retention-current.json');
+    expect(await fs.pathExists(currentFile)).toBe(true);
+  });
+
   test('supports governance session list/stats/prune lifecycle through CLI', async () => {
     const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
     await fs.ensureDir(governanceSessionDir);

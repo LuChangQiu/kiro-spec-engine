@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Governance close-loop post-run retention hook**: Added `--governance-session-keep` and `--governance-session-older-than-days` to `kse auto governance close-loop` for automatic governance session archive pruning after each run, with current session protection and telemetry in `governance_session_prune`.
 - **Governance resume drift guardrails**: `kse auto governance close-loop --governance-resume` now reuses persisted target/advisory policy defaults by default and blocks explicit policy drift unless `--governance-resume-allow-drift` is set, reducing accidental resume misconfiguration.
 - **Governance session maintenance commands**: Added `kse auto governance session list|stats|prune` for persisted governance close-loop session observability and retention management, including status/day filters, convergence/risk telemetry, and archive cleanup controls (`--keep`, `--older-than-days`, `--dry-run`).
 - **Governance close-loop session persistence and resume**: Added default governance loop session archiving (`.kiro/auto/governance-close-loop-sessions`) with controls `--governance-session-id`, `--no-governance-session`, and `--governance-resume <session|latest|file>` so interrupted governance rounds can be resumed without restarting from round 1.

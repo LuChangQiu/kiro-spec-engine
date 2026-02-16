@@ -306,6 +306,42 @@ describe('auto close-loop command', () => {
     expect(summary.processed_goals).toBe(4);
   });
 
+  test('allocates unique prefixes per goal for parallel close-loop-batch runs', async () => {
+    const goalsFile = path.join(tempDir, 'goals.json');
+    await fs.writeJson(goalsFile, {
+      goals: ['goal one', 'goal two', 'goal three']
+    }, { spaces: 2 });
+    await fs.ensureDir(path.join(tempDir, '.kiro', 'specs', '210-00-existing'));
+
+    runAutoCloseLoop.mockImplementation(async (_goal, options) => ({
+      status: 'completed',
+      portfolio: {
+        master_spec: `master-${options.prefix}`,
+        sub_specs: []
+      }
+    }));
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'close-loop-batch',
+      goalsFile,
+      '--batch-parallel',
+      '2',
+      '--continue-on-error',
+      '--json'
+    ]);
+
+    expect(runAutoCloseLoop).toHaveBeenCalledTimes(3);
+    const prefixes = runAutoCloseLoop.mock.calls
+      .map(call => call[1].prefix)
+      .sort((a, b) => a - b);
+    expect(prefixes).toEqual([211, 212, 213]);
+    expect(new Set(prefixes).size).toBe(3);
+  });
+
   test('applies batch agent budget to per-goal maxParallel', async () => {
     const goalsFile = path.join(tempDir, 'goals.json');
     await fs.writeJson(goalsFile, {

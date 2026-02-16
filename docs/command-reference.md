@@ -477,6 +477,9 @@ kse auto governance close-loop --plan-only --max-rounds 3 --target-risk low --js
 kse auto governance close-loop --max-rounds 3 --target-risk low --session-keep 20 --batch-session-keep 20 --controller-session-keep 20 --json
 kse auto governance close-loop --max-rounds 3 --target-risk low --execute-advisory --advisory-recover-max-rounds 3 --advisory-controller-max-cycles 20 --dry-run --json
 kse auto governance close-loop --governance-resume latest --max-rounds 5 --json
+kse auto governance session list --limit 20 --status completed,failed --json
+kse auto governance session stats --days 30 --json
+kse auto governance session prune --keep 50 --older-than-days 30 --dry-run --json
 
 # Recovery memory maintenance
 kse auto recovery-memory show --json
@@ -680,6 +683,9 @@ Cross-archive autonomous governance maintenance:
   - Governance close-loop sessions are persisted by default at `.kiro/auto/governance-close-loop-sessions/*.json`; use `--governance-resume` to continue interrupted governance loops.
   - `--execute-advisory` enables automatic advisory action execution (`recover-latest`, `controller-resume-latest`) when governance assessment detects failed sessions or controller pending goals; KSE auto-selects the latest actionable advisory source and reports `skipped` (not `failed`) when no actionable source exists.
   - JSON output includes round-by-round risk/action telemetry (`rounds`), advisory telemetry (`execute_advisory`, `advisory_policy`, `advisory_summary`, `rounds[*].advisory_actions`), plus `initial_assessment`, `final_assessment`, and convergence metadata.
+- `kse auto governance session list [--limit <n>] [--status <csv>] [--json]`: list persisted governance close-loop sessions.
+- `kse auto governance session stats [--days <n>] [--status <csv>] [--json]`: aggregate governance close-loop session telemetry (completion/failure/convergence, rounds, risk/stop composition).
+- `kse auto governance session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune governance close-loop session archive by retention policy.
 
 Close-loop recovery memory maintenance:
 - `kse auto recovery-memory show [--scope <scope>] [--json]`: inspect persisted recovery signatures/actions and aggregate stats (optionally scoped)

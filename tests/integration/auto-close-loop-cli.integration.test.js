@@ -2133,4 +2133,110 @@ describe('auto close-loop CLI integration', () => {
     expect(resumedPayload.rounds).toHaveLength(2);
     expect(resumedPayload.stop_reason).toBe('non-mutating-mode');
   });
+
+  test('supports governance session list/stats/prune lifecycle through CLI', async () => {
+    const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
+    await fs.ensureDir(governanceSessionDir);
+
+    const oldSession = path.join(governanceSessionDir, 'integration-governance-session-old.json');
+    const newSession = path.join(governanceSessionDir, 'integration-governance-session-new.json');
+    await fs.writeJson(oldSession, {
+      mode: 'auto-governance-close-loop',
+      status: 'failed',
+      target_risk: 'low',
+      max_rounds: 3,
+      performed_rounds: 3,
+      converged: false,
+      stop_reason: 'max-rounds-exhausted',
+      execute_advisory: true,
+      advisory_summary: {
+        planned_actions: 2,
+        executed_actions: 1,
+        failed_actions: 1,
+        skipped_actions: 0
+      },
+      final_assessment: { health: { risk_level: 'high' } },
+      governance_session: {
+        id: 'integration-governance-session-old',
+        file: oldSession
+      }
+    }, { spaces: 2 });
+    await fs.writeJson(newSession, {
+      mode: 'auto-governance-close-loop',
+      status: 'completed',
+      target_risk: 'low',
+      max_rounds: 3,
+      performed_rounds: 1,
+      converged: true,
+      stop_reason: 'target-risk-reached',
+      execute_advisory: false,
+      advisory_summary: {
+        planned_actions: 0,
+        executed_actions: 0,
+        failed_actions: 0,
+        skipped_actions: 0
+      },
+      final_assessment: { health: { risk_level: 'low' } },
+      governance_session: {
+        id: 'integration-governance-session-new',
+        file: newSession
+      }
+    }, { spaces: 2 });
+
+    const oldDate = new Date('2020-01-01T00:00:00.000Z');
+    await fs.utimes(oldSession, oldDate, oldDate);
+    await fs.utimes(newSession, new Date(), new Date());
+
+    const listed = await runCli([
+      'auto',
+      'governance',
+      'session',
+      'list',
+      '--status',
+      'failed',
+      '--json'
+    ], { cwd: tempDir });
+    expect(listed.exitCode).toBe(0);
+    const listPayload = parseJsonOutput(listed.stdout);
+    expect(listPayload.mode).toBe('auto-governance-session-list');
+    expect(listPayload.total).toBe(1);
+    expect(listPayload.sessions).toHaveLength(1);
+    expect(listPayload.sessions[0].id).toBe('integration-governance-session-old');
+
+    const stats = await runCli([
+      'auto',
+      'governance',
+      'session',
+      'stats',
+      '--json'
+    ], { cwd: tempDir });
+    expect(stats.exitCode).toBe(0);
+    const statsPayload = parseJsonOutput(stats.stdout);
+    expect(statsPayload.mode).toBe('auto-governance-session-stats');
+    expect(statsPayload.total_sessions).toBe(2);
+    expect(statsPayload.completed_sessions).toBe(1);
+    expect(statsPayload.failed_sessions).toBe(1);
+    expect(statsPayload.converged_sessions).toBe(1);
+    expect(statsPayload.final_risk_counts).toEqual(expect.objectContaining({
+      high: 1,
+      low: 1
+    }));
+
+    const pruned = await runCli([
+      'auto',
+      'governance',
+      'session',
+      'prune',
+      '--keep',
+      '1',
+      '--json'
+    ], { cwd: tempDir });
+    expect(pruned.exitCode).toBe(0);
+    const prunePayload = parseJsonOutput(pruned.stdout);
+    expect(prunePayload.mode).toBe('auto-governance-session-prune');
+    expect(prunePayload.deleted_count).toBe(1);
+    expect(prunePayload.errors).toEqual([]);
+    expect(await fs.pathExists(oldSession)).toBe(false);
+    expect(await fs.pathExists(newSession)).toBe(true);
+  });
 });

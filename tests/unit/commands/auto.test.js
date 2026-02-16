@@ -4740,6 +4740,125 @@ describe('auto close-loop command', () => {
     expect(resumedPayload.stop_reason).toBe('non-mutating-mode');
   });
 
+  test('lists, stats, and prunes governance close-loop sessions in json mode', async () => {
+    const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
+    await fs.ensureDir(governanceSessionDir);
+
+    const oldSession = path.join(governanceSessionDir, 'governance-session-old.json');
+    const newSession = path.join(governanceSessionDir, 'governance-session-new.json');
+    await fs.writeJson(oldSession, {
+      mode: 'auto-governance-close-loop',
+      status: 'failed',
+      target_risk: 'low',
+      max_rounds: 3,
+      performed_rounds: 3,
+      converged: false,
+      stop_reason: 'max-rounds-exhausted',
+      execute_advisory: true,
+      advisory_summary: {
+        planned_actions: 2,
+        executed_actions: 1,
+        failed_actions: 1,
+        skipped_actions: 0
+      },
+      final_assessment: { health: { risk_level: 'high' } },
+      governance_session: {
+        id: 'governance-session-old',
+        file: oldSession
+      }
+    }, { spaces: 2 });
+    await fs.writeJson(newSession, {
+      mode: 'auto-governance-close-loop',
+      status: 'completed',
+      target_risk: 'low',
+      max_rounds: 3,
+      performed_rounds: 1,
+      converged: true,
+      stop_reason: 'target-risk-reached',
+      execute_advisory: false,
+      advisory_summary: {
+        planned_actions: 0,
+        executed_actions: 0,
+        failed_actions: 0,
+        skipped_actions: 0
+      },
+      final_assessment: { health: { risk_level: 'low' } },
+      governance_session: {
+        id: 'governance-session-new',
+        file: newSession
+      }
+    }, { spaces: 2 });
+
+    await fs.utimes(oldSession, new Date('2020-01-01T00:00:00.000Z'), new Date('2020-01-01T00:00:00.000Z'));
+    await fs.utimes(newSession, new Date(), new Date());
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'governance',
+      'session',
+      'list',
+      '--status',
+      'failed',
+      '--json'
+    ]);
+    const listOutput = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const listPayload = JSON.parse(listOutput.trim());
+    expect(listPayload.mode).toBe('auto-governance-session-list');
+    expect(listPayload.total).toBe(1);
+    expect(listPayload.status_counts).toEqual(expect.objectContaining({
+      failed: 1
+    }));
+    expect(listPayload.sessions).toHaveLength(1);
+    expect(listPayload.sessions[0].id).toBe('governance-session-old');
+
+    logSpy.mockClear();
+    const statsProgram = buildProgram();
+    await statsProgram.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'governance',
+      'session',
+      'stats',
+      '--json'
+    ]);
+    const statsOutput = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const statsPayload = JSON.parse(statsOutput.trim());
+    expect(statsPayload.mode).toBe('auto-governance-session-stats');
+    expect(statsPayload.total_sessions).toBe(2);
+    expect(statsPayload.completed_sessions).toBe(1);
+    expect(statsPayload.failed_sessions).toBe(1);
+    expect(statsPayload.converged_sessions).toBe(1);
+    expect(statsPayload.final_risk_counts).toEqual(expect.objectContaining({
+      high: 1,
+      low: 1
+    }));
+
+    logSpy.mockClear();
+    const pruneProgram = buildProgram();
+    await pruneProgram.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'governance',
+      'session',
+      'prune',
+      '--keep',
+      '1',
+      '--json'
+    ]);
+    const pruneOutput = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const prunePayload = JSON.parse(pruneOutput.trim());
+    expect(prunePayload.mode).toBe('auto-governance-session-prune');
+    expect(prunePayload.deleted_count).toBe(1);
+    expect(prunePayload.errors).toEqual([]);
+    expect(await fs.pathExists(oldSession)).toBe(false);
+    expect(await fs.pathExists(newSession)).toBe(true);
+  });
+
   test('prunes close-loop-controller summary sessions with keep policy', async () => {
     const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(sessionDir);

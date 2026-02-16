@@ -234,6 +234,9 @@ Cross-archive governance snapshot:
   - Governance close-loop sessions persist by default at `.kiro/auto/governance-close-loop-sessions`; use `--governance-resume` to continue interrupted governance loops.
   - `--execute-advisory` enables automatic advisory action execution when detected (`recover-latest`, `controller-resume-latest`), with autonomous source selection (latest recoverable summary / latest pending controller session) and `skipped` telemetry when no actionable source exists.
   - Emits round history (`risk_before`/`risk_after`, planned/applicable/applied/failed actions), advisory telemetry (`advisory_*` fields), plus initial/final assessments for auditable autonomous governance convergence.
+- `kse auto governance session list [--limit <n>] [--status <csv>] [--json]`: inspect persisted governance close-loop session archive.
+- `kse auto governance session stats [--days <n>] [--status <csv>] [--json]`: aggregate governance session completion/failure/convergence/risk telemetry.
+- `kse auto governance session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: enforce governance session retention policy.
 
 Recovery memory maintenance:
 - Default recovery memory file: `.kiro/auto/close-loop-recovery-memory.json`

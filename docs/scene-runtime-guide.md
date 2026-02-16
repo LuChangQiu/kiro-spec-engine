@@ -268,6 +268,12 @@ Defined in `governance_contract.data_lineage`:
 }
 ```
 
+### Impact & Path Queries
+
+Use ontology as an operational graph, not just static visualization:
+- `impact`: reverse-traverse matching relations to estimate blast radius from one changed ref
+- `path`: find the shortest relation path between two refs for dependency explainability
+
 ### Agent Hints
 
 The `agent_hints` field provides metadata for autonomous AI operation:
@@ -301,6 +307,14 @@ kse scene ontology show --package ./my-package --json
 # Query dependency chain
 kse scene ontology deps --package <path> --ref <node-ref>
 kse scene ontology deps --package ./my-package --ref entity:Order --json
+
+# Query reverse impact radius
+kse scene ontology impact --package <path> --ref <node-ref>
+kse scene ontology impact --package ./my-package --ref service:createOrder --relation depends_on,composes --max-depth 2 --json
+
+# Query shortest relation path between two refs
+kse scene ontology path --package <path> --from <source-ref> --to <target-ref>
+kse scene ontology path --package ./my-package --from service:createOrder --to entity:Order --undirected --json
 
 # Validate graph (dangling edges, cycles)
 kse scene ontology validate --package <path>

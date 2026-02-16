@@ -609,6 +609,8 @@ kse scene contribute --package <path>          # One-stop validate → lint → 
 # Scene ontology (NEW in v1.42.0)
 kse scene ontology show --package <path>       # Show ontology graph
 kse scene ontology deps --ref <ref>            # Query dependency chain
+kse scene ontology impact --ref <ref>          # Analyze reverse impact radius
+kse scene ontology path --from <ref> --to <ref> # Query shortest ontology relation path
 kse scene ontology validate --package <path>   # Validate graph consistency
 kse scene ontology actions --ref <ref>         # Show action abstraction
 kse scene ontology lineage --ref <ref>         # Show data lineage

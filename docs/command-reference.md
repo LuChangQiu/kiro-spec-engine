@@ -783,6 +783,14 @@ kse scene ontology show --package ./my-scene-package --json
 kse scene ontology deps --package <path> --ref <node-ref>
 kse scene ontology deps --package ./my-scene-package --ref entity:Order --json
 
+# Analyze reverse dependency impact radius (what will be affected)
+kse scene ontology impact --package <path> --ref <node-ref>
+kse scene ontology impact --package ./my-scene-package --ref service:createOrder --relation depends_on,composes --max-depth 2 --json
+
+# Find shortest ontology relation path between two refs
+kse scene ontology path --package <path> --from <source-ref> --to <target-ref>
+kse scene ontology path --package ./my-scene-package --from service:createOrder --to entity:Order --undirected --json
+
 # Validate ontology graph (detect dangling edges, cycles)
 kse scene ontology validate --package <path>
 kse scene ontology validate --package ./my-scene-package --json

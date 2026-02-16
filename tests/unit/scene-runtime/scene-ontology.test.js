@@ -891,6 +891,139 @@ describe('queryDependencyChain', () => {
 });
 
 
+const { findImpactRadius, findRelationPath } = require('../../../lib/scene-runtime/scene-ontology');
+
+describe('findImpactRadius', () => {
+  test('returns error when ref does not exist in graph', () => {
+    const graph = new OntologyGraph();
+    const result = findImpactRadius(graph, 'missing');
+    expect(result.error).toBe('Node not found');
+    expect(result.total).toBe(0);
+  });
+
+  test('returns reverse depends_on impacted refs transitively', () => {
+    const graph = new OntologyGraph();
+    graph.addNode('service.checkout');
+    graph.addNode('service.pay');
+    graph.addNode('service.ship');
+    graph.addEdge('service.pay', 'service.checkout', 'depends_on');
+    graph.addEdge('service.ship', 'service.pay', 'depends_on');
+
+    const result = findImpactRadius(graph, 'service.checkout');
+    expect(result.ref).toBe('service.checkout');
+    expect(result.relationTypes).toEqual(['depends_on']);
+    expect(result.impacted).toEqual(['service.pay', 'service.ship']);
+    expect(result.total).toBe(2);
+    expect(result.details[0]).toMatchObject({ ref: 'service.pay', depth: 1, via: 'depends_on', through: 'service.checkout' });
+  });
+
+  test('respects maxDepth when provided', () => {
+    const graph = new OntologyGraph();
+    graph.addNode('a');
+    graph.addNode('b');
+    graph.addNode('c');
+    graph.addEdge('b', 'a', 'depends_on');
+    graph.addEdge('c', 'b', 'depends_on');
+
+    const result = findImpactRadius(graph, 'a', { maxDepth: 1 });
+    expect(result.impacted).toEqual(['b']);
+    expect(result.total).toBe(1);
+  });
+
+  test('supports filtering by relation type', () => {
+    const graph = new OntologyGraph();
+    graph.addNode('root');
+    graph.addNode('mod.a');
+    graph.addNode('mod.b');
+    graph.addEdge('mod.a', 'root', 'composes');
+    graph.addEdge('mod.b', 'root', 'depends_on');
+
+    const result = findImpactRadius(graph, 'root', { relationTypes: ['composes'] });
+    expect(result.impacted).toEqual(['mod.a']);
+    expect(result.total).toBe(1);
+  });
+
+  test('returns error on invalid relation type', () => {
+    const graph = new OntologyGraph();
+    graph.addNode('a');
+    const result = findImpactRadius(graph, 'a', { relationTypes: ['bad_type'] });
+    expect(result.error).toContain('Invalid relation type');
+  });
+});
+
+describe('findRelationPath', () => {
+  test('returns error when source node does not exist', () => {
+    const graph = new OntologyGraph();
+    graph.addNode('a');
+    const result = findRelationPath(graph, 'missing', 'a');
+    expect(result.error).toBe('Source node not found');
+    expect(result.found).toBe(false);
+  });
+
+  test('returns error when target node does not exist', () => {
+    const graph = new OntologyGraph();
+    graph.addNode('a');
+    const result = findRelationPath(graph, 'a', 'missing');
+    expect(result.error).toBe('Target node not found');
+    expect(result.found).toBe(false);
+  });
+
+  test('finds shortest directed path by default', () => {
+    const graph = new OntologyGraph();
+    graph.addNode('a');
+    graph.addNode('b');
+    graph.addNode('c');
+    graph.addEdge('a', 'b', 'depends_on');
+    graph.addEdge('b', 'c', 'depends_on');
+
+    const result = findRelationPath(graph, 'a', 'c');
+    expect(result.found).toBe(true);
+    expect(result.hops).toBe(2);
+    expect(result.nodes).toEqual(['a', 'b', 'c']);
+    expect(result.edges).toHaveLength(2);
+  });
+
+  test('returns not found for reverse direction in directed mode', () => {
+    const graph = new OntologyGraph();
+    graph.addNode('a');
+    graph.addNode('b');
+    graph.addEdge('a', 'b', 'depends_on');
+
+    const result = findRelationPath(graph, 'b', 'a');
+    expect(result.found).toBe(false);
+    expect(result.hops).toBeNull();
+  });
+
+  test('finds path in undirected mode using incoming edge traversal', () => {
+    const graph = new OntologyGraph();
+    graph.addNode('a');
+    graph.addNode('b');
+    graph.addEdge('a', 'b', 'depends_on');
+
+    const result = findRelationPath(graph, 'b', 'a', { undirected: true });
+    expect(result.found).toBe(true);
+    expect(result.hops).toBe(1);
+    expect(result.edges[0]).toMatchObject({ source: 'b', target: 'a', type: 'depends_on', direction: 'incoming' });
+  });
+
+  test('supports relation type filtering', () => {
+    const graph = new OntologyGraph();
+    graph.addNode('a');
+    graph.addNode('b');
+    graph.addNode('c');
+    graph.addEdge('a', 'b', 'depends_on');
+    graph.addEdge('b', 'c', 'composes');
+
+    const filtered = findRelationPath(graph, 'a', 'c', { relationTypes: ['depends_on'] });
+    expect(filtered.found).toBe(false);
+
+    const all = findRelationPath(graph, 'a', 'c', { relationTypes: ['depends_on', 'composes'] });
+    expect(all.found).toBe(true);
+    expect(all.nodes).toEqual(['a', 'b', 'c']);
+  });
+});
+
+
 const { getActionInfo } = require('../../../lib/scene-runtime/scene-ontology');
 
 describe('getActionInfo', () => {

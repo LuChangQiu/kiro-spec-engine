@@ -511,6 +511,8 @@ kse scene contribute --package <path>          # 一站式验证 → lint → �
 # 场景 Ontology (v1.42.0 新增)
 kse scene ontology show --package <path>       # 显示 Ontology 图
 kse scene ontology deps --ref <ref>            # 查询依赖链
+kse scene ontology impact --ref <ref>          # 分析反向影响面
+kse scene ontology path --from <ref> --to <ref> # 查询最短关系路径
 kse scene ontology validate --package <path>   # 验证图一致性
 kse scene ontology actions --ref <ref>         # 显示 Action Abstraction
 kse scene ontology lineage --ref <ref>         # 显示数据血缘

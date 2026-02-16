@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Scene ontology impact/path analysis commands**: Added `kse scene ontology impact` (reverse dependency blast-radius analysis with `--relation` and `--max-depth`) and `kse scene ontology path` (shortest relation path between refs with optional `--undirected`) to improve ontology-driven change planning and explainability.
 - **Governance resumed-session filtering and ratio telemetry**: `kse auto governance session list|stats` now support `--resume-only`, with new resumed/fresh counters and resume lineage composition telemetry (`resumed_rate_percent`, `resumed_from_counts`) for resumed-chain observability.
 - **Governance close-loop post-run retention hook**: Added `--governance-session-keep` and `--governance-session-older-than-days` to `kse auto governance close-loop` for automatic governance session archive pruning after each run, with current session protection and telemetry in `governance_session_prune`.
 - **Governance resume drift guardrails**: `kse auto governance close-loop --governance-resume` now reuses persisted target/advisory policy defaults by default and blocks explicit policy drift unless `--governance-resume-allow-drift` is set, reducing accidental resume misconfiguration.

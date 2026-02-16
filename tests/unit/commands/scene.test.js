@@ -72,14 +72,22 @@ const {
   runSceneExtractCommand,
   normalizeOntologyOptions,
   validateOntologyOptions,
+  normalizeOntologyImpactOptions,
+  validateOntologyImpactOptions,
+  normalizeOntologyPathOptions,
+  validateOntologyPathOptions,
   runSceneOntologyShowCommand,
   runSceneOntologyDepsCommand,
+  runSceneOntologyImpactCommand,
+  runSceneOntologyPathCommand,
   runSceneOntologyValidateCommand,
   runSceneOntologyActionsCommand,
   runSceneOntologyLineageCommand,
   runSceneOntologyAgentInfoCommand,
   printSceneOntologyShowSummary,
   printSceneOntologyDepsSummary,
+  printSceneOntologyImpactSummary,
+  printSceneOntologyPathSummary,
   printSceneOntologyValidateSummary,
   printSceneOntologyActionsSummary,
   printSceneOntologyLineageSummary,
@@ -5511,6 +5519,81 @@ describe('Scene Ontology CLI', () => {
     expect(validateOntologyOptions({ ref: 'a.b.c' }, true)).toBeNull();
   });
 
+  // ─── normalizeOntologyImpactOptions / validateOntologyImpactOptions ──────
+
+  test('normalizeOntologyImpactOptions applies defaults', () => {
+    const result = normalizeOntologyImpactOptions();
+    expect(result).toEqual({
+      package: '.',
+      json: false,
+      ref: null,
+      relationTypes: ['depends_on'],
+      maxDepth: null
+    });
+  });
+
+  test('normalizeOntologyImpactOptions parses relation csv and maxDepth', () => {
+    const result = normalizeOntologyImpactOptions({
+      package: './pkg',
+      ref: 'a.b',
+      relation: 'depends_on, composes',
+      maxDepth: '2',
+      json: true
+    });
+    expect(result).toEqual({
+      package: './pkg',
+      json: true,
+      ref: 'a.b',
+      relationTypes: ['depends_on', 'composes'],
+      maxDepth: 2
+    });
+  });
+
+  test('validateOntologyImpactOptions validates required fields and constraints', () => {
+    expect(validateOntologyImpactOptions({ ref: null, relationTypes: ['depends_on'], maxDepth: null })).toBe('--ref is required');
+    expect(validateOntologyImpactOptions({ ref: 'a', relationTypes: ['bad'], maxDepth: null })).toContain('invalid type');
+    expect(validateOntologyImpactOptions({ ref: 'a', relationTypes: ['depends_on'], maxDepth: 0 })).toBe('--max-depth must be an integer >= 1');
+    expect(validateOntologyImpactOptions({ ref: 'a', relationTypes: ['depends_on'], maxDepth: null })).toBeNull();
+  });
+
+  // ─── normalizeOntologyPathOptions / validateOntologyPathOptions ──────────
+
+  test('normalizeOntologyPathOptions applies defaults', () => {
+    const result = normalizeOntologyPathOptions();
+    expect(result.package).toBe('.');
+    expect(result.json).toBe(false);
+    expect(result.from).toBeNull();
+    expect(result.to).toBeNull();
+    expect(result.relationTypes).toEqual(['depends_on', 'composes', 'extends', 'produces']);
+    expect(result.undirected).toBe(false);
+  });
+
+  test('normalizeOntologyPathOptions parses values', () => {
+    const result = normalizeOntologyPathOptions({
+      package: './pkg',
+      from: ' a ',
+      to: ' b ',
+      relation: 'depends_on,extends',
+      undirected: true,
+      json: true
+    });
+    expect(result).toEqual({
+      package: './pkg',
+      json: true,
+      from: 'a',
+      to: 'b',
+      relationTypes: ['depends_on', 'extends'],
+      undirected: true
+    });
+  });
+
+  test('validateOntologyPathOptions validates required fields and relation types', () => {
+    expect(validateOntologyPathOptions({ from: null, to: 'b', relationTypes: ['depends_on'] })).toBe('--from is required');
+    expect(validateOntologyPathOptions({ from: 'a', to: null, relationTypes: ['depends_on'] })).toBe('--to is required');
+    expect(validateOntologyPathOptions({ from: 'a', to: 'b', relationTypes: ['bad'] })).toContain('invalid type');
+    expect(validateOntologyPathOptions({ from: 'a', to: 'b', relationTypes: ['depends_on'] })).toBeNull();
+  });
+
   // ─── runSceneOntologyShowCommand ──────────────────────────────
 
   test('runSceneOntologyShowCommand returns graph payload on success', async () => {
@@ -5591,6 +5674,87 @@ describe('Scene Ontology CLI', () => {
     expect(result).not.toBeNull();
     expect(result.result.chain).toContain('a.b.list');
     spy.mockRestore();
+  });
+
+  // ─── runSceneOntologyImpactCommand ────────────────────────────
+
+  test('runSceneOntologyImpactCommand returns impacted refs', async () => {
+    const spy = jest.spyOn(console, 'log').mockImplementation();
+    const contract = {
+      capability_contract: {
+        bindings: [
+          { ref: 'svc.checkout', type: 'mutation' },
+          { ref: 'svc.pay', type: 'mutation', depends_on: 'svc.checkout' },
+          { ref: 'svc.ship', type: 'mutation', depends_on: 'svc.pay' }
+        ]
+      }
+    };
+    const mockFs = { readJson: jest.fn().mockResolvedValue(contract) };
+    const result = await runSceneOntologyImpactCommand(
+      { package: '.', ref: 'svc.checkout' },
+      { fileSystem: mockFs, projectRoot: '/test' }
+    );
+    expect(result).not.toBeNull();
+    expect(result.success).toBe(true);
+    expect(result.result.impacted).toEqual(['svc.pay', 'svc.ship']);
+    spy.mockRestore();
+  });
+
+  test('runSceneOntologyImpactCommand returns null when --ref missing', async () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation();
+    const result = await runSceneOntologyImpactCommand({ package: '.' });
+    expect(result).toBeNull();
+    expect(process.exitCode).toBe(1);
+    spy.mockRestore();
+    process.exitCode = 0;
+  });
+
+  // ─── runSceneOntologyPathCommand ──────────────────────────────
+
+  test('runSceneOntologyPathCommand returns path when found', async () => {
+    const spy = jest.spyOn(console, 'log').mockImplementation();
+    const contract = {
+      capability_contract: {
+        bindings: [
+          { ref: 'a.b.c', type: 'query' },
+          { ref: 'a.b.d', type: 'query', depends_on: 'a.b.c' },
+          { ref: 'a.b.e', type: 'query', depends_on: 'a.b.d' }
+        ]
+      }
+    };
+    const mockFs = { readJson: jest.fn().mockResolvedValue(contract) };
+    const result = await runSceneOntologyPathCommand(
+      { package: '.', from: 'a.b.e', to: 'a.b.c', relation: 'depends_on' },
+      { fileSystem: mockFs, projectRoot: '/test' }
+    );
+    expect(result).not.toBeNull();
+    expect(result.success).toBe(true);
+    expect(result.result.found).toBe(true);
+    expect(result.result.nodes).toEqual(['a.b.e', 'a.b.d', 'a.b.c']);
+    spy.mockRestore();
+  });
+
+  test('runSceneOntologyPathCommand sets failure when no path found', async () => {
+    const spy = jest.spyOn(console, 'log').mockImplementation();
+    const contract = {
+      capability_contract: {
+        bindings: [
+          { ref: 'x.a', type: 'query' },
+          { ref: 'y.b', type: 'query' }
+        ]
+      }
+    };
+    const mockFs = { readJson: jest.fn().mockResolvedValue(contract) };
+    const result = await runSceneOntologyPathCommand(
+      { package: '.', from: 'x.a', to: 'y.b' },
+      { fileSystem: mockFs, projectRoot: '/test' }
+    );
+    expect(result).not.toBeNull();
+    expect(result.success).toBe(false);
+    expect(result.result.found).toBe(false);
+    expect(process.exitCode).toBe(1);
+    spy.mockRestore();
+    process.exitCode = 0;
   });
 
   // ─── runSceneOntologyValidateCommand ──────────────────────────
@@ -5765,6 +5929,29 @@ describe('Scene Ontology CLI', () => {
     const spy = jest.spyOn(console, 'log').mockImplementation((...args) => logs.push(args.join(' ')));
     printSceneOntologyDepsSummary({ json: false }, { result: { error: 'ref not found' } });
     expect(logs.some(l => l.includes('ref not found'))).toBe(true);
+    spy.mockRestore();
+  });
+
+  test('printSceneOntologyImpactSummary outputs JSON when json=true', () => {
+    const logs = [];
+    const spy = jest.spyOn(console, 'log').mockImplementation((...args) => logs.push(args.join(' ')));
+    printSceneOntologyImpactSummary(
+      { json: true },
+      { result: { ref: 'a', impacted: [], details: [], total: 0 } }
+    );
+    const parsed = JSON.parse(logs[0]);
+    expect(parsed.result.ref).toBe('a');
+    spy.mockRestore();
+  });
+
+  test('printSceneOntologyPathSummary shows no-path message', () => {
+    const logs = [];
+    const spy = jest.spyOn(console, 'log').mockImplementation((...args) => logs.push(args.join(' ')));
+    printSceneOntologyPathSummary(
+      { json: false },
+      { result: { from: 'a', to: 'b', relationTypes: ['depends_on'], undirected: false, found: false, nodes: [], edges: [], hops: null } }
+    );
+    expect(logs.some(l => l.includes('No path found'))).toBe(true);
     spy.mockRestore();
   });
 

@@ -5806,4 +5806,116 @@ describe('auto close-loop command', () => {
     expect((await fs.readJson(closeLoopFile)).schema_version).toBe('1.0');
     expect((await fs.readJson(controllerFile)).schema_version).toBe('1.0');
   });
+
+  test('builds handoff integration plan from manifest in json mode', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: [
+        { name: '60-06-project-wbs-management' },
+        '60-02-sales-lifecycle-enhancement'
+      ],
+      templates: [
+        { name: 'moqui-domain-extension' }
+      ],
+      known_gaps: ['project milestone approval rule not fully automated']
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'plan',
+      '--manifest',
+      manifestFile,
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-plan');
+    expect(payload.source_project).toBe('E:/workspace/331-poc');
+    expect(payload.handoff.spec_count).toBe(2);
+    expect(payload.handoff.template_count).toBe(1);
+    expect(payload.validation.is_valid).toBe(true);
+    expect(payload.phases).toHaveLength(4);
+    expect(payload.phases[1]).toEqual(expect.objectContaining({
+      id: 'spec-validation'
+    }));
+    expect(payload.phases[1].commands).toEqual(expect.arrayContaining([
+      'kse auto spec status 60-06-project-wbs-management --json',
+      'kse scene package-validate --spec 60-06-project-wbs-management --spec-package custom/scene-package.json --strict --json'
+    ]));
+  });
+
+  test('generates handoff queue goals and writes queue file', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    const queueFile = path.join(tempDir, '.kiro', 'auto', 'handoff-goals.lines');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-07-service-support-repair'],
+      templates: ['moqui-full-capability-closure-program'],
+      known_gaps: ['service SLA exception policy']
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'queue',
+      '--manifest',
+      manifestFile,
+      '--out',
+      queueFile,
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-queue');
+    expect(payload.goal_count).toBeGreaterThanOrEqual(4);
+    expect(payload.output_file).toBe(queueFile);
+    const queueContent = await fs.readFile(queueFile, 'utf8');
+    expect(queueContent).toContain('integrate handoff spec 60-07-service-support-repair');
+    expect(queueContent).toContain('remediate handoff known gap: service SLA exception policy');
+  });
+
+  test('supports dry-run queue generation without known gaps', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    const queueFile = path.join(tempDir, '.kiro', 'auto', 'handoff-goals.lines');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-11-reporting-audit-ops'],
+      templates: ['moqui-domain-extension'],
+      known_gaps: ['auditing KPI mismatch']
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'queue',
+      '--manifest',
+      manifestFile,
+      '--out',
+      queueFile,
+      '--no-include-known-gaps',
+      '--dry-run',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-queue');
+    expect(payload.dry_run).toBe(true);
+    expect(payload.include_known_gaps).toBe(false);
+    expect(payload.goals.join('\n')).not.toContain('auditing KPI mismatch');
+    expect(await fs.pathExists(queueFile)).toBe(false);
+  });
 });

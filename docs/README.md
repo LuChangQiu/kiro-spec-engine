@@ -90,6 +90,8 @@ Detailed technical documentation:
 - **[Multi-Repository Management Guide](multi-repo-management-guide.md)** - Managing multiple Git repositories
 - **[Value Observability Guide](value-observability-guide.md)** - KPI snapshot, baseline, trend, and gate evidence workflow
 - **[Scene Runtime Guide](scene-runtime-guide.md)** - Scene template engine, quality pipeline, ontology, and Moqui ERP integration
+- **[331-poc Dual-Track Integration Guide](331-poc-dual-track-integration-guide.md)** - Handoff contract and integration playbook between 331-poc and kse
+- **[331-poc Adaptation Roadmap](331-poc-adaptation-roadmap.md)** - Ongoing KSE-side adaptation backlog and rollout phases
 - **[Multi-Agent Coordination Guide](multi-agent-coordination-guide.md)** - Multi-agent parallel coordination for concurrent development
 - **[Troubleshooting](troubleshooting.md)** - Solutions to common problems
 - **[FAQ](faq.md)** - Answers to frequently asked questions
@@ -184,6 +186,8 @@ Detailed technical documentation:
 
 ### Scene Runtime
 - [Scene Runtime Guide](scene-runtime-guide.md)
+- [331-poc Dual-Track Integration Guide](331-poc-dual-track-integration-guide.md)
+- [331-poc Adaptation Roadmap](331-poc-adaptation-roadmap.md)
 - [Scene Template Engine](command-reference.md#scene-template-engine)
 - [Scene Quality Pipeline](command-reference.md#scene-template-quality-pipeline)
 - [Scene Ontology](command-reference.md#scene-ontology-enhancement)

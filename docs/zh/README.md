@@ -171,6 +171,18 @@
 - Ontology 图、Action Abstraction、Data Lineage、Agent Hints
 - Moqui ERP 连接、发现、模板提取
 
+### [331-poc 双轨协同对接手册](../331-poc-dual-track-integration-guide.md)
+**331-poc 与 kse 协同执行指南** - 交接契约、接入命令链、主从闭环验收
+- 331 深化成果输入约束
+- KSE 侧模板/ontology/gate 验证流程
+- 双仓协同失败回退策略
+
+### [331-poc 适配路线图](../331-poc-adaptation-roadmap.md)
+**KSE 侧持续适配清单** - 已完成、下一阶段、中期增强与长期目标
+- handoff 自动化命令演进
+- 主从编排与门禁增强
+- 跨轮次回归与发布治理集成
+
 ### [Value 可观测指南](value-observability-guide.md)
 **KPI 量化交付指南** - 快照、基线、趋势、门禁证据
 - 周度 KPI 快照生成

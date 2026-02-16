@@ -508,6 +508,12 @@ kse auto schema check --json
 kse auto schema migrate --json                           # dry-run by default
 kse auto schema migrate --apply --json                  # apply schema_version migration
 kse auto schema migrate --only close-loop-session,batch-session --apply --json
+
+# Dual-track handoff integration (e.g., 331-poc -> kse)
+kse auto handoff plan --manifest ../331-poc/docs/handoffs/handoff-manifest.json --json
+kse auto handoff plan --manifest ../331-poc/docs/handoffs/handoff-manifest.json --strict --out .kiro/reports/handoff-plan.json --json
+kse auto handoff queue --manifest ../331-poc/docs/handoffs/handoff-manifest.json --out .kiro/auto/handoff-goals.lines --json
+kse auto close-loop-batch .kiro/auto/handoff-goals.lines --format lines --batch-autonomous --continue-on-error --json
 ``` 
 
 DoD-related options:
@@ -737,6 +743,10 @@ Autonomous archive schema compatibility:
 - `kse auto schema check [--only <scopes>] [--json]`: scan archive schema compatibility (`schema_version`) for `close-loop-session`, `batch-session`, `controller-session`, and `governance-session`.
 - `kse auto schema migrate [--only <scopes>] [--target-version <version>] [--apply] [--json]`: migrate/backfill `schema_version` across autonomous archives.
   - Default mode is dry-run; use `--apply` to persist changes.
+
+Dual-track handoff integration:
+- `kse auto handoff plan --manifest <path> [--out <path>] [--strict] [--strict-warnings] [--json]`: parse handoff manifest (source project, specs, templates, known gaps) and generate an executable KSE integration phase plan.
+- `kse auto handoff queue --manifest <path> [--out <path>] [--append] [--no-include-known-gaps] [--dry-run] [--json]`: generate close-loop batch goal queue from handoff manifest and optionally persist line-based queue file (default `.kiro/auto/handoff-goals.lines`).
 
 Recommended `.kiro/config/orchestrator.json`:
 

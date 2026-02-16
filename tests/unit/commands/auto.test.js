@@ -5594,4 +5594,216 @@ describe('auto close-loop command', () => {
       signature_count: 1
     }));
   });
+
+  test('builds unified observability snapshot in json mode', async () => {
+    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
+    const recoveryMemoryFile = path.join(tempDir, '.kiro', 'auto', 'close-loop-recovery-memory.json');
+    await fs.ensureDir(closeLoopSessionDir);
+    await fs.ensureDir(batchSessionDir);
+    await fs.ensureDir(controllerSessionDir);
+    await fs.ensureDir(governanceSessionDir);
+    await fs.ensureDir(path.dirname(recoveryMemoryFile));
+
+    const closeLoopFile = path.join(closeLoopSessionDir, 'obs-close-loop.json');
+    await fs.writeJson(closeLoopFile, {
+      session_id: 'obs-close-loop',
+      status: 'completed',
+      goal: 'observability close-loop',
+      portfolio: {
+        master_spec: '121-00-obs',
+        sub_specs: ['121-01-a']
+      },
+      schema_version: '1.0'
+    }, { spaces: 2 });
+
+    const batchFile = path.join(batchSessionDir, 'obs-batch.json');
+    await fs.writeJson(batchFile, {
+      mode: 'auto-close-loop-program',
+      status: 'completed',
+      total_goals: 1,
+      processed_goals: 1,
+      completed_goals: 1,
+      failed_goals: 0,
+      program_started_at: '2026-02-01T00:00:00.000Z',
+      program_completed_at: '2026-02-01T00:05:00.000Z',
+      batch_session: { id: 'obs-batch', file: batchFile },
+      schema_version: '1.0'
+    }, { spaces: 2 });
+
+    const controllerFile = path.join(controllerSessionDir, 'obs-controller.json');
+    await fs.writeJson(controllerFile, {
+      status: 'completed',
+      processed_goals: 1,
+      pending_goals: 0,
+      controller_session: { id: 'obs-controller', file: controllerFile },
+      schema_version: '1.0'
+    }, { spaces: 2 });
+
+    const governanceFile = path.join(governanceSessionDir, 'obs-governance.json');
+    await fs.writeJson(governanceFile, {
+      mode: 'auto-governance-close-loop',
+      status: 'completed',
+      target_risk: 'medium',
+      converged: true,
+      governance_session: { id: 'obs-governance', file: governanceFile },
+      final_assessment: {
+        health: {
+          risk_level: 'low'
+        }
+      },
+      schema_version: '1.0'
+    }, { spaces: 2 });
+
+    await fs.writeJson(recoveryMemoryFile, {
+      version: 1,
+      signatures: {}
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync(['node', 'kse', 'auto', 'observability', 'snapshot', '--json']);
+
+    const parsed = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(parsed.mode).toBe('auto-observability-snapshot');
+    expect(parsed.highlights.total_sessions).toBeGreaterThanOrEqual(4);
+    expect(parsed.snapshots.close_loop_session.total_sessions).toBeGreaterThanOrEqual(1);
+    expect(parsed.snapshots.kpi_trend).toEqual(expect.objectContaining({
+      mode: 'auto-kpi-trend',
+      mode_filter: 'all'
+    }));
+  });
+
+  test('provides spec status and instructions json interfaces', async () => {
+    const specDir = path.join(tempDir, '.kiro', 'specs', '121-00-agent-interface');
+    await fs.ensureDir(specDir);
+    await fs.writeFile(path.join(specDir, 'requirements.md'), '# Requirements\n\nDeliver feature X.\n', 'utf8');
+    await fs.writeFile(path.join(specDir, 'design.md'), '# Design\n\nUse modular design.\n', 'utf8');
+    await fs.writeFile(path.join(specDir, 'tasks.md'), [
+      '- [x] bootstrap',
+      '- [ ] implement API',
+      '- [ ] add tests'
+    ].join('\n'), 'utf8');
+    await fs.writeJson(path.join(specDir, 'collaboration.json'), {
+      type: 'sub',
+      dependencies: [{ spec: '121-00-foundation', type: 'requires-completion' }],
+      status: {
+        current: 'in-progress'
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node', 'kse', 'auto', 'spec', 'status', '121-00-agent-interface', '--json'
+    ]);
+    const statusPayload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(statusPayload.mode).toBe('auto-spec-status');
+    expect(statusPayload.docs.all_required_present).toBe(true);
+    expect(statusPayload.task_progress.total).toBe(3);
+    expect(statusPayload.task_progress.closed).toBe(1);
+    expect(statusPayload.collaboration.status).toBe('in-progress');
+
+    logSpy.mockClear();
+    await program.parseAsync([
+      'node', 'kse', 'auto', 'spec', 'instructions', '121-00-agent-interface', '--json'
+    ]);
+    const instructionsPayload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(instructionsPayload.mode).toBe('auto-spec-instructions');
+    expect(instructionsPayload.instructions.next_actions.length).toBeGreaterThanOrEqual(2);
+    expect(instructionsPayload.instructions.priority_open_tasks).toEqual(expect.arrayContaining([
+      'implement API',
+      'add tests'
+    ]));
+  });
+
+  test('checks schema compatibility across autonomous archives', async () => {
+    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
+    await fs.ensureDir(closeLoopSessionDir);
+    await fs.ensureDir(batchSessionDir);
+    await fs.ensureDir(controllerSessionDir);
+    await fs.ensureDir(governanceSessionDir);
+
+    await fs.writeJson(path.join(closeLoopSessionDir, 'schema-missing.json'), {
+      session_id: 'schema-missing',
+      status: 'completed',
+      portfolio: { master_spec: '121-00-a', sub_specs: [] }
+    }, { spaces: 2 });
+    await fs.writeJson(path.join(batchSessionDir, 'schema-compatible.json'), {
+      schema_version: '1.0',
+      status: 'completed'
+    }, { spaces: 2 });
+    await fs.writeJson(path.join(controllerSessionDir, 'schema-incompatible.json'), {
+      schema_version: '0.9',
+      status: 'completed'
+    }, { spaces: 2 });
+    await fs.writeFile(path.join(governanceSessionDir, 'schema-invalid.json'), '{ invalid json', 'utf8');
+
+    const program = buildProgram();
+    await program.parseAsync(['node', 'kse', 'auto', 'schema', 'check', '--json']);
+    const parsed = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(parsed.mode).toBe('auto-schema-check');
+    expect(parsed.summary.total_files).toBe(4);
+    expect(parsed.summary.compatible_files).toBe(1);
+    expect(parsed.summary.missing_schema_version_files).toBe(1);
+    expect(parsed.summary.incompatible_files).toBe(1);
+    expect(parsed.summary.parse_error_files).toBe(1);
+  });
+
+  test('migrates schema_version in dry-run and apply modes', async () => {
+    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    await fs.ensureDir(closeLoopSessionDir);
+    await fs.ensureDir(controllerSessionDir);
+
+    const closeLoopFile = path.join(closeLoopSessionDir, 'migrate-close-loop.json');
+    const controllerFile = path.join(controllerSessionDir, 'migrate-controller.json');
+    await fs.writeJson(closeLoopFile, {
+      session_id: 'migrate-close-loop',
+      status: 'completed',
+      portfolio: { master_spec: '121-00-m', sub_specs: [] }
+    }, { spaces: 2 });
+    await fs.writeJson(controllerFile, {
+      schema_version: '0.9',
+      status: 'completed'
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'schema',
+      'migrate',
+      '--only',
+      'close-loop-session,controller-session',
+      '--json'
+    ]);
+    const dryRunPayload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(dryRunPayload.mode).toBe('auto-schema-migrate');
+    expect(dryRunPayload.dry_run).toBe(true);
+    expect(dryRunPayload.summary.candidate_files).toBe(2);
+    expect((await fs.readJson(closeLoopFile)).schema_version).toBeUndefined();
+
+    logSpy.mockClear();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'schema',
+      'migrate',
+      '--only',
+      'close-loop-session,controller-session',
+      '--apply',
+      '--json'
+    ]);
+    const applyPayload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(applyPayload.dry_run).toBe(false);
+    expect(applyPayload.summary.updated_files).toBe(2);
+    expect((await fs.readJson(closeLoopFile)).schema_version).toBe('1.0');
+    expect((await fs.readJson(controllerFile)).schema_version).toBe('1.0');
+  });
 });

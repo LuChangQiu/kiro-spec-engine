@@ -537,6 +537,11 @@ kse auto close-loop-controller .kiro/auto/program-queue.lines --wait-on-empty --
 kse auto close-loop-controller --controller-resume latest --json # Resume autonomous controller from latest persisted checkpoint
 kse auto controller-session list --limit 50 --json # Inspect persisted close-loop-controller summary sessions
 kse auto controller-session prune --keep 20 --older-than-days 14 --dry-run --json # Prune old controller summaries by retention policy
+kse auto observability snapshot --days 14 --json # Unified autonomous observability snapshot (sessions + governance + trend)
+kse auto spec status 121-00-master --json # Agent-facing structured spec status interface
+kse auto spec instructions 121-02-sub-track --json # Agent-facing execution instructions for one spec
+kse auto schema check --json # Check autonomous archive schema compatibility
+kse auto schema migrate --apply --json # Backfill/migrate schema_version for autonomous archives
 
 # Spec workflow (recommended)
 kse spec bootstrap --name <spec> --non-interactive         # Generate requirements/design/tasks draft

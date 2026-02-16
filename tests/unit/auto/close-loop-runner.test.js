@@ -66,7 +66,16 @@ describe('close-loop-runner', () => {
     expect(result.status).toBe('completed');
     expect(result.dod).toBeDefined();
     expect(result.dod.passed).toBe(true);
+    expect(result.strategy_memory).toEqual(expect.objectContaining({
+      enabled: true
+    }));
     expect(result.portfolio.sub_specs).toHaveLength(3);
+    expect(result.portfolio.execution_plan).toEqual(expect.objectContaining({
+      conflict_governance_enabled: true,
+      ontology_guidance_enabled: true
+    }));
+    expect(Array.isArray(result.portfolio.assignments)).toBe(true);
+    expect(result.portfolio.assignments.length).toBe(result.portfolio.sub_specs.length + 1);
     expect(mockRunOrchestration).toHaveBeenCalledWith(expect.objectContaining({
       maxParallel: 4,
       silent: true,
@@ -94,6 +103,45 @@ describe('close-loop-runner', () => {
     expect(dodReport.mode).toBe('auto-close-loop-dod-report');
     expect(dodReport.portfolio.master_spec).toBe(masterSpec);
     expect(dodReport.dod.passed).toBe(true);
+
+    const strategyMemoryFile = path.join(tempDir, '.kiro', 'auto', 'close-loop-strategy-memory.json');
+    expect(await fs.pathExists(strategyMemoryFile)).toBe(true);
+  });
+
+  test('enforces DoD risk, completion KPI, and baseline drop thresholds', async () => {
+    const baselineSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    await fs.ensureDir(baselineSessionDir);
+    const baselineFile = path.join(baselineSessionDir, 'baseline.json');
+    await fs.writeJson(baselineFile, {
+      session_id: 'baseline',
+      status: 'completed',
+      portfolio: {
+        master_spec: '120-00-baseline',
+        sub_specs: ['120-01-a', '120-02-b']
+      }
+    }, { spaces: 2 });
+
+    const result = await runAutoCloseLoop(
+      'Close-loop DoD threshold hardening',
+      {
+        run: false,
+        dodMaxRiskLevel: 'medium',
+        dodKpiMinCompletionRate: 100,
+        dodMaxSuccessRateDrop: 20,
+        dodBaselineWindow: 1
+      },
+      {
+        projectPath: tempDir
+      }
+    );
+
+    expect(result.status).toBe('failed');
+    expect(result.dod.passed).toBe(false);
+    expect(result.dod.failed_checks).toEqual(expect.arrayContaining([
+      'risk-level-threshold',
+      'kpi-completion-rate-threshold',
+      'kpi-baseline-drop-threshold'
+    ]));
   });
 
   test('fails close-loop when DoD test command fails', async () => {

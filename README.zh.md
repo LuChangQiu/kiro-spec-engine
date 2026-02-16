@@ -454,6 +454,11 @@ kse auto close-loop-controller .kiro/auto/program-queue.lines --wait-on-empty --
 kse auto close-loop-controller --controller-resume latest --json # 从最近一次 controller 检查点恢复自治推进
 kse auto controller-session list --limit 50 --json # 查看持久化 close-loop-controller 摘要会话
 kse auto controller-session prune --keep 20 --older-than-days 14 --dry-run --json # 按保留策略清理旧 controller 摘要
+kse auto observability snapshot --days 14 --json # 统一自治可观测快照（会话 + 治理 + 趋势）
+kse auto spec status 121-00-master --json # 面向 Agent 的结构化 Spec 状态接口
+kse auto spec instructions 121-02-sub-track --json # 面向 Agent 的 Spec 执行指令接口
+kse auto schema check --json # 检查自治归档 schema 兼容性
+kse auto schema migrate --apply --json # 回填/迁移自治归档 schema_version
 
 # Spec 工作流（推荐）
 kse spec bootstrap --name <spec> --non-interactive          # 生成 requirements/design/tasks 初稿

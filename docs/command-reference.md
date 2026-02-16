@@ -494,11 +494,29 @@ kse auto recovery-memory clear --json
 # Autonomous KPI trend (weekly/daily buckets + CSV export)
 kse auto kpi trend --weeks 12 --period week --mode all --json
 kse auto kpi trend --weeks 8 --period day --mode program --csv --out ./auto-kpi-trend.csv
+
+# Unified observability snapshot (sessions + governance + KPI trend)
+kse auto observability snapshot --days 14 --status completed,failed --json
+kse auto observability snapshot --out .kiro/reports/auto-observability.json --json
+
+# Agent-facing spec interfaces
+kse auto spec status 121-00-master --json
+kse auto spec instructions 121-02-sub-track --json
+
+# Autonomous archive schema compatibility
+kse auto schema check --json
+kse auto schema migrate --json                           # dry-run by default
+kse auto schema migrate --apply --json                  # apply schema_version migration
+kse auto schema migrate --only close-loop-session,batch-session --apply --json
 ``` 
 
 DoD-related options:
 - `--dod-tests <command>`: run a final shell command as a completion gate
 - `--dod-tests-timeout <ms>`: timeout for `--dod-tests` (default `600000`)
+- `--dod-max-risk-level <low|medium|high>`: fail DoD when derived run risk is above threshold
+- `--dod-kpi-min-completion-rate <n>`: minimum close-loop completion rate percent (`0-100`)
+- `--dod-max-success-rate-drop <n>`: max allowed completion-rate drop vs recent baseline (`0-100`)
+- `--dod-baseline-window <n>`: number of recent sessions used for baseline comparison (`1-50`, default `5`)
 - `--dod-tasks-closed`: require no unchecked `- [ ]` items in generated `tasks.md`
 - `--no-dod-docs`: skip doc completeness gate
 - `--no-dod-collab`: skip collaboration completion gate
@@ -515,6 +533,8 @@ DoD-related options:
 - `--replan-attempts <n>`: max automatic replan cycles after failed orchestration (`0-5`, default `1`)
 - `--replan-no-progress-window <n>`: stop replan when no progress repeats for `n` failed cycles (`1-10`, default `3`)
 - `--no-replan`: disable automatic replan cycle
+- `--no-conflict-governance`: disable lease-conflict prediction and scheduling guard
+- `--no-ontology-guidance`: disable scene ontology `agent_hints` scheduling guidance
 
 Close-loop batch (`kse auto close-loop-batch <goals-file>`) options:
 - supports shared close-loop execution options (for example: `--subs`, `--max-parallel`, `--dod*`, `--replan*`, `--dry-run`, `--json`)
@@ -704,6 +724,19 @@ Autonomous KPI trend:
   - `--period <week|day>` selects weekly (default) or daily buckets.
   - `--csv` prints CSV rows to stdout and writes CSV when used with `--out` (JSON remains default).
   - JSON output includes `mode_breakdown` (batch/program/recover/controller/other run distribution), `anomaly_detection`, and flattened `anomalies` (latest-period regression checks against historical baseline).
+
+Unified observability snapshot:
+- `kse auto observability snapshot [--days <n>] [--status <csv>] [--weeks <n>] [--trend-mode <mode>] [--trend-period <period>] [--out <path>] [--json]`: generate one unified observability snapshot that combines close-loop session stats, batch stats, controller stats, governance session stats, governance health, and KPI trend.
+- JSON output includes top-level `highlights` plus detailed archive/trend payloads under `snapshots`.
+
+Agent-facing spec interfaces:
+- `kse auto spec status <spec-name> [--json]`: structured status for one spec (`docs`, `task_progress`, `collaboration`, `health`).
+- `kse auto spec instructions <spec-name> [--json]`: machine-readable execution instructions for one spec (`next_actions`, `priority_open_tasks`, recommended commands, document excerpts).
+
+Autonomous archive schema compatibility:
+- `kse auto schema check [--only <scopes>] [--json]`: scan archive schema compatibility (`schema_version`) for `close-loop-session`, `batch-session`, `controller-session`, and `governance-session`.
+- `kse auto schema migrate [--only <scopes>] [--target-version <version>] [--apply] [--json]`: migrate/backfill `schema_version` across autonomous archives.
+  - Default mode is dry-run; use `--apply` to persist changes.
 
 Recommended `.kiro/config/orchestrator.json`:
 

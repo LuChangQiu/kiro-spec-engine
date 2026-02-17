@@ -357,14 +357,34 @@ jobs:
 
       - name: Build release gate history index
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
           NOTES_DIR=".kiro/reports/release-evidence"
           HISTORY_FILE="${NOTES_DIR}/release-gate-history.json"
           HISTORY_SUMMARY_FILE="${NOTES_DIR}/release-gate-history-${TAG}.json"
+          LATEST_RELEASE_FILE="${NOTES_DIR}/latest-release-${TAG}.json"
+          LATEST_RELEASE_API="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/latest"
 
           mkdir -p "${NOTES_DIR}"
+          if curl -fsSL \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "${LATEST_RELEASE_API}" \
+            -o "${LATEST_RELEASE_FILE}"; then
+            HISTORY_ASSET_URL="$(node -e "const fs=require('fs');const payload=JSON.parse(fs.readFileSync(process.argv[1],'utf8'));const assets=Array.isArray(payload.assets)?payload.assets:[];const hit=assets.find(item=>item&&item.name==='release-gate-history.json');if(hit&&hit.url){process.stdout.write(hit.url);}" "${LATEST_RELEASE_FILE}")"
+            if [[ -n "${HISTORY_ASSET_URL}" ]]; then
+              curl -fsSL \
+                -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+                -H "Accept: application/octet-stream" \
+                "${HISTORY_ASSET_URL}" \
+                -o "${HISTORY_FILE}" || true
+            fi
+          fi
+          rm -f "${LATEST_RELEASE_FILE}"
+
           if ! node bin/kiro-spec-engine.js auto handoff gate-index \
             --dir "${NOTES_DIR}" \
             --history-file "${HISTORY_FILE}" \

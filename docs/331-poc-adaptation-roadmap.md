@@ -68,10 +68,13 @@
 24. 发布流程自动产出门禁历史索引：
    - `release.yml` 在 gate 评估后自动执行 `handoff gate-index`，生成 `release-gate-history.json` 与当次 summary。
    - 两份索引产物随 GitHub Release 资产发布，便于对外审计与回放。
+25. 发布流程支持跨版本历史增量：
+   - `release.yml` 在构建索引前自动尝试下载上一版 Release 的 `release-gate-history.json`。
+   - 当前 tag 发布时基于上一版历史做增量合并，持续积累趋势数据。
 
 ## 下一阶段（P2）
 
-1. 在 `release.yml` 中自动拉取上一个 Release 的 `release-gate-history.json`，并在当前 tag 发布时增量更新后重新上传。
+1. 基于 `release-gate-history.json` 增加趋势摘要（例如近 5 版 gate pass rate、风险漂移）并写入 Release Notes。
 
 ## 长期目标（P3）
 

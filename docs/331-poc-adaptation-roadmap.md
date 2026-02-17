@@ -53,10 +53,13 @@
 19. 新增 release evidence 附件发布：
    - tag 发布时自动将 release notes 草稿、evidence 审阅 markdown、summary JSON 作为 GitHub Release 资产上传。
    - 无 evidence 时至少上传 fallback notes，保证发布资产结构稳定。
+20. 新增可配置发布门禁（workflow 级）：
+   - 支持通过 `KSE_RELEASE_*` 仓库变量配置 success rate/risk/ontology 阈值。
+   - 支持 advisory（默认）与 enforce（阻断发布）两种模式，兼顾安全性与稳定性。
 
 ## 下一阶段（P2）
 
-1. 增加可配置发布门禁（例如：风险级别/成功率阈值），支持在 release workflow 中按策略阻断发布。
+1. 将 release gate 结果回写到 `.kiro/reports/release-evidence`（带历史索引），支持跨版本趋势审计。
 
 ## 长期目标（P3）
 

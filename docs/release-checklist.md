@@ -96,5 +96,13 @@ Ensure:
 - `package.json` version is correct.
 - `CHANGELOG.md` includes release-relevant entries.
 - Release notes draft exists (for example `docs/releases/vX.Y.Z.md`).
+- Optional: configure release evidence gate with repository variables (`Settings -> Secrets and variables -> Actions -> Variables`):
+  - `KSE_RELEASE_GATE_ENFORCE`: `true|false` (default advisory, non-blocking)
+  - `KSE_RELEASE_GATE_REQUIRE_EVIDENCE`: require `handoff-runs.json` summary
+  - `KSE_RELEASE_GATE_REQUIRE_GATE_PASS`: require evidence gate `passed=true` (default true when evidence exists)
+  - `KSE_RELEASE_MIN_SPEC_SUCCESS_RATE`: minimum allowed success rate percent
+  - `KSE_RELEASE_MAX_RISK_LEVEL`: `low|medium|high|unknown` (default `unknown`)
+  - `KSE_RELEASE_MAX_UNMAPPED_RULES`: maximum allowed unmapped ontology business rules
+  - `KSE_RELEASE_MAX_UNDECIDED_DECISIONS`: maximum allowed undecided ontology decisions
 
 Then proceed with your release workflow (tag, push, npm publish, GitHub release).

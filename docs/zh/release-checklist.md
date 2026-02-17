@@ -96,5 +96,13 @@ git log --oneline -n 15
 - `package.json` 版本号正确；
 - `CHANGELOG.md` 已记录发布相关变化；
 - 发布说明草稿已就绪（如 `docs/releases/vX.Y.Z.md`）。
+- 可选：通过仓库变量配置 release evidence 门禁（`Settings -> Secrets and variables -> Actions -> Variables`）：
+  - `KSE_RELEASE_GATE_ENFORCE`：`true|false`（默认 advisory，不阻断发布）
+  - `KSE_RELEASE_GATE_REQUIRE_EVIDENCE`：是否要求存在 `handoff-runs.json` 摘要
+  - `KSE_RELEASE_GATE_REQUIRE_GATE_PASS`：是否要求 evidence gate `passed=true`（有 evidence 时默认要求）
+  - `KSE_RELEASE_MIN_SPEC_SUCCESS_RATE`：最小允许成功率（百分比）
+  - `KSE_RELEASE_MAX_RISK_LEVEL`：`low|medium|high|unknown`（默认 `unknown`）
+  - `KSE_RELEASE_MAX_UNMAPPED_RULES`：ontology 业务规则未映射最大允许值
+  - `KSE_RELEASE_MAX_UNDECIDED_DECISIONS`：ontology 决策未定最大允许值
 
 然后再执行你的正式发布流程（打 tag、push、npm publish、GitHub Release）。

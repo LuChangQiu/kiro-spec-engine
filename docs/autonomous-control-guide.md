@@ -270,15 +270,15 @@ Batch multi-goal autonomous execution:
 - `--resume-from-summary <path>`: resume only pending goals from previous batch summary
 - `--resume-from-summary latest`: resolve and resume from latest persisted batch summary session
 - `--resume-strategy <pending|failed-only>`: control whether summary resume includes unprocessed goals (`pending`) or only failed/error goals (`failed-only`)
-- `--batch-parallel <n>`: run multiple goals concurrently (`1-20`, default `1`)
+- `--batch-parallel <n>`: run multiple goals concurrently (`1-20`, default adaptive under autonomous policy)
 - `--batch-agent-budget <n>`: set global agent parallel budget shared across all active goals (`1-500`)
-- `--batch-priority <strategy>`: choose `fifo` (default), `complex-first`, `complex-last`, or `critical-first` scheduling
-- `--batch-aging-factor <n>`: increase waiting-goal score per scheduling cycle (`0-100`, default `0`)
-- `--batch-retry-rounds <n>`: automatically retry failed/stopped goals for `n` extra rounds (`0-5`, default `0`)
+- `--batch-priority <strategy>`: choose `fifo`, `complex-first`, `complex-last`, or `critical-first` scheduling (default `complex-first` under autonomous policy)
+- `--batch-aging-factor <n>`: increase waiting-goal score per scheduling cycle (`0-100`, default `2` under autonomous policy)
+- `--batch-retry-rounds <n>`: automatically retry failed/stopped goals for `n` extra rounds (`0-5`, default `0`, or until-complete under autonomous policy)
 - `--batch-retry-strategy <strategy>`: choose `adaptive` (default) or `strict` retry behavior
 - `--batch-retry-until-complete`: enable goal-draining retry mode until completion or max rounds
 - `--batch-retry-max-rounds <n>`: max extra rounds for until-complete mode (`1-20`, default `10`)
-- `--batch-autonomous`: enable autonomous defaults (`continue-on-error`, adaptive `batch-parallel`, `complex-first`, aging `2`, retry-until-complete)
+- `--batch-autonomous`: enable autonomous defaults (`continue-on-error`, adaptive `batch-parallel`, `complex-first`, aging `2`, retry-until-complete); enabled by default
 - `--batch-session-id <id>`: set explicit id for persisted batch summary session
 - `--batch-session-keep <n>`: keep newest `n` persisted batch summary sessions (`0-1000`)
 - `--batch-session-older-than-days <n>`: when pruning persisted batch summaries, only delete sessions older than `n` days (`0-36500`)
@@ -292,7 +292,6 @@ Batch multi-goal autonomous execution:
 - `--spec-session-max-duplicate-goals <n>`: goal-input duplicate guard for batch inputs (`0-500000`)
 - `--spec-session-budget-hard-fail`: fail run when spec count exceeds `--spec-session-max-total` before/after execution
 - `--no-batch-session`: disable persisted batch summary session archive for this run
-- `--batch-retry-max-rounds` requires `--batch-retry-until-complete`
 - `--continue-on-error`: continue remaining goals when one goal fails
 - Returns one summary with per-goal statuses (`completed`, `failed`, `error`, `planned`)
 - Summary includes `resource_plan` and aggregate `metrics` (success rate, status breakdown, avg sub-spec count, avg replan cycles)

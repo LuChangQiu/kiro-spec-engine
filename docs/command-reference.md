@@ -570,15 +570,15 @@ Close-loop batch (`kse auto close-loop-batch <goals-file>`) options:
 - `--resume-from-summary <path>`: derive pending goals from an existing batch summary (reruns failed/error and previously unprocessed goals)
 - `--resume-from-summary latest`: load the most recent persisted batch session summary automatically
 - `--resume-strategy <strategy>`: `pending` (default) or `failed-only` for summary resume scope
-- `--batch-parallel <n>`: run up to `n` goals concurrently (`1-20`, default `1`)
+- `--batch-parallel <n>`: run up to `n` goals concurrently (`1-20`, default adaptive under autonomous policy)
 - `--batch-agent-budget <n>`: global agent parallel budget shared by all running goals (`1-500`)
-- `--batch-priority <strategy>`: scheduling strategy `fifo` (default), `complex-first`, `complex-last`, or `critical-first`
-- `--batch-aging-factor <n>`: waiting-goal aging boost per scheduling cycle (`0-100`, default `0`)
-- `--batch-retry-rounds <n>`: retry failed/stopped goals for `n` additional rounds (`0-5`, default `0`)
+- `--batch-priority <strategy>`: scheduling strategy `fifo`, `complex-first`, `complex-last`, or `critical-first` (default `complex-first` under autonomous policy)
+- `--batch-aging-factor <n>`: waiting-goal aging boost per scheduling cycle (`0-100`, default `2` under autonomous policy)
+- `--batch-retry-rounds <n>`: retry failed/stopped goals for `n` additional rounds (`0-5`, default `0`, or until-complete under autonomous policy)
 - `--batch-retry-strategy <strategy>`: retry strategy `adaptive` (default) or `strict`
 - `--batch-retry-until-complete`: keep retrying until no failed/stopped goals remain or max rounds reached
 - `--batch-retry-max-rounds <n>`: max extra rounds for `--batch-retry-until-complete` (`1-20`, default `10`)
-- `--batch-autonomous`: apply autonomous closed-loop defaults (`continue-on-error`, adaptive `batch-parallel`, `complex-first`, aging `2`, retry-until-complete)
+- `--batch-autonomous`: apply autonomous closed-loop defaults (`continue-on-error`, adaptive `batch-parallel`, `complex-first`, aging `2`, retry-until-complete); enabled by default
 - `--batch-session-id <id>`: set explicit persisted batch session id
 - `--batch-session-keep <n>`: keep newest `n` persisted batch summaries after each run (`0-1000`)
 - `--batch-session-older-than-days <n>`: when pruning persisted batch summaries, only delete sessions older than `n` days (`0-36500`)
@@ -592,7 +592,6 @@ Close-loop batch (`kse auto close-loop-batch <goals-file>`) options:
 - `--spec-session-max-duplicate-goals <n>`: goal-input duplicate guard for batch runs (`0-500000`)
 - `--spec-session-budget-hard-fail`: fail run when spec count exceeds `--spec-session-max-total` before/after execution
 - `--no-batch-session`: disable automatic persisted batch summary session archive
-- `--batch-retry-max-rounds` requires `--batch-retry-until-complete`
 - `--continue-on-error`: continue remaining goals after a failed/error goal
 - `--out <path>`: write batch summary JSON output file
 - `--resume` and `--session-id` are not supported in batch mode (sessions are per-goal)

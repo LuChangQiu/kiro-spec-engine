@@ -1279,7 +1279,7 @@ describe('auto close-loop CLI integration', () => {
     }));
   });
 
-  test('supports autonomous batch policy in close-loop-batch CLI summary', async () => {
+  test('applies autonomous batch policy in close-loop-batch CLI summary by default', async () => {
     const goalsPath = path.join(tempDir, 'batch-goals.json');
     await fs.writeJson(goalsPath, {
       goals: ['autonomous goal one', 'autonomous goal two']
@@ -1290,7 +1290,6 @@ describe('auto close-loop CLI integration', () => {
       'close-loop-batch',
       goalsPath,
       '--dry-run',
-      '--batch-autonomous',
       '--json'
     ], { cwd: tempDir });
 

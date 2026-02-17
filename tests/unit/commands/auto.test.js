@@ -239,7 +239,7 @@ describe('auto close-loop command', () => {
     }));
     expect(summary.resource_plan).toEqual(expect.objectContaining({
       agent_budget: null,
-      effective_goal_parallel: 1
+      effective_goal_parallel: 2
     }));
     expect(summary.output_file).toBe(outFile);
 
@@ -2447,26 +2447,31 @@ describe('auto close-loop command', () => {
     expect(runAutoCloseLoop).not.toHaveBeenCalled();
   });
 
-  test('rejects --batch-retry-max-rounds without --batch-retry-until-complete', async () => {
+  test('allows --batch-retry-max-rounds under default autonomous policy', async () => {
     const goalsFile = path.join(tempDir, 'goals.json');
     await fs.writeJson(goalsFile, ['goal one'], { spaces: 2 });
+    runAutoCloseLoop.mockResolvedValueOnce({
+      status: 'completed',
+      portfolio: { master_spec: '122-00-a', sub_specs: [] }
+    });
 
     const program = buildProgram();
-    await expect(
-      program.parseAsync([
-        'node',
-        'kse',
-        'auto',
-        'close-loop-batch',
-        goalsFile,
-        '--batch-retry-max-rounds',
-        '3'
-      ])
-    ).rejects.toThrow('process.exit called');
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'close-loop-batch',
+      goalsFile,
+      '--batch-retry-max-rounds',
+      '3',
+      '--json'
+    ]);
 
-    const errorOutput = errorSpy.mock.calls.map(call => call.join(' ')).join('\n');
-    expect(errorOutput).toContain('--batch-retry-max-rounds requires --batch-retry-until-complete.');
-    expect(runAutoCloseLoop).not.toHaveBeenCalled();
+    const summary = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(summary.batch_retry).toEqual(expect.objectContaining({
+      until_complete: true,
+      max_rounds: 3
+    }));
   });
 
   test('validates --batch-retry-max-rounds range in close-loop-batch', async () => {
@@ -2514,7 +2519,7 @@ describe('auto close-loop command', () => {
     expect(runAutoCloseLoop).not.toHaveBeenCalled();
   });
 
-  test('enables autonomous batch closed-loop policy with --batch-autonomous', async () => {
+  test('enables autonomous batch closed-loop policy by default', async () => {
     const goalsFile = path.join(tempDir, 'goals.json');
     await fs.writeJson(goalsFile, {
       goals: ['goal one', 'goal two', 'goal three']
@@ -2532,7 +2537,6 @@ describe('auto close-loop command', () => {
       'auto',
       'close-loop-batch',
       goalsFile,
-      '--batch-autonomous',
       '--json'
     ]);
 
@@ -2556,7 +2560,7 @@ describe('auto close-loop command', () => {
     }));
   });
 
-  test('allows --batch-retry-max-rounds with --batch-autonomous', async () => {
+  test('allows --batch-retry-max-rounds with default autonomous policy', async () => {
     const goalsFile = path.join(tempDir, 'goals.json');
     await fs.writeJson(goalsFile, ['goal one'], { spaces: 2 });
     runAutoCloseLoop.mockResolvedValueOnce({
@@ -2571,7 +2575,6 @@ describe('auto close-loop command', () => {
       'auto',
       'close-loop-batch',
       goalsFile,
-      '--batch-autonomous',
       '--batch-retry-max-rounds',
       '3',
       '--json'
@@ -2888,35 +2891,39 @@ describe('auto close-loop command', () => {
     expect(summary.results.every(item => Number.isFinite(item.base_priority))).toBe(true);
   });
 
-  test('stops on first failed goal in close-loop-batch by default', async () => {
+  test('continues after failed goals by default in close-loop-batch', async () => {
     const goalsFile = path.join(tempDir, 'goals.json');
-    await fs.writeJson(goalsFile, ['first failed goal', 'second should not run'], { spaces: 2 });
+    await fs.writeJson(goalsFile, ['first failed goal', 'second should still run'], { spaces: 2 });
 
     runAutoCloseLoop
       .mockResolvedValueOnce({ status: 'failed', portfolio: { master_spec: '121-00-fail', sub_specs: [] } })
-      .mockResolvedValueOnce({ status: 'completed', portfolio: { master_spec: '122-00-pass', sub_specs: [] } });
+      .mockResolvedValueOnce({ status: 'completed', portfolio: { master_spec: '122-00-pass', sub_specs: [] } })
+      .mockResolvedValueOnce({ status: 'completed', portfolio: { master_spec: '121-00-fail-r2', sub_specs: [] } });
 
     const program = buildProgram();
-    await expect(
-      program.parseAsync([
-        'node',
-        'kse',
+    await program.parseAsync([
+      'node',
+      'kse',
       'auto',
       'close-loop-batch',
       goalsFile,
       '--batch-parallel',
       '1',
       '--json'
-    ])
-    ).rejects.toThrow('process.exit called');
+    ]);
 
-    expect(runAutoCloseLoop).toHaveBeenCalled();
+    expect(runAutoCloseLoop).toHaveBeenCalledTimes(3);
     const summary = JSON.parse(`${logSpy.mock.calls[0][0]}`);
-    expect(summary.failed_goals).toBeGreaterThanOrEqual(1);
-    expect(summary.status).not.toBe('completed');
+    expect(summary.completed_goals).toBe(2);
+    expect(summary.failed_goals).toBe(0);
+    expect(summary.status).toBe('completed');
+    expect(summary.batch_retry).toEqual(expect.objectContaining({
+      until_complete: true,
+      performed_rounds: 1
+    }));
   });
 
-  test('continues on error in close-loop-batch with --continue-on-error', async () => {
+  test('continues on error in close-loop-batch when retry-until-complete is disabled', async () => {
     const goalsFile = path.join(tempDir, 'goals.json');
     await fs.writeJson(goalsFile, ['first throws', 'second still runs'], { spaces: 2 });
 
@@ -2932,7 +2939,8 @@ describe('auto close-loop command', () => {
         'auto',
         'close-loop-batch',
         goalsFile,
-        '--continue-on-error',
+        '--batch-retry-rounds',
+        '0',
         '--json'
       ])
     ).rejects.toThrow('process.exit called');
@@ -3057,38 +3065,36 @@ describe('auto close-loop command', () => {
     }));
   });
 
-  test('uses adaptive retry strategy to drain unprocessed goals after stop-on-error', async () => {
+  test('uses adaptive retry strategy to drain failed goals while keeping default continue-on-error', async () => {
     const goalsFile = path.join(tempDir, 'goals.json');
-    await fs.writeJson(goalsFile, ['first always fails', 'second should eventually run'], { spaces: 2 });
+    await fs.writeJson(goalsFile, ['first flaky goal', 'second stable goal'], { spaces: 2 });
 
     runAutoCloseLoop
       .mockResolvedValueOnce({ status: 'failed', portfolio: { master_spec: '121-00-fail-r1', sub_specs: [] } })
-      .mockResolvedValueOnce({ status: 'failed', portfolio: { master_spec: '121-00-fail-r2', sub_specs: [] } })
-      .mockResolvedValueOnce({ status: 'completed', portfolio: { master_spec: '121-00-pass-r2', sub_specs: [] } });
+      .mockResolvedValueOnce({ status: 'completed', portfolio: { master_spec: '121-00-pass-r1', sub_specs: [] } })
+      .mockResolvedValueOnce({ status: 'completed', portfolio: { master_spec: '121-00-fail-r2-fixed', sub_specs: [] } });
 
     const program = buildProgram();
-    await expect(
-      program.parseAsync([
-        'node',
-        'kse',
-        'auto',
-        'close-loop-batch',
-        goalsFile,
-        '--batch-retry-rounds',
-        '1',
-        '--batch-retry-strategy',
-        'adaptive',
-        '--json'
-      ])
-    ).rejects.toThrow('process.exit called');
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'close-loop-batch',
+      goalsFile,
+      '--batch-retry-rounds',
+      '1',
+      '--batch-retry-strategy',
+      'adaptive',
+      '--json'
+    ]);
 
     expect(runAutoCloseLoop).toHaveBeenCalledTimes(3);
-    expect(runAutoCloseLoop).toHaveBeenNthCalledWith(1, 'first always fails', expect.any(Object));
-    expect(runAutoCloseLoop).toHaveBeenNthCalledWith(2, 'first always fails', expect.any(Object));
-    expect(runAutoCloseLoop).toHaveBeenNthCalledWith(3, 'second should eventually run', expect.any(Object));
+    expect(runAutoCloseLoop).toHaveBeenNthCalledWith(1, 'first flaky goal', expect.any(Object));
+    expect(runAutoCloseLoop).toHaveBeenNthCalledWith(2, 'second stable goal', expect.any(Object));
+    expect(runAutoCloseLoop).toHaveBeenNthCalledWith(3, 'first flaky goal', expect.any(Object));
 
     const summary = JSON.parse(`${logSpy.mock.calls[0][0]}`);
-    expect(summary.status).toBe('partial-failed');
+    expect(summary.status).toBe('completed');
     expect(summary.batch_retry).toEqual(expect.objectContaining({
       strategy: 'adaptive',
       configured_rounds: 1,
@@ -3099,16 +3105,18 @@ describe('auto close-loop command', () => {
       continue_on_error: true
     }));
     expect(summary.results[1].status).toBe('completed');
-    expect(summary.results[1].batch_attempt).toBe(2);
+    expect(summary.results[1].batch_attempt).toBe(1);
   });
 
-  test('uses strict retry strategy to keep stop-on-error behavior across retry rounds', async () => {
+  test('uses strict retry strategy and keeps default continue-on-error behavior across retry rounds', async () => {
     const goalsFile = path.join(tempDir, 'goals.json');
-    await fs.writeJson(goalsFile, ['first always fails', 'second remains blocked'], { spaces: 2 });
+    await fs.writeJson(goalsFile, ['first always fails', 'second also fails'], { spaces: 2 });
 
     runAutoCloseLoop
       .mockResolvedValueOnce({ status: 'failed', portfolio: { master_spec: '121-00-fail-r1', sub_specs: [] } })
-      .mockResolvedValueOnce({ status: 'failed', portfolio: { master_spec: '121-00-fail-r2', sub_specs: [] } });
+      .mockResolvedValueOnce({ status: 'failed', portfolio: { master_spec: '121-00-fail-r1b', sub_specs: [] } })
+      .mockResolvedValueOnce({ status: 'failed', portfolio: { master_spec: '121-00-fail-r2', sub_specs: [] } })
+      .mockResolvedValueOnce({ status: 'failed', portfolio: { master_spec: '121-00-fail-r2b', sub_specs: [] } });
 
     const program = buildProgram();
     await expect(
@@ -3126,9 +3134,9 @@ describe('auto close-loop command', () => {
       ])
     ).rejects.toThrow('process.exit called');
 
-    expect(runAutoCloseLoop).toHaveBeenCalledTimes(2);
+    expect(runAutoCloseLoop).toHaveBeenCalledTimes(4);
     expect(runAutoCloseLoop).toHaveBeenNthCalledWith(1, 'first always fails', expect.any(Object));
-    expect(runAutoCloseLoop).toHaveBeenNthCalledWith(2, 'first always fails', expect.any(Object));
+    expect(runAutoCloseLoop).toHaveBeenNthCalledWith(2, 'second also fails', expect.any(Object));
 
     const summary = JSON.parse(`${logSpy.mock.calls[0][0]}`);
     expect(summary.status).toBe('failed');
@@ -3140,9 +3148,9 @@ describe('auto close-loop command', () => {
     }));
     expect(summary.batch_retry.history[1]).toEqual(expect.objectContaining({
       round: 2,
-      continue_on_error: false
+      continue_on_error: true
     }));
-    expect(summary.results[1].status).toBe('stopped');
+    expect(summary.results[1].status).toBe('failed');
   });
 
   test('supports --batch-retry-until-complete without explicit retry rounds', async () => {

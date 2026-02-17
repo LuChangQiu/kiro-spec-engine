@@ -327,6 +327,25 @@ describe('OrchestrationEngine', () => {
       expect(engine._getEffectiveMaxParallel(5)).toBe(5);
     });
 
+    test('launch hold still applies when adaptive parallel is disabled', () => {
+      let now = 1000;
+      engine._now = () => now;
+      engine._applyRetryPolicyConfig({
+        rateLimitAdaptiveParallel: false,
+        rateLimitParallelFloor: 1,
+        rateLimitCooldownMs: 1000,
+      });
+      engine._initializeAdaptiveParallel(5);
+
+      engine._onRateLimitSignal(2000);
+
+      expect(engine._effectiveMaxParallel).toBe(5);
+      expect(engine._getRateLimitLaunchHoldRemainingMs()).toBe(2000);
+
+      now = 1500;
+      expect(engine._getRateLimitLaunchHoldRemainingMs()).toBe(1500);
+    });
+
     test('rate-limit launch hold pauses new launches until hold expires', async () => {
       let now = 1000;
       engine._now = () => now;

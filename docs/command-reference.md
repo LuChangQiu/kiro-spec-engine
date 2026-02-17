@@ -836,10 +836,11 @@ kse scene template-render --package scene-erp --values '{"entity_name":"Order"}'
 ### Scene Package Batch Publish
 
 ```bash
-# Publish scene package templates from a handoff manifest (default: completed specs only + ontology validation required)
+# Publish scene package templates from a handoff manifest
+# Defaults: completed specs only + ontology validation required + ontology batch gate (avg>=70, valid-rate>=100%)
 kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --json
 
-# Use 331-poc preset defaults (manifest/docs paths + completed filter + ontology batch gate: avg>=70, valid-rate>=100%)
+# Optional convenience preset for 331-style path conventions (manifest/docs fallback paths)
 kse scene package-publish-batch --from-331 --json
 
 # Preview batch publish plan without writing template files

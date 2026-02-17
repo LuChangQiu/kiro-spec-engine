@@ -3329,7 +3329,17 @@ Trace: doctor-trace-erp
 
     const publishRunner = jest.fn().mockResolvedValue({
       published: true,
-      template: { id: 'kse.scene--master-data-deepening--0.1.0' }
+      template: { id: 'kse.scene--master-data-deepening--0.1.0' },
+      ontology_validation: {
+        required: true,
+        valid: true,
+        error_count: 0,
+        error_codes: [],
+        score: 72,
+        level: 'medium',
+        min_score: null,
+        min_score_passed: true
+      }
     });
 
     const payload = await runScenePackagePublishBatchCommand({
@@ -3456,7 +3466,17 @@ Trace: doctor-trace-erp
     const publishRunner = jest.fn().mockResolvedValue({
       published: false,
       dry_run: true,
-      template: { id: 'kse.scene--moqui-full-capability-closure-program--0.1.0' }
+      template: { id: 'kse.scene--moqui-full-capability-closure-program--0.1.0' },
+      ontology_validation: {
+        required: true,
+        valid: true,
+        error_count: 0,
+        error_codes: [],
+        score: 72,
+        level: 'medium',
+        min_score: null,
+        min_score_passed: true
+      }
     });
 
     const payload = await runScenePackagePublishBatchCommand({
@@ -3560,7 +3580,17 @@ Trace: doctor-trace-erp
 
     const publishRunner = jest.fn().mockResolvedValue({
       published: true,
-      template: { id: 'kse.scene--moqui-capability-itemized-parity-matrix--1.0.0' }
+      template: { id: 'kse.scene--moqui-capability-itemized-parity-matrix--1.0.0' },
+      ontology_validation: {
+        required: true,
+        valid: true,
+        error_count: 0,
+        error_codes: [],
+        score: 72,
+        level: 'medium',
+        min_score: null,
+        min_score_passed: true
+      }
     });
 
     const payload = await runScenePackagePublishBatchCommand({
@@ -3596,7 +3626,17 @@ Trace: doctor-trace-erp
 
     const publishRunner = jest.fn().mockResolvedValue({
       published: true,
-      template: { id: 'kse.scene--moqui-capability-itemized-parity-matrix--1.0.0' }
+      template: { id: 'kse.scene--moqui-capability-itemized-parity-matrix--1.0.0' },
+      ontology_validation: {
+        required: true,
+        valid: true,
+        error_count: 0,
+        error_codes: [],
+        score: 72,
+        level: 'medium',
+        min_score: 70,
+        min_score_passed: true
+      }
     });
 
     const payload = await runScenePackagePublishBatchCommand({
@@ -3844,7 +3884,7 @@ Trace: doctor-trace-erp
     expect(payload.success).toBe(false);
     expect(payload.ontology_task_queue).toMatchObject({
       output_path: '.kiro/auto/ontology-remediation.lines',
-      queued_tasks: 1
+      queued_tasks: 2
     });
     expect(fileSystem.writeFile).toHaveBeenCalledTimes(1);
     expect(normalizePath(fileSystem.writeFile.mock.calls[0][0]))

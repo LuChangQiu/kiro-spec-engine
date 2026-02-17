@@ -769,8 +769,9 @@ Dual-track handoff integration:
   - Default mode is dependency-aware: spec integration goals are grouped into dependency batches and executed in topological order.
   - `--continue-from` resumes pending goals from an existing handoff run report (`latest`, session id, or JSON file path). For safety, KSE enforces manifest-path consistency between the previous report and current run.
   - `--continue-strategy auto|pending|failed-only` controls resumed scope. `auto` (default) derives the best strategy from prior run state (`pending` when unprocessed/planned goals exist, otherwise `failed-only` for pure failure replay).
-  - Non-dry runs auto-merge release evidence into `.kiro/reports/release-evidence/handoff-runs.json` with session-level gate/ontology/regression snapshots. Merge failures are recorded as warnings without aborting the run.
+  - Non-dry runs auto-merge release evidence into `.kiro/reports/release-evidence/handoff-runs.json` with session-level gate/ontology/regression/moqui-baseline snapshots. Merge failures are recorded as warnings without aborting the run.
   - `--release-evidence-window` controls trend snapshot window size (2-50, default `5`) used in merged release evidence (`latest_trend_window` and per-session `trend_window`).
+  - Run output includes `moqui_baseline` snapshot by default, with artifacts at `.kiro/reports/release-evidence/moqui-template-baseline.json` and `.kiro/reports/release-evidence/moqui-template-baseline.md`.
   - Run result includes `recommendations` with executable follow-up commands (for example, auto-generated `--continue-from <session>` on failed/incomplete batches).
   - Gate defaults: `--min-spec-success-rate` defaults to `100`, `--max-risk-level` defaults to `high`, and ontology validation requirement is enabled by default.
   - Use `--no-require-ontology-validation` only for emergency bypass; default behavior fails fast at precheck if manifest ontology evidence is missing or not passed.
@@ -781,11 +782,11 @@ Dual-track handoff integration:
   - Markdown report includes `Trend Series` (ASCII success/ontology bars per session) and `Risk Layer View`.
   - `--out` writes the generated regression report using the selected format.
   - Output includes `recommendations` to guide next action when trend degrades or risk escalates.
-- `kse auto handoff evidence [--file <path>] [--session-id <id|latest>] [--window <n>] [--format <json|markdown>] [--out <path>] [--json]`: quick-review merged release evidence and render current-batch gate/ontology/regression/risk-layer overview.
+- `kse auto handoff evidence [--file <path>] [--session-id <id|latest>] [--window <n>] [--format <json|markdown>] [--out <path>] [--json]`: quick-review merged release evidence and render current-batch gate/ontology/regression/moqui-baseline/risk-layer overview.
   - Default evidence file is `.kiro/reports/release-evidence/handoff-runs.json`.
   - `--window` (1-50, default `5`) controls how many recent sessions are aggregated in review.
   - JSON output includes `current_overview`, `aggregates.status_counts`, `aggregates.gate_pass_rate_percent`, and `risk_layers`.
-  - Markdown output includes `Current Gate`, `Current Ontology`, `Current Regression`, `Trend Series`, and `Risk Layer View`.
+  - Markdown output includes `Current Gate`, `Current Ontology`, `Current Regression`, `Current Moqui Baseline`, `Trend Series`, and `Risk Layer View`.
   - Add `--release-draft <path>` to auto-generate a release notes draft and evidence review markdown in one run.
   - `--release-version` sets draft version tag (defaults to `v<package.json version>`), and `--release-date` accepts `YYYY-MM-DD` (default: current UTC date).
   - Use `--review-out <path>` to override the generated evidence review markdown path (default `.kiro/reports/release-evidence/handoff-evidence-review.md`).

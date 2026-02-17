@@ -6326,6 +6326,10 @@ describe('auto close-loop command', () => {
     expect(payload.gates.passed).toBe(true);
     expect(payload.queue.output_file).toBe(queueFile);
     expect(payload.output_file).toContain(path.join('.kiro', 'reports', 'handoff-runs'));
+    expect(payload.moqui_baseline).toEqual(expect.objectContaining({
+      status: 'skipped',
+      generated: false
+    }));
     expect(Array.isArray(payload.recommendations)).toBe(true);
     expect(payload.recommendations.some(item => item.includes('kse auto handoff regression --session-id'))).toBe(true);
     expect(payload.release_evidence).toEqual(expect.objectContaining({
@@ -6359,6 +6363,10 @@ describe('auto close-loop command', () => {
       session_id: payload.session_id,
       status: 'completed',
       manifest_path: manifestFile
+    }));
+    expect(releaseEvidence.sessions[0].moqui_baseline).toEqual(expect.objectContaining({
+      status: 'skipped',
+      generated: false
     }));
     expect(releaseEvidence.sessions[0].handoff_report_file).toContain('.kiro/reports/handoff-runs/');
     expect(releaseEvidence.sessions[0].trend_window).toEqual(expect.objectContaining({
@@ -7789,6 +7797,33 @@ describe('auto close-loop command', () => {
               spec_success_rate_percent: 25
             }
           },
+          moqui_baseline: {
+            status: 'passed',
+            generated: true,
+            summary: {
+              total_templates: 3,
+              scoped_templates: 3,
+              avg_score: 95,
+              valid_rate_percent: 100,
+              baseline_passed: 3,
+              baseline_failed: 0,
+              portfolio_passed: true
+            },
+            compare: {
+              deltas: {
+                avg_score: 2,
+                valid_rate_percent: 0
+              },
+              failed_templates: {
+                newly_failed: [],
+                recovered: ['kse.scene--legacy-order--0.1.0']
+              }
+            },
+            output: {
+              json: '.kiro/reports/release-evidence/moqui-template-baseline.json',
+              markdown: '.kiro/reports/release-evidence/moqui-template-baseline.md'
+            }
+          },
           batch_summary: {
             failed_goals: 0
           }
@@ -7812,6 +7847,12 @@ describe('auto close-loop command', () => {
     expect(payload.mode).toBe('auto-handoff-evidence-review');
     expect(payload.current.session_id).toBe('handoff-new');
     expect(payload.current_overview.gate.passed).toBe(true);
+    expect(payload.current_overview.moqui_baseline).toEqual(expect.objectContaining({
+      status: 'passed',
+      summary: expect.objectContaining({
+        portfolio_passed: true
+      })
+    }));
     expect(payload.window).toEqual(expect.objectContaining({
       requested: 5,
       actual: 2
@@ -7901,6 +7942,7 @@ describe('auto close-loop command', () => {
     expect(markdown).toContain('## Current Gate');
     expect(markdown).toContain('## Current Ontology');
     expect(markdown).toContain('## Current Regression');
+    expect(markdown).toContain('## Current Moqui Baseline');
     expect(markdown).toContain('## Risk Layer View');
   });
 

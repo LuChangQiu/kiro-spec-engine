@@ -13,6 +13,7 @@ This playbook defines a generic (project-agnostic) path to absorb Moqui capabili
 KSE defaults already enforce the baseline below:
 
 - `kse auto handoff run`: ontology validation is required by default.
+- `kse auto handoff run`: generates Moqui baseline snapshot by default and appends it to release-evidence sessions.
 - `kse scene package-publish-batch`:
   - ontology validation required by default
   - batch ontology gate defaults:
@@ -62,6 +63,8 @@ Required artifacts for each intake batch:
 
 - `.kiro/reports/moqui-template-baseline.json`
 - `.kiro/reports/moqui-template-baseline.md`
+- `.kiro/reports/release-evidence/moqui-template-baseline.json`
+- `.kiro/reports/release-evidence/moqui-template-baseline.md`
 - `.kiro/reports/handoff-runs/<session>.json`
 - `.kiro/reports/scene-package-ontology-batch.json`
 - `.kiro/templates/scene-packages/registry.json`

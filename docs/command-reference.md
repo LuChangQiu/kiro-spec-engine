@@ -833,6 +833,22 @@ kse scene template-render --package <name> --values <json-or-path> --out <dir>
 kse scene template-render --package scene-erp --values '{"entity_name":"Order"}' --out ./output --json
 ```
 
+### Scene Package Batch Publish
+
+```bash
+# Publish scene package templates from a handoff manifest (default: completed specs only)
+kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --json
+
+# Preview batch publish plan without writing template files
+kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --json
+
+# Publish selected specs only
+kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --include 62-00-moqui-full-capability-closure-program,62-01-moqui-capability-itemized-parity-matrix --json
+
+# Disable status filter and use docs/* fallback paths for manifest entries missing scene paths
+kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --status all --fallback-spec-package docs/scene-package.json --fallback-scene-manifest docs/scene.yaml --force --json
+```
+
 ### Moqui ERP Integration
 
 ```bash

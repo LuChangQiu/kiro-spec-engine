@@ -15,6 +15,7 @@ const {
   validateScenePackageTemplateOptions,
   validateScenePackageValidateOptions,
   validateScenePackagePublishOptions,
+  validateScenePackagePublishBatchOptions,
   validateScenePackageInstantiateOptions,
   validateScenePackageRegistryOptions,
   validateScenePackageGateTemplateOptions,
@@ -37,6 +38,7 @@ const {
   runScenePackageTemplateCommand,
   runScenePackageValidateCommand,
   runScenePackagePublishCommand,
+  runScenePackagePublishBatchCommand,
   runScenePackageInstantiateCommand,
   runScenePackageRegistryCommand,
   runScenePackageGateTemplateCommand,
@@ -260,6 +262,30 @@ describe('Scene command', () => {
       .toBe('--template-id must contain at least one alphanumeric character');
     expect(validateScenePackagePublishOptions({ spec: '67-00-scene-package', specPackage: 'custom/scene-package.json', sceneManifest: 'custom/scene.yaml', outDir: '.kiro/templates' }))
       .toBeNull();
+  });
+
+  test('validateScenePackagePublishBatchOptions enforces batch publish constraints', () => {
+    expect(validateScenePackagePublishBatchOptions({ outDir: '.kiro/templates/scene-packages' }))
+      .toBe('--manifest is required');
+    expect(validateScenePackagePublishBatchOptions({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      fallbackSpecPackage: '/tmp/scene-package.json',
+      fallbackSceneManifest: 'custom/scene.yaml',
+      outDir: '.kiro/templates/scene-packages'
+    })).toBe('--fallback-spec-package must be a non-empty relative path');
+    expect(validateScenePackagePublishBatchOptions({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      fallbackSpecPackage: 'custom/scene-package.json',
+      fallbackSceneManifest: '/tmp/scene.yaml',
+      outDir: '.kiro/templates/scene-packages'
+    })).toBe('--fallback-scene-manifest must be a non-empty relative path');
+    expect(validateScenePackagePublishBatchOptions({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      fallbackSpecPackage: 'custom/scene-package.json',
+      fallbackSceneManifest: 'custom/scene.yaml',
+      outDir: '.kiro/templates/scene-packages',
+      status: 'completed'
+    })).toBeNull();
   });
 
   test('validateScenePackageInstantiateOptions enforces instantiate constraints', () => {
@@ -2856,6 +2882,288 @@ Trace: doctor-trace-erp
 
     expect(normalizePath(fileSystem.writeFile.mock.calls[0][0]))
       .toBe('/workspace/.kiro/templates/scene-packages/kse.scene--erp-order-query--0.2.0/scene.template.yaml');
+  });
+
+  test('runScenePackagePublishCommand supports dry-run preview without writes', async () => {
+    const contract = {
+      apiVersion: 'kse.scene.package/v0.1',
+      kind: 'scene-template',
+      metadata: {
+        group: 'kse.scene',
+        name: 'erp-order-query',
+        version: '0.2.0'
+      },
+      compatibility: {
+        kse_version: '>=1.24.0',
+        scene_api_version: 'kse.scene/v0.2'
+      },
+      capabilities: {
+        provides: ['scene.erp.query'],
+        requires: ['binding:http']
+      },
+      parameters: [
+        { id: 'entity_name', type: 'string', required: true }
+      ],
+      artifacts: {
+        entry_scene: 'custom/scene.yaml',
+        generates: ['requirements.md', 'design.md', 'tasks.md', 'custom/scene.yaml']
+      },
+      governance: {
+        risk_level: 'low',
+        approval_required: false,
+        rollback_supported: true
+      }
+    };
+
+    const fileSystem = {
+      pathExists: jest.fn().mockImplementation(async (targetPath) => {
+        const normalized = normalizePath(targetPath);
+        if (normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration') {
+          return true;
+        }
+        if (normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration/custom/scene.yaml') {
+          return true;
+        }
+        if (normalized === '/workspace/.kiro/templates/scene-packages/kse.scene--erp-order-query--0.2.0') {
+          return false;
+        }
+        return false;
+      }),
+      readJson: jest.fn().mockResolvedValue(contract),
+      readFile: jest.fn().mockResolvedValue('apiVersion: kse.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{entity_name}}\n'),
+      ensureDir: jest.fn().mockResolvedValue(),
+      writeJson: jest.fn().mockResolvedValue(),
+      writeFile: jest.fn().mockResolvedValue()
+    };
+
+    const payload = await runScenePackagePublishCommand({
+      spec: '67-00-scene-package-contract-declaration',
+      dryRun: true,
+      json: true
+    }, {
+      projectRoot: '/workspace',
+      fileSystem
+    });
+
+    expect(payload).toBeDefined();
+    expect(payload.dry_run).toBe(true);
+    expect(payload.mode).toBe('dry-run');
+    expect(payload.published).toBe(false);
+    expect(fileSystem.ensureDir).not.toHaveBeenCalled();
+    expect(fileSystem.writeJson).not.toHaveBeenCalled();
+    expect(fileSystem.writeFile).not.toHaveBeenCalled();
+  });
+
+  test('runScenePackagePublishCommand dry-run allows existing template without --force', async () => {
+    const contract = {
+      apiVersion: 'kse.scene.package/v0.1',
+      kind: 'scene-template',
+      metadata: {
+        group: 'kse.scene',
+        name: 'erp-order-query',
+        version: '0.2.0'
+      },
+      compatibility: {
+        kse_version: '>=1.24.0',
+        scene_api_version: 'kse.scene/v0.2'
+      },
+      capabilities: {
+        provides: ['scene.erp.query'],
+        requires: ['binding:http']
+      },
+      parameters: [
+        { id: 'entity_name', type: 'string', required: true }
+      ],
+      artifacts: {
+        entry_scene: 'custom/scene.yaml',
+        generates: ['requirements.md', 'design.md', 'tasks.md', 'custom/scene.yaml']
+      },
+      governance: {
+        risk_level: 'low',
+        approval_required: false,
+        rollback_supported: true
+      }
+    };
+
+    const fileSystem = {
+      pathExists: jest.fn().mockImplementation(async (targetPath) => {
+        const normalized = normalizePath(targetPath);
+        if (normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration') {
+          return true;
+        }
+        if (normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration/custom/scene.yaml') {
+          return true;
+        }
+        if (normalized === '/workspace/.kiro/templates/scene-packages/kse.scene--erp-order-query--0.2.0') {
+          return true;
+        }
+        return false;
+      }),
+      readJson: jest.fn().mockResolvedValue(contract),
+      readFile: jest.fn().mockResolvedValue('apiVersion: kse.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{entity_name}}\n'),
+      ensureDir: jest.fn().mockResolvedValue(),
+      writeJson: jest.fn().mockResolvedValue(),
+      writeFile: jest.fn().mockResolvedValue()
+    };
+
+    const payload = await runScenePackagePublishCommand({
+      spec: '67-00-scene-package-contract-declaration',
+      dryRun: true,
+      json: true
+    }, {
+      projectRoot: '/workspace',
+      fileSystem
+    });
+
+    expect(payload).toBeDefined();
+    expect(payload.dry_run).toBe(true);
+    expect(payload.overwritten).toBe(true);
+    expect(fileSystem.ensureDir).not.toHaveBeenCalled();
+    expect(fileSystem.writeJson).not.toHaveBeenCalled();
+    expect(fileSystem.writeFile).not.toHaveBeenCalled();
+  });
+
+  test('runScenePackagePublishBatchCommand publishes completed specs from handoff manifest', async () => {
+    const fileSystem = {
+      readJson: jest.fn().mockResolvedValue({
+        specs: [
+          {
+            id: '60-01-master-data-deepening',
+            status: 'completed',
+            scene_package: '.kiro/specs/60-01-master-data-deepening/docs/scene-package.json',
+            scene_manifest: '.kiro/specs/60-01-master-data-deepening/docs/scene.yaml'
+          },
+          {
+            id: '60-02-sales-lifecycle-enhancement',
+            status: 'in_progress',
+            scene_package: '.kiro/specs/60-02-sales-lifecycle-enhancement/docs/scene-package.json',
+            scene_manifest: '.kiro/specs/60-02-sales-lifecycle-enhancement/docs/scene.yaml'
+          }
+        ]
+      })
+    };
+
+    const publishRunner = jest.fn().mockResolvedValue({
+      published: true,
+      template: { id: 'kse.scene--master-data-deepening--0.1.0' }
+    });
+
+    const payload = await runScenePackagePublishBatchCommand({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      json: true
+    }, {
+      projectRoot: '/workspace',
+      fileSystem,
+      publishRunner
+    });
+
+    expect(payload).toBeDefined();
+    expect(payload.success).toBe(true);
+    expect(payload.summary).toMatchObject({
+      selected: 1,
+      published: 1,
+      failed: 0,
+      skipped: 1
+    });
+
+    expect(publishRunner).toHaveBeenCalledTimes(1);
+    expect(publishRunner.mock.calls[0][0]).toMatchObject({
+      spec: '60-01-master-data-deepening',
+      specPackage: 'docs/scene-package.json',
+      sceneManifest: 'docs/scene.yaml'
+    });
+  });
+
+  test('runScenePackagePublishBatchCommand continues failures in non-strict mode', async () => {
+    const fileSystem = {
+      readJson: jest.fn().mockResolvedValue({
+        specs: [
+          {
+            id: '62-00-moqui-full-capability-closure-program',
+            status: 'completed'
+          },
+          {
+            id: '62-01-moqui-capability-itemized-parity-matrix',
+            status: 'completed',
+            scene_package: '.kiro/specs/62-01-moqui-capability-itemized-parity-matrix/docs/scene-package.json',
+            scene_manifest: '.kiro/specs/62-01-moqui-capability-itemized-parity-matrix/docs/scene.yaml'
+          }
+        ]
+      })
+    };
+
+    const publishRunner = jest.fn()
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({
+        published: true,
+        template: { id: 'kse.scene--moqui-capability-itemized-parity-matrix--0.1.0' }
+      });
+
+    const payload = await runScenePackagePublishBatchCommand({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      fallbackSpecPackage: 'docs/scene-package.json',
+      fallbackSceneManifest: 'docs/scene.yaml',
+      json: true
+    }, {
+      projectRoot: '/workspace',
+      fileSystem,
+      publishRunner
+    });
+
+    expect(publishRunner).toHaveBeenCalledTimes(2);
+    expect(payload.success).toBe(false);
+    expect(payload.summary).toMatchObject({
+      selected: 2,
+      published: 1,
+      failed: 1
+    });
+    expect(payload.failures[0].spec).toBe('62-00-moqui-full-capability-closure-program');
+    expect(process.exitCode).toBe(1);
+  });
+
+  test('runScenePackagePublishBatchCommand supports dry-run planning mode', async () => {
+    const fileSystem = {
+      readJson: jest.fn().mockResolvedValue({
+        specs: [
+          {
+            id: '62-00-moqui-full-capability-closure-program',
+            status: 'completed'
+          }
+        ]
+      })
+    };
+
+    const publishRunner = jest.fn().mockResolvedValue({
+      published: false,
+      dry_run: true,
+      template: { id: 'kse.scene--moqui-full-capability-closure-program--0.1.0' }
+    });
+
+    const payload = await runScenePackagePublishBatchCommand({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      dryRun: true,
+      json: true
+    }, {
+      projectRoot: '/workspace',
+      fileSystem,
+      publishRunner
+    });
+
+    expect(payload).toBeDefined();
+    expect(payload.success).toBe(true);
+    expect(payload.mode).toBe('dry-run');
+    expect(payload.summary).toMatchObject({
+      selected: 1,
+      published: 0,
+      planned: 1,
+      failed: 0,
+      skipped: 0
+    });
+    expect(publishRunner).toHaveBeenCalledTimes(1);
+    expect(publishRunner.mock.calls[0][0]).toMatchObject({
+      spec: '62-00-moqui-full-capability-closure-program',
+      dryRun: true
+    });
   });
 
   test('runScenePackageInstantiateCommand instantiates spec from template', async () => {

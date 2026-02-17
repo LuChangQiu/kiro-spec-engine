@@ -6844,6 +6844,9 @@ describe('auto close-loop command', () => {
       source_project: 'E:/workspace/331-poc',
       specs: ['60-09-order-fulfillment'],
       templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      },
       known_gaps: ['delivery anomaly triage']
     }, { spaces: 2 });
 
@@ -6929,7 +6932,7 @@ describe('auto close-loop command', () => {
     expect(await fs.pathExists(payload.output_file)).toBe(true);
   });
 
-  test('fails handoff run early when ontology validation gate is required but missing', async () => {
+  test('fails handoff run early when ontology validation is missing (default gate enabled)', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
     await fs.writeJson(manifestFile, {
       timestamp: '2026-02-16T00:00:00.000Z',
@@ -6949,7 +6952,6 @@ describe('auto close-loop command', () => {
         'run',
         '--manifest',
         manifestFile,
-        '--require-ontology-validation',
         '--json'
       ])
     ).rejects.toThrow('process.exit called');
@@ -6958,9 +6960,45 @@ describe('auto close-loop command', () => {
     expect(payload.mode).toBe('auto-handoff-run');
     expect(payload.status).toBe('failed');
     expect(payload.error).toContain('handoff ontology validation gate failed');
-    expect(payload.recommendations.some(item => item.includes('--require-ontology-validation'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('Ensure manifest ontology_validation is present and passed'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('--continue-from'))).toBe(false);
     expect(runAutoCloseLoop).not.toHaveBeenCalled();
+  });
+
+  test('allows disabling ontology validation gate via --no-require-ontology-validation', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-10-service-quality'],
+      templates: ['moqui-domain-extension']
+    }, { spaces: 2 });
+
+    runAutoCloseLoop.mockResolvedValue({
+      status: 'completed',
+      portfolio: {
+        master_spec: '160-10-service-quality',
+        sub_specs: []
+      }
+    });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'run',
+      '--manifest',
+      manifestFile,
+      '--no-require-ontology-validation',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.status).toBe('completed');
+    expect(payload.policy.require_ontology_validation).toBe(false);
+    expect(runAutoCloseLoop).toHaveBeenCalled();
   });
 
   test('fails handoff run early when ontology quality score is below threshold', async () => {

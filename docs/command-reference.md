@@ -522,7 +522,7 @@ kse auto handoff plan --manifest ../331-poc/docs/handoffs/handoff-manifest.json 
 kse auto handoff queue --manifest ../331-poc/docs/handoffs/handoff-manifest.json --out .kiro/auto/handoff-goals.lines --json
 kse auto handoff template-diff --manifest ../331-poc/docs/handoffs/handoff-manifest.json --json
 kse auto handoff run --manifest ../331-poc/docs/handoffs/handoff-manifest.json --json
-kse auto handoff run --manifest ../331-poc/docs/handoffs/handoff-manifest.json --require-ontology-validation --min-spec-success-rate 95 --max-risk-level medium --json
+kse auto handoff run --manifest ../331-poc/docs/handoffs/handoff-manifest.json --min-spec-success-rate 95 --max-risk-level medium --json
 kse auto handoff run --manifest ../331-poc/docs/handoffs/handoff-manifest.json --continue-from latest --continue-strategy auto --json
 kse auto handoff regression --session-id latest --json
 kse auto handoff regression --session-id latest --window 5 --json
@@ -765,15 +765,15 @@ Dual-track handoff integration:
 - `kse auto handoff plan --manifest <path> [--out <path>] [--strict] [--strict-warnings] [--json]`: parse handoff manifest (source project, specs, templates, known gaps) and generate an executable KSE integration phase plan.
 - `kse auto handoff queue --manifest <path> [--out <path>] [--append] [--no-include-known-gaps] [--dry-run] [--json]`: generate close-loop batch goal queue from handoff manifest and optionally persist line-based queue file (default `.kiro/auto/handoff-goals.lines`).
 - `kse auto handoff template-diff --manifest <path> [--json]`: compare manifest templates against local template exports/registry and report `missing_in_local` and `extra_in_local`.
-- `kse auto handoff run --manifest <path> [--out <path>] [--queue-out <path>] [--append] [--no-include-known-gaps] [--continue-from <session|latest|file>] [--continue-strategy <auto|pending|failed-only>] [--dry-run] [--strict] [--strict-warnings] [--no-dependency-batching] [--min-spec-success-rate <n>] [--max-risk-level <level>] [--require-ontology-validation] [--release-evidence-window <n>] [--json]`: execute handoff end-to-end (`plan -> queue -> close-loop-batch -> observability`) with automatic report archive to `.kiro/reports/handoff-runs/<session>.json`.
+- `kse auto handoff run --manifest <path> [--out <path>] [--queue-out <path>] [--append] [--no-include-known-gaps] [--continue-from <session|latest|file>] [--continue-strategy <auto|pending|failed-only>] [--dry-run] [--strict] [--strict-warnings] [--no-dependency-batching] [--min-spec-success-rate <n>] [--max-risk-level <level>] [--no-require-ontology-validation] [--release-evidence-window <n>] [--json]`: execute handoff end-to-end (`plan -> queue -> close-loop-batch -> observability`) with automatic report archive to `.kiro/reports/handoff-runs/<session>.json`.
   - Default mode is dependency-aware: spec integration goals are grouped into dependency batches and executed in topological order.
   - `--continue-from` resumes pending goals from an existing handoff run report (`latest`, session id, or JSON file path). For safety, KSE enforces manifest-path consistency between the previous report and current run.
   - `--continue-strategy auto|pending|failed-only` controls resumed scope. `auto` (default) derives the best strategy from prior run state (`pending` when unprocessed/planned goals exist, otherwise `failed-only` for pure failure replay).
   - Non-dry runs auto-merge release evidence into `.kiro/reports/release-evidence/handoff-runs.json` with session-level gate/ontology/regression snapshots. Merge failures are recorded as warnings without aborting the run.
   - `--release-evidence-window` controls trend snapshot window size (2-50, default `5`) used in merged release evidence (`latest_trend_window` and per-session `trend_window`).
   - Run result includes `recommendations` with executable follow-up commands (for example, auto-generated `--continue-from <session>` on failed/incomplete batches).
-  - Gate defaults: `--min-spec-success-rate` defaults to `100`, `--max-risk-level` defaults to `high`.
-  - When `--require-ontology-validation` is enabled, run fails fast at precheck if manifest ontology evidence is missing or not passed.
+  - Gate defaults: `--min-spec-success-rate` defaults to `100`, `--max-risk-level` defaults to `high`, and ontology validation requirement is enabled by default.
+  - Use `--no-require-ontology-validation` only for emergency bypass; default behavior fails fast at precheck if manifest ontology evidence is missing or not passed.
 - `kse auto handoff regression [--session-id <id|latest>] [--window <n>] [--format <json|markdown>] [--out <path>] [--json]`: compare one handoff run report with its previous run and output trend deltas (success-rate/risk/failed-goals/elapsed time).
   - `--window` (2-50, default `2`) returns multi-run `series`, `window_trend`, and `aggregates` for broader regression visibility.
   - Regression JSON now includes `risk_layers` (low/medium/high/unknown buckets with per-layer session list and quality aggregates).
@@ -836,10 +836,10 @@ kse scene template-render --package scene-erp --values '{"entity_name":"Order"}'
 ### Scene Package Batch Publish
 
 ```bash
-# Publish scene package templates from a handoff manifest (default: completed specs only)
+# Publish scene package templates from a handoff manifest (default: completed specs only + ontology validation required)
 kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --json
 
-# Use 331-poc preset defaults (manifest/docs paths + completed filter)
+# Use 331-poc preset defaults (manifest/docs paths + completed filter + ontology batch gate: avg>=70, valid-rate>=100%)
 kse scene package-publish-batch --from-331 --json
 
 # Preview batch publish plan without writing template files
@@ -854,7 +854,7 @@ kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json -
 # Read specs from non-standard manifest path
 kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --manifest-spec-path handoff.spec_items --json
 
-# Enforce ontology validation + semantic quality threshold before publish
+# Tighten per-spec ontology semantic quality threshold before publish
 kse scene package-publish-batch --from-331 --require-ontology-validation --ontology-min-score 70 --json
 
 # Persist ontology/publish batch report for governance tracking
@@ -862,6 +862,9 @@ kse scene package-publish-batch --from-331 --dry-run --ontology-report-out .kiro
 
 # Enforce batch-level ontology portfolio gate (average score + valid-rate)
 kse scene package-publish-batch --from-331 --dry-run --ontology-min-average-score 60 --ontology-min-valid-rate 90 --json
+
+# Emergency bypass (not recommended): disable ontology validation requirement
+kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --no-require-ontology-validation --json
 
 # Export ontology remediation task draft markdown
 kse scene package-publish-batch --from-331 --dry-run --ontology-task-out .kiro/reports/scene-package-ontology-task-draft.md --json

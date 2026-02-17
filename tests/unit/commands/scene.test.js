@@ -3343,6 +3343,7 @@ Trace: doctor-trace-erp
 
     expect(payload).toBeDefined();
     expect(payload.success).toBe(true);
+    expect(payload.options.require_ontology_validation).toBe(true);
     expect(payload.summary).toMatchObject({
       selected: 1,
       published: 1,
@@ -3354,7 +3355,8 @@ Trace: doctor-trace-erp
     expect(publishRunner.mock.calls[0][0]).toMatchObject({
       spec: '60-01-master-data-deepening',
       specPackage: 'docs/scene-package.json',
-      sceneManifest: 'docs/scene.yaml'
+      sceneManifest: 'docs/scene.yaml',
+      requireOntologyValidation: true
     });
   });
 
@@ -3498,7 +3500,17 @@ Trace: doctor-trace-erp
 
     const publishRunner = jest.fn().mockResolvedValue({
       published: true,
-      template: { id: 'kse.scene--moqui-full-capability-closure-program--1.0.0' }
+      template: { id: 'kse.scene--moqui-full-capability-closure-program--1.0.0' },
+      ontology_validation: {
+        required: true,
+        valid: true,
+        error_count: 0,
+        error_codes: [],
+        score: 72,
+        level: 'medium',
+        min_score: null,
+        min_score_passed: true
+      }
     });
 
     const payload = await runScenePackagePublishBatchCommand({
@@ -3518,13 +3530,17 @@ Trace: doctor-trace-erp
       manifest_spec_path: 'specs',
       fallback_spec_package: 'docs/scene-package.json',
       fallback_scene_manifest: 'docs/scene.yaml',
-      status: 'completed'
+      status: 'completed',
+      require_ontology_validation: true,
+      ontology_min_average_score: 70,
+      ontology_min_valid_rate: 100
     });
     expect(publishRunner).toHaveBeenCalledTimes(1);
     expect(publishRunner.mock.calls[0][0]).toMatchObject({
       spec: '62-00-moqui-full-capability-closure-program',
       specPackage: 'docs/scene-package.json',
-      sceneManifest: 'docs/scene.yaml'
+      sceneManifest: 'docs/scene.yaml',
+      requireOntologyValidation: true
     });
   });
 

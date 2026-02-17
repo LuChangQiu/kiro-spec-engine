@@ -82,3 +82,25 @@ spec:
             - inventoryOperationId
             - reserveStatus
             - adjustmentStatus
+    business_rules:
+      - id: rule.inventory.non-negative-balance
+        description: Inventory adjustment must never produce negative available balance
+        entity_ref: inventory_item
+        bind_to: spec.erp.inventory-adjust
+        status: enforced
+      - id: rule.inventory.reserve-before-adjust
+        description: Adjustment path requires reservation attempt evidence
+        entity_ref: inventory_reservation
+        bind_to: spec.erp.inventory-reserve
+        status: active
+    decision_logic:
+      - id: decision.inventory.reserve-or-adjust-branch
+        description: Choose reserve-only or reserve-plus-adjust branch from ATP threshold
+        bind_to: spec.erp.inventory-reserve
+        status: resolved
+        automated: true
+      - id: decision.inventory.adjust-compensation-policy
+        description: Execute compensation when adjustment fails after reservation
+        bind_to: spec.erp.inventory-adjust
+        status: resolved
+        automated: true

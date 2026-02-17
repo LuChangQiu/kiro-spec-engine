@@ -117,24 +117,26 @@ kse auto close-loop-recover .kiro/auto/close-loop-batch-summaries/batch-20260215
   --program-audit-out .kiro/reports/close-loop-recover-audit.json \
   --dry-run --json
 
+# Default autonomous batch run (continue-on-error + adaptive scheduling + retry-until-complete)
+kse auto close-loop-batch .kiro/goals.json --json
+
 # Batch parallel mode: run multiple goals concurrently
-kse auto close-loop-batch .kiro/goals.json --batch-parallel 3 --continue-on-error --json
+kse auto close-loop-batch .kiro/goals.json --batch-parallel 3 --json
 
 # Batch with global agent budget (automatic per-goal maxParallel throttling)
 kse auto close-loop-batch .kiro/goals.json \
   --batch-parallel 3 \
   --batch-agent-budget 6 \
-  --continue-on-error --json
+  --json
 
 # Batch priority scheduling with aging (favor complex goals, prevent starvation)
 kse auto close-loop-batch .kiro/goals.json \
   --batch-priority critical-first \
   --batch-aging-factor 3 \
-  --continue-on-error --json
+  --json
 
 # Auto-retry failed/stopped goals in the same batch run
 kse auto close-loop-batch .kiro/goals.json \
-  --continue-on-error \
   --batch-retry-rounds 1 \
   --batch-retry-strategy adaptive \
   --json
@@ -145,9 +147,9 @@ kse auto close-loop-batch .kiro/goals.json \
   --batch-retry-max-rounds 10 \
   --json
 
-# Enable autonomous closed-loop batch policy (recommended for multi-goal programs)
+# Disable autonomous closed-loop batch policy (only when you need legacy/manual tuning)
 kse auto close-loop-batch .kiro/goals.json \
-  --batch-autonomous \
+  --no-batch-autonomous \
   --json
 
 # Resume a stopped/failed batch from previous summary output
@@ -278,7 +280,7 @@ Batch multi-goal autonomous execution:
 - `--batch-retry-strategy <strategy>`: choose `adaptive` (default) or `strict` retry behavior
 - `--batch-retry-until-complete`: enable goal-draining retry mode until completion or max rounds
 - `--batch-retry-max-rounds <n>`: max extra rounds for until-complete mode (`1-20`, default `10`)
-- `--batch-autonomous`: enable autonomous defaults (`continue-on-error`, adaptive `batch-parallel`, `complex-first`, aging `2`, retry-until-complete); enabled by default
+- `--no-batch-autonomous`: disable autonomous defaults and use explicit batch flags only
 - `--batch-session-id <id>`: set explicit id for persisted batch summary session
 - `--batch-session-keep <n>`: keep newest `n` persisted batch summary sessions (`0-1000`)
 - `--batch-session-older-than-days <n>`: when pruning persisted batch summaries, only delete sessions older than `n` days (`0-36500`)
@@ -292,7 +294,7 @@ Batch multi-goal autonomous execution:
 - `--spec-session-max-duplicate-goals <n>`: goal-input duplicate guard for batch inputs (`0-500000`)
 - `--spec-session-budget-hard-fail`: fail run when spec count exceeds `--spec-session-max-total` before/after execution
 - `--no-batch-session`: disable persisted batch summary session archive for this run
-- `--continue-on-error`: continue remaining goals when one goal fails
+- `--continue-on-error`: continue remaining goals when one goal fails (enabled by default under autonomous policy)
 - Returns one summary with per-goal statuses (`completed`, `failed`, `error`, `planned`)
 - Summary includes `resource_plan` and aggregate `metrics` (success rate, status breakdown, avg sub-spec count, avg replan cycles)
 - `--program-goals` requires `--decompose-goal`, and goal sources are mutually exclusive (`<goals-file>` vs `--resume-from-summary` vs `--decompose-goal`)

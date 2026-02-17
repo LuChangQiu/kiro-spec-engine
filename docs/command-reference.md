@@ -382,27 +382,26 @@ kse auto close-loop-recover .kiro/auto/close-loop-batch-summaries/batch-20260215
   --program-audit-out .kiro/reports/close-loop-recover-audit.json \
   --dry-run --json
 
-# Continue processing later goals even if one goal fails
-kse auto close-loop-batch .kiro/goals.json --continue-on-error --json
+# Default autonomous batch run (continue-on-error + adaptive scheduling + retry-until-complete)
+kse auto close-loop-batch .kiro/goals.json --json
 
 # Run batch goals with concurrent close-loop workers
-kse auto close-loop-batch .kiro/goals.json --batch-parallel 3 --continue-on-error --json
+kse auto close-loop-batch .kiro/goals.json --batch-parallel 3 --json
 
 # Apply global agent budget across all concurrent goals
 kse auto close-loop-batch .kiro/goals.json \
   --batch-parallel 3 \
   --batch-agent-budget 6 \
-  --continue-on-error --json
+  --json
 
 # Prioritize complex goals first and enable anti-starvation aging
 kse auto close-loop-batch .kiro/goals.json \
   --batch-priority critical-first \
   --batch-aging-factor 3 \
-  --continue-on-error --json
+  --json
 
 # Automatically retry failed/stopped goals for one extra round
 kse auto close-loop-batch .kiro/goals.json \
-  --continue-on-error \
   --batch-retry-rounds 1 \
   --batch-retry-strategy adaptive \
   --json
@@ -413,9 +412,9 @@ kse auto close-loop-batch .kiro/goals.json \
   --batch-retry-max-rounds 10 \
   --json
 
-# Enable autonomous batch policy (closed-loop defaults for program-scale runs)
+# Disable autonomous batch policy explicitly (only when you need legacy/manual tuning)
 kse auto close-loop-batch .kiro/goals.json \
-  --batch-autonomous \
+  --no-batch-autonomous \
   --json
 
 # Resume only pending goals from a previous batch summary
@@ -529,7 +528,7 @@ kse auto handoff regression --session-id latest --json
 kse auto handoff regression --session-id latest --window 5 --json
 kse auto handoff regression --session-id latest --format markdown --out .kiro/reports/handoff-regression.md --json
 kse auto handoff regression --session-id latest --window 5 --out .kiro/reports/handoff-regression.json --json
-kse auto close-loop-batch .kiro/auto/handoff-goals.lines --format lines --batch-autonomous --continue-on-error --json
+kse auto close-loop-batch .kiro/auto/handoff-goals.lines --format lines --json
 ``` 
 
 DoD-related options:
@@ -578,7 +577,7 @@ Close-loop batch (`kse auto close-loop-batch <goals-file>`) options:
 - `--batch-retry-strategy <strategy>`: retry strategy `adaptive` (default) or `strict`
 - `--batch-retry-until-complete`: keep retrying until no failed/stopped goals remain or max rounds reached
 - `--batch-retry-max-rounds <n>`: max extra rounds for `--batch-retry-until-complete` (`1-20`, default `10`)
-- `--batch-autonomous`: apply autonomous closed-loop defaults (`continue-on-error`, adaptive `batch-parallel`, `complex-first`, aging `2`, retry-until-complete); enabled by default
+- `--no-batch-autonomous`: disable autonomous closed-loop defaults and rely on explicit batch flags
 - `--batch-session-id <id>`: set explicit persisted batch session id
 - `--batch-session-keep <n>`: keep newest `n` persisted batch summaries after each run (`0-1000`)
 - `--batch-session-older-than-days <n>`: when pruning persisted batch summaries, only delete sessions older than `n` days (`0-36500`)
@@ -592,7 +591,7 @@ Close-loop batch (`kse auto close-loop-batch <goals-file>`) options:
 - `--spec-session-max-duplicate-goals <n>`: goal-input duplicate guard for batch runs (`0-500000`)
 - `--spec-session-budget-hard-fail`: fail run when spec count exceeds `--spec-session-max-total` before/after execution
 - `--no-batch-session`: disable automatic persisted batch summary session archive
-- `--continue-on-error`: continue remaining goals after a failed/error goal
+- `--continue-on-error`: continue remaining goals after a failed/error goal (enabled by default under autonomous policy)
 - `--out <path>`: write batch summary JSON output file
 - `--resume` and `--session-id` are not supported in batch mode (sessions are per-goal)
 - `--program-goals` requires `--decompose-goal`
@@ -682,7 +681,7 @@ Close-loop recovery (`kse auto close-loop-recover [summary]`) options:
 - `--recover-max-minutes <n>`: elapsed-time budget for recovery loop (minutes, default unlimited)
 - `--recovery-memory-ttl-days <n>`: prune stale recovery memory entries before auto action selection (`0-36500`)
 - `--recovery-memory-scope <scope>`: scope key for recovery memory isolation (default auto: project + git branch)
-- Supports batch controls (`--batch-parallel`, `--batch-agent-budget`, `--batch-priority`, `--batch-aging-factor`, `--batch-retry*`, `--batch-autonomous`)
+- Supports batch controls (`--batch-parallel`, `--batch-agent-budget`, `--batch-priority`, `--batch-aging-factor`, `--batch-retry*`, `--no-batch-autonomous`)
 - Supports spec retention controls (`--spec-session-keep`, `--spec-session-older-than-days`, `--no-spec-session-protect-active`)
   - Includes `--spec-session-protect-window-days` to tune recent-reference protection window.
   - Includes `--spec-session-max-total` and optional `--spec-session-budget-hard-fail` for spec-count budget governance.

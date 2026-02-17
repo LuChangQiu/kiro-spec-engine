@@ -3,6 +3,7 @@
 const {
   checkActionAbstraction,
   checkDataLineage,
+  checkOntologySemanticCoverage,
   checkAgentHints,
   scoreAgentReadiness,
   calculateQualityScore
@@ -202,6 +203,80 @@ describe('checkDataLineage', () => {
     expect(items).toHaveLength(3);
     expect(items.filter(i => i.code === 'LINEAGE_SOURCE_NOT_IN_BINDINGS')).toHaveLength(2);
     expect(items.filter(i => i.code === 'LINEAGE_SINK_NOT_IN_BINDINGS')).toHaveLength(1);
+  });
+});
+
+// ─── checkOntologySemanticCoverage ────────────────────────────────
+
+describe('checkOntologySemanticCoverage', () => {
+  test('returns empty array for non scene-domain-profile package', () => {
+    const contract = { kind: 'scene-capability' };
+    expect(checkOntologySemanticCoverage(contract, null)).toEqual([]);
+  });
+
+  test('returns warnings when ontology model and scene bridge are missing', () => {
+    const contract = {
+      kind: 'scene-domain-profile',
+      governance_contract: {}
+    };
+    const items = checkOntologySemanticCoverage(contract, null);
+    const codes = items.map(item => item.code);
+    expect(codes).toContain('ONTOLOGY_ENTITIES_MISSING');
+    expect(codes).toContain('ONTOLOGY_RELATIONS_MISSING');
+    expect(codes).toContain('ONTOLOGY_BUSINESS_RULES_MISSING');
+    expect(codes).toContain('ONTOLOGY_DECISION_LOGIC_MISSING');
+    expect(codes).toContain('SCENE_GOVERNANCE_CONTRACT_MISSING');
+  });
+
+  test('returns warnings when scene governance does not carry package rules and decisions', () => {
+    const contract = {
+      kind: 'scene-domain-profile',
+      ontology_model: {
+        entities: [{ id: 'order_header' }],
+        relations: [{ source: 'order_header', target: 'order_item', type: 'composes' }]
+      },
+      governance_contract: {
+        business_rules: [{ id: 'rule.order.read-allowed' }],
+        decision_logic: [{ id: 'decision.order.empty-result' }]
+      }
+    };
+    const manifest = {
+      spec: {
+        governance_contract: {
+          business_rules: [],
+          decision_logic: []
+        }
+      }
+    };
+    const items = checkOntologySemanticCoverage(contract, manifest);
+    const codes = items.map(item => item.code);
+    expect(codes).toContain('SCENE_GOVERNANCE_RULES_MISSING');
+    expect(codes).toContain('SCENE_GOVERNANCE_DECISIONS_MISSING');
+    expect(codes).toContain('SCENE_GOVERNANCE_RULES_UNALIGNED');
+    expect(codes).toContain('SCENE_GOVERNANCE_DECISIONS_UNALIGNED');
+  });
+
+  test('returns empty array when ontology and scene bridge are aligned', () => {
+    const contract = {
+      kind: 'scene-domain-profile',
+      ontology_model: {
+        entities: [{ id: 'order_header' }],
+        relations: [{ source: 'order_header', target: 'order_item', type: 'composes' }]
+      },
+      governance_contract: {
+        business_rules: [{ id: 'rule.order.read-allowed' }],
+        decision_logic: [{ id: 'decision.order.empty-result' }]
+      }
+    };
+    const manifest = {
+      spec: {
+        governance_contract: {
+          business_rules: [{ id: 'rule.order.read-allowed' }],
+          decision_logic: [{ id: 'decision.order.empty-result' }]
+        }
+      }
+    };
+    expect(checkOntologySemanticCoverage(contract, manifest)).toEqual([]);
   });
 });
 

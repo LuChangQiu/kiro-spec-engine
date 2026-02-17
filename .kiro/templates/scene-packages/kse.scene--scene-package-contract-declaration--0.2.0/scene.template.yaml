@@ -74,3 +74,25 @@ spec:
             - packageCoordinate
             - compatibilityStatus
             - riskLevel
+    business_rules:
+      - id: rule.package-coordinate-unique
+        description: Package coordinate must be unique in registry scope
+        entity_ref: package_contract
+        bind_to: spec.erp.scene-package-contract-read
+        status: enforced
+      - id: rule.compatibility-before-publish
+        description: Compatibility check must pass before metadata publication
+        entity_ref: compatibility_profile
+        bind_to: spec.erp.scene-package-compatibility-check
+        status: active
+    decision_logic:
+      - id: decision.compatibility-gate-strategy
+        description: Block publication when scene_api_version is incompatible
+        bind_to: spec.erp.scene-package-compatibility-check
+        status: resolved
+        automated: true
+      - id: decision.risk-annotation-strategy
+        description: Use low/medium/high annotation based on policy violations
+        bind_to: spec.erp.scene-package-metadata-query
+        status: resolved
+        automated: true

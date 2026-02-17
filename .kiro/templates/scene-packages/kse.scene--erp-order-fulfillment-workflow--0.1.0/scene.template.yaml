@@ -93,3 +93,25 @@ spec:
             - orderId
             - statusId
             - executionId
+    business_rules:
+      - id: rule.fulfillment.reserve-before-release
+        description: Inventory must be reserved before fulfillment release
+        entity_ref: inventory_reservation
+        bind_to: spec.erp.inventory-reserve
+        status: enforced
+      - id: rule.fulfillment.payment-before-status-transition
+        description: Payment authorization must exist before final status update
+        entity_ref: payment_authorization
+        bind_to: spec.erp.payment-authorize
+        status: enforced
+    decision_logic:
+      - id: decision.fulfillment.partial-reserve-policy
+        description: Choose partial or full fulfillment path based on reservation coverage
+        bind_to: spec.erp.inventory-reserve
+        status: resolved
+        automated: true
+      - id: decision.fulfillment.payment-failure-compensation
+        description: Trigger reservation compensation when payment authorization fails
+        bind_to: spec.erp.payment-authorize
+        status: resolved
+        automated: true

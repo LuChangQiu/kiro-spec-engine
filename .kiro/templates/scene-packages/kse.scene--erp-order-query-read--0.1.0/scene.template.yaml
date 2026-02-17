@@ -71,3 +71,25 @@ spec:
             - orderProjection
             - items
             - totals
+    business_rules:
+      - id: rule.order-query.filter-whitelist
+        description: Only approved filter fields can be used for order query
+        entity_ref: order_header
+        bind_to: spec.erp.order-list-query
+        status: enforced
+      - id: rule.order-query.header-redaction
+        description: Sensitive header fields must be redacted before projection output
+        entity_ref: order_projection
+        bind_to: spec.erp.order-header-read
+        status: active
+    decision_logic:
+      - id: decision.order-query.empty-result-policy
+        description: Return explicit empty projection when no order is matched
+        bind_to: spec.erp.order-list-query
+        status: resolved
+        automated: true
+      - id: decision.order-query.item-hydration-policy
+        description: Skip item hydration when header is missing required keys
+        bind_to: spec.erp.order-item-read
+        status: resolved
+        automated: true

@@ -481,6 +481,37 @@ jobs:
                 acc[risk] += 1;
                 return acc;
               }, { low: 0, medium: 0, high: 0, unknown: 0 });
+              const failedStreak = (() => {
+                let count = 0;
+                for (const item of recent) {
+                  if (!item || item.gate_passed !== false) {
+                    break;
+                  }
+                  count += 1;
+                }
+                return count;
+              })();
+              const highRiskShare = recent.length > 0
+                ? Number(((riskCounts.high / recent.length) * 100).toFixed(2))
+                : 0;
+              const shortWindow = entries.slice(0, Math.min(entries.length, 3));
+              const longWindow = entries.slice(0, Math.min(entries.length, 5));
+              const shortHighShare = shortWindow.length > 0
+                ? shortWindow.filter(item => item && `${item.risk_level || ''}`.toLowerCase() === 'high').length / shortWindow.length
+                : 0;
+              const longHighShare = longWindow.length > 0
+                ? longWindow.filter(item => item && `${item.risk_level || ''}`.toLowerCase() === 'high').length / longWindow.length
+                : 0;
+              const driftAlerts = [];
+              if (failedStreak >= 2) {
+                driftAlerts.push(`consecutive gate failures: ${failedStreak}`);
+              }
+              if (highRiskShare >= 60) {
+                driftAlerts.push(`high-risk share in latest 5 is ${highRiskShare}%`);
+              }
+              if (shortWindow.length >= 2 && longWindow.length >= 3 && (shortHighShare - longHighShare) >= 0.25) {
+                driftAlerts.push(`high-risk share increased from ${(longHighShare * 100).toFixed(2)}% to ${(shortHighShare * 100).toFixed(2)}%`);
+              }
 
               const lines = [
                 '',
@@ -494,8 +525,21 @@ jobs:
                 `- History index: ${historyJsonUrl ? `[${historyJsonAsset}](${historyJsonUrl})` : historyJsonAsset}`,
                 `- History summary: ${historySummaryUrl ? `[${historySummaryAsset}](${historySummaryUrl})` : historySummaryAsset}`,
                 '',
-                '### Recent Versions'
+                '### Drift Alerts'
               ];
+
+              if (driftAlerts.length === 0) {
+                lines.push('', '- none');
+              } else {
+                for (const alert of driftAlerts) {
+                  lines.push('', `- ${alert}`);
+                }
+              }
+
+              lines.push(
+                '',
+                '### Recent Versions'
+              );
 
               if (recent.length === 0) {
                 lines.push('', '- none');

@@ -83,10 +83,13 @@
 29. Release Notes 资产链接增强：
    - 趋势段落自动生成 `release-gate-history` 相关资产的可点击下载链接。
    - 发布页可直接跳转趋势卡片/索引 JSON，无需手工查找资产列表。
+30. 发布说明新增门禁漂移告警：
+   - 自动检测连续 gate 失败、高风险占比过高、短期风险占比上升。
+   - 在 Release Notes 中显式给出 drift alerts，提前暴露质量恶化趋势。
 
 ## 下一阶段（P2）
 
-1. 增加 `release-gate-history` 的漂移告警阈值（连续 N 版失败或 high 风险占比上升）并在 Release Notes 显示告警。
+1. 将 drift alert 阈值参数化（repo variables），支持项目级自定义灵敏度。
 
 ## 长期目标（P3）
 

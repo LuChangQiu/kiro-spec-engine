@@ -6134,9 +6134,29 @@ describe('auto close-loop command', () => {
     expect(payload.output_file).toContain(path.join('.kiro', 'reports', 'handoff-runs'));
     expect(Array.isArray(payload.recommendations)).toBe(true);
     expect(payload.recommendations.some(item => item.includes('kse auto handoff regression --session-id'))).toBe(true);
+    expect(payload.release_evidence).toEqual(expect.objectContaining({
+      mode: 'auto-handoff-release-evidence',
+      merged: true,
+      updated_existing: false,
+      latest_session_id: payload.session_id,
+      total_runs: 1
+    }));
     expect(await fs.pathExists(payload.output_file)).toBe(true);
     expect(await fs.pathExists(queueFile)).toBe(true);
     expect(runAutoCloseLoop).toHaveBeenCalledTimes(payload.queue.goal_count);
+    const releaseEvidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+    expect(payload.release_evidence.file).toBe(releaseEvidenceFile);
+    expect(await fs.pathExists(releaseEvidenceFile)).toBe(true);
+    const releaseEvidence = await fs.readJson(releaseEvidenceFile);
+    expect(releaseEvidence.mode).toBe('auto-handoff-release-evidence');
+    expect(releaseEvidence.total_runs).toBe(1);
+    expect(releaseEvidence.latest_session_id).toBe(payload.session_id);
+    expect(releaseEvidence.sessions[0]).toEqual(expect.objectContaining({
+      session_id: payload.session_id,
+      status: 'completed',
+      manifest_path: manifestFile
+    }));
+    expect(releaseEvidence.sessions[0].handoff_report_file).toContain('.kiro/reports/handoff-runs/');
   });
 
   test('runs handoff by dependency batches before post-spec goals', async () => {
@@ -6185,6 +6205,76 @@ describe('auto close-loop command', () => {
     expect(payload.dependency_execution.dependency_plan.batch_count).toBe(2);
     expect(runAutoCloseLoop.mock.calls[0][0]).toContain('integrate handoff spec 60-30-base-spec');
     expect(runAutoCloseLoop.mock.calls[1][0]).toContain('integrate handoff spec 60-31-dependent-spec');
+  });
+
+  test('updates existing release evidence entry when session id repeats', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-32-repeatable-session'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    runAutoCloseLoop.mockResolvedValue({
+      status: 'completed',
+      portfolio: {
+        master_spec: '161-10-handoff-repeat',
+        sub_specs: []
+      }
+    });
+
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2026-02-16T12:34:56.000Z'));
+    const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0.42424);
+
+    try {
+      const firstProgram = buildProgram();
+      await firstProgram.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--json'
+      ]);
+      const firstPayload = JSON.parse(`${logSpy.mock.calls[logSpy.mock.calls.length - 1][0]}`);
+
+      logSpy.mockClear();
+      const secondProgram = buildProgram();
+      await secondProgram.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--json'
+      ]);
+      const secondPayload = JSON.parse(`${logSpy.mock.calls[logSpy.mock.calls.length - 1][0]}`);
+
+      expect(secondPayload.session_id).toBe(firstPayload.session_id);
+      expect(secondPayload.release_evidence).toEqual(expect.objectContaining({
+        mode: 'auto-handoff-release-evidence',
+        merged: true,
+        updated_existing: true,
+        total_runs: 1
+      }));
+      const releaseEvidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+      const releaseEvidence = await fs.readJson(releaseEvidenceFile);
+      expect(releaseEvidence.total_runs).toBe(1);
+      expect(releaseEvidence.sessions).toHaveLength(1);
+      expect(releaseEvidence.sessions[0].session_id).toBe(firstPayload.session_id);
+    } finally {
+      randomSpy.mockRestore();
+      jest.useRealTimers();
+    }
   });
 
   test('continues handoff run from latest report with pending goals only', async () => {
@@ -6520,6 +6610,63 @@ describe('auto close-loop command', () => {
     expect(payload.phases.find(item => item.id === 'observability').status).toBe('skipped');
     expect(await fs.pathExists(queueFile)).toBe(false);
     expect(runAutoCloseLoop).not.toHaveBeenCalled();
+    expect(await fs.pathExists(payload.output_file)).toBe(true);
+    expect(payload.release_evidence).toEqual(expect.objectContaining({
+      mode: 'auto-handoff-release-evidence',
+      merged: false,
+      skipped: true,
+      reason: 'dry-run'
+    }));
+    const releaseEvidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+    expect(await fs.pathExists(releaseEvidenceFile)).toBe(false);
+  });
+
+  test('does not fail handoff run when release evidence merge errors', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-13-evidence-merge-resilience'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    runAutoCloseLoop.mockResolvedValue({
+      status: 'completed',
+      portfolio: {
+        master_spec: '160-13-evidence-merge-resilience',
+        sub_specs: []
+      }
+    });
+
+    const blockedEvidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+    await fs.ensureDir(blockedEvidenceFile);
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'run',
+      '--manifest',
+      manifestFile,
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('completed');
+    expect(payload.release_evidence).toEqual(expect.objectContaining({
+      mode: 'auto-handoff-release-evidence',
+      merged: false,
+      file: blockedEvidenceFile
+    }));
+    expect(payload.release_evidence.error).toContain('failed to read release evidence JSON');
+    expect(Array.isArray(payload.warnings)).toBe(true);
+    expect(payload.warnings.some(item => item.includes('release evidence merge failed'))).toBe(true);
     expect(await fs.pathExists(payload.output_file)).toBe(true);
   });
 

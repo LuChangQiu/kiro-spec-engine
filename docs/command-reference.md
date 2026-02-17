@@ -770,6 +770,7 @@ Dual-track handoff integration:
   - Default mode is dependency-aware: spec integration goals are grouped into dependency batches and executed in topological order.
   - `--continue-from` resumes pending goals from an existing handoff run report (`latest`, session id, or JSON file path). For safety, KSE enforces manifest-path consistency between the previous report and current run.
   - `--continue-strategy auto|pending|failed-only` controls resumed scope. `auto` (default) derives the best strategy from prior run state (`pending` when unprocessed/planned goals exist, otherwise `failed-only` for pure failure replay).
+  - Non-dry runs auto-merge release evidence into `.kiro/reports/release-evidence/handoff-runs.json` with session-level gate/ontology/regression snapshots. Merge failures are recorded as warnings without aborting the run.
   - Run result includes `recommendations` with executable follow-up commands (for example, auto-generated `--continue-from <session>` on failed/incomplete batches).
   - Gate defaults: `--min-spec-success-rate` defaults to `100`, `--max-risk-level` defaults to `high`.
   - When `--require-ontology-validation` is enabled, run fails fast at precheck if manifest ontology evidence is missing or not passed.

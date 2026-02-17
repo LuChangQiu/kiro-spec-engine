@@ -29,12 +29,16 @@
 11. 新增跨轮次回归分析：
    - `kse auto handoff regression` 对比相邻批次成功率/风险/失败目标/耗时变化。
    - `handoff run` 结果中自动附加 regression 摘要。
+12. 新增断点续跑能力：
+   - `kse auto handoff run --continue-from <session|latest|file>`。
+   - 支持 `--continue-strategy auto|pending|failed-only`。
+13. 新增 release evidence 自动归并：
+   - `handoff run` 结束后自动将批次结果合并到 `.kiro/reports/release-evidence/handoff-runs.json`。
+   - 按 `session_id` 去重更新，失败时写 warning 不阻塞主流程。
 
 ## 下一阶段（P2）
 
-1. 让 `handoff run` 输出与 release evidence 自动合并，形成可发布证据包。
-2. 增加 `handoff run --continue-from <session>` 断点续跑能力。
-3. 增加回归对比可视化报表（多轮趋势图 + 风险分层视图）。
+1. 增加回归对比可视化报表（多轮趋势图 + 风险分层视图）。
 
 ## 长期目标（P3）
 

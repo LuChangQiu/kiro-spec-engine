@@ -870,6 +870,22 @@ kse scene package-publish-batch --from-331 --dry-run --ontology-task-out .kiro/r
 kse scene package-publish-batch --from-331 --dry-run --ontology-task-queue-out .kiro/auto/ontology-remediation.lines --json
 ```
 
+### Scene Package Ontology Backfill Batch
+
+```bash
+# Backfill ontology_model from a handoff manifest (commit mode)
+kse scene package-ontology-backfill-batch --manifest docs/handoffs/handoff-manifest.json --spec-package-path docs/scene-package.json --json
+
+# Use 331-poc preset defaults in dry-run mode
+kse scene package-ontology-backfill-batch --from-331 --dry-run --json
+
+# Backfill selected specs only
+kse scene package-ontology-backfill-batch --from-331 --include 62-00-moqui-full-capability-closure-program,62-01-moqui-capability-itemized-parity-matrix --dry-run --json
+
+# Export detailed backfill report for governance review
+kse scene package-ontology-backfill-batch --from-331 --dry-run --out-report .kiro/reports/scene-package-ontology-backfill-report.json --json
+```
+
 ### Moqui ERP Integration
 
 ```bash

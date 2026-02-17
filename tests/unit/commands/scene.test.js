@@ -16,6 +16,7 @@ const {
   validateScenePackageValidateOptions,
   validateScenePackagePublishOptions,
   validateScenePackagePublishBatchOptions,
+  validateScenePackageOntologyBackfillBatchOptions,
   validateScenePackageInstantiateOptions,
   validateScenePackageRegistryOptions,
   validateScenePackageGateTemplateOptions,
@@ -39,6 +40,7 @@ const {
   runScenePackageValidateCommand,
   runScenePackagePublishCommand,
   runScenePackagePublishBatchCommand,
+  runScenePackageOntologyBackfillBatchCommand,
   runScenePackageInstantiateCommand,
   runScenePackageRegistryCommand,
   runScenePackageGateTemplateCommand,
@@ -349,6 +351,33 @@ describe('Scene command', () => {
       fallbackSpecPackage: 'custom/scene-package.json',
       fallbackSceneManifest: 'custom/scene.yaml',
       outDir: '.kiro/templates/scene-packages',
+      status: 'completed'
+    })).toBeNull();
+  });
+
+  test('validateScenePackageOntologyBackfillBatchOptions enforces ontology backfill constraints', () => {
+    expect(validateScenePackageOntologyBackfillBatchOptions({ specPackagePath: 'docs/scene-package.json' }))
+      .toBe('--manifest is required');
+    expect(validateScenePackageOntologyBackfillBatchOptions({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      manifestSpecPath: '',
+      specPackagePath: 'docs/scene-package.json'
+    })).toBe('--manifest-spec-path must be a non-empty path selector');
+    expect(validateScenePackageOntologyBackfillBatchOptions({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      manifestSpecPath: 'specs',
+      specPackagePath: '/tmp/scene-package.json'
+    })).toBe('--spec-package-path must be a non-empty relative path');
+    expect(validateScenePackageOntologyBackfillBatchOptions({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      manifestSpecPath: 'specs',
+      specPackagePath: 'docs/scene-package.json',
+      outReport: ''
+    })).toBe('--out-report must be a non-empty path');
+    expect(validateScenePackageOntologyBackfillBatchOptions({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      manifestSpecPath: 'specs',
+      specPackagePath: 'docs/scene-package.json',
       status: 'completed'
     })).toBeNull();
   });
@@ -3808,6 +3837,241 @@ Trace: doctor-trace-erp
       .toContain('[ontology-remediation][high] repair ontology and republish 62-00-moqui-full-capability-closure-program');
     expect(fileSystem.writeFile.mock.calls[0][1])
       .toContain('evidence: ontology semantic quality score 30 is below minimum 50');
+  });
+
+  test('runScenePackageOntologyBackfillBatchCommand plans ontology additions in dry-run mode', async () => {
+    const specId = '60-01-master-data-deepening';
+    const contract = {
+      apiVersion: 'kse.scene.package/v0.1',
+      kind: 'scene-template',
+      metadata: { group: 'kse.scene', name: 'master-data-deepening', version: '1.0.0' },
+      compatibility: { kse_version: '>=1.47.0', scene_api_version: 'kse.scene/v0.2' },
+      capabilities: {
+        provides: ['scene.master.data.deepening.completed-capability'],
+        requires: ['binding:http', 'profile:erp']
+      },
+      parameters: [{ id: 'entity_name', type: 'string', required: true }],
+      artifacts: { entry_scene: 'scene.yaml', generates: ['scene.yaml', 'scene-package.json'] },
+      governance: { risk_level: 'low', approval_required: false, rollback_supported: true },
+      capability_contract: {
+        bindings: [
+          {
+            type: 'query',
+            ref: 'spec.erp.order-query-service',
+            preconditions: ['required input is validated']
+          }
+        ]
+      },
+      governance_contract: {
+        risk_level: 'low',
+        approval: { required: false },
+        idempotency: { required: true, key: 'orderId' },
+        data_lineage: {
+          sources: [{ ref: 'spec.erp.order-query-service', fields: ['id'] }],
+          transforms: [],
+          sinks: [{ ref: 'spec.erp.order-query-service', fields: ['id'] }]
+        }
+      },
+      agent_hints: {
+        suggested_sequence: ['spec.erp.order-query-service']
+      }
+    };
+
+    const fileSystem = {
+      readJson: jest.fn().mockImplementation(async (targetPath) => {
+        const normalized = normalizePath(targetPath);
+        if (normalized.endsWith('/docs/handoffs/handoff-manifest.json')) {
+          return {
+            specs: [
+              {
+                id: specId,
+                status: 'completed',
+                scene_package: `.kiro/specs/${specId}/docs/scene-package.json`
+              }
+            ]
+          };
+        }
+
+        if (normalized.endsWith(`/.kiro/specs/${specId}/docs/scene-package.json`)) {
+          return contract;
+        }
+
+        throw new Error(`unexpected readJson path: ${targetPath}`);
+      }),
+      ensureDir: jest.fn().mockResolvedValue(),
+      writeJson: jest.fn().mockResolvedValue()
+    };
+
+    const payload = await runScenePackageOntologyBackfillBatchCommand({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      specPackagePath: 'docs/scene-package.json',
+      dryRun: true,
+      json: true
+    }, {
+      projectRoot: '/workspace',
+      fileSystem
+    });
+
+    expect(payload).toBeDefined();
+    expect(payload.success).toBe(true);
+    expect(payload.mode).toBe('dry-run');
+    expect(payload.summary).toMatchObject({
+      selected: 1,
+      planned: 1,
+      updated: 0,
+      failed: 0,
+      unchanged: 0
+    });
+    expect(payload.updated[0].changed_fields).toEqual(
+      expect.arrayContaining(['entities', 'relations', 'business_rules', 'decision_logic'])
+    );
+    expect(payload.updated[0].additions.entities).toBeGreaterThan(0);
+    expect(payload.updated[0].additions.relations).toBeGreaterThan(0);
+    expect(payload.updated[0].ontology_before.score).toBe(30);
+    expect(payload.updated[0].ontology_after.score).toBeGreaterThan(30);
+    expect(fileSystem.writeJson).not.toHaveBeenCalled();
+  });
+
+  test('runScenePackageOntologyBackfillBatchCommand writes updated scene package in commit mode', async () => {
+    const specId = '60-02-sales-lifecycle-enhancement';
+    const contract = {
+      apiVersion: 'kse.scene.package/v0.1',
+      kind: 'scene-template',
+      metadata: { group: 'kse.scene', name: 'sales-lifecycle-enhancement', version: '1.0.0' },
+      compatibility: { kse_version: '>=1.47.0', scene_api_version: 'kse.scene/v0.2' },
+      capabilities: {
+        provides: ['scene.sales.lifecycle.enhancement.completed-capability'],
+        requires: ['binding:http']
+      },
+      parameters: [{ id: 'entity_name', type: 'string', required: true }],
+      artifacts: { entry_scene: 'scene.yaml', generates: ['scene.yaml', 'scene-package.json'] },
+      governance: { risk_level: 'medium', approval_required: true, rollback_supported: true },
+      capability_contract: {
+        bindings: [
+          {
+            type: 'invoke',
+            ref: 'spec.erp.sales-order-service',
+            preconditions: ['approval is completed']
+          }
+        ]
+      },
+      governance_contract: {
+        risk_level: 'medium',
+        approval: { required: true },
+        idempotency: { required: true, key: 'orderId' },
+        data_lineage: {
+          sources: [{ ref: 'spec.erp.sales-order-service', fields: ['id'] }],
+          transforms: [{ operation: 'spec.erp.sales-order-service', description: 'sales order update' }],
+          sinks: [{ ref: 'spec.erp.sales-order-service', fields: ['id'] }]
+        }
+      },
+      agent_hints: {
+        suggested_sequence: ['spec.erp.sales-order-service']
+      }
+    };
+
+    const fileSystem = {
+      readJson: jest.fn().mockImplementation(async (targetPath) => {
+        const normalized = normalizePath(targetPath);
+        if (normalized.endsWith('/docs/handoffs/handoff-manifest.json')) {
+          return {
+            specs: [
+              {
+                id: specId,
+                status: 'completed',
+                scene_package: `.kiro/specs/${specId}/docs/scene-package.json`
+              }
+            ]
+          };
+        }
+        if (normalized.endsWith(`/.kiro/specs/${specId}/docs/scene-package.json`)) {
+          return contract;
+        }
+        throw new Error(`unexpected readJson path: ${targetPath}`);
+      }),
+      ensureDir: jest.fn().mockResolvedValue(),
+      writeJson: jest.fn().mockResolvedValue()
+    };
+
+    const payload = await runScenePackageOntologyBackfillBatchCommand({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      specPackagePath: 'docs/scene-package.json',
+      json: true
+    }, {
+      projectRoot: '/workspace',
+      fileSystem
+    });
+
+    expect(payload).toBeDefined();
+    expect(payload.success).toBe(true);
+    expect(payload.mode).toBe('commit');
+    expect(payload.summary.updated).toBe(1);
+    expect(fileSystem.writeJson).toHaveBeenCalledTimes(1);
+    expect(normalizePath(fileSystem.writeJson.mock.calls[0][0]))
+      .toBe(`/workspace/.kiro/specs/${specId}/docs/scene-package.json`);
+    const writtenContract = fileSystem.writeJson.mock.calls[0][1];
+    expect(writtenContract.ontology_model).toBeDefined();
+    expect(Array.isArray(writtenContract.ontology_model.entities)).toBe(true);
+    expect(Array.isArray(writtenContract.ontology_model.relations)).toBe(true);
+    expect(Array.isArray(writtenContract.ontology_model.business_rules)).toBe(true);
+    expect(Array.isArray(writtenContract.ontology_model.decision_logic)).toBe(true);
+  });
+
+  test('runScenePackageOntologyBackfillBatchCommand supports from-331 defaults', async () => {
+    const specId = '60-03-production-planning-mrp';
+    const fileSystem = {
+      readJson: jest.fn().mockImplementation(async (targetPath) => {
+        const normalized = normalizePath(targetPath);
+        if (normalized.endsWith('/docs/handoffs/handoff-manifest.json')) {
+          return {
+            specs: [
+              {
+                id: specId,
+                status: 'completed',
+                scene_package: `.kiro/specs/${specId}/docs/scene-package.json`
+              }
+            ]
+          };
+        }
+        if (normalized.endsWith(`/.kiro/specs/${specId}/docs/scene-package.json`)) {
+          return {
+            apiVersion: 'kse.scene.package/v0.1',
+            kind: 'scene-template',
+            metadata: { group: 'kse.scene', name: 'production-planning-mrp', version: '1.0.0' },
+            compatibility: { kse_version: '>=1.47.0', scene_api_version: 'kse.scene/v0.2' },
+            capabilities: { provides: ['scene.production.planning.mrp'], requires: ['binding:http'] },
+            parameters: [{ id: 'entity_name', type: 'string', required: true }],
+            artifacts: { entry_scene: 'scene.yaml', generates: ['scene.yaml', 'scene-package.json'] },
+            governance: { risk_level: 'low', approval_required: false, rollback_supported: true },
+            capability_contract: { bindings: [{ type: 'query', ref: 'spec.erp.production-service' }] },
+            governance_contract: { data_lineage: { sources: [], transforms: [], sinks: [] } },
+            agent_hints: { suggested_sequence: ['spec.erp.production-service'] }
+          };
+        }
+        throw new Error(`unexpected readJson path: ${targetPath}`);
+      }),
+      ensureDir: jest.fn().mockResolvedValue(),
+      writeJson: jest.fn().mockResolvedValue()
+    };
+
+    const payload = await runScenePackageOntologyBackfillBatchCommand({
+      from331: true,
+      dryRun: true,
+      json: true
+    }, {
+      projectRoot: '/workspace',
+      fileSystem
+    });
+
+    expect(payload).toBeDefined();
+    expect(payload.success).toBe(true);
+    expect(normalizePath(fileSystem.readJson.mock.calls[0][0])).toBe('/workspace/docs/handoffs/handoff-manifest.json');
+    expect(payload.options).toMatchObject({
+      profile: 'from-331',
+      spec_package_path: 'docs/scene-package.json',
+      status: 'completed'
+    });
+    expect(payload.summary.planned).toBe(1);
   });
 
   test('runScenePackageInstantiateCommand instantiates spec from template', async () => {

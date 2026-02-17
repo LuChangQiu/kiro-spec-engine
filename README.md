@@ -413,6 +413,12 @@ Tip: `kse spec bootstrap|pipeline run|gate run --specs ...` now defaults to this
   "maxParallel": 3,
   "timeoutSeconds": 900,
   "maxRetries": 2,
+  "rateLimitMaxRetries": 6,
+  "rateLimitBackoffBaseMs": 1000,
+  "rateLimitBackoffMaxMs": 30000,
+  "rateLimitAdaptiveParallel": true,
+  "rateLimitParallelFloor": 1,
+  "rateLimitCooldownMs": 30000,
   "apiKeyEnvVar": "CODEX_API_KEY",
   "codexArgs": ["--skip-git-repo-check"],
   "codexCommand": "npx @openai/codex"
@@ -420,6 +426,7 @@ Tip: `kse spec bootstrap|pipeline run|gate run --specs ...` now defaults to this
 ```
 
 If Codex CLI is globally installed, you can set `"codexCommand": "codex"`.
+Use the `rateLimit*` settings to absorb transient 429/too-many-requests failures without stalling orchestration.
 
 ### Spec-Level Steering & Context Sync 🚀 NEW in v1.44.0
 - **Spec Steering (L4)**: Independent `steering.md` per Spec with constraints, notes, and decisions — zero cross-agent conflict

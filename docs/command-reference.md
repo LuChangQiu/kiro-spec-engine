@@ -787,11 +787,19 @@ Recommended `.kiro/config/orchestrator.json`:
   "maxParallel": 3,
   "timeoutSeconds": 900,
   "maxRetries": 2,
+  "rateLimitMaxRetries": 6,
+  "rateLimitBackoffBaseMs": 1000,
+  "rateLimitBackoffMaxMs": 30000,
+  "rateLimitAdaptiveParallel": true,
+  "rateLimitParallelFloor": 1,
+  "rateLimitCooldownMs": 30000,
   "apiKeyEnvVar": "CODEX_API_KEY",
   "codexArgs": ["--skip-git-repo-check"],
   "codexCommand": "npx @openai/codex"
 }
 ```
+
+`rateLimit*` settings provide dedicated retry/backoff and adaptive parallel throttling when providers return 429 / too-many-requests errors.
 
 ### Scene Template Engine
 

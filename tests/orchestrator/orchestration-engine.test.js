@@ -73,6 +73,8 @@ describe('OrchestrationEngine', () => {
       initSpec: jest.fn(),
       updateSpecStatus: jest.fn(),
       incrementRetry: jest.fn(),
+      recordRateLimitEvent: jest.fn(),
+      updateParallelTelemetry: jest.fn(),
       setOrchestrationState: jest.fn(),
       setBatchInfo: jest.fn(),
       getOrchestrationStatus: jest.fn().mockReturnValue({
@@ -297,6 +299,18 @@ describe('OrchestrationEngine', () => {
 
       now = 2002;
       expect(engine._getEffectiveMaxParallel(8)).toBe(4);
+
+      expect(mockStatusMonitor.updateParallelTelemetry).toHaveBeenCalledWith(
+        expect.objectContaining({
+          event: 'throttled',
+          effectiveMaxParallel: 4,
+        })
+      );
+      expect(mockStatusMonitor.updateParallelTelemetry).toHaveBeenCalledWith(
+        expect.objectContaining({
+          event: 'recovered',
+        })
+      );
     });
 
     test('adaptive parallel can be disabled', () => {
@@ -506,6 +520,12 @@ describe('OrchestrationEngine', () => {
       expect(mockSpawner.spawn).toHaveBeenCalledTimes(2);
       expect(sleepSpy).toHaveBeenCalledTimes(1);
       expect(sleepSpy).toHaveBeenCalledWith(100);
+      expect(mockStatusMonitor.recordRateLimitEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          specName: 'spec-a',
+          retryDelayMs: 100,
+        })
+      );
       expect(result.completed).toContain('spec-a');
       sleepSpy.mockRestore();
     });

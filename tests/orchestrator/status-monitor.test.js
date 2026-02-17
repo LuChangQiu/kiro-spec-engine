@@ -161,6 +161,97 @@ describe('StatusMonitor', () => {
   });
 
   // -------------------------------------------------------------------------
+  // rate-limit telemetry
+  // -------------------------------------------------------------------------
+
+  describe('recordRateLimitEvent()', () => {
+    test('tracks counters and last signal details', () => {
+      const { monitor } = createMonitor();
+
+      monitor.recordRateLimitEvent({
+        specName: 'spec-a',
+        retryCount: 2,
+        retryDelayMs: 1500,
+        error: '429 Too Many Requests',
+      });
+
+      const report = monitor.getOrchestrationStatus();
+      expect(report.rateLimit.signalCount).toBe(1);
+      expect(report.rateLimit.retryCount).toBe(1);
+      expect(report.rateLimit.totalBackoffMs).toBe(1500);
+      expect(report.rateLimit.lastSpecName).toBe('spec-a');
+      expect(report.rateLimit.lastRetryCount).toBe(2);
+      expect(report.rateLimit.lastDelayMs).toBe(1500);
+      expect(report.rateLimit.lastError).toContain('429');
+      expect(report.rateLimit.lastSignalAt).not.toBeNull();
+    });
+
+    test('gracefully handles missing/invalid numeric fields', () => {
+      const { monitor } = createMonitor();
+
+      expect(() => monitor.recordRateLimitEvent({
+        retryCount: 'bad',
+        retryDelayMs: -1,
+      })).not.toThrow();
+
+      const report = monitor.getOrchestrationStatus();
+      expect(report.rateLimit.signalCount).toBe(1);
+      expect(report.rateLimit.totalBackoffMs).toBe(0);
+      expect(report.rateLimit.lastDelayMs).toBe(0);
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // adaptive parallel telemetry
+  // -------------------------------------------------------------------------
+
+  describe('updateParallelTelemetry()', () => {
+    test('tracks throttled and recovered events', () => {
+      const { monitor } = createMonitor();
+
+      monitor.updateParallelTelemetry({
+        event: 'throttled',
+        reason: 'rate-limit',
+        adaptive: true,
+        maxParallel: 8,
+        effectiveMaxParallel: 4,
+        floor: 1,
+      });
+      monitor.updateParallelTelemetry({
+        event: 'recovered',
+        adaptive: true,
+        maxParallel: 8,
+        effectiveMaxParallel: 5,
+      });
+
+      const report = monitor.getOrchestrationStatus();
+      expect(report.parallel.adaptive).toBe(true);
+      expect(report.parallel.maxParallel).toBe(8);
+      expect(report.parallel.effectiveMaxParallel).toBe(5);
+      expect(report.parallel.floor).toBe(1);
+      expect(report.parallel.throttledCount).toBe(1);
+      expect(report.parallel.recoveredCount).toBe(1);
+      expect(report.parallel.lastReason).toBe('rate-limit');
+      expect(report.parallel.lastThrottledAt).not.toBeNull();
+      expect(report.parallel.lastRecoveredAt).not.toBeNull();
+    });
+
+    test('ignores invalid numeric values', () => {
+      const { monitor } = createMonitor();
+      monitor.updateParallelTelemetry({
+        maxParallel: 0,
+        effectiveMaxParallel: -2,
+        floor: 'bad',
+      });
+
+      const report = monitor.getOrchestrationStatus();
+      expect(report.parallel.maxParallel).toBeNull();
+      expect(report.parallel.effectiveMaxParallel).toBeNull();
+      expect(report.parallel.floor).toBeNull();
+    });
+  });
+
+  // -------------------------------------------------------------------------
   // setOrchestrationState
   // -------------------------------------------------------------------------
 
@@ -434,6 +525,16 @@ describe('StatusMonitor', () => {
       expect(report.status).toBe('idle');
       expect(report.startedAt).toBeNull();
       expect(report.completedAt).toBeNull();
+      expect(report.rateLimit).toEqual(expect.objectContaining({
+        signalCount: 0,
+        retryCount: 0,
+        totalBackoffMs: 0,
+      }));
+      expect(report.parallel).toEqual(expect.objectContaining({
+        adaptive: null,
+        maxParallel: null,
+        effectiveMaxParallel: null,
+      }));
     });
   });
 

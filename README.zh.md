@@ -367,6 +367,12 @@ kse orchestrate stop
   "maxParallel": 3,
   "timeoutSeconds": 900,
   "maxRetries": 2,
+  "rateLimitMaxRetries": 6,
+  "rateLimitBackoffBaseMs": 1000,
+  "rateLimitBackoffMaxMs": 30000,
+  "rateLimitAdaptiveParallel": true,
+  "rateLimitParallelFloor": 1,
+  "rateLimitCooldownMs": 30000,
   "apiKeyEnvVar": "CODEX_API_KEY",
   "codexArgs": ["--skip-git-repo-check"],
   "codexCommand": "npx @openai/codex"
@@ -374,6 +380,7 @@ kse orchestrate stop
 ```
 
 如果你已全局安装 Codex CLI，可将 `"codexCommand"` 改为 `"codex"`。
+可通过 `rateLimit*` 配置吸收 429/too-many-requests 等限流抖动，避免编排流程卡死。
 
 ### Spec 级 Steering 与上下文同步 🚀 v1.44.0 新增
 - **Spec Steering (L4)**: 每个 Spec 独立的 `steering.md`，包含约束、注意事项、决策记录 — 跨 Agent 零冲突

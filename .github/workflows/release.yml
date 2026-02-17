@@ -92,7 +92,17 @@ jobs:
               --json > "${SUMMARY_FILE}"; then
               if [[ -f "${DRAFT_FILE}" ]]; then
                 echo "release_body_file=${DRAFT_FILE}" >> "$GITHUB_OUTPUT"
-                echo "review_file=${REVIEW_FILE}" >> "$GITHUB_OUTPUT"
+                {
+                  echo "asset_files<<EOF"
+                  echo "${DRAFT_FILE}"
+                  if [[ -f "${REVIEW_FILE}" ]]; then
+                    echo "${REVIEW_FILE}"
+                  fi
+                  if [[ -f "${SUMMARY_FILE}" ]]; then
+                    echo "${SUMMARY_FILE}"
+                  fi
+                  echo "EOF"
+                } >> "$GITHUB_OUTPUT"
                 exit 0
               fi
             fi
@@ -106,12 +116,17 @@ jobs:
           See [CHANGELOG.md](https://github.com/${GITHUB_REPOSITORY}/blob/main/CHANGELOG.md) for details.
           EOF
           echo "release_body_file=${FALLBACK_FILE}" >> "$GITHUB_OUTPUT"
-          echo "review_file=" >> "$GITHUB_OUTPUT"
+          {
+            echo "asset_files<<EOF"
+            echo "${FALLBACK_FILE}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           body_path: ${{ steps.release_notes.outputs.release_body_file }}
+          files: ${{ steps.release_notes.outputs.asset_files }}
           draft: false
           prerelease: false
         env:

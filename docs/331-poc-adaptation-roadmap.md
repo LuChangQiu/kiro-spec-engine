@@ -50,10 +50,13 @@
 18. 新增 CI 发布链路集成：
    - `release.yml` 在 tag 发布时自动尝试基于 `handoff-runs.json` 生成 release notes 草稿。
    - 若证据缺失或生成失败，自动回退到默认 CHANGELOG 引导文案，避免发布流水卡死。
+19. 新增 release evidence 附件发布：
+   - tag 发布时自动将 release notes 草稿、evidence 审阅 markdown、summary JSON 作为 GitHub Release 资产上传。
+   - 无 evidence 时至少上传 fallback notes，保证发布资产结构稳定。
 
 ## 下一阶段（P2）
 
-1. 将 evidence 审阅 markdown 作为 release artifact 上传，并在 GitHub Release 中附带下载入口。
+1. 增加可配置发布门禁（例如：风险级别/成功率阈值），支持在 release workflow 中按策略阻断发布。
 
 ## 长期目标（P3）
 

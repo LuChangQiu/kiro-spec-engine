@@ -1,0 +1,156 @@
+{
+  "mode": "moqui-template-baseline",
+  "generated_at": "2026-02-17T15:29:22.909Z",
+  "template_root": ".kiro\\templates\\scene-packages",
+  "filter": {
+    "include_all": false,
+    "match": "(moqui|erp)"
+  },
+  "baseline": {
+    "min_score": 70,
+    "min_valid_rate_percent": 100
+  },
+  "summary": {
+    "total_templates": 4,
+    "scoped_templates": 3,
+    "avg_score": 100,
+    "valid_rate_percent": 100,
+    "baseline_passed": 3,
+    "baseline_failed": 0,
+    "portfolio_passed": true
+  },
+  "templates": [
+    {
+      "template_id": "kse.scene--erp-inventory-reserve-adjust--0.1.0",
+      "template_path": ".kiro\\templates\\scene-packages\\kse.scene--erp-inventory-reserve-adjust--0.1.0",
+      "contract_path": ".kiro\\templates\\scene-packages\\kse.scene--erp-inventory-reserve-adjust--0.1.0\\scene-package.json",
+      "ontology": {
+        "valid": true,
+        "error_count": 0
+      },
+      "semantic": {
+        "score": 100,
+        "level": "high",
+        "metrics": {
+          "entity_count": 4,
+          "relation_count": 4,
+          "business_rule_total": 2,
+          "business_rule_mapped": 2,
+          "business_rule_unmapped": 0,
+          "business_rule_passed": 2,
+          "business_rule_failed": 0,
+          "business_rule_mapping_rate_percent": 100,
+          "business_rule_pass_rate_percent": 100,
+          "decision_total": 2,
+          "decision_resolved": 2,
+          "decision_pending": 0,
+          "decision_undecided": 0,
+          "decision_automated": 2,
+          "decision_resolved_rate_percent": 100
+        }
+      },
+      "baseline": {
+        "flags": {
+          "graph_valid": true,
+          "score_passed": true,
+          "entity_coverage": true,
+          "relation_coverage": true,
+          "business_rule_coverage": true,
+          "business_rule_closed": true,
+          "decision_coverage": true,
+          "decision_closed": true,
+          "baseline_passed": true
+        },
+        "gaps": []
+      }
+    },
+    {
+      "template_id": "kse.scene--erp-order-fulfillment-workflow--0.1.0",
+      "template_path": ".kiro\\templates\\scene-packages\\kse.scene--erp-order-fulfillment-workflow--0.1.0",
+      "contract_path": ".kiro\\templates\\scene-packages\\kse.scene--erp-order-fulfillment-workflow--0.1.0\\scene-package.json",
+      "ontology": {
+        "valid": true,
+        "error_count": 0
+      },
+      "semantic": {
+        "score": 100,
+        "level": "high",
+        "metrics": {
+          "entity_count": 5,
+          "relation_count": 6,
+          "business_rule_total": 2,
+          "business_rule_mapped": 2,
+          "business_rule_unmapped": 0,
+          "business_rule_passed": 2,
+          "business_rule_failed": 0,
+          "business_rule_mapping_rate_percent": 100,
+          "business_rule_pass_rate_percent": 100,
+          "decision_total": 2,
+          "decision_resolved": 2,
+          "decision_pending": 0,
+          "decision_undecided": 0,
+          "decision_automated": 2,
+          "decision_resolved_rate_percent": 100
+        }
+      },
+      "baseline": {
+        "flags": {
+          "graph_valid": true,
+          "score_passed": true,
+          "entity_coverage": true,
+          "relation_coverage": true,
+          "business_rule_coverage": true,
+          "business_rule_closed": true,
+          "decision_coverage": true,
+          "decision_closed": true,
+          "baseline_passed": true
+        },
+        "gaps": []
+      }
+    },
+    {
+      "template_id": "kse.scene--erp-order-query-read--0.1.0",
+      "template_path": ".kiro\\templates\\scene-packages\\kse.scene--erp-order-query-read--0.1.0",
+      "contract_path": ".kiro\\templates\\scene-packages\\kse.scene--erp-order-query-read--0.1.0\\scene-package.json",
+      "ontology": {
+        "valid": true,
+        "error_count": 0
+      },
+      "semantic": {
+        "score": 100,
+        "level": "high",
+        "metrics": {
+          "entity_count": 4,
+          "relation_count": 4,
+          "business_rule_total": 2,
+          "business_rule_mapped": 2,
+          "business_rule_unmapped": 0,
+          "business_rule_passed": 2,
+          "business_rule_failed": 0,
+          "business_rule_mapping_rate_percent": 100,
+          "business_rule_pass_rate_percent": 100,
+          "decision_total": 2,
+          "decision_resolved": 2,
+          "decision_pending": 0,
+          "decision_undecided": 0,
+          "decision_automated": 2,
+          "decision_resolved_rate_percent": 100
+        }
+      },
+      "baseline": {
+        "flags": {
+          "graph_valid": true,
+          "score_passed": true,
+          "entity_coverage": true,
+          "relation_coverage": true,
+          "business_rule_coverage": true,
+          "business_rule_closed": true,
+          "decision_coverage": true,
+          "decision_closed": true,
+          "baseline_passed": true
+        },
+        "gaps": []
+      }
+    }
+  ]
+}

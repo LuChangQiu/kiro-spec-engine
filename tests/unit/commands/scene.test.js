@@ -316,6 +316,14 @@ describe('Scene command', () => {
       manifestSpecPath: 'specs',
       fallbackSpecPackage: 'custom/scene-package.json',
       fallbackSceneManifest: 'custom/scene.yaml',
+      ontologyTaskOut: '',
+      outDir: '.kiro/templates/scene-packages'
+    })).toBe('--ontology-task-out must be a non-empty path');
+    expect(validateScenePackagePublishBatchOptions({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      manifestSpecPath: 'specs',
+      fallbackSpecPackage: 'custom/scene-package.json',
+      fallbackSceneManifest: 'custom/scene.yaml',
       ontologyMinAverageScore: 110,
       outDir: '.kiro/templates/scene-packages'
     })).toBe('--ontology-min-average-score must be a number between 0 and 100');
@@ -3680,6 +3688,61 @@ Trace: doctor-trace-erp
     expect(payload.batch_ontology_gate.failures[0].message)
       .toBe('ontology average score 30 is below minimum 35');
     expect(process.exitCode).toBe(1);
+  });
+
+  test('runScenePackagePublishBatchCommand writes ontology remediation task draft', async () => {
+    const fileSystem = {
+      readJson: jest.fn().mockResolvedValue({
+        specs: [
+          {
+            id: '62-00-moqui-full-capability-closure-program',
+            status: 'completed'
+          }
+        ]
+      }),
+      ensureDir: jest.fn().mockResolvedValue(),
+      writeFile: jest.fn().mockResolvedValue()
+    };
+
+    const publishRunner = jest.fn().mockResolvedValue({
+      published: false,
+      error: 'ontology semantic quality score 30 is below minimum 50',
+      ontology_validation: {
+        required: true,
+        valid: true,
+        error_count: 0,
+        error_codes: [],
+        score: 30,
+        level: 'low',
+        min_score: 50,
+        min_score_passed: false
+      }
+    });
+
+    const payload = await runScenePackagePublishBatchCommand({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      requireOntologyValidation: true,
+      ontologyMinScore: 50,
+      ontologyTaskOut: '.kiro/reports/scene-package-ontology-task-draft.md',
+      dryRun: true,
+      json: true
+    }, {
+      projectRoot: '/workspace',
+      fileSystem,
+      publishRunner
+    });
+
+    expect(payload).toBeDefined();
+    expect(payload.success).toBe(false);
+    expect(payload.ontology_task_draft).toMatchObject({
+      output_path: '.kiro/reports/scene-package-ontology-task-draft.md'
+    });
+    expect(fileSystem.writeFile).toHaveBeenCalledTimes(1);
+    expect(normalizePath(fileSystem.writeFile.mock.calls[0][0]))
+      .toBe('/workspace/.kiro/reports/scene-package-ontology-task-draft.md');
+    expect(fileSystem.writeFile.mock.calls[0][1]).toContain('# Scene Package Ontology Remediation Task Draft');
+    expect(fileSystem.writeFile.mock.calls[0][1]).toContain('repair ontology and republish 62-00-moqui-full-capability-closure-program');
+    expect(fileSystem.writeFile.mock.calls[0][1]).toContain('ontology semantic quality score 30 is below minimum 50');
   });
 
   test('runScenePackageInstantiateCommand instantiates spec from template', async () => {

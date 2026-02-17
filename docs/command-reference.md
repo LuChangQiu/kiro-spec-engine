@@ -862,6 +862,9 @@ kse scene package-publish-batch --from-331 --dry-run --ontology-report-out .kiro
 
 # Enforce batch-level ontology portfolio gate (average score + valid-rate)
 kse scene package-publish-batch --from-331 --dry-run --ontology-min-average-score 60 --ontology-min-valid-rate 90 --json
+
+# Export ontology remediation task draft markdown
+kse scene package-publish-batch --from-331 --dry-run --ontology-task-out .kiro/reports/scene-package-ontology-task-draft.md --json
 ```
 
 ### Moqui ERP Integration

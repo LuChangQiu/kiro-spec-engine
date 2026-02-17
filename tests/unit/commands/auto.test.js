@@ -7484,4 +7484,245 @@ describe('auto close-loop command', () => {
     const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
     expect(payload.error).toContain('--format must be one of: json, markdown.');
   });
+
+  test('builds handoff release evidence review summary in json mode', async () => {
+    const evidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+    await fs.ensureDir(path.dirname(evidenceFile));
+    await fs.writeJson(evidenceFile, {
+      mode: 'auto-handoff-release-evidence',
+      generated_at: '2026-02-16T00:00:00.000Z',
+      updated_at: '2026-02-16T01:00:00.000Z',
+      latest_session_id: 'handoff-new',
+      total_runs: 2,
+      sessions: [
+        {
+          session_id: 'handoff-old',
+          merged_at: '2026-02-16T00:00:00.000Z',
+          status: 'failed',
+          manifest_path: 'handoff-manifest-old.json',
+          gate: {
+            passed: false,
+            actual: {
+              spec_success_rate_percent: 75,
+              risk_level: 'high',
+              ontology_quality_score: 70,
+              ontology_business_rule_unmapped: 2,
+              ontology_decision_undecided: 1
+            }
+          },
+          ontology_validation: {
+            status: 'passed',
+            quality_score: 70,
+            metrics: {
+              business_rule_unmapped: 2,
+              decision_undecided: 1
+            }
+          },
+          regression: {
+            trend: 'degraded',
+            delta: {
+              spec_success_rate_percent: -20
+            }
+          },
+          batch_summary: {
+            failed_goals: 2
+          }
+        },
+        {
+          session_id: 'handoff-new',
+          merged_at: '2026-02-16T01:00:00.000Z',
+          status: 'completed',
+          manifest_path: 'handoff-manifest-new.json',
+          gate: {
+            passed: true,
+            actual: {
+              spec_success_rate_percent: 100,
+              risk_level: 'low',
+              ontology_quality_score: 92,
+              ontology_business_rule_unmapped: 0,
+              ontology_decision_undecided: 0
+            }
+          },
+          ontology_validation: {
+            status: 'passed',
+            quality_score: 92,
+            metrics: {
+              business_rule_unmapped: 0,
+              decision_undecided: 0
+            }
+          },
+          regression: {
+            trend: 'improved',
+            delta: {
+              spec_success_rate_percent: 25
+            }
+          },
+          batch_summary: {
+            failed_goals: 0
+          }
+        }
+      ]
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'evidence',
+      '--file',
+      evidenceFile,
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-evidence-review');
+    expect(payload.current.session_id).toBe('handoff-new');
+    expect(payload.current_overview.gate.passed).toBe(true);
+    expect(payload.window).toEqual(expect.objectContaining({
+      requested: 5,
+      actual: 2
+    }));
+    expect(payload.aggregates.status_counts).toEqual(expect.objectContaining({
+      completed: 1,
+      failed: 1
+    }));
+    expect(payload.aggregates.gate_pass_rate_percent).toBe(50);
+    expect(payload.risk_layers).toEqual(expect.objectContaining({
+      low: expect.objectContaining({
+        count: 1,
+        sessions: ['handoff-new']
+      }),
+      high: expect.objectContaining({
+        count: 1,
+        sessions: ['handoff-old']
+      })
+    }));
+  });
+
+  test('supports handoff evidence markdown format output file', async () => {
+    const evidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+    const outFile = path.join(tempDir, '.kiro', 'reports', 'handoff-evidence.md');
+    await fs.ensureDir(path.dirname(evidenceFile));
+    await fs.writeJson(evidenceFile, {
+      mode: 'auto-handoff-release-evidence',
+      generated_at: '2026-02-16T00:00:00.000Z',
+      updated_at: '2026-02-16T01:00:00.000Z',
+      latest_session_id: 'handoff-one',
+      total_runs: 1,
+      sessions: [
+        {
+          session_id: 'handoff-one',
+          merged_at: '2026-02-16T01:00:00.000Z',
+          status: 'completed',
+          gate: {
+            passed: true,
+            actual: {
+              spec_success_rate_percent: 95,
+              risk_level: 'low',
+              ontology_quality_score: 88
+            }
+          },
+          ontology_validation: {
+            status: 'passed',
+            quality_score: 88,
+            metrics: {
+              business_rule_unmapped: 0,
+              decision_undecided: 0
+            }
+          },
+          regression: {
+            trend: 'baseline',
+            delta: {}
+          },
+          batch_summary: {
+            failed_goals: 0
+          }
+        }
+      ]
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'evidence',
+      '--file',
+      evidenceFile,
+      '--format',
+      'markdown',
+      '--out',
+      outFile,
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-evidence-review');
+    expect(payload.report_format).toBe('markdown');
+    expect(payload.output_file).toBe(outFile);
+    expect(await fs.pathExists(outFile)).toBe(true);
+    const markdown = await fs.readFile(outFile, 'utf8');
+    expect(markdown).toContain('# Auto Handoff Release Evidence Review');
+    expect(markdown).toContain('## Current Gate');
+    expect(markdown).toContain('## Current Ontology');
+    expect(markdown).toContain('## Current Regression');
+    expect(markdown).toContain('## Risk Layer View');
+  });
+
+  test('validates handoff evidence window option range', async () => {
+    const evidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+    await fs.ensureDir(path.dirname(evidenceFile));
+    await fs.writeJson(evidenceFile, {
+      mode: 'auto-handoff-release-evidence',
+      sessions: [
+        {
+          session_id: 'handoff-one',
+          merged_at: '2026-02-16T01:00:00.000Z',
+          status: 'completed',
+          gate: {
+            passed: true,
+            actual: {
+              spec_success_rate_percent: 100,
+              risk_level: 'low',
+              ontology_quality_score: 95
+            }
+          },
+          ontology_validation: {
+            status: 'passed',
+            quality_score: 95,
+            metrics: {}
+          },
+          regression: {
+            trend: 'baseline',
+            delta: {}
+          },
+          batch_summary: {
+            failed_goals: 0
+          }
+        }
+      ]
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'evidence',
+        '--file',
+        evidenceFile,
+        '--window',
+        '0',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.error).toContain('--window must be an integer between 1 and 50.');
+  });
 });

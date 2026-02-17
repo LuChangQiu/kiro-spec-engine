@@ -41,10 +41,13 @@
 15. 新增 release evidence 趋势窗口快照：
    - `handoff run` 支持 `--release-evidence-window <n>`（默认 5）。
    - release evidence 自动写入 `latest_trend_window` 与每个 session 的 `trend_window`，支持发布包一键审阅。
+16. 新增 release evidence 快速审阅命令：
+   - `kse auto handoff evidence` 直接聚合当前批次 gate/ontology/regression/risk-layer 概览。
+   - 支持 JSON/markdown 输出与 `--window` 会话窗口聚合。
 
 ## 下一阶段（P2）
 
-1. 增加 release evidence 快速审阅命令（聚合输出当前批次 gate/ontology/regression/risk-layer 概览）。
+1. 将 `handoff evidence` 摘要纳入 release 发布流水（自动生成审阅文件并写入 release notes 草稿）。
 
 ## 长期目标（P3）
 

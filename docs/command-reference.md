@@ -782,6 +782,11 @@ Dual-track handoff integration:
   - Markdown report includes `Trend Series` (ASCII success/ontology bars per session) and `Risk Layer View`.
   - `--out` writes the generated regression report using the selected format.
   - Output includes `recommendations` to guide next action when trend degrades or risk escalates.
+- `kse auto handoff evidence [--file <path>] [--session-id <id|latest>] [--window <n>] [--format <json|markdown>] [--out <path>] [--json]`: quick-review merged release evidence and render current-batch gate/ontology/regression/risk-layer overview.
+  - Default evidence file is `.kiro/reports/release-evidence/handoff-runs.json`.
+  - `--window` (1-50, default `5`) controls how many recent sessions are aggregated in review.
+  - JSON output includes `current_overview`, `aggregates.status_counts`, `aggregates.gate_pass_rate_percent`, and `risk_layers`.
+  - Markdown output includes `Current Gate`, `Current Ontology`, `Current Regression`, `Trend Series`, and `Risk Layer View`.
 
 Recommended `.kiro/config/orchestrator.json`:
 

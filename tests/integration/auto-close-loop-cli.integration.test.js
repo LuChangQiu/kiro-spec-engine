@@ -489,7 +489,7 @@ describe('auto close-loop CLI integration', () => {
     expect(payload.status).toBe('completed');
     expect(payload.total_goals).toBe(2);
     expect(payload.processed_goals).toBe(2);
-    expect(payload.batch_parallel).toBe(1);
+    expect(payload.batch_parallel).toBe(2);
     expect(payload.results).toHaveLength(2);
     expect(payload.results[0]).toEqual(expect.objectContaining({
       index: 1,

@@ -316,6 +316,22 @@ describe('Scene command', () => {
       manifestSpecPath: 'specs',
       fallbackSpecPackage: 'custom/scene-package.json',
       fallbackSceneManifest: 'custom/scene.yaml',
+      ontologyMinAverageScore: 110,
+      outDir: '.kiro/templates/scene-packages'
+    })).toBe('--ontology-min-average-score must be a number between 0 and 100');
+    expect(validateScenePackagePublishBatchOptions({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      manifestSpecPath: 'specs',
+      fallbackSpecPackage: 'custom/scene-package.json',
+      fallbackSceneManifest: 'custom/scene.yaml',
+      ontologyMinValidRate: -2,
+      outDir: '.kiro/templates/scene-packages'
+    })).toBe('--ontology-min-valid-rate must be a number between 0 and 100');
+    expect(validateScenePackagePublishBatchOptions({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      manifestSpecPath: 'specs',
+      fallbackSpecPackage: 'custom/scene-package.json',
+      fallbackSceneManifest: 'custom/scene.yaml',
       outDir: '.kiro/templates/scene-packages',
       status: 'completed'
     })).toBeNull();
@@ -3611,6 +3627,59 @@ Trace: doctor-trace-erp
       spec: '62-00-moqui-full-capability-closure-program',
       status: 'planned'
     });
+  });
+
+  test('runScenePackagePublishBatchCommand fails batch ontology gate on average score threshold', async () => {
+    const fileSystem = {
+      readJson: jest.fn().mockResolvedValue({
+        specs: [
+          {
+            id: '62-00-moqui-full-capability-closure-program',
+            status: 'completed'
+          }
+        ]
+      })
+    };
+
+    const publishRunner = jest.fn().mockResolvedValue({
+      published: false,
+      dry_run: true,
+      template: { id: 'kse.scene--moqui-full-capability-closure-program--1.0.0' },
+      ontology_validation: {
+        required: false,
+        valid: true,
+        error_count: 0,
+        error_codes: [],
+        score: 30,
+        level: 'low',
+        min_score: null,
+        min_score_passed: true
+      }
+    });
+
+    const payload = await runScenePackagePublishBatchCommand({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      ontologyMinAverageScore: 35,
+      dryRun: true,
+      json: true
+    }, {
+      projectRoot: '/workspace',
+      fileSystem,
+      publishRunner
+    });
+
+    expect(payload).toBeDefined();
+    expect(payload.success).toBe(false);
+    expect(payload.summary).toMatchObject({
+      selected: 1,
+      planned: 1,
+      failed: 0,
+      batch_gate_failed: true
+    });
+    expect(payload.batch_ontology_gate.passed).toBe(false);
+    expect(payload.batch_ontology_gate.failures[0].message)
+      .toBe('ontology average score 30 is below minimum 35');
+    expect(process.exitCode).toBe(1);
   });
 
   test('runScenePackageInstantiateCommand instantiates spec from template', async () => {

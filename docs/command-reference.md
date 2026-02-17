@@ -859,6 +859,9 @@ kse scene package-publish-batch --from-331 --require-ontology-validation --ontol
 
 # Persist ontology/publish batch report for governance tracking
 kse scene package-publish-batch --from-331 --dry-run --ontology-report-out .kiro/reports/scene-package-ontology-batch.json --json
+
+# Enforce batch-level ontology portfolio gate (average score + valid-rate)
+kse scene package-publish-batch --from-331 --dry-run --ontology-min-average-score 60 --ontology-min-valid-rate 90 --json
 ```
 
 ### Moqui ERP Integration

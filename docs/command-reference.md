@@ -890,6 +890,24 @@ kse scene package-ontology-backfill-batch --from-331 --include 62-00-moqui-full-
 kse scene package-ontology-backfill-batch --from-331 --dry-run --out-report .kiro/reports/scene-package-ontology-backfill-report.json --json
 ```
 
+### Moqui Template Baseline Scorecard
+
+```bash
+# Score Moqui/ERP templates in the local template library (default filter: moqui|erp)
+npm run report:moqui-baseline
+
+# Score all scene templates instead of Moqui/ERP subset
+node scripts/moqui-template-baseline-report.js --include-all --json
+
+# Customize score thresholds and output paths
+node scripts/moqui-template-baseline-report.js \
+  --min-score 75 \
+  --min-valid-rate 100 \
+  --out .kiro/reports/moqui-template-baseline.json \
+  --markdown-out .kiro/reports/moqui-template-baseline.md \
+  --json
+```
+
 ### Moqui ERP Integration
 
 ```bash

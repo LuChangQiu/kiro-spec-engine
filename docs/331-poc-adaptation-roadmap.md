@@ -55,7 +55,7 @@
    - 无 evidence 时至少上传 fallback notes，保证发布资产结构稳定。
 20. 新增可配置发布门禁（workflow 级）：
    - 支持通过 `KSE_RELEASE_*` 仓库变量配置 success rate/risk/ontology 阈值。
-   - 支持 advisory（默认）与 enforce（阻断发布）两种模式，兼顾安全性与稳定性。
+   - 支持 advisory（默认）与 enforce（阻断发布）两种模式，且门禁在 `npm publish` 前执行。
 
 ## 下一阶段（P2）
 

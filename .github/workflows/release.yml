@@ -60,11 +60,6 @@ jobs:
       
       - name: Install dependencies
         run: npm ci
-      
-      - name: Publish to npm
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Build release evidence notes
         id: release_notes
@@ -320,6 +315,11 @@ jobs:
             console.warn(`${message} (advisory only)`);
           }
           NODE
+
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1

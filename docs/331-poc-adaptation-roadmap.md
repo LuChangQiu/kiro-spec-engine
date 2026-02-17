@@ -80,10 +80,13 @@
 28. 发布流程附带趋势卡片资产：
    - `release.yml` 自动生成并上传 `release-gate-history-<tag>.md`。
    - Release Notes 趋势段落附带卡片资产文件名，便于发布后检索。
+29. Release Notes 资产链接增强：
+   - 趋势段落自动生成 `release-gate-history` 相关资产的可点击下载链接。
+   - 发布页可直接跳转趋势卡片/索引 JSON，无需手工查找资产列表。
 
 ## 下一阶段（P2）
 
-1. 在 Release Notes 中自动填入可点击的卡片链接（基于发布完成后的资产 URL）。
+1. 增加 `release-gate-history` 的漂移告警阈值（连续 N 版失败或 high 风险占比上升）并在 Release Notes 显示告警。
 
 ## 长期目标（P3）
 

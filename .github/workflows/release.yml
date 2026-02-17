@@ -421,6 +421,7 @@ jobs:
         env:
           RELEASE_BODY_FILE: ${{ steps.release_notes.outputs.release_body_file }}
           RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
@@ -458,6 +459,20 @@ jobs:
               const passRate = payload.aggregates && Number.isFinite(Number(payload.aggregates.pass_rate_percent))
                 ? Number(payload.aggregates.pass_rate_percent)
                 : null;
+              const releaseTag = process.env.RELEASE_TAG || 'current';
+              const releaseRepository = process.env.RELEASE_REPOSITORY || process.env.GITHUB_REPOSITORY || '';
+              const historyCardAsset = `release-gate-history-${releaseTag}.md`;
+              const historyJsonAsset = 'release-gate-history.json';
+              const historySummaryAsset = `release-gate-history-${releaseTag}.json`;
+              const toAssetUrl = (assetName) => {
+                if (!releaseRepository || !releaseTag) {
+                  return null;
+                }
+                return `https://github.com/${releaseRepository}/releases/download/${releaseTag}/${assetName}`;
+              };
+              const historyCardUrl = toAssetUrl(historyCardAsset);
+              const historyJsonUrl = toAssetUrl(historyJsonAsset);
+              const historySummaryUrl = toAssetUrl(historySummaryAsset);
               const riskCounts = recent.reduce((acc, item) => {
                 const risk = `${item && item.risk_level ? item.risk_level : 'unknown'}`.toLowerCase();
                 if (!acc[risk]) {
@@ -475,7 +490,9 @@ jobs:
                 `- Gate pass rate (history): ${passRate === null ? 'n/a' : `${passRate}%`}`,
                 `- Recent pass ratio (latest 5): ${recentKnown === 0 ? 'n/a' : `${recentPass}/${recentKnown}`}`,
                 `- Recent risk mix (latest 5): low=${riskCounts.low}, medium=${riskCounts.medium}, high=${riskCounts.high}, unknown=${riskCounts.unknown}`,
-                `- Trend card artifact: release-gate-history-${process.env.RELEASE_TAG || 'current'}.md`,
+                `- Trend card: ${historyCardUrl ? `[${historyCardAsset}](${historyCardUrl})` : historyCardAsset}`,
+                `- History index: ${historyJsonUrl ? `[${historyJsonAsset}](${historyJsonUrl})` : historyJsonAsset}`,
+                `- History summary: ${historySummaryUrl ? `[${historySummaryAsset}](${historySummaryUrl})` : historySummaryAsset}`,
                 '',
                 '### Recent Versions'
               ];

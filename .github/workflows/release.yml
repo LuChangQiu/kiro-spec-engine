@@ -597,6 +597,7 @@ jobs:
           RELEASE_DRIFT_FAIL_STREAK_MIN: ${{ vars.KSE_RELEASE_DRIFT_FAIL_STREAK_MIN }}
           RELEASE_DRIFT_HIGH_RISK_SHARE_MIN_PERCENT: ${{ vars.KSE_RELEASE_DRIFT_HIGH_RISK_SHARE_MIN_PERCENT }}
           RELEASE_DRIFT_HIGH_RISK_SHARE_DELTA_MIN_PERCENT: ${{ vars.KSE_RELEASE_DRIFT_HIGH_RISK_SHARE_DELTA_MIN_PERCENT }}
+          RELEASE_GATE_REPORT_FILE: ${{ steps.release_notes.outputs.gate_file }}
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
@@ -628,6 +629,7 @@ jobs:
             }
 
             const historyFile = process.env.RELEASE_DRIFT_HISTORY_FILE;
+            const gateReportFile = process.env.RELEASE_GATE_REPORT_FILE;
             const enforce = parseBoolean(process.env.RELEASE_DRIFT_ENFORCE, false);
             const failStreakThreshold = Math.max(
               1,
@@ -717,6 +719,27 @@ jobs:
                 + `(threshold=${highRiskDeltaThreshold}%)`
               );
             }
+            const blocked = enforce && alerts.length > 0;
+            const driftPayload = {
+              enforce,
+              thresholds: {
+                fail_streak_min: failStreakThreshold,
+                high_risk_share_min_percent: highRiskShareThreshold,
+                high_risk_share_delta_min_percent: highRiskDeltaThreshold
+              },
+              metrics: {
+                failed_streak_latest5: failedStreak,
+                high_risk_share_latest5_percent: highRiskShare,
+                high_risk_share_delta_percent: highRiskDeltaPercent,
+                recent_window_size: recent.length,
+                short_window_size: shortWindow.length,
+                long_window_size: longWindow.length
+              },
+              alerts,
+              alert_count: alerts.length,
+              blocked,
+              evaluated_at: new Date().toISOString()
+            };
 
             console.log(
               `[release-drift] enforce=${enforce} fail_streak_threshold=${failStreakThreshold} `
@@ -729,6 +752,21 @@ jobs:
               alerts.forEach(item => console.warn(`[release-drift] alert=${item}`));
             } else {
               console.log('[release-drift] no drift alerts');
+            }
+
+            if (gateReportFile) {
+              let gatePayload = {};
+              try {
+                if (fs.existsSync(gateReportFile)) {
+                  gatePayload = JSON.parse(fs.readFileSync(gateReportFile, 'utf8'));
+                }
+              } catch (_error) {
+                gatePayload = {};
+              }
+              gatePayload.drift = driftPayload;
+              gatePayload.updated_at = new Date().toISOString();
+              fs.writeFileSync(gateReportFile, `${JSON.stringify(gatePayload, null, 2)}\n`, 'utf8');
+              console.log(`[release-drift] merged drift into gate report: ${gateReportFile}`);
             }
 
             const summaryPath = process.env.GITHUB_STEP_SUMMARY;
@@ -753,7 +791,7 @@ jobs:
               fs.appendFileSync(summaryPath, `${lines.join('\n')}\n\n`);
             }
 
-            if (enforce && alerts.length > 0) {
+            if (blocked) {
               console.error(`[release-drift] blocked by drift alerts: ${alerts.join('; ')}`);
               process.exit(1);
             }

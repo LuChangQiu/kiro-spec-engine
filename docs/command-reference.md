@@ -598,7 +598,7 @@ Close-loop batch (`kse auto close-loop-batch <goals-file>`) options:
 - `--resume` and `--session-id` are not supported in batch mode (sessions are per-goal)
 - `--program-goals` requires `--decompose-goal`
 - `<goals-file>`, `--resume-from-summary`, and `--decompose-goal` are mutually exclusive goal sources
-- Batch summary includes `resource_plan` (budget/effective parallel/per-goal maxParallel/scheduling strategy/aging/starvation wait metrics/criticality summary) and `metrics` (`success_rate_percent`, `status_breakdown`, `average_sub_specs_per_goal`, `average_replan_cycles_per_goal`)
+- Batch summary includes `resource_plan` (budget/effective parallel/per-goal maxParallel/scheduling strategy/aging/starvation wait metrics/criticality summary) and `metrics` (`success_rate_percent`, `status_breakdown`, `average_sub_specs_per_goal`, `average_replan_cycles_per_goal`, `total_rate_limit_signals`, `average_rate_limit_signals_per_goal`, `total_rate_limit_backoff_ms`)
   - Under budget mode, scheduler is complexity-weighted (`goal_weight`/`scheduling_weight`) so higher-complexity goals consume more shared slots and can reduce same-batch concurrency.
   - Batch summary includes `batch_retry` telemetry (strategy, until-complete mode, configured/max/performed rounds, exhausted flag, per-round history).
   - Batch summary includes `batch_session` metadata when persisted (session id + file path).
@@ -646,7 +646,7 @@ Close-loop program (`kse auto close-loop-program "<goal>"`) options:
 - With `--program-govern-until-stable`, summary additionally includes:
   - `program_governance` (round history, stop reason, exhausted/converged state)
   - `program_governance` includes action-selection metadata (`auto_action_enabled`, `action_selection_enabled`, `pinned_action_index`, per-round `selected_action*`).
-  - `program_kpi_trend` and `program_kpi_anomalies` (anomaly-aware governance context)
+  - `program_kpi_trend` and `program_kpi_anomalies` (anomaly-aware governance context, including `rate-limit-spike` pressure that can auto-reduce `batchParallel`/`batchAgentBudget`).
 - Program summary includes `program_diagnostics` with `failure_clusters` and `remediation_actions` (prioritized follow-up commands for convergence).
 - Program summary includes `program_coordination` (master/sub topology, unresolved goal indexes, scheduler snapshot) and `auto_recovery` metadata.
 
@@ -747,7 +747,7 @@ Autonomous KPI trend:
 - `kse auto kpi trend [--weeks <n>] [--mode <all|batch|program|recover|controller>] [--period <week|day>] [--csv] [--out <path>] [--json]`: aggregate periodic KPI trend from persisted autonomous summary sessions.
   - `--period <week|day>` selects weekly (default) or daily buckets.
   - `--csv` prints CSV rows to stdout and writes CSV when used with `--out` (JSON remains default).
-  - JSON output includes `mode_breakdown` (batch/program/recover/controller/other run distribution), `anomaly_detection`, and flattened `anomalies` (latest-period regression checks against historical baseline).
+  - JSON output includes `mode_breakdown` (batch/program/recover/controller/other run distribution), `anomaly_detection`, and flattened `anomalies` (latest-period regression checks against historical baseline, including rate-limit pressure via `average_rate_limit_signals` / `average_rate_limit_backoff_ms`).
 
 Unified observability snapshot:
 - `kse auto observability snapshot [--days <n>] [--status <csv>] [--weeks <n>] [--trend-mode <mode>] [--trend-period <period>] [--out <path>] [--json]`: generate one unified observability snapshot that combines close-loop session stats, batch stats, controller stats, governance session stats, governance health, and KPI trend.

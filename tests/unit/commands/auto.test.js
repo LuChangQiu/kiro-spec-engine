@@ -171,11 +171,25 @@ describe('auto close-loop command', () => {
     runAutoCloseLoop
       .mockResolvedValueOnce({
         status: 'completed',
-        portfolio: { master_spec: '121-00-first', sub_specs: ['121-01-a', '121-02-b'] }
+        portfolio: { master_spec: '121-00-first', sub_specs: ['121-01-a', '121-02-b'] },
+        orchestration: {
+          rateLimit: {
+            signalCount: 2,
+            totalBackoffMs: 1200,
+            lastLaunchHoldMs: 700
+          }
+        }
       })
       .mockResolvedValueOnce({
         status: 'completed',
-        portfolio: { master_spec: '122-00-second', sub_specs: ['122-01-a', '122-02-b'] }
+        portfolio: { master_spec: '122-00-second', sub_specs: ['122-01-a', '122-02-b'] },
+        orchestration: {
+          rateLimit: {
+            signalCount: 1,
+            totalBackoffMs: 300,
+            lastLaunchHoldMs: 200
+          }
+        }
       });
 
     const program = buildProgram();
@@ -216,6 +230,13 @@ describe('auto close-loop command', () => {
     expect(summary.processed_goals).toBe(2);
     expect(summary.completed_goals).toBe(2);
     expect(summary.failed_goals).toBe(0);
+    expect(summary.metrics).toEqual(expect.objectContaining({
+      total_rate_limit_signals: 3,
+      average_rate_limit_signals_per_goal: 1.5,
+      total_rate_limit_backoff_ms: 1500,
+      average_rate_limit_backoff_ms_per_goal: 750,
+      max_rate_limit_launch_hold_ms: 700
+    }));
     expect(summary.resource_plan).toEqual(expect.objectContaining({
       agent_budget: null,
       effective_goal_parallel: 1
@@ -1236,6 +1257,82 @@ describe('auto close-loop command', () => {
       selected_action_index: null,
       action_selection_source: null
     }));
+  });
+
+  test('governance loop reduces concurrency when high rate-limit anomaly is detected', async () => {
+    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    await fs.ensureDir(sessionDir);
+    const baselineFile = path.join(sessionDir, 'govern-rate-limit-baseline.json');
+    await fs.writeJson(baselineFile, {
+      mode: 'auto-close-loop-program',
+      status: 'completed',
+      updated_at: '2026-02-10T10:00:00.000Z',
+      total_goals: 2,
+      processed_goals: 2,
+      failed_goals: 0,
+      metrics: {
+        success_rate_percent: 100,
+        total_sub_specs: 2,
+        total_rate_limit_signals: 0,
+        total_rate_limit_backoff_ms: 0,
+        average_rate_limit_signals_per_goal: 0,
+        average_rate_limit_backoff_ms_per_goal: 0
+      },
+      program_kpi: { completion_rate_percent: 100 },
+      program_gate_effective: { passed: true },
+      spec_session_budget: { estimated_created: 1 }
+    }, { spaces: 2 });
+    await fs.utimes(baselineFile, new Date('2026-02-10T10:00:00.000Z'), new Date('2026-02-10T10:00:00.000Z'));
+
+    runAutoCloseLoop.mockImplementation(async () => ({
+      status: 'completed',
+      portfolio: { master_spec: '122-12-govern-rate-limit', sub_specs: [] },
+      orchestration: {
+        rateLimit: {
+          signalCount: 4,
+          totalBackoffMs: 4000,
+          lastLaunchHoldMs: 2000
+        }
+      }
+    }));
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'close-loop-program',
+      'deliver resilient autonomous rollout',
+      '--program-goals',
+      '2',
+      '--batch-parallel',
+      '3',
+      '--batch-agent-budget',
+      '3',
+      '--program-govern-until-stable',
+      '--program-govern-max-rounds',
+      '1',
+      '--program-govern-anomaly-period',
+      'day',
+      '--json'
+    ]);
+
+    expect(runAutoCloseLoop.mock.calls.length).toBeGreaterThanOrEqual(4);
+    const summary = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(summary.program_governance).toEqual(expect.objectContaining({
+      enabled: true,
+      performed_rounds: 1
+    }));
+    expect(summary.program_governance.history[0]).toEqual(expect.objectContaining({
+      trigger: expect.objectContaining({
+        anomaly_failed: true
+      }),
+      applied_patch: expect.objectContaining({
+        batchParallel: 2,
+        batchAgentBudget: 2
+      })
+    }));
+    expect(summary.program_governance.history[0].patch_reasons.join(' ')).toContain('rate-limit-spike');
   });
 
   test('validates --dequeue-limit range in close-loop-controller', async () => {
@@ -5263,7 +5360,14 @@ describe('auto close-loop command', () => {
       status: 'completed',
       updated_at: '2026-02-12T10:00:00.000Z',
       failed_goals: 0,
-      metrics: { success_rate_percent: 100, total_sub_specs: 5 },
+      metrics: {
+        success_rate_percent: 100,
+        total_sub_specs: 5,
+        total_rate_limit_signals: 0,
+        total_rate_limit_backoff_ms: 0,
+        average_rate_limit_signals_per_goal: 0,
+        average_rate_limit_backoff_ms_per_goal: 0
+      },
       program_kpi: { completion_rate_percent: 100 },
       program_gate_effective: { passed: true },
       spec_session_budget: { estimated_created: 1 }
@@ -5273,7 +5377,14 @@ describe('auto close-loop command', () => {
       status: 'completed',
       updated_at: '2026-02-13T10:00:00.000Z',
       failed_goals: 0,
-      metrics: { success_rate_percent: 100, total_sub_specs: 5 },
+      metrics: {
+        success_rate_percent: 100,
+        total_sub_specs: 5,
+        total_rate_limit_signals: 0,
+        total_rate_limit_backoff_ms: 0,
+        average_rate_limit_signals_per_goal: 0,
+        average_rate_limit_backoff_ms_per_goal: 0
+      },
       program_kpi: { completion_rate_percent: 100 },
       program_gate_effective: { passed: true },
       spec_session_budget: { estimated_created: 1 }
@@ -5283,7 +5394,14 @@ describe('auto close-loop command', () => {
       status: 'partial-failed',
       updated_at: '2026-02-14T10:00:00.000Z',
       failed_goals: 4,
-      metrics: { success_rate_percent: 40, total_sub_specs: 10 },
+      metrics: {
+        success_rate_percent: 40,
+        total_sub_specs: 10,
+        total_rate_limit_signals: 12,
+        total_rate_limit_backoff_ms: 4800,
+        average_rate_limit_signals_per_goal: 12,
+        average_rate_limit_backoff_ms_per_goal: 4800
+      },
       program_kpi: { completion_rate_percent: 40 },
       program_gate_effective: { passed: false },
       spec_session_budget: { estimated_created: 7 }
@@ -5320,7 +5438,8 @@ describe('auto close-loop command', () => {
     expect(parsed.anomalies).toEqual(expect.arrayContaining([
       expect.objectContaining({ type: 'success-rate-drop' }),
       expect.objectContaining({ type: 'failed-goals-spike' }),
-      expect.objectContaining({ type: 'spec-growth-spike' })
+      expect.objectContaining({ type: 'spec-growth-spike' }),
+      expect.objectContaining({ type: 'rate-limit-spike' })
     ]));
   });
 

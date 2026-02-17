@@ -270,6 +270,36 @@ describe('orchestrate status', () => {
     expect(output).toContain('spec-b');
   });
 
+  test('shows active rate-limit launch hold in status output', async () => {
+    const now = Date.now();
+    const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(now);
+
+    const statusDir = path.join(tempDir, '.kiro', 'config');
+    fs.mkdirSync(statusDir, { recursive: true });
+    const statusData = {
+      status: 'running',
+      rateLimit: {
+        signalCount: 2,
+        totalBackoffMs: 3000,
+        lastSignalAt: new Date(now - 500).toISOString(),
+        lastLaunchHoldMs: 2000,
+      },
+      specs: {},
+    };
+    fs.writeJsonSync(path.join(statusDir, 'orchestration-status.json'), statusData);
+
+    const { registerOrchestrateCommands } = require('../../lib/commands/orchestrate');
+    const program = new Command();
+    program.exitOverride();
+    registerOrchestrateCommands(program);
+
+    await program.parseAsync(['node', 'kse', 'orchestrate', 'status']);
+
+    const output = logSpy.mock.calls.map(c => c.join(' ')).join(' ');
+    expect(output).toContain('Rate-limit launch hold: 1500ms remaining');
+    nowSpy.mockRestore();
+  });
+
   test('displays persisted status in JSON mode', async () => {
     const statusDir = path.join(tempDir, '.kiro', 'config');
     fs.mkdirSync(statusDir, { recursive: true });

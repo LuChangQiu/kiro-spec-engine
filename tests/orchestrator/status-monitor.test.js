@@ -172,6 +172,7 @@ describe('StatusMonitor', () => {
         specName: 'spec-a',
         retryCount: 2,
         retryDelayMs: 1500,
+        launchHoldMs: 1750,
         error: '429 Too Many Requests',
       });
 
@@ -182,6 +183,7 @@ describe('StatusMonitor', () => {
       expect(report.rateLimit.lastSpecName).toBe('spec-a');
       expect(report.rateLimit.lastRetryCount).toBe(2);
       expect(report.rateLimit.lastDelayMs).toBe(1500);
+      expect(report.rateLimit.lastLaunchHoldMs).toBe(1750);
       expect(report.rateLimit.lastError).toContain('429');
       expect(report.rateLimit.lastSignalAt).not.toBeNull();
     });
@@ -198,6 +200,7 @@ describe('StatusMonitor', () => {
       expect(report.rateLimit.signalCount).toBe(1);
       expect(report.rateLimit.totalBackoffMs).toBe(0);
       expect(report.rateLimit.lastDelayMs).toBe(0);
+      expect(report.rateLimit.lastLaunchHoldMs).toBe(0);
     });
   });
 

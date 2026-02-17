@@ -269,18 +269,28 @@ describe('Scene command', () => {
       .toBe('--manifest is required');
     expect(validateScenePackagePublishBatchOptions({
       manifest: 'docs/handoffs/handoff-manifest.json',
+      manifestSpecPath: '',
+      fallbackSpecPackage: 'custom/scene-package.json',
+      fallbackSceneManifest: 'custom/scene.yaml',
+      outDir: '.kiro/templates/scene-packages'
+    })).toBe('--manifest-spec-path must be a non-empty path selector');
+    expect(validateScenePackagePublishBatchOptions({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      manifestSpecPath: 'specs',
       fallbackSpecPackage: '/tmp/scene-package.json',
       fallbackSceneManifest: 'custom/scene.yaml',
       outDir: '.kiro/templates/scene-packages'
     })).toBe('--fallback-spec-package must be a non-empty relative path');
     expect(validateScenePackagePublishBatchOptions({
       manifest: 'docs/handoffs/handoff-manifest.json',
+      manifestSpecPath: 'specs',
       fallbackSpecPackage: 'custom/scene-package.json',
       fallbackSceneManifest: '/tmp/scene.yaml',
       outDir: '.kiro/templates/scene-packages'
     })).toBe('--fallback-scene-manifest must be a non-empty relative path');
     expect(validateScenePackagePublishBatchOptions({
       manifest: 'docs/handoffs/handoff-manifest.json',
+      manifestSpecPath: 'specs',
       fallbackSpecPackage: 'custom/scene-package.json',
       fallbackSceneManifest: 'custom/scene.yaml',
       outDir: '.kiro/templates/scene-packages',
@@ -3164,6 +3174,88 @@ Trace: doctor-trace-erp
       spec: '62-00-moqui-full-capability-closure-program',
       dryRun: true
     });
+  });
+
+  test('runScenePackagePublishBatchCommand supports from-331 preset defaults', async () => {
+    const fileSystem = {
+      readJson: jest.fn().mockResolvedValue({
+        specs: [
+          {
+            id: '62-00-moqui-full-capability-closure-program',
+            status: 'completed'
+          }
+        ]
+      })
+    };
+
+    const publishRunner = jest.fn().mockResolvedValue({
+      published: true,
+      template: { id: 'kse.scene--moqui-full-capability-closure-program--1.0.0' }
+    });
+
+    const payload = await runScenePackagePublishBatchCommand({
+      from331: true,
+      json: true
+    }, {
+      projectRoot: '/workspace',
+      fileSystem,
+      publishRunner
+    });
+
+    expect(payload).toBeDefined();
+    expect(payload.success).toBe(true);
+    expect(normalizePath(fileSystem.readJson.mock.calls[0][0])).toBe('/workspace/docs/handoffs/handoff-manifest.json');
+    expect(payload.options).toMatchObject({
+      profile: 'from-331',
+      manifest_spec_path: 'specs',
+      fallback_spec_package: 'docs/scene-package.json',
+      fallback_scene_manifest: 'docs/scene.yaml',
+      status: 'completed'
+    });
+    expect(publishRunner).toHaveBeenCalledTimes(1);
+    expect(publishRunner.mock.calls[0][0]).toMatchObject({
+      spec: '62-00-moqui-full-capability-closure-program',
+      specPackage: 'docs/scene-package.json',
+      sceneManifest: 'docs/scene.yaml'
+    });
+  });
+
+  test('runScenePackagePublishBatchCommand supports custom manifest spec path', async () => {
+    const fileSystem = {
+      readJson: jest.fn().mockResolvedValue({
+        handoff: {
+          spec_items: [
+            {
+              id: '62-01-moqui-capability-itemized-parity-matrix',
+              status: 'completed'
+            }
+          ]
+        }
+      })
+    };
+
+    const publishRunner = jest.fn().mockResolvedValue({
+      published: true,
+      template: { id: 'kse.scene--moqui-capability-itemized-parity-matrix--1.0.0' }
+    });
+
+    const payload = await runScenePackagePublishBatchCommand({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      manifestSpecPath: 'handoff.spec_items',
+      fallbackSpecPackage: 'docs/scene-package.json',
+      fallbackSceneManifest: 'docs/scene.yaml',
+      json: true
+    }, {
+      projectRoot: '/workspace',
+      fileSystem,
+      publishRunner
+    });
+
+    expect(payload).toBeDefined();
+    expect(payload.success).toBe(true);
+    expect(payload.options.manifest_spec_path).toBe('handoff.spec_items');
+    expect(payload.summary.selected).toBe(1);
+    expect(publishRunner).toHaveBeenCalledTimes(1);
   });
 
   test('runScenePackageInstantiateCommand instantiates spec from template', async () => {

@@ -839,6 +839,9 @@ kse scene template-render --package scene-erp --values '{"entity_name":"Order"}'
 # Publish scene package templates from a handoff manifest (default: completed specs only)
 kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --json
 
+# Use 331-poc preset defaults (manifest/docs paths + completed filter)
+kse scene package-publish-batch --from-331 --json
+
 # Preview batch publish plan without writing template files
 kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --json
 
@@ -847,6 +850,9 @@ kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json -
 
 # Disable status filter and use docs/* fallback paths for manifest entries missing scene paths
 kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --status all --fallback-spec-package docs/scene-package.json --fallback-scene-manifest docs/scene.yaml --force --json
+
+# Read specs from non-standard manifest path
+kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --manifest-spec-path handoff.spec_items --json
 ```
 
 ### Moqui ERP Integration

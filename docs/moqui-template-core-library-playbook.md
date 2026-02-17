@@ -26,6 +26,9 @@ Emergency bypass exists but is not recommended:
 ## One-Shot Intake Flow
 
 ```bash
+# 0) Generate template baseline scoreboard (Moqui/ERP templates by default)
+node scripts/moqui-template-baseline-report.js --json
+
 # 1) Handoff close-loop
 kse auto handoff run --manifest docs/handoffs/handoff-manifest.json --json
 
@@ -51,6 +54,8 @@ kse scene package-gate --registry .kiro/templates/scene-packages/registry.json -
 
 Required artifacts for each intake batch:
 
+- `.kiro/reports/moqui-template-baseline.json`
+- `.kiro/reports/moqui-template-baseline.md`
 - `.kiro/reports/handoff-runs/<session>.json`
 - `.kiro/reports/scene-package-ontology-batch.json`
 - `.kiro/templates/scene-packages/registry.json`

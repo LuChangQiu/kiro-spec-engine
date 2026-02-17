@@ -34,6 +34,7 @@
     "test:skip-audit": "node scripts/check-skip-allowlist.js",
     "test:watch": "npx jest --watch",
     "coverage": "npx jest --coverage",
+    "report:moqui-baseline": "node scripts/moqui-template-baseline-report.js --json",
     "prepublishOnly": "npm run test:full && npm run test:skip-audit",
     "publish:manual": "npm publish --access public",
     "install-global": "npm install -g .",

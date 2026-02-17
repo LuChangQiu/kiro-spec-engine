@@ -61,6 +61,86 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Resolve previous Moqui baseline asset
+        id: moqui_baseline_prev
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          NOTES_DIR=".kiro/reports/release-evidence"
+          LATEST_RELEASE_FILE="${NOTES_DIR}/latest-release-${TAG}.json"
+          PREVIOUS_BASELINE_FILE="${NOTES_DIR}/moqui-template-baseline-prev-${TAG}.json"
+          LATEST_RELEASE_API="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/latest"
+
+          mkdir -p "${NOTES_DIR}"
+          echo "previous_file=" >> "$GITHUB_OUTPUT"
+
+          if curl -fsSL \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "${LATEST_RELEASE_API}" \
+            -o "${LATEST_RELEASE_FILE}"; then
+            BASELINE_ASSET_URL="$(node -e "const fs=require('fs');const payload=JSON.parse(fs.readFileSync(process.argv[1],'utf8'));const assets=Array.isArray(payload.assets)?payload.assets:[];const hit=assets.find(item=>item&&item.name==='moqui-template-baseline.json');if(hit&&hit.url){process.stdout.write(hit.url);}" "${LATEST_RELEASE_FILE}")"
+            if [[ -n "${BASELINE_ASSET_URL}" ]]; then
+              if curl -fsSL \
+                -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+                -H "Accept: application/octet-stream" \
+                "${BASELINE_ASSET_URL}" \
+                -o "${PREVIOUS_BASELINE_FILE}"; then
+                echo "previous_file=${PREVIOUS_BASELINE_FILE}" >> "$GITHUB_OUTPUT"
+              fi
+            fi
+          fi
+          rm -f "${LATEST_RELEASE_FILE}"
+
+      - name: Build Moqui template baseline scorecard
+        id: moqui_baseline
+        shell: bash
+        env:
+          PREVIOUS_MOQUI_BASELINE_FILE: ${{ steps.moqui_baseline_prev.outputs.previous_file }}
+          MOQUI_BASELINE_ENFORCE: ${{ vars.KSE_MOQUI_BASELINE_ENFORCE }}
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          NOTES_DIR=".kiro/reports/release-evidence"
+          BASELINE_JSON="${NOTES_DIR}/moqui-template-baseline.json"
+          BASELINE_MD="${NOTES_DIR}/moqui-template-baseline.md"
+          BASELINE_STDOUT="${NOTES_DIR}/moqui-template-baseline-${TAG}.stdout.json"
+
+          mkdir -p "${NOTES_DIR}"
+
+          BASELINE_ENFORCE_RAW="${MOQUI_BASELINE_ENFORCE:-true}"
+          BASELINE_ENFORCE_NORMALIZED="$(printf '%s' "${BASELINE_ENFORCE_RAW}" | tr '[:upper:]' '[:lower:]')"
+          BASELINE_FAIL_FLAG=""
+          if [[ -z "${BASELINE_ENFORCE_NORMALIZED}" || "${BASELINE_ENFORCE_NORMALIZED}" == "1" || "${BASELINE_ENFORCE_NORMALIZED}" == "true" || "${BASELINE_ENFORCE_NORMALIZED}" == "yes" || "${BASELINE_ENFORCE_NORMALIZED}" == "y" || "${BASELINE_ENFORCE_NORMALIZED}" == "on" ]]; then
+            BASELINE_FAIL_FLAG="--fail-on-portfolio-fail"
+            echo "[moqui-baseline] mode=enforce"
+          else
+            echo "[moqui-baseline] mode=advisory"
+          fi
+
+          if [[ -n "${PREVIOUS_MOQUI_BASELINE_FILE}" && -f "${PREVIOUS_MOQUI_BASELINE_FILE}" ]]; then
+            node scripts/moqui-template-baseline-report.js \
+              --out "${BASELINE_JSON}" \
+              --markdown-out "${BASELINE_MD}" \
+              --compare-with "${PREVIOUS_MOQUI_BASELINE_FILE}" \
+              ${BASELINE_FAIL_FLAG} \
+              --json > "${BASELINE_STDOUT}"
+          else
+            node scripts/moqui-template-baseline-report.js \
+              --out "${BASELINE_JSON}" \
+              --markdown-out "${BASELINE_MD}" \
+              ${BASELINE_FAIL_FLAG} \
+              --json > "${BASELINE_STDOUT}"
+          fi
+
+          cat "${BASELINE_STDOUT}"
+          rm -f "${BASELINE_STDOUT}"
+          echo "json_file=${BASELINE_JSON}" >> "$GITHUB_OUTPUT"
+          echo "markdown_file=${BASELINE_MD}" >> "$GITHUB_OUTPUT"
+
       - name: Build release evidence notes
         id: release_notes
         shell: bash
@@ -803,7 +883,10 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           body_path: ${{ steps.release_notes.outputs.release_body_file }}
-          files: ${{ steps.release_notes.outputs.asset_files }}
+          files: |
+            ${{ steps.release_notes.outputs.asset_files }}
+            ${{ steps.moqui_baseline.outputs.json_file }}
+            ${{ steps.moqui_baseline.outputs.markdown_file }}
           draft: false
           prerelease: false
         env:

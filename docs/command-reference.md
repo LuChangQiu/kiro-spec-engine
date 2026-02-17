@@ -906,7 +906,17 @@ node scripts/moqui-template-baseline-report.js \
   --out .kiro/reports/moqui-template-baseline.json \
   --markdown-out .kiro/reports/moqui-template-baseline.md \
   --json
+
+# Compare with a previous baseline and fail CI on portfolio gate fail
+node scripts/moqui-template-baseline-report.js \
+  --compare-with .kiro/reports/release-evidence/moqui-template-baseline-prev.json \
+  --fail-on-portfolio-fail \
+  --json
 ```
+
+Release workflow default:
+- Publishes `moqui-template-baseline.json` + `moqui-template-baseline.md` as release assets.
+- Enforces baseline portfolio gate by default (`KSE_MOQUI_BASELINE_ENFORCE` defaults to `true` when unset).
 
 ### Moqui ERP Integration
 

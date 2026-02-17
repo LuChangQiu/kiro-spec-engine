@@ -24,6 +24,8 @@ function parseArgs(argv) {
     includeAll: false,
     minScore: DEFAULT_MIN_SCORE,
     minValidRate: DEFAULT_MIN_VALID_RATE,
+    compareWith: null,
+    failOnPortfolioFail: false,
     json: false
   };
 
@@ -48,8 +50,13 @@ function parseArgs(argv) {
     } else if (token === '--min-valid-rate' && next) {
       options.minValidRate = Number(next);
       i += 1;
+    } else if (token === '--compare-with' && next) {
+      options.compareWith = next;
+      i += 1;
     } else if (token === '--include-all') {
       options.includeAll = true;
+    } else if (token === '--fail-on-portfolio-fail') {
+      options.failOnPortfolioFail = true;
     } else if (token === '--json') {
       options.json = true;
     } else if (token === '--help' || token === '-h') {
@@ -79,6 +86,8 @@ function printHelpAndExit(code) {
     '  --include-all           Disable selector filter and score all templates',
     `  --min-score <n>         Baseline min semantic score (default: ${DEFAULT_MIN_SCORE})`,
     `  --min-valid-rate <n>    Baseline min ontology valid-rate % (default: ${DEFAULT_MIN_VALID_RATE})`,
+    '  --compare-with <path>   Compare against a previous baseline JSON report',
+    '  --fail-on-portfolio-fail Exit non-zero when portfolio baseline gate fails',
     '  --json                  Print JSON payload to stdout',
     '  -h, --help              Show this help'
   ];
@@ -140,6 +149,60 @@ function collectGapReasons(flags) {
   return gaps;
 }
 
+function toDelta(currentValue, previousValue) {
+  if (!Number.isFinite(Number(currentValue)) || !Number.isFinite(Number(previousValue))) {
+    return null;
+  }
+  return Number((Number(currentValue) - Number(previousValue)).toFixed(2));
+}
+
+function readFailedTemplates(report) {
+  const templates = Array.isArray(report && report.templates) ? report.templates : [];
+  return templates
+    .filter((item) => !(item && item.baseline && item.baseline.flags && item.baseline.flags.baseline_passed))
+    .map((item) => item && item.template_id)
+    .filter((id) => typeof id === 'string' && id.length > 0)
+    .sort((a, b) => a.localeCompare(b));
+}
+
+function buildComparison(report, previousReport) {
+  const currentSummary = report && report.summary ? report.summary : {};
+  const previousSummary = previousReport && previousReport.summary ? previousReport.summary : {};
+  const currentFailedTemplates = readFailedTemplates(report);
+  const previousFailedTemplates = readFailedTemplates(previousReport);
+  const previousFailedSet = new Set(previousFailedTemplates);
+  const currentFailedSet = new Set(currentFailedTemplates);
+  const newlyFailed = currentFailedTemplates
+    .filter((item) => !previousFailedSet.has(item))
+    .sort((a, b) => a.localeCompare(b));
+  const recovered = previousFailedTemplates
+    .filter((item) => !currentFailedSet.has(item))
+    .sort((a, b) => a.localeCompare(b));
+
+  return {
+    previous_generated_at: previousReport && previousReport.generated_at ? previousReport.generated_at : null,
+    previous_template_root: previousReport && previousReport.template_root ? previousReport.template_root : null,
+    deltas: {
+      scoped_templates: toDelta(currentSummary.scoped_templates, previousSummary.scoped_templates),
+      avg_score: toDelta(currentSummary.avg_score, previousSummary.avg_score),
+      valid_rate_percent: toDelta(currentSummary.valid_rate_percent, previousSummary.valid_rate_percent),
+      baseline_passed: toDelta(currentSummary.baseline_passed, previousSummary.baseline_passed),
+      baseline_failed: toDelta(currentSummary.baseline_failed, previousSummary.baseline_failed)
+    },
+    portfolio: {
+      previous_passed: previousSummary.portfolio_passed === true,
+      current_passed: currentSummary.portfolio_passed === true,
+      changed: (previousSummary.portfolio_passed === true) !== (currentSummary.portfolio_passed === true)
+    },
+    failed_templates: {
+      previous: previousFailedTemplates,
+      current: currentFailedTemplates,
+      newly_failed: newlyFailed,
+      recovered
+    }
+  };
+}
+
 function buildMarkdownReport(report) {
   const lines = [];
   lines.push('# Moqui Template Baseline Report');
@@ -165,6 +228,24 @@ function buildMarkdownReport(report) {
   lines.push('| --- | ---: | --- | --- | --- |');
   for (const item of report.templates) {
     lines.push(`| ${item.template_id} | ${item.semantic.score} | ${item.ontology.valid ? 'valid' : 'invalid'} | ${item.baseline.flags.baseline_passed ? 'pass' : 'fail'} | ${item.baseline.gaps.join(', ') || 'none'} |`);
+  }
+  if (report.compare) {
+    const compare = report.compare;
+    const deltas = compare.deltas || {};
+    const failedTemplates = compare.failed_templates || {};
+    lines.push('');
+    lines.push('## Trend vs Previous');
+    lines.push('');
+    lines.push(`- Previous generated at: ${compare.previous_generated_at || 'n/a'}`);
+    lines.push(`- Previous template root: ${compare.previous_template_root || 'n/a'}`);
+    lines.push(`- Delta scoped templates: ${deltas.scoped_templates === null ? 'n/a' : deltas.scoped_templates}`);
+    lines.push(`- Delta avg score: ${deltas.avg_score === null ? 'n/a' : deltas.avg_score}`);
+    lines.push(`- Delta valid-rate: ${deltas.valid_rate_percent === null ? 'n/a' : `${deltas.valid_rate_percent}%`}`);
+    lines.push(`- Delta baseline passed: ${deltas.baseline_passed === null ? 'n/a' : deltas.baseline_passed}`);
+    lines.push(`- Delta baseline failed: ${deltas.baseline_failed === null ? 'n/a' : deltas.baseline_failed}`);
+    lines.push(`- Portfolio transition: ${compare.portfolio.previous_passed ? 'pass' : 'fail'} -> ${compare.portfolio.current_passed ? 'pass' : 'fail'}`);
+    lines.push(`- Newly failed templates: ${failedTemplates.newly_failed && failedTemplates.newly_failed.length > 0 ? failedTemplates.newly_failed.join(', ') : 'none'}`);
+    lines.push(`- Recovered templates: ${failedTemplates.recovered && failedTemplates.recovered.length > 0 ? failedTemplates.recovered.join(', ') : 'none'}`);
   }
   return `${lines.join('\n')}\n`;
 }
@@ -201,6 +282,9 @@ async function main() {
   const templateRoot = path.resolve(process.cwd(), options.templateDir);
   const outPath = path.resolve(process.cwd(), options.out);
   const markdownPath = path.resolve(process.cwd(), options.markdownOut);
+  const compareWithPath = options.compareWith
+    ? path.resolve(process.cwd(), options.compareWith)
+    : null;
 
   const selector = new RegExp(options.match, 'i');
   const contracts = await readTemplateContracts(templateRoot);
@@ -278,6 +362,14 @@ async function main() {
     templates
   };
 
+  if (compareWithPath) {
+    if (!(await fs.pathExists(compareWithPath))) {
+      throw new Error(`--compare-with file not found: ${path.relative(process.cwd(), compareWithPath)}`);
+    }
+    const previousReport = await fs.readJson(compareWithPath);
+    report.compare = buildComparison(report, previousReport);
+  }
+
   await fs.ensureDir(path.dirname(outPath));
   await fs.writeJson(outPath, report, { spaces: 2 });
 
@@ -301,6 +393,21 @@ async function main() {
     console.log(`  Avg score: ${summary.avg_score === null ? 'n/a' : summary.avg_score}`);
     console.log(`  Valid-rate: ${summary.valid_rate_percent === null ? 'n/a' : `${summary.valid_rate_percent}%`}`);
     console.log(`  Baseline passed: ${summary.baseline_passed}`);
+    if (report.compare) {
+      const deltas = report.compare.deltas || {};
+      console.log(`  Delta avg score: ${deltas.avg_score === null ? 'n/a' : deltas.avg_score}`);
+      console.log(`  Delta valid-rate: ${deltas.valid_rate_percent === null ? 'n/a' : `${deltas.valid_rate_percent}%`}`);
+    }
+  }
+
+  if (options.failOnPortfolioFail && !summary.portfolio_passed) {
+    const reason = (
+      `portfolio baseline gate failed (avg_score=${summary.avg_score === null ? 'n/a' : summary.avg_score}, `
+      + `valid_rate=${summary.valid_rate_percent === null ? 'n/a' : `${summary.valid_rate_percent}%`}, `
+      + `thresholds score>=${options.minScore}, valid-rate>=${options.minValidRate}%)`
+    );
+    console.error(`Moqui template baseline failed: ${reason}`);
+    process.exitCode = 2;
   }
 }
 

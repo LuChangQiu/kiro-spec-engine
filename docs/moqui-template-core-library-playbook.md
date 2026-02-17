@@ -29,6 +29,12 @@ Emergency bypass exists but is not recommended:
 # 0) Generate template baseline scoreboard (Moqui/ERP templates by default)
 node scripts/moqui-template-baseline-report.js --json
 
+# 0.1) CI/release mode: compare against previous baseline and enforce portfolio gate
+node scripts/moqui-template-baseline-report.js \
+  --compare-with .kiro/reports/release-evidence/moqui-template-baseline-prev.json \
+  --fail-on-portfolio-fail \
+  --json
+
 # 1) Handoff close-loop
 kse auto handoff run --manifest docs/handoffs/handoff-manifest.json --json
 

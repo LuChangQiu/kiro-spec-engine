@@ -172,6 +172,12 @@
 - Ontology 图、Action Abstraction、Data Lineage、Agent Hints
 - Moqui ERP 连接、发现、模板提取
 
+### [Moqui Template Core Library Playbook](../moqui-template-core-library-playbook.md)
+**Moqui 能力核心库化执行清单（英文）** - 默认门禁、批处理吸收链路、证据合同
+- 不依赖 331 特参的通用 intake 流程
+- Ontology 与 scene-package 默认门禁
+- remediation 队列回灌闭环
+
 ### [331-poc 双轨协同对接手册](../331-poc-dual-track-integration-guide.md)
 **331-poc 与 kse 协同执行指南** - 交接契约、接入命令链、主从闭环验收
 - 331 深化成果输入约束

@@ -326,6 +326,25 @@ describe('OrchestrationEngine', () => {
       expect(engine._effectiveMaxParallel).toBe(5);
       expect(engine._getEffectiveMaxParallel(5)).toBe(5);
     });
+
+    test('rate-limit launch hold pauses new launches until hold expires', async () => {
+      let now = 1000;
+      engine._now = () => now;
+      engine._rateLimitLaunchHoldUntil = 1500;
+
+      const sleepSpy = jest.spyOn(engine, '_sleep').mockImplementation(async (ms) => {
+        now += ms;
+      });
+      const executeSpy = jest.spyOn(engine, '_executeSpec').mockResolvedValue(undefined);
+
+      await engine._executeSpecsInParallel(['spec-a'], 1, 0);
+
+      expect(sleepSpy).toHaveBeenCalledWith(500);
+      expect(executeSpy).toHaveBeenCalledWith('spec-a', 0);
+
+      executeSpy.mockRestore();
+      sleepSpy.mockRestore();
+    });
   });
 
   // -------------------------------------------------------------------------

@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Moqui runtime binding config overrides**: Added `--moqui-config <path>` to `kse scene run` and `kse scene doctor`, allowing runtime binding resolution to use an explicit `moqui-adapter.json` path per execution context.
+- **Moqui client rate-limit resilience tests**: Added dedicated unit coverage for `429 Too Many Requests` retry/exhaustion handling and retryable network error recovery in `tests/unit/scene-runtime/moqui-client.test.js`.
+- **Template ontology contract completeness**: Hardened scene package template contract examples to include ontology entities/relations plus governance lineage/rules/decision sections required by strict lint and ontology validation flows.
 - **Scene ontology impact/path analysis commands**: Added `kse scene ontology impact` (reverse dependency blast-radius analysis with `--relation` and `--max-depth`) and `kse scene ontology path` (shortest relation path between refs with optional `--undirected`) to improve ontology-driven change planning and explainability.
 - **Close-loop quantitative DoD gates**: Added `--dod-max-risk-level`, `--dod-kpi-min-completion-rate`, `--dod-max-success-rate-drop`, and `--dod-baseline-window` so autonomous closure can enforce explicit risk/KPI/baseline thresholds beyond binary checks.
 - **Close-loop conflict/ontology execution planning**: Added lease-conflict scheduling governance and scene ontology scheduling guidance with opt-out controls (`--no-conflict-governance`, `--no-ontology-guidance`), and surfaced planning telemetry in `portfolio.execution_plan` plus agent sync plan output.
@@ -114,6 +117,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Live orchestration status streaming**: Added event/interval-driven status persistence callback support in `runOrchestration()` and wired `auto close-loop` live progress output (`--no-stream` to disable).
 
 ### Changed
+- **Default ERP binding routing now prefers Moqui when configured**: Runtime default handler order now resolves `spec.erp.*` through `moqui.adapter` first when adapter config is present, while preserving deterministic fallback to `builtin.erp-sim` when config is unavailable.
+- **Moqui extraction output enriched for AI-native ontology usage**: Extracted manifests/contracts now emit action intent semantics, dependency chains, governance lineage, ontology model entities/relations, and agent hints for downstream planning.
 - **Controller queue hygiene default**: `close-loop-controller` now deduplicates duplicate broad goals by default (`--no-controller-dedupe` to preserve raw duplicates), and summary telemetry includes dedupe/lock/session metadata.
 - **Positioning and onboarding messaging**: Strengthened EN/ZH README and quick-start docs with explicit kse advantage matrix, 90-second value proof, and KPI observability positioning to improve first-contact clarity.
 - **CLI first-screen positioning text**: Updated `kse --help` top description in EN/ZH locales to reflect current core strengths: Spec workflow, orchestration, and KPI observability.
@@ -127,6 +132,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Autonomous operator UX**: Expanded docs with semantic decomposition and live stream behavior for close-loop command usage.
 
 ### Fixed
+- **Scene runtime 429 failure behavior under high request pressure**: Moqui HTTP client now retries on `429` with `Retry-After` support and bounded exponential backoff, reducing multi-agent stalls caused by transient service-side request limits.
+- **Moqui adapter matching fallback safety**: `spec.erp.*` bindings no longer get captured by Moqui handler when no adapter config exists, preventing false hard-fail paths and restoring expected simulator fallback behavior.
 - **Controller summary semantics**: `close-loop-controller` now reports final `pending_goals` from the persisted queue snapshot and only marks `cycle-limit-reached` as exhausted when pending work remains (or empty-polling mode explicitly consumes cycle budget).
 - **npm package hygiene**: Excluded transient Python bytecode artifacts (`__pycache__`, `*.pyc/pyo/pyd`) from published package contents to reduce package noise and size.
 - **Documentation contact placeholders**: Replaced `yourusername` placeholder repository links in onboarding docs with the canonical project URL and removed stale example email contact.

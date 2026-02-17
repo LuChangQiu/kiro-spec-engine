@@ -33,9 +33,6 @@
   "artifacts": {
     "entry_scene": "custom/scene.yaml",
     "generates": [
-      "requirements.md",
-      "design.md",
-      "tasks.md",
       "custom/scene.yaml"
     ]
   }

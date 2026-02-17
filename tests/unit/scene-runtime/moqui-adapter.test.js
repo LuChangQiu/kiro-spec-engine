@@ -8,6 +8,7 @@ const {
   validateAdapterConfig,
   parseBindingRef,
   mapMoquiResponseToResult,
+  createMoquiAdapterHandler,
   DEFAULT_TIMEOUT,
   DEFAULT_RETRY_COUNT,
   DEFAULT_RETRY_DELAY
@@ -342,6 +343,51 @@ describe('MoquiAdapter', () => {
 
       expect(result.status).toBe('failed');
       expect(result.error.code).toBe('INVALID_RESPONSE');
+    });
+  });
+
+  // ─── createMoquiAdapterHandler ──────────────────────────────────
+
+  describe('createMoquiAdapterHandler', () => {
+    test('does not claim spec.erp refs when config is missing and fallback is enabled', () => {
+      const handler = createMoquiAdapterHandler({
+        projectRoot: tmpDir,
+        allowSpecErpFallback: true
+      });
+
+      expect(handler.match({ binding_ref: 'spec.erp.order-query' })).toBe(false);
+    });
+
+    test('claims spec.erp refs when config is present', () => {
+      fs.writeFileSync(path.join(tmpDir, 'moqui-adapter.json'), JSON.stringify({
+        baseUrl: 'http://localhost:8080',
+        credentials: { username: 'admin', password: 'moqui' }
+      }));
+
+      const handler = createMoquiAdapterHandler({
+        projectRoot: tmpDir,
+        allowSpecErpFallback: true
+      });
+
+      expect(handler.match({ binding_ref: 'spec.erp.order-query' })).toBe(true);
+    });
+
+    test('always claims moqui refs even when config is missing', () => {
+      const handler = createMoquiAdapterHandler({
+        projectRoot: tmpDir,
+        allowSpecErpFallback: true
+      });
+
+      expect(handler.match({ binding_ref: 'moqui.OrderHeader.list' })).toBe(true);
+    });
+
+    test('claims spec.erp refs in strict mode even when config is missing', () => {
+      const handler = createMoquiAdapterHandler({
+        projectRoot: tmpDir,
+        strictMatch: true
+      });
+
+      expect(handler.match({ binding_ref: 'spec.erp.order-query' })).toBe(true);
     });
   });
 });

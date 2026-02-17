@@ -1,4 +1,8 @@
-﻿const BindingRegistry = require('../../../lib/scene-runtime/binding-registry');
+const fs = require('fs-extra');
+const os = require('os');
+const path = require('path');
+
+const BindingRegistry = require('../../../lib/scene-runtime/binding-registry');
 
 describe('BindingRegistry', () => {
   test('resolves handler by ref prefix and executes custom handler', async () => {
@@ -71,5 +75,55 @@ describe('BindingRegistry', () => {
       passed: false,
       reason: 'missing-stop-channel'
     });
+  });
+
+  test('default handlers fall back to erp-sim when moqui config is missing', () => {
+    const registry = new BindingRegistry({
+      projectRoot: path.join(os.tmpdir(), `kse-binding-registry-missing-${Date.now()}`)
+    });
+
+    const handler = registry.resolve({
+      node_type: 'query',
+      binding_ref: 'spec.erp.order-query-service'
+    });
+
+    expect(handler.id).toBe('builtin.erp-sim');
+  });
+
+  test('default handlers prefer moqui adapter for spec.erp refs when config is present', async () => {
+    const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-binding-registry-'));
+
+    try {
+      await fs.writeJson(path.join(tempRoot, 'moqui-adapter.json'), {
+        baseUrl: 'http://localhost:8080',
+        credentials: {
+          username: 'demo',
+          password: 'demo'
+        }
+      }, { spaces: 2 });
+
+      const registry = new BindingRegistry({ projectRoot: tempRoot });
+      const handler = registry.resolve({
+        node_type: 'query',
+        binding_ref: 'spec.erp.order-query-service'
+      });
+
+      expect(handler.id).toBe('moqui.adapter');
+    } finally {
+      await fs.remove(tempRoot);
+    }
+  });
+
+  test('default handlers route moqui refs to moqui adapter even without config', () => {
+    const registry = new BindingRegistry({
+      projectRoot: path.join(os.tmpdir(), `kse-binding-registry-moqui-${Date.now()}`)
+    });
+
+    const handler = registry.resolve({
+      node_type: 'query',
+      binding_ref: 'moqui.OrderHeader.list'
+    });
+
+    expect(handler.id).toBe('moqui.adapter');
   });
 });

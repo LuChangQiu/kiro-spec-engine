@@ -1374,6 +1374,27 @@ describe('MoquiExtractor', () => {
       expect(bindings[4].side_effect).toBe(true);
     });
 
+    test('generated bindings include action abstraction and dependency chain', () => {
+      const match = {
+        pattern: 'crud',
+        primaryResource: 'Order',
+        entities: ['OrderHeader'],
+        services: [],
+        bindingRefs: [],
+        modelScope: { read: [], write: [] },
+        governance: { riskLevel: 'medium', approvalRequired: true, idempotencyRequired: true, idempotencyKey: 'orderId' }
+      };
+
+      const manifest = generateSceneManifest(match);
+      const bindings = manifest.spec.capability_contract.bindings;
+
+      expect(typeof bindings[0].intent).toBe('string');
+      expect(Array.isArray(bindings[0].preconditions)).toBe(true);
+      expect(Array.isArray(bindings[0].postconditions)).toBe(true);
+      expect(bindings[1].depends_on).toBe(bindings[0].ref);
+      expect(bindings[2].depends_on).toBe(bindings[1].ref);
+    });
+
     test('crud pattern has medium risk governance with approval and idempotency', () => {
       const match = {
         pattern: 'crud',
@@ -1479,6 +1500,28 @@ describe('MoquiExtractor', () => {
       expect(gov.risk_level).toBe('low');
       expect(gov.approval.required).toBe(false);
       expect(gov.idempotency).toBeUndefined();
+    });
+
+    test('governance_contract includes data lineage', () => {
+      const match = {
+        pattern: 'query',
+        primaryResource: 'Product',
+        entities: ['Product'],
+        services: [],
+        bindingRefs: [],
+        modelScope: { read: [], write: [] },
+        governance: { riskLevel: 'low', approvalRequired: false, idempotencyRequired: false }
+      };
+
+      const manifest = generateSceneManifest(match);
+      const lineage = manifest.spec.governance_contract.data_lineage;
+
+      expect(lineage).toBeDefined();
+      expect(Array.isArray(lineage.sources)).toBe(true);
+      expect(Array.isArray(lineage.transforms)).toBe(true);
+      expect(Array.isArray(lineage.sinks)).toBe(true);
+      expect(lineage.sources[0].ref).toBe('moqui.Product.list');
+      expect(lineage.sinks[0].ref).toBe('moqui.Product.get');
     });
 
     test('query pattern has empty write scope', () => {
@@ -1758,6 +1801,70 @@ describe('MoquiExtractor', () => {
       expect(contract.governance.risk_level).toBe('medium');
       expect(contract.governance.approval_required).toBe(true);
       expect(contract.governance.rollback_supported).toBe(true);
+    });
+
+    test('contract includes capability bindings with action metadata', () => {
+      const match = {
+        pattern: 'crud',
+        primaryResource: 'Order',
+        entities: ['OrderHeader'],
+        services: [],
+        bindingRefs: [],
+        modelScope: { read: [], write: [] },
+        governance: { riskLevel: 'medium', approvalRequired: true, idempotencyRequired: true }
+      };
+
+      const contract = generatePackageContract(match);
+      const bindings = contract.capability_contract.bindings;
+
+      expect(Array.isArray(bindings)).toBe(true);
+      expect(bindings).toHaveLength(5);
+      expect(typeof bindings[0].intent).toBe('string');
+      expect(Array.isArray(bindings[0].preconditions)).toBe(true);
+      expect(bindings[1].depends_on).toBe(bindings[0].ref);
+    });
+
+    test('contract includes governance_contract lineage, rules, and decisions', () => {
+      const match = {
+        pattern: 'workflow',
+        primaryResource: 'ReserveInventory',
+        entities: [],
+        services: ['ReserveInventory'],
+        bindingRefs: ['moqui.service.ReserveInventory.invoke'],
+        modelScope: { read: [], write: [] },
+        governance: { riskLevel: 'medium', approvalRequired: true, idempotencyRequired: true }
+      };
+
+      const contract = generatePackageContract(match);
+      const governanceContract = contract.governance_contract;
+
+      expect(governanceContract).toBeDefined();
+      expect(governanceContract.data_lineage).toBeDefined();
+      expect(Array.isArray(governanceContract.business_rules)).toBe(true);
+      expect(Array.isArray(governanceContract.decision_logic)).toBe(true);
+      expect(governanceContract.business_rules.length).toBeGreaterThan(0);
+      expect(governanceContract.decision_logic.length).toBeGreaterThan(0);
+    });
+
+    test('contract includes ontology_model and agent_hints', () => {
+      const match = {
+        pattern: 'query',
+        primaryResource: 'Product',
+        entities: ['Product'],
+        services: [],
+        bindingRefs: [],
+        modelScope: { read: [], write: [] },
+        governance: { riskLevel: 'low', approvalRequired: false, idempotencyRequired: false }
+      };
+
+      const contract = generatePackageContract(match);
+
+      expect(contract.ontology_model).toBeDefined();
+      expect(Array.isArray(contract.ontology_model.entities)).toBe(true);
+      expect(Array.isArray(contract.ontology_model.relations)).toBe(true);
+      expect(contract.agent_hints).toBeDefined();
+      expect(contract.agent_hints.complexity).toBe('low');
+      expect(Array.isArray(contract.agent_hints.suggested_sequence)).toBe(true);
     });
 
     // --- Query pattern ---

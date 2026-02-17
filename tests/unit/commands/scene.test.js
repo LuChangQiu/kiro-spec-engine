@@ -135,6 +135,7 @@ describe('Scene command', () => {
     expect(validateRunOptions({ spec: 'a', mode: 'preview' })).toBe('mode must be dry_run or commit');
     expect(validateRunOptions({ spec: 'a', mode: 'dry_run', bindingPluginDir: {} })).toBe('--binding-plugin-dir must be a non-empty path');
     expect(validateRunOptions({ spec: 'a', mode: 'dry_run', bindingPluginManifest: {} })).toBe('--binding-plugin-manifest must be a non-empty path');
+    expect(validateRunOptions({ spec: 'a', mode: 'dry_run', moquiConfig: {} })).toBe('--moqui-config must be a non-empty path');
     expect(validateRunOptions({ spec: 'a', mode: 'commit' })).toBeNull();
   });
 
@@ -144,6 +145,7 @@ describe('Scene command', () => {
     expect(validateDoctorOptions({ manifest: 'scene.yaml', mode: 'commit', syncSpecTasks: true })).toBe('--sync-spec-tasks requires --spec source');
     expect(validateDoctorOptions({ spec: 'x', mode: 'commit', bindingPluginDir: {} })).toBe('--binding-plugin-dir must be a non-empty path');
     expect(validateDoctorOptions({ spec: 'x', mode: 'commit', bindingPluginManifest: {} })).toBe('--binding-plugin-manifest must be a non-empty path');
+    expect(validateDoctorOptions({ spec: 'x', mode: 'commit', moquiConfig: {} })).toBe('--moqui-config must be a non-empty path');
     expect(validateDoctorOptions({ spec: 'x', mode: 'commit' })).toBeNull();
   });
 

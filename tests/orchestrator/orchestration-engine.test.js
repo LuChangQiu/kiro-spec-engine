@@ -530,6 +530,55 @@ describe('OrchestrationEngine', () => {
       sleepSpy.mockRestore();
     });
 
+    test('rate-limit errors honor retry-after hints when higher than computed backoff', async () => {
+      mockDependencyManager.buildDependencyGraph.mockResolvedValue({
+        nodes: ['spec-a'],
+        edges: [],
+      });
+      mockConfig.getConfig.mockResolvedValue({
+        maxParallel: 3,
+        maxRetries: 1,
+        rateLimitBackoffBaseMs: 200,
+        rateLimitBackoffMaxMs: 5000,
+      });
+
+      engine._random = () => 0; // computed backoff = 100ms
+      const sleepSpy = jest.spyOn(engine, '_sleep').mockResolvedValue(undefined);
+
+      let callCount = 0;
+      mockSpawner.spawn.mockImplementation((specName) => {
+        callCount++;
+        const agentId = `agent-${specName}-${callCount}`;
+        process.nextTick(() => {
+          if (callCount === 1) {
+            mockSpawner.emit('agent:failed', {
+              agentId,
+              specName,
+              exitCode: 1,
+              stderr: '429 Too Many Requests. Retry-After: 7',
+            });
+          } else {
+            mockSpawner.emit('agent:completed', { agentId, specName, exitCode: 0 });
+          }
+        });
+        return Promise.resolve({ agentId, specName, status: 'running' });
+      });
+
+      const result = await engine.start(['spec-a']);
+
+      expect(mockSpawner.spawn).toHaveBeenCalledTimes(2);
+      expect(sleepSpy).toHaveBeenCalledTimes(1);
+      expect(sleepSpy).toHaveBeenCalledWith(7000);
+      expect(mockStatusMonitor.recordRateLimitEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          specName: 'spec-a',
+          retryDelayMs: 7000,
+        })
+      );
+      expect(result.completed).toContain('spec-a');
+      sleepSpy.mockRestore();
+    });
+
     test('non-rate-limit retries do not apply backoff sleep', async () => {
       mockDependencyManager.buildDependencyGraph.mockResolvedValue({
         nodes: ['spec-a'],

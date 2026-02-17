@@ -811,7 +811,7 @@ Recommended `.kiro/config/orchestrator.json`:
 }
 ```
 
-`rateLimit*` settings provide dedicated retry/backoff and adaptive parallel throttling when providers return 429 / too-many-requests errors.
+`rateLimit*` settings provide dedicated retry/backoff and adaptive parallel throttling when providers return 429 / too-many-requests errors. Engine retry now also honors `Retry-After` / `try again in ...` hints from provider error messages when present.
 
 ### Scene Template Engine
 

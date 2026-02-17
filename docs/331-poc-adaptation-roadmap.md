@@ -59,6 +59,9 @@
 21. 新增 release gate 审计产物：
    - 每次 tag 发布生成 `release-gate-<tag>.json`，记录阈值、观测信号、违规项和判定结果。
    - `release-gate` 报告随 GitHub Release 资产一起发布，便于后续追溯。
+22. 增强多 Agent 限流韧性：
+   - 编排引擎在 429/RateLimit 错误重试时，支持解析 `Retry-After`/`try again in` 提示并抬升 backoff。
+   - 减少服务端限流窗口内的无效重试与“卡死感”。
 
 ## 下一阶段（P2）
 

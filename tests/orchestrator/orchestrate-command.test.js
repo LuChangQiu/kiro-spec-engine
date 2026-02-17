@@ -300,6 +300,41 @@ describe('orchestrate status', () => {
     nowSpy.mockRestore();
   });
 
+  test('shows active launch-budget hold in status output', async () => {
+    const now = Date.now();
+    const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(now);
+
+    const statusDir = path.join(tempDir, '.kiro', 'config');
+    fs.mkdirSync(statusDir, { recursive: true });
+    const statusData = {
+      status: 'running',
+      rateLimit: {
+        signalCount: 0,
+        totalBackoffMs: 0,
+        launchBudgetPerMinute: 12,
+        launchBudgetWindowMs: 60000,
+        launchBudgetUsed: 12,
+        launchBudgetHoldCount: 1,
+        lastLaunchBudgetHoldMs: 3000,
+        lastLaunchBudgetHoldAt: new Date(now - 1000).toISOString(),
+      },
+      specs: {},
+    };
+    fs.writeJsonSync(path.join(statusDir, 'orchestration-status.json'), statusData);
+
+    const { registerOrchestrateCommands } = require('../../lib/commands/orchestrate');
+    const program = new Command();
+    program.exitOverride();
+    registerOrchestrateCommands(program);
+
+    await program.parseAsync(['node', 'kse', 'orchestrate', 'status']);
+
+    const output = logSpy.mock.calls.map(c => c.join(' ')).join(' ');
+    expect(output).toContain('Launch budget: 12/12 in 60000ms (holds: 1)');
+    expect(output).toContain('Launch budget hold: 2000ms remaining');
+    nowSpy.mockRestore();
+  });
+
   test('displays persisted status in JSON mode', async () => {
     const statusDir = path.join(tempDir, '.kiro', 'config');
     fs.mkdirSync(statusDir, { recursive: true });

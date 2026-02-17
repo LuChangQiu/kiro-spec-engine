@@ -141,6 +141,27 @@ jobs:
           echo "json_file=${BASELINE_JSON}" >> "$GITHUB_OUTPUT"
           echo "markdown_file=${BASELINE_MD}" >> "$GITHUB_OUTPUT"
 
+      - name: Run Moqui core regression suite
+        id: moqui_core_regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          NOTES_DIR=".kiro/reports/release-evidence"
+          REGRESSION_JSON="${NOTES_DIR}/moqui-core-regression-suite-${TAG}.json"
+          REGRESSION_MD="${NOTES_DIR}/moqui-core-regression-suite-${TAG}.md"
+          REGRESSION_STDOUT="${NOTES_DIR}/moqui-core-regression-suite-${TAG}.stdout.json"
+
+          mkdir -p "${NOTES_DIR}"
+          node scripts/moqui-core-regression-suite.js \
+            --out "${REGRESSION_JSON}" \
+            --markdown-out "${REGRESSION_MD}" \
+            --json > "${REGRESSION_STDOUT}"
+          cat "${REGRESSION_STDOUT}"
+          rm -f "${REGRESSION_STDOUT}"
+          echo "json_file=${REGRESSION_JSON}" >> "$GITHUB_OUTPUT"
+          echo "markdown_file=${REGRESSION_MD}" >> "$GITHUB_OUTPUT"
+
       - name: Build release evidence notes
         id: release_notes
         shell: bash
@@ -194,13 +215,13 @@ jobs:
             fi
           fi
 
-          cat > "${FALLBACK_FILE}" <<EOF
-          # Release ${TAG}
-
-          Release date: ${RELEASE_DATE}
-
-          See [CHANGELOG.md](https://github.com/${GITHUB_REPOSITORY}/blob/main/CHANGELOG.md) for details.
-          EOF
+          printf '%s\n' \
+            "# Release ${TAG}" \
+            "" \
+            "Release date: ${RELEASE_DATE}" \
+            "" \
+            "See [CHANGELOG.md](https://github.com/${GITHUB_REPOSITORY}/blob/main/CHANGELOG.md) for details." \
+            > "${FALLBACK_FILE}"
           echo "release_body_file=${FALLBACK_FILE}" >> "$GITHUB_OUTPUT"
           echo "summary_file=" >> "$GITHUB_OUTPUT"
           echo "gate_file=${GATE_FILE}" >> "$GITHUB_OUTPUT"
@@ -887,6 +908,8 @@ jobs:
             ${{ steps.release_notes.outputs.asset_files }}
             ${{ steps.moqui_baseline.outputs.json_file }}
             ${{ steps.moqui_baseline.outputs.markdown_file }}
+            ${{ steps.moqui_core_regression.outputs.json_file }}
+            ${{ steps.moqui_core_regression.outputs.markdown_file }}
           draft: false
           prerelease: false
         env:

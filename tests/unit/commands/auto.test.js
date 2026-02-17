@@ -7202,6 +7202,115 @@ if (process.argv.includes('--json')) {
     expect(runAutoCloseLoop).not.toHaveBeenCalled();
   });
 
+  test('normalizes capability aliases and deprecated aliases through Moqui lexicon', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-10-capability-lexicon-normalization'],
+      templates: ['moqui-domain-extension'],
+      capabilities: ['order-query-read', 'order-fulfillment', 'inventory-adjustment'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-capability-lexicon');
+    await fs.ensureDir(templateDir);
+    await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
+      capabilities: {
+        provides: [
+          'erp-order-query-read',
+          'erp-order-fulfillment-workflow',
+          'erp-inventory-reserve-adjust'
+        ]
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'run',
+      '--manifest',
+      manifestFile,
+      '--dry-run',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('dry-run');
+    expect(payload.gates.passed).toBe(true);
+    expect(payload.moqui_capability_coverage.summary).toEqual(expect.objectContaining({
+      covered_capabilities: 3,
+      uncovered_capabilities: 0,
+      coverage_percent: 100,
+      passed: true
+    }));
+    expect(payload.moqui_capability_coverage.normalization).toEqual(expect.objectContaining({
+      expected_alias_mapped: expect.arrayContaining([
+        expect.objectContaining({ raw: 'order-query-read', canonical: 'erp-order-query-read' }),
+        expect.objectContaining({ raw: 'order-fulfillment', canonical: 'erp-order-fulfillment-workflow' })
+      ]),
+      expected_deprecated_aliases: expect.arrayContaining([
+        expect.objectContaining({ raw: 'inventory-adjustment', canonical: 'erp-inventory-reserve-adjust' })
+      ]),
+      expected_unknown: []
+    }));
+    expect(payload.moqui_capability_coverage.warnings.some(item => item.includes('deprecated'))).toBe(true);
+    expect(runAutoCloseLoop).not.toHaveBeenCalled();
+  });
+
+  test('records unknown manifest capabilities in lexicon normalization warnings', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-10-capability-lexicon-unknown'],
+      templates: ['moqui-domain-extension'],
+      capabilities: ['mystery-capability'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-capability-lexicon-unknown');
+    await fs.ensureDir(templateDir);
+    await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
+      capabilities: {
+        provides: ['erp-order-query-read']
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--dry-run',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('failed');
+    expect(payload.error).toContain('handoff capability coverage gate failed');
+    expect(payload.moqui_capability_coverage.normalization.expected_unknown).toEqual(expect.arrayContaining([
+      expect.objectContaining({ raw: 'mystery-capability', canonical: 'mystery-capability' })
+    ]));
+    expect(payload.moqui_capability_coverage.warnings.some(item => item.includes('unknown to Moqui lexicon'))).toBe(true);
+    expect(runAutoCloseLoop).not.toHaveBeenCalled();
+  });
+
   test('fails handoff run early when ontology quality score is below threshold', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
     await fs.writeJson(manifestFile, {

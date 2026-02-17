@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-02-17T00:00:00.000Z",
+  "source_project": "E:/workspace/moqui-core-regression",
+  "specs": [
+    {
+      "id": "60-10-moqui-core-order-query",
+      "status": "completed",
+      "scene_package": ".kiro/specs/60-10-moqui-core-order-query/custom/scene-package.json",
+      "scene_manifest": ".kiro/specs/60-10-moqui-core-order-query/custom/scene.yaml"
+    }
+  ],
+  "templates": [
+    "kse.scene--erp-order-query-read--0.1.0"
+  ],
+  "capabilities": [
+    "order-query-read",
+    "order-fulfillment",
+    "inventory-adjustment"
+  ],
+  "known_gaps": [],
+  "ontology_validation": {
+    "status": "passed",
+    "quality_score": 100,
+    "business_rules": {
+      "total": 1,
+      "mapped": 1
+    },
+    "decision_logic": {
+      "total": 1,
+      "resolved": 1
+    }
+  }
+}

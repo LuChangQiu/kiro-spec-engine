@@ -1,0 +1,10 @@
+version: "1.0"
+name: "moqui-core-order-query"
+description: "Regression fixture scene manifest for moqui core order query template."
+steps:
+  - id: read-order
+    action: query
+    target: order.query.read
+  - id: plan-fulfillment
+    action: workflow
+    target: order.fulfillment.workflow

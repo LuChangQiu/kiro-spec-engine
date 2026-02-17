@@ -1,0 +1,45 @@
+{
+  "version": "2026.02.17",
+  "source": "kse-moqui-core",
+  "capabilities": [
+    {
+      "canonical": "erp-order-query-read",
+      "aliases": [
+        "order-query-read",
+        "order-read",
+        "moqui-order-query-read",
+        "moqui-order-read"
+      ],
+      "deprecated_aliases": [
+        "order-query",
+        "order-reader"
+      ]
+    },
+    {
+      "canonical": "erp-order-fulfillment-workflow",
+      "aliases": [
+        "order-fulfillment-workflow",
+        "order-fulfillment",
+        "fulfillment-workflow",
+        "moqui-order-fulfillment"
+      ],
+      "deprecated_aliases": [
+        "order-fulfilment-workflow",
+        "order-fulfilment"
+      ]
+    },
+    {
+      "canonical": "erp-inventory-reserve-adjust",
+      "aliases": [
+        "inventory-reserve-adjust",
+        "inventory-adjust",
+        "inventory-reserve",
+        "moqui-inventory-reserve-adjust"
+      ],
+      "deprecated_aliases": [
+        "inventory-adjustment",
+        "inventory-reservation-adjustment"
+      ]
+    }
+  ]
+}

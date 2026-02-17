@@ -205,6 +205,53 @@ describe('StatusMonitor', () => {
   });
 
   // -------------------------------------------------------------------------
+  // launch-budget telemetry
+  // -------------------------------------------------------------------------
+
+  describe('updateLaunchBudgetTelemetry()', () => {
+    test('tracks launch budget counters and hold snapshots', () => {
+      const { monitor } = createMonitor();
+
+      monitor.updateLaunchBudgetTelemetry({
+        budgetPerMinute: 12,
+        windowMs: 60000,
+        used: 12,
+      });
+      monitor.updateLaunchBudgetTelemetry({
+        event: 'hold',
+        budgetPerMinute: 12,
+        windowMs: 60000,
+        used: 12,
+        holdMs: 4500,
+      });
+
+      const report = monitor.getOrchestrationStatus();
+      expect(report.rateLimit.launchBudgetPerMinute).toBe(12);
+      expect(report.rateLimit.launchBudgetWindowMs).toBe(60000);
+      expect(report.rateLimit.launchBudgetUsed).toBe(12);
+      expect(report.rateLimit.launchBudgetHoldCount).toBe(1);
+      expect(report.rateLimit.lastLaunchBudgetHoldMs).toBe(4500);
+      expect(report.rateLimit.lastLaunchBudgetHoldAt).not.toBeNull();
+    });
+
+    test('gracefully handles invalid launch budget values', () => {
+      const { monitor } = createMonitor();
+      expect(() => monitor.updateLaunchBudgetTelemetry({
+        budgetPerMinute: -1,
+        windowMs: 'bad',
+        used: -2,
+        holdMs: -3,
+      })).not.toThrow();
+
+      const report = monitor.getOrchestrationStatus();
+      expect(report.rateLimit.launchBudgetPerMinute).toBeNull();
+      expect(report.rateLimit.launchBudgetWindowMs).toBeNull();
+      expect(report.rateLimit.launchBudgetUsed).toBe(0);
+      expect(report.rateLimit.lastLaunchBudgetHoldMs).toBe(0);
+    });
+  });
+
+  // -------------------------------------------------------------------------
   // adaptive parallel telemetry
   // -------------------------------------------------------------------------
 

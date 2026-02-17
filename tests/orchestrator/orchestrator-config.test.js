@@ -43,6 +43,8 @@ describe('OrchestratorConfig', () => {
         rateLimitAdaptiveParallel: true,
         rateLimitParallelFloor: 1,
         rateLimitCooldownMs: 30000,
+        rateLimitLaunchBudgetPerMinute: 12,
+        rateLimitLaunchBudgetWindowMs: 60000,
         apiKeyEnvVar: 'CODEX_API_KEY',
         bootstrapTemplate: null,
         codexArgs: [],
@@ -61,6 +63,7 @@ describe('OrchestratorConfig', () => {
         'agentBackend', 'maxParallel', 'timeoutSeconds',
         'maxRetries', 'rateLimitMaxRetries', 'rateLimitBackoffBaseMs', 'rateLimitBackoffMaxMs',
         'rateLimitAdaptiveParallel', 'rateLimitParallelFloor', 'rateLimitCooldownMs',
+        'rateLimitLaunchBudgetPerMinute', 'rateLimitLaunchBudgetWindowMs',
         'apiKeyEnvVar', 'bootstrapTemplate', 'codexArgs',
         'codexCommand',
       ];
@@ -104,6 +107,8 @@ describe('OrchestratorConfig', () => {
       expect(result.rateLimitAdaptiveParallel).toBe(true);
       expect(result.rateLimitParallelFloor).toBe(1);
       expect(result.rateLimitCooldownMs).toBe(30000);
+      expect(result.rateLimitLaunchBudgetPerMinute).toBe(12);
+      expect(result.rateLimitLaunchBudgetWindowMs).toBe(60000);
       expect(result.apiKeyEnvVar).toBe('CODEX_API_KEY');
       expect(result.bootstrapTemplate).toBeNull();
       expect(result.codexArgs).toEqual([]);
@@ -123,6 +128,8 @@ describe('OrchestratorConfig', () => {
         rateLimitAdaptiveParallel: false,
         rateLimitParallelFloor: 2,
         rateLimitCooldownMs: 120000,
+        rateLimitLaunchBudgetPerMinute: 20,
+        rateLimitLaunchBudgetWindowMs: 90000,
         apiKeyEnvVar: 'CLAUDE_API_KEY',
         bootstrapTemplate: 'templates/custom.md',
         codexArgs: ['--model', 'gpt-4'],

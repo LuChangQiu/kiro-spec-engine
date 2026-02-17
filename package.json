@@ -1,6 +1,6 @@
 {
   "name": "kiro-spec-engine",
-  "version": "1.47.33",
+  "version": "1.47.34",
   "description": "kiro-spec-engine (kse) - A CLI tool and npm package for spec-driven development with AI coding assistants. NOT the Kiro IDE desktop application.",
   "main": "index.js",
   "bin": {
@@ -35,6 +35,7 @@
     "test:watch": "npx jest --watch",
     "coverage": "npx jest --coverage",
     "report:moqui-baseline": "node scripts/moqui-template-baseline-report.js --json",
+    "report:moqui-core-regression": "node scripts/moqui-core-regression-suite.js --json",
     "prepublishOnly": "npm run test:full && npm run test:skip-audit",
     "publish:manual": "npm publish --access public",
     "install-global": "npm install -g .",

@@ -75,6 +75,7 @@ describe('OrchestrationEngine', () => {
       incrementRetry: jest.fn(),
       recordRateLimitEvent: jest.fn(),
       updateParallelTelemetry: jest.fn(),
+      updateLaunchBudgetTelemetry: jest.fn(),
       setOrchestrationState: jest.fn(),
       setBatchInfo: jest.fn(),
       getOrchestrationStatus: jest.fn().mockReturnValue({
@@ -360,6 +361,37 @@ describe('OrchestrationEngine', () => {
 
       expect(sleepSpy).toHaveBeenCalledWith(500);
       expect(executeSpy).toHaveBeenCalledWith('spec-a', 0);
+
+      executeSpy.mockRestore();
+      sleepSpy.mockRestore();
+    });
+
+    test('launch budget hold pauses new launches until rolling window frees capacity', async () => {
+      let now = 0;
+      engine._now = () => now;
+      engine._applyRetryPolicyConfig({
+        rateLimitLaunchBudgetPerMinute: 1,
+        rateLimitLaunchBudgetWindowMs: 1000,
+      });
+      engine._initializeAdaptiveParallel(2);
+
+      const sleepSpy = jest.spyOn(engine, '_sleep').mockImplementation(async (ms) => {
+        now += ms;
+      });
+      const executeSpy = jest.spyOn(engine, '_executeSpec').mockResolvedValue(undefined);
+
+      await engine._executeSpecsInParallel(['spec-a', 'spec-b'], 2, 0);
+
+      expect(sleepSpy).toHaveBeenCalledWith(1000);
+      expect(executeSpy).toHaveBeenCalledWith('spec-a', 0);
+      expect(executeSpy).toHaveBeenCalledWith('spec-b', 0);
+      expect(mockStatusMonitor.updateLaunchBudgetTelemetry).toHaveBeenCalledWith(
+        expect.objectContaining({
+          event: 'hold',
+          budgetPerMinute: 1,
+          windowMs: 1000,
+        })
+      );
 
       executeSpy.mockRestore();
       sleepSpy.mockRestore();

@@ -56,10 +56,13 @@
 20. 新增可配置发布门禁（workflow 级）：
    - 支持通过 `KSE_RELEASE_*` 仓库变量配置 success rate/risk/ontology 阈值。
    - 支持 advisory（默认）与 enforce（阻断发布）两种模式，且门禁在 `npm publish` 前执行。
+21. 新增 release gate 审计产物：
+   - 每次 tag 发布生成 `release-gate-<tag>.json`，记录阈值、观测信号、违规项和判定结果。
+   - `release-gate` 报告随 GitHub Release 资产一起发布，便于后续追溯。
 
 ## 下一阶段（P2）
 
-1. 将 release gate 结果回写到 `.kiro/reports/release-evidence`（带历史索引），支持跨版本趋势审计。
+1. 将 `release-gate-<tag>.json` 聚合为历史索引（跨版本），形成可查询的发布门禁趋势视图。
 
 ## 长期目标（P3）
 

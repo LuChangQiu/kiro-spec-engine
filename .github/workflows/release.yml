@@ -74,6 +74,7 @@ jobs:
           DRAFT_FILE="${NOTES_DIR}/release-notes-${TAG}.md"
           FALLBACK_FILE="${NOTES_DIR}/release-notes-fallback-${TAG}.md"
           SUMMARY_FILE="${NOTES_DIR}/release-evidence-summary-${TAG}.json"
+          GATE_FILE="${NOTES_DIR}/release-gate-${TAG}.json"
 
           mkdir -p "${NOTES_DIR}"
 
@@ -88,6 +89,7 @@ jobs:
               if [[ -f "${DRAFT_FILE}" ]]; then
                 echo "release_body_file=${DRAFT_FILE}" >> "$GITHUB_OUTPUT"
                 echo "summary_file=${SUMMARY_FILE}" >> "$GITHUB_OUTPUT"
+                echo "gate_file=${GATE_FILE}" >> "$GITHUB_OUTPUT"
                 echo "evidence_used=true" >> "$GITHUB_OUTPUT"
                 {
                   echo "asset_files<<EOF"
@@ -98,6 +100,7 @@ jobs:
                   if [[ -f "${SUMMARY_FILE}" ]]; then
                     echo "${SUMMARY_FILE}"
                   fi
+                  echo "${GATE_FILE}"
                   echo "EOF"
                 } >> "$GITHUB_OUTPUT"
                 exit 0
@@ -114,10 +117,12 @@ jobs:
           EOF
           echo "release_body_file=${FALLBACK_FILE}" >> "$GITHUB_OUTPUT"
           echo "summary_file=" >> "$GITHUB_OUTPUT"
+          echo "gate_file=${GATE_FILE}" >> "$GITHUB_OUTPUT"
           echo "evidence_used=false" >> "$GITHUB_OUTPUT"
           {
             echo "asset_files<<EOF"
             echo "${FALLBACK_FILE}"
+            echo "${GATE_FILE}"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
@@ -133,10 +138,12 @@ jobs:
           RELEASE_GATE_MAX_UNDECIDED_DECISIONS: ${{ vars.KSE_RELEASE_GATE_MAX_UNDECIDED_DECISIONS }}
           RELEASE_EVIDENCE_SUMMARY_FILE: ${{ steps.release_notes.outputs.summary_file }}
           RELEASE_EVIDENCE_USED: ${{ steps.release_notes.outputs.evidence_used }}
+          RELEASE_GATE_REPORT_FILE: ${{ steps.release_notes.outputs.gate_file }}
         run: |
           set -euo pipefail
           node <<'NODE'
           const fs = require('fs');
+          const path = require('path');
           const configWarnings = [];
 
           function read(name, fallback = '') {
@@ -195,6 +202,7 @@ jobs:
           const maxUndecidedDecisions = parseNumber('RELEASE_GATE_MAX_UNDECIDED_DECISIONS', Number.POSITIVE_INFINITY);
           const evidenceUsed = parseBoolean('RELEASE_EVIDENCE_USED', false);
           const summaryFile = read('RELEASE_EVIDENCE_SUMMARY_FILE', '');
+          const gateReportFile = read('RELEASE_GATE_REPORT_FILE', '');
 
           const violations = [];
           const signals = [];
@@ -267,6 +275,31 @@ jobs:
           console.log(header);
           signals.forEach((line) => console.log(`[release-gate] ${line}`));
           configWarnings.forEach((line) => console.log(`[release-gate] warning=${line}`));
+
+          if (gateReportFile) {
+            const reportPayload = {
+              mode,
+              enforce,
+              evidence_used: evidenceUsed,
+              require_evidence: requireEvidence,
+              require_gate_pass: requireGatePass,
+              thresholds: {
+                min_spec_success_rate: minSpecSuccessRate,
+                max_risk_level: maxRiskLevel,
+                max_unmapped_rules: Number.isFinite(maxUnmappedRules) ? maxUnmappedRules : null,
+                max_undecided_decisions: Number.isFinite(maxUndecidedDecisions) ? maxUndecidedDecisions : null
+              },
+              summary_file: summaryFile || null,
+              config_warnings: configWarnings,
+              signals,
+              violations,
+              gate_passed: violations.length === 0,
+              evaluated_at: new Date().toISOString()
+            };
+            fs.mkdirSync(path.dirname(gateReportFile), { recursive: true });
+            fs.writeFileSync(gateReportFile, `${JSON.stringify(reportPayload, null, 2)}\n`, 'utf8');
+            console.log(`[release-gate] report_file=${gateReportFile}`);
+          }
 
           const summaryPath = process.env.GITHUB_STEP_SUMMARY;
           if (summaryPath) {

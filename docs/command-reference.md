@@ -853,6 +853,9 @@ kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json -
 
 # Read specs from non-standard manifest path
 kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --manifest-spec-path handoff.spec_items --json
+
+# Enforce ontology validation + semantic quality threshold before publish
+kse scene package-publish-batch --from-331 --require-ontology-validation --ontology-min-score 70 --json
 ```
 
 ### Moqui ERP Integration

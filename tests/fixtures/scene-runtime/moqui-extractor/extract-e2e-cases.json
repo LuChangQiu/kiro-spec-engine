@@ -1,0 +1,87 @@
+[
+  {
+    "id": "query-order-composite",
+    "discovery": {
+      "entities": ["OrderHeader", "OrderItem"],
+      "services": [],
+      "screens": []
+    },
+    "options": {},
+    "expected": {
+      "total_templates": 1,
+      "patterns": {
+        "crud": 0,
+        "query": 1,
+        "workflow": 0
+      },
+      "bundle_dirs": ["query-order"],
+      "templates": [
+        {
+          "bundle_dir": "query-order",
+          "risk_level": "low",
+          "min_semantic_score": 90
+        }
+      ]
+    }
+  },
+  {
+    "id": "workflow-service-only",
+    "discovery": {
+      "entities": [],
+      "services": ["ReserveInventory", "AdjustInventory"],
+      "screens": []
+    },
+    "options": {},
+    "expected": {
+      "total_templates": 1,
+      "patterns": {
+        "crud": 0,
+        "query": 0,
+        "workflow": 1
+      },
+      "bundle_dirs": ["workflow-reserve-inventory"],
+      "templates": [
+        {
+          "bundle_dir": "workflow-reserve-inventory",
+          "risk_level": "medium",
+          "min_semantic_score": 90
+        }
+      ]
+    }
+  },
+  {
+    "id": "mixed-entity-and-workflow-services",
+    "discovery": {
+      "entities": ["OrderHeader", "OrderItem", "Product"],
+      "services": ["OrderService", "ReserveInventory"],
+      "screens": []
+    },
+    "options": {},
+    "expected": {
+      "total_templates": 3,
+      "patterns": {
+        "crud": 1,
+        "query": 1,
+        "workflow": 1
+      },
+      "bundle_dirs": ["crud-order", "query-product", "workflow-reserve-inventory"],
+      "templates": [
+        {
+          "bundle_dir": "crud-order",
+          "risk_level": "medium",
+          "min_semantic_score": 90
+        },
+        {
+          "bundle_dir": "query-product",
+          "risk_level": "low",
+          "min_semantic_score": 90
+        },
+        {
+          "bundle_dir": "workflow-reserve-inventory",
+          "risk_level": "medium",
+          "min_semantic_score": 90
+        }
+      ]
+    }
+  }
+]

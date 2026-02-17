@@ -1,5 +1,7 @@
 'use strict';
 
+const path = require('path');
+
 const {
   SUPPORTED_PATTERNS,
   HEADER_ITEM_SUFFIXES,
@@ -33,6 +35,11 @@ const {
   evaluateOntologySemanticQuality
 } = require('../../../lib/scene-runtime/scene-ontology');
 const archetypeMatches = require('../../fixtures/scene-runtime/moqui-extractor/archetype-matches.json');
+const extractE2ECases = require('../../fixtures/scene-runtime/moqui-extractor/extract-e2e-cases.json');
+
+function normalizePath(targetPath) {
+  return String(targetPath || '').split('\\').join('/');
+}
 
 describe('MoquiExtractor', () => {
   // ─── Constants ─────────────────────────────────────────────────
@@ -2847,6 +2854,76 @@ describe('MoquiExtractor', () => {
       expect(result.success).toBe(true);
       if (result.templates.length > 0) {
         expect(Object.keys(mockFs.files).length).toBeGreaterThan(0);
+      }
+    });
+
+    test.each(extractE2ECases)('end-to-end extraction writes expected bundles for $id', async (fixture) => {
+      const client = createMockClient({
+        requestHandler: (method, reqPath) => {
+          if (reqPath === '/api/v1/entities') {
+            return { success: true, data: { entities: fixture.discovery.entities || [] } };
+          }
+          if (reqPath === '/api/v1/services') {
+            return { success: true, data: { services: fixture.discovery.services || [] } };
+          }
+          if (reqPath === '/api/v1/screens') {
+            return { success: true, data: { screens: fixture.discovery.screens || [] } };
+          }
+          return { success: true, data: {} };
+        }
+      });
+      const mockFs = createMockFs();
+      const outDir = '/snapshot/out';
+
+      const result = await runExtraction(
+        {
+          out: outDir,
+          ...(fixture.options || {})
+        },
+        { client, fileSystem: mockFs }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.summary.totalTemplates).toBe(fixture.expected.total_templates);
+      expect(result.summary.patterns).toMatchObject(fixture.expected.patterns);
+      expect(result.templates.map((template) => template.bundleDir).sort())
+        .toEqual([...fixture.expected.bundle_dirs].sort());
+
+      const writtenPaths = Object.keys(mockFs.files).map((targetPath) => normalizePath(targetPath));
+      for (const bundleDir of fixture.expected.bundle_dirs) {
+        expect(writtenPaths).toContain(normalizePath(path.join(outDir, bundleDir, 'scene.yaml')));
+        expect(writtenPaths).toContain(normalizePath(path.join(outDir, bundleDir, 'scene-package.json')));
+      }
+
+      for (const template of result.templates) {
+        const contract = JSON.parse(template.contractJson);
+        const semanticQuality = evaluateOntologySemanticQuality(contract);
+        const expectedTemplate = fixture.expected.templates.find((entry) => entry.bundle_dir === template.bundleDir);
+
+        expect(expectedTemplate).toBeDefined();
+        expect(contract.governance.risk_level).toBe(expectedTemplate.risk_level);
+        expect(semanticQuality.score).toBeGreaterThanOrEqual(expectedTemplate.min_semantic_score);
+        expect(Array.isArray(contract.governance_contract.business_rules)).toBe(true);
+        expect(Array.isArray(contract.governance_contract.decision_logic)).toBe(true);
+        expect(Array.isArray(contract.ontology_model.entities)).toBe(true);
+        expect(Array.isArray(contract.ontology_model.relations)).toBe(true);
+
+        const bindingRefs = new Set(
+          (contract.capability_contract && Array.isArray(contract.capability_contract.bindings))
+            ? contract.capability_contract.bindings.map((binding) => binding.ref)
+            : []
+        );
+        const lineage = contract.governance_contract && contract.governance_contract.data_lineage
+          ? contract.governance_contract.data_lineage
+          : { sources: [], sinks: [] };
+
+        for (const source of lineage.sources || []) {
+          expect(bindingRefs.has(source.ref)).toBe(true);
+        }
+
+        for (const sink of lineage.sinks || []) {
+          expect(bindingRefs.has(sink.ref)).toBe(true);
+        }
       }
     });
 

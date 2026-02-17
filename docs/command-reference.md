@@ -865,6 +865,9 @@ kse scene package-publish-batch --from-331 --dry-run --ontology-min-average-scor
 
 # Export ontology remediation task draft markdown
 kse scene package-publish-batch --from-331 --dry-run --ontology-task-out .kiro/reports/scene-package-ontology-task-draft.md --json
+
+# Export ontology remediation queue lines (directly consumable by close-loop-batch)
+kse scene package-publish-batch --from-331 --dry-run --ontology-task-queue-out .kiro/auto/ontology-remediation.lines --json
 ```
 
 ### Moqui ERP Integration

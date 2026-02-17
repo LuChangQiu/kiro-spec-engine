@@ -6141,6 +6141,11 @@ describe('auto close-loop command', () => {
       latest_session_id: payload.session_id,
       total_runs: 1
     }));
+    expect(payload.release_evidence.trend_window).toEqual(expect.objectContaining({
+      window: expect.objectContaining({
+        requested: 5
+      })
+    }));
     expect(await fs.pathExists(payload.output_file)).toBe(true);
     expect(await fs.pathExists(queueFile)).toBe(true);
     expect(runAutoCloseLoop).toHaveBeenCalledTimes(payload.queue.goal_count);
@@ -6151,12 +6156,22 @@ describe('auto close-loop command', () => {
     expect(releaseEvidence.mode).toBe('auto-handoff-release-evidence');
     expect(releaseEvidence.total_runs).toBe(1);
     expect(releaseEvidence.latest_session_id).toBe(payload.session_id);
+    expect(releaseEvidence.latest_trend_window).toEqual(expect.objectContaining({
+      window: expect.objectContaining({
+        requested: 5
+      })
+    }));
     expect(releaseEvidence.sessions[0]).toEqual(expect.objectContaining({
       session_id: payload.session_id,
       status: 'completed',
       manifest_path: manifestFile
     }));
     expect(releaseEvidence.sessions[0].handoff_report_file).toContain('.kiro/reports/handoff-runs/');
+    expect(releaseEvidence.sessions[0].trend_window).toEqual(expect.objectContaining({
+      window: expect.objectContaining({
+        requested: 5
+      })
+    }));
   });
 
   test('runs handoff by dependency batches before post-spec goals', async () => {
@@ -6275,6 +6290,56 @@ describe('auto close-loop command', () => {
       randomSpy.mockRestore();
       jest.useRealTimers();
     }
+  });
+
+  test('supports custom release evidence trend window size', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-33-release-evidence-window'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    runAutoCloseLoop.mockResolvedValue({
+      status: 'completed',
+      portfolio: {
+        master_spec: '161-11-handoff-window',
+        sub_specs: []
+      }
+    });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'run',
+      '--manifest',
+      manifestFile,
+      '--release-evidence-window',
+      '3',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.status).toBe('completed');
+    expect(payload.release_evidence.trend_window).toEqual(expect.objectContaining({
+      window: expect.objectContaining({
+        requested: 3
+      })
+    }));
+    const releaseEvidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+    const releaseEvidence = await fs.readJson(releaseEvidenceFile);
+    expect(releaseEvidence.latest_trend_window).toEqual(expect.objectContaining({
+      window: expect.objectContaining({
+        requested: 3
+      })
+    }));
   });
 
   test('continues handoff run from latest report with pending goals only', async () => {
@@ -6903,6 +6968,38 @@ describe('auto close-loop command', () => {
     ).rejects.toThrow('process.exit called');
     payload = JSON.parse(`${logSpy.mock.calls[logSpy.mock.calls.length - 1][0]}`);
     expect(payload.error).toContain('--max-unmapped-rules must be an integer >= 0.');
+  });
+
+  test('validates handoff release evidence window option range', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-11-release-evidence-window-option'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--release-evidence-window',
+        '1',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.error).toContain('--release-evidence-window must be an integer between 2 and 50.');
   });
 
   test('builds handoff regression by comparing latest run report with previous one', async () => {

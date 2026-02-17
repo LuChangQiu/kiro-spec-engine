@@ -38,10 +38,13 @@
 14. 新增回归可视化报表增强：
    - `handoff regression` 输出增加 `risk_layers` 风险分层视图（low/medium/high/unknown）。
    - markdown 报表新增 `Trend Series` 与 `Risk Layer View`，支持多轮趋势快速审阅。
+15. 新增 release evidence 趋势窗口快照：
+   - `handoff run` 支持 `--release-evidence-window <n>`（默认 5）。
+   - release evidence 自动写入 `latest_trend_window` 与每个 session 的 `trend_window`，支持发布包一键审阅。
 
 ## 下一阶段（P2）
 
-1. 在 release evidence 中追加可选趋势窗口聚合快照（用于发布包一键审阅）。
+1. 增加 release evidence 快速审阅命令（聚合输出当前批次 gate/ontology/regression/risk-layer 概览）。
 
 ## 长期目标（P3）
 

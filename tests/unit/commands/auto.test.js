@@ -6469,6 +6469,7 @@ if (process.argv.includes('--json')) {
       'run',
       '--manifest',
       manifestFile,
+      '--no-require-scene-package-batch',
       '--json'
     ]);
 
@@ -7138,6 +7139,97 @@ if (process.argv.includes('--json')) {
       generated: false
     }));
     expect(payload.gates.passed).toBe(true);
+  });
+
+  test('fails handoff run early when scene package publish-batch dry-run gate fails (default gate enabled)', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: [
+        {
+          id: '60-10-scene-batch-gate',
+          spec: '60-10-scene-batch-gate',
+          status: 'completed'
+        }
+      ],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('failed');
+    expect(payload.error).toContain('handoff scene package batch gate failed');
+    expect(payload.scene_package_batch).toEqual(expect.objectContaining({
+      status: 'failed',
+      generated: true,
+      summary: expect.objectContaining({
+        selected: 1,
+        failed: 1
+      })
+    }));
+    expect(runAutoCloseLoop).not.toHaveBeenCalled();
+  });
+
+  test('allows disabling scene package publish-batch dry-run gate via --no-require-scene-package-batch', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: [
+        {
+          id: '60-10-scene-batch-gate-bypass',
+          spec: '60-10-scene-batch-gate-bypass',
+          status: 'completed'
+        }
+      ],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'run',
+      '--manifest',
+      manifestFile,
+      '--dry-run',
+      '--no-require-scene-package-batch',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('dry-run');
+    expect(payload.policy.require_scene_package_batch).toBe(false);
+    expect(payload.scene_package_batch).toEqual(expect.objectContaining({
+      status: 'failed',
+      generated: true
+    }));
+    expect(payload.gates.passed).toBe(true);
+    expect(runAutoCloseLoop).not.toHaveBeenCalled();
   });
 
   test('fails handoff run when capability coverage is below default threshold and writes remediation queue', async () => {

@@ -395,24 +395,21 @@ jobs:
             --out "${HISTORY_FILE}" \
             --markdown-out "${HISTORY_CARD_FILE}" \
             --json > "${HISTORY_SUMMARY_FILE}"; then
-            cat > "${HISTORY_SUMMARY_FILE}" <<EOF
-            {
-              "mode": "auto-handoff-release-gate-history",
-              "error": "failed to build release gate history index"
-            }
-            EOF
-            cat > "${HISTORY_CARD_FILE}" <<EOF
-            # Release Gate History
-
-            Failed to build release gate history markdown.
-            EOF
+            printf '%s\n' \
+              '{' \
+              '  "mode": "auto-handoff-release-gate-history",' \
+              '  "error": "failed to build release gate history index"' \
+              '}' > "${HISTORY_SUMMARY_FILE}"
+            printf '%s\n' \
+              '# Release Gate History' \
+              '' \
+              'Failed to build release gate history markdown.' > "${HISTORY_CARD_FILE}"
             if [[ ! -f "${HISTORY_FILE}" ]]; then
-              cat > "${HISTORY_FILE}" <<EOF
-              {
-                "mode": "auto-handoff-release-gate-history",
-                "entries": []
-              }
-              EOF
+              printf '%s\n' \
+                '{' \
+                '  "mode": "auto-handoff-release-gate-history",' \
+                '  "entries": []' \
+                '}' > "${HISTORY_FILE}"
             fi
           fi
 
@@ -586,7 +583,7 @@ jobs:
               }
 
               fs.appendFileSync(bodyFile, `${lines.join('\n')}\n`, 'utf8');
-              NODE
+          NODE
           fi
 
       - name: Evaluate release drift alerts
@@ -795,7 +792,7 @@ jobs:
               console.error(`[release-drift] blocked by drift alerts: ${alerts.join('; ')}`);
               process.exit(1);
             }
-            NODE
+          NODE
 
       - name: Publish to npm
         run: npm publish --access public

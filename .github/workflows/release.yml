@@ -65,12 +65,53 @@ jobs:
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      
+
+      - name: Build release evidence notes
+        id: release_notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          RELEASE_DATE="$(date -u +%F)"
+          NOTES_DIR=".kiro/reports/release-evidence"
+          EVIDENCE_FILE="${NOTES_DIR}/handoff-runs.json"
+          REVIEW_FILE="${NOTES_DIR}/handoff-evidence-review-${TAG}.md"
+          DRAFT_FILE="${NOTES_DIR}/release-notes-${TAG}.md"
+          FALLBACK_FILE="${NOTES_DIR}/release-notes-fallback-${TAG}.md"
+          SUMMARY_FILE="${NOTES_DIR}/release-evidence-summary-${TAG}.json"
+
+          mkdir -p "${NOTES_DIR}"
+
+          if [[ -f "${EVIDENCE_FILE}" ]]; then
+            if node bin/kiro-spec-engine.js auto handoff evidence \
+              --file "${EVIDENCE_FILE}" \
+              --review-out "${REVIEW_FILE}" \
+              --release-draft "${DRAFT_FILE}" \
+              --release-version "${TAG}" \
+              --release-date "${RELEASE_DATE}" \
+              --json > "${SUMMARY_FILE}"; then
+              if [[ -f "${DRAFT_FILE}" ]]; then
+                echo "release_body_file=${DRAFT_FILE}" >> "$GITHUB_OUTPUT"
+                echo "review_file=${REVIEW_FILE}" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+            fi
+          fi
+
+          cat > "${FALLBACK_FILE}" <<EOF
+          # Release ${TAG}
+
+          Release date: ${RELEASE_DATE}
+
+          See [CHANGELOG.md](https://github.com/${GITHUB_REPOSITORY}/blob/main/CHANGELOG.md) for details.
+          EOF
+          echo "release_body_file=${FALLBACK_FILE}" >> "$GITHUB_OUTPUT"
+          echo "review_file=" >> "$GITHUB_OUTPUT"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          body: |
-            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
+          body_path: ${{ steps.release_notes.outputs.release_body_file }}
           draft: false
           prerelease: false
         env:

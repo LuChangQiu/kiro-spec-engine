@@ -47,10 +47,13 @@
 17. 新增 release draft 自动生成：
    - `kse auto handoff evidence --release-draft <path>` 一次命令生成 evidence 审阅 markdown + release notes 草稿。
    - 草稿自动注入当前批次 gate/ontology/regression/risk-layer 摘要与证据路径。
+18. 新增 CI 发布链路集成：
+   - `release.yml` 在 tag 发布时自动尝试基于 `handoff-runs.json` 生成 release notes 草稿。
+   - 若证据缺失或生成失败，自动回退到默认 CHANGELOG 引导文案，避免发布流水卡死。
 
 ## 下一阶段（P2）
 
-1. 将 `handoff evidence --release-draft` 接入 CI 发布任务（tag 后自动产出草稿并附加到 GitHub Release）。
+1. 将 evidence 审阅 markdown 作为 release artifact 上传，并在 GitHub Release 中附带下载入口。
 
 ## 长期目标（P3）
 

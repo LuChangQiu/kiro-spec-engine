@@ -14,6 +14,8 @@ KSE defaults already enforce the baseline below:
 
 - `kse auto handoff run`: ontology validation is required by default.
 - `kse auto handoff run`: generates Moqui baseline snapshot by default and appends it to release-evidence sessions.
+- `kse auto handoff run`: requires Moqui baseline portfolio pass by default.
+- `kse auto handoff run`: evaluates capability coverage matrix by default when manifest `capabilities` is declared (default minimum `100%`).
 - `kse scene package-publish-batch`:
   - ontology validation required by default
   - batch ontology gate defaults:
@@ -23,6 +25,8 @@ KSE defaults already enforce the baseline below:
 Emergency bypass exists but is not recommended:
 
 - `--no-require-ontology-validation`
+- `--no-require-moqui-baseline`
+- `--no-require-capability-coverage`
 
 ## One-Shot Intake Flow
 
@@ -65,8 +69,11 @@ Required artifacts for each intake batch:
 - `.kiro/reports/moqui-template-baseline.md`
 - `.kiro/reports/release-evidence/moqui-template-baseline.json`
 - `.kiro/reports/release-evidence/moqui-template-baseline.md`
+- `.kiro/reports/release-evidence/moqui-capability-coverage.json`
+- `.kiro/reports/release-evidence/moqui-capability-coverage.md`
 - `.kiro/reports/handoff-runs/<session>.json`
 - `.kiro/reports/scene-package-ontology-batch.json`
+- `.kiro/auto/moqui-remediation.lines` (when baseline/coverage gaps exist)
 - `.kiro/templates/scene-packages/registry.json`
 - gate output/evidence linked from release notes or handoff summary
 

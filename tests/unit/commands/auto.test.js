@@ -20,6 +20,62 @@ describe('auto close-loop command', () => {
   beforeEach(async () => {
     jest.resetAllMocks();
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-auto-command-'));
+    const baselineScript = path.join(tempDir, 'scripts', 'moqui-template-baseline-report.js');
+    await fs.ensureDir(path.dirname(baselineScript));
+    await fs.writeFile(
+      baselineScript,
+      `'use strict';
+const fs = require('fs');
+const path = require('path');
+const readArg = flag => {
+  const index = process.argv.indexOf(flag);
+  return index >= 0 ? process.argv[index + 1] : null;
+};
+const outFile = readArg('--out');
+const markdownFile = readArg('--markdown-out');
+const payload = {
+  mode: 'moqui-template-baseline',
+  generated_at: '2026-02-17T00:00:00.000Z',
+  summary: {
+    total_templates: 3,
+    scoped_templates: 3,
+    avg_score: 95,
+    valid_rate_percent: 100,
+    baseline_passed: 3,
+    baseline_failed: 0,
+    portfolio_passed: true
+  },
+  compare: {
+    previous_generated_at: null,
+    deltas: {
+      scoped_templates: 0,
+      avg_score: 0,
+      valid_rate_percent: 0,
+      baseline_passed: 0,
+      baseline_failed: 0
+    },
+    failed_templates: {
+      previous: [],
+      current: [],
+      newly_failed: [],
+      recovered: []
+    }
+  }
+};
+if (outFile) {
+  fs.mkdirSync(path.dirname(outFile), { recursive: true });
+  fs.writeFileSync(outFile, JSON.stringify(payload, null, 2), 'utf8');
+}
+if (markdownFile) {
+  fs.mkdirSync(path.dirname(markdownFile), { recursive: true });
+  fs.writeFileSync(markdownFile, '# Mock Moqui Baseline\\n', 'utf8');
+}
+if (process.argv.includes('--json')) {
+  process.stdout.write(JSON.stringify(payload));
+}
+`,
+      'utf8'
+    );
     exitSpy = jest.spyOn(process, 'exit').mockImplementation(() => {
       throw new Error('process.exit called');
     });
@@ -6327,8 +6383,8 @@ describe('auto close-loop command', () => {
     expect(payload.queue.output_file).toBe(queueFile);
     expect(payload.output_file).toContain(path.join('.kiro', 'reports', 'handoff-runs'));
     expect(payload.moqui_baseline).toEqual(expect.objectContaining({
-      status: 'skipped',
-      generated: false
+      status: 'passed',
+      generated: true
     }));
     expect(Array.isArray(payload.recommendations)).toBe(true);
     expect(payload.recommendations.some(item => item.includes('kse auto handoff regression --session-id'))).toBe(true);
@@ -6365,8 +6421,8 @@ describe('auto close-loop command', () => {
       manifest_path: manifestFile
     }));
     expect(releaseEvidence.sessions[0].moqui_baseline).toEqual(expect.objectContaining({
-      status: 'skipped',
-      generated: false
+      status: 'passed',
+      generated: true
     }));
     expect(releaseEvidence.sessions[0].handoff_report_file).toContain('.kiro/reports/handoff-runs/');
     expect(releaseEvidence.sessions[0].trend_window).toEqual(expect.objectContaining({
@@ -7007,6 +7063,143 @@ describe('auto close-loop command', () => {
     expect(payload.status).toBe('completed');
     expect(payload.policy.require_ontology_validation).toBe(false);
     expect(runAutoCloseLoop).toHaveBeenCalled();
+  });
+
+  test('fails handoff run early when Moqui baseline script is missing (default gate enabled)', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-10-moqui-baseline-gate'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    await fs.remove(path.join(tempDir, 'scripts', 'moqui-template-baseline-report.js'));
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('failed');
+    expect(payload.error).toContain('handoff moqui baseline gate failed');
+    expect(payload.error).toContain('baseline script missing');
+    expect(runAutoCloseLoop).not.toHaveBeenCalled();
+  });
+
+  test('allows disabling Moqui baseline gate via --no-require-moqui-baseline', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-10-moqui-baseline-bypass'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    await fs.remove(path.join(tempDir, 'scripts', 'moqui-template-baseline-report.js'));
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'run',
+      '--manifest',
+      manifestFile,
+      '--dry-run',
+      '--no-require-moqui-baseline',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('dry-run');
+    expect(payload.policy.require_moqui_baseline).toBe(false);
+    expect(payload.moqui_baseline).toEqual(expect.objectContaining({
+      status: 'skipped',
+      generated: false
+    }));
+    expect(payload.gates.passed).toBe(true);
+  });
+
+  test('fails handoff run when capability coverage is below default threshold and writes remediation queue', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-10-capability-gate'],
+      templates: ['moqui-domain-extension'],
+      capabilities: ['order-fulfillment', 'inventory-allocation'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-capability');
+    await fs.ensureDir(templateDir);
+    await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
+      capabilities: {
+        provides: ['inventory-allocation']
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('failed');
+    expect(payload.error).toContain('handoff capability coverage gate failed');
+    expect(payload.error).toContain('capability_coverage_percent');
+    expect(payload.moqui_capability_coverage).toEqual(expect.objectContaining({
+      status: 'evaluated',
+      summary: expect.objectContaining({
+        total_capabilities: 2,
+        covered_capabilities: 1,
+        uncovered_capabilities: 1,
+        coverage_percent: 50,
+        min_required_percent: 100,
+        passed: false
+      })
+    }));
+    expect(payload.remediation_queue).toEqual(expect.objectContaining({
+      goal_count: expect.any(Number)
+    }));
+    expect(payload.remediation_queue.goal_count).toBeGreaterThanOrEqual(2);
+    expect(await fs.pathExists(payload.remediation_queue.file)).toBe(true);
+    const queueContent = await fs.readFile(payload.remediation_queue.file, 'utf8');
+    expect(queueContent).toContain('order-fulfillment');
+    expect(payload.recommendations.some(item => item.includes('kse auto close-loop-batch'))).toBe(true);
+    expect(runAutoCloseLoop).not.toHaveBeenCalled();
   });
 
   test('fails handoff run early when ontology quality score is below threshold', async () => {

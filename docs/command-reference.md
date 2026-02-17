@@ -765,16 +765,18 @@ Dual-track handoff integration:
 - `kse auto handoff plan --manifest <path> [--out <path>] [--strict] [--strict-warnings] [--json]`: parse handoff manifest (source project, specs, templates, known gaps) and generate an executable KSE integration phase plan.
 - `kse auto handoff queue --manifest <path> [--out <path>] [--append] [--no-include-known-gaps] [--dry-run] [--json]`: generate close-loop batch goal queue from handoff manifest and optionally persist line-based queue file (default `.kiro/auto/handoff-goals.lines`).
 - `kse auto handoff template-diff --manifest <path> [--json]`: compare manifest templates against local template exports/registry and report `missing_in_local` and `extra_in_local`.
-- `kse auto handoff run --manifest <path> [--out <path>] [--queue-out <path>] [--append] [--no-include-known-gaps] [--continue-from <session|latest|file>] [--continue-strategy <auto|pending|failed-only>] [--dry-run] [--strict] [--strict-warnings] [--no-dependency-batching] [--min-spec-success-rate <n>] [--max-risk-level <level>] [--no-require-ontology-validation] [--release-evidence-window <n>] [--json]`: execute handoff end-to-end (`plan -> queue -> close-loop-batch -> observability`) with automatic report archive to `.kiro/reports/handoff-runs/<session>.json`.
+- `kse auto handoff run --manifest <path> [--out <path>] [--queue-out <path>] [--append] [--no-include-known-gaps] [--continue-from <session|latest|file>] [--continue-strategy <auto|pending|failed-only>] [--dry-run] [--strict] [--strict-warnings] [--no-dependency-batching] [--min-spec-success-rate <n>] [--max-risk-level <level>] [--no-require-ontology-validation] [--no-require-moqui-baseline] [--min-capability-coverage <n>] [--no-require-capability-coverage] [--release-evidence-window <n>] [--json]`: execute handoff end-to-end (`plan -> queue -> close-loop-batch -> observability`) with automatic report archive to `.kiro/reports/handoff-runs/<session>.json`.
   - Default mode is dependency-aware: spec integration goals are grouped into dependency batches and executed in topological order.
   - `--continue-from` resumes pending goals from an existing handoff run report (`latest`, session id, or JSON file path). For safety, KSE enforces manifest-path consistency between the previous report and current run.
   - `--continue-strategy auto|pending|failed-only` controls resumed scope. `auto` (default) derives the best strategy from prior run state (`pending` when unprocessed/planned goals exist, otherwise `failed-only` for pure failure replay).
-  - Non-dry runs auto-merge release evidence into `.kiro/reports/release-evidence/handoff-runs.json` with session-level gate/ontology/regression/moqui-baseline snapshots. Merge failures are recorded as warnings without aborting the run.
+  - Non-dry runs auto-merge release evidence into `.kiro/reports/release-evidence/handoff-runs.json` with session-level gate/ontology/regression/moqui-baseline/capability-coverage snapshots. Merge failures are recorded as warnings without aborting the run.
   - `--release-evidence-window` controls trend snapshot window size (2-50, default `5`) used in merged release evidence (`latest_trend_window` and per-session `trend_window`).
   - Run output includes `moqui_baseline` snapshot by default, with artifacts at `.kiro/reports/release-evidence/moqui-template-baseline.json` and `.kiro/reports/release-evidence/moqui-template-baseline.md`.
+  - Run output includes `moqui_capability_coverage` snapshot by default (when manifest `capabilities` is declared), with artifacts at `.kiro/reports/release-evidence/moqui-capability-coverage.json` and `.kiro/reports/release-evidence/moqui-capability-coverage.md`.
+  - When Moqui baseline/capability gates fail, KSE auto-generates remediation queue lines at `.kiro/auto/moqui-remediation.lines`.
   - Run result includes `recommendations` with executable follow-up commands (for example, auto-generated `--continue-from <session>` on failed/incomplete batches).
-  - Gate defaults: `--min-spec-success-rate` defaults to `100`, `--max-risk-level` defaults to `high`, and ontology validation requirement is enabled by default.
-  - Use `--no-require-ontology-validation` only for emergency bypass; default behavior fails fast at precheck if manifest ontology evidence is missing or not passed.
+  - Gate defaults: `--min-spec-success-rate` defaults to `100`, `--max-risk-level` defaults to `high`, ontology validation requirement is enabled by default, Moqui baseline requirement is enabled by default, and capability coverage minimum defaults to `100` when manifest `capabilities` is declared.
+  - Use `--no-require-ontology-validation`, `--no-require-moqui-baseline`, or `--no-require-capability-coverage` only for emergency bypass.
 - `kse auto handoff regression [--session-id <id|latest>] [--window <n>] [--format <json|markdown>] [--out <path>] [--json]`: compare one handoff run report with its previous run and output trend deltas (success-rate/risk/failed-goals/elapsed time).
   - `--window` (2-50, default `2`) returns multi-run `series`, `window_trend`, and `aggregates` for broader regression visibility.
   - Regression JSON now includes `risk_layers` (low/medium/high/unknown buckets with per-layer session list and quality aggregates).
@@ -782,11 +784,11 @@ Dual-track handoff integration:
   - Markdown report includes `Trend Series` (ASCII success/ontology bars per session) and `Risk Layer View`.
   - `--out` writes the generated regression report using the selected format.
   - Output includes `recommendations` to guide next action when trend degrades or risk escalates.
-- `kse auto handoff evidence [--file <path>] [--session-id <id|latest>] [--window <n>] [--format <json|markdown>] [--out <path>] [--json]`: quick-review merged release evidence and render current-batch gate/ontology/regression/moqui-baseline/risk-layer overview.
+- `kse auto handoff evidence [--file <path>] [--session-id <id|latest>] [--window <n>] [--format <json|markdown>] [--out <path>] [--json]`: quick-review merged release evidence and render current-batch gate/ontology/regression/moqui-baseline/capability-coverage/risk-layer overview.
   - Default evidence file is `.kiro/reports/release-evidence/handoff-runs.json`.
   - `--window` (1-50, default `5`) controls how many recent sessions are aggregated in review.
   - JSON output includes `current_overview`, `aggregates.status_counts`, `aggregates.gate_pass_rate_percent`, and `risk_layers`.
-  - Markdown output includes `Current Gate`, `Current Ontology`, `Current Regression`, `Current Moqui Baseline`, `Trend Series`, and `Risk Layer View`.
+  - Markdown output includes `Current Gate`, `Current Ontology`, `Current Regression`, `Current Moqui Baseline`, `Current Capability Coverage`, `Trend Series`, and `Risk Layer View`.
   - Add `--release-draft <path>` to auto-generate a release notes draft and evidence review markdown in one run.
   - `--release-version` sets draft version tag (defaults to `v<package.json version>`), and `--release-date` accepts `YYYY-MM-DD` (default: current UTC date).
   - Use `--review-out <path>` to override the generated evidence review markdown path (default `.kiro/reports/release-evidence/handoff-evidence-review.md`).

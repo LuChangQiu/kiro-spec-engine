@@ -105,6 +105,7 @@ git log --oneline -n 15
   - `KSE_RELEASE_GATE_MAX_UNMAPPED_RULES`：ontology 业务规则未映射最大允许值
   - `KSE_RELEASE_GATE_MAX_UNDECIDED_DECISIONS`：ontology 决策未定最大允许值
 - 可选：通过仓库变量调节 Release Notes 中的漂移告警阈值：
+  - `KSE_RELEASE_DRIFT_ENFORCE`：`true|false`（默认 `false`），触发 drift alert 时阻断发布
   - `KSE_RELEASE_DRIFT_FAIL_STREAK_MIN`：触发告警的最小连续失败次数（默认 `2`）
   - `KSE_RELEASE_DRIFT_HIGH_RISK_SHARE_MIN_PERCENT`：近 5 版 high 风险占比告警阈值（默认 `60`）
   - `KSE_RELEASE_DRIFT_HIGH_RISK_SHARE_DELTA_MIN_PERCENT`：短期相对长期 high 风险占比增量阈值（默认 `25`）

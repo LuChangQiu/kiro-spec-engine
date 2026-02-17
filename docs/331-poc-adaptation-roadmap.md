@@ -89,10 +89,13 @@
 31. 漂移告警阈值参数化：
    - 支持通过 `KSE_RELEASE_DRIFT_*` 仓库变量调节 fail streak/high-risk share/delta 阈值。
    - 不同项目可按发布策略调整灵敏度，减少误报或漏报。
+32. 漂移告警阻断模式：
+   - 新增 `KSE_RELEASE_DRIFT_ENFORCE`，可在漂移告警触发时阻断发布。
+   - 保留默认 advisory 模式，确保历史数据不足时不误阻断。
 
 ## 下一阶段（P2）
 
-1. 为 drift alerts 增加“阻断模式”开关（可选），实现超阈值时阻断发布。
+1. 将 drift alerts 结果写入 `release-gate-<tag>.json`，统一门禁与漂移审计口径。
 
 ## 长期目标（P3）
 

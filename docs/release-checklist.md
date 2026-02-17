@@ -105,6 +105,7 @@ Ensure:
   - `KSE_RELEASE_GATE_MAX_UNMAPPED_RULES`: maximum allowed unmapped ontology business rules
   - `KSE_RELEASE_GATE_MAX_UNDECIDED_DECISIONS`: maximum allowed undecided ontology decisions
 - Optional: tune release drift alerts in release notes:
+  - `KSE_RELEASE_DRIFT_ENFORCE`: `true|false` (default `false`), block publish when drift alerts are triggered
   - `KSE_RELEASE_DRIFT_FAIL_STREAK_MIN`: minimum consecutive failed gates to trigger alert (default `2`)
   - `KSE_RELEASE_DRIFT_HIGH_RISK_SHARE_MIN_PERCENT`: minimum high-risk share in latest 5 versions (default `60`)
   - `KSE_RELEASE_DRIFT_HIGH_RISK_SHARE_DELTA_MIN_PERCENT`: minimum short-vs-long high-risk share delta (default `25`)

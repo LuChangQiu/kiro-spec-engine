@@ -71,10 +71,13 @@
 25. 发布流程支持跨版本历史增量：
    - `release.yml` 在构建索引前自动尝试下载上一版 Release 的 `release-gate-history.json`。
    - 当前 tag 发布时基于上一版历史做增量合并，持续积累趋势数据。
+26. 发布说明自动注入门禁趋势摘要：
+   - `release.yml` 在发布前将 `release-gate-history` 的近 5 版趋势追加到 Release Notes。
+   - 发布页可直接看到 gate pass ratio、风险分布与近期版本轨迹。
 
 ## 下一阶段（P2）
 
-1. 基于 `release-gate-history.json` 增加趋势摘要（例如近 5 版 gate pass rate、风险漂移）并写入 Release Notes。
+1. 补充 `gate-index` Markdown 输出（便于在 PR/Issue 中直接引用人类可读趋势卡片）。
 
 ## 长期目标（P3）
 

@@ -406,6 +406,89 @@ jobs:
             fi
           fi
 
+      - name: Append release gate trend summary
+        shell: bash
+        env:
+          RELEASE_BODY_FILE: ${{ steps.release_notes.outputs.release_body_file }}
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          NOTES_DIR=".kiro/reports/release-evidence"
+          HISTORY_SUMMARY_FILE="${NOTES_DIR}/release-gate-history-${TAG}.json"
+
+          if [[ -f "${RELEASE_BODY_FILE}" && -f "${HISTORY_SUMMARY_FILE}" ]]; then
+            RELEASE_HISTORY_SUMMARY_FILE="${HISTORY_SUMMARY_FILE}" \
+              node <<'NODE'
+              const fs = require('fs');
+
+              const bodyFile = process.env.RELEASE_BODY_FILE;
+              const historyFile = process.env.RELEASE_HISTORY_SUMMARY_FILE;
+              if (!bodyFile || !historyFile) {
+                process.exit(0);
+              }
+              if (!fs.existsSync(bodyFile) || !fs.existsSync(historyFile)) {
+                process.exit(0);
+              }
+
+              let payload = null;
+              try {
+                payload = JSON.parse(fs.readFileSync(historyFile, 'utf8'));
+              } catch (_error) {
+                process.exit(0);
+              }
+              if (!payload || typeof payload !== 'object') {
+                process.exit(0);
+              }
+
+              const entries = Array.isArray(payload.entries) ? payload.entries : [];
+              const recent = entries.slice(0, 5);
+              const recentPass = recent.filter(item => item && item.gate_passed === true).length;
+              const recentKnown = recent.filter(item => item && typeof item.gate_passed === 'boolean').length;
+              const passRate = payload.aggregates && Number.isFinite(Number(payload.aggregates.pass_rate_percent))
+                ? Number(payload.aggregates.pass_rate_percent)
+                : null;
+              const riskCounts = recent.reduce((acc, item) => {
+                const risk = `${item && item.risk_level ? item.risk_level : 'unknown'}`.toLowerCase();
+                if (!acc[risk]) {
+                  acc[risk] = 0;
+                }
+                acc[risk] += 1;
+                return acc;
+              }, { low: 0, medium: 0, high: 0, unknown: 0 });
+
+              const lines = [
+                '',
+                '## Release Gate Trend',
+                '',
+                `- Indexed entries: ${Number(payload.total_entries) || 0}`,
+                `- Gate pass rate (history): ${passRate === null ? 'n/a' : `${passRate}%`}`,
+                `- Recent pass ratio (latest 5): ${recentKnown === 0 ? 'n/a' : `${recentPass}/${recentKnown}`}`,
+                `- Recent risk mix (latest 5): low=${riskCounts.low}, medium=${riskCounts.medium}, high=${riskCounts.high}, unknown=${riskCounts.unknown}`,
+                '',
+                '### Recent Versions'
+              ];
+
+              if (recent.length === 0) {
+                lines.push('', '- none');
+              } else {
+                for (const item of recent) {
+                  const tag = item && item.tag ? item.tag : 'n/a';
+                  const passed = item && typeof item.gate_passed === 'boolean'
+                    ? (item.gate_passed ? 'yes' : 'no')
+                    : 'n/a';
+                  const risk = item && item.risk_level ? item.risk_level : 'unknown';
+                  const successRate = Number.isFinite(Number(item && item.spec_success_rate_percent))
+                    ? `${Number(item.spec_success_rate_percent)}`
+                    : 'n/a';
+                  const evaluatedAt = item && item.evaluated_at ? item.evaluated_at : 'n/a';
+                  lines.push('', `- ${tag} | passed=${passed} | risk=${risk} | success=${successRate} | at=${evaluatedAt}`);
+                }
+              }
+
+              fs.appendFileSync(bodyFile, `${lines.join('\n')}\n`, 'utf8');
+              NODE
+          fi
+
       - name: Publish to npm
         run: npm publish --access public
         env:

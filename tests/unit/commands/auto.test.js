@@ -7133,6 +7133,23 @@ describe('auto close-loop command', () => {
       medium: 1,
       high: 1
     }));
+    expect(payload.risk_layers).toEqual(expect.objectContaining({
+      low: expect.objectContaining({
+        count: 1,
+        sessions: ['handoff-latest'],
+        avg_spec_success_rate_percent: 90
+      }),
+      medium: expect.objectContaining({
+        count: 1,
+        sessions: ['handoff-middle'],
+        avg_spec_success_rate_percent: 80
+      }),
+      high: expect.objectContaining({
+        count: 1,
+        sessions: ['handoff-oldest'],
+        avg_spec_success_rate_percent: 70
+      })
+    }));
   });
 
   test('validates regression window range', async () => {
@@ -7330,6 +7347,10 @@ describe('auto close-loop command', () => {
     const markdown = await fs.readFile(outFile, 'utf8');
     expect(markdown).toContain('# Auto Handoff Regression Report');
     expect(markdown).toContain('- Session: handoff-new');
+    expect(markdown).toContain('## Trend Series');
+    expect(markdown).toContain('## Risk Layer View');
+    expect(markdown).toContain('success=');
+    expect(markdown).toContain('low: count=');
     expect(markdown).toContain('## Recommendations');
   });
 

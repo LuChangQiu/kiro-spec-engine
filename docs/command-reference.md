@@ -776,7 +776,9 @@ Dual-track handoff integration:
   - When `--require-ontology-validation` is enabled, run fails fast at precheck if manifest ontology evidence is missing or not passed.
 - `kse auto handoff regression [--session-id <id|latest>] [--window <n>] [--format <json|markdown>] [--out <path>] [--json]`: compare one handoff run report with its previous run and output trend deltas (success-rate/risk/failed-goals/elapsed time).
   - `--window` (2-50, default `2`) returns multi-run `series`, `window_trend`, and `aggregates` for broader regression visibility.
+  - Regression JSON now includes `risk_layers` (low/medium/high/unknown buckets with per-layer session list and quality aggregates).
   - `--format` supports `json` (default) and `markdown` for human-readable report rendering.
+  - Markdown report includes `Trend Series` (ASCII success/ontology bars per session) and `Risk Layer View`.
   - `--out` writes the generated regression report using the selected format.
   - Output includes `recommendations` to guide next action when trend degrades or risk escalates.
 

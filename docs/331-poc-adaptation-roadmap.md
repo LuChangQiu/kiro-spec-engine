@@ -35,10 +35,13 @@
 13. 新增 release evidence 自动归并：
    - `handoff run` 结束后自动将批次结果合并到 `.kiro/reports/release-evidence/handoff-runs.json`。
    - 按 `session_id` 去重更新，失败时写 warning 不阻塞主流程。
+14. 新增回归可视化报表增强：
+   - `handoff regression` 输出增加 `risk_layers` 风险分层视图（low/medium/high/unknown）。
+   - markdown 报表新增 `Trend Series` 与 `Risk Layer View`，支持多轮趋势快速审阅。
 
 ## 下一阶段（P2）
 
-1. 增加回归对比可视化报表（多轮趋势图 + 风险分层视图）。
+1. 在 release evidence 中追加可选趋势窗口聚合快照（用于发布包一键审阅）。
 
 ## 长期目标（P3）
 

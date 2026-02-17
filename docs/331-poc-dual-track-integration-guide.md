@@ -22,11 +22,10 @@
 npx kse auto handoff run --manifest ../331-poc/docs/handoffs/handoff-manifest.json --json
 ```
 
-需要更严格门禁时：
+需要提高成功率门槛时：
 
 ```bash
 npx kse auto handoff run --manifest ../331-poc/docs/handoffs/handoff-manifest.json \
-  --require-ontology-validation \
   --min-spec-success-rate 95 \
   --max-risk-level medium \
   --json

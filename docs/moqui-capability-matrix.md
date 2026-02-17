@@ -48,4 +48,4 @@ A capability is considered absorbed by KSE when all checks pass:
 - `kse scene lint --strict`
 - `kse scene score --threshold 85`
 - `kse scene ontology validate`
-- `kse auto handoff run --require-ontology-validation`
+- `kse auto handoff run`

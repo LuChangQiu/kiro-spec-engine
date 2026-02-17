@@ -516,14 +516,14 @@ kse auto schema migrate --json                           # dry-run by default
 kse auto schema migrate --apply --json                  # apply schema_version migration
 kse auto schema migrate --only close-loop-session,batch-session --apply --json
 
-# Dual-track handoff integration (e.g., 331-poc -> kse)
-kse auto handoff plan --manifest ../331-poc/docs/handoffs/handoff-manifest.json --json
-kse auto handoff plan --manifest ../331-poc/docs/handoffs/handoff-manifest.json --strict --out .kiro/reports/handoff-plan.json --json
-kse auto handoff queue --manifest ../331-poc/docs/handoffs/handoff-manifest.json --out .kiro/auto/handoff-goals.lines --json
-kse auto handoff template-diff --manifest ../331-poc/docs/handoffs/handoff-manifest.json --json
-kse auto handoff run --manifest ../331-poc/docs/handoffs/handoff-manifest.json --json
-kse auto handoff run --manifest ../331-poc/docs/handoffs/handoff-manifest.json --min-spec-success-rate 95 --max-risk-level medium --json
-kse auto handoff run --manifest ../331-poc/docs/handoffs/handoff-manifest.json --continue-from latest --continue-strategy auto --json
+# Dual-track handoff integration (generic external project -> kse)
+kse auto handoff plan --manifest docs/handoffs/handoff-manifest.json --json
+kse auto handoff plan --manifest docs/handoffs/handoff-manifest.json --strict --out .kiro/reports/handoff-plan.json --json
+kse auto handoff queue --manifest docs/handoffs/handoff-manifest.json --out .kiro/auto/handoff-goals.lines --json
+kse auto handoff template-diff --manifest docs/handoffs/handoff-manifest.json --json
+kse auto handoff run --manifest docs/handoffs/handoff-manifest.json --json
+kse auto handoff run --manifest docs/handoffs/handoff-manifest.json --min-spec-success-rate 95 --max-risk-level medium --json
+kse auto handoff run --manifest docs/handoffs/handoff-manifest.json --continue-from latest --continue-strategy auto --json
 kse auto handoff regression --session-id latest --json
 kse auto handoff regression --session-id latest --window 5 --json
 kse auto handoff regression --session-id latest --format markdown --out .kiro/reports/handoff-regression.md --json
@@ -856,22 +856,22 @@ kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json -
 kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --manifest-spec-path handoff.spec_items --json
 
 # Tighten per-spec ontology semantic quality threshold before publish
-kse scene package-publish-batch --from-331 --require-ontology-validation --ontology-min-score 70 --json
+kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --ontology-min-score 70 --json
 
 # Persist ontology/publish batch report for governance tracking
-kse scene package-publish-batch --from-331 --dry-run --ontology-report-out .kiro/reports/scene-package-ontology-batch.json --json
+kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-report-out .kiro/reports/scene-package-ontology-batch.json --json
 
 # Enforce batch-level ontology portfolio gate (average score + valid-rate)
-kse scene package-publish-batch --from-331 --dry-run --ontology-min-average-score 60 --ontology-min-valid-rate 90 --json
+kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-min-average-score 60 --ontology-min-valid-rate 90 --json
 
 # Emergency bypass (not recommended): disable ontology validation requirement
 kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --no-require-ontology-validation --json
 
 # Export ontology remediation task draft markdown
-kse scene package-publish-batch --from-331 --dry-run --ontology-task-out .kiro/reports/scene-package-ontology-task-draft.md --json
+kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-task-out .kiro/reports/scene-package-ontology-task-draft.md --json
 
 # Export ontology remediation queue lines (directly consumable by close-loop-batch)
-kse scene package-publish-batch --from-331 --dry-run --ontology-task-queue-out .kiro/auto/ontology-remediation.lines --json
+kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-task-queue-out .kiro/auto/ontology-remediation.lines --json
 ```
 
 ### Scene Package Ontology Backfill Batch

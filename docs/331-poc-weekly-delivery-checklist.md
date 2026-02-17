@@ -28,7 +28,6 @@ Use this checklist before each integration batch.
 
 ```bash
 npx kse auto handoff run --manifest ../331-poc/docs/handoffs/handoff-manifest.json \\
-  --require-ontology-validation \\
   --min-spec-success-rate 95 \\
   --max-risk-level medium \\
   --json

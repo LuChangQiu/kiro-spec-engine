@@ -7718,6 +7718,12 @@ if (process.argv.includes('--json')) {
           decision_resolved_rate_percent: 70
         }
       },
+      scene_package_batch: {
+        status: 'failed',
+        summary: {
+          batch_gate_failure_count: 2
+        }
+      },
       batch_summary: {
         failed_goals: 1
       }
@@ -7738,6 +7744,12 @@ if (process.argv.includes('--json')) {
           decision_undecided: 0,
           business_rule_pass_rate_percent: 100,
           decision_resolved_rate_percent: 100
+        }
+      },
+      scene_package_batch: {
+        status: 'passed',
+        summary: {
+          batch_gate_failure_count: 0
         }
       },
       batch_summary: {
@@ -7765,7 +7777,11 @@ if (process.argv.includes('--json')) {
     expect(payload.delta.ontology_quality_score).toBe(16);
     expect(payload.delta.ontology_unmapped_rules).toBe(-2);
     expect(payload.delta.ontology_undecided_decisions).toBe(-1);
+    expect(payload.current.scene_package_batch_passed).toBe(true);
+    expect(payload.current.scene_package_batch_failure_count).toBe(0);
+    expect(payload.delta.scene_package_batch_failure_count).toBe(-2);
     expect(payload.aggregates.avg_ontology_quality_score).toBe(80);
+    expect(payload.aggregates.scene_package_batch_pass_rate_percent).toBe(50);
   });
 
   test('builds handoff regression trend series within custom window', async () => {
@@ -8081,6 +8097,7 @@ if (process.argv.includes('--json')) {
     expect(markdown).toContain('## Trend Series');
     expect(markdown).toContain('## Risk Layer View');
     expect(markdown).toContain('success=');
+    expect(markdown).toContain('scene-batch=');
     expect(markdown).toContain('low: count=');
     expect(markdown).toContain('## Recommendations');
   });
@@ -8158,6 +8175,28 @@ if (process.argv.includes('--json')) {
               spec_success_rate_percent: -20
             }
           },
+          scene_package_batch: {
+            status: 'failed',
+            generated: true,
+            summary: {
+              selected: 2,
+              failed: 1,
+              batch_gate_passed: false,
+              batch_gate_failure_count: 1
+            },
+            batch_ontology_gate: {
+              passed: false,
+              failures: [
+                {
+                  id: 'ontology_min_average_score',
+                  message: 'ontology average score 68 is below minimum 70'
+                }
+              ]
+            },
+            output: {
+              json: '.kiro/reports/release-evidence/scene-package-publish-batch-dry-run.json'
+            }
+          },
           batch_summary: {
             failed_goals: 2
           }
@@ -8218,6 +8257,23 @@ if (process.argv.includes('--json')) {
               markdown: '.kiro/reports/release-evidence/moqui-template-baseline.md'
             }
           },
+          scene_package_batch: {
+            status: 'passed',
+            generated: true,
+            summary: {
+              selected: 2,
+              failed: 0,
+              batch_gate_passed: true,
+              batch_gate_failure_count: 0
+            },
+            batch_ontology_gate: {
+              passed: true,
+              failures: []
+            },
+            output: {
+              json: '.kiro/reports/release-evidence/scene-package-publish-batch-dry-run.json'
+            }
+          },
           batch_summary: {
             failed_goals: 0
           }
@@ -8247,6 +8303,12 @@ if (process.argv.includes('--json')) {
         portfolio_passed: true
       })
     }));
+    expect(payload.current_overview.scene_package_batch).toEqual(expect.objectContaining({
+      status: 'passed',
+      summary: expect.objectContaining({
+        batch_gate_passed: true
+      })
+    }));
     expect(payload.window).toEqual(expect.objectContaining({
       requested: 5,
       actual: 2
@@ -8256,6 +8318,7 @@ if (process.argv.includes('--json')) {
       failed: 1
     }));
     expect(payload.aggregates.gate_pass_rate_percent).toBe(50);
+    expect(payload.aggregates.scene_package_batch_pass_rate_percent).toBe(50);
     expect(payload.risk_layers).toEqual(expect.objectContaining({
       low: expect.objectContaining({
         count: 1,
@@ -8337,6 +8400,7 @@ if (process.argv.includes('--json')) {
     expect(markdown).toContain('## Current Ontology');
     expect(markdown).toContain('## Current Regression');
     expect(markdown).toContain('## Current Moqui Baseline');
+    expect(markdown).toContain('## Current Scene Package Batch');
     expect(markdown).toContain('## Risk Layer View');
   });
 

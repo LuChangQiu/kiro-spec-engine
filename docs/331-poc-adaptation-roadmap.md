@@ -44,10 +44,13 @@
 16. 新增 release evidence 快速审阅命令：
    - `kse auto handoff evidence` 直接聚合当前批次 gate/ontology/regression/risk-layer 概览。
    - 支持 JSON/markdown 输出与 `--window` 会话窗口聚合。
+17. 新增 release draft 自动生成：
+   - `kse auto handoff evidence --release-draft <path>` 一次命令生成 evidence 审阅 markdown + release notes 草稿。
+   - 草稿自动注入当前批次 gate/ontology/regression/risk-layer 摘要与证据路径。
 
 ## 下一阶段（P2）
 
-1. 将 `handoff evidence` 摘要纳入 release 发布流水（自动生成审阅文件并写入 release notes 草稿）。
+1. 将 `handoff evidence --release-draft` 接入 CI 发布任务（tag 后自动产出草稿并附加到 GitHub Release）。
 
 ## 长期目标（P3）
 

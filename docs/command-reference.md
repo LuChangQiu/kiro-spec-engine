@@ -787,6 +787,9 @@ Dual-track handoff integration:
   - `--window` (1-50, default `5`) controls how many recent sessions are aggregated in review.
   - JSON output includes `current_overview`, `aggregates.status_counts`, `aggregates.gate_pass_rate_percent`, and `risk_layers`.
   - Markdown output includes `Current Gate`, `Current Ontology`, `Current Regression`, `Trend Series`, and `Risk Layer View`.
+  - Add `--release-draft <path>` to auto-generate a release notes draft and evidence review markdown in one run.
+  - `--release-version` sets draft version tag (defaults to `v<package.json version>`), and `--release-date` accepts `YYYY-MM-DD` (default: current UTC date).
+  - Use `--review-out <path>` to override the generated evidence review markdown path (default `.kiro/reports/release-evidence/handoff-evidence-review.md`).
 
 Recommended `.kiro/config/orchestrator.json`:
 

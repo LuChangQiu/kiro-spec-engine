@@ -7725,4 +7725,145 @@ describe('auto close-loop command', () => {
     const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
     expect(payload.error).toContain('--window must be an integer between 1 and 50.');
   });
+
+  test('writes handoff release draft and evidence review files', async () => {
+    const evidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+    const releaseDraftFile = path.join(tempDir, 'docs', 'releases', 'v9.9.9-draft.md');
+    await fs.ensureDir(path.dirname(evidenceFile));
+    await fs.writeJson(evidenceFile, {
+      mode: 'auto-handoff-release-evidence',
+      generated_at: '2026-02-16T00:00:00.000Z',
+      updated_at: '2026-02-16T01:00:00.000Z',
+      latest_session_id: 'handoff-one',
+      total_runs: 1,
+      sessions: [
+        {
+          session_id: 'handoff-one',
+          merged_at: '2026-02-16T01:00:00.000Z',
+          status: 'completed',
+          handoff_report_file: '.kiro/reports/handoff-runs/handoff-one.json',
+          gate: {
+            passed: true,
+            actual: {
+              spec_success_rate_percent: 97,
+              risk_level: 'low',
+              ontology_quality_score: 91
+            }
+          },
+          ontology_validation: {
+            status: 'passed',
+            quality_score: 91,
+            metrics: {
+              business_rule_unmapped: 0,
+              decision_undecided: 0
+            }
+          },
+          regression: {
+            trend: 'improved',
+            delta: {
+              spec_success_rate_percent: 12
+            }
+          },
+          batch_summary: {
+            failed_goals: 0
+          }
+        }
+      ]
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'evidence',
+      '--file',
+      evidenceFile,
+      '--release-draft',
+      releaseDraftFile,
+      '--release-version',
+      '9.9.9',
+      '--release-date',
+      '2026-02-17',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-evidence-review');
+    expect(payload.release_draft).toEqual(expect.objectContaining({
+      file: releaseDraftFile,
+      version: 'v9.9.9',
+      release_date: '2026-02-17'
+    }));
+    expect(await fs.pathExists(releaseDraftFile)).toBe(true);
+    expect(await fs.pathExists(payload.release_draft.review_file)).toBe(true);
+
+    const releaseDraft = await fs.readFile(releaseDraftFile, 'utf8');
+    expect(releaseDraft).toContain('# Release Notes Draft: v9.9.9');
+    expect(releaseDraft).toContain('Release date: 2026-02-17');
+    expect(releaseDraft).toContain('## Handoff Evidence Summary');
+    expect(releaseDraft).toContain('## Risk Layer Snapshot');
+    expect(releaseDraft).toContain('## Release Evidence Artifacts');
+
+    const reviewMarkdown = await fs.readFile(payload.release_draft.review_file, 'utf8');
+    expect(reviewMarkdown).toContain('# Auto Handoff Release Evidence Review');
+    expect(reviewMarkdown).toContain('## Current Gate');
+  });
+
+  test('validates handoff evidence release date format', async () => {
+    const evidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+    await fs.ensureDir(path.dirname(evidenceFile));
+    await fs.writeJson(evidenceFile, {
+      mode: 'auto-handoff-release-evidence',
+      sessions: [
+        {
+          session_id: 'handoff-one',
+          merged_at: '2026-02-16T01:00:00.000Z',
+          status: 'completed',
+          gate: {
+            passed: true,
+            actual: {
+              spec_success_rate_percent: 100,
+              risk_level: 'low',
+              ontology_quality_score: 95
+            }
+          },
+          ontology_validation: {
+            status: 'passed',
+            quality_score: 95,
+            metrics: {}
+          },
+          regression: {
+            trend: 'baseline',
+            delta: {}
+          },
+          batch_summary: {
+            failed_goals: 0
+          }
+        }
+      ]
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'evidence',
+        '--file',
+        evidenceFile,
+        '--release-draft',
+        path.join(tempDir, 'docs', 'releases', 'invalid-date.md'),
+        '--release-date',
+        '2026/02/17',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.error).toContain('--release-date must be in YYYY-MM-DD format.');
+  });
 });

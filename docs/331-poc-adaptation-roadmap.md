@@ -86,10 +86,13 @@
 30. 发布说明新增门禁漂移告警：
    - 自动检测连续 gate 失败、高风险占比过高、短期风险占比上升。
    - 在 Release Notes 中显式给出 drift alerts，提前暴露质量恶化趋势。
+31. 漂移告警阈值参数化：
+   - 支持通过 `KSE_RELEASE_DRIFT_*` 仓库变量调节 fail streak/high-risk share/delta 阈值。
+   - 不同项目可按发布策略调整灵敏度，减少误报或漏报。
 
 ## 下一阶段（P2）
 
-1. 将 drift alert 阈值参数化（repo variables），支持项目级自定义灵敏度。
+1. 为 drift alerts 增加“阻断模式”开关（可选），实现超阈值时阻断发布。
 
 ## 长期目标（P3）
 

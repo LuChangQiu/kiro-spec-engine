@@ -422,6 +422,9 @@ jobs:
           RELEASE_BODY_FILE: ${{ steps.release_notes.outputs.release_body_file }}
           RELEASE_TAG: ${{ github.ref_name }}
           RELEASE_REPOSITORY: ${{ github.repository }}
+          RELEASE_DRIFT_FAIL_STREAK_MIN: ${{ vars.KSE_RELEASE_DRIFT_FAIL_STREAK_MIN }}
+          RELEASE_DRIFT_HIGH_RISK_SHARE_MIN_PERCENT: ${{ vars.KSE_RELEASE_DRIFT_HIGH_RISK_SHARE_MIN_PERCENT }}
+          RELEASE_DRIFT_HIGH_RISK_SHARE_DELTA_MIN_PERCENT: ${{ vars.KSE_RELEASE_DRIFT_HIGH_RISK_SHARE_DELTA_MIN_PERCENT }}
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
@@ -459,6 +462,22 @@ jobs:
               const passRate = payload.aggregates && Number.isFinite(Number(payload.aggregates.pass_rate_percent))
                 ? Number(payload.aggregates.pass_rate_percent)
                 : null;
+              const parseNumber = (value, fallback) => {
+                const parsed = Number(value);
+                return Number.isFinite(parsed) ? parsed : fallback;
+              };
+              const failStreakThreshold = Math.max(
+                1,
+                Math.floor(parseNumber(process.env.RELEASE_DRIFT_FAIL_STREAK_MIN, 2))
+              );
+              const highRiskShareThreshold = Math.max(
+                0,
+                Math.min(100, parseNumber(process.env.RELEASE_DRIFT_HIGH_RISK_SHARE_MIN_PERCENT, 60))
+              );
+              const highRiskDeltaThreshold = Math.max(
+                0,
+                Math.min(100, parseNumber(process.env.RELEASE_DRIFT_HIGH_RISK_SHARE_DELTA_MIN_PERCENT, 25))
+              );
               const releaseTag = process.env.RELEASE_TAG || 'current';
               const releaseRepository = process.env.RELEASE_REPOSITORY || process.env.GITHUB_REPOSITORY || '';
               const historyCardAsset = `release-gate-history-${releaseTag}.md`;
@@ -503,14 +522,21 @@ jobs:
                 ? longWindow.filter(item => item && `${item.risk_level || ''}`.toLowerCase() === 'high').length / longWindow.length
                 : 0;
               const driftAlerts = [];
-              if (failedStreak >= 2) {
-                driftAlerts.push(`consecutive gate failures: ${failedStreak}`);
+              if (failedStreak >= failStreakThreshold) {
+                driftAlerts.push(`consecutive gate failures: ${failedStreak} (threshold=${failStreakThreshold})`);
               }
-              if (highRiskShare >= 60) {
-                driftAlerts.push(`high-risk share in latest 5 is ${highRiskShare}%`);
+              if (highRiskShare >= highRiskShareThreshold) {
+                driftAlerts.push(`high-risk share in latest 5 is ${highRiskShare}% (threshold=${highRiskShareThreshold}%)`);
               }
-              if (shortWindow.length >= 2 && longWindow.length >= 3 && (shortHighShare - longHighShare) >= 0.25) {
-                driftAlerts.push(`high-risk share increased from ${(longHighShare * 100).toFixed(2)}% to ${(shortHighShare * 100).toFixed(2)}%`);
+              if (
+                shortWindow.length >= 2 &&
+                longWindow.length >= 3 &&
+                ((shortHighShare - longHighShare) * 100) >= highRiskDeltaThreshold
+              ) {
+                driftAlerts.push(
+                  `high-risk share increased from ${(longHighShare * 100).toFixed(2)}% to ${(shortHighShare * 100).toFixed(2)}% `
+                  + `(threshold=${highRiskDeltaThreshold}%)`
+                );
               }
 
               const lines = [
@@ -524,6 +550,7 @@ jobs:
                 `- Trend card: ${historyCardUrl ? `[${historyCardAsset}](${historyCardUrl})` : historyCardAsset}`,
                 `- History index: ${historyJsonUrl ? `[${historyJsonAsset}](${historyJsonUrl})` : historyJsonAsset}`,
                 `- History summary: ${historySummaryUrl ? `[${historySummaryAsset}](${historySummaryUrl})` : historySummaryAsset}`,
+                `- Drift thresholds: fail_streak>=${failStreakThreshold}, high_share>=${highRiskShareThreshold}%, high_share_delta>=${highRiskDeltaThreshold}%`,
                 '',
                 '### Drift Alerts'
               ];

@@ -308,6 +308,14 @@ describe('Scene command', () => {
       manifestSpecPath: 'specs',
       fallbackSpecPackage: 'custom/scene-package.json',
       fallbackSceneManifest: 'custom/scene.yaml',
+      ontologyReportOut: '',
+      outDir: '.kiro/templates/scene-packages'
+    })).toBe('--ontology-report-out must be a non-empty path');
+    expect(validateScenePackagePublishBatchOptions({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      manifestSpecPath: 'specs',
+      fallbackSpecPackage: 'custom/scene-package.json',
+      fallbackSceneManifest: 'custom/scene.yaml',
       outDir: '.kiro/templates/scene-packages',
       status: 'completed'
     })).toBeNull();
@@ -3172,6 +3180,72 @@ Trace: doctor-trace-erp
     expect(fileSystem.writeFile).not.toHaveBeenCalled();
   });
 
+  test('runScenePackagePublishCommand returns structured ontology failure in silent mode', async () => {
+    const contract = {
+      apiVersion: 'kse.scene.package/v0.1',
+      kind: 'scene-template',
+      metadata: {
+        group: 'kse.scene',
+        name: 'erp-order-query',
+        version: '0.2.0'
+      },
+      compatibility: {
+        kse_version: '>=1.24.0',
+        scene_api_version: 'kse.scene/v0.2'
+      },
+      capabilities: {
+        provides: ['scene.erp.query'],
+        requires: ['binding:http']
+      },
+      parameters: [
+        { id: 'entity_name', type: 'string', required: true }
+      ],
+      artifacts: {
+        entry_scene: 'custom/scene.yaml',
+        generates: ['requirements.md', 'design.md', 'tasks.md', 'custom/scene.yaml']
+      },
+      governance: {
+        risk_level: 'low',
+        approval_required: false,
+        rollback_supported: true
+      }
+    };
+
+    const fileSystem = {
+      pathExists: jest.fn().mockImplementation(async (targetPath) => {
+        const normalized = normalizePath(targetPath);
+        return normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration';
+      }),
+      readJson: jest.fn().mockResolvedValue(contract),
+      readFile: jest.fn().mockResolvedValue('apiVersion: kse.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{entity_name}}\n'),
+      ensureDir: jest.fn().mockResolvedValue(),
+      writeJson: jest.fn().mockResolvedValue(),
+      writeFile: jest.fn().mockResolvedValue()
+    };
+
+    const payload = await runScenePackagePublishCommand({
+      spec: '67-00-scene-package-contract-declaration',
+      ontologyMinScore: 80,
+      silent: true,
+      json: false
+    }, {
+      projectRoot: '/workspace',
+      fileSystem
+    });
+
+    expect(payload).toBeDefined();
+    expect(payload.published).toBe(false);
+    expect(payload.error).toContain('is below minimum 80');
+    expect(payload.ontology_validation).toMatchObject({
+      score: 30,
+      min_score: 80,
+      min_score_passed: false
+    });
+    expect(fileSystem.ensureDir).not.toHaveBeenCalled();
+    expect(fileSystem.writeJson).not.toHaveBeenCalled();
+    expect(fileSystem.writeFile).not.toHaveBeenCalled();
+  });
+
   test('runScenePackagePublishBatchCommand publishes completed specs from handoff manifest', async () => {
     const fileSystem = {
       readJson: jest.fn().mockResolvedValue({
@@ -3469,6 +3543,73 @@ Trace: doctor-trace-erp
     expect(publishRunner.mock.calls[0][0]).toMatchObject({
       requireOntologyValidation: true,
       ontologyMinScore: 70
+    });
+  });
+
+  test('runScenePackagePublishBatchCommand writes ontology report output', async () => {
+    const fileSystem = {
+      readJson: jest.fn().mockResolvedValue({
+        specs: [
+          {
+            id: '62-00-moqui-full-capability-closure-program',
+            status: 'completed'
+          }
+        ]
+      }),
+      ensureDir: jest.fn().mockResolvedValue(),
+      writeJson: jest.fn().mockResolvedValue()
+    };
+
+    const publishRunner = jest.fn().mockResolvedValue({
+      published: false,
+      dry_run: true,
+      template: { id: 'kse.scene--moqui-full-capability-closure-program--1.0.0' },
+      ontology_validation: {
+        required: true,
+        valid: true,
+        error_count: 0,
+        error_codes: [],
+        score: 72,
+        level: 'medium',
+        min_score: 70,
+        min_score_passed: true
+      }
+    });
+
+    const payload = await runScenePackagePublishBatchCommand({
+      manifest: 'docs/handoffs/handoff-manifest.json',
+      requireOntologyValidation: true,
+      ontologyMinScore: 70,
+      ontologyReportOut: '.kiro/reports/scene-package-ontology-batch.json',
+      dryRun: true,
+      json: true
+    }, {
+      projectRoot: '/workspace',
+      fileSystem,
+      publishRunner
+    });
+
+    expect(payload).toBeDefined();
+    expect(payload.success).toBe(true);
+    expect(payload.ontology_report_path).toBe('.kiro/reports/scene-package-ontology-batch.json');
+    expect(normalizePath(fileSystem.ensureDir.mock.calls[0][0])).toBe('/workspace/.kiro/reports');
+    expect(fileSystem.writeJson).toHaveBeenCalledTimes(1);
+    expect(normalizePath(fileSystem.writeJson.mock.calls[0][0]))
+      .toBe('/workspace/.kiro/reports/scene-package-ontology-batch.json');
+
+    const reportPayload = fileSystem.writeJson.mock.calls[0][1];
+    expect(reportPayload.summary.selected).toBe(1);
+    expect(reportPayload.ontology_summary).toMatchObject({
+      scored_specs: 1,
+      average_score: 72,
+      graph_valid: 1,
+      graph_invalid: 0,
+      min_score_passed: 1,
+      min_score_failed: 0
+    });
+    expect(reportPayload.specs[0]).toMatchObject({
+      spec: '62-00-moqui-full-capability-closure-program',
+      status: 'planned'
     });
   });
 

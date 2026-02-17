@@ -856,6 +856,9 @@ kse scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json -
 
 # Enforce ontology validation + semantic quality threshold before publish
 kse scene package-publish-batch --from-331 --require-ontology-validation --ontology-min-score 70 --json
+
+# Persist ontology/publish batch report for governance tracking
+kse scene package-publish-batch --from-331 --dry-run --ontology-report-out .kiro/reports/scene-package-ontology-batch.json --json
 ```
 
 ### Moqui ERP Integration

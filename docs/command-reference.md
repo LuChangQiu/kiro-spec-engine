@@ -893,14 +893,17 @@ kse scene package-ontology-backfill-batch --from-331 --dry-run --out-report .kir
 ### Moqui Template Baseline Scorecard
 
 ```bash
-# Score Moqui/ERP templates in the local template library (default filter: moqui|erp)
+# Preferred CLI entry: score Moqui/ERP templates in the local template library (default filter: moqui|erp)
+kse scene moqui-baseline --json
+
+# Script alias (same behavior)
 npm run report:moqui-baseline
 
 # Score all scene templates instead of Moqui/ERP subset
-node scripts/moqui-template-baseline-report.js --include-all --json
+kse scene moqui-baseline --include-all --json
 
 # Customize score thresholds and output paths
-node scripts/moqui-template-baseline-report.js \
+kse scene moqui-baseline \
   --min-score 75 \
   --min-valid-rate 100 \
   --out .kiro/reports/moqui-template-baseline.json \
@@ -908,7 +911,7 @@ node scripts/moqui-template-baseline-report.js \
   --json
 
 # Compare with a previous baseline and fail CI on portfolio gate fail
-node scripts/moqui-template-baseline-report.js \
+kse scene moqui-baseline \
   --compare-with .kiro/reports/release-evidence/moqui-template-baseline-prev.json \
   --fail-on-portfolio-fail \
   --json

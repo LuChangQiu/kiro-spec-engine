@@ -27,10 +27,10 @@ Emergency bypass exists but is not recommended:
 
 ```bash
 # 0) Generate template baseline scoreboard (Moqui/ERP templates by default)
-node scripts/moqui-template-baseline-report.js --json
+kse scene moqui-baseline --json
 
 # 0.1) CI/release mode: compare against previous baseline and enforce portfolio gate
-node scripts/moqui-template-baseline-report.js \
+kse scene moqui-baseline \
   --compare-with .kiro/reports/release-evidence/moqui-template-baseline-prev.json \
   --fail-on-portfolio-fail \
   --json

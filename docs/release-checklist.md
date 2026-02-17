@@ -100,9 +100,11 @@ Ensure:
   - `KSE_RELEASE_GATE_ENFORCE`: `true|false` (default advisory, non-blocking)
   - `KSE_RELEASE_GATE_REQUIRE_EVIDENCE`: require `handoff-runs.json` summary
   - `KSE_RELEASE_GATE_REQUIRE_GATE_PASS`: require evidence gate `passed=true` (default true when evidence exists)
-  - `KSE_RELEASE_MIN_SPEC_SUCCESS_RATE`: minimum allowed success rate percent
-  - `KSE_RELEASE_MAX_RISK_LEVEL`: `low|medium|high|unknown` (default `unknown`)
-  - `KSE_RELEASE_MAX_UNMAPPED_RULES`: maximum allowed unmapped ontology business rules
-  - `KSE_RELEASE_MAX_UNDECIDED_DECISIONS`: maximum allowed undecided ontology decisions
+  - `KSE_RELEASE_GATE_MIN_SPEC_SUCCESS_RATE`: minimum allowed success rate percent
+  - `KSE_RELEASE_GATE_MAX_RISK_LEVEL`: `low|medium|high|unknown` (default `unknown`)
+  - `KSE_RELEASE_GATE_MAX_UNMAPPED_RULES`: maximum allowed unmapped ontology business rules
+  - `KSE_RELEASE_GATE_MAX_UNDECIDED_DECISIONS`: maximum allowed undecided ontology decisions
+- Optional local dry-run for gate history index artifact:
+  - `kse auto handoff gate-index --dir .kiro/reports/release-evidence --out .kiro/reports/release-evidence/release-gate-history.json --json`
 
 Then proceed with your release workflow (tag, push, npm publish, GitHub release).

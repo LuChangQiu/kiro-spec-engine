@@ -62,10 +62,16 @@
 22. 增强多 Agent 限流韧性：
    - 编排引擎在 429/RateLimit 错误重试时，支持解析 `Retry-After`/`try again in` 提示并抬升 backoff。
    - 减少服务端限流窗口内的无效重试与“卡死感”。
+23. 新增 release gate 历史索引命令：
+   - `kse auto handoff gate-index` 聚合 `release-gate-*.json` 为跨版本历史索引。
+   - 支持与已有历史索引合并去重（按 tag/file），输出门禁通过率与风险分布聚合指标。
+24. 发布流程自动产出门禁历史索引：
+   - `release.yml` 在 gate 评估后自动执行 `handoff gate-index`，生成 `release-gate-history.json` 与当次 summary。
+   - 两份索引产物随 GitHub Release 资产发布，便于对外审计与回放。
 
 ## 下一阶段（P2）
 
-1. 将 `release-gate-<tag>.json` 聚合为历史索引（跨版本），形成可查询的发布门禁趋势视图。
+1. 在 `release.yml` 中自动拉取上一个 Release 的 `release-gate-history.json`，并在当前 tag 发布时增量更新后重新上传。
 
 ## 长期目标（P3）
 

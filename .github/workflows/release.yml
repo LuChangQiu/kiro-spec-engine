@@ -75,6 +75,8 @@ jobs:
           FALLBACK_FILE="${NOTES_DIR}/release-notes-fallback-${TAG}.md"
           SUMMARY_FILE="${NOTES_DIR}/release-evidence-summary-${TAG}.json"
           GATE_FILE="${NOTES_DIR}/release-gate-${TAG}.json"
+          HISTORY_FILE="${NOTES_DIR}/release-gate-history.json"
+          HISTORY_SUMMARY_FILE="${NOTES_DIR}/release-gate-history-${TAG}.json"
 
           mkdir -p "${NOTES_DIR}"
 
@@ -101,6 +103,8 @@ jobs:
                     echo "${SUMMARY_FILE}"
                   fi
                   echo "${GATE_FILE}"
+                  echo "${HISTORY_FILE}"
+                  echo "${HISTORY_SUMMARY_FILE}"
                   echo "EOF"
                 } >> "$GITHUB_OUTPUT"
                 exit 0
@@ -123,6 +127,8 @@ jobs:
             echo "asset_files<<EOF"
             echo "${FALLBACK_FILE}"
             echo "${GATE_FILE}"
+            echo "${HISTORY_FILE}"
+            echo "${HISTORY_SUMMARY_FILE}"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
@@ -348,6 +354,37 @@ jobs:
             console.warn(`${message} (advisory only)`);
           }
           NODE
+
+      - name: Build release gate history index
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          NOTES_DIR=".kiro/reports/release-evidence"
+          HISTORY_FILE="${NOTES_DIR}/release-gate-history.json"
+          HISTORY_SUMMARY_FILE="${NOTES_DIR}/release-gate-history-${TAG}.json"
+
+          mkdir -p "${NOTES_DIR}"
+          if ! node bin/kiro-spec-engine.js auto handoff gate-index \
+            --dir "${NOTES_DIR}" \
+            --history-file "${HISTORY_FILE}" \
+            --out "${HISTORY_FILE}" \
+            --json > "${HISTORY_SUMMARY_FILE}"; then
+            cat > "${HISTORY_SUMMARY_FILE}" <<EOF
+            {
+              "mode": "auto-handoff-release-gate-history",
+              "error": "failed to build release gate history index"
+            }
+            EOF
+            if [[ ! -f "${HISTORY_FILE}" ]]; then
+              cat > "${HISTORY_FILE}" <<EOF
+              {
+                "mode": "auto-handoff-release-gate-history",
+                "entries": []
+              }
+              EOF
+            fi
+          fi
 
       - name: Publish to npm
         run: npm publish --access public

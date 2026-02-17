@@ -7811,6 +7811,138 @@ describe('auto close-loop command', () => {
     expect(reviewMarkdown).toContain('## Current Gate');
   });
 
+  test('builds release gate history index by merging reports with seed history', async () => {
+    const evidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    const outFile = path.join(evidenceDir, 'release-gate-history.json');
+    await fs.ensureDir(evidenceDir);
+
+    await fs.writeJson(path.join(evidenceDir, 'release-gate-v1.2.0.json'), {
+      mode: 'advisory',
+      enforce: false,
+      evidence_used: true,
+      require_evidence: false,
+      require_gate_pass: true,
+      thresholds: {
+        min_spec_success_rate: 90,
+        max_risk_level: 'medium'
+      },
+      signals: [
+        'risk_level=medium',
+        'spec_success_rate=88',
+        'gate_passed=true'
+      ],
+      violations: [],
+      config_warnings: [],
+      gate_passed: true,
+      evaluated_at: '2026-02-17T01:00:00.000Z'
+    }, { spaces: 2 });
+
+    await fs.writeJson(path.join(evidenceDir, 'release-gate-v1.3.0.json'), {
+      mode: 'enforce',
+      enforce: true,
+      evidence_used: true,
+      require_evidence: true,
+      require_gate_pass: true,
+      thresholds: {
+        min_spec_success_rate: 95,
+        max_risk_level: 'medium'
+      },
+      signals: [
+        'risk_level=high',
+        'spec_success_rate=70',
+        'gate_passed=false'
+      ],
+      violations: [
+        'risk level high exceeds max medium'
+      ],
+      config_warnings: [],
+      gate_passed: false,
+      evaluated_at: '2026-02-17T02:00:00.000Z'
+    }, { spaces: 2 });
+
+    await fs.writeJson(outFile, {
+      mode: 'auto-handoff-release-gate-history',
+      entries: [
+        {
+          tag: 'v1.1.0',
+          evaluated_at: '2026-02-17T00:00:00.000Z',
+          gate_passed: true,
+          enforce: false,
+          evidence_used: false,
+          risk_level: 'unknown',
+          violations_count: 0,
+          config_warning_count: 0,
+          thresholds: {}
+        }
+      ]
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'gate-index',
+      '--dir',
+      evidenceDir,
+      '--out',
+      outFile,
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-release-gate-history');
+    expect(payload.total_entries).toBe(3);
+    expect(payload.latest).toEqual(expect.objectContaining({
+      tag: 'v1.3.0',
+      gate_passed: false
+    }));
+    expect(payload.aggregates).toEqual(expect.objectContaining({
+      gate_passed_count: 2,
+      gate_failed_count: 1,
+      enforce_count: 1,
+      pass_rate_percent: 66.67
+    }));
+    expect(payload.entries[0]).toEqual(expect.objectContaining({
+      tag: 'v1.3.0',
+      risk_level: 'high'
+    }));
+    expect(payload.output_file).toBe(outFile);
+
+    const written = await fs.readJson(outFile);
+    expect(written.mode).toBe('auto-handoff-release-gate-history');
+    expect(written.entries).toHaveLength(3);
+  });
+
+  test('validates handoff gate-index keep option range', async () => {
+    const evidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    await fs.ensureDir(evidenceDir);
+    await fs.writeJson(path.join(evidenceDir, 'release-gate-v1.0.0.json'), {
+      gate_passed: true,
+      evaluated_at: '2026-02-17T00:00:00.000Z'
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'gate-index',
+        '--dir',
+        evidenceDir,
+        '--keep',
+        '0',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.error).toContain('--keep must be an integer between 1 and 5000.');
+  });
+
   test('validates handoff evidence release date format', async () => {
     const evidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
     await fs.ensureDir(path.dirname(evidenceFile));

@@ -100,9 +100,11 @@ git log --oneline -n 15
   - `KSE_RELEASE_GATE_ENFORCE`：`true|false`（默认 advisory，不阻断发布）
   - `KSE_RELEASE_GATE_REQUIRE_EVIDENCE`：是否要求存在 `handoff-runs.json` 摘要
   - `KSE_RELEASE_GATE_REQUIRE_GATE_PASS`：是否要求 evidence gate `passed=true`（有 evidence 时默认要求）
-  - `KSE_RELEASE_MIN_SPEC_SUCCESS_RATE`：最小允许成功率（百分比）
-  - `KSE_RELEASE_MAX_RISK_LEVEL`：`low|medium|high|unknown`（默认 `unknown`）
-  - `KSE_RELEASE_MAX_UNMAPPED_RULES`：ontology 业务规则未映射最大允许值
-  - `KSE_RELEASE_MAX_UNDECIDED_DECISIONS`：ontology 决策未定最大允许值
+  - `KSE_RELEASE_GATE_MIN_SPEC_SUCCESS_RATE`：最小允许成功率（百分比）
+  - `KSE_RELEASE_GATE_MAX_RISK_LEVEL`：`low|medium|high|unknown`（默认 `unknown`）
+  - `KSE_RELEASE_GATE_MAX_UNMAPPED_RULES`：ontology 业务规则未映射最大允许值
+  - `KSE_RELEASE_GATE_MAX_UNDECIDED_DECISIONS`：ontology 决策未定最大允许值
+- 可选本地预演 release gate 历史索引产物：
+  - `kse auto handoff gate-index --dir .kiro/reports/release-evidence --out .kiro/reports/release-evidence/release-gate-history.json --json`
 
 然后再执行你的正式发布流程（打 tag、push、npm publish、GitHub Release）。

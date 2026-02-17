@@ -790,6 +790,10 @@ Dual-track handoff integration:
   - Add `--release-draft <path>` to auto-generate a release notes draft and evidence review markdown in one run.
   - `--release-version` sets draft version tag (defaults to `v<package.json version>`), and `--release-date` accepts `YYYY-MM-DD` (default: current UTC date).
   - Use `--review-out <path>` to override the generated evidence review markdown path (default `.kiro/reports/release-evidence/handoff-evidence-review.md`).
+- `kse auto handoff gate-index [--dir <path>] [--history-file <path>] [--keep <n>] [--out <path>] [--json]`: aggregate `release-gate-*.json` audits into a cross-version history index.
+  - Default scan dir is `.kiro/reports/release-evidence`, default output file is `.kiro/reports/release-evidence/release-gate-history.json`.
+  - `--history-file` merges an existing index (for example, previous release asset) before dedup/refresh.
+  - `--keep` retains latest N entries (`1-5000`, default `200`).
 
 Recommended `.kiro/config/orchestrator.json`:
 

@@ -656,7 +656,7 @@ Close-loop controller (`kse auto close-loop-controller [queue-file]`) options:
 - `--controller-resume <session-or-file>`: resume from persisted controller session (`latest`, session id, or file path)
 - `--queue-format <auto|json|lines>`: queue parser mode (default `auto`)
 - `--no-controller-dedupe`: disable duplicate broad-goal deduplication (default dedupe enabled)
-- `--dequeue-limit <n>`: consume up to `n` goals per controller cycle (`1-100`, default `1`)
+- `--dequeue-limit <n>`: consume up to `n` goals per controller cycle (`1-100`, default `all` pending goals)
 - `--wait-on-empty`: keep polling when queue is empty instead of stopping
 - `--poll-seconds <n>`: polling interval for `--wait-on-empty` (`1-3600`, default `30`)
 - `--max-cycles <n>`: max controller cycles (`1-100000`, default `1000`)

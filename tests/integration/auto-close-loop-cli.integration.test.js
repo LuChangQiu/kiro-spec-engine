@@ -703,7 +703,7 @@ describe('auto close-loop CLI integration', () => {
     }));
   });
 
-  test('drains close-loop-controller queue through CLI', async () => {
+  test('drains close-loop-controller queue through CLI in one cycle by default', async () => {
     const queueFile = path.join(tempDir, 'controller-goals.lines');
     await fs.writeFile(queueFile, [
       'deliver autonomous controller goal one',
@@ -716,8 +716,6 @@ describe('auto close-loop CLI integration', () => {
       queueFile,
       '--program-goals',
       '2',
-      '--dequeue-limit',
-      '2',
       '--max-cycles',
       '1',
       '--dry-run',
@@ -729,6 +727,7 @@ describe('auto close-loop CLI integration', () => {
     expect(payload).toEqual(expect.objectContaining({
       mode: 'auto-close-loop-controller',
       status: 'completed',
+      dequeue_limit: 'all',
       processed_goals: 2,
       completed_goals: 2,
       failed_goals: 0,

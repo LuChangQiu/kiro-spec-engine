@@ -1355,7 +1355,7 @@ describe('auto close-loop command', () => {
     expect(errorOutput).toContain('--dequeue-limit must be an integer between 1 and 100.');
   });
 
-  test('drains controller queue and runs close-loop-program autonomously', async () => {
+  test('drains controller queue in one cycle by default and runs close-loop-program autonomously', async () => {
     runAutoCloseLoop
       .mockResolvedValue({ status: 'completed', portfolio: { master_spec: '200-00-controller', sub_specs: [] } });
 
@@ -1372,8 +1372,6 @@ describe('auto close-loop command', () => {
       queueFile,
       '--program-goals',
       '2',
-      '--dequeue-limit',
-      '2',
       '--max-cycles',
       '1',
       '--controller-done-file',
@@ -1389,6 +1387,7 @@ describe('auto close-loop command', () => {
     expect(summary).toEqual(expect.objectContaining({
       mode: 'auto-close-loop-controller',
       status: 'completed',
+      dequeue_limit: 'all',
       processed_goals: 2,
       completed_goals: 2,
       failed_goals: 0,

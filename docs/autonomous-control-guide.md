@@ -343,7 +343,7 @@ Close-loop controller command:
 - Queue file defaults to `.kiro/auto/close-loop-controller-goals.lines`; supports `auto|json|lines` parsing via `--queue-format`.
 - `--controller-resume <session-or-file>` resumes queue/controller context from persisted controller session (`latest`, session id, or file path).
 - Duplicate broad goals are deduped by default; use `--no-controller-dedupe` to preserve raw queue duplicates.
-- `--dequeue-limit <n>` controls how many queued goals are consumed in one cycle (`1-100`, default `1`).
+- `--dequeue-limit <n>` controls how many queued goals are consumed in one cycle (`1-100`, default: all pending goals).
 - `--wait-on-empty` + `--poll-seconds <n>` enables long-running poll mode for continuously appended program queues.
 - `--max-cycles <n>` + `--max-minutes <n>` bound controller runtime to prevent unbounded loops.
 - Controller lease lock is enabled by default to prevent concurrent queue corruption (`--controller-lock-file`, `--controller-lock-ttl-seconds`, `--no-controller-lock`).

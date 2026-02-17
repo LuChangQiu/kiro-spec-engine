@@ -27,6 +27,12 @@ const {
   discoverResources,
   runExtraction
 } = require('../../../lib/scene-runtime/moqui-extractor');
+const {
+  buildOntologyFromManifest,
+  validateOntology,
+  evaluateOntologySemanticQuality
+} = require('../../../lib/scene-runtime/scene-ontology');
+const archetypeMatches = require('../../fixtures/scene-runtime/moqui-extractor/archetype-matches.json');
 
 describe('MoquiExtractor', () => {
   // ─── Constants ─────────────────────────────────────────────────
@@ -2017,6 +2023,61 @@ describe('MoquiExtractor', () => {
       const contract = generatePackageContract(match);
 
       expect(contract.metadata.name).toBe('crud-product-category');
+    });
+  });
+
+  // ─── Archetype Conformance Regression ─────────────────────────
+
+  describe('archetype conformance regression', () => {
+    test.each(archetypeMatches)('$id preserves ontology and governance semantics', (fixture) => {
+      const manifest = generateSceneManifest(fixture.match);
+      const contract = generatePackageContract(fixture.match);
+
+      expect(manifest).not.toBeNull();
+      expect(contract).not.toBeNull();
+      expect(contract.metadata.name).toBe(fixture.expected.package_name);
+      expect(contract.governance.risk_level).toBe(fixture.expected.risk_level);
+
+      const bindings = contract.capability_contract && Array.isArray(contract.capability_contract.bindings)
+        ? contract.capability_contract.bindings
+        : [];
+      expect(bindings.length).toBeGreaterThanOrEqual(fixture.expected.min_bindings);
+
+      const bindingRefs = new Set(bindings.map((binding) => binding.ref));
+
+      const lineage = contract.governance_contract && contract.governance_contract.data_lineage
+        ? contract.governance_contract.data_lineage
+        : { sources: [], sinks: [] };
+
+      for (const source of lineage.sources || []) {
+        expect(bindingRefs.has(source.ref)).toBe(true);
+      }
+
+      for (const sink of lineage.sinks || []) {
+        expect(bindingRefs.has(sink.ref)).toBe(true);
+      }
+
+      for (const rule of contract.governance_contract.business_rules || []) {
+        expect(bindingRefs.has(rule.bind_to)).toBe(true);
+      }
+
+      for (const decision of contract.governance_contract.decision_logic || []) {
+        expect(bindingRefs.has(decision.bind_to)).toBe(true);
+      }
+
+      const graph = buildOntologyFromManifest(contract);
+      const ontologyResult = validateOntology(graph);
+      expect(ontologyResult.valid).toBe(true);
+
+      const semanticQuality = evaluateOntologySemanticQuality(contract);
+      expect(semanticQuality.score).toBeGreaterThanOrEqual(fixture.expected.min_semantic_score);
+      expect(semanticQuality.metrics.business_rule_unmapped).toBe(0);
+      expect(semanticQuality.metrics.decision_pending).toBe(0);
+
+      expect(contract.agent_hints.suggested_sequence).toEqual(bindings.map((binding) => binding.ref));
+
+      const yaml = serializeManifestToYaml(manifest);
+      expect(parseYaml(yaml)).toEqual(manifest);
     });
   });
 

@@ -1,0 +1,89 @@
+[
+  {
+    "id": "order-query-read",
+    "match": {
+      "pattern": "query",
+      "primaryResource": "OrderHeader",
+      "entities": ["OrderHeader", "OrderItem"],
+      "services": [],
+      "bindingRefs": ["moqui.OrderHeader.list", "moqui.OrderHeader.get"],
+      "modelScope": {
+        "read": ["moqui.OrderHeader.orderId", "moqui.OrderHeader.statusId", "moqui.OrderItem.orderId"],
+        "write": []
+      },
+      "governance": {
+        "riskLevel": "low",
+        "approvalRequired": false,
+        "idempotencyRequired": false
+      }
+    },
+    "expected": {
+      "package_name": "query-order-header",
+      "risk_level": "low",
+      "min_bindings": 2,
+      "min_semantic_score": 90
+    }
+  },
+  {
+    "id": "order-fulfillment-workflow",
+    "match": {
+      "pattern": "workflow",
+      "primaryResource": "OrderFulfillment",
+      "entities": ["OrderHeader", "OrderItem", "InventoryReservation", "PaymentAuthorization", "FulfillmentExecution"],
+      "services": ["ReserveInventory", "AuthorizePayment", "ReleaseFulfillment", "UpdateOrderStatus"],
+      "bindingRefs": [
+        "moqui.service.ReserveInventory.invoke",
+        "moqui.service.AuthorizePayment.invoke",
+        "moqui.service.ReleaseFulfillment.invoke",
+        "moqui.service.UpdateOrderStatus.invoke"
+      ],
+      "modelScope": {
+        "read": ["moqui.OrderHeader.orderId", "moqui.OrderHeader.statusId"],
+        "write": ["moqui.OrderHeader.statusId", "moqui.InventoryReservation.quantity", "moqui.PaymentAuthorization.statusId"]
+      },
+      "governance": {
+        "riskLevel": "medium",
+        "approvalRequired": true,
+        "idempotencyRequired": true,
+        "idempotencyKey": "orderId"
+      }
+    },
+    "expected": {
+      "package_name": "workflow-order-fulfillment",
+      "risk_level": "medium",
+      "min_bindings": 4,
+      "min_semantic_score": 90
+    }
+  },
+  {
+    "id": "inventory-reserve-adjust",
+    "match": {
+      "pattern": "workflow",
+      "primaryResource": "InventoryReserveAdjust",
+      "entities": ["InventoryItem", "InventoryReservation", "InventoryAdjustment", "InventorySnapshot"],
+      "services": ["InventoryAvailability", "InventoryReserve", "InventoryAdjust", "InventoryAudit"],
+      "bindingRefs": [
+        "moqui.service.InventoryAvailability.invoke",
+        "moqui.service.InventoryReserve.invoke",
+        "moqui.service.InventoryAdjust.invoke",
+        "moqui.service.InventoryAudit.invoke"
+      ],
+      "modelScope": {
+        "read": ["moqui.InventoryItem.productId", "moqui.InventoryItem.facilityId", "moqui.InventoryItem.atp"],
+        "write": ["moqui.InventoryReservation.quantity", "moqui.InventoryAdjustment.quantity"]
+      },
+      "governance": {
+        "riskLevel": "medium",
+        "approvalRequired": true,
+        "idempotencyRequired": true,
+        "idempotencyKey": "inventoryOperationId"
+      }
+    },
+    "expected": {
+      "package_name": "workflow-inventory-reserve-adjust",
+      "risk_level": "medium",
+      "min_bindings": 4,
+      "min_semantic_score": 90
+    }
+  }
+]

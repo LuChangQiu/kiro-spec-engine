@@ -74,10 +74,16 @@
 26. 发布说明自动注入门禁趋势摘要：
    - `release.yml` 在发布前将 `release-gate-history` 的近 5 版趋势追加到 Release Notes。
    - 发布页可直接看到 gate pass ratio、风险分布与近期版本轨迹。
+27. 新增 gate-index Markdown 趋势卡片：
+   - `kse auto handoff gate-index --markdown-out <path>` 直接产出可读趋势卡片。
+   - 便于在 PR/Issue 中复用，降低历史门禁审阅成本。
+28. 发布流程附带趋势卡片资产：
+   - `release.yml` 自动生成并上传 `release-gate-history-<tag>.md`。
+   - Release Notes 趋势段落附带卡片资产文件名，便于发布后检索。
 
 ## 下一阶段（P2）
 
-1. 补充 `gate-index` Markdown 输出（便于在 PR/Issue 中直接引用人类可读趋势卡片）。
+1. 在 Release Notes 中自动填入可点击的卡片链接（基于发布完成后的资产 URL）。
 
 ## 长期目标（P3）
 

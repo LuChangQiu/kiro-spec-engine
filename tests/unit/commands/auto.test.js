@@ -7915,6 +7915,51 @@ describe('auto close-loop command', () => {
     expect(written.entries).toHaveLength(3);
   });
 
+  test('writes gate-index markdown trend card when --markdown-out is provided', async () => {
+    const evidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    const outFile = path.join(evidenceDir, 'release-gate-history.json');
+    const markdownFile = path.join(evidenceDir, 'release-gate-history.md');
+    await fs.ensureDir(evidenceDir);
+    await fs.writeJson(path.join(evidenceDir, 'release-gate-v1.0.0.json'), {
+      mode: 'advisory',
+      enforce: false,
+      evidence_used: true,
+      gate_passed: true,
+      signals: [
+        'risk_level=low',
+        'spec_success_rate=98'
+      ],
+      evaluated_at: '2026-02-17T03:00:00.000Z'
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'gate-index',
+      '--dir',
+      evidenceDir,
+      '--out',
+      outFile,
+      '--markdown-out',
+      markdownFile,
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-release-gate-history');
+    expect(payload.markdown_file).toBe(markdownFile);
+    expect(await fs.pathExists(markdownFile)).toBe(true);
+
+    const markdown = await fs.readFile(markdownFile, 'utf8');
+    expect(markdown).toContain('# Auto Handoff Release Gate History');
+    expect(markdown).toContain('## Aggregates');
+    expect(markdown).toContain('## Recent Entries');
+    expect(markdown).toContain('v1.0.0');
+  });
+
   test('validates handoff gate-index keep option range', async () => {
     const evidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
     await fs.ensureDir(evidenceDir);

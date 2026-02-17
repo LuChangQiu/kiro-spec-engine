@@ -77,6 +77,7 @@ jobs:
           GATE_FILE="${NOTES_DIR}/release-gate-${TAG}.json"
           HISTORY_FILE="${NOTES_DIR}/release-gate-history.json"
           HISTORY_SUMMARY_FILE="${NOTES_DIR}/release-gate-history-${TAG}.json"
+          HISTORY_CARD_FILE="${NOTES_DIR}/release-gate-history-${TAG}.md"
 
           mkdir -p "${NOTES_DIR}"
 
@@ -105,6 +106,7 @@ jobs:
                   echo "${GATE_FILE}"
                   echo "${HISTORY_FILE}"
                   echo "${HISTORY_SUMMARY_FILE}"
+                  echo "${HISTORY_CARD_FILE}"
                   echo "EOF"
                 } >> "$GITHUB_OUTPUT"
                 exit 0
@@ -129,6 +131,7 @@ jobs:
             echo "${GATE_FILE}"
             echo "${HISTORY_FILE}"
             echo "${HISTORY_SUMMARY_FILE}"
+            echo "${HISTORY_CARD_FILE}"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
@@ -365,6 +368,7 @@ jobs:
           NOTES_DIR=".kiro/reports/release-evidence"
           HISTORY_FILE="${NOTES_DIR}/release-gate-history.json"
           HISTORY_SUMMARY_FILE="${NOTES_DIR}/release-gate-history-${TAG}.json"
+          HISTORY_CARD_FILE="${NOTES_DIR}/release-gate-history-${TAG}.md"
           LATEST_RELEASE_FILE="${NOTES_DIR}/latest-release-${TAG}.json"
           LATEST_RELEASE_API="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/latest"
 
@@ -389,12 +393,18 @@ jobs:
             --dir "${NOTES_DIR}" \
             --history-file "${HISTORY_FILE}" \
             --out "${HISTORY_FILE}" \
+            --markdown-out "${HISTORY_CARD_FILE}" \
             --json > "${HISTORY_SUMMARY_FILE}"; then
             cat > "${HISTORY_SUMMARY_FILE}" <<EOF
             {
               "mode": "auto-handoff-release-gate-history",
               "error": "failed to build release gate history index"
             }
+            EOF
+            cat > "${HISTORY_CARD_FILE}" <<EOF
+            # Release Gate History
+
+            Failed to build release gate history markdown.
             EOF
             if [[ ! -f "${HISTORY_FILE}" ]]; then
               cat > "${HISTORY_FILE}" <<EOF
@@ -410,6 +420,7 @@ jobs:
         shell: bash
         env:
           RELEASE_BODY_FILE: ${{ steps.release_notes.outputs.release_body_file }}
+          RELEASE_TAG: ${{ github.ref_name }}
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
@@ -464,6 +475,7 @@ jobs:
                 `- Gate pass rate (history): ${passRate === null ? 'n/a' : `${passRate}%`}`,
                 `- Recent pass ratio (latest 5): ${recentKnown === 0 ? 'n/a' : `${recentPass}/${recentKnown}`}`,
                 `- Recent risk mix (latest 5): low=${riskCounts.low}, medium=${riskCounts.medium}, high=${riskCounts.high}, unknown=${riskCounts.unknown}`,
+                `- Trend card artifact: release-gate-history-${process.env.RELEASE_TAG || 'current'}.md`,
                 '',
                 '### Recent Versions'
               ];

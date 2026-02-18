@@ -725,7 +725,11 @@ Close-loop controller session maintenance:
 Cross-archive autonomous governance maintenance:
 - `sce auto governance stats [--days <n>] [--status <csv>] [--json]`: aggregate a unified governance snapshot from session/batch-session/controller-session archives plus recovery memory state.
   - JSON output includes `totals`, `throughput`, `health` (`risk_level`, `concerns`, `recommendations`, `release_gate`, `handoff_quality`), `top_master_specs`, `recovery_memory`, and full per-archive stats under `archives`.
-  - `health.handoff_quality` carries Moqui matrix regression governance signals:
+  - `health.handoff_quality` carries Moqui matrix + capability lexicon governance signals:
+    - `latest_capability_expected_unknown_count`
+    - `latest_capability_provided_unknown_count`
+    - `capability_expected_unknown_positive_rate_percent`
+    - `capability_provided_unknown_positive_rate_percent`
     - `latest_moqui_matrix_regression_count`
     - `latest_moqui_matrix_regression_gate_max`
     - `avg_moqui_matrix_regression_count`
@@ -743,6 +747,10 @@ Cross-archive autonomous governance maintenance:
   - `--execute-advisory` enables automatic advisory action execution (`recover-latest`, `controller-resume-latest`) when governance assessment detects failed sessions or controller pending goals; sce auto-selects the latest actionable advisory source and reports `skipped` (not `failed`) when no actionable source exists.
   - JSON output includes round-by-round risk/action telemetry (`rounds`, with `risk_before/risk_after` and `release_gate_before/release_gate_after`), advisory telemetry (`execute_advisory`, `advisory_policy`, `advisory_summary`, `rounds[*].advisory_actions`), `stop_detail` + `recommendations` for explicit blocking reasons, plus `initial_assessment`, `final_assessment`, and convergence metadata.
   - Release-gate block reasons now include handoff matrix regression reasons when present:
+    - `handoff-capability-expected-unknown-positive:<n>`
+    - `handoff-capability-provided-unknown-positive:<n>`
+    - `handoff-capability-expected-unknown-positive-rate:<percent>`
+    - `handoff-capability-provided-unknown-positive-rate:<percent>`
     - `handoff-moqui-matrix-regressions-positive:<n>`
     - `handoff-moqui-matrix-regressions-over-gate:<n>/<max>`
 - `sce auto governance session list [--limit <n>] [--status <csv>] [--resume-only] [--json]`: list persisted governance close-loop sessions (`--resume-only` filters to resumed-chain sessions only).
@@ -814,7 +822,7 @@ Dual-track handoff integration:
   - Default scan dir is `.kiro/reports/release-evidence`, default output file is `.kiro/reports/release-evidence/release-gate-history.json`.
   - `--history-file` merges an existing index (for example, previous release asset) before dedup/refresh.
   - `--keep` retains latest N entries (`1-5000`, default `200`).
-  - Aggregates include scene package batch, drift, and release-preflight/hard-gate signals (`scene_package_batch_*`, `drift_alert_*`, `drift_block_*`, `release_gate_preflight_*`) when present in gate reports.
+  - Aggregates include scene package batch, capability unknown trend, drift, and release-preflight/hard-gate signals (`scene_package_batch_*`, `capability_expected_unknown_*`, `capability_provided_unknown_*`, `drift_alert_*`, `drift_block_*`, `release_gate_preflight_*`) when present in gate reports.
   - `--markdown-out <path>` writes a human-readable trend card markdown for PR/Issue handoff.
 
 Moqui template library lexicon audit (script-level governance helper):

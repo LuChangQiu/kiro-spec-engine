@@ -621,10 +621,6 @@ jobs:
                 process.exit(0);
               }
 
-              const entries = Array.isArray(payload.entries) ? payload.entries : [];
-              const recent = entries.slice(0, 5);
-              const recentPass = recent.filter(item => item && item.gate_passed === true).length;
-              const recentKnown = recent.filter(item => item && typeof item.gate_passed === 'boolean').length;
               const passRate = payload.aggregates && Number.isFinite(Number(payload.aggregates.pass_rate_percent))
                 ? Number(payload.aggregates.pass_rate_percent)
                 : null;
@@ -640,34 +636,33 @@ jobs:
               const preflightBlockedRateHistory = payload.aggregates && Number.isFinite(Number(payload.aggregates.release_gate_preflight_block_rate_percent))
                 ? Number(payload.aggregates.release_gate_preflight_block_rate_percent)
                 : null;
-              const parseNumber = (value, fallback) => {
-                const parsed = Number(value);
-                return Number.isFinite(parsed) ? parsed : fallback;
-              };
-              const failStreakThreshold = Math.max(
-                1,
-                Math.floor(parseNumber(process.env.RELEASE_DRIFT_FAIL_STREAK_MIN, 2))
-              );
-              const highRiskShareThreshold = Math.max(
-                0,
-                Math.min(100, parseNumber(process.env.RELEASE_DRIFT_HIGH_RISK_SHARE_MIN_PERCENT, 60))
-              );
-              const highRiskDeltaThreshold = Math.max(
-                0,
-                Math.min(100, parseNumber(process.env.RELEASE_DRIFT_HIGH_RISK_SHARE_DELTA_MIN_PERCENT, 25))
-              );
-              const preflightBlockRateThreshold = Math.max(
-                0,
-                Math.min(100, parseNumber(process.env.RELEASE_DRIFT_PREFLIGHT_BLOCK_RATE_MIN_PERCENT, 40))
-              );
-              const hardGateBlockedStreakThreshold = Math.max(
-                1,
-                Math.floor(parseNumber(process.env.RELEASE_DRIFT_HARD_GATE_BLOCK_STREAK_MIN, 2))
-              );
-              const preflightUnavailableStreakThreshold = Math.max(
-                1,
-                Math.floor(parseNumber(process.env.RELEASE_DRIFT_PREFLIGHT_UNAVAILABLE_STREAK_MIN, 2))
-              );
+              const {
+                buildReleaseDriftSignals,
+                resolveReleaseDriftThresholds
+              } = require('./scripts/release-drift-signals');
+              const thresholds = resolveReleaseDriftThresholds(process.env);
+              const driftSignals = buildReleaseDriftSignals(payload, { thresholds });
+              const {
+                recent,
+                recentPass,
+                recentKnown,
+                riskCounts,
+                failedStreak,
+                highRiskShare,
+                highRiskDeltaPercent,
+                recentPreflightKnown,
+                recentPreflightBlocked,
+                recentPreflightBlockedRate,
+                hardGateBlockedStreak,
+                preflightUnavailableStreak,
+                alerts: driftAlerts
+              } = driftSignals;
+              const failStreakThreshold = thresholds.failStreakMin;
+              const highRiskShareThreshold = thresholds.highRiskShareMinPercent;
+              const highRiskDeltaThreshold = thresholds.highRiskShareDeltaMinPercent;
+              const preflightBlockRateThreshold = thresholds.preflightBlockRateMinPercent;
+              const hardGateBlockedStreakThreshold = thresholds.hardGateBlockStreakMin;
+              const preflightUnavailableStreakThreshold = thresholds.preflightUnavailableStreakMin;
               const releaseTag = process.env.RELEASE_TAG || 'current';
               const releaseRepository = process.env.RELEASE_REPOSITORY || process.env.GITHUB_REPOSITORY || '';
               const historyCardAsset = `release-gate-history-${releaseTag}.md`;
@@ -682,99 +677,6 @@ jobs:
               const historyCardUrl = toAssetUrl(historyCardAsset);
               const historyJsonUrl = toAssetUrl(historyJsonAsset);
               const historySummaryUrl = toAssetUrl(historySummaryAsset);
-              const riskCounts = recent.reduce((acc, item) => {
-                const risk = `${item && item.risk_level ? item.risk_level : 'unknown'}`.toLowerCase();
-                if (!acc[risk]) {
-                  acc[risk] = 0;
-                }
-                acc[risk] += 1;
-                return acc;
-              }, { low: 0, medium: 0, high: 0, unknown: 0 });
-              const failedStreak = (() => {
-                let count = 0;
-                for (const item of recent) {
-                  if (!item || item.gate_passed !== false) {
-                    break;
-                  }
-                  count += 1;
-                }
-                return count;
-              })();
-              const highRiskShare = recent.length > 0
-                ? Number(((riskCounts.high / recent.length) * 100).toFixed(2))
-                : 0;
-              const shortWindow = entries.slice(0, Math.min(entries.length, 3));
-              const longWindow = entries.slice(0, Math.min(entries.length, 5));
-              const shortHighShare = shortWindow.length > 0
-                ? shortWindow.filter(item => item && `${item.risk_level || ''}`.toLowerCase() === 'high').length / shortWindow.length
-                : 0;
-              const longHighShare = longWindow.length > 0
-                ? longWindow.filter(item => item && `${item.risk_level || ''}`.toLowerCase() === 'high').length / longWindow.length
-                : 0;
-              const recentPreflightKnown = recent.filter(
-                item => item && typeof item.release_gate_preflight_blocked === 'boolean'
-              ).length;
-              const recentPreflightBlocked = recent.filter(
-                item => item && item.release_gate_preflight_blocked === true
-              ).length;
-              const recentPreflightBlockedRate = recentPreflightKnown > 0
-                ? Number(((recentPreflightBlocked / recentPreflightKnown) * 100).toFixed(2))
-                : null;
-              const hardGateBlockedStreak = (() => {
-                let count = 0;
-                for (const item of recent) {
-                  if (!item || item.require_release_gate_preflight !== true || item.release_gate_preflight_blocked !== true) {
-                    break;
-                  }
-                  count += 1;
-                }
-                return count;
-              })();
-              const preflightUnavailableStreak = (() => {
-                let count = 0;
-                for (const item of recent) {
-                  if (!item || item.release_gate_preflight_available !== false) {
-                    break;
-                  }
-                  count += 1;
-                }
-                return count;
-              })();
-              const driftAlerts = [];
-              if (failedStreak >= failStreakThreshold) {
-                driftAlerts.push(`consecutive gate failures: ${failedStreak} (threshold=${failStreakThreshold})`);
-              }
-              if (highRiskShare >= highRiskShareThreshold) {
-                driftAlerts.push(`high-risk share in latest 5 is ${highRiskShare}% (threshold=${highRiskShareThreshold}%)`);
-              }
-              if (
-                shortWindow.length >= 2 &&
-                longWindow.length >= 3 &&
-                ((shortHighShare - longHighShare) * 100) >= highRiskDeltaThreshold
-              ) {
-                driftAlerts.push(
-                  `high-risk share increased from ${(longHighShare * 100).toFixed(2)}% to ${(shortHighShare * 100).toFixed(2)}% `
-                  + `(threshold=${highRiskDeltaThreshold}%)`
-                );
-              }
-              if (recentPreflightBlockedRate !== null && recentPreflightBlockedRate >= preflightBlockRateThreshold) {
-                driftAlerts.push(
-                  `release preflight blocked rate in latest 5 is ${recentPreflightBlockedRate}% `
-                  + `(threshold=${preflightBlockRateThreshold}%, known=${recentPreflightKnown})`
-                );
-              }
-              if (hardGateBlockedStreak >= hardGateBlockedStreakThreshold) {
-                driftAlerts.push(
-                  `hard-gate preflight blocked streak is ${hardGateBlockedStreak} `
-                  + `(threshold=${hardGateBlockedStreakThreshold})`
-                );
-              }
-              if (preflightUnavailableStreak >= preflightUnavailableStreakThreshold) {
-                driftAlerts.push(
-                  `release preflight unavailable streak is ${preflightUnavailableStreak} `
-                  + `(threshold=${preflightUnavailableStreakThreshold})`
-                );
-              }
 
               const lines = [
                 '',
@@ -868,56 +770,22 @@ jobs:
           RELEASE_DRIFT_HISTORY_FILE="${HISTORY_SUMMARY_FILE}" \
             node <<'NODE'
             const fs = require('fs');
-
-            function parseNumber(value, fallback) {
-              const parsed = Number(value);
-              return Number.isFinite(parsed) ? parsed : fallback;
-            }
-
-            function parseBoolean(value, fallback = false) {
-              if (value === undefined || value === null) {
-                return fallback;
-              }
-              const normalized = `${value}`.trim().toLowerCase();
-              if (!normalized) {
-                return fallback;
-              }
-              if (['1', 'true', 'yes', 'y', 'on'].includes(normalized)) {
-                return true;
-              }
-              if (['0', 'false', 'no', 'n', 'off'].includes(normalized)) {
-                return false;
-              }
-              return fallback;
-            }
+            const {
+              buildReleaseDriftSignals,
+              parseBoolean,
+              resolveReleaseDriftThresholds
+            } = require('./scripts/release-drift-signals');
 
             const historyFile = process.env.RELEASE_DRIFT_HISTORY_FILE;
             const gateReportFile = process.env.RELEASE_GATE_REPORT_FILE;
             const enforce = parseBoolean(process.env.RELEASE_DRIFT_ENFORCE, false);
-            const failStreakThreshold = Math.max(
-              1,
-              Math.floor(parseNumber(process.env.RELEASE_DRIFT_FAIL_STREAK_MIN, 2))
-            );
-            const highRiskShareThreshold = Math.max(
-              0,
-              Math.min(100, parseNumber(process.env.RELEASE_DRIFT_HIGH_RISK_SHARE_MIN_PERCENT, 60))
-            );
-            const highRiskDeltaThreshold = Math.max(
-              0,
-              Math.min(100, parseNumber(process.env.RELEASE_DRIFT_HIGH_RISK_SHARE_DELTA_MIN_PERCENT, 25))
-            );
-            const preflightBlockRateThreshold = Math.max(
-              0,
-              Math.min(100, parseNumber(process.env.RELEASE_DRIFT_PREFLIGHT_BLOCK_RATE_MIN_PERCENT, 40))
-            );
-            const hardGateBlockedStreakThreshold = Math.max(
-              1,
-              Math.floor(parseNumber(process.env.RELEASE_DRIFT_HARD_GATE_BLOCK_STREAK_MIN, 2))
-            );
-            const preflightUnavailableStreakThreshold = Math.max(
-              1,
-              Math.floor(parseNumber(process.env.RELEASE_DRIFT_PREFLIGHT_UNAVAILABLE_STREAK_MIN, 2))
-            );
+            const thresholds = resolveReleaseDriftThresholds(process.env);
+            const failStreakThreshold = thresholds.failStreakMin;
+            const highRiskShareThreshold = thresholds.highRiskShareMinPercent;
+            const highRiskDeltaThreshold = thresholds.highRiskShareDeltaMinPercent;
+            const preflightBlockRateThreshold = thresholds.preflightBlockRateMinPercent;
+            const hardGateBlockedStreakThreshold = thresholds.hardGateBlockStreakMin;
+            const preflightUnavailableStreakThreshold = thresholds.preflightUnavailableStreakMin;
 
             if (!historyFile || !fs.existsSync(historyFile)) {
               const msg = `[release-drift] history summary missing: ${historyFile || 'n/a'}`;
@@ -942,105 +810,19 @@ jobs:
               process.exit(0);
             }
 
-            const entries = Array.isArray(payload && payload.entries) ? payload.entries : [];
-            const recent = entries.slice(0, 5);
-            const riskCounts = recent.reduce((acc, item) => {
-              const risk = `${item && item.risk_level ? item.risk_level : 'unknown'}`.toLowerCase();
-              if (!acc[risk]) {
-                acc[risk] = 0;
-              }
-              acc[risk] += 1;
-              return acc;
-            }, { low: 0, medium: 0, high: 0, unknown: 0 });
-
-            const failedStreak = (() => {
-              let count = 0;
-              for (const item of recent) {
-                if (!item || item.gate_passed !== false) {
-                  break;
-                }
-                count += 1;
-              }
-              return count;
-            })();
-
-            const highRiskShare = recent.length > 0
-              ? Number(((riskCounts.high / recent.length) * 100).toFixed(2))
-              : 0;
-            const shortWindow = entries.slice(0, Math.min(entries.length, 3));
-            const longWindow = entries.slice(0, Math.min(entries.length, 5));
-            const shortHighShare = shortWindow.length > 0
-              ? shortWindow.filter(item => item && `${item.risk_level || ''}`.toLowerCase() === 'high').length / shortWindow.length
-              : 0;
-            const longHighShare = longWindow.length > 0
-              ? longWindow.filter(item => item && `${item.risk_level || ''}`.toLowerCase() === 'high').length / longWindow.length
-              : 0;
-            const highRiskDeltaPercent = Number(((shortHighShare - longHighShare) * 100).toFixed(2));
-            const recentPreflightKnown = recent.filter(
-              item => item && typeof item.release_gate_preflight_blocked === 'boolean'
-            ).length;
-            const recentPreflightBlocked = recent.filter(
-              item => item && item.release_gate_preflight_blocked === true
-            ).length;
-            const recentPreflightBlockedRate = recentPreflightKnown > 0
-              ? Number(((recentPreflightBlocked / recentPreflightKnown) * 100).toFixed(2))
-              : null;
-            const hardGateBlockedStreak = (() => {
-              let count = 0;
-              for (const item of recent) {
-                if (!item || item.require_release_gate_preflight !== true || item.release_gate_preflight_blocked !== true) {
-                  break;
-                }
-                count += 1;
-              }
-              return count;
-            })();
-            const preflightUnavailableStreak = (() => {
-              let count = 0;
-              for (const item of recent) {
-                if (!item || item.release_gate_preflight_available !== false) {
-                  break;
-                }
-                count += 1;
-              }
-              return count;
-            })();
-
-            const alerts = [];
-            if (failedStreak >= failStreakThreshold) {
-              alerts.push(`consecutive gate failures: ${failedStreak} (threshold=${failStreakThreshold})`);
-            }
-            if (highRiskShare >= highRiskShareThreshold) {
-              alerts.push(`high-risk share in latest 5 is ${highRiskShare}% (threshold=${highRiskShareThreshold}%)`);
-            }
-            if (
-              shortWindow.length >= 2 &&
-              longWindow.length >= 3 &&
-              highRiskDeltaPercent >= highRiskDeltaThreshold
-            ) {
-              alerts.push(
-                `high-risk share increased from ${(longHighShare * 100).toFixed(2)}% to ${(shortHighShare * 100).toFixed(2)}% `
-                + `(threshold=${highRiskDeltaThreshold}%)`
-              );
-            }
-            if (recentPreflightBlockedRate !== null && recentPreflightBlockedRate >= preflightBlockRateThreshold) {
-              alerts.push(
-                `release preflight blocked rate in latest 5 is ${recentPreflightBlockedRate}% `
-                + `(threshold=${preflightBlockRateThreshold}%, known=${recentPreflightKnown})`
-              );
-            }
-            if (hardGateBlockedStreak >= hardGateBlockedStreakThreshold) {
-              alerts.push(
-                `hard-gate preflight blocked streak is ${hardGateBlockedStreak} `
-                + `(threshold=${hardGateBlockedStreakThreshold})`
-              );
-            }
-            if (preflightUnavailableStreak >= preflightUnavailableStreakThreshold) {
-              alerts.push(
-                `release preflight unavailable streak is ${preflightUnavailableStreak} `
-                + `(threshold=${preflightUnavailableStreakThreshold})`
-              );
-            }
+            const driftSignals = buildReleaseDriftSignals(payload, { thresholds });
+            const {
+              alerts,
+              failedStreak,
+              hardGateBlockedStreak,
+              highRiskDeltaPercent,
+              highRiskShare,
+              preflightUnavailableStreak,
+              recentPreflightBlocked,
+              recentPreflightBlockedRate,
+              recentPreflightKnown,
+              windows
+            } = driftSignals;
             const blocked = enforce && alerts.length > 0;
             const driftPayload = {
               enforce,
@@ -1061,9 +843,9 @@ jobs:
                 preflight_blocked_rate_latest5_percent: recentPreflightBlockedRate,
                 hard_gate_blocked_streak_latest5: hardGateBlockedStreak,
                 preflight_unavailable_streak_latest5: preflightUnavailableStreak,
-                recent_window_size: recent.length,
-                short_window_size: shortWindow.length,
-                long_window_size: longWindow.length
+                recent_window_size: windows.recent,
+                short_window_size: windows.short,
+                long_window_size: windows.long
               },
               alerts,
               alert_count: alerts.length,

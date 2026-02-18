@@ -8568,6 +8568,12 @@ if (process.argv.includes('--json')) {
       violations: [],
       config_warnings: [],
       gate_passed: true,
+      drift: {
+        enforce: false,
+        alert_count: 0,
+        blocked: false,
+        evaluated_at: '2026-02-17T01:10:00.000Z'
+      },
       evaluated_at: '2026-02-17T01:00:00.000Z'
     }, { spaces: 2 });
 
@@ -8593,6 +8599,12 @@ if (process.argv.includes('--json')) {
       ],
       config_warnings: [],
       gate_passed: false,
+      drift: {
+        enforce: true,
+        alert_count: 2,
+        blocked: true,
+        evaluated_at: '2026-02-17T02:10:00.000Z'
+      },
       evaluated_at: '2026-02-17T02:00:00.000Z'
     }, { spaces: 2 });
 
@@ -8636,7 +8648,9 @@ if (process.argv.includes('--json')) {
       tag: 'v1.3.0',
       gate_passed: false,
       scene_package_batch_passed: false,
-      scene_package_batch_failure_count: 2
+      scene_package_batch_failure_count: 2,
+      drift_alert_count: 2,
+      drift_blocked: true
     }));
     expect(payload.aggregates).toEqual(expect.objectContaining({
       gate_passed_count: 2,
@@ -8645,13 +8659,19 @@ if (process.argv.includes('--json')) {
       pass_rate_percent: 66.67,
       scene_package_batch_pass_rate_percent: 66.67,
       scene_package_batch_failed_count: 1,
-      avg_scene_package_batch_failure_count: 0.67
+      avg_scene_package_batch_failure_count: 0.67,
+      drift_alert_runs: 1,
+      drift_blocked_runs: 1,
+      drift_alert_rate_percent: 50,
+      drift_block_rate_percent: 50
     }));
     expect(payload.entries[0]).toEqual(expect.objectContaining({
       tag: 'v1.3.0',
       risk_level: 'high',
       scene_package_batch_passed: false,
-      scene_package_batch_failure_count: 2
+      scene_package_batch_failure_count: 2,
+      drift_alert_count: 2,
+      drift_blocked: true
     }));
     expect(payload.output_file).toBe(outFile);
 
@@ -8706,6 +8726,8 @@ if (process.argv.includes('--json')) {
     expect(markdown).toContain('## Recent Entries');
     expect(markdown).toContain('Scene package batch pass rate');
     expect(markdown).toContain('scene-batch=');
+    expect(markdown).toContain('Drift alert runs');
+    expect(markdown).toContain('drift-alerts=');
     expect(markdown).toContain('v1.0.0');
   });
 

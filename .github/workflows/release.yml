@@ -978,6 +978,28 @@ jobs:
             }
           NODE
 
+      - name: Refresh release gate history index (post-drift)
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          NOTES_DIR=".kiro/reports/release-evidence"
+          GATE_FILE="${NOTES_DIR}/release-gate-${TAG}.json"
+          HISTORY_FILE="${NOTES_DIR}/release-gate-history.json"
+          HISTORY_SUMMARY_FILE="${NOTES_DIR}/release-gate-history-${TAG}.json"
+          HISTORY_CARD_FILE="${NOTES_DIR}/release-gate-history-${TAG}.md"
+
+          if [[ -f "${GATE_FILE}" ]]; then
+            if ! node bin/kiro-spec-engine.js auto handoff gate-index \
+              --dir "${NOTES_DIR}" \
+              --history-file "${HISTORY_FILE}" \
+              --out "${HISTORY_FILE}" \
+              --markdown-out "${HISTORY_CARD_FILE}" \
+              --json > "${HISTORY_SUMMARY_FILE}"; then
+              echo "[release-gate] warning: post-drift history refresh failed; keep previous gate-index artifacts"
+            fi
+          fi
+
       - name: Publish to npm
         run: npm publish --access public
         env:

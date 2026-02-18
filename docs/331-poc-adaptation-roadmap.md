@@ -92,10 +92,16 @@
 32. 漂移告警阻断模式：
    - 新增 `KSE_RELEASE_DRIFT_ENFORCE`，可在漂移告警触发时阻断发布。
    - 保留默认 advisory 模式，确保历史数据不足时不误阻断。
+33. 漂移告警审计写回 gate 报告：
+   - `release.yml` 将 drift 评估结果回写到 `release-gate-<tag>.json` 的 `drift` 字段。
+   - 单一门禁产物同时覆盖 gate 与 drift 审计口径，便于回放。
+34. gate-index 漂移趋势聚合：
+   - `kse auto handoff gate-index` 聚合 `drift_alert_count/drift_blocked` 指标并输出 markdown 趋势。
+   - 发布流程在 drift 合并后自动刷新一次 gate-index，确保当次 release 资产包含 drift 最新状态。
 
 ## 下一阶段（P2）
 
-1. 将 drift alerts 结果写入 `release-gate-<tag>.json`，统一门禁与漂移审计口径。
+1. 将 handoff 质量指标纳入 `kse auto governance close-loop` 默认评估维度（含发布门禁与趋势信号）。
 
 ## 长期目标（P3）
 

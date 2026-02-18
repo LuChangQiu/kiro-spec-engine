@@ -796,6 +796,7 @@ Dual-track handoff integration:
   - Default scan dir is `.kiro/reports/release-evidence`, default output file is `.kiro/reports/release-evidence/release-gate-history.json`.
   - `--history-file` merges an existing index (for example, previous release asset) before dedup/refresh.
   - `--keep` retains latest N entries (`1-5000`, default `200`).
+  - Aggregates include scene package batch and drift signals (`scene_package_batch_*`, `drift_alert_*`, `drift_block_*`) when present in gate reports.
   - `--markdown-out <path>` writes a human-readable trend card markdown for PR/Issue handoff.
 
 Recommended `.kiro/config/orchestrator.json`:

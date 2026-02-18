@@ -4862,6 +4862,127 @@ if (process.argv.includes('--json')) {
     ]));
   });
 
+  test('elevates governance risk when handoff lexicon unknown capability counts are positive', async () => {
+    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    await fs.ensureDir(closeLoopSessionDir);
+    await fs.ensureDir(batchSessionDir);
+    await fs.ensureDir(controllerSessionDir);
+    await fs.ensureDir(releaseEvidenceDir);
+
+    const closeLoopFile = path.join(closeLoopSessionDir, 'governance-handoff-lexicon-session.json');
+    await fs.writeJson(closeLoopFile, {
+      session_id: 'governance-handoff-lexicon-session',
+      status: 'completed',
+      portfolio: {
+        master_spec: '121-00-governance',
+        sub_specs: ['121-01-a']
+      }
+    }, { spaces: 2 });
+
+    const batchFile = path.join(batchSessionDir, 'governance-handoff-lexicon-batch.json');
+    await fs.writeJson(batchFile, {
+      mode: 'auto-close-loop-batch',
+      status: 'completed',
+      total_goals: 2,
+      processed_goals: 2,
+      batch_session: { id: 'governance-handoff-lexicon-batch', file: batchFile }
+    }, { spaces: 2 });
+
+    const controllerFile = path.join(controllerSessionDir, 'governance-handoff-lexicon-controller.json');
+    await fs.writeJson(controllerFile, {
+      mode: 'auto-close-loop-controller',
+      status: 'completed',
+      processed_goals: 2,
+      pending_goals: 0,
+      controller_session: { id: 'governance-handoff-lexicon-controller', file: controllerFile }
+    }, { spaces: 2 });
+
+    const releaseEvidenceFile = path.join(releaseEvidenceDir, 'handoff-runs.json');
+    await fs.writeJson(releaseEvidenceFile, {
+      mode: 'auto-handoff-release-evidence',
+      generated_at: '2026-02-18T00:00:00.000Z',
+      updated_at: '2026-02-18T01:00:00.000Z',
+      latest_session_id: 'handoff-lexicon-blocked',
+      total_runs: 2,
+      sessions: [
+        {
+          session_id: 'handoff-lexicon-blocked',
+          merged_at: '2026-02-18T01:00:00.000Z',
+          status: 'completed',
+          gate: {
+            passed: true,
+            actual: {
+              spec_success_rate_percent: 98,
+              risk_level: 'low',
+              ontology_quality_score: 95,
+              capability_expected_unknown_count: 1,
+              capability_provided_unknown_count: 2
+            }
+          },
+          capability_coverage: {
+            summary: {
+              coverage_percent: 100,
+              passed: true
+            }
+          },
+          release_gate_preflight: {
+            available: true,
+            blocked: false
+          }
+        },
+        {
+          session_id: 'handoff-lexicon-healthy',
+          merged_at: '2026-02-17T01:00:00.000Z',
+          status: 'completed',
+          gate: {
+            passed: true,
+            actual: {
+              spec_success_rate_percent: 99,
+              risk_level: 'low',
+              ontology_quality_score: 94,
+              capability_expected_unknown_count: 0,
+              capability_provided_unknown_count: 0
+            }
+          },
+          capability_coverage: {
+            summary: {
+              coverage_percent: 100,
+              passed: true
+            }
+          },
+          release_gate_preflight: {
+            available: true,
+            blocked: false
+          }
+        }
+      ]
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync(['node', 'sce', 'auto', 'governance', 'stats', '--json']);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-governance-stats');
+    expect(parsed.health.risk_level).toBe('high');
+    expect(parsed.health.handoff_quality).toEqual(expect.objectContaining({
+      latest_capability_expected_unknown_count: 1,
+      latest_capability_provided_unknown_count: 2,
+      capability_expected_unknown_positive_rate_percent: 50,
+      capability_provided_unknown_positive_rate_percent: 50
+    }));
+    expect(parsed.health.concerns).toEqual(expect.arrayContaining([
+      expect.stringContaining('manifest capability unknown count is 1'),
+      expect.stringContaining('template capability unknown count is 2')
+    ]));
+    expect(parsed.health.recommendations).toEqual(expect.arrayContaining([
+      expect.stringContaining('node scripts/moqui-lexicon-audit.js')
+    ]));
+  });
+
   test('plans governance maintenance actions in json mode without apply', async () => {
     const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
     await fs.ensureDir(closeLoopSessionDir);
@@ -5557,6 +5678,75 @@ if (process.argv.includes('--json')) {
     expect(parsed.recommendations).toEqual(expect.arrayContaining([
       expect.stringContaining('--max-moqui-matrix-regressions 0'),
       expect.stringContaining('sce scene moqui-baseline --include-all')
+    ]));
+  });
+
+  test('stops governance close-loop when handoff lexicon unknown counts are positive', async () => {
+    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    await fs.ensureDir(releaseEvidenceDir);
+    await fs.writeJson(path.join(releaseEvidenceDir, 'handoff-runs.json'), {
+      mode: 'auto-handoff-release-evidence',
+      generated_at: '2026-02-18T00:00:00.000Z',
+      updated_at: '2026-02-18T01:00:00.000Z',
+      latest_session_id: 'handoff-lexicon-blocked',
+      total_runs: 1,
+      sessions: [
+        {
+          session_id: 'handoff-lexicon-blocked',
+          merged_at: '2026-02-18T01:00:00.000Z',
+          status: 'completed',
+          gate: {
+            passed: true,
+            actual: {
+              spec_success_rate_percent: 98,
+              risk_level: 'low',
+              ontology_quality_score: 95,
+              capability_expected_unknown_count: 1,
+              capability_provided_unknown_count: 2
+            }
+          },
+          release_gate_preflight: {
+            available: true,
+            blocked: false
+          },
+          capability_coverage: {
+            summary: {
+              coverage_percent: 100,
+              passed: true
+            }
+          }
+        }
+      ]
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'sce',
+      'auto',
+      'governance',
+      'close-loop',
+      '--max-rounds',
+      '3',
+      '--target-risk',
+      'low',
+      '--json'
+    ]);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-governance-close-loop');
+    expect(parsed.stop_reason).toBe('release-gate-blocked');
+    expect(parsed.converged).toBe(false);
+    expect(parsed.stop_detail).toEqual(expect.objectContaining({
+      type: 'release-gate-block'
+    }));
+    expect(parsed.stop_detail.reasons).toEqual(expect.arrayContaining([
+      'handoff-capability-expected-unknown-positive:1',
+      'handoff-capability-provided-unknown-positive:2'
+    ]));
+    expect(parsed.recommendations).toEqual(expect.arrayContaining([
+      expect.stringContaining('node scripts/moqui-lexicon-audit.js')
     ]));
   });
 
@@ -8872,6 +9062,62 @@ if (process.argv.includes('--json')) {
       ]),
       expected_unknown: []
     }));
+    expect(runAutoCloseLoop).not.toHaveBeenCalled();
+  });
+
+  test('fails handoff run when template provides unknown capability aliases under lexicon gate', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-18T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-10-capability-lexicon-provided-unknown'],
+      templates: ['moqui-domain-extension'],
+      capabilities: ['erp-order-query-read'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-capability-lexicon-provided-unknown');
+    await fs.ensureDir(templateDir);
+    await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
+      capabilities: {
+        provides: ['erp-order-query-read', 'template-capability-unknown']
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'sce',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--dry-run',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('failed');
+    expect(payload.error).toContain('handoff capability lexicon gate failed');
+    expect(payload.error).toContain('capability_lexicon_provided_unknown_count 1 > allowed 0');
+    expect(payload.moqui_capability_coverage.summary).toEqual(expect.objectContaining({
+      covered_capabilities: 1,
+      uncovered_capabilities: 0,
+      coverage_percent: 100,
+      passed: true
+    }));
+    expect(payload.moqui_capability_coverage.normalization.provided_unknown).toEqual(expect.arrayContaining([
+      expect.objectContaining({ raw: 'template-capability-unknown', canonical: 'template-capability-unknown' })
+    ]));
+    expect(payload.recommendations).toEqual(expect.arrayContaining([
+      expect.stringContaining('node scripts/moqui-lexicon-audit.js')
+    ]));
     expect(runAutoCloseLoop).not.toHaveBeenCalled();
   });
 

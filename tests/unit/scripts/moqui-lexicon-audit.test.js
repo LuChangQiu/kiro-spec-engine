@@ -139,6 +139,65 @@ describe('moqui-lexicon-audit script', () => {
     expect(payload.templates[0].template_id).toBe('kse.scene--erp-order-query-read--0.1.0');
   });
 
+  test('infers expected capabilities from manifest templates when capabilities are missing', async () => {
+    const projectRoot = path.resolve(__dirname, '..', '..', '..');
+    const scriptPath = path.join(projectRoot, 'scripts', 'moqui-lexicon-audit.js');
+    const workspace = path.join(tempDir, 'workspace');
+    const manifestFile = path.join(workspace, 'docs', 'handoffs', 'handoff-manifest.json');
+    const templateRoot = path.join(workspace, '.kiro', 'templates', 'scene-packages');
+    const templateDir = path.join(templateRoot, 'sce.scene--erp-order-query-read--0.1.0');
+    const outFile = path.join(tempDir, 'moqui-lexicon-audit-infer.json');
+
+    await fs.ensureDir(path.dirname(manifestFile));
+    await fs.ensureDir(templateDir);
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-18T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['66-01-infer-sample'],
+      templates: ['sce.scene--erp-order-query-read--0.1.0'],
+      capabilities: []
+    }, { spaces: 2 });
+    await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
+      capabilities: {
+        provides: ['erp-order-query-read']
+      }
+    }, { spaces: 2 });
+
+    const result = spawnSync(
+      process.execPath,
+      [
+        scriptPath,
+        '--manifest',
+        'docs/handoffs/handoff-manifest.json',
+        '--template-dir',
+        '.kiro/templates/scene-packages',
+        '--lexicon',
+        path.join(projectRoot, 'lib', 'data', 'moqui-capability-lexicon.json'),
+        '--out',
+        outFile,
+        '--json',
+        '--fail-on-gap',
+      ],
+      {
+        cwd: workspace,
+        encoding: 'utf8',
+      }
+    );
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.summary.passed).toBe(true);
+    expect(payload.summary.expected_total).toBe(1);
+    expect(payload.summary.expected_source).toBe('manifest.templates');
+    expect(payload.coverage.coverage_percent).toBe(100);
+    expect(payload.expected_scope).toEqual(expect.objectContaining({
+      source: 'manifest.templates',
+      declared_count: 0,
+      inferred_count: 1,
+      unresolved_template_count: 0,
+    }));
+  });
+
   test('fails with exit code 2 when unknown lexicon gaps exist and --fail-on-gap is set', async () => {
     const projectRoot = path.resolve(__dirname, '..', '..', '..');
     const scriptPath = path.join(projectRoot, 'scripts', 'moqui-lexicon-audit.js');

@@ -829,6 +829,7 @@ Dual-track handoff integration:
 
 Moqui template library lexicon audit (script-level governance helper):
 - `node scripts/moqui-lexicon-audit.js [--manifest <path>] [--template-dir <path>] [--lexicon <path>] [--out <path>] [--markdown-out <path>] [--fail-on-gap] [--json]`: audit manifest/template capability names against canonical Moqui lexicon; reports unknown aliases and uncovered expected capabilities.
+  - Expected capability scope uses `manifest.capabilities` first; when empty, it infers canonical expected capabilities from `manifest.templates` and emits `expected_scope` metadata (`source`, `inferred_*`, `unresolved_templates`).
   - By default, template capability auditing is scoped to `manifest.templates` (when matched), reducing noise from unrelated templates.
   - Template scope matching normalizes `sce.scene--*` / `kse.scene--*` prefixes, so renamed template namespaces still map correctly.
 
@@ -840,12 +841,14 @@ Recommended `.kiro/config/orchestrator.json`:
   "maxParallel": 3,
   "timeoutSeconds": 900,
   "maxRetries": 2,
-  "rateLimitMaxRetries": 6,
-  "rateLimitBackoffBaseMs": 1000,
-  "rateLimitBackoffMaxMs": 30000,
+  "rateLimitMaxRetries": 8,
+  "rateLimitBackoffBaseMs": 1500,
+  "rateLimitBackoffMaxMs": 60000,
   "rateLimitAdaptiveParallel": true,
   "rateLimitParallelFloor": 1,
-  "rateLimitCooldownMs": 30000,
+  "rateLimitCooldownMs": 45000,
+  "rateLimitLaunchBudgetPerMinute": 8,
+  "rateLimitLaunchBudgetWindowMs": 60000,
   "apiKeyEnvVar": "CODEX_API_KEY",
   "codexArgs": ["--skip-git-repo-check"],
   "codexCommand": "npx @openai/codex"

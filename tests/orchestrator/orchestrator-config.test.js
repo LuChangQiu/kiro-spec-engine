@@ -37,13 +37,13 @@ describe('OrchestratorConfig', () => {
         maxParallel: 3,
         timeoutSeconds: 600,
         maxRetries: 2,
-        rateLimitMaxRetries: 6,
-        rateLimitBackoffBaseMs: 1000,
-        rateLimitBackoffMaxMs: 30000,
+        rateLimitMaxRetries: 8,
+        rateLimitBackoffBaseMs: 1500,
+        rateLimitBackoffMaxMs: 60000,
         rateLimitAdaptiveParallel: true,
         rateLimitParallelFloor: 1,
-        rateLimitCooldownMs: 30000,
-        rateLimitLaunchBudgetPerMinute: 12,
+        rateLimitCooldownMs: 45000,
+        rateLimitLaunchBudgetPerMinute: 8,
         rateLimitLaunchBudgetWindowMs: 60000,
         apiKeyEnvVar: 'CODEX_API_KEY',
         bootstrapTemplate: null,
@@ -101,13 +101,13 @@ describe('OrchestratorConfig', () => {
       // Other fields should be defaults
       expect(result.agentBackend).toBe('codex');
       expect(result.maxRetries).toBe(2);
-      expect(result.rateLimitMaxRetries).toBe(6);
-      expect(result.rateLimitBackoffBaseMs).toBe(1000);
-      expect(result.rateLimitBackoffMaxMs).toBe(30000);
+      expect(result.rateLimitMaxRetries).toBe(8);
+      expect(result.rateLimitBackoffBaseMs).toBe(1500);
+      expect(result.rateLimitBackoffMaxMs).toBe(60000);
       expect(result.rateLimitAdaptiveParallel).toBe(true);
       expect(result.rateLimitParallelFloor).toBe(1);
-      expect(result.rateLimitCooldownMs).toBe(30000);
-      expect(result.rateLimitLaunchBudgetPerMinute).toBe(12);
+      expect(result.rateLimitCooldownMs).toBe(45000);
+      expect(result.rateLimitLaunchBudgetPerMinute).toBe(8);
       expect(result.rateLimitLaunchBudgetWindowMs).toBe(60000);
       expect(result.apiKeyEnvVar).toBe('CODEX_API_KEY');
       expect(result.bootstrapTemplate).toBeNull();

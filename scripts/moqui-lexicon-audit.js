@@ -161,6 +161,58 @@ function collectManifestTemplateIdentifiers(manifestPayload) {
   return identifiers;
 }
 
+function normalizeTemplateCapabilityCandidate(value) {
+  const normalizedTemplate = normalizeTemplateIdentifier(value);
+  if (!normalizedTemplate) {
+    return null;
+  }
+  let candidate = normalizedTemplate.replace(/^scene--/, '');
+  candidate = candidate.replace(
+    /--\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?(?:\+[a-z0-9.-]+)?$/,
+    ''
+  );
+  candidate = candidate.replace(/--\d{4}(?:-\d{2}){1,2}(?:-[a-z0-9-]+)?$/, '');
+  return normalizeCapabilityToken(candidate);
+}
+
+function inferExpectedCapabilitiesFromTemplates(templateIdentifiers = [], lexiconIndex) {
+  const capabilities = [];
+  const capabilitySet = new Set();
+  const inferredFrom = [];
+  const unresolvedTemplates = [];
+  const unresolvedSet = new Set();
+
+  for (const templateId of templateIdentifiers) {
+    const candidate = normalizeTemplateCapabilityCandidate(templateId);
+    if (!candidate) {
+      continue;
+    }
+    const descriptor = resolveCapabilityDescriptor(candidate, lexiconIndex);
+    if (descriptor && descriptor.is_known) {
+      if (!capabilitySet.has(descriptor.canonical)) {
+        capabilitySet.add(descriptor.canonical);
+        capabilities.push(descriptor.canonical);
+      }
+      inferredFrom.push({
+        template: templateId,
+        normalized_template: candidate,
+        capability: descriptor.canonical
+      });
+      continue;
+    }
+    if (!unresolvedSet.has(templateId)) {
+      unresolvedSet.add(templateId);
+      unresolvedTemplates.push(templateId);
+    }
+  }
+
+  return {
+    capabilities,
+    inferred_from: inferredFrom,
+    unresolved_templates: unresolvedTemplates
+  };
+}
+
 async function collectTemplateProvidedCapabilities(templateRoot) {
   const results = [];
   if (!(await fs.pathExists(templateRoot))) {
@@ -300,6 +352,9 @@ function toRate(numerator, denominator) {
 function buildMarkdownReport(report) {
   const summary = report.summary && typeof report.summary === 'object' ? report.summary : {};
   const coverage = report.coverage && typeof report.coverage === 'object' ? report.coverage : {};
+  const expectedScope = report.expected_scope && typeof report.expected_scope === 'object'
+    ? report.expected_scope
+    : {};
   const lines = [];
   lines.push('# Moqui Lexicon Audit');
   lines.push('');
@@ -312,6 +367,9 @@ function buildMarkdownReport(report) {
   lines.push('## Summary');
   lines.push('');
   lines.push(`- Expected capabilities: ${summary.expected_total}`);
+  lines.push(`- Expected source: ${expectedScope.source || 'none'}`);
+  lines.push(`- Expected inferred count: ${expectedScope.inferred_count || 0}`);
+  lines.push(`- Expected unresolved templates: ${expectedScope.unresolved_template_count || 0}`);
   lines.push(`- Expected unknown: ${summary.expected_unknown_count}`);
   lines.push(`- Provided capabilities: ${summary.provided_total}`);
   lines.push(`- Provided unknown: ${summary.provided_unknown_count}`);
@@ -352,6 +410,18 @@ function buildMarkdownReport(report) {
     lines.push('');
   }
 
+  if (
+    Array.isArray(expectedScope.unresolved_templates) &&
+    expectedScope.unresolved_templates.length > 0
+  ) {
+    lines.push('## Expected Inference Unresolved Templates');
+    lines.push('');
+    for (const templateId of expectedScope.unresolved_templates) {
+      lines.push(`- ${templateId}`);
+    }
+    lines.push('');
+  }
+
   lines.push('## Recommendations');
   lines.push('');
   const recommendations = Array.isArray(report.recommendations) ? report.recommendations : [];
@@ -370,6 +440,9 @@ function buildRecommendations(report) {
   const recommendations = [];
   const summary = report.summary && typeof report.summary === 'object' ? report.summary : {};
   const coverage = report.coverage && typeof report.coverage === 'object' ? report.coverage : {};
+  const expectedScope = report.expected_scope && typeof report.expected_scope === 'object'
+    ? report.expected_scope
+    : {};
 
   if (summary.expected_unknown_count > 0) {
     recommendations.push(
@@ -394,6 +467,19 @@ function buildRecommendations(report) {
       'Replace deprecated capability aliases with canonical capability IDs in manifests and templates.'
     );
   }
+  if (expectedScope.source === 'none') {
+    recommendations.push(
+      'Declare manifest capabilities or use lexicon-aligned scene template names so expected scope is not empty.'
+    );
+  }
+  if (
+    expectedScope.source === 'manifest.templates' &&
+    expectedScope.unresolved_template_count > 0
+  ) {
+    recommendations.push(
+      'Template-based capability inference has unresolved template names; align template IDs with lexicon capability names or declare manifest capabilities explicitly.'
+    );
+  }
 
   return recommendations;
 }
@@ -416,8 +502,22 @@ async function main() {
   const manifestPayload = await fs.readJson(manifestPath);
   const lexiconPayload = await fs.readJson(lexiconPath);
   const lexiconIndex = buildLexiconIndex(lexiconPayload);
-  const expectedValues = collectManifestCapabilities(manifestPayload);
+  const manifestCapabilities = collectManifestCapabilities(manifestPayload);
   const manifestTemplateIdentifiers = collectManifestTemplateIdentifiers(manifestPayload);
+  const capabilityInference = inferExpectedCapabilitiesFromTemplates(
+    manifestTemplateIdentifiers,
+    lexiconIndex
+  );
+  let expectedValues = manifestCapabilities;
+  let expectedSource = 'manifest.capabilities';
+  if (manifestCapabilities.length === 0) {
+    if (capabilityInference.capabilities.length > 0) {
+      expectedValues = capabilityInference.capabilities;
+      expectedSource = 'manifest.templates';
+    } else {
+      expectedSource = 'none';
+    }
+  }
   const templates = await collectTemplateProvidedCapabilities(templateRoot);
   const manifestTemplateIdentifierSet = new Set(manifestTemplateIdentifiers);
   const scopedTemplates = manifestTemplateIdentifierSet.size > 0
@@ -449,6 +549,7 @@ async function main() {
   );
   const summary = {
     expected_total: expectedDescriptors.length,
+    expected_source: expectedSource,
     expected_known_count: expectedDescriptors.length - expectedUnknown.length,
     expected_unknown_count: expectedUnknown.length,
     expected_alias_count: expectedAliases.length,
@@ -472,6 +573,16 @@ async function main() {
       manifest_templates_total: manifestTemplateIdentifiers.length,
       matched_templates_count: scopedTemplates.length,
       using_manifest_scope: manifestTemplateIdentifierSet.size > 0 && scopedTemplates.length > 0,
+    },
+    expected_scope: {
+      source: expectedSource,
+      declared_count: manifestCapabilities.length,
+      effective_count: expectedValues.length,
+      inferred_count: capabilityInference.capabilities.length,
+      inferred_capabilities: capabilityInference.capabilities,
+      inferred_from_templates: capabilityInference.inferred_from,
+      unresolved_template_count: capabilityInference.unresolved_templates.length,
+      unresolved_templates: capabilityInference.unresolved_templates
     },
     lexicon: {
       file: path.relative(process.cwd(), lexiconPath),

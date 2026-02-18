@@ -4730,6 +4730,138 @@ if (process.argv.includes('--json')) {
     ]));
   });
 
+  test('elevates governance risk when handoff Moqui matrix regressions exceed gate', async () => {
+    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    await fs.ensureDir(closeLoopSessionDir);
+    await fs.ensureDir(batchSessionDir);
+    await fs.ensureDir(controllerSessionDir);
+    await fs.ensureDir(releaseEvidenceDir);
+
+    const closeLoopFile = path.join(closeLoopSessionDir, 'governance-handoff-matrix-session.json');
+    await fs.writeJson(closeLoopFile, {
+      session_id: 'governance-handoff-matrix-session',
+      status: 'completed',
+      portfolio: {
+        master_spec: '121-00-governance',
+        sub_specs: ['121-01-a']
+      }
+    }, { spaces: 2 });
+
+    const batchFile = path.join(batchSessionDir, 'governance-handoff-matrix-batch.json');
+    await fs.writeJson(batchFile, {
+      mode: 'auto-close-loop-batch',
+      status: 'completed',
+      total_goals: 2,
+      processed_goals: 2,
+      batch_session: { id: 'governance-handoff-matrix-batch', file: batchFile }
+    }, { spaces: 2 });
+
+    const controllerFile = path.join(controllerSessionDir, 'governance-handoff-matrix-controller.json');
+    await fs.writeJson(controllerFile, {
+      mode: 'auto-close-loop-controller',
+      status: 'completed',
+      processed_goals: 2,
+      pending_goals: 0,
+      controller_session: { id: 'governance-handoff-matrix-controller', file: controllerFile }
+    }, { spaces: 2 });
+
+    const releaseEvidenceFile = path.join(releaseEvidenceDir, 'handoff-runs.json');
+    await fs.writeJson(releaseEvidenceFile, {
+      mode: 'auto-handoff-release-evidence',
+      generated_at: '2026-02-18T00:00:00.000Z',
+      updated_at: '2026-02-18T01:00:00.000Z',
+      latest_session_id: 'handoff-matrix-regression',
+      total_runs: 2,
+      sessions: [
+        {
+          session_id: 'handoff-matrix-regression',
+          merged_at: '2026-02-18T01:00:00.000Z',
+          status: 'completed',
+          gate: {
+            passed: true,
+            actual: {
+              spec_success_rate_percent: 96,
+              risk_level: 'low',
+              ontology_quality_score: 92
+            }
+          },
+          capability_coverage: {
+            summary: {
+              coverage_percent: 100,
+              passed: true
+            }
+          },
+          release_gate_preflight: {
+            available: true,
+            blocked: false
+          },
+          moqui_baseline: {
+            compare: {
+              coverage_matrix_deltas: {
+                business_rule_closed: { count: -1, rate_percent: -25 },
+                decision_closed: { count: 0, rate_percent: 0 }
+              }
+            }
+          },
+          policy: {
+            max_moqui_matrix_regressions: 0
+          }
+        },
+        {
+          session_id: 'handoff-matrix-healthy',
+          merged_at: '2026-02-17T01:00:00.000Z',
+          status: 'completed',
+          gate: {
+            passed: true,
+            actual: {
+              spec_success_rate_percent: 98,
+              risk_level: 'low',
+              ontology_quality_score: 93,
+              moqui_matrix_regression_count: 0
+            }
+          },
+          capability_coverage: {
+            summary: {
+              coverage_percent: 100,
+              passed: true
+            }
+          },
+          release_gate_preflight: {
+            available: true,
+            blocked: false
+          },
+          policy: {
+            max_moqui_matrix_regressions: 0
+          }
+        }
+      ]
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync(['node', 'sce', 'auto', 'governance', 'stats', '--json']);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-governance-stats');
+    expect(parsed.health.risk_level).toBe('high');
+    expect(parsed.health.handoff_quality).toEqual(expect.objectContaining({
+      latest_moqui_matrix_regression_count: 1,
+      latest_moqui_matrix_regression_gate_max: 0,
+      avg_moqui_matrix_regression_count: 0.5,
+      max_moqui_matrix_regression_count: 1,
+      moqui_matrix_regression_positive_rate_percent: 50
+    }));
+    expect(parsed.health.concerns).toEqual(expect.arrayContaining([
+      expect.stringContaining('Moqui matrix regressions exceed gate')
+    ]));
+    expect(parsed.health.recommendations).toEqual(expect.arrayContaining([
+      expect.stringContaining('--max-moqui-matrix-regressions 0')
+    ]));
+  });
+
   test('plans governance maintenance actions in json mode without apply', async () => {
     const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
     await fs.ensureDir(closeLoopSessionDir);
@@ -5347,6 +5479,84 @@ if (process.argv.includes('--json')) {
     expect(parsed.recommendations).toEqual(expect.arrayContaining([
       expect.stringContaining('sce auto handoff evidence --window 5 --json'),
       expect.stringContaining('--continue-from latest --continue-strategy failed-only')
+    ]));
+  });
+
+  test('stops governance close-loop when handoff Moqui matrix regressions exceed gate', async () => {
+    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    await fs.ensureDir(releaseEvidenceDir);
+    await fs.writeJson(path.join(releaseEvidenceDir, 'handoff-runs.json'), {
+      mode: 'auto-handoff-release-evidence',
+      generated_at: '2026-02-18T00:00:00.000Z',
+      updated_at: '2026-02-18T01:00:00.000Z',
+      latest_session_id: 'handoff-matrix-blocked',
+      total_runs: 1,
+      sessions: [
+        {
+          session_id: 'handoff-matrix-blocked',
+          merged_at: '2026-02-18T01:00:00.000Z',
+          status: 'completed',
+          gate: {
+            passed: true,
+            actual: {
+              spec_success_rate_percent: 96,
+              risk_level: 'low',
+              ontology_quality_score: 92
+            }
+          },
+          release_gate_preflight: {
+            available: true,
+            blocked: false
+          },
+          capability_coverage: {
+            summary: {
+              coverage_percent: 100,
+              passed: true
+            }
+          },
+          moqui_baseline: {
+            compare: {
+              coverage_matrix_deltas: {
+                business_rule_closed: { count: -1, rate_percent: -20 }
+              }
+            }
+          },
+          policy: {
+            max_moqui_matrix_regressions: 0
+          }
+        }
+      ]
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'sce',
+      'auto',
+      'governance',
+      'close-loop',
+      '--max-rounds',
+      '3',
+      '--target-risk',
+      'low',
+      '--json'
+    ]);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-governance-close-loop');
+    expect(parsed.stop_reason).toBe('release-gate-blocked');
+    expect(parsed.converged).toBe(false);
+    expect(parsed.stop_detail).toEqual(expect.objectContaining({
+      type: 'release-gate-block'
+    }));
+    expect(parsed.stop_detail.reasons).toEqual(expect.arrayContaining([
+      'handoff-moqui-matrix-regressions-positive:1',
+      'handoff-moqui-matrix-regressions-over-gate:1/0'
+    ]));
+    expect(parsed.recommendations).toEqual(expect.arrayContaining([
+      expect.stringContaining('--max-moqui-matrix-regressions 0'),
+      expect.stringContaining('sce scene moqui-baseline --include-all')
     ]));
   });
 

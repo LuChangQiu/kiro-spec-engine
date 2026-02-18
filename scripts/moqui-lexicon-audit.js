@@ -122,6 +122,45 @@ function collectManifestCapabilities(manifestPayload) {
   return capabilities;
 }
 
+function normalizeTemplateIdentifier(value) {
+  if (value === undefined || value === null) {
+    return null;
+  }
+  const normalized = `${value}`
+    .trim()
+    .toLowerCase()
+    .replace(/\\/g, '/');
+  if (!normalized) {
+    return null;
+  }
+  const base = normalized.split('/').pop() || normalized;
+  return base.replace(/^[a-z0-9-]+\.scene--/, 'scene--');
+}
+
+function collectManifestTemplateIdentifiers(manifestPayload) {
+  const entries = Array.isArray(manifestPayload && manifestPayload.templates)
+    ? manifestPayload.templates
+    : [];
+  const identifiers = [];
+  const seen = new Set();
+  for (const entry of entries) {
+    const candidate = typeof entry === 'string'
+      ? entry
+      : (
+        entry && typeof entry === 'object'
+          ? (entry.id || entry.template_id || entry.template || entry.name)
+          : null
+      );
+    const normalized = normalizeTemplateIdentifier(candidate);
+    if (!normalized || seen.has(normalized)) {
+      continue;
+    }
+    seen.add(normalized);
+    identifiers.push(normalized);
+  }
+  return identifiers;
+}
+
 async function collectTemplateProvidedCapabilities(templateRoot) {
   const results = [];
   if (!(await fs.pathExists(templateRoot))) {
@@ -378,8 +417,16 @@ async function main() {
   const lexiconPayload = await fs.readJson(lexiconPath);
   const lexiconIndex = buildLexiconIndex(lexiconPayload);
   const expectedValues = collectManifestCapabilities(manifestPayload);
+  const manifestTemplateIdentifiers = collectManifestTemplateIdentifiers(manifestPayload);
   const templates = await collectTemplateProvidedCapabilities(templateRoot);
-  const providedValues = templates.flatMap(item => item.provides || []);
+  const manifestTemplateIdentifierSet = new Set(manifestTemplateIdentifiers);
+  const scopedTemplates = manifestTemplateIdentifierSet.size > 0
+    ? templates.filter(item => manifestTemplateIdentifierSet.has(
+      normalizeTemplateIdentifier(item && item.template_id)
+    ))
+    : templates;
+  const selectedTemplates = scopedTemplates.length > 0 ? scopedTemplates : templates;
+  const providedValues = selectedTemplates.flatMap(item => item.provides || []);
 
   const expectedDescriptors = collectUniqueDescriptors(expectedValues, lexiconIndex);
   const providedDescriptors = collectUniqueDescriptors(providedValues, lexiconIndex);
@@ -421,6 +468,11 @@ async function main() {
     generated_at: new Date().toISOString(),
     manifest_path: path.relative(process.cwd(), manifestPath),
     template_root: path.relative(process.cwd(), templateRoot),
+    template_scope: {
+      manifest_templates_total: manifestTemplateIdentifiers.length,
+      matched_templates_count: scopedTemplates.length,
+      using_manifest_scope: manifestTemplateIdentifierSet.size > 0 && scopedTemplates.length > 0,
+    },
     lexicon: {
       file: path.relative(process.cwd(), lexiconPath),
       version: lexiconIndex.version,
@@ -446,7 +498,7 @@ async function main() {
       uncovered_expected: uncoveredExpected,
       coverage_percent: coveragePercent,
     },
-    templates,
+    templates: selectedTemplates,
     recommendations: [],
   };
   report.recommendations = buildRecommendations(report);

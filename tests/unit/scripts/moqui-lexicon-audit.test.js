@@ -63,9 +63,80 @@ describe('moqui-lexicon-audit script', () => {
       uncovered_expected_count: 0,
       passed: true,
     }));
+    expect(payload.template_scope).toEqual(expect.objectContaining({
+      manifest_templates_total: 1,
+      matched_templates_count: 1,
+      using_manifest_scope: true,
+    }));
     expect(payload.coverage.coverage_percent).toBe(100);
     expect(await fs.pathExists(outFile)).toBe(true);
     expect(await fs.pathExists(markdownFile)).toBe(true);
+  });
+
+  test('filters provided capabilities to manifest template scope with kse/sce prefix normalization', async () => {
+    const projectRoot = path.resolve(__dirname, '..', '..', '..');
+    const scriptPath = path.join(projectRoot, 'scripts', 'moqui-lexicon-audit.js');
+    const workspace = path.join(tempDir, 'workspace');
+    const manifestFile = path.join(workspace, 'docs', 'handoffs', 'handoff-manifest.json');
+    const templateRoot = path.join(workspace, '.kiro', 'templates', 'scene-packages');
+    const targetTemplateDir = path.join(templateRoot, 'kse.scene--erp-order-query-read--0.1.0');
+    const noiseTemplateDir = path.join(templateRoot, 'kse.scene--scene-package-contract-declaration--0.2.0');
+    const outFile = path.join(tempDir, 'moqui-lexicon-audit-scoped.json');
+
+    await fs.ensureDir(path.dirname(manifestFile));
+    await fs.ensureDir(targetTemplateDir);
+    await fs.ensureDir(noiseTemplateDir);
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-18T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['66-01-gap-sample'],
+      templates: ['sce.scene--erp-order-query-read--0.1.0'],
+      capabilities: ['erp-order-query-read']
+    }, { spaces: 2 });
+    await fs.writeJson(path.join(targetTemplateDir, 'scene-package.json'), {
+      capabilities: {
+        provides: ['erp-order-query-read']
+      }
+    }, { spaces: 2 });
+    await fs.writeJson(path.join(noiseTemplateDir, 'scene-package.json'), {
+      capabilities: {
+        provides: ['scene.scene-domain-profile.core']
+      }
+    }, { spaces: 2 });
+
+    const result = spawnSync(
+      process.execPath,
+      [
+        scriptPath,
+        '--manifest',
+        'docs/handoffs/handoff-manifest.json',
+        '--template-dir',
+        '.kiro/templates/scene-packages',
+        '--lexicon',
+        path.join(projectRoot, 'lib', 'data', 'moqui-capability-lexicon.json'),
+        '--out',
+        outFile,
+        '--json',
+        '--fail-on-gap',
+      ],
+      {
+        cwd: workspace,
+        encoding: 'utf8',
+      }
+    );
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.summary.passed).toBe(true);
+    expect(payload.summary.provided_unknown_count).toBe(0);
+    expect(payload.coverage.coverage_percent).toBe(100);
+    expect(payload.template_scope).toEqual(expect.objectContaining({
+      manifest_templates_total: 1,
+      matched_templates_count: 1,
+      using_manifest_scope: true,
+    }));
+    expect(payload.templates).toHaveLength(1);
+    expect(payload.templates[0].template_id).toBe('kse.scene--erp-order-query-read--0.1.0');
   });
 
   test('fails with exit code 2 when unknown lexicon gaps exist and --fail-on-gap is set', async () => {

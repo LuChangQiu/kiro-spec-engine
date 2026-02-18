@@ -1,5 +1,5 @@
 {
-  "version": "2026.02.18",
+  "version": "2026.02.18.1",
   "source": "sce-moqui-core",
   "capabilities": [
     {
@@ -8,7 +8,8 @@
         "order-query-read",
         "order-read",
         "moqui-order-query-read",
-        "moqui-order-read"
+        "moqui-order-read",
+        "scene.erp.order.query.read"
       ],
       "deprecated_aliases": [
         "order-query",
@@ -21,7 +22,8 @@
         "order-fulfillment-workflow",
         "order-fulfillment",
         "fulfillment-workflow",
-        "moqui-order-fulfillment"
+        "moqui-order-fulfillment",
+        "scene.erp.order.fulfillment.workflow"
       ],
       "deprecated_aliases": [
         "order-fulfilment-workflow",
@@ -34,7 +36,8 @@
         "inventory-reserve-adjust",
         "inventory-adjust",
         "inventory-reserve",
-        "moqui-inventory-reserve-adjust"
+        "moqui-inventory-reserve-adjust",
+        "scene.erp.inventory.reserve.adjust"
       ],
       "deprecated_aliases": [
         "inventory-adjustment",

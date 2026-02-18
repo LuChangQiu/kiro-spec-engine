@@ -827,6 +827,8 @@ Dual-track handoff integration:
 
 Moqui template library lexicon audit (script-level governance helper):
 - `node scripts/moqui-lexicon-audit.js [--manifest <path>] [--template-dir <path>] [--lexicon <path>] [--out <path>] [--markdown-out <path>] [--fail-on-gap] [--json]`: audit manifest/template capability names against canonical Moqui lexicon; reports unknown aliases and uncovered expected capabilities.
+  - By default, template capability auditing is scoped to `manifest.templates` (when matched), reducing noise from unrelated templates.
+  - Template scope matching normalizes `sce.scene--*` / `kse.scene--*` prefixes, so renamed template namespaces still map correctly.
 
 Recommended `.kiro/config/orchestrator.json`:
 

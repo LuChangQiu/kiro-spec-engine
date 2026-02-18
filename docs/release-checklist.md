@@ -107,6 +107,7 @@ Ensure:
   - `KSE_RELEASE_GATE_REQUIRE_SCENE_BATCH_PASS`: require scene package publish-batch gate passed (`true|false`, default `true`)
   - `KSE_RELEASE_GATE_MAX_SCENE_BATCH_FAILURES`: maximum allowed scene package batch failure count (default `0`)
 - Optional: tune release drift alerts in release notes:
+  - Drift evaluation is executed by `scripts/release-drift-evaluate.js` in CI (history load, alert calc, gate report writeback, enforce exit code).
   - `KSE_RELEASE_DRIFT_ENFORCE`: `true|false` (default `false`), block publish when drift alerts are triggered
   - `KSE_RELEASE_DRIFT_FAIL_STREAK_MIN`: minimum consecutive failed gates to trigger alert (default `2`)
   - `KSE_RELEASE_DRIFT_HIGH_RISK_SHARE_MIN_PERCENT`: minimum high-risk share in latest 5 versions (default `60`)

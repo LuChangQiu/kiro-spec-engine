@@ -107,6 +107,7 @@ git log --oneline -n 15
   - `KSE_RELEASE_GATE_REQUIRE_SCENE_BATCH_PASS`：是否要求 scene package publish-batch gate 必须通过（`true|false`，默认 `true`）
   - `KSE_RELEASE_GATE_MAX_SCENE_BATCH_FAILURES`：scene package batch 失败数量最大允许值（默认 `0`）
 - 可选：通过仓库变量调节 Release Notes 中的漂移告警阈值：
+  - CI 中漂移评估由 `scripts/release-drift-evaluate.js` 执行（历史读取、告警计算、gate 报告写回、enforce 退出码）。
   - `KSE_RELEASE_DRIFT_ENFORCE`：`true|false`（默认 `false`），触发 drift alert 时阻断发布
   - `KSE_RELEASE_DRIFT_FAIL_STREAK_MIN`：触发告警的最小连续失败次数（默认 `2`）
   - `KSE_RELEASE_DRIFT_HIGH_RISK_SHARE_MIN_PERCENT`：近 5 版 high 风险占比告警阈值（默认 `60`）

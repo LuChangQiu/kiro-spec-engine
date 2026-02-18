@@ -4577,6 +4577,138 @@ if (process.argv.includes('--json')) {
     ]));
   });
 
+  test('elevates governance risk when handoff quality degrades', async () => {
+    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    await fs.ensureDir(closeLoopSessionDir);
+    await fs.ensureDir(batchSessionDir);
+    await fs.ensureDir(controllerSessionDir);
+    await fs.ensureDir(releaseEvidenceDir);
+
+    const closeLoopFile = path.join(closeLoopSessionDir, 'governance-handoff-quality-session.json');
+    await fs.writeJson(closeLoopFile, {
+      session_id: 'governance-handoff-quality-session',
+      status: 'completed',
+      portfolio: {
+        master_spec: '121-00-governance',
+        sub_specs: ['121-01-a']
+      }
+    }, { spaces: 2 });
+
+    const batchFile = path.join(batchSessionDir, 'governance-handoff-quality-batch.json');
+    await fs.writeJson(batchFile, {
+      mode: 'auto-close-loop-batch',
+      status: 'completed',
+      total_goals: 2,
+      processed_goals: 2,
+      batch_session: { id: 'governance-handoff-quality-batch', file: batchFile }
+    }, { spaces: 2 });
+
+    const controllerFile = path.join(controllerSessionDir, 'governance-handoff-quality-controller.json');
+    await fs.writeJson(controllerFile, {
+      mode: 'auto-close-loop-controller',
+      status: 'completed',
+      processed_goals: 2,
+      pending_goals: 0,
+      controller_session: { id: 'governance-handoff-quality-controller', file: controllerFile }
+    }, { spaces: 2 });
+
+    const releaseEvidenceFile = path.join(releaseEvidenceDir, 'handoff-runs.json');
+    await fs.writeJson(releaseEvidenceFile, {
+      mode: 'auto-handoff-release-evidence',
+      generated_at: '2026-02-18T00:00:00.000Z',
+      updated_at: '2026-02-18T01:00:00.000Z',
+      latest_session_id: 'handoff-degraded',
+      total_runs: 2,
+      sessions: [
+        {
+          session_id: 'handoff-degraded',
+          merged_at: '2026-02-18T01:00:00.000Z',
+          status: 'failed',
+          gate: {
+            passed: false,
+            actual: {
+              spec_success_rate_percent: 72,
+              risk_level: 'high',
+              ontology_quality_score: 65
+            }
+          },
+          release_gate_preflight: {
+            available: true,
+            blocked: true
+          },
+          failure_summary: {
+            highlights: ['release_gate_preflight: latest-release-gate-failed']
+          },
+          capability_coverage: {
+            summary: {
+              coverage_percent: 70,
+              passed: false
+            }
+          },
+          scene_package_batch: {
+            summary: {
+              batch_gate_passed: false
+            }
+          },
+          batch_summary: {
+            failed_goals: 2
+          }
+        },
+        {
+          session_id: 'handoff-healthy',
+          merged_at: '2026-02-17T01:00:00.000Z',
+          status: 'completed',
+          gate: {
+            passed: true,
+            actual: {
+              spec_success_rate_percent: 98,
+              risk_level: 'low',
+              ontology_quality_score: 92
+            }
+          },
+          capability_coverage: {
+            summary: {
+              coverage_percent: 100,
+              passed: true
+            }
+          },
+          scene_package_batch: {
+            summary: {
+              batch_gate_passed: true
+            }
+          },
+          batch_summary: {
+            failed_goals: 0
+          }
+        }
+      ]
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync(['node', 'kse', 'auto', 'governance', 'stats', '--json']);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-governance-stats');
+    expect(parsed.health.risk_level).toBe('high');
+    expect(parsed.health.handoff_quality).toEqual(expect.objectContaining({
+      available: true,
+      latest_status: 'failed',
+      latest_gate_passed: false,
+      latest_ontology_quality_score: 65,
+      latest_capability_coverage_passed: false
+    }));
+    expect(parsed.health.concerns).toEqual(expect.arrayContaining([
+      expect.stringContaining('Latest handoff run status is failed')
+    ]));
+    expect(parsed.health.recommendations).toEqual(expect.arrayContaining([
+      expect.stringContaining('kse auto handoff evidence --window 5 --json')
+    ]));
+  });
+
   test('plans governance maintenance actions in json mode without apply', async () => {
     const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
     await fs.ensureDir(closeLoopSessionDir);
@@ -4688,6 +4820,67 @@ if (process.argv.includes('--json')) {
     expect(parsed.plan).toEqual(expect.arrayContaining([
       expect.objectContaining({
         id: 'release-gate-scene-batch-remediate',
+        enabled: true,
+        apply_supported: false
+      })
+    ]));
+  });
+
+  test('adds handoff remediation action in governance maintain plan when handoff quality blocks', async () => {
+    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    await fs.ensureDir(releaseEvidenceDir);
+    await fs.writeJson(path.join(releaseEvidenceDir, 'handoff-runs.json'), {
+      mode: 'auto-handoff-release-evidence',
+      generated_at: '2026-02-18T00:00:00.000Z',
+      updated_at: '2026-02-18T01:00:00.000Z',
+      latest_session_id: 'handoff-blocked',
+      total_runs: 1,
+      sessions: [
+        {
+          session_id: 'handoff-blocked',
+          merged_at: '2026-02-18T01:00:00.000Z',
+          status: 'failed',
+          gate: {
+            passed: false,
+            actual: {
+              spec_success_rate_percent: 70,
+              risk_level: 'high',
+              ontology_quality_score: 66
+            }
+          },
+          release_gate_preflight: {
+            available: true,
+            blocked: true
+          },
+          capability_coverage: {
+            summary: {
+              coverage_percent: 65,
+              passed: false
+            }
+          },
+          batch_summary: {
+            failed_goals: 2
+          }
+        }
+      ]
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'governance',
+      'maintain',
+      '--json'
+    ]);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-governance-maintain');
+    expect(parsed.plan).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: 'release-gate-handoff-remediate',
         enabled: true,
         apply_supported: false
       })
@@ -5046,6 +5239,93 @@ if (process.argv.includes('--json')) {
     ]));
     expect(parsed.recommendations).toEqual(expect.arrayContaining([
       expect.stringContaining('kse auto handoff evidence --window 5 --json')
+    ]));
+  });
+
+  test('stops governance close-loop when handoff quality is blocked', async () => {
+    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    await fs.ensureDir(releaseEvidenceDir);
+    await fs.writeJson(path.join(releaseEvidenceDir, 'release-gate-history.json'), {
+      mode: 'auto-handoff-release-gate-history',
+      total_entries: 3,
+      latest: {
+        tag: 'v1.47.40',
+        gate_passed: true,
+        risk_level: 'low'
+      },
+      aggregates: {
+        pass_rate_percent: 100,
+        scene_package_batch_pass_rate_percent: 100,
+        drift_alert_rate_percent: 0,
+        drift_alert_runs: 0,
+        drift_blocked_runs: 0
+      },
+      entries: []
+    }, { spaces: 2 });
+    await fs.writeJson(path.join(releaseEvidenceDir, 'handoff-runs.json'), {
+      mode: 'auto-handoff-release-evidence',
+      generated_at: '2026-02-18T00:00:00.000Z',
+      updated_at: '2026-02-18T01:00:00.000Z',
+      latest_session_id: 'handoff-blocked',
+      total_runs: 1,
+      sessions: [
+        {
+          session_id: 'handoff-blocked',
+          merged_at: '2026-02-18T01:00:00.000Z',
+          status: 'failed',
+          gate: {
+            passed: false,
+            actual: {
+              spec_success_rate_percent: 70,
+              risk_level: 'high',
+              ontology_quality_score: 66
+            }
+          },
+          release_gate_preflight: {
+            available: true,
+            blocked: true
+          },
+          capability_coverage: {
+            summary: {
+              coverage_percent: 65,
+              passed: false
+            }
+          },
+          batch_summary: {
+            failed_goals: 2
+          }
+        }
+      ]
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'governance',
+      'close-loop',
+      '--max-rounds',
+      '3',
+      '--target-risk',
+      'low',
+      '--json'
+    ]);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-governance-close-loop');
+    expect(parsed.stop_reason).toBe('release-gate-blocked');
+    expect(parsed.converged).toBe(false);
+    expect(parsed.stop_detail).toEqual(expect.objectContaining({
+      type: 'release-gate-block'
+    }));
+    expect(parsed.stop_detail.reasons).toEqual(expect.arrayContaining([
+      expect.stringContaining('handoff-latest-status:failed')
+    ]));
+    expect(parsed.recommendations).toEqual(expect.arrayContaining([
+      expect.stringContaining('kse auto handoff evidence --window 5 --json'),
+      expect.stringContaining('--continue-from latest --continue-strategy failed-only')
     ]));
   });
 
@@ -8757,6 +9037,12 @@ if (process.argv.includes('--json')) {
         sessions: ['handoff-old']
       })
     }));
+    expect(payload.governance_snapshot).toEqual(expect.objectContaining({
+      mode: 'auto-governance-stats',
+      health: expect.objectContaining({
+        risk_level: expect.any(String)
+      })
+    }));
   });
 
   test('supports handoff evidence markdown format output file', async () => {
@@ -8847,6 +9133,7 @@ if (process.argv.includes('--json')) {
     expect(markdown).toContain('## Current Moqui Baseline');
     expect(markdown).toContain('## Current Scene Package Batch');
     expect(markdown).toContain('## Risk Layer View');
+    expect(markdown).toContain('## Governance Snapshot');
   });
 
   test('validates handoff evidence window option range', async () => {
@@ -8998,6 +9285,7 @@ if (process.argv.includes('--json')) {
     expect(releaseDraft).toContain('Release gate preflight blocked: yes');
     expect(releaseDraft).toContain('Release gate preflight hard-gate: enabled');
     expect(releaseDraft).toContain('## Risk Layer Snapshot');
+    expect(releaseDraft).toContain('## Governance Snapshot');
     expect(releaseDraft).toContain('## Release Evidence Artifacts');
 
     const reviewMarkdown = await fs.readFile(payload.release_draft.review_file, 'utf8');

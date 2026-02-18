@@ -135,12 +135,22 @@
    - 增加 `tests/fixtures/release-drift-history/*.json`，模拟阻断与健康两类 release history 摘要。
    - 单测覆盖共享脚本对 fixture 的告警输出，先行固化 workflow 级门禁口径。
 
-## 下一阶段（P2）
+## 已完成（本轮补齐）
 
-1. 增加 release workflow 端到端 smoke（mock env + step 输入输出），覆盖 `release.yml` 中 drift 门禁结果回写 gate report 的链路。
+1. release workflow drift 门禁补齐端到端 smoke 链路：
+   - 新增 `scripts/release-drift-evaluate.js`，统一处理历史读取、阈值评估、gate report `drift` 写回、summary 输出与阻断退出码。
+   - `release.yml` 的 Evaluate drift 步骤改为直接调用脚本，消除大段内联 heredoc，降低语法错误与维护成本。
+   - 新增 `tests/unit/scripts/release-drift-evaluate.test.js` 覆盖 advisory/enforce/missing history/gate report 写回四类场景。
+2. handoff 质量指标接入 governance 默认评估闭环：
+   - `kse auto governance stats` 默认聚合 `.kiro/reports/release-evidence/handoff-runs.json`，输出 `health.handoff_quality` 快照。
+   - `risk/concerns/recommendations` 自动纳入 handoff 最新状态、gate、ontology、capability、preflight 阻断等信号。
+   - `kse auto governance close-loop` 的阻断判断纳入 handoff 严重质量信号，统一通过 `stop_reason=release-gate-blocked` 回传处置语义。
+   - `kse auto governance maintain` 在 handoff 质量阻断时新增 `release-gate-handoff-remediate` 建议动作。
+3. release evidence 与治理视图合并：
+   - `kse auto handoff evidence` 报告新增 `governance_snapshot`（risk/concerns/recommendations + release/handoff health）。
+   - evidence markdown 与 release draft 同步输出 `Governance Snapshot` 区块，形成可发布的一体化治理审阅材料。
 
-## 长期目标（P3）
+## 下一阶段（新）
 
-1. 抽象成通用“外部项目 handoff 适配框架”（不只 331-poc）。
-2. 与 release evidence 合并，形成可发布的治理报表。
-3. 将 handoff 质量指标纳入 `kse auto governance close-loop` 的默认评估维度。
+1. 在 release workflow 中将 `governance_snapshot` 抽出为独立 release asset（JSON/Markdown），便于外部审计直接消费。
+2. 将 handoff 模板适配抽象为 profile（moqui/default/enterprise），对外发布通用外部项目接入规范。

@@ -6982,6 +6982,22 @@ if (process.argv.includes('--json')) {
     await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
       capabilities: {
         provides: ['erp-order-query-read']
+      },
+      governance_contract: {
+        business_rules: [
+          { id: 'rule.query.filter' }
+        ],
+        decision_logic: [
+          { id: 'decision.query.empty' }
+        ]
+      },
+      ontology_model: {
+        entities: [
+          { id: 'order_header' }
+        ],
+        relations: [
+          { source: 'order_header', target: 'order_projection', type: 'produces' }
+        ]
       }
     }, { spaces: 2 });
 
@@ -7010,7 +7026,7 @@ if (process.argv.includes('--json')) {
     const markdown = await fs.readFile(outFile, 'utf8');
     expect(markdown).toContain('# Auto Handoff Capability Matrix');
     expect(markdown).toContain('## Capability Coverage');
-    expect(markdown).toContain('| Capability | Covered | Matched Templates |');
+    expect(markdown).toContain('| Capability | Covered | Semantic Complete | Missing Semantic Dimensions | Matched Templates |');
     expect(markdown).toContain('erp-order-query-read');
   });
 
@@ -7054,6 +7070,96 @@ if (process.argv.includes('--json')) {
     expect(payload.mode).toBe('auto-handoff-capability-matrix');
     expect(payload.gates.passed).toBe(false);
     expect(payload.gates.reasons.some(item => item.includes('capability-coverage:capability_coverage_percent'))).toBe(true);
+  });
+
+  test('fails capability matrix semantic gate by default when semantic dimensions are missing', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-26-capability-matrix-semantic-default'],
+      templates: ['tpl-matrix-semantic-missing'],
+      capabilities: ['erp-order-query-read'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-matrix-semantic-missing');
+    await fs.ensureDir(templateDir);
+    await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
+      capabilities: {
+        provides: ['erp-order-query-read']
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'capability-matrix',
+      '--manifest',
+      manifestFile,
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-capability-matrix');
+    expect(payload.capability_coverage.summary).toEqual(expect.objectContaining({
+      coverage_percent: 100,
+      passed: true,
+      semantic_complete_percent: 0,
+      semantic_passed: false
+    }));
+    expect(payload.gates.passed).toBe(false);
+    expect(payload.gates.reasons.some(item => item.includes('capability-semantic:capability_semantic_percent'))).toBe(true);
+  });
+
+  test('allows bypassing capability semantic gate with --no-require-capability-semantic', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-27-capability-matrix-semantic-bypass'],
+      templates: ['tpl-matrix-semantic-bypass'],
+      capabilities: ['erp-order-query-read'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-matrix-semantic-bypass');
+    await fs.ensureDir(templateDir);
+    await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
+      capabilities: {
+        provides: ['erp-order-query-read']
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'capability-matrix',
+      '--manifest',
+      manifestFile,
+      '--no-require-capability-semantic',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-capability-matrix');
+    expect(payload.capability_coverage.summary).toEqual(expect.objectContaining({
+      coverage_percent: 100,
+      semantic_complete_percent: 0,
+      semantic_passed: false
+    }));
+    expect(payload.gates.capability_semantic.passed).toBe(true);
+    expect(payload.gates.passed).toBe(true);
   });
 
   test('runs handoff pipeline end-to-end and archives run report', async () => {

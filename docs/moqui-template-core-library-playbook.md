@@ -16,6 +16,7 @@ KSE defaults already enforce the baseline below:
 - `kse auto handoff run`: generates Moqui baseline snapshot by default and appends it to release-evidence sessions.
 - `kse auto handoff run`: requires Moqui baseline portfolio pass by default.
 - `kse auto handoff run`: evaluates capability coverage matrix by default when manifest `capabilities` is declared (default minimum `100%`).
+- `kse auto handoff capability-matrix`: enforces both capability coverage and capability semantic completeness (default minimum `100%` for each).
 - `kse scene package-publish-batch`:
   - ontology validation required by default
   - batch ontology gate defaults:

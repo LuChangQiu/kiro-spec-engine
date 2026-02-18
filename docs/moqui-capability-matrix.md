@@ -54,6 +54,8 @@ kse auto handoff capability-matrix \
   --json
 ```
 
+`capability-matrix` now checks both capability coverage and semantic completeness (ontology entities/relations + governance business rules/decision logic) by default.
+
 When gaps exist, KSE writes remediation queue lines (default `.kiro/auto/moqui-remediation.lines`) that can be fed directly into:
 
 ```bash

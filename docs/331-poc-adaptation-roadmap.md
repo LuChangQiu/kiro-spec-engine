@@ -131,10 +131,13 @@
 45. release workflow 漂移口径抽离共享脚本：
    - 新增 `scripts/release-drift-signals.js` 统一计算 drift/preflight/hard-gate 信号。
    - release notes 生成与 drift gate 判定复用同一计算模块，减少规则分叉。
+46. release drift fixture 回放样例：
+   - 增加 `tests/fixtures/release-drift-history/*.json`，模拟阻断与健康两类 release history 摘要。
+   - 单测覆盖共享脚本对 fixture 的告警输出，先行固化 workflow 级门禁口径。
 
 ## 下一阶段（P2）
 
-1. 为 release drift 共享脚本补充 workflow 级回归样例（历史摘要 fixture），覆盖发布门禁的端到端回放。
+1. 增加 release workflow 端到端 smoke（mock env + step 输入输出），覆盖 `release.yml` 中 drift 门禁结果回写 gate report 的链路。
 
 ## 长期目标（P3）
 

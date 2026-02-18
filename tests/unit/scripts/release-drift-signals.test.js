@@ -1,5 +1,8 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
+
 const {
   buildReleaseDriftSignals,
   parseBoolean,
@@ -110,5 +113,54 @@ describe('release drift signals', () => {
     expect(parseBoolean('')).toBe(false);
     expect(parseBoolean('not-a-bool', true)).toBe(true);
   });
-});
 
+  test('replays blocked fixture and emits composite drift alerts', () => {
+    const blockedFixture = JSON.parse(
+      fs.readFileSync(
+        path.join(__dirname, '../../fixtures/release-drift-history/blocked.json'),
+        'utf8'
+      )
+    );
+
+    const signals = buildReleaseDriftSignals(blockedFixture, {
+      thresholds: {
+        failStreakMin: 2,
+        highRiskShareMinPercent: 60,
+        highRiskShareDeltaMinPercent: 10,
+        preflightBlockRateMinPercent: 50,
+        hardGateBlockStreakMin: 2,
+        preflightUnavailableStreakMin: 2
+      }
+    });
+
+    expect(signals.alerts).toEqual(expect.arrayContaining([
+      expect.stringContaining('consecutive gate failures'),
+      expect.stringContaining('high-risk share'),
+      expect.stringContaining('release preflight blocked rate'),
+      expect.stringContaining('hard-gate preflight blocked streak'),
+      expect.stringContaining('release preflight unavailable streak')
+    ]));
+  });
+
+  test('replays healthy fixture and keeps alert list empty', () => {
+    const healthyFixture = JSON.parse(
+      fs.readFileSync(
+        path.join(__dirname, '../../fixtures/release-drift-history/healthy.json'),
+        'utf8'
+      )
+    );
+
+    const signals = buildReleaseDriftSignals(healthyFixture, {
+      thresholds: {
+        failStreakMin: 2,
+        highRiskShareMinPercent: 60,
+        highRiskShareDeltaMinPercent: 10,
+        preflightBlockRateMinPercent: 50,
+        hardGateBlockStreakMin: 2,
+        preflightUnavailableStreakMin: 2
+      }
+    });
+
+    expect(signals.alerts).toEqual([]);
+  });
+});

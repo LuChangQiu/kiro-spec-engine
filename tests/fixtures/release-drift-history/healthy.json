@@ -1,0 +1,50 @@
+{
+  "mode": "auto-handoff-release-gate-history",
+  "total_entries": 5,
+  "entries": [
+    {
+      "tag": "v1.5.0",
+      "gate_passed": true,
+      "risk_level": "low",
+      "release_gate_preflight_available": true,
+      "release_gate_preflight_blocked": false,
+      "require_release_gate_preflight": false
+    },
+    {
+      "tag": "v1.4.0",
+      "gate_passed": true,
+      "risk_level": "low",
+      "release_gate_preflight_available": true,
+      "release_gate_preflight_blocked": false,
+      "require_release_gate_preflight": false
+    },
+    {
+      "tag": "v1.3.0",
+      "gate_passed": true,
+      "risk_level": "medium",
+      "release_gate_preflight_available": true,
+      "release_gate_preflight_blocked": false,
+      "require_release_gate_preflight": false
+    },
+    {
+      "tag": "v1.2.0",
+      "gate_passed": true,
+      "risk_level": "low",
+      "release_gate_preflight_available": true,
+      "release_gate_preflight_blocked": false,
+      "require_release_gate_preflight": false
+    },
+    {
+      "tag": "v1.1.0",
+      "gate_passed": true,
+      "risk_level": "low",
+      "release_gate_preflight_available": true,
+      "release_gate_preflight_blocked": false,
+      "require_release_gate_preflight": false
+    }
+  ],
+  "aggregates": {
+    "pass_rate_percent": 100,
+    "release_gate_preflight_block_rate_percent": 0
+  }
+}

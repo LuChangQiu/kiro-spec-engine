@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **SCE naming consolidation + compatibility bridge**: Rebranded product naming to `Scene Capability Engine`, moved package to `scene-capability-engine`, promoted `sce` as the primary CLI command, and preserved `sco` / `sce` / `scene-capability-engine` aliases for migration continuity.
+- **Official template library v1.5.0 alignment**: Synced with `scene-capability-engine-templates` `v1.5.0`, adding scene orchestration template coverage for canvas visualization, interaction hardening, execution playbook, dependency drilldown, decision cockpit, runbook export, action queue orchestration, action pack export, and unified scene governance closure.
 - **Branding consistency release guard**: Added `test:brand-consistency` to block publish when legacy repository/package/product naming reappears in tracked source files.
 - **Rate-limit launch budget safety guard**: Hardened orchestration launch-budget bookkeeping to safely handle partially initialized engine instances in property/instrumentation scenarios.
 - **Property test CI stability (`orchestration-engine.property`)**: Disabled launch-budget waiting in parallel invariant property harness to avoid artificial 60s hold windows and intermittent Jest worker crashes under high-concurrency CI runs.

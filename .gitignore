@@ -68,6 +68,8 @@ test-project/
 .kiro/backups/
 .kiro/logs/
 .kiro/reports/
+.kiro/auto/
+.kiro/incoming/
 
 # Spec artifacts (COMMIT - team shared)
 # specs/ directory is committed by default, but exclude temporary files
@@ -87,11 +89,23 @@ test-project/
 
 # Tools and config (COMMIT - team shared)
 # .kiro/tools/, .kiro/config/ are committed by default
+# Runtime state files in config (DO NOT commit - machine/session specific)
+.kiro/config/agent-registry.json
+.kiro/config/orchestration-status.json
 
 # Temporary files
 *.tmp
 .tmp/
 temp/
+
+# Local build artifacts
+kiro-spec-engine-*.tgz
+scene-capability-engine-*.tgz
+
+# Test runtime artifacts
+tests/fixtures/moqui-core-regression/workspace/.SCE/
+tests/fixtures/moqui-core-regression/workspace/.kiro/auto/
+tests/fixtures/moqui-core-regression/workspace/.kiro/reports/
 
 # Credentials (NEVER commit!)
 .credentials.txt

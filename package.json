@@ -1,6 +1,6 @@
 {
   "name": "sco-engine",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "SCO (Scene Capability Orchestrator) - A CLI tool and npm package for spec-driven development with AI coding assistants.",
   "main": "index.js",
   "bin": {

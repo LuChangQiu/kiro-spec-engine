@@ -731,6 +731,13 @@ describe('Property 4: 并行度不变量 (Parallel Invariant)', () => {
     engine._completedSpecs = new Set();
     engine._runningAgents = new Map();
     engine._executionPlan = null;
+    // Disable launch-budget waiting in property tests so scheduling checks stay fast
+    // and deterministic even when the real engine has rate-limit launch controls.
+    engine._rateLimitLaunchBudgetPerMinute = 0;
+    engine._rateLimitLaunchBudgetWindowMs = 60000;
+    engine._rateLimitLaunchTimestamps = [];
+    engine._launchBudgetLastHoldSignalAt = 0;
+    engine._launchBudgetLastHoldMs = 0;
 
     let currentConcurrent = 0;
 

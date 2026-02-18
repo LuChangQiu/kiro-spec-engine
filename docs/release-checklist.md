@@ -104,6 +104,8 @@ Ensure:
   - `KSE_RELEASE_GATE_MAX_RISK_LEVEL`: `low|medium|high|unknown` (default `unknown`)
   - `KSE_RELEASE_GATE_MAX_UNMAPPED_RULES`: maximum allowed unmapped ontology business rules
   - `KSE_RELEASE_GATE_MAX_UNDECIDED_DECISIONS`: maximum allowed undecided ontology decisions
+  - `KSE_RELEASE_GATE_REQUIRE_SCENE_BATCH_PASS`: require scene package publish-batch gate passed (`true|false`, default `false`)
+  - `KSE_RELEASE_GATE_MAX_SCENE_BATCH_FAILURES`: maximum allowed scene package batch failure count (default unlimited)
 - Optional: tune release drift alerts in release notes:
   - `KSE_RELEASE_DRIFT_ENFORCE`: `true|false` (default `false`), block publish when drift alerts are triggered
   - `KSE_RELEASE_DRIFT_FAIL_STREAK_MIN`: minimum consecutive failed gates to trigger alert (default `2`)

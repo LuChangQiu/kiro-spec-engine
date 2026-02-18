@@ -246,6 +246,8 @@ jobs:
           RELEASE_GATE_MAX_RISK_LEVEL: ${{ vars.KSE_RELEASE_GATE_MAX_RISK_LEVEL }}
           RELEASE_GATE_MAX_UNMAPPED_RULES: ${{ vars.KSE_RELEASE_GATE_MAX_UNMAPPED_RULES }}
           RELEASE_GATE_MAX_UNDECIDED_DECISIONS: ${{ vars.KSE_RELEASE_GATE_MAX_UNDECIDED_DECISIONS }}
+          RELEASE_GATE_REQUIRE_SCENE_BATCH_PASS: ${{ vars.KSE_RELEASE_GATE_REQUIRE_SCENE_BATCH_PASS }}
+          RELEASE_GATE_MAX_SCENE_BATCH_FAILURES: ${{ vars.KSE_RELEASE_GATE_MAX_SCENE_BATCH_FAILURES }}
           RELEASE_EVIDENCE_SUMMARY_FILE: ${{ steps.release_notes.outputs.summary_file }}
           RELEASE_EVIDENCE_USED: ${{ steps.release_notes.outputs.evidence_used }}
           RELEASE_GATE_REPORT_FILE: ${{ steps.release_notes.outputs.gate_file }}
@@ -310,6 +312,8 @@ jobs:
           const maxRiskLevel = parseRiskLevel('RELEASE_GATE_MAX_RISK_LEVEL', 'unknown');
           const maxUnmappedRules = parseNumber('RELEASE_GATE_MAX_UNMAPPED_RULES', Number.POSITIVE_INFINITY);
           const maxUndecidedDecisions = parseNumber('RELEASE_GATE_MAX_UNDECIDED_DECISIONS', Number.POSITIVE_INFINITY);
+          const requireSceneBatchPass = parseBoolean('RELEASE_GATE_REQUIRE_SCENE_BATCH_PASS', false);
+          const maxSceneBatchFailures = parseNumber('RELEASE_GATE_MAX_SCENE_BATCH_FAILURES', Number.POSITIVE_INFINITY);
           const evidenceUsed = parseBoolean('RELEASE_EVIDENCE_USED', false);
           const summaryFile = read('RELEASE_EVIDENCE_SUMMARY_FILE', '');
           const gateReportFile = read('RELEASE_GATE_REPORT_FILE', '');
@@ -400,6 +404,14 @@ jobs:
               if (Number.isFinite(undecidedDecisions) && undecidedDecisions > maxUndecidedDecisions) {
                 violations.push(`ontology undecided decisions ${undecidedDecisions} > max ${maxUndecidedDecisions}`);
               }
+              if (requireSceneBatchPass) {
+                if (sceneBatchPassed !== true) {
+                  violations.push(`scene package batch status ${sceneBatchStatus} is not passed`);
+                }
+              }
+              if (Number.isFinite(sceneBatchFailureCount) && sceneBatchFailureCount > maxSceneBatchFailures) {
+                violations.push(`scene package batch failure count ${sceneBatchFailureCount} > max ${maxSceneBatchFailures}`);
+              }
             } catch (error) {
               signals.push(`summary=parse_error:${error.message}`);
               violations.push(`release evidence summary parse failed: ${error.message}`);
@@ -423,7 +435,9 @@ jobs:
                 min_spec_success_rate: minSpecSuccessRate,
                 max_risk_level: maxRiskLevel,
                 max_unmapped_rules: Number.isFinite(maxUnmappedRules) ? maxUnmappedRules : null,
-                max_undecided_decisions: Number.isFinite(maxUndecidedDecisions) ? maxUndecidedDecisions : null
+                max_undecided_decisions: Number.isFinite(maxUndecidedDecisions) ? maxUndecidedDecisions : null,
+                require_scene_batch_pass: requireSceneBatchPass,
+                max_scene_batch_failures: Number.isFinite(maxSceneBatchFailures) ? maxSceneBatchFailures : null
               },
               summary_file: summaryFile || null,
               scene_package_batch_status: null,
@@ -472,7 +486,9 @@ jobs:
               `- min spec success rate: ${minSpecSuccessRate}`,
               `- max risk level: ${maxRiskLevel}`,
               `- max unmapped rules: ${Number.isFinite(maxUnmappedRules) ? maxUnmappedRules : 'inf'}`,
-              `- max undecided decisions: ${Number.isFinite(maxUndecidedDecisions) ? maxUndecidedDecisions : 'inf'}`
+              `- max undecided decisions: ${Number.isFinite(maxUndecidedDecisions) ? maxUndecidedDecisions : 'inf'}`,
+              `- require scene batch pass: ${requireSceneBatchPass}`,
+              `- max scene batch failures: ${Number.isFinite(maxSceneBatchFailures) ? maxSceneBatchFailures : 'inf'}`
             ];
             if (configWarnings.length > 0) {
               lines.push('', '### Config Warnings');

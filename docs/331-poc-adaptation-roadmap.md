@@ -107,10 +107,13 @@
 37. 治理会话统计聚合 release gate 轮次趋势：
    - `kse auto governance session stats` 新增 `release_gate` 聚合区块，覆盖 gate fail/drift alert/blocked 与通过率均值。
    - 会话统计输出同时汇总 `round_telemetry_observed/changed`，可量化治理轮次对发布质量信号的影响。
+38. 治理 close-loop 接入 release gate 阻断语义：
+   - `kse auto governance close-loop` 在 release gate/drift 信号异常时输出 `stop_reason=release-gate-blocked`。
+   - 结果新增 `stop_detail` 与 `recommendations`，显式给出阻断原因与处置命令。
 
 ## 下一阶段（P2）
 
-1. 将 release gate 聚合趋势进一步接入 `kse auto governance close-loop` 的 stop reason/recommendations，给出显式治理阻断原因。
+1. 将 release gate 阻断语义接入 `kse auto governance maintain` 的 action plan 优先级，先处理发布质量阻断再做常规清理。
 
 ## 长期目标（P3）
 

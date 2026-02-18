@@ -4950,6 +4950,57 @@ if (process.argv.includes('--json')) {
     expect(await fs.pathExists(controllerNew)).toBe(true);
   });
 
+  test('stops governance close-loop when release gate is blocked', async () => {
+    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    await fs.ensureDir(releaseEvidenceDir);
+    await fs.writeJson(path.join(releaseEvidenceDir, 'release-gate-history.json'), {
+      mode: 'auto-handoff-release-gate-history',
+      total_entries: 6,
+      latest: {
+        tag: 'v1.47.35',
+        gate_passed: false,
+        risk_level: 'high'
+      },
+      aggregates: {
+        pass_rate_percent: 45,
+        scene_package_batch_pass_rate_percent: 55,
+        drift_alert_rate_percent: 100,
+        drift_alert_runs: 3,
+        drift_blocked_runs: 2
+      },
+      entries: []
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'governance',
+      'close-loop',
+      '--max-rounds',
+      '3',
+      '--target-risk',
+      'low',
+      '--json'
+    ]);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-governance-close-loop');
+    expect(parsed.stop_reason).toBe('release-gate-blocked');
+    expect(parsed.converged).toBe(false);
+    expect(parsed.stop_detail).toEqual(expect.objectContaining({
+      type: 'release-gate-block'
+    }));
+    expect(parsed.stop_detail.reasons).toEqual(expect.arrayContaining([
+      expect.stringContaining('latest-release-gate-failed')
+    ]));
+    expect(parsed.recommendations).toEqual(expect.arrayContaining([
+      expect.stringContaining('kse auto handoff evidence --window 5 --json')
+    ]));
+  });
+
   test('runs governance close-loop with advisory execution enabled', async () => {
     runAutoCloseLoop.mockResolvedValue({
       status: 'completed',

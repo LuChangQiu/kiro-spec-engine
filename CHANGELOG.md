@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Capability lexicon hard gate end-to-end defaultization**: `sce auto handoff run` and `sce auto handoff capability-matrix` now enforce unknown Moqui capability alias blocking by default (expected/provided), emit lexicon gate telemetry into release evidence, and promote those signals into governance risk/concern/recommendation/close-loop block decisions.
 - **SCE naming consolidation + compatibility bridge**: Rebranded product naming to `Scene Capability Engine`, moved package to `scene-capability-engine`, promoted `sce` as the primary CLI command, and preserved `sco` / `sce` / `scene-capability-engine` aliases for migration continuity.
 - **Official template library v1.5.0 alignment**: Synced with `scene-capability-engine-templates` `v1.5.0`, adding scene orchestration template coverage for canvas visualization, interaction hardening, execution playbook, dependency drilldown, decision cockpit, runbook export, action queue orchestration, action pack export, and unified scene governance closure.
 - **Branding consistency release guard**: Added `test:brand-consistency` to block publish when legacy repository/package/product naming reappears in tracked source files.

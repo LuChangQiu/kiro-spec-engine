@@ -8774,6 +8774,9 @@ if (process.argv.includes('--json')) {
           session_id: 'handoff-one',
           merged_at: '2026-02-16T01:00:00.000Z',
           status: 'completed',
+          policy: {
+            require_release_gate_preflight: false
+          },
           gate: {
             passed: true,
             actual: {
@@ -8781,6 +8784,18 @@ if (process.argv.includes('--json')) {
               risk_level: 'low',
               ontology_quality_score: 88
             }
+          },
+          release_gate_preflight: {
+            available: true,
+            blocked: false,
+            latest_tag: 'v1.47.35',
+            latest_gate_passed: true,
+            reasons: []
+          },
+          failure_summary: {
+            gate_failed: false,
+            release_gate_preflight_blocked: false,
+            highlights: []
           },
           ontology_validation: {
             status: 'passed',
@@ -8825,6 +8840,8 @@ if (process.argv.includes('--json')) {
     const markdown = await fs.readFile(outFile, 'utf8');
     expect(markdown).toContain('# Auto Handoff Release Evidence Review');
     expect(markdown).toContain('## Current Gate');
+    expect(markdown).toContain('## Current Release Gate Preflight');
+    expect(markdown).toContain('## Current Failure Summary');
     expect(markdown).toContain('## Current Ontology');
     expect(markdown).toContain('## Current Regression');
     expect(markdown).toContain('## Current Moqui Baseline');
@@ -8902,6 +8919,9 @@ if (process.argv.includes('--json')) {
           merged_at: '2026-02-16T01:00:00.000Z',
           status: 'completed',
           handoff_report_file: '.kiro/reports/handoff-runs/handoff-one.json',
+          policy: {
+            require_release_gate_preflight: true
+          },
           gate: {
             passed: true,
             actual: {
@@ -8909,6 +8929,18 @@ if (process.argv.includes('--json')) {
               risk_level: 'low',
               ontology_quality_score: 91
             }
+          },
+          release_gate_preflight: {
+            available: true,
+            blocked: true,
+            latest_tag: 'v1.47.35',
+            latest_gate_passed: false,
+            reasons: ['latest-release-gate-failed', 'drift-alert-rate-positive:100']
+          },
+          failure_summary: {
+            gate_failed: false,
+            release_gate_preflight_blocked: true,
+            highlights: ['release_gate_preflight: latest-release-gate-failed']
           },
           ontology_validation: {
             status: 'passed',
@@ -8963,12 +8995,16 @@ if (process.argv.includes('--json')) {
     expect(releaseDraft).toContain('# Release Notes Draft: v9.9.9');
     expect(releaseDraft).toContain('Release date: 2026-02-17');
     expect(releaseDraft).toContain('## Handoff Evidence Summary');
+    expect(releaseDraft).toContain('Release gate preflight blocked: yes');
+    expect(releaseDraft).toContain('Release gate preflight hard-gate: enabled');
     expect(releaseDraft).toContain('## Risk Layer Snapshot');
     expect(releaseDraft).toContain('## Release Evidence Artifacts');
 
     const reviewMarkdown = await fs.readFile(payload.release_draft.review_file, 'utf8');
     expect(reviewMarkdown).toContain('# Auto Handoff Release Evidence Review');
     expect(reviewMarkdown).toContain('## Current Gate');
+    expect(reviewMarkdown).toContain('## Current Release Gate Preflight');
+    expect(reviewMarkdown).toContain('## Current Failure Summary');
   });
 
   test('builds release gate history index by merging reports with seed history', async () => {

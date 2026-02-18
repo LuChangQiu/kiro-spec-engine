@@ -119,10 +119,13 @@
 41. handoff run 增加 release gate 可选硬门禁：
    - 新增 `--require-release-gate-preflight`，可在生产场景将 release gate preflight 从 advisory 升级为 hard-fail。
    - 默认保持 advisory，避免对现有项目引入破坏性变更。
+42. release draft/evidence review 纳入 preflight 与失败摘要信号：
+   - `kse auto handoff evidence --format markdown` 新增 `Current Release Gate Preflight` 与 `Current Failure Summary`。
+   - release notes draft 摘要新增 preflight 可用性、阻断状态、hard-gate 模式与失败高亮。
 
 ## 下一阶段（P2）
 
-1. 将 handoff run 的 release gate preflight/hard-gate 信号接入 release draft 与 gate-index 趋势卡片，形成发布闭环看板。
+1. 将 handoff run 的 release gate preflight/hard-gate 信号接入 gate-index 趋势卡片，形成跨版本发布闭环看板。
 
 ## 长期目标（P3）
 

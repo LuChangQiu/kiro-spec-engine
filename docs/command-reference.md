@@ -790,8 +790,8 @@ Dual-track handoff integration:
 - `kse auto handoff evidence [--file <path>] [--session-id <id|latest>] [--window <n>] [--format <json|markdown>] [--out <path>] [--json]`: quick-review merged release evidence and render current-batch gate/ontology/regression/moqui-baseline/capability-coverage/risk-layer overview.
   - Default evidence file is `.kiro/reports/release-evidence/handoff-runs.json`.
   - `--window` (1-50, default `5`) controls how many recent sessions are aggregated in review.
-  - JSON output includes `current_overview`, `aggregates.status_counts`, `aggregates.gate_pass_rate_percent`, and `risk_layers`.
-  - Markdown output includes `Current Gate`, `Current Ontology`, `Current Regression`, `Current Moqui Baseline`, `Current Capability Coverage`, `Trend Series`, and `Risk Layer View`.
+  - JSON output includes `current_overview` (with `release_gate_preflight`, `failure_summary`, and preflight policy flags), `aggregates.status_counts`, `aggregates.gate_pass_rate_percent`, and `risk_layers`.
+  - Markdown output includes `Current Gate`, `Current Release Gate Preflight`, `Current Failure Summary`, `Current Ontology`, `Current Regression`, `Current Moqui Baseline`, `Current Capability Coverage`, `Trend Series`, and `Risk Layer View`.
   - Add `--release-draft <path>` to auto-generate a release notes draft and evidence review markdown in one run.
   - `--release-version` sets draft version tag (defaults to `v<package.json version>`), and `--release-date` accepts `YYYY-MM-DD` (default: current UTC date).
   - Use `--review-out <path>` to override the generated evidence review markdown path (default `.kiro/reports/release-evidence/handoff-evidence-review.md`).

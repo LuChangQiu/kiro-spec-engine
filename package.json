@@ -1,11 +1,12 @@
 {
-  "name": "kiro-spec-engine",
-  "version": "1.47.38",
-  "description": "kiro-spec-engine (kse) - A CLI tool and npm package for spec-driven development with AI coding assistants. NOT the Kiro IDE desktop application.",
+  "name": "sco-engine",
+  "version": "2.0.0",
+  "description": "SCO (Scene Capability Orchestrator) - A CLI tool and npm package for spec-driven development with AI coding assistants.",
   "main": "index.js",
   "bin": {
-    "kiro-spec-engine": "bin/kiro-spec-engine.js",
-    "kse": "bin/kiro-spec-engine.js"
+    "sco": "bin/sco.js",
+    "kse": "bin/kse.js",
+    "kiro-spec-engine": "bin/kiro-spec-engine.js"
   },
   "files": [
     "bin/",
@@ -39,7 +40,7 @@
     "prepublishOnly": "npm run test:full && npm run test:skip-audit",
     "publish:manual": "npm publish --access public",
     "install-global": "npm install -g .",
-    "uninstall-global": "npm uninstall -g kiro-spec-engine"
+    "uninstall-global": "npm uninstall -g sco-engine"
   },
   "keywords": [
     "kiro",
@@ -60,7 +61,10 @@
     "english",
     "development-tools",
     "quality-enhancement",
-    "sisyphus"
+    "sisyphus",
+    "sco",
+    "scene",
+    "orchestrator"
   ],
   "author": "heguangyong",
   "license": "MIT",

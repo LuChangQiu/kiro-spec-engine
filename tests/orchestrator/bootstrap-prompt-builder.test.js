@@ -106,7 +106,7 @@ describe('BootstrapPromptBuilder', () => {
     test('falls back to default summary when README is missing', async () => {
       const prompt = await builder.buildPrompt('any-spec');
 
-      expect(prompt).toContain('kse (Kiro Spec Engine)');
+      expect(prompt).toContain('SCO (Scene Capability Orchestrator)');
     });
   });
 

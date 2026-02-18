@@ -1,10 +1,11 @@
-# kse - Kiro Spec Engine
+# SCO - Scene Capability Orchestrator
 
-[![npm version](https://badge.fury.io/js/kiro-spec-engine.svg)](https://badge.fury.io/js/kiro-spec-engine)
+[![npm version](https://badge.fury.io/js/sco-engine.svg)](https://badge.fury.io/js/sco-engine)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **⚠️ Important Clarification**: `kiro-spec-engine` (kse) is an **npm package and CLI tool** for spec-driven development.  
+> **⚠️ Important Clarification**: `sco-engine` (`sco`) is an **npm package and CLI tool** for spec-driven development.  
 > It is **NOT** the Kiro IDE desktop application. If you're looking for Kiro IDE, visit https://kiro.dev
+> Legacy commands `kse` and `kiro-spec-engine` remain available for compatibility.
 
 **A context provider for AI coding tools** - Structure your project requirements, design, and tasks so AI assistants can help you build better software.
 
@@ -14,43 +15,43 @@ English | [简体中文](README.zh.md)
 
 ---
 
-## What is kse?
+## What is sco?
 
-**kse (Kiro Spec Engine) is a context management system for AI-assisted development.** It helps you organize project information into structured "Specs" (Requirements → Design → Tasks) that AI tools can understand and use effectively.
+**SCO (Scene Capability Orchestrator) is a context management system for AI-assisted development.** It helps you organize project information into structured "Specs" (Requirements → Design → Tasks) that AI tools can understand and use effectively.
 
-Think of kse as a **librarian for your AI assistant** - it organizes and presents project context so your AI tool knows exactly what you're building, why, and how.
+Think of sco as a **librarian for your AI assistant** - it organizes and presents project context so your AI tool knows exactly what you're building, why, and how.
 
 ### How it Works
 
 ```mermaid
 graph LR
-    A[You create Specs] --> B[kse organizes context]
+    A[You create Specs] --> B[sco organizes context]
     B --> C[AI tool reads context]
     C --> D[AI generates better code]
 ```
 
 1. **You create Specs** - Write requirements, design, and tasks in structured markdown files
-2. **kse organizes context** - Exports formatted context optimized for AI tools
+2. **sco organizes context** - Exports formatted context optimized for AI tools
 3. **AI tool reads context** - Your AI assistant understands your project structure
 4. **AI generates better code** - Code that matches your design and requirements
 
-### What kse is NOT
+### What sco is NOT
 
-- ❌ **Not a code generator** - kse doesn't write code; your AI tool does
-- ❌ **Not an IDE** - kse works alongside your existing development tools
+- ❌ **Not a code generator** - sco doesn't write code; your AI tool does
+- ❌ **Not an IDE** - sco works alongside your existing development tools
 - ❌ **Not AI-specific** - Works with Claude, Cursor, Windsurf, Copilot, and any AI tool
 - ❌ **Not a replacement for documentation** - It's a structured way to organize project context
 
-### Who Should Use kse?
+### Who Should Use sco?
 
 - ✅ Developers using AI coding assistants (Claude, Cursor, Copilot, etc.)
 - ✅ Teams wanting structured project documentation
 - ✅ Anyone building features that need clear requirements and design
 - ✅ Projects that benefit from spec-driven development
 
-## Why kse Wins in AI Delivery
+## Why sco Wins in AI Delivery
 
-| Advantage | kse Capability | Practical Impact |
+| Advantage | sco Capability | Practical Impact |
 | --- | --- | --- |
 | Structure-first execution | Requirements → Design → Tasks + gate checks | Lower rework and fewer requirement drifts |
 | Autonomous close-loop delivery | One-command close loop (`auto close-loop`) | No step-by-step confirmation waits |
@@ -66,17 +67,17 @@ graph LR
 ### 90-Second Value Proof
 
 ```bash
-# 1) Adopt kse in current repo
-kse adopt
+# 1) Adopt sco in current repo
+sco adopt
 
 # 2) Generate Spec workflow draft
-kse spec bootstrap --name 01-00-demo-feature --non-interactive
+sco spec bootstrap --name 01-00-demo-feature --non-interactive
 
 # 3) Generate KPI input sample
-kse value metrics sample --out ./kpi-input.json --json
+sco value metrics sample --out ./kpi-input.json --json
 
 # 4) Produce machine-readable KPI snapshot
-kse value metrics snapshot --input ./kpi-input.json --json
+sco value metrics snapshot --input ./kpi-input.json --json
 ```
 
 ---
@@ -88,12 +89,12 @@ kse value metrics snapshot --input ./kpi-input.json --json
 **Just tell your AI:**
 
 ```
-Install kse and use it to manage this project with Spec-driven development.
+Install sco and use it to manage this project with Spec-driven development.
 ```
 
 **Your AI will:**
-1. Install kse globally (`npm install -g kiro-spec-engine`)
-2. Adopt it in your project (`kse adopt`)
+1. Install sco globally (`npm install -g sco-engine`)
+2. Adopt it in your project (`sco adopt`)
 3. Read the methodology guide (`.kiro/README.md`)
 4. Start working according to Spec-driven approach
 
@@ -106,24 +107,24 @@ Install kse and use it to manage this project with Spec-driven development.
 <details>
 <summary><b>Click to expand detailed steps</b></summary>
 
-#### Step 1: Install kse (30 seconds)
+#### Step 1: Install sco (30 seconds)
 
 ```bash
-npm install -g kiro-spec-engine
+npm install -g sco-engine
 ```
 
 Verify installation:
 ```bash
-kse --version
+sco --version
 ```
 
-#### Step 2: Adopt kse in Your Project (30 seconds)
+#### Step 2: Adopt sco in Your Project (30 seconds)
 
 Navigate to your project directory and run:
 
 ```bash
 cd your-project
-kse adopt
+sco adopt
 ```
 
 This creates a `.kiro/` directory with:
@@ -143,7 +144,7 @@ Please read .kiro/README.md to understand how this project works.
 - This project follows Spec-driven development
 - Every feature starts with a Spec (requirements + design + tasks)
 - How to work with this methodology
-- When to use kse commands
+- When to use sco commands
 
 #### Step 4: Start Building Features
 
@@ -157,7 +158,7 @@ I need a user login feature with email and password.
 1. Create a Spec with requirements, design, and tasks
 2. Implement according to the Spec
 3. Update task status as work progresses
-4. Use kse commands internally (you don't need to run them)
+4. Use sco commands internally (you don't need to run them)
 
 **Example conversation:**
 - **You**: "I need user login with email and password"
@@ -169,7 +170,7 @@ I need a user login feature with email and password.
 
 ---
 
-**Key insight:** You don't "use kse" - your project "follows Spec-driven methodology" and kse helps enforce it. The AI handles all the kse commands for you.
+**Key insight:** You don't "use sco" - your project "follows Spec-driven methodology" and sco helps enforce it. The AI handles all the sco commands for you.
 
 ### Step 5: Next Steps (30 seconds)
 
@@ -198,9 +199,9 @@ A **Spec** is a structured description of a feature or project component. Each S
 
 ### Integration Modes
 
-kse supports three ways to work with AI tools:
+sco supports three ways to work with AI tools:
 
-1. **Native Integration** - AI tool directly accesses kse (Kiro IDE)
+1. **Native Integration** - AI tool directly accesses sco (Kiro IDE)
 2. **Manual Export** - You export and paste context (Claude, ChatGPT, Cursor)
 3. **Watch Mode** - Automatic context updates on file changes (all tools)
 
@@ -210,7 +211,7 @@ Learn more: [Integration Modes Guide](docs/integration-modes.md)
 
 ## Integration with Your AI Tool
 
-kse works with any AI coding assistant. Choose your tool for specific guidance:
+sco works with any AI coding assistant. Choose your tool for specific guidance:
 
 ### Popular AI Tools
 
@@ -227,13 +228,13 @@ kse works with any AI coding assistant. Choose your tool for specific guidance:
 sequenceDiagram
     participant You
     participant AI Tool
-    participant kse
+    participant sco
     You->>AI Tool: "I have a Spec for user-login, implement task 1.1"
-    AI Tool->>kse: kse context export user-login
+    AI Tool->>sco: sco context export user-login
     kse->>AI Tool: Spec content (requirements, design, tasks)
     AI Tool->>AI Tool: Generate code following Spec
     AI Tool->>You: Here's the implementation
-    AI Tool->>kse: Update tasks.md (mark task complete)
+    AI Tool->>sco: Update tasks.md (mark task complete)
 ```
 
 **Key insight:** You stay in your AI tool. The AI reads the Spec and generates code that matches your design.
@@ -256,8 +257,8 @@ sequenceDiagram
 - 🎭 **[Scene Runtime](docs/scene-runtime-guide.md)** - Template engine, quality pipeline, ontology, Moqui ERP
 - 🤖 **[Multi-Agent Coordination](docs/multi-agent-coordination-guide.md)** - Parallel agent coordination
 - 📈 **[Value Observability](docs/value-observability-guide.md)** - KPI snapshot, baseline, trend, gate-ready evidence
-- 🔌 **[Integration Modes](docs/integration-modes.md)** - Three ways to integrate kse
-- 📝 **[Command Reference](docs/command-reference.md)** - All kse commands
+- 🔌 **[Integration Modes](docs/integration-modes.md)** - Three ways to integrate sco
+- 📝 **[Command Reference](docs/command-reference.md)** - All sco commands
 
 ### Tool-Specific Guides
 - [Cursor Integration](docs/tools/cursor-guide.md)
@@ -273,14 +274,14 @@ sequenceDiagram
 - [CLI Feature Example](docs/examples/add-export-command/) - CLI command Spec
 
 ### Advanced Topics
-- [Adoption Guide](docs/adoption-guide.md) - Adopting kse in existing projects
+- [Adoption Guide](docs/adoption-guide.md) - Adopting sco in existing projects
 - [Upgrade Guide](docs/upgrade-guide.md) - Version upgrade instructions
 - [Release Archive](docs/releases/README.md) - Versioned release notes and validation report index
 - [Release Notes v1.46.2](docs/releases/v1.46.2.md) - Current release highlights and impact
 - [Validation Report v1.46.2](docs/releases/v1.46.2-validation.md) - Release-readiness evidence and verification results
 - [Release Checklist](docs/release-checklist.md) - Repeatable pre-release verification flow
 - [Manual Workflows](docs/manual-workflows-guide.md) - Step-by-step workflows
-- [Developer Guide](docs/developer-guide.md) - Contributing and extending kse
+- [Developer Guide](docs/developer-guide.md) - Contributing and extending sco
 
 ### Complete Documentation
 - 📚 **[Documentation Index](docs/README.md)** - All documentation in one place
@@ -291,10 +292,10 @@ sequenceDiagram
 
 ### Autonomous Control 🚀 NEW in v1.23.0
 - **Fully Autonomous Execution**: AI independently manages entire development workflows from requirements to delivery
-- **Closed-Loop Program Execution**: `kse auto close-loop "<goal>"` runs from goal decomposition to terminal orchestration state without manual confirmation gates
+- **Closed-Loop Program Execution**: `sco auto close-loop "<goal>"` runs from goal decomposition to terminal orchestration state without manual confirmation gates
 - **Automatic Master/Sub Portfolio Split**: Large goals are auto-split into dependency-wired sub-specs and coordinated by a master spec
 - **Semantic Decomposition + Live Stream**: Clause/category-aware goal parsing plus live orchestration status stream (disable via `--no-stream`)
-- **Session Resume + Retention Hygiene**: Resume interrupted runs with `--resume interrupted` (or `--resume latest`) and maintain archives via `kse auto session list/prune`, `kse auto batch-session list/prune`, and `kse auto controller-session list/prune`
+- **Session Resume + Retention Hygiene**: Resume interrupted runs with `--resume interrupted` (or `--resume latest`) and maintain archives via `sco auto session list/prune`, `sco auto batch-session list/prune`, and `sco auto controller-session list/prune`
 - **Intelligent Error Recovery**: Automatically diagnose and fix errors with 3 retry attempts and learning system
 - **Strategic Checkpoints**: Pause only at meaningful milestones (phase boundaries, fatal errors, external resources)
 - **Continuous Task Execution**: Execute multiple tasks without interruption between individual tasks
@@ -308,19 +309,19 @@ sequenceDiagram
 **Quick Start**:
 ```bash
 # Decompose one broad goal into master/sub specs and run to closure
-kse auto close-loop "build autonomous close-loop and master/sub multi-spec execution for kse"
+sco auto close-loop "build autonomous close-loop and master/sub multi-spec execution for sco"
 
 # Create and execute a feature autonomously
-kse auto create "user authentication with JWT tokens"
+sco auto create "user authentication with JWT tokens"
 
 # Run existing Spec autonomously
-kse auto run 33-00-ai-autonomous-control
+sco auto run 33-00-ai-autonomous-control
 
 # Check status
-kse auto status
+sco auto status
 
 # Resume after pause
-kse auto resume
+sco auto resume
 ```
 
 [Learn more about Autonomous Control →](docs/autonomous-control-guide.md)
@@ -336,7 +337,7 @@ Structure your work with Requirements → Design → Tasks workflow
 - **CLI Commands**: `value metrics sample`, `value metrics snapshot`, `value metrics baseline`, `value metrics trend` with `--json` support
 
 ### Multi-Workspace Management 🚀 NEW in v1.11.0
-- **Workspace Registry**: Manage multiple kse projects from a single location
+- **Workspace Registry**: Manage multiple sco projects from a single location
 - **Quick Switching**: Switch between projects without directory navigation
 - **Data Atomicity**: Single source of truth (`~/.kse/workspace-state.json`)
 - **Cross-Platform**: Consistent path handling across Windows/Linux/macOS
@@ -395,16 +396,16 @@ Structure your work with Requirements → Design → Tasks workflow
 **Quick Start**:
 ```bash
 # Run 3 Specs in parallel via Codex CLI
-kse orchestrate run --specs "spec-a,spec-b,spec-c" --max-parallel 3
+sco orchestrate run --specs "spec-a,spec-b,spec-c" --max-parallel 3
 
 # Check orchestration progress
-kse orchestrate status
+sco orchestrate status
 
 # Stop all sub-agents
-kse orchestrate stop
+sco orchestrate stop
 ```
 
-Tip: `kse spec bootstrap|pipeline run|gate run --specs ...` now defaults to this orchestrate mode automatically.
+Tip: `sco spec bootstrap|pipeline run|gate run --specs ...` now defaults to this orchestrate mode automatically.
 
 **Recommended Codex-Orchestrator config (`.kiro/config/orchestrator.json`)**:
 ```json
@@ -471,26 +472,26 @@ Use the `rateLimit*` settings to absorb transient 429/too-many-requests failures
 - **Multi-User Coordination**: Prevent conflicts when multiple developers work on the same Spec
 - **Machine Identification**: Unique machine IDs for accurate lock ownership tracking
 - **Stale Lock Detection**: Automatic detection and cleanup of abandoned locks (default: 24h timeout)
-- **Lock Status Integration**: View lock status in `kse status` output
+- **Lock Status Integration**: View lock status in `sco status` output
 - **Force Unlock**: Override locks when necessary with `--force` flag
 - **Backward Compatible**: Locking is optional and doesn't affect existing workflows
 
 **Quick Start**:
 ```bash
 # Acquire a lock before editing
-kse lock acquire my-feature --reason "Implementing auth module"
+sco lock acquire my-feature --reason "Implementing auth module"
 
 # Check lock status
-kse lock status
+sco lock status
 
 # Release when done
-kse unlock my-feature
+sco unlock my-feature
 
 # Clean up stale locks
-kse lock cleanup
+sco lock cleanup
 
 # View your machine ID
-kse lock whoami
+sco lock whoami
 ```
 
 ### DevOps Integration Foundation 🚀
@@ -533,143 +534,143 @@ English and Chinese interfaces
 
 ```bash
 # Project setup
-kse adopt                          # Adopt kse in existing project
-kse create-spec <name>             # Legacy: create empty Spec folder only
+sco adopt                          # Adopt sco in existing project
+sco create-spec <name>             # Legacy: create empty Spec folder only
 
 # Autonomous close-loop program (one command, no confirmation loop)
-kse auto close-loop "<goal>"       # Auto split goal into master/sub specs and execute to closure
-kse auto close-loop --resume interrupted # Resume from latest non-completed close-loop session
-kse auto close-loop continue       # Shorthand: continue latest interrupted close-loop session
-kse auto continue                  # Shortcut command: continue latest interrupted close-loop session
-kse auto close-loop "<goal>" --dry-run --json  # Preview decomposition plan only
-kse auto close-loop-program "<goal>" --program-govern-until-stable --program-govern-use-action 1 --json # Program-level recovery + governance with remediation action execution
-kse auto close-loop-controller .kiro/auto/program-queue.lines --wait-on-empty --dequeue-limit 2 --json # Queue-driven autonomous controller for broad-goal backlogs
-kse auto close-loop-controller --controller-resume latest --json # Resume autonomous controller from latest persisted checkpoint
-kse auto controller-session list --limit 50 --json # Inspect persisted close-loop-controller summary sessions
-kse auto controller-session prune --keep 20 --older-than-days 14 --dry-run --json # Prune old controller summaries by retention policy
-kse auto observability snapshot --days 14 --json # Unified autonomous observability snapshot (sessions + governance + trend)
-kse auto spec status 121-00-master --json # Agent-facing structured spec status interface
-kse auto spec instructions 121-02-sub-track --json # Agent-facing execution instructions for one spec
-kse auto schema check --json # Check autonomous archive schema compatibility
-kse auto schema migrate --apply --json # Backfill/migrate schema_version for autonomous archives
+sco auto close-loop "<goal>"       # Auto split goal into master/sub specs and execute to closure
+sco auto close-loop --resume interrupted # Resume from latest non-completed close-loop session
+sco auto close-loop continue       # Shorthand: continue latest interrupted close-loop session
+sco auto continue                  # Shortcut command: continue latest interrupted close-loop session
+sco auto close-loop "<goal>" --dry-run --json  # Preview decomposition plan only
+sco auto close-loop-program "<goal>" --program-govern-until-stable --program-govern-use-action 1 --json # Program-level recovery + governance with remediation action execution
+sco auto close-loop-controller .kiro/auto/program-queue.lines --wait-on-empty --dequeue-limit 2 --json # Queue-driven autonomous controller for broad-goal backlogs
+sco auto close-loop-controller --controller-resume latest --json # Resume autonomous controller from latest persisted checkpoint
+sco auto controller-session list --limit 50 --json # Inspect persisted close-loop-controller summary sessions
+sco auto controller-session prune --keep 20 --older-than-days 14 --dry-run --json # Prune old controller summaries by retention policy
+sco auto observability snapshot --days 14 --json # Unified autonomous observability snapshot (sessions + governance + trend)
+sco auto spec status 121-00-master --json # Agent-facing structured spec status interface
+sco auto spec instructions 121-02-sub-track --json # Agent-facing execution instructions for one spec
+sco auto schema check --json # Check autonomous archive schema compatibility
+sco auto schema migrate --apply --json # Backfill/migrate schema_version for autonomous archives
 
 # Spec workflow (recommended)
-kse spec bootstrap --name <spec> --non-interactive         # Generate requirements/design/tasks draft
-kse spec pipeline run --spec <spec>                         # Run staged workflow for one Spec
-kse spec gate run --spec <spec> --json                      # Run standardized Spec gate checks
-kse spec bootstrap --specs "<spec-a,spec-b>" --max-parallel <N>  # Multi-Spec defaults to orchestrate
-kse spec pipeline run --specs "<spec-a,spec-b>" --max-parallel <N> # Multi-Spec defaults to orchestrate
-kse spec gate run --specs "<spec-a,spec-b>" --max-parallel <N>     # Multi-Spec defaults to orchestrate
+sco spec bootstrap --name <spec> --non-interactive         # Generate requirements/design/tasks draft
+sco spec pipeline run --spec <spec>                         # Run staged workflow for one Spec
+sco spec gate run --spec <spec> --json                      # Run standardized Spec gate checks
+sco spec bootstrap --specs "<spec-a,spec-b>" --max-parallel <N>  # Multi-Spec defaults to orchestrate
+sco spec pipeline run --specs "<spec-a,spec-b>" --max-parallel <N> # Multi-Spec defaults to orchestrate
+sco spec gate run --specs "<spec-a,spec-b>" --max-parallel <N>     # Multi-Spec defaults to orchestrate
 
 # Context management
-kse context export <spec-name>     # Export context for AI tools
-kse prompt generate <spec> <task>  # Generate task-specific prompt
+sco context export <spec-name>     # Export context for AI tools
+sco prompt generate <spec> <task>  # Generate task-specific prompt
 
 # KPI automation and observability (NEW in v1.46.2)
-kse value metrics sample --out <path> --json               # Generate sample KPI input JSON
-kse value metrics snapshot --input <path> --json          # Generate weekly KPI snapshot + gate summary
-kse value metrics baseline --from-history <N> --json      # Build baseline from earliest N snapshots
-kse value metrics trend --window <N> --json               # Analyze trend/risk from latest N snapshots
-kse auto kpi trend --weeks 8 --period week --json         # Aggregate autonomous delivery KPI trend (weekly/daily buckets + anomalies)
-kse auto kpi trend --weeks 8 --period day --csv --out <path> # Export autonomous KPI trend as CSV
-kse auto kpi trend --weeks 8 --mode controller --json     # Filter trend to close-loop-controller sessions only
+sco value metrics sample --out <path> --json               # Generate sample KPI input JSON
+sco value metrics snapshot --input <path> --json          # Generate weekly KPI snapshot + gate summary
+sco value metrics baseline --from-history <N> --json      # Build baseline from earliest N snapshots
+sco value metrics trend --window <N> --json               # Analyze trend/risk from latest N snapshots
+sco auto kpi trend --weeks 8 --period week --json         # Aggregate autonomous delivery KPI trend (weekly/daily buckets + anomalies)
+sco auto kpi trend --weeks 8 --period day --csv --out <path> # Export autonomous KPI trend as CSV
+sco auto kpi trend --weeks 8 --mode controller --json     # Filter trend to close-loop-controller sessions only
 
 # Workspace management (NEW in v1.11.0)
-kse workspace create <name> [path] # Register a new workspace
-kse workspace list                 # List all workspaces
-kse workspace switch <name>        # Switch active workspace
-kse workspace info [name]          # Show workspace details
-kse workspace remove <name>        # Remove workspace
+sco workspace create <name> [path] # Register a new workspace
+sco workspace list                 # List all workspaces
+sco workspace switch <name>        # Switch active workspace
+sco workspace info [name]          # Show workspace details
+sco workspace remove <name>        # Remove workspace
 
 # Environment management (NEW in v1.14.0)
-kse env list                       # List all environments
-kse env switch <name>              # Switch to environment (with backup)
-kse env info                       # Show active environment details
-kse env register <config-file>     # Register new environment
-kse env unregister <name>          # Remove environment
-kse env rollback                   # Rollback to previous environment
-kse env verify                     # Verify current environment
-kse env run "<command>"            # Run command in environment context
+sco env list                       # List all environments
+sco env switch <name>              # Switch to environment (with backup)
+sco env info                       # Show active environment details
+sco env register <config-file>     # Register new environment
+sco env unregister <name>          # Remove environment
+sco env rollback                   # Rollback to previous environment
+sco env verify                     # Verify current environment
+sco env run "<command>"            # Run command in environment context
 
 # Multi-repository management (NEW in v1.20.0)
-kse repo init [--nested]           # Initialize repository configuration (nested scanning by default)
-kse repo init --no-nested          # Initialize without nested repository scanning
-kse repo status [--verbose]        # Show status of all repositories (including nested)
-kse repo exec "<command>"          # Execute command in all repositories
+sco repo init [--nested]           # Initialize repository configuration (nested scanning by default)
+sco repo init --no-nested          # Initialize without nested repository scanning
+sco repo status [--verbose]        # Show status of all repositories (including nested)
+sco repo exec "<command>"          # Execute command in all repositories
 
 # Spec-level collaboration (NEW in v1.22.0)
-kse collab init <master> [options] # Initialize Master Spec with Sub-Specs
-kse collab status [spec] [--graph] # Display collaboration status
-kse collab assign <spec> <kiro>    # Assign Spec to Kiro instance
-kse collab verify <spec>           # Verify interface contracts
-kse collab integrate <specs...>    # Run integration tests
-kse collab migrate <spec>          # Convert standalone Spec to collaborative
-kse repo health                    # Check repository health
+sco collab init <master> [options] # Initialize Master Spec with Sub-Specs
+sco collab status [spec] [--graph] # Display collaboration status
+sco collab assign <spec> <kiro>    # Assign Spec to Kiro instance
+sco collab verify <spec>           # Verify interface contracts
+sco collab integrate <specs...>    # Run integration tests
+sco collab migrate <spec>          # Convert standalone Spec to collaborative
+sco repo health                    # Check repository health
 
 # Scene template engine (NEW in v1.25.0)
-kse scene template-validate --package <path>   # Validate template variable schema
-kse scene template-resolve --package <name>    # Resolve inheritance chain and merged schema
-kse scene template-render --package <name> --values <json> --out <dir>  # Render template files
+sco scene template-validate --package <path>   # Validate template variable schema
+sco scene template-resolve --package <name>    # Resolve inheritance chain and merged schema
+sco scene template-render --package <name> --values <json> --out <dir>  # Render template files
 
 # Moqui ERP integration (NEW in v1.39.0)
-kse scene connect --config <path>              # Test connectivity to Moqui ERP instance
-kse scene discover --config <path>             # Discover entities, services, screens from Moqui
-kse scene extract --config <path> --out <dir>  # Extract scene templates from Moqui (v1.40.0)
+sco scene connect --config <path>              # Test connectivity to Moqui ERP instance
+sco scene discover --config <path>             # Discover entities, services, screens from Moqui
+sco scene extract --config <path> --out <dir>  # Extract scene templates from Moqui (v1.40.0)
 
 # Scene template quality pipeline (NEW in v1.41.0)
-kse scene lint --package <path>                # Lint scene package for quality issues
-kse scene score --package <path>               # Calculate quality score (0-100)
-kse scene contribute --package <path>          # One-stop validate → lint → score → publish
+sco scene lint --package <path>                # Lint scene package for quality issues
+sco scene score --package <path>               # Calculate quality score (0-100)
+sco scene contribute --package <path>          # One-stop validate → lint → score → publish
 
 # Scene ontology (NEW in v1.42.0)
-kse scene ontology show --package <path>       # Show ontology graph
-kse scene ontology deps --ref <ref>            # Query dependency chain
-kse scene ontology impact --ref <ref>          # Analyze reverse impact radius
-kse scene ontology path --from <ref> --to <ref> # Query shortest ontology relation path
-kse scene ontology validate --package <path>   # Validate graph consistency
-kse scene ontology actions --ref <ref>         # Show action abstraction
-kse scene ontology lineage --ref <ref>         # Show data lineage
-kse scene ontology agent-info --package <path> # Show agent hints
-kse scene contribute --package <path>          # One-stop validate → lint → score → publish
+sco scene ontology show --package <path>       # Show ontology graph
+sco scene ontology deps --ref <ref>            # Query dependency chain
+sco scene ontology impact --ref <ref>          # Analyze reverse impact radius
+sco scene ontology path --from <ref> --to <ref> # Query shortest ontology relation path
+sco scene ontology validate --package <path>   # Validate graph consistency
+sco scene ontology actions --ref <ref>         # Show action abstraction
+sco scene ontology lineage --ref <ref>         # Show data lineage
+sco scene ontology agent-info --package <path> # Show agent hints
+sco scene contribute --package <path>          # One-stop validate → lint → score → publish
 
 # Agent orchestration (NEW in v1.45.0)
-kse orchestrate run --specs "<spec-list>" --max-parallel <N>  # Start multi-agent orchestration
-kse orchestrate status                         # View orchestration progress
-kse orchestrate stop                           # Stop all sub-agents
+sco orchestrate run --specs "<spec-list>" --max-parallel <N>  # Start multi-agent orchestration
+sco orchestrate status                         # View orchestration progress
+sco orchestrate stop                           # Stop all sub-agents
 
 # DevOps operations
-kse ops init <project-name>        # Initialize operations specs
-kse ops validate [<project>]       # Validate operations completeness
-kse ops audit [options]            # Query audit logs
-kse ops takeover <action>          # Manage AI takeover levels
-kse ops feedback <action>          # Manage user feedback
+sco ops init <project-name>        # Initialize operations specs
+sco ops validate [<project>]       # Validate operations completeness
+sco ops audit [options]            # Query audit logs
+sco ops takeover <action>          # Manage AI takeover levels
+sco ops feedback <action>          # Manage user feedback
 
 # Task management
-kse task claim <spec> <task-id>    # Claim a task
-kse task list <spec>               # List claimed tasks
+sco task claim <spec> <task-id>    # Claim a task
+sco task list <spec>               # List claimed tasks
 
 # Spec locking (multi-user collaboration)
-kse lock acquire <spec-name>       # Acquire lock on a Spec
-kse lock release <spec-name>       # Release lock (or use: kse unlock)
-kse lock status [spec-name]        # Show lock status
-kse lock cleanup                   # Remove stale locks
-kse lock whoami                    # Show machine identifier
-kse unlock <spec-name> [--force]   # Release lock (alias)
+sco lock acquire <spec-name>       # Acquire lock on a Spec
+sco lock release <spec-name>       # Release lock (or use: sco unlock)
+sco lock status [spec-name]        # Show lock status
+sco lock cleanup                   # Remove stale locks
+sco lock whoami                    # Show machine identifier
+sco unlock <spec-name> [--force]   # Release lock (alias)
 
 # Document governance
-kse docs diagnose                  # Check document compliance
-kse docs cleanup                   # Remove temporary files
-kse docs validate                  # Validate document structure
-kse docs archive --spec <name>     # Organize Spec artifacts
-kse docs hooks install             # Install Git pre-commit hooks
+sco docs diagnose                  # Check document compliance
+sco docs cleanup                   # Remove temporary files
+sco docs validate                  # Validate document structure
+sco docs archive --spec <name>     # Organize Spec artifacts
+sco docs hooks install             # Install Git pre-commit hooks
 
 # Automation
-kse watch start                    # Start watch mode
-kse watch status                   # Check watch status
+sco watch start                    # Start watch mode
+sco watch status                   # Check watch status
 
 # Project info
-kse status                         # Project status
-kse workflows                      # List available workflows
+sco status                         # Project status
+sco workflows                      # List available workflows
 ```
 
 See [Command Reference](docs/command-reference.md) for complete documentation.
@@ -721,9 +722,9 @@ MIT License - see [LICENSE](LICENSE) file for details.
 **Ready to enhance your AI-assisted development?** 🚀
 
 ```bash
-npm install -g kiro-spec-engine
-kse adopt
-kse spec bootstrap --name 01-00-my-first-feature --non-interactive
+npm install -g sco-engine
+sco adopt
+sco spec bootstrap --name 01-00-my-first-feature --non-interactive
 ```
 
 ---
@@ -736,7 +737,7 @@ Join our community to discuss AI-driven development, Spec workflows, and best pr
 
 <img src="docs/images/wechat-qr.png" width="200" alt="WeChat Group QR Code">
 
-*Scan to add WeChat, note "kse" to join the group*
+*Scan to add WeChat, note "sco" to join the group*
 
 ### Other Channels
 
@@ -759,6 +760,6 @@ A deep conversation about AI development trends, Neo-Confucian philosophy, and s
 
 ---
 
-**Version**: 1.47.4  
-**Last Updated**: 2026-02-15
+**Version**: 2.0.0  
+**Last Updated**: 2026-02-18
 

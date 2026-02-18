@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **SCO major rebrand + compatibility bridge**: Rebranded package/CLI to `sco-engine` + `sco` (v2.0.0 baseline), while preserving legacy command aliases `kse` and `kiro-spec-engine` for migration continuity.
 - **Moqui runtime binding config overrides**: Added `--moqui-config <path>` to `kse scene run` and `kse scene doctor`, allowing runtime binding resolution to use an explicit `moqui-adapter.json` path per execution context.
 - **Moqui client rate-limit resilience tests**: Added dedicated unit coverage for `429 Too Many Requests` retry/exhaustion handling and retryable network error recovery in `tests/unit/scene-runtime/moqui-client.test.js`.
 - **Template ontology contract completeness**: Hardened scene package template contract examples to include ontology entities/relations plus governance lineage/rules/decision sections required by strict lint and ontology validation flows.

@@ -1,27 +1,27 @@
 {
   "cli": {
-    "name": "kiro-spec-engine",
-    "description": "🔥 Kiro Spec Engine - Structured AI delivery with Specs, orchestration, and KPI observability",
+    "name": "sco",
+    "description": "🔥 SCO (Scene Capability Orchestrator) - Structured AI delivery with Specs, orchestration, and KPI observability",
     "commands": {
       "init": {
-        "description": "Initialize a new Kiro Ultrawork project",
+        "description": "Initialize a new SCO project",
         "projectNamePrompt": "Enter project name:",
         "forceOption": "Force initialization even if .kiro directory exists",
         "alreadyExists": "⚠️  .kiro directory already exists",
         "overwritePrompt": "Do you want to overwrite it?",
         "cancelled": "Initialization cancelled.",
-        "success": "🎉 Kiro Ultrawork project initialized successfully!",
+        "success": "🎉 SCO project initialized successfully!",
         "nextSteps": "📋 Next steps:",
         "step1": "Create your first spec: mkdir .kiro/specs/01-00-your-feature",
         "step2": "Write basic requirements.md",
-        "step3": "Enhance with Ultrawork: kiro-spec-engine enhance requirements .kiro/specs/01-00-your-feature/requirements.md",
+        "step3": "Enhance with Ultrawork: sco enhance requirements .kiro/specs/01-00-your-feature/requirements.md",
         "startJourney": "🔥 Start your Ultrawork journey!",
         "error": "❌ Error initializing project:"
       },
       "enhance": {
         "description": "Enhance document quality with Ultrawork spirit",
         "starting": "🔥 Starting {stage} stage Ultrawork enhancement...",
-        "toolNotFound": "❌ Ultrawork tool not found. Please run: kiro-spec-engine init",
+        "toolNotFound": "❌ Ultrawork tool not found. Please run: sco init",
         "completed": "✅ Ultrawork enhancement completed!",
         "failed": "❌ Enhancement failed with code:",
         "pythonError": "❌ Error running Python tool:",
@@ -32,14 +32,14 @@
         "success": "✅ Created spec directory:",
         "nextSteps": "📋 Next steps:",
         "step1": "Create requirements.md in the spec directory",
-        "step2": "Enhance with: kiro-spec-engine enhance requirements {specPath}/requirements.md",
+        "step2": "Enhance with: sco enhance requirements {specPath}/requirements.md",
         "error": "❌ Error creating spec:"
       },
       "status": {
         "description": "Check project status and available specs",
-        "noProject": "⚠️  No Kiro Ultrawork project found in current directory",
-        "initTip": "Run: kiro-spec-engine init to initialize",
-        "title": "🔥 Kiro Ultrawork Project Status",
+        "noProject": "⚠️  No SCO project found in current directory",
+        "initTip": "Run: sco init to initialize",
+        "title": "🔥 SCO Project Status",
         "toolStatus": "Ultrawork Tool:",
         "available": "✅ Available",
         "missing": "❌ Missing",
@@ -57,7 +57,7 @@
         "python": "Python",
         "python_note": "Note: Python is required for Ultrawork quality enhancement features.",
         "all_good": "All system requirements are met!",
-        "ready": "You're ready to use all Kiro Spec Engine features including Ultrawork enhancements.",
+        "ready": "You're ready to use all SCO features including Ultrawork enhancements.",
         "python_missing": "Python is not available",
         "basic_features": "Basic CLI features (init, status, create-spec) will work normally.",
         "ultrawork_unavailable": "Ultrawork enhancement features require Python 3.8 or higher."
@@ -84,7 +84,7 @@
     },
     "stages": {
       "requirements": "Requirements",
-      "design": "Design", 
+      "design": "Design",
       "tasks": "Tasks"
     }
   },

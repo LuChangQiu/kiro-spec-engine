@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **SCE naming consolidation + compatibility bridge**: Rebranded product naming to `Scene Capability Engine`, moved package to `scene-capability-engine`, promoted `sce` as the primary CLI command, and preserved `sco` / `kse` / `kiro-spec-engine` aliases for migration continuity.
+- **Branding consistency release guard**: Added `test:brand-consistency` to block publish when legacy repository/package/product naming reappears in tracked source files.
 - **Rate-limit launch budget safety guard**: Hardened orchestration launch-budget bookkeeping to safely handle partially initialized engine instances in property/instrumentation scenarios.
 - **Property test CI stability (`orchestration-engine.property`)**: Disabled launch-budget waiting in parallel invariant property harness to avoid artificial 60s hold windows and intermittent Jest worker crashes under high-concurrency CI runs.
 - **Moqui runtime binding config overrides**: Added `--moqui-config <path>` to `kse scene run` and `kse scene doctor`, allowing runtime binding resolution to use an explicit `moqui-adapter.json` path per execution context.

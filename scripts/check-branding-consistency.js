@@ -33,6 +33,10 @@ const EXCLUDE_PREFIXES = [
   'node_modules/'
 ];
 
+const EXCLUDE_FILES = new Set([
+  'scripts/check-branding-consistency.js'
+]);
+
 const TEXT_EXTENSIONS = new Set([
   '.js', '.json', '.md', '.txt', '.yml', '.yaml'
 ]);
@@ -46,6 +50,10 @@ function getTrackedFiles() {
 }
 
 function shouldScan(filePath) {
+  if (EXCLUDE_FILES.has(filePath)) {
+    return false;
+  }
+
   if (EXCLUDE_PREFIXES.some((prefix) => filePath.startsWith(prefix))) {
     return false;
   }

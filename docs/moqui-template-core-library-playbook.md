@@ -15,8 +15,10 @@ sce defaults already enforce the baseline below:
 - `sce auto handoff run`: ontology validation is required by default.
 - `sce auto handoff run`: generates Moqui baseline snapshot by default and appends it to release-evidence sessions.
 - `sce auto handoff run`: requires Moqui baseline portfolio pass by default.
+- `sce auto handoff run`: enforces Moqui matrix regression hard-gate by default (`max_moqui_matrix_regressions=0`).
 - `sce auto handoff run`: evaluates capability coverage matrix by default when manifest `capabilities` is declared (default minimum `100%`).
 - `sce auto handoff capability-matrix`: enforces both capability coverage and capability semantic completeness (default minimum `100%` for each).
+- `sce auto governance stats` / `sce auto governance close-loop`: treats Moqui matrix regressions as first-class risk/block signals (including over-gate stop reasons).
 - `sce scene package-publish-batch`:
   - ontology validation required by default
   - batch ontology gate defaults:
@@ -51,6 +53,12 @@ sce auto handoff capability-matrix \
 
 # 1) Handoff close-loop
 sce auto handoff run --manifest docs/handoffs/handoff-manifest.json --json
+
+# 1.1) Explicitly keep strict matrix hard-gate (same as default, recommended in CI)
+sce auto handoff run \
+  --manifest docs/handoffs/handoff-manifest.json \
+  --max-moqui-matrix-regressions 0 \
+  --json
 
 # 2) Publish templates from scene packages (with default ontology gates)
 sce scene package-publish-batch \
@@ -94,6 +102,9 @@ Required artifacts for each intake batch:
 - `compare.coverage_matrix_deltas` (trend deltas used to detect matrix regression/plateau between runs)
 - `compare.coverage_matrix_regressions` (negative-delta signals consumed by auto remediation/recommendation flows)
 - default handoff hard-gate enforces `max_moqui_matrix_regressions=0` unless explicitly relaxed
+- governance close-loop block reasons include:
+  - `handoff-moqui-matrix-regressions-positive:<n>`
+  - `handoff-moqui-matrix-regressions-over-gate:<n>/<max>`
 
 ## Minimum Semantic Coverage
 

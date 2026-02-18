@@ -721,6 +721,73 @@ describe('OrchestrationEngine', () => {
       expect(sleepSpy).toHaveBeenCalledTimes(2);
       sleepSpy.mockRestore();
     });
+
+    test('burst 429 under high parallelism converges without deadlock', async () => {
+      mockDependencyManager.buildDependencyGraph.mockResolvedValue({
+        nodes: ['spec-a', 'spec-b', 'spec-c', 'spec-d'],
+        edges: [],
+      });
+      mockConfig.getConfig.mockResolvedValue({
+        maxParallel: 4,
+        maxRetries: 0,
+        timeoutSeconds: 60,
+        rateLimitMaxRetries: 2,
+        rateLimitBackoffBaseMs: 50,
+        rateLimitBackoffMaxMs: 50,
+        rateLimitAdaptiveParallel: true,
+        rateLimitParallelFloor: 1,
+        rateLimitCooldownMs: 1000,
+      });
+
+      const sleepSpy = jest.spyOn(engine, '_sleep').mockResolvedValue(undefined);
+      const attempts = new Map();
+      const specs = ['spec-a', 'spec-b', 'spec-c', 'spec-d'];
+
+      mockSpawner.spawn.mockImplementation((specName) => {
+        const attempt = (attempts.get(specName) || 0) + 1;
+        attempts.set(specName, attempt);
+        const agentId = `agent-${specName}-${attempt}`;
+        process.nextTick(() => {
+          if (attempt === 1) {
+            mockSpawner.emit('agent:failed', {
+              agentId,
+              specName,
+              exitCode: 1,
+              stderr: '429 Too Many Requests',
+            });
+            return;
+          }
+          mockSpawner.emit('agent:completed', { agentId, specName, exitCode: 0 });
+        });
+        return Promise.resolve({ agentId, specName, status: 'running' });
+      });
+
+      const result = await engine.start(specs);
+
+      expect(result.status).toBe('completed');
+      expect(result.completed).toEqual(expect.arrayContaining(specs));
+      expect(mockSpawner.spawn).toHaveBeenCalledTimes(8); // 4 initial + 4 retry
+      expect(mockStatusMonitor.recordRateLimitEvent).toHaveBeenCalledTimes(4);
+      expect(mockStatusMonitor.updateParallelTelemetry).toHaveBeenCalledWith(
+        expect.objectContaining({ event: 'throttled', reason: 'rate-limit' })
+      );
+      sleepSpy.mockRestore();
+    });
+
+    test('waitForAgent has fallback timeout when lifecycle events are missing', async () => {
+      jest.useFakeTimers();
+      try {
+        engine._agentWaitTimeoutMs = 200;
+        const waitPromise = engine._waitForAgent('spec-a', 'agent-spec-a');
+        jest.advanceTimersByTime(250);
+        await expect(waitPromise).resolves.toEqual(expect.objectContaining({
+          status: 'timeout',
+          error: expect.stringContaining('without lifecycle events'),
+        }));
+      } finally {
+        jest.useRealTimers();
+      }
+    });
   });
 
   // -------------------------------------------------------------------------

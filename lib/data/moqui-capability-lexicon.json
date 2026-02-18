@@ -1,5 +1,5 @@
 {
-  "version": "2026.02.17",
+  "version": "2026.02.18",
   "source": "sce-moqui-core",
   "capabilities": [
     {
@@ -39,6 +39,262 @@
       "deprecated_aliases": [
         "inventory-adjustment",
         "inventory-reservation-adjustment"
+      ]
+    },
+    {
+      "canonical": "erp-party-management",
+      "aliases": [
+        "party-management",
+        "party-master",
+        "party-domain-management",
+        "moqui-party-management"
+      ],
+      "deprecated_aliases": [
+        "party-mgmt"
+      ]
+    },
+    {
+      "canonical": "erp-product-management",
+      "aliases": [
+        "product-management",
+        "product-master-management",
+        "moqui-product-management"
+      ],
+      "deprecated_aliases": [
+        "product-mgmt"
+      ]
+    },
+    {
+      "canonical": "erp-order-management",
+      "aliases": [
+        "order-management",
+        "moqui-order-management"
+      ],
+      "deprecated_aliases": [
+        "order-mgmt"
+      ]
+    },
+    {
+      "canonical": "erp-shipment-management",
+      "aliases": [
+        "shipment-management",
+        "shipment-flow-management",
+        "moqui-shipment-management"
+      ],
+      "deprecated_aliases": [
+        "shipment-mgmt"
+      ]
+    },
+    {
+      "canonical": "erp-return-rma-management",
+      "aliases": [
+        "return-rma-management",
+        "rma-management",
+        "return-management",
+        "moqui-return-rma-management"
+      ],
+      "deprecated_aliases": [
+        "return-rma"
+      ]
+    },
+    {
+      "canonical": "erp-accounting-invoice",
+      "aliases": [
+        "accounting-invoice",
+        "invoice-management",
+        "moqui-accounting-invoice"
+      ],
+      "deprecated_aliases": [
+        "invoice-accounting"
+      ]
+    },
+    {
+      "canonical": "erp-procurement-management",
+      "aliases": [
+        "procurement-management",
+        "purchase-management",
+        "moqui-procurement-management"
+      ],
+      "deprecated_aliases": [
+        "procurement-mgmt"
+      ]
+    },
+    {
+      "canonical": "erp-inventory-management",
+      "aliases": [
+        "inventory-management",
+        "facility-inventory",
+        "moqui-inventory-management"
+      ],
+      "deprecated_aliases": [
+        "inventory-mgmt"
+      ]
+    },
+    {
+      "canonical": "erp-production-run",
+      "aliases": [
+        "production-run",
+        "production-execution",
+        "moqui-production-run"
+      ],
+      "deprecated_aliases": [
+        "production-job-run"
+      ]
+    },
+    {
+      "canonical": "erp-bom-management",
+      "aliases": [
+        "bom-management",
+        "bill-of-material-management",
+        "moqui-bom-management"
+      ],
+      "deprecated_aliases": [
+        "bom-mgmt"
+      ]
+    },
+    {
+      "canonical": "erp-routing-management",
+      "aliases": [
+        "routing-management",
+        "production-routing-management",
+        "moqui-routing-management"
+      ],
+      "deprecated_aliases": [
+        "routing-mgmt"
+      ]
+    },
+    {
+      "canonical": "erp-quality-inspection",
+      "aliases": [
+        "quality-inspection",
+        "quality-gate-inspection",
+        "moqui-quality-inspection"
+      ],
+      "deprecated_aliases": [
+        "quality-inspect"
+      ]
+    },
+    {
+      "canonical": "erp-equipment-management",
+      "aliases": [
+        "equipment-management",
+        "asset-equipment-management",
+        "moqui-equipment-management"
+      ],
+      "deprecated_aliases": [
+        "equipment-mgmt"
+      ]
+    },
+    {
+      "canonical": "erp-cost-management",
+      "aliases": [
+        "cost-management",
+        "costing-management",
+        "moqui-cost-management"
+      ],
+      "deprecated_aliases": [
+        "cost-mgmt"
+      ]
+    },
+    {
+      "canonical": "erp-engineering-change",
+      "aliases": [
+        "engineering-change",
+        "engineering-change-management",
+        "moqui-engineering-change"
+      ],
+      "deprecated_aliases": [
+        "ecm-management"
+      ]
+    },
+    {
+      "canonical": "erp-hr-employee-management",
+      "aliases": [
+        "hr-employee-management",
+        "employee-management",
+        "moqui-hr-employee-management"
+      ],
+      "deprecated_aliases": [
+        "employee-hr-management"
+      ]
+    },
+    {
+      "canonical": "erp-work-calendar",
+      "aliases": [
+        "work-calendar",
+        "calendar-management",
+        "moqui-work-calendar"
+      ],
+      "deprecated_aliases": [
+        "work-schedule-calendar"
+      ]
+    },
+    {
+      "canonical": "platform-workflow-approval-engine",
+      "aliases": [
+        "workflow-approval-engine",
+        "workflow-approval",
+        "approval-engine",
+        "moqui-workflow-approval-engine"
+      ],
+      "deprecated_aliases": [
+        "workflow-approval-center"
+      ]
+    },
+    {
+      "canonical": "platform-reporting-audit-ops",
+      "aliases": [
+        "reporting-audit-ops",
+        "audit-ops",
+        "ops-audit-reporting",
+        "moqui-reporting-audit-ops"
+      ],
+      "deprecated_aliases": [
+        "audit-reporting-ops"
+      ]
+    },
+    {
+      "canonical": "platform-data-migration-domestic-validation",
+      "aliases": [
+        "data-migration-domestic-validation",
+        "data-migration-validation",
+        "moqui-data-migration-domestic-validation"
+      ],
+      "deprecated_aliases": [
+        "domestic-data-migration-validation"
+      ]
+    },
+    {
+      "canonical": "platform-suite-hub-ui-integration",
+      "aliases": [
+        "suite-hub-ui-integration",
+        "suite-hub-ui",
+        "moqui-suite-hub-ui-integration"
+      ],
+      "deprecated_aliases": [
+        "suite-ui-hub-integration"
+      ]
+    },
+    {
+      "canonical": "platform-suite-capability-observability",
+      "aliases": [
+        "suite-capability-observability",
+        "capability-observability",
+        "moqui-suite-capability-observability"
+      ],
+      "deprecated_aliases": [
+        "suite-capability-visibility"
+      ]
+    },
+    {
+      "canonical": "platform-suite-native-ui-parity-audit",
+      "aliases": [
+        "suite-native-ui-parity-audit",
+        "native-ui-parity-audit",
+        "moqui-suite-native-ui-parity-audit"
+      ],
+      "deprecated_aliases": [
+        "suite-ui-parity-audit"
       ]
     }
   ]

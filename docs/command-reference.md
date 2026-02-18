@@ -724,7 +724,13 @@ Close-loop controller session maintenance:
 
 Cross-archive autonomous governance maintenance:
 - `sce auto governance stats [--days <n>] [--status <csv>] [--json]`: aggregate a unified governance snapshot from session/batch-session/controller-session archives plus recovery memory state.
-  - JSON output includes `totals`, `throughput`, `health` (`risk_level`, `concerns`, `recommendations`, `release_gate`), `top_master_specs`, `recovery_memory`, and full per-archive stats under `archives`.
+  - JSON output includes `totals`, `throughput`, `health` (`risk_level`, `concerns`, `recommendations`, `release_gate`, `handoff_quality`), `top_master_specs`, `recovery_memory`, and full per-archive stats under `archives`.
+  - `health.handoff_quality` carries Moqui matrix regression governance signals:
+    - `latest_moqui_matrix_regression_count`
+    - `latest_moqui_matrix_regression_gate_max`
+    - `avg_moqui_matrix_regression_count`
+    - `max_moqui_matrix_regression_count`
+    - `moqui_matrix_regression_positive_rate_percent`
 - `sce auto governance maintain [--days <n>] [--status <csv>] [--session-keep <n>] [--batch-session-keep <n>] [--controller-session-keep <n>] [--recovery-memory-older-than-days <n>] [--apply] [--dry-run] [--json]`: run governance-maintenance planning and optional execution in one command.
   - Plan-only mode is default; add `--apply` to execute maintenance actions (`session prune`, `batch-session prune`, `controller-session prune`, `recovery-memory prune`).
   - When release gate is blocked, plan output prioritizes release remediation advisories (`release-gate-evidence-review`, `release-gate-scene-batch-remediate`) before routine cleanup actions.
@@ -736,6 +742,9 @@ Cross-archive autonomous governance maintenance:
   - `--governance-session-keep` (with optional `--governance-session-older-than-days`) enables post-run governance session retention pruning while protecting the current session snapshot.
   - `--execute-advisory` enables automatic advisory action execution (`recover-latest`, `controller-resume-latest`) when governance assessment detects failed sessions or controller pending goals; sce auto-selects the latest actionable advisory source and reports `skipped` (not `failed`) when no actionable source exists.
   - JSON output includes round-by-round risk/action telemetry (`rounds`, with `risk_before/risk_after` and `release_gate_before/release_gate_after`), advisory telemetry (`execute_advisory`, `advisory_policy`, `advisory_summary`, `rounds[*].advisory_actions`), `stop_detail` + `recommendations` for explicit blocking reasons, plus `initial_assessment`, `final_assessment`, and convergence metadata.
+  - Release-gate block reasons now include handoff matrix regression reasons when present:
+    - `handoff-moqui-matrix-regressions-positive:<n>`
+    - `handoff-moqui-matrix-regressions-over-gate:<n>/<max>`
 - `sce auto governance session list [--limit <n>] [--status <csv>] [--resume-only] [--json]`: list persisted governance close-loop sessions (`--resume-only` filters to resumed-chain sessions only).
 - `sce auto governance session stats [--days <n>] [--status <csv>] [--resume-only] [--json]`: aggregate governance close-loop session telemetry (completion/failure/convergence, rounds, risk/stop composition, resumed-chain ratios/source counts, and aggregated `release_gate` round telemetry trends).
 - `sce auto governance session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune governance close-loop session archive by retention policy.

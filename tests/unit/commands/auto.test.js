@@ -8816,6 +8816,65 @@ if (process.argv.includes('--json')) {
     expect(runAutoCloseLoop).not.toHaveBeenCalled();
   });
 
+  test('normalizes expanded 331 capability aliases through Moqui lexicon', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-18T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['64-05-suite-capability-observability'],
+      templates: ['suite-capability-observability'],
+      capabilities: ['party-master', 'workflow-approval', 'audit-ops'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-capability-lexicon-331');
+    await fs.ensureDir(templateDir);
+    await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
+      capabilities: {
+        provides: [
+          'erp-party-management',
+          'platform-workflow-approval-engine',
+          'platform-reporting-audit-ops'
+        ]
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'sce',
+      'auto',
+      'handoff',
+      'run',
+      '--manifest',
+      manifestFile,
+      '--dry-run',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('dry-run');
+    expect(payload.gates.passed).toBe(true);
+    expect(payload.moqui_capability_coverage.summary).toEqual(expect.objectContaining({
+      covered_capabilities: 3,
+      uncovered_capabilities: 0,
+      coverage_percent: 100,
+      passed: true
+    }));
+    expect(payload.moqui_capability_coverage.normalization).toEqual(expect.objectContaining({
+      expected_alias_mapped: expect.arrayContaining([
+        expect.objectContaining({ raw: 'party-master', canonical: 'erp-party-management' }),
+        expect.objectContaining({ raw: 'workflow-approval', canonical: 'platform-workflow-approval-engine' }),
+        expect.objectContaining({ raw: 'audit-ops', canonical: 'platform-reporting-audit-ops' })
+      ]),
+      expected_unknown: []
+    }));
+    expect(runAutoCloseLoop).not.toHaveBeenCalled();
+  });
+
   test('records unknown manifest capabilities in lexicon normalization warnings', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
     await fs.writeJson(manifestFile, {

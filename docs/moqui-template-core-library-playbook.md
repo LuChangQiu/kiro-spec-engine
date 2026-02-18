@@ -40,6 +40,14 @@ kse scene moqui-baseline \
   --fail-on-portfolio-fail \
   --json
 
+# 0.2) Fast capability matrix gate (recommended before full handoff run)
+kse auto handoff capability-matrix \
+  --manifest docs/handoffs/handoff-manifest.json \
+  --format markdown \
+  --out .kiro/reports/handoff-capability-matrix.md \
+  --fail-on-gap \
+  --json
+
 # 1) Handoff close-loop
 kse auto handoff run --manifest docs/handoffs/handoff-manifest.json --json
 
@@ -71,6 +79,7 @@ Required artifacts for each intake batch:
 - `.kiro/reports/release-evidence/moqui-template-baseline.md`
 - `.kiro/reports/release-evidence/moqui-capability-coverage.json`
 - `.kiro/reports/release-evidence/moqui-capability-coverage.md`
+- `.kiro/reports/handoff-capability-matrix.md` (or JSON equivalent from `kse auto handoff capability-matrix`)
 - `.kiro/reports/handoff-runs/<session>.json`
 - `.kiro/reports/scene-package-ontology-batch.json`
 - `.kiro/auto/moqui-remediation.lines` (when baseline/coverage gaps exist)

@@ -35,10 +35,30 @@ This document defines the execution boundary for converting Moqui capabilities i
 ## Batch Workflow
 
 1. 331-poc exports spec/template/handoff artifacts.
-2. KSE runs `auto handoff run` with strict gates.
-3. KSE validates template registry and ontology consistency.
-4. KSE executes close-loop batch and snapshots observability.
-5. KSE archives evidence and publishes release.
+2. KSE runs `auto handoff capability-matrix` as the fast intake gate.
+3. KSE runs `auto handoff run` with strict gates.
+4. KSE validates template registry and ontology consistency.
+5. KSE executes close-loop batch and snapshots observability.
+6. KSE archives evidence and publishes release.
+
+## Fast Matrix Loop
+
+Use this command during template iteration before full handoff execution:
+
+```bash
+kse auto handoff capability-matrix \
+  --manifest docs/handoffs/handoff-manifest.json \
+  --format markdown \
+  --out .kiro/reports/handoff-capability-matrix.md \
+  --fail-on-gap \
+  --json
+```
+
+When gaps exist, KSE writes remediation queue lines (default `.kiro/auto/moqui-remediation.lines`) that can be fed directly into:
+
+```bash
+kse auto close-loop-batch .kiro/auto/moqui-remediation.lines --format lines --json
+```
 
 ## Definition Of Done
 

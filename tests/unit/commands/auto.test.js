@@ -6905,6 +6905,157 @@ if (process.argv.includes('--json')) {
     expect(payload.diff.extra_in_local).toEqual(expect.arrayContaining(['tpl-c', 'tpl-d']));
   });
 
+  test('builds handoff capability matrix in json mode and writes remediation queue', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    const remediationQueueFile = path.join(tempDir, '.kiro', 'auto', 'matrix-remediation.lines');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-23-capability-matrix'],
+      templates: ['tpl-matrix'],
+      capabilities: ['order-fulfillment', 'inventory-allocation'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-matrix');
+    await fs.ensureDir(templateDir);
+    await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
+      capabilities: {
+        provides: ['inventory-allocation']
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'capability-matrix',
+      '--manifest',
+      manifestFile,
+      '--remediation-queue-out',
+      remediationQueueFile,
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-capability-matrix');
+    expect(payload.gates.passed).toBe(false);
+    expect(payload.capability_coverage.summary).toEqual(expect.objectContaining({
+      total_capabilities: 2,
+      covered_capabilities: 1,
+      uncovered_capabilities: 1,
+      coverage_percent: 50,
+      min_required_percent: 100,
+      passed: false
+    }));
+    expect(payload.remediation_queue).toEqual(expect.objectContaining({
+      file: remediationQueueFile,
+      goal_count: expect.any(Number)
+    }));
+    expect(payload.remediation_queue.goal_count).toBeGreaterThanOrEqual(2);
+    expect(await fs.pathExists(remediationQueueFile)).toBe(true);
+    const queueContent = await fs.readFile(remediationQueueFile, 'utf8');
+    expect(queueContent).toContain('order-fulfillment');
+    expect(payload.recommendations.some(item => item.includes('kse auto close-loop-batch'))).toBe(true);
+  });
+
+  test('supports capability matrix markdown format output file', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    const outFile = path.join(tempDir, '.kiro', 'reports', 'handoff-capability-matrix.md');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-24-capability-matrix-markdown'],
+      templates: ['tpl-matrix-ready'],
+      capabilities: ['erp-order-query-read'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-matrix-ready');
+    await fs.ensureDir(templateDir);
+    await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
+      capabilities: {
+        provides: ['erp-order-query-read']
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'handoff',
+      'capability-matrix',
+      '--manifest',
+      manifestFile,
+      '--format',
+      'markdown',
+      '--out',
+      outFile,
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-capability-matrix');
+    expect(payload.report_format).toBe('markdown');
+    expect(payload.gates.passed).toBe(true);
+    expect(payload.output_file).toBe(outFile);
+    expect(await fs.pathExists(outFile)).toBe(true);
+    const markdown = await fs.readFile(outFile, 'utf8');
+    expect(markdown).toContain('# Auto Handoff Capability Matrix');
+    expect(markdown).toContain('## Capability Coverage');
+    expect(markdown).toContain('| Capability | Covered | Matched Templates |');
+    expect(markdown).toContain('erp-order-query-read');
+  });
+
+  test('supports --fail-on-gap for handoff capability matrix', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-25-capability-matrix-fail-gap'],
+      templates: ['tpl-matrix-fail'],
+      capabilities: ['order-fulfillment'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-matrix-fail');
+    await fs.ensureDir(templateDir);
+    await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
+      capabilities: {
+        provides: ['erp-order-query-read']
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'capability-matrix',
+        '--manifest',
+        manifestFile,
+        '--fail-on-gap',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-capability-matrix');
+    expect(payload.gates.passed).toBe(false);
+    expect(payload.gates.reasons.some(item => item.includes('capability-coverage:capability_coverage_percent'))).toBe(true);
+  });
+
   test('runs handoff pipeline end-to-end and archives run report', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
     const queueFile = path.join(tempDir, '.kiro', 'auto', 'handoff-goals.lines');

@@ -266,6 +266,57 @@ function toDelta(currentValue, previousValue) {
   return Number((Number(currentValue) - Number(previousValue)).toFixed(2));
 }
 
+function formatDeltaPercent(metric = {}) {
+  const value = metric && Number.isFinite(Number(metric.rate_percent))
+    ? Number(metric.rate_percent)
+    : null;
+  return value === null ? 'n/a' : `${value}%`;
+}
+
+function readCoverageMetric(summary = {}, metricName = '') {
+  const matrix = summary && summary.coverage_matrix && typeof summary.coverage_matrix === 'object'
+    ? summary.coverage_matrix
+    : {};
+  return matrix && matrix[metricName] && typeof matrix[metricName] === 'object'
+    ? matrix[metricName]
+    : {};
+}
+
+function buildCoverageMatrixDeltas(currentSummary = {}, previousSummary = {}) {
+  const metricNames = [
+    'graph_valid',
+    'score_passed',
+    'entity_coverage',
+    'relation_coverage',
+    'business_rule_coverage',
+    'business_rule_closed',
+    'decision_coverage',
+    'decision_closed',
+    'baseline_passed'
+  ];
+  const deltas = {};
+
+  for (const metricName of metricNames) {
+    const currentMetric = readCoverageMetric(currentSummary, metricName);
+    const previousMetric = readCoverageMetric(previousSummary, metricName);
+    const metricDelta = {
+      count: toDelta(currentMetric.count, previousMetric.count),
+      rate_percent: toDelta(currentMetric.rate_percent, previousMetric.rate_percent)
+    };
+    if (
+      Number.isFinite(Number(currentMetric.among_covered_rate_percent))
+      || Number.isFinite(Number(previousMetric.among_covered_rate_percent))
+    ) {
+      metricDelta.among_covered_rate_percent = toDelta(
+        currentMetric.among_covered_rate_percent,
+        previousMetric.among_covered_rate_percent
+      );
+    }
+    deltas[metricName] = metricDelta;
+  }
+  return deltas;
+}
+
 function readFailedTemplates(report) {
   const templates = Array.isArray(report && report.templates) ? report.templates : [];
   return templates
@@ -299,6 +350,7 @@ function buildComparison(report, previousReport) {
       baseline_passed: toDelta(currentSummary.baseline_passed, previousSummary.baseline_passed),
       baseline_failed: toDelta(currentSummary.baseline_failed, previousSummary.baseline_failed)
     },
+    coverage_matrix_deltas: buildCoverageMatrixDeltas(currentSummary, previousSummary),
     portfolio: {
       previous_passed: previousSummary.portfolio_passed === true,
       current_passed: currentSummary.portfolio_passed === true,
@@ -378,6 +430,7 @@ function buildMarkdownReport(report) {
   if (report.compare) {
     const compare = report.compare;
     const deltas = compare.deltas || {};
+    const matrixDeltas = compare.coverage_matrix_deltas || {};
     const failedTemplates = compare.failed_templates || {};
     lines.push('');
     lines.push('## Trend vs Previous');
@@ -389,6 +442,9 @@ function buildMarkdownReport(report) {
     lines.push(`- Delta valid-rate: ${deltas.valid_rate_percent === null ? 'n/a' : `${deltas.valid_rate_percent}%`}`);
     lines.push(`- Delta baseline passed: ${deltas.baseline_passed === null ? 'n/a' : deltas.baseline_passed}`);
     lines.push(`- Delta baseline failed: ${deltas.baseline_failed === null ? 'n/a' : deltas.baseline_failed}`);
+    lines.push(`- Delta entity coverage: ${formatDeltaPercent(matrixDeltas.entity_coverage)}`);
+    lines.push(`- Delta business-rule closed: ${formatDeltaPercent(matrixDeltas.business_rule_closed)}`);
+    lines.push(`- Delta decision closed: ${formatDeltaPercent(matrixDeltas.decision_closed)}`);
     lines.push(`- Portfolio transition: ${compare.portfolio.previous_passed ? 'pass' : 'fail'} -> ${compare.portfolio.current_passed ? 'pass' : 'fail'}`);
     lines.push(`- Newly failed templates: ${failedTemplates.newly_failed && failedTemplates.newly_failed.length > 0 ? failedTemplates.newly_failed.join(', ') : 'none'}`);
     lines.push(`- Recovered templates: ${failedTemplates.recovered && failedTemplates.recovered.length > 0 ? failedTemplates.recovered.join(', ') : 'none'}`);

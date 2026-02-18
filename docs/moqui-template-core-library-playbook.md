@@ -87,6 +87,12 @@ Required artifacts for each intake batch:
 - `.kiro/templates/scene-packages/registry.json`
 - gate output/evidence linked from release notes or handoff summary
 
+`moqui-template-baseline.json` summary should be consumed as a matrix gate:
+- `scope_breakdown` (moqui_erp / scene_orchestration / other)
+- `coverage_matrix` (entity/relation/business-rule/decision coverage and closure rates)
+- `gap_frequency` (top recurring ontology gaps for remediation prioritization)
+- `compare.coverage_matrix_deltas` (trend deltas used to detect matrix regression/plateau between runs)
+
 ## Minimum Semantic Coverage
 
 Each accepted template should include ontology semantics for:

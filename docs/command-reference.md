@@ -777,6 +777,8 @@ Dual-track handoff integration:
   - Non-dry runs auto-merge release evidence into `.kiro/reports/release-evidence/handoff-runs.json` with session-level gate/ontology/regression/moqui-baseline/capability-coverage snapshots. Merge failures are recorded as warnings without aborting the run.
   - `--release-evidence-window` controls trend snapshot window size (2-50, default `5`) used in merged release evidence (`latest_trend_window` and per-session `trend_window`).
   - Run output includes `moqui_baseline` snapshot by default, with artifacts at `.kiro/reports/release-evidence/moqui-template-baseline.json` and `.kiro/reports/release-evidence/moqui-template-baseline.md`.
+  - `moqui_baseline.summary` now includes `scope_breakdown`, `coverage_matrix`, and `gap_frequency` for ER/BR/decision closure tracking.
+  - `moqui_baseline.compare` now includes `coverage_matrix_deltas` for trend-level entity/relation/rule/decision closure movement.
   - Run output includes `moqui_capability_coverage` snapshot by default (when manifest `capabilities` is declared), with artifacts at `.kiro/reports/release-evidence/moqui-capability-coverage.json` and `.kiro/reports/release-evidence/moqui-capability-coverage.md`.
   - Run output includes `release_gate_preflight` (latest release gate history signal snapshot + blocked reasons) and carries this context into `warnings`.
   - `release_gate_preflight` is advisory by default; use `--require-release-gate-preflight` to hard-fail when preflight is unavailable/blocked.

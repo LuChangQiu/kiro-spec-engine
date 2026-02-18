@@ -43,7 +43,21 @@ const payload = {
     valid_rate_percent: 100,
     baseline_passed: 3,
     baseline_failed: 0,
-    portfolio_passed: true
+    portfolio_passed: true,
+    scope_breakdown: {
+      moqui_erp: 2,
+      scene_orchestration: 1,
+      other: 0
+    },
+    coverage_matrix: {
+      entity_coverage: { count: 3, rate_percent: 100 },
+      relation_coverage: { count: 3, rate_percent: 100 },
+      business_rule_coverage: { count: 3, rate_percent: 100 },
+      business_rule_closed: { count: 3, rate_percent: 100 },
+      decision_coverage: { count: 3, rate_percent: 100 },
+      decision_closed: { count: 3, rate_percent: 100 }
+    },
+    gap_frequency: []
   },
   compare: {
     previous_generated_at: null,
@@ -53,6 +67,12 @@ const payload = {
       valid_rate_percent: 0,
       baseline_passed: 0,
       baseline_failed: 0
+    },
+    coverage_matrix_deltas: {
+      entity_coverage: { count: 0, rate_percent: 0 },
+      relation_coverage: { count: 0, rate_percent: 0 },
+      business_rule_closed: { count: 0, rate_percent: 0 },
+      decision_closed: { count: 0, rate_percent: 0 }
     },
     failed_templates: {
       previous: [],
@@ -7209,6 +7229,17 @@ if (process.argv.includes('--json')) {
       status: 'passed',
       generated: true
     }));
+    expect(payload.moqui_baseline.summary).toEqual(expect.objectContaining({
+      scope_breakdown: expect.objectContaining({
+        moqui_erp: 2,
+        scene_orchestration: 1
+      }),
+      coverage_matrix: expect.objectContaining({
+        entity_coverage: expect.objectContaining({ rate_percent: 100 }),
+        business_rule_closed: expect.objectContaining({ rate_percent: 100 }),
+        decision_closed: expect.objectContaining({ rate_percent: 100 })
+      })
+    }));
     expect(Array.isArray(payload.recommendations)).toBe(true);
     expect(payload.recommendations.some(item => item.includes('sce auto handoff regression --session-id'))).toBe(true);
     expect(payload.release_evidence).toEqual(expect.objectContaining({
@@ -7246,6 +7277,16 @@ if (process.argv.includes('--json')) {
     expect(releaseEvidence.sessions[0].moqui_baseline).toEqual(expect.objectContaining({
       status: 'passed',
       generated: true
+    }));
+    expect(releaseEvidence.sessions[0].moqui_baseline.summary).toEqual(expect.objectContaining({
+      coverage_matrix: expect.objectContaining({
+        relation_coverage: expect.objectContaining({ rate_percent: 100 })
+      })
+    }));
+    expect(releaseEvidence.sessions[0].moqui_baseline.compare).toEqual(expect.objectContaining({
+      coverage_matrix_deltas: expect.objectContaining({
+        business_rule_closed: expect.objectContaining({ rate_percent: 0 })
+      })
     }));
     expect(releaseEvidence.sessions[0].handoff_report_file).toContain('.kiro/reports/handoff-runs/');
     expect(releaseEvidence.sessions[0].trend_window).toEqual(expect.objectContaining({
@@ -9205,12 +9246,31 @@ if (process.argv.includes('--json')) {
               valid_rate_percent: 100,
               baseline_passed: 3,
               baseline_failed: 0,
-              portfolio_passed: true
+              portfolio_passed: true,
+              scope_breakdown: {
+                moqui_erp: 2,
+                scene_orchestration: 1,
+                other: 0
+              },
+              coverage_matrix: {
+                entity_coverage: { count: 3, rate_percent: 100 },
+                relation_coverage: { count: 3, rate_percent: 100 },
+                business_rule_coverage: { count: 3, rate_percent: 100 },
+                business_rule_closed: { count: 3, rate_percent: 100 },
+                decision_coverage: { count: 3, rate_percent: 100 },
+                decision_closed: { count: 3, rate_percent: 100 }
+              },
+              gap_frequency: []
             },
             compare: {
               deltas: {
                 avg_score: 2,
                 valid_rate_percent: 0
+              },
+              coverage_matrix_deltas: {
+                entity_coverage: { count: 0, rate_percent: 0 },
+                business_rule_closed: { count: 1, rate_percent: 33.33 },
+                decision_closed: { count: 0, rate_percent: 0 }
               },
               failed_templates: {
                 newly_failed: [],
@@ -9265,7 +9325,12 @@ if (process.argv.includes('--json')) {
     expect(payload.current_overview.moqui_baseline).toEqual(expect.objectContaining({
       status: 'passed',
       summary: expect.objectContaining({
-        portfolio_passed: true
+        portfolio_passed: true,
+        coverage_matrix: expect.objectContaining({
+          entity_coverage: expect.objectContaining({
+            rate_percent: 100
+          })
+        })
       })
     }));
     expect(payload.current_overview.scene_package_batch).toEqual(expect.objectContaining({
@@ -9500,6 +9565,54 @@ if (process.argv.includes('--json')) {
               spec_success_rate_percent: 12
             }
           },
+          moqui_baseline: {
+            status: 'passed',
+            generated: true,
+            summary: {
+              total_templates: 6,
+              scoped_templates: 6,
+              avg_score: 91,
+              valid_rate_percent: 100,
+              baseline_passed: 6,
+              baseline_failed: 0,
+              portfolio_passed: true,
+              scope_breakdown: {
+                moqui_erp: 3,
+                scene_orchestration: 3,
+                other: 0
+              },
+              coverage_matrix: {
+                entity_coverage: { count: 6, rate_percent: 100 },
+                relation_coverage: { count: 6, rate_percent: 100 },
+                business_rule_coverage: { count: 6, rate_percent: 100 },
+                business_rule_closed: { count: 5, rate_percent: 83.33 },
+                decision_coverage: { count: 6, rate_percent: 100 },
+                decision_closed: { count: 6, rate_percent: 100 }
+              },
+              gap_frequency: [
+                { gap: 'unmapped business rules remain', count: 1 }
+              ]
+            },
+            compare: {
+              deltas: {
+                avg_score: 2,
+                valid_rate_percent: 0
+              },
+              coverage_matrix_deltas: {
+                entity_coverage: { count: 0, rate_percent: 0 },
+                business_rule_closed: { count: 1, rate_percent: 16.67 },
+                decision_closed: { count: 0, rate_percent: 0 }
+              },
+              failed_templates: {
+                newly_failed: [],
+                recovered: []
+              }
+            },
+            output: {
+              json: '.kiro/reports/release-evidence/moqui-template-baseline.json',
+              markdown: '.kiro/reports/release-evidence/moqui-template-baseline.md'
+            }
+          },
           batch_summary: {
             failed_goals: 0
           }
@@ -9541,6 +9654,10 @@ if (process.argv.includes('--json')) {
     expect(releaseDraft).toContain('## Handoff Evidence Summary');
     expect(releaseDraft).toContain('Release gate preflight blocked: yes');
     expect(releaseDraft).toContain('Release gate preflight hard-gate: enabled');
+    expect(releaseDraft).toContain('Moqui entity coverage: 100%');
+    expect(releaseDraft).toContain('Moqui business-rule closed: 83.33%');
+    expect(releaseDraft).toContain('Moqui business-rule closed delta: 16.67%');
+    expect(releaseDraft).toContain('Moqui top baseline gaps: unmapped business rules remain:1');
     expect(releaseDraft).toContain('## Risk Layer Snapshot');
     expect(releaseDraft).toContain('## Governance Snapshot');
     expect(releaseDraft).toContain('## Release Evidence Artifacts');
@@ -9550,6 +9667,7 @@ if (process.argv.includes('--json')) {
     expect(reviewMarkdown).toContain('## Current Gate');
     expect(reviewMarkdown).toContain('## Current Release Gate Preflight');
     expect(reviewMarkdown).toContain('## Current Failure Summary');
+    expect(reviewMarkdown).toContain('Delta business-rule closed: 16.67%');
   });
 
   test('builds release gate history index by merging reports with seed history', async () => {

@@ -8561,7 +8561,9 @@ if (process.argv.includes('--json')) {
       signals: [
         'risk_level=medium',
         'spec_success_rate=88',
-        'gate_passed=true'
+        'gate_passed=true',
+        'scene_package_batch_passed=true',
+        'scene_package_batch_failure_count=0'
       ],
       violations: [],
       config_warnings: [],
@@ -8582,7 +8584,9 @@ if (process.argv.includes('--json')) {
       signals: [
         'risk_level=high',
         'spec_success_rate=70',
-        'gate_passed=false'
+        'gate_passed=false',
+        'scene_package_batch_passed=false',
+        'scene_package_batch_failure_count=2'
       ],
       violations: [
         'risk level high exceeds max medium'
@@ -8602,6 +8606,8 @@ if (process.argv.includes('--json')) {
           enforce: false,
           evidence_used: false,
           risk_level: 'unknown',
+          scene_package_batch_passed: true,
+          scene_package_batch_failure_count: 0,
           violations_count: 0,
           config_warning_count: 0,
           thresholds: {}
@@ -8628,17 +8634,24 @@ if (process.argv.includes('--json')) {
     expect(payload.total_entries).toBe(3);
     expect(payload.latest).toEqual(expect.objectContaining({
       tag: 'v1.3.0',
-      gate_passed: false
+      gate_passed: false,
+      scene_package_batch_passed: false,
+      scene_package_batch_failure_count: 2
     }));
     expect(payload.aggregates).toEqual(expect.objectContaining({
       gate_passed_count: 2,
       gate_failed_count: 1,
       enforce_count: 1,
-      pass_rate_percent: 66.67
+      pass_rate_percent: 66.67,
+      scene_package_batch_pass_rate_percent: 66.67,
+      scene_package_batch_failed_count: 1,
+      avg_scene_package_batch_failure_count: 0.67
     }));
     expect(payload.entries[0]).toEqual(expect.objectContaining({
       tag: 'v1.3.0',
-      risk_level: 'high'
+      risk_level: 'high',
+      scene_package_batch_passed: false,
+      scene_package_batch_failure_count: 2
     }));
     expect(payload.output_file).toBe(outFile);
 
@@ -8659,7 +8672,9 @@ if (process.argv.includes('--json')) {
       gate_passed: true,
       signals: [
         'risk_level=low',
-        'spec_success_rate=98'
+        'spec_success_rate=98',
+        'scene_package_batch_passed=true',
+        'scene_package_batch_failure_count=0'
       ],
       evaluated_at: '2026-02-17T03:00:00.000Z'
     }, { spaces: 2 });
@@ -8689,6 +8704,8 @@ if (process.argv.includes('--json')) {
     expect(markdown).toContain('# Auto Handoff Release Gate History');
     expect(markdown).toContain('## Aggregates');
     expect(markdown).toContain('## Recent Entries');
+    expect(markdown).toContain('Scene package batch pass rate');
+    expect(markdown).toContain('scene-batch=');
     expect(markdown).toContain('v1.0.0');
   });
 

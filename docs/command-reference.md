@@ -774,8 +774,9 @@ Dual-track handoff integration:
   - `--release-evidence-window` controls trend snapshot window size (2-50, default `5`) used in merged release evidence (`latest_trend_window` and per-session `trend_window`).
   - Run output includes `moqui_baseline` snapshot by default, with artifacts at `.kiro/reports/release-evidence/moqui-template-baseline.json` and `.kiro/reports/release-evidence/moqui-template-baseline.md`.
   - Run output includes `moqui_capability_coverage` snapshot by default (when manifest `capabilities` is declared), with artifacts at `.kiro/reports/release-evidence/moqui-capability-coverage.json` and `.kiro/reports/release-evidence/moqui-capability-coverage.md`.
+  - Run output includes `release_gate_preflight` (latest release gate history signal snapshot + blocked reasons) and carries this context into `warnings`.
   - When Moqui baseline/capability gates fail, KSE auto-generates remediation queue lines at `.kiro/auto/moqui-remediation.lines`.
-  - Run result includes `recommendations` with executable follow-up commands (for example, auto-generated `--continue-from <session>` on failed/incomplete batches).
+  - Run result includes `failure_summary` (failed phase/gate/release-gate preflight highlights) and `recommendations` with executable follow-up commands (for example, auto-generated `--continue-from <session>` on failed/incomplete batches).
   - Gate defaults: `--min-spec-success-rate` defaults to `100`, `--max-risk-level` defaults to `high`, ontology validation requirement is enabled by default, Moqui baseline requirement is enabled by default, and capability coverage minimum defaults to `100` when manifest `capabilities` is declared.
   - Use `--no-require-ontology-validation`, `--no-require-moqui-baseline`, or `--no-require-capability-coverage` only for emergency bypass.
 - `kse auto handoff regression [--session-id <id|latest>] [--window <n>] [--format <json|markdown>] [--out <path>] [--json]`: compare one handoff run report with its previous run and output trend deltas (success-rate/risk/failed-goals/elapsed time).

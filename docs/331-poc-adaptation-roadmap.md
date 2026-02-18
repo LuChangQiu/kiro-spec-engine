@@ -113,10 +113,13 @@
 39. 治理 maintain 计划默认优先 release gate 修复：
    - `kse auto governance maintain` 在 release gate 阻断时优先产出 `release-gate-evidence-review` / `release-gate-scene-batch-remediate`。
    - 发布质量阻断先处理，再执行常规会话/内存清理动作。
+40. handoff run 接入 release gate preflight 与失败摘要：
+   - `kse auto handoff run` 默认输出 `release_gate_preflight`，在 precheck 阶段给出 release gate 阻断提示。
+   - 失败结果新增 `failure_summary`，统一汇总 phase/gate/release-gate 阻断原因并联动推荐命令。
 
 ## 下一阶段（P2）
 
-1. 将 release gate 阻断信号接入 `kse auto handoff run` 的 preflight 提示与失败摘要，形成闭环入口。
+1. 将 handoff run 的 release gate preflight 信号接入可选 hard-gate 开关（默认 advisory，生产可强制阻断）。
 
 ## 长期目标（P3）
 

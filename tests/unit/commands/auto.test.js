@@ -7190,6 +7190,13 @@ if (process.argv.includes('--json')) {
   test('supports handoff run dry-run without executing close-loop-batch', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
     const queueFile = path.join(tempDir, '.kiro', 'auto', 'handoff-goals.lines');
+    const releaseGateHistoryFile = path.join(
+      tempDir,
+      '.kiro',
+      'reports',
+      'release-evidence',
+      'release-gate-history.json'
+    );
     await fs.writeJson(manifestFile, {
       timestamp: '2026-02-16T00:00:00.000Z',
       source_project: 'E:/workspace/331-poc',
@@ -7199,6 +7206,24 @@ if (process.argv.includes('--json')) {
         status: 'passed'
       },
       known_gaps: ['delivery anomaly triage']
+    }, { spaces: 2 });
+    await fs.ensureDir(path.dirname(releaseGateHistoryFile));
+    await fs.writeJson(releaseGateHistoryFile, {
+      mode: 'auto-handoff-release-gate-history',
+      total_entries: 4,
+      latest: {
+        tag: 'v1.47.35',
+        gate_passed: false,
+        risk_level: 'high'
+      },
+      aggregates: {
+        pass_rate_percent: 55,
+        scene_package_batch_pass_rate_percent: 60,
+        drift_alert_rate_percent: 100,
+        drift_alert_runs: 2,
+        drift_blocked_runs: 1
+      },
+      entries: []
     }, { spaces: 2 });
 
     const program = buildProgram();
@@ -7221,6 +7246,20 @@ if (process.argv.includes('--json')) {
     expect(payload.status).toBe('dry-run');
     expect(payload.phases.find(item => item.id === 'execution').status).toBe('skipped');
     expect(payload.phases.find(item => item.id === 'observability').status).toBe('skipped');
+    expect(payload.release_gate_preflight).toEqual(expect.objectContaining({
+      available: true,
+      blocked: true,
+      latest_gate_passed: false
+    }));
+    expect(payload.phases.find(item => item.id === 'precheck').details.release_gate_preflight).toEqual(
+      expect.objectContaining({
+        available: true,
+        blocked: true
+      })
+    );
+    expect(Array.isArray(payload.warnings)).toBe(true);
+    expect(payload.warnings.some(item => item.includes('release gate preflight is blocked'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('kse auto handoff evidence --window 5 --json'))).toBe(true);
     expect(await fs.pathExists(queueFile)).toBe(false);
     expect(runAutoCloseLoop).not.toHaveBeenCalled();
     expect(await fs.pathExists(payload.output_file)).toBe(true);
@@ -7285,12 +7324,37 @@ if (process.argv.includes('--json')) {
 
   test('fails handoff run early when ontology validation is missing (default gate enabled)', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    const releaseGateHistoryFile = path.join(
+      tempDir,
+      '.kiro',
+      'reports',
+      'release-evidence',
+      'release-gate-history.json'
+    );
     await fs.writeJson(manifestFile, {
       timestamp: '2026-02-16T00:00:00.000Z',
       source_project: 'E:/workspace/331-poc',
       specs: ['60-10-service-quality'],
       templates: ['moqui-domain-extension'],
       known_gaps: ['quality baseline missing']
+    }, { spaces: 2 });
+    await fs.ensureDir(path.dirname(releaseGateHistoryFile));
+    await fs.writeJson(releaseGateHistoryFile, {
+      mode: 'auto-handoff-release-gate-history',
+      total_entries: 4,
+      latest: {
+        tag: 'v1.47.35',
+        gate_passed: false,
+        risk_level: 'high'
+      },
+      aggregates: {
+        pass_rate_percent: 50,
+        scene_package_batch_pass_rate_percent: 60,
+        drift_alert_rate_percent: 100,
+        drift_alert_runs: 3,
+        drift_blocked_runs: 1
+      },
+      entries: []
     }, { spaces: 2 });
 
     const program = buildProgram();
@@ -7311,7 +7375,19 @@ if (process.argv.includes('--json')) {
     expect(payload.mode).toBe('auto-handoff-run');
     expect(payload.status).toBe('failed');
     expect(payload.error).toContain('handoff ontology validation gate failed');
+    expect(payload.release_gate_preflight).toEqual(expect.objectContaining({
+      available: true,
+      blocked: true
+    }));
+    expect(payload.failure_summary).toEqual(expect.objectContaining({
+      gate_failed: false,
+      release_gate_preflight_blocked: true
+    }));
+    expect(payload.failure_summary.highlights).toEqual(expect.arrayContaining([
+      expect.stringContaining('release_gate_preflight')
+    ]));
     expect(payload.recommendations.some(item => item.includes('Ensure manifest ontology_validation is present and passed'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('kse auto handoff evidence --window 5 --json'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('--continue-from'))).toBe(false);
     expect(runAutoCloseLoop).not.toHaveBeenCalled();
   });

@@ -7950,12 +7950,15 @@ if (process.argv.includes('--json')) {
       'run',
       '--manifest',
       manifestFile,
+      '--max-moqui-matrix-regressions',
+      '5',
       '--dry-run',
       '--json'
     ]);
 
     const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
     expect(payload.status).toBe('dry-run');
+    expect(payload.policy.max_moqui_matrix_regressions).toBe(5);
     expect(payload.recommendations.some(item => item.includes('Recover Moqui matrix regressions'))).toBe(true);
     expect(payload.failure_summary).toEqual(expect.objectContaining({
       moqui_matrix_regressions: expect.arrayContaining([
@@ -7971,6 +7974,124 @@ if (process.argv.includes('--json')) {
     expect(await fs.pathExists(payload.remediation_queue.file)).toBe(true);
     const queueContent = await fs.readFile(payload.remediation_queue.file, 'utf8');
     expect(queueContent).toContain('recover moqui matrix regression business-rule-closed (-25%)');
+    expect(runAutoCloseLoop).not.toHaveBeenCalled();
+  });
+
+  test('fails handoff run when Moqui matrix regressions exceed default gate', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-09-moqui-matrix-regression-hard-gate'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const baselineScript = path.join(tempDir, 'scripts', 'moqui-template-baseline-report.js');
+    await fs.writeFile(
+      baselineScript,
+      `'use strict';
+const fs = require('fs');
+const path = require('path');
+const readArg = flag => {
+  const index = process.argv.indexOf(flag);
+  return index >= 0 ? process.argv[index + 1] : null;
+};
+const outFile = readArg('--out');
+const markdownFile = readArg('--markdown-out');
+const payload = {
+  mode: 'moqui-template-baseline',
+  generated_at: '2026-02-17T00:00:00.000Z',
+  summary: {
+    total_templates: 3,
+    scoped_templates: 3,
+    avg_score: 93,
+    valid_rate_percent: 100,
+    baseline_passed: 3,
+    baseline_failed: 0,
+    portfolio_passed: true,
+    scope_breakdown: {
+      moqui_erp: 2,
+      scene_orchestration: 1,
+      other: 0
+    },
+    coverage_matrix: {
+      entity_coverage: { count: 3, rate_percent: 100 },
+      relation_coverage: { count: 3, rate_percent: 100 },
+      business_rule_coverage: { count: 3, rate_percent: 100 },
+      business_rule_closed: { count: 2, rate_percent: 66.67 },
+      decision_coverage: { count: 3, rate_percent: 100 },
+      decision_closed: { count: 2, rate_percent: 66.67 }
+    },
+    gap_frequency: []
+  },
+  compare: {
+    previous_generated_at: '2026-02-16T00:00:00.000Z',
+    deltas: {
+      scoped_templates: 0,
+      avg_score: 0,
+      valid_rate_percent: 0,
+      baseline_passed: 0,
+      baseline_failed: 0
+    },
+    coverage_matrix_deltas: {
+      entity_coverage: { count: 0, rate_percent: 0 },
+      relation_coverage: { count: 0, rate_percent: 0 },
+      business_rule_closed: { count: -1, rate_percent: -33.33 },
+      decision_closed: { count: -1, rate_percent: -33.33 }
+    },
+    failed_templates: {
+      previous: [],
+      current: [],
+      newly_failed: [],
+      recovered: []
+    }
+  }
+};
+if (outFile) {
+  fs.mkdirSync(path.dirname(outFile), { recursive: true });
+  fs.writeFileSync(outFile, JSON.stringify(payload, null, 2), 'utf8');
+}
+if (markdownFile) {
+  fs.mkdirSync(path.dirname(markdownFile), { recursive: true });
+  fs.writeFileSync(markdownFile, '# Mock Moqui Baseline Regression\\n', 'utf8');
+}
+if (process.argv.includes('--json')) {
+  process.stdout.write(JSON.stringify(payload));
+}
+`,
+      'utf8'
+    );
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'sce',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--dry-run',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.status).toBe('failed');
+    expect(payload.error).toContain('moqui baseline matrix regressions');
+    expect(payload.gates).toBeNull();
+    expect(payload.policy.max_moqui_matrix_regressions).toBe(0);
+    expect(payload.failure_summary).toEqual(expect.objectContaining({
+      moqui_matrix_regressions: expect.arrayContaining([
+        expect.objectContaining({
+          metric: 'business_rule_closed'
+        })
+      ])
+    }));
     expect(runAutoCloseLoop).not.toHaveBeenCalled();
   });
 
@@ -8731,6 +8852,25 @@ if (process.argv.includes('--json')) {
     ).rejects.toThrow('process.exit called');
     payload = JSON.parse(`${logSpy.mock.calls[logSpy.mock.calls.length - 1][0]}`);
     expect(payload.error).toContain('--max-unmapped-rules must be an integer >= 0.');
+
+    logSpy.mockClear();
+    const thirdProgram = buildProgram();
+    await expect(
+      thirdProgram.parseAsync([
+        'node',
+        'sce',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--max-moqui-matrix-regressions',
+        '-1',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+    payload = JSON.parse(`${logSpy.mock.calls[logSpy.mock.calls.length - 1][0]}`);
+    expect(payload.error).toContain('--max-moqui-matrix-regressions must be an integer >= 0.');
   });
 
   test('validates handoff release evidence window option range', async () => {
@@ -9506,6 +9646,7 @@ if (process.argv.includes('--json')) {
           merged_at: '2026-02-16T01:00:00.000Z',
           status: 'completed',
           policy: {
+            max_moqui_matrix_regressions: 0,
             require_release_gate_preflight: false
           },
           gate: {
@@ -9652,6 +9793,7 @@ if (process.argv.includes('--json')) {
           status: 'completed',
           handoff_report_file: '.kiro/reports/handoff-runs/handoff-one.json',
           policy: {
+            max_moqui_matrix_regressions: 0,
             require_release_gate_preflight: true
           },
           gate: {
@@ -9780,6 +9922,8 @@ if (process.argv.includes('--json')) {
     expect(releaseDraft).toContain('Moqui entity coverage: 100%');
     expect(releaseDraft).toContain('Moqui business-rule closed: 83.33%');
     expect(releaseDraft).toContain('Moqui business-rule closed delta: 16.67%');
+    expect(releaseDraft).toContain('Moqui matrix regression count: 0');
+    expect(releaseDraft).toContain('Moqui matrix regression gate (max): 0');
     expect(releaseDraft).toContain('Moqui matrix regressions: none');
     expect(releaseDraft).toContain('Moqui top baseline gaps: unmapped business rules remain:1');
     expect(releaseDraft).toContain('## Risk Layer Snapshot');
@@ -9792,6 +9936,7 @@ if (process.argv.includes('--json')) {
     expect(reviewMarkdown).toContain('## Current Release Gate Preflight');
     expect(reviewMarkdown).toContain('## Current Failure Summary');
     expect(reviewMarkdown).toContain('Delta business-rule closed: 16.67%');
+    expect(reviewMarkdown).toContain('Matrix regression gate (max): 0');
     expect(reviewMarkdown).toContain('Matrix regressions: none');
   });
 

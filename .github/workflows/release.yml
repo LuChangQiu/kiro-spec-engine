@@ -588,6 +588,9 @@ jobs:
           RELEASE_DRIFT_FAIL_STREAK_MIN: ${{ vars.KSE_RELEASE_DRIFT_FAIL_STREAK_MIN }}
           RELEASE_DRIFT_HIGH_RISK_SHARE_MIN_PERCENT: ${{ vars.KSE_RELEASE_DRIFT_HIGH_RISK_SHARE_MIN_PERCENT }}
           RELEASE_DRIFT_HIGH_RISK_SHARE_DELTA_MIN_PERCENT: ${{ vars.KSE_RELEASE_DRIFT_HIGH_RISK_SHARE_DELTA_MIN_PERCENT }}
+          RELEASE_DRIFT_PREFLIGHT_BLOCK_RATE_MIN_PERCENT: ${{ vars.KSE_RELEASE_DRIFT_PREFLIGHT_BLOCK_RATE_MIN_PERCENT }}
+          RELEASE_DRIFT_HARD_GATE_BLOCK_STREAK_MIN: ${{ vars.KSE_RELEASE_DRIFT_HARD_GATE_BLOCK_STREAK_MIN }}
+          RELEASE_DRIFT_PREFLIGHT_UNAVAILABLE_STREAK_MIN: ${{ vars.KSE_RELEASE_DRIFT_PREFLIGHT_UNAVAILABLE_STREAK_MIN }}
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
@@ -631,6 +634,12 @@ jobs:
               const sceneBatchFailedCount = payload.aggregates && Number.isFinite(Number(payload.aggregates.scene_package_batch_failed_count))
                 ? Number(payload.aggregates.scene_package_batch_failed_count)
                 : null;
+              const preflightAvailabilityRateHistory = payload.aggregates && Number.isFinite(Number(payload.aggregates.release_gate_preflight_availability_rate_percent))
+                ? Number(payload.aggregates.release_gate_preflight_availability_rate_percent)
+                : null;
+              const preflightBlockedRateHistory = payload.aggregates && Number.isFinite(Number(payload.aggregates.release_gate_preflight_block_rate_percent))
+                ? Number(payload.aggregates.release_gate_preflight_block_rate_percent)
+                : null;
               const parseNumber = (value, fallback) => {
                 const parsed = Number(value);
                 return Number.isFinite(parsed) ? parsed : fallback;
@@ -646,6 +655,18 @@ jobs:
               const highRiskDeltaThreshold = Math.max(
                 0,
                 Math.min(100, parseNumber(process.env.RELEASE_DRIFT_HIGH_RISK_SHARE_DELTA_MIN_PERCENT, 25))
+              );
+              const preflightBlockRateThreshold = Math.max(
+                0,
+                Math.min(100, parseNumber(process.env.RELEASE_DRIFT_PREFLIGHT_BLOCK_RATE_MIN_PERCENT, 40))
+              );
+              const hardGateBlockedStreakThreshold = Math.max(
+                1,
+                Math.floor(parseNumber(process.env.RELEASE_DRIFT_HARD_GATE_BLOCK_STREAK_MIN, 2))
+              );
+              const preflightUnavailableStreakThreshold = Math.max(
+                1,
+                Math.floor(parseNumber(process.env.RELEASE_DRIFT_PREFLIGHT_UNAVAILABLE_STREAK_MIN, 2))
               );
               const releaseTag = process.env.RELEASE_TAG || 'current';
               const releaseRepository = process.env.RELEASE_REPOSITORY || process.env.GITHUB_REPOSITORY || '';
@@ -690,6 +711,35 @@ jobs:
               const longHighShare = longWindow.length > 0
                 ? longWindow.filter(item => item && `${item.risk_level || ''}`.toLowerCase() === 'high').length / longWindow.length
                 : 0;
+              const recentPreflightKnown = recent.filter(
+                item => item && typeof item.release_gate_preflight_blocked === 'boolean'
+              ).length;
+              const recentPreflightBlocked = recent.filter(
+                item => item && item.release_gate_preflight_blocked === true
+              ).length;
+              const recentPreflightBlockedRate = recentPreflightKnown > 0
+                ? Number(((recentPreflightBlocked / recentPreflightKnown) * 100).toFixed(2))
+                : null;
+              const hardGateBlockedStreak = (() => {
+                let count = 0;
+                for (const item of recent) {
+                  if (!item || item.require_release_gate_preflight !== true || item.release_gate_preflight_blocked !== true) {
+                    break;
+                  }
+                  count += 1;
+                }
+                return count;
+              })();
+              const preflightUnavailableStreak = (() => {
+                let count = 0;
+                for (const item of recent) {
+                  if (!item || item.release_gate_preflight_available !== false) {
+                    break;
+                  }
+                  count += 1;
+                }
+                return count;
+              })();
               const driftAlerts = [];
               if (failedStreak >= failStreakThreshold) {
                 driftAlerts.push(`consecutive gate failures: ${failedStreak} (threshold=${failStreakThreshold})`);
@@ -707,6 +757,24 @@ jobs:
                   + `(threshold=${highRiskDeltaThreshold}%)`
                 );
               }
+              if (recentPreflightBlockedRate !== null && recentPreflightBlockedRate >= preflightBlockRateThreshold) {
+                driftAlerts.push(
+                  `release preflight blocked rate in latest 5 is ${recentPreflightBlockedRate}% `
+                  + `(threshold=${preflightBlockRateThreshold}%, known=${recentPreflightKnown})`
+                );
+              }
+              if (hardGateBlockedStreak >= hardGateBlockedStreakThreshold) {
+                driftAlerts.push(
+                  `hard-gate preflight blocked streak is ${hardGateBlockedStreak} `
+                  + `(threshold=${hardGateBlockedStreakThreshold})`
+                );
+              }
+              if (preflightUnavailableStreak >= preflightUnavailableStreakThreshold) {
+                driftAlerts.push(
+                  `release preflight unavailable streak is ${preflightUnavailableStreak} `
+                  + `(threshold=${preflightUnavailableStreakThreshold})`
+                );
+              }
 
               const lines = [
                 '',
@@ -716,12 +784,17 @@ jobs:
                 `- Gate pass rate (history): ${passRate === null ? 'n/a' : `${passRate}%`}`,
                 `- Scene batch pass rate (history): ${sceneBatchPassRate === null ? 'n/a' : `${sceneBatchPassRate}%`}`,
                 `- Scene batch failed runs (history): ${sceneBatchFailedCount === null ? 'n/a' : sceneBatchFailedCount}`,
+                `- Release preflight availability rate (history): ${preflightAvailabilityRateHistory === null ? 'n/a' : `${preflightAvailabilityRateHistory}%`}`,
+                `- Release preflight blocked rate (history): ${preflightBlockedRateHistory === null ? 'n/a' : `${preflightBlockedRateHistory}%`}`,
                 `- Recent pass ratio (latest 5): ${recentKnown === 0 ? 'n/a' : `${recentPass}/${recentKnown}`}`,
                 `- Recent risk mix (latest 5): low=${riskCounts.low}, medium=${riskCounts.medium}, high=${riskCounts.high}, unknown=${riskCounts.unknown}`,
+                `- Recent preflight blocked ratio (latest 5): ${recentPreflightKnown === 0 ? 'n/a' : `${recentPreflightBlocked}/${recentPreflightKnown} (${recentPreflightBlockedRate}%)`}`,
+                `- Hard-gate preflight blocked streak (latest 5): ${hardGateBlockedStreak}`,
+                `- Preflight unavailable streak (latest 5): ${preflightUnavailableStreak}`,
                 `- Trend card: ${historyCardUrl ? `[${historyCardAsset}](${historyCardUrl})` : historyCardAsset}`,
                 `- History index: ${historyJsonUrl ? `[${historyJsonAsset}](${historyJsonUrl})` : historyJsonAsset}`,
                 `- History summary: ${historySummaryUrl ? `[${historySummaryAsset}](${historySummaryUrl})` : historySummaryAsset}`,
-                `- Drift thresholds: fail_streak>=${failStreakThreshold}, high_share>=${highRiskShareThreshold}%, high_share_delta>=${highRiskDeltaThreshold}%`,
+                `- Drift thresholds: fail_streak>=${failStreakThreshold}, high_share>=${highRiskShareThreshold}%, high_share_delta>=${highRiskDeltaThreshold}%, preflight_block_rate>=${preflightBlockRateThreshold}%, hard_gate_block_streak>=${hardGateBlockedStreakThreshold}, preflight_unavailable_streak>=${preflightUnavailableStreakThreshold}`,
                 '',
                 '### Drift Alerts'
               ];
@@ -757,11 +830,17 @@ jobs:
                   const sceneFailures = Number.isFinite(Number(item && item.scene_package_batch_failure_count))
                     ? `${Number(item.scene_package_batch_failure_count)}`
                     : 'n/a';
+                  const preflightBlocked = item && typeof item.release_gate_preflight_blocked === 'boolean'
+                    ? (item.release_gate_preflight_blocked ? 'yes' : 'no')
+                    : 'n/a';
+                  const hardGateMode = item && item.require_release_gate_preflight === true
+                    ? 'enabled'
+                    : (item && item.require_release_gate_preflight === false ? 'advisory' : 'n/a');
                   const evaluatedAt = item && item.evaluated_at ? item.evaluated_at : 'n/a';
                   lines.push(
                     '',
                     `- ${tag} | passed=${passed} | risk=${risk} | scene-batch=${sceneBatch} | ` +
-                    `scene-failures=${sceneFailures} | success=${successRate} | at=${evaluatedAt}`
+                    `scene-failures=${sceneFailures} | preflight-blocked=${preflightBlocked} | hard-gate=${hardGateMode} | success=${successRate} | at=${evaluatedAt}`
                   );
                 }
               }
@@ -778,6 +857,9 @@ jobs:
           RELEASE_DRIFT_FAIL_STREAK_MIN: ${{ vars.KSE_RELEASE_DRIFT_FAIL_STREAK_MIN }}
           RELEASE_DRIFT_HIGH_RISK_SHARE_MIN_PERCENT: ${{ vars.KSE_RELEASE_DRIFT_HIGH_RISK_SHARE_MIN_PERCENT }}
           RELEASE_DRIFT_HIGH_RISK_SHARE_DELTA_MIN_PERCENT: ${{ vars.KSE_RELEASE_DRIFT_HIGH_RISK_SHARE_DELTA_MIN_PERCENT }}
+          RELEASE_DRIFT_PREFLIGHT_BLOCK_RATE_MIN_PERCENT: ${{ vars.KSE_RELEASE_DRIFT_PREFLIGHT_BLOCK_RATE_MIN_PERCENT }}
+          RELEASE_DRIFT_HARD_GATE_BLOCK_STREAK_MIN: ${{ vars.KSE_RELEASE_DRIFT_HARD_GATE_BLOCK_STREAK_MIN }}
+          RELEASE_DRIFT_PREFLIGHT_UNAVAILABLE_STREAK_MIN: ${{ vars.KSE_RELEASE_DRIFT_PREFLIGHT_UNAVAILABLE_STREAK_MIN }}
           RELEASE_GATE_REPORT_FILE: ${{ steps.release_notes.outputs.gate_file }}
         run: |
           set -euo pipefail
@@ -823,6 +905,18 @@ jobs:
             const highRiskDeltaThreshold = Math.max(
               0,
               Math.min(100, parseNumber(process.env.RELEASE_DRIFT_HIGH_RISK_SHARE_DELTA_MIN_PERCENT, 25))
+            );
+            const preflightBlockRateThreshold = Math.max(
+              0,
+              Math.min(100, parseNumber(process.env.RELEASE_DRIFT_PREFLIGHT_BLOCK_RATE_MIN_PERCENT, 40))
+            );
+            const hardGateBlockedStreakThreshold = Math.max(
+              1,
+              Math.floor(parseNumber(process.env.RELEASE_DRIFT_HARD_GATE_BLOCK_STREAK_MIN, 2))
+            );
+            const preflightUnavailableStreakThreshold = Math.max(
+              1,
+              Math.floor(parseNumber(process.env.RELEASE_DRIFT_PREFLIGHT_UNAVAILABLE_STREAK_MIN, 2))
             );
 
             if (!historyFile || !fs.existsSync(historyFile)) {
@@ -882,6 +976,35 @@ jobs:
               ? longWindow.filter(item => item && `${item.risk_level || ''}`.toLowerCase() === 'high').length / longWindow.length
               : 0;
             const highRiskDeltaPercent = Number(((shortHighShare - longHighShare) * 100).toFixed(2));
+            const recentPreflightKnown = recent.filter(
+              item => item && typeof item.release_gate_preflight_blocked === 'boolean'
+            ).length;
+            const recentPreflightBlocked = recent.filter(
+              item => item && item.release_gate_preflight_blocked === true
+            ).length;
+            const recentPreflightBlockedRate = recentPreflightKnown > 0
+              ? Number(((recentPreflightBlocked / recentPreflightKnown) * 100).toFixed(2))
+              : null;
+            const hardGateBlockedStreak = (() => {
+              let count = 0;
+              for (const item of recent) {
+                if (!item || item.require_release_gate_preflight !== true || item.release_gate_preflight_blocked !== true) {
+                  break;
+                }
+                count += 1;
+              }
+              return count;
+            })();
+            const preflightUnavailableStreak = (() => {
+              let count = 0;
+              for (const item of recent) {
+                if (!item || item.release_gate_preflight_available !== false) {
+                  break;
+                }
+                count += 1;
+              }
+              return count;
+            })();
 
             const alerts = [];
             if (failedStreak >= failStreakThreshold) {
@@ -900,18 +1023,44 @@ jobs:
                 + `(threshold=${highRiskDeltaThreshold}%)`
               );
             }
+            if (recentPreflightBlockedRate !== null && recentPreflightBlockedRate >= preflightBlockRateThreshold) {
+              alerts.push(
+                `release preflight blocked rate in latest 5 is ${recentPreflightBlockedRate}% `
+                + `(threshold=${preflightBlockRateThreshold}%, known=${recentPreflightKnown})`
+              );
+            }
+            if (hardGateBlockedStreak >= hardGateBlockedStreakThreshold) {
+              alerts.push(
+                `hard-gate preflight blocked streak is ${hardGateBlockedStreak} `
+                + `(threshold=${hardGateBlockedStreakThreshold})`
+              );
+            }
+            if (preflightUnavailableStreak >= preflightUnavailableStreakThreshold) {
+              alerts.push(
+                `release preflight unavailable streak is ${preflightUnavailableStreak} `
+                + `(threshold=${preflightUnavailableStreakThreshold})`
+              );
+            }
             const blocked = enforce && alerts.length > 0;
             const driftPayload = {
               enforce,
               thresholds: {
                 fail_streak_min: failStreakThreshold,
                 high_risk_share_min_percent: highRiskShareThreshold,
-                high_risk_share_delta_min_percent: highRiskDeltaThreshold
+                high_risk_share_delta_min_percent: highRiskDeltaThreshold,
+                preflight_block_rate_min_percent: preflightBlockRateThreshold,
+                hard_gate_block_streak_min: hardGateBlockedStreakThreshold,
+                preflight_unavailable_streak_min: preflightUnavailableStreakThreshold
               },
               metrics: {
                 failed_streak_latest5: failedStreak,
                 high_risk_share_latest5_percent: highRiskShare,
                 high_risk_share_delta_percent: highRiskDeltaPercent,
+                preflight_known_latest5: recentPreflightKnown,
+                preflight_blocked_latest5: recentPreflightBlocked,
+                preflight_blocked_rate_latest5_percent: recentPreflightBlockedRate,
+                hard_gate_blocked_streak_latest5: hardGateBlockedStreak,
+                preflight_unavailable_streak_latest5: preflightUnavailableStreak,
                 recent_window_size: recent.length,
                 short_window_size: shortWindow.length,
                 long_window_size: longWindow.length
@@ -924,10 +1073,15 @@ jobs:
 
             console.log(
               `[release-drift] enforce=${enforce} fail_streak_threshold=${failStreakThreshold} `
-              + `high_share_threshold=${highRiskShareThreshold}% high_delta_threshold=${highRiskDeltaThreshold}%`
+              + `high_share_threshold=${highRiskShareThreshold}% high_delta_threshold=${highRiskDeltaThreshold}% `
+              + `preflight_block_rate_threshold=${preflightBlockRateThreshold}% `
+              + `hard_gate_block_streak_threshold=${hardGateBlockedStreakThreshold} `
+              + `preflight_unavailable_streak_threshold=${preflightUnavailableStreakThreshold}`
             );
             console.log(
-              `[release-drift] metrics failed_streak=${failedStreak} high_share=${highRiskShare}% high_delta=${highRiskDeltaPercent}%`
+              `[release-drift] metrics failed_streak=${failedStreak} high_share=${highRiskShare}% high_delta=${highRiskDeltaPercent}% `
+              + `preflight_block_rate=${recentPreflightBlockedRate === null ? 'n/a' : `${recentPreflightBlockedRate}%`} `
+              + `hard_gate_block_streak=${hardGateBlockedStreak} preflight_unavailable_streak=${preflightUnavailableStreak}`
             );
             if (alerts.length > 0) {
               alerts.forEach(item => console.warn(`[release-drift] alert=${item}`));
@@ -959,9 +1113,15 @@ jobs:
                 `- fail streak threshold: ${failStreakThreshold}`,
                 `- high risk share threshold: ${highRiskShareThreshold}%`,
                 `- high risk delta threshold: ${highRiskDeltaThreshold}%`,
+                `- release preflight blocked rate threshold: ${preflightBlockRateThreshold}%`,
+                `- hard-gate blocked streak threshold: ${hardGateBlockedStreakThreshold}`,
+                `- preflight unavailable streak threshold: ${preflightUnavailableStreakThreshold}`,
                 `- failed streak (latest 5): ${failedStreak}`,
                 `- high risk share (latest 5): ${highRiskShare}%`,
-                `- high risk delta (short-long): ${highRiskDeltaPercent}%`
+                `- high risk delta (short-long): ${highRiskDeltaPercent}%`,
+                `- release preflight blocked ratio (latest 5): ${recentPreflightKnown === 0 ? 'n/a' : `${recentPreflightBlocked}/${recentPreflightKnown} (${recentPreflightBlockedRate}%)`}`,
+                `- hard-gate blocked streak (latest 5): ${hardGateBlockedStreak}`,
+                `- preflight unavailable streak (latest 5): ${preflightUnavailableStreak}`
               ];
               if (alerts.length === 0) {
                 lines.push('', '- no alerts');

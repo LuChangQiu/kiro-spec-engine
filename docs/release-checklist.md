@@ -111,6 +111,9 @@ Ensure:
   - `KSE_RELEASE_DRIFT_FAIL_STREAK_MIN`: minimum consecutive failed gates to trigger alert (default `2`)
   - `KSE_RELEASE_DRIFT_HIGH_RISK_SHARE_MIN_PERCENT`: minimum high-risk share in latest 5 versions (default `60`)
   - `KSE_RELEASE_DRIFT_HIGH_RISK_SHARE_DELTA_MIN_PERCENT`: minimum short-vs-long high-risk share delta (default `25`)
+  - `KSE_RELEASE_DRIFT_PREFLIGHT_BLOCK_RATE_MIN_PERCENT`: minimum release preflight blocked rate in latest 5 known runs (default `40`)
+  - `KSE_RELEASE_DRIFT_HARD_GATE_BLOCK_STREAK_MIN`: minimum consecutive hard-gate preflight blocked streak (latest window, default `2`)
+  - `KSE_RELEASE_DRIFT_PREFLIGHT_UNAVAILABLE_STREAK_MIN`: minimum consecutive release preflight unavailable streak (latest window, default `2`)
 - Optional local dry-run for gate history index artifact:
   - `kse auto handoff gate-index --dir .kiro/reports/release-evidence --out .kiro/reports/release-evidence/release-gate-history.json --json`
 

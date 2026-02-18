@@ -111,6 +111,9 @@ git log --oneline -n 15
   - `KSE_RELEASE_DRIFT_FAIL_STREAK_MIN`：触发告警的最小连续失败次数（默认 `2`）
   - `KSE_RELEASE_DRIFT_HIGH_RISK_SHARE_MIN_PERCENT`：近 5 版 high 风险占比告警阈值（默认 `60`）
   - `KSE_RELEASE_DRIFT_HIGH_RISK_SHARE_DELTA_MIN_PERCENT`：短期相对长期 high 风险占比增量阈值（默认 `25`）
+  - `KSE_RELEASE_DRIFT_PREFLIGHT_BLOCK_RATE_MIN_PERCENT`：近 5 版（有 preflight 信号）blocked 占比告警阈值（默认 `40`）
+  - `KSE_RELEASE_DRIFT_HARD_GATE_BLOCK_STREAK_MIN`：hard-gate preflight 连续 blocked 告警阈值（最近窗口，默认 `2`）
+  - `KSE_RELEASE_DRIFT_PREFLIGHT_UNAVAILABLE_STREAK_MIN`：release preflight 连续 unavailable 告警阈值（最近窗口，默认 `2`）
 - 可选本地预演 release gate 历史索引产物：
   - `kse auto handoff gate-index --dir .kiro/reports/release-evidence --out .kiro/reports/release-evidence/release-gate-history.json --json`
 

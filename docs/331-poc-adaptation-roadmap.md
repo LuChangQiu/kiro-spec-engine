@@ -125,10 +125,13 @@
 43. gate-index 趋势卡片纳入 preflight/hard-gate 聚合：
    - `kse auto handoff gate-index` 聚合 `release_gate_preflight_*` 指标并在 markdown 趋势卡片展示。
    - Recent entries 行新增 `preflight-blocked` / `hard-gate` 维度，便于跨版本定位阻断模式。
+44. release workflow 漂移判定纳入 preflight/hard-gate 趋势：
+   - `release.yml` 的 drift alert 增加 preflight blocked rate、hard-gate blocked streak、preflight unavailable streak 三类阈值。
+   - drift 评估结果与 release notes 趋势摘要统一输出 preflight/hard-gate 指标，形成单一发布阻断口径。
 
 ## 下一阶段（P2）
 
-1. 将 preflight/hard-gate 趋势接入 release workflow 的 drift alert 判定，形成统一发布阻断策略。
+1. 将 release workflow 中重复的 drift 计算逻辑抽成共享脚本，避免 release notes 与 gate 判定口径漂移。
 
 ## 长期目标（P3）
 

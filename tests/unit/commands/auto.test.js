@@ -7273,6 +7273,72 @@ if (process.argv.includes('--json')) {
     expect(await fs.pathExists(releaseEvidenceFile)).toBe(false);
   });
 
+  test('enforces release gate preflight when --require-release-gate-preflight is set', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    const releaseGateHistoryFile = path.join(
+      tempDir,
+      '.kiro',
+      'reports',
+      'release-evidence',
+      'release-gate-history.json'
+    );
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-09-release-gate-hard-gate'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+    await fs.ensureDir(path.dirname(releaseGateHistoryFile));
+    await fs.writeJson(releaseGateHistoryFile, {
+      mode: 'auto-handoff-release-gate-history',
+      total_entries: 4,
+      latest: {
+        tag: 'v1.47.35',
+        gate_passed: false,
+        risk_level: 'high'
+      },
+      aggregates: {
+        pass_rate_percent: 55,
+        scene_package_batch_pass_rate_percent: 60,
+        drift_alert_rate_percent: 100,
+        drift_alert_runs: 2,
+        drift_blocked_runs: 1
+      },
+      entries: []
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'kse',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--dry-run',
+        '--require-release-gate-preflight',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('failed');
+    expect(payload.policy.require_release_gate_preflight).toBe(true);
+    expect(payload.error).toContain('handoff release gate preflight failed');
+    expect(payload.release_gate_preflight).toEqual(expect.objectContaining({
+      available: true,
+      blocked: true
+    }));
+    expect(payload.recommendations.some(item => item.includes('kse auto handoff evidence --window 5 --json'))).toBe(true);
+    expect(runAutoCloseLoop).not.toHaveBeenCalled();
+  });
+
   test('does not fail handoff run when release evidence merge errors', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
     await fs.writeJson(manifestFile, {

@@ -116,10 +116,13 @@
 40. handoff run 接入 release gate preflight 与失败摘要：
    - `kse auto handoff run` 默认输出 `release_gate_preflight`，在 precheck 阶段给出 release gate 阻断提示。
    - 失败结果新增 `failure_summary`，统一汇总 phase/gate/release-gate 阻断原因并联动推荐命令。
+41. handoff run 增加 release gate 可选硬门禁：
+   - 新增 `--require-release-gate-preflight`，可在生产场景将 release gate preflight 从 advisory 升级为 hard-fail。
+   - 默认保持 advisory，避免对现有项目引入破坏性变更。
 
 ## 下一阶段（P2）
 
-1. 将 handoff run 的 release gate preflight 信号接入可选 hard-gate 开关（默认 advisory，生产可强制阻断）。
+1. 将 handoff run 的 release gate preflight/hard-gate 信号接入 release draft 与 gate-index 趋势卡片，形成发布闭环看板。
 
 ## 长期目标（P3）
 

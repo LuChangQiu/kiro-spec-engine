@@ -1,6 +1,6 @@
 # Export Command - Design
 
-> Technical design for kse export command
+> Technical design for sce export command
 
 ---
 
@@ -83,7 +83,7 @@ class ExportService {
 
 ## Command Registration
 
-**File:** `bin/kiro-spec-engine.js`
+**File:** `bin/scene-capability-engine.js`
 
 ```javascript
 program

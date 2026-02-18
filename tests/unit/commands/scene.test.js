@@ -232,13 +232,13 @@ describe('Scene command', () => {
   });
 
   test('validateScenePackageTemplateOptions enforces package template constraints', () => {
-    expect(validateScenePackageTemplateOptions({ kind: 'scene-template', group: 'kse.scene', version: '0.1.0' }))
+    expect(validateScenePackageTemplateOptions({ kind: 'scene-template', group: 'sce.scene', version: '0.1.0' }))
       .toBe('--out must be a non-empty path');
-    expect(validateScenePackageTemplateOptions({ out: '.kiro/templates/scene-package.json', kind: 'bad-kind', group: 'kse.scene', version: '0.1.0' }))
+    expect(validateScenePackageTemplateOptions({ out: '.kiro/templates/scene-package.json', kind: 'bad-kind', group: 'sce.scene', version: '0.1.0' }))
       .toContain('kind must be one of');
-    expect(validateScenePackageTemplateOptions({ out: '.kiro/templates/scene-package.json', kind: 'scene-template', group: 'kse.scene', version: 'v1' }))
+    expect(validateScenePackageTemplateOptions({ out: '.kiro/templates/scene-package.json', kind: 'scene-template', group: 'sce.scene', version: 'v1' }))
       .toBe('--pkg-version must be a semantic version (x.y.z)');
-    expect(validateScenePackageTemplateOptions({ out: '.kiro/templates/scene-package.json', kind: 'scene-template', group: 'kse.scene', version: '1.2.3' }))
+    expect(validateScenePackageTemplateOptions({ out: '.kiro/templates/scene-package.json', kind: 'scene-template', group: 'sce.scene', version: '1.2.3' }))
       .toBeNull();
   });
 
@@ -2182,7 +2182,7 @@ Trace: doctor-trace-erp
 
         if (normalizedPath.endsWith('/36-00-scene-contract-kind-model/custom/scene.yaml')) {
           return [
-            'apiVersion: kse.scene/v0.2',
+            'apiVersion: sce.scene/v0.2',
             'kind: scene',
             'metadata:',
             '  obj_id: scene.erp.order.query',
@@ -2203,7 +2203,7 @@ Trace: doctor-trace-erp
 
         if (normalizedPath.endsWith('/37-00-scene-runtime-execution-pilot/custom/scene.yaml')) {
           return [
-            'apiVersion: kse.scene/v0.2',
+            'apiVersion: sce.scene/v0.2',
             'kind: scene',
             'metadata:',
             '  obj_id: scene.robot.shadow.run',
@@ -2338,7 +2338,7 @@ Trace: doctor-trace-erp
         const normalizedPath = normalizePath(targetPath);
         if (normalizedPath.endsWith('/36-00-scene-contract-kind-model/custom/scene.yaml')) {
           return [
-            'apiVersion: kse.scene/v0.2',
+            'apiVersion: sce.scene/v0.2',
             'kind: scene',
             'metadata:',
             '  obj_id: scene.erp.order.query',
@@ -2359,7 +2359,7 @@ Trace: doctor-trace-erp
 
         if (normalizedPath.endsWith('/37-00-scene-runtime-execution-pilot/custom/scene.yaml')) {
           return [
-            'apiVersion: kse.scene/v0.2',
+            'apiVersion: sce.scene/v0.2',
             'kind: scene',
             'metadata:',
             '  obj_id: scene.hybrid.pick.shadow',
@@ -2404,9 +2404,9 @@ Trace: doctor-trace-erp
       spec: '36-00-scene-contract-kind-model'
     });
     expect(route.selected.commands).toMatchObject({
-      validate: 'kse scene validate --spec 36-00-scene-contract-kind-model --spec-manifest custom/scene.yaml',
-      doctor: 'kse scene doctor --spec 36-00-scene-contract-kind-model --spec-manifest custom/scene.yaml --mode dry_run',
-      run: 'kse scene run --spec 36-00-scene-contract-kind-model --spec-manifest custom/scene.yaml --mode dry_run'
+      validate: 'sce scene validate --spec 36-00-scene-contract-kind-model --spec-manifest custom/scene.yaml',
+      doctor: 'sce scene doctor --spec 36-00-scene-contract-kind-model --spec-manifest custom/scene.yaml --mode dry_run',
+      run: 'sce scene run --spec 36-00-scene-contract-kind-model --spec-manifest custom/scene.yaml --mode dry_run'
     });
     expect(normalizePath(fileSystem.writeJson.mock.calls[0][0])).toBe('/workspace/.kiro/results/scene-route.json');
   });
@@ -2438,7 +2438,7 @@ Trace: doctor-trace-erp
         const normalizedPath = normalizePath(targetPath);
         const isCatalog = normalizedPath.includes('61-00-scene-catalog-discovery-and-routing');
         return [
-          'apiVersion: kse.scene/v0.2',
+          'apiVersion: sce.scene/v0.2',
           'kind: scene',
           'metadata:',
           `  obj_id: ${isCatalog ? 'scene.erp.catalog.routing' : 'scene.erp.routing.layer'}`,
@@ -2513,7 +2513,7 @@ Trace: doctor-trace-erp
         const normalizedPath = normalizePath(targetPath);
         const isFirst = normalizedPath.includes('36-00-scene-contract-kind-model');
         return [
-          'apiVersion: kse.scene/v0.2',
+          'apiVersion: sce.scene/v0.2',
           'kind: scene',
           'metadata:',
           `  obj_id: ${isFirst ? 'scene.erp.order.one' : 'scene.erp.order.two'}`,
@@ -2856,7 +2856,7 @@ Trace: doctor-trace-erp
     const payload = await runScenePackageTemplateCommand({
       spec: '67-00-scene-package-contract-declaration',
       kind: 'scene-domain-profile',
-      group: 'kse.scene',
+      group: 'sce.scene',
       pkgVersion: '0.2.0',
       json: true
     }, {
@@ -2874,10 +2874,10 @@ Trace: doctor-trace-erp
     expect(normalizePath(writeCall[0]))
       .toBe('/workspace/.kiro/specs/67-00-scene-package-contract-declaration/custom/scene-package.json');
     expect(writeCall[1]).toMatchObject({
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-domain-profile',
       metadata: {
-        group: 'kse.scene',
+        group: 'sce.scene',
         version: '0.2.0'
       }
     });
@@ -2886,7 +2886,7 @@ Trace: doctor-trace-erp
   test('runScenePackageValidateCommand reports invalid contract with non-zero exit code', async () => {
     const fileSystem = {
       readJson: jest.fn().mockResolvedValue({
-        apiVersion: 'kse.scene.package/v0.1',
+        apiVersion: 'sce.scene.package/v0.1',
         kind: 'scene-template'
       })
     };
@@ -2907,16 +2907,16 @@ Trace: doctor-trace-erp
 
   test('runScenePackagePublishCommand publishes template assets', async () => {
     const contract = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: {
-        group: 'kse.scene',
+        group: 'sce.scene',
         name: 'erp-order-query',
         version: '0.2.0'
       },
       compatibility: {
         kse_version: '>=1.24.0',
-        scene_api_version: 'kse.scene/v0.2'
+        scene_api_version: 'sce.scene/v0.2'
       },
       capabilities: {
         provides: ['scene.erp.query'],
@@ -2946,13 +2946,13 @@ Trace: doctor-trace-erp
         if (normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration/custom/scene.yaml') {
           return true;
         }
-        if (normalized === '/workspace/.kiro/templates/scene-packages/kse.scene--erp-order-query--0.2.0') {
+        if (normalized === '/workspace/.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0') {
           return false;
         }
         return false;
       }),
       readJson: jest.fn().mockResolvedValue(contract),
-      readFile: jest.fn().mockResolvedValue('apiVersion: kse.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{entity_name}}\n'),
+      readFile: jest.fn().mockResolvedValue('apiVersion: sce.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{entity_name}}\n'),
       ensureDir: jest.fn().mockResolvedValue(),
       writeJson: jest.fn().mockResolvedValue(),
       writeFile: jest.fn().mockResolvedValue()
@@ -2967,29 +2967,29 @@ Trace: doctor-trace-erp
     });
 
     expect(payload).toBeDefined();
-    expect(payload.template.id).toBe('kse.scene--erp-order-query--0.2.0');
-    expect(payload.template.output_dir).toBe('.kiro/templates/scene-packages/kse.scene--erp-order-query--0.2.0');
+    expect(payload.template.id).toBe('sce.scene--erp-order-query--0.2.0');
+    expect(payload.template.output_dir).toBe('.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0');
 
     const writeJsonTargets = fileSystem.writeJson.mock.calls.map((call) => normalizePath(call[0]));
-    expect(writeJsonTargets).toContain('/workspace/.kiro/templates/scene-packages/kse.scene--erp-order-query--0.2.0/template.manifest.json');
-    expect(writeJsonTargets).toContain('/workspace/.kiro/templates/scene-packages/kse.scene--erp-order-query--0.2.0/scene-package.json');
+    expect(writeJsonTargets).toContain('/workspace/.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0/template.manifest.json');
+    expect(writeJsonTargets).toContain('/workspace/.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0/scene-package.json');
 
     expect(normalizePath(fileSystem.writeFile.mock.calls[0][0]))
-      .toBe('/workspace/.kiro/templates/scene-packages/kse.scene--erp-order-query--0.2.0/scene.template.yaml');
+      .toBe('/workspace/.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0/scene.template.yaml');
   });
 
   test('runScenePackagePublishCommand supports dry-run preview without writes', async () => {
     const contract = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: {
-        group: 'kse.scene',
+        group: 'sce.scene',
         name: 'erp-order-query',
         version: '0.2.0'
       },
       compatibility: {
         kse_version: '>=1.24.0',
-        scene_api_version: 'kse.scene/v0.2'
+        scene_api_version: 'sce.scene/v0.2'
       },
       capabilities: {
         provides: ['scene.erp.query'],
@@ -3018,13 +3018,13 @@ Trace: doctor-trace-erp
         if (normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration/custom/scene.yaml') {
           return true;
         }
-        if (normalized === '/workspace/.kiro/templates/scene-packages/kse.scene--erp-order-query--0.2.0') {
+        if (normalized === '/workspace/.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0') {
           return false;
         }
         return false;
       }),
       readJson: jest.fn().mockResolvedValue(contract),
-      readFile: jest.fn().mockResolvedValue('apiVersion: kse.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{entity_name}}\n'),
+      readFile: jest.fn().mockResolvedValue('apiVersion: sce.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{entity_name}}\n'),
       ensureDir: jest.fn().mockResolvedValue(),
       writeJson: jest.fn().mockResolvedValue(),
       writeFile: jest.fn().mockResolvedValue()
@@ -3050,16 +3050,16 @@ Trace: doctor-trace-erp
 
   test('runScenePackagePublishCommand dry-run allows existing template without --force', async () => {
     const contract = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: {
-        group: 'kse.scene',
+        group: 'sce.scene',
         name: 'erp-order-query',
         version: '0.2.0'
       },
       compatibility: {
         kse_version: '>=1.24.0',
-        scene_api_version: 'kse.scene/v0.2'
+        scene_api_version: 'sce.scene/v0.2'
       },
       capabilities: {
         provides: ['scene.erp.query'],
@@ -3088,13 +3088,13 @@ Trace: doctor-trace-erp
         if (normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration/custom/scene.yaml') {
           return true;
         }
-        if (normalized === '/workspace/.kiro/templates/scene-packages/kse.scene--erp-order-query--0.2.0') {
+        if (normalized === '/workspace/.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0') {
           return true;
         }
         return false;
       }),
       readJson: jest.fn().mockResolvedValue(contract),
-      readFile: jest.fn().mockResolvedValue('apiVersion: kse.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{entity_name}}\n'),
+      readFile: jest.fn().mockResolvedValue('apiVersion: sce.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{entity_name}}\n'),
       ensureDir: jest.fn().mockResolvedValue(),
       writeJson: jest.fn().mockResolvedValue(),
       writeFile: jest.fn().mockResolvedValue()
@@ -3119,16 +3119,16 @@ Trace: doctor-trace-erp
 
   test('runScenePackagePublishCommand fails when ontology validation is required and graph is invalid', async () => {
     const contract = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: {
-        group: 'kse.scene',
+        group: 'sce.scene',
         name: 'erp-order-query',
         version: '0.2.0'
       },
       compatibility: {
         kse_version: '>=1.24.0',
-        scene_api_version: 'kse.scene/v0.2'
+        scene_api_version: 'sce.scene/v0.2'
       },
       capabilities: {
         provides: ['scene.erp.query'],
@@ -3160,7 +3160,7 @@ Trace: doctor-trace-erp
         return normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration';
       }),
       readJson: jest.fn().mockResolvedValue(contract),
-      readFile: jest.fn().mockResolvedValue('apiVersion: kse.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{entity_name}}\n'),
+      readFile: jest.fn().mockResolvedValue('apiVersion: sce.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{entity_name}}\n'),
       ensureDir: jest.fn().mockResolvedValue(),
       writeJson: jest.fn().mockResolvedValue(),
       writeFile: jest.fn().mockResolvedValue()
@@ -3184,16 +3184,16 @@ Trace: doctor-trace-erp
 
   test('runScenePackagePublishCommand fails when ontology semantic score is below threshold', async () => {
     const contract = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: {
-        group: 'kse.scene',
+        group: 'sce.scene',
         name: 'erp-order-query',
         version: '0.2.0'
       },
       compatibility: {
         kse_version: '>=1.24.0',
-        scene_api_version: 'kse.scene/v0.2'
+        scene_api_version: 'sce.scene/v0.2'
       },
       capabilities: {
         provides: ['scene.erp.query'],
@@ -3219,7 +3219,7 @@ Trace: doctor-trace-erp
         return normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration';
       }),
       readJson: jest.fn().mockResolvedValue(contract),
-      readFile: jest.fn().mockResolvedValue('apiVersion: kse.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{entity_name}}\n'),
+      readFile: jest.fn().mockResolvedValue('apiVersion: sce.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{entity_name}}\n'),
       ensureDir: jest.fn().mockResolvedValue(),
       writeJson: jest.fn().mockResolvedValue(),
       writeFile: jest.fn().mockResolvedValue()
@@ -3243,16 +3243,16 @@ Trace: doctor-trace-erp
 
   test('runScenePackagePublishCommand returns structured ontology failure in silent mode', async () => {
     const contract = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: {
-        group: 'kse.scene',
+        group: 'sce.scene',
         name: 'erp-order-query',
         version: '0.2.0'
       },
       compatibility: {
         kse_version: '>=1.24.0',
-        scene_api_version: 'kse.scene/v0.2'
+        scene_api_version: 'sce.scene/v0.2'
       },
       capabilities: {
         provides: ['scene.erp.query'],
@@ -3278,7 +3278,7 @@ Trace: doctor-trace-erp
         return normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration';
       }),
       readJson: jest.fn().mockResolvedValue(contract),
-      readFile: jest.fn().mockResolvedValue('apiVersion: kse.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{entity_name}}\n'),
+      readFile: jest.fn().mockResolvedValue('apiVersion: sce.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{entity_name}}\n'),
       ensureDir: jest.fn().mockResolvedValue(),
       writeJson: jest.fn().mockResolvedValue(),
       writeFile: jest.fn().mockResolvedValue()
@@ -3329,7 +3329,7 @@ Trace: doctor-trace-erp
 
     const publishRunner = jest.fn().mockResolvedValue({
       published: true,
-      template: { id: 'kse.scene--master-data-deepening--0.1.0' },
+      template: { id: 'sce.scene--master-data-deepening--0.1.0' },
       ontology_validation: {
         required: true,
         valid: true,
@@ -3392,7 +3392,7 @@ Trace: doctor-trace-erp
       .mockResolvedValueOnce(null)
       .mockResolvedValueOnce({
         published: true,
-        template: { id: 'kse.scene--moqui-capability-itemized-parity-matrix--0.1.0' }
+        template: { id: 'sce.scene--moqui-capability-itemized-parity-matrix--0.1.0' }
       });
 
     const payload = await runScenePackagePublishBatchCommand({
@@ -3466,7 +3466,7 @@ Trace: doctor-trace-erp
     const publishRunner = jest.fn().mockResolvedValue({
       published: false,
       dry_run: true,
-      template: { id: 'kse.scene--moqui-full-capability-closure-program--0.1.0' },
+      template: { id: 'sce.scene--moqui-full-capability-closure-program--0.1.0' },
       ontology_validation: {
         required: true,
         valid: true,
@@ -3520,7 +3520,7 @@ Trace: doctor-trace-erp
 
     const publishRunner = jest.fn().mockResolvedValue({
       published: true,
-      template: { id: 'kse.scene--moqui-full-capability-closure-program--1.0.0' },
+      template: { id: 'sce.scene--moqui-full-capability-closure-program--1.0.0' },
       ontology_validation: {
         required: true,
         valid: true,
@@ -3580,7 +3580,7 @@ Trace: doctor-trace-erp
 
     const publishRunner = jest.fn().mockResolvedValue({
       published: true,
-      template: { id: 'kse.scene--moqui-capability-itemized-parity-matrix--1.0.0' },
+      template: { id: 'sce.scene--moqui-capability-itemized-parity-matrix--1.0.0' },
       ontology_validation: {
         required: true,
         valid: true,
@@ -3626,7 +3626,7 @@ Trace: doctor-trace-erp
 
     const publishRunner = jest.fn().mockResolvedValue({
       published: true,
-      template: { id: 'kse.scene--moqui-capability-itemized-parity-matrix--1.0.0' },
+      template: { id: 'sce.scene--moqui-capability-itemized-parity-matrix--1.0.0' },
       ontology_validation: {
         required: true,
         valid: true,
@@ -3680,7 +3680,7 @@ Trace: doctor-trace-erp
     const publishRunner = jest.fn().mockResolvedValue({
       published: false,
       dry_run: true,
-      template: { id: 'kse.scene--moqui-full-capability-closure-program--1.0.0' },
+      template: { id: 'sce.scene--moqui-full-capability-closure-program--1.0.0' },
       ontology_validation: {
         required: true,
         valid: true,
@@ -3745,7 +3745,7 @@ Trace: doctor-trace-erp
     const publishRunner = jest.fn().mockResolvedValue({
       published: false,
       dry_run: true,
-      template: { id: 'kse.scene--moqui-full-capability-closure-program--1.0.0' },
+      template: { id: 'sce.scene--moqui-full-capability-closure-program--1.0.0' },
       ontology_validation: {
         required: false,
         valid: true,
@@ -3898,10 +3898,10 @@ Trace: doctor-trace-erp
   test('runScenePackageOntologyBackfillBatchCommand plans ontology additions in dry-run mode', async () => {
     const specId = '60-01-master-data-deepening';
     const contract = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
-      metadata: { group: 'kse.scene', name: 'master-data-deepening', version: '1.0.0' },
-      compatibility: { kse_version: '>=1.47.0', scene_api_version: 'kse.scene/v0.2' },
+      metadata: { group: 'sce.scene', name: 'master-data-deepening', version: '1.0.0' },
+      compatibility: { kse_version: '>=1.47.0', scene_api_version: 'sce.scene/v0.2' },
       capabilities: {
         provides: ['scene.master.data.deepening.completed-capability'],
         requires: ['binding:http', 'profile:erp']
@@ -3991,10 +3991,10 @@ Trace: doctor-trace-erp
   test('runScenePackageOntologyBackfillBatchCommand writes updated scene package in commit mode', async () => {
     const specId = '60-02-sales-lifecycle-enhancement';
     const contract = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
-      metadata: { group: 'kse.scene', name: 'sales-lifecycle-enhancement', version: '1.0.0' },
-      compatibility: { kse_version: '>=1.47.0', scene_api_version: 'kse.scene/v0.2' },
+      metadata: { group: 'sce.scene', name: 'sales-lifecycle-enhancement', version: '1.0.0' },
+      compatibility: { kse_version: '>=1.47.0', scene_api_version: 'sce.scene/v0.2' },
       capabilities: {
         provides: ['scene.sales.lifecycle.enhancement.completed-capability'],
         requires: ['binding:http']
@@ -4091,10 +4091,10 @@ Trace: doctor-trace-erp
         }
         if (normalized.endsWith(`/.kiro/specs/${specId}/docs/scene-package.json`)) {
           return {
-            apiVersion: 'kse.scene.package/v0.1',
+            apiVersion: 'sce.scene.package/v0.1',
             kind: 'scene-template',
-            metadata: { group: 'kse.scene', name: 'production-planning-mrp', version: '1.0.0' },
-            compatibility: { kse_version: '>=1.47.0', scene_api_version: 'kse.scene/v0.2' },
+            metadata: { group: 'sce.scene', name: 'production-planning-mrp', version: '1.0.0' },
+            compatibility: { kse_version: '>=1.47.0', scene_api_version: 'sce.scene/v0.2' },
             capabilities: { provides: ['scene.production.planning.mrp'], requires: ['binding:http'] },
             parameters: [{ id: 'entity_name', type: 'string', required: true }],
             artifacts: { entry_scene: 'scene.yaml', generates: ['scene.yaml', 'scene-package.json'] },
@@ -4132,16 +4132,16 @@ Trace: doctor-trace-erp
 
   test('runScenePackageInstantiateCommand instantiates spec from template', async () => {
     const contract = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: {
-        group: 'kse.scene',
+        group: 'sce.scene',
         name: 'erp-order-query',
         version: '0.2.0'
       },
       compatibility: {
         kse_version: '>=1.24.0',
-        scene_api_version: 'kse.scene/v0.2'
+        scene_api_version: 'sce.scene/v0.2'
       },
       capabilities: {
         provides: ['scene.erp.query'],
@@ -4167,10 +4167,10 @@ Trace: doctor-trace-erp
         const normalized = normalizePath(targetPath);
         if (normalized.endsWith('/template.manifest.json')) {
           return {
-            apiVersion: 'kse.scene.template/v0.1',
+            apiVersion: 'sce.scene.template/v0.1',
             kind: 'scene-package-template',
             metadata: {
-              template_id: 'kse.scene--erp-order-query--0.2.0'
+              template_id: 'sce.scene--erp-order-query--0.2.0'
             },
             template: {
               package_contract: 'scene-package.json',
@@ -4201,16 +4201,16 @@ Trace: doctor-trace-erp
 
         return false;
       }),
-      readFile: jest.fn().mockResolvedValue('apiVersion: kse.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{ entity_name }}\nspec:\n  service: ${service_name}\n'),
+      readFile: jest.fn().mockResolvedValue('apiVersion: sce.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{ entity_name }}\nspec:\n  service: ${service_name}\n'),
       ensureDir: jest.fn().mockResolvedValue(),
       writeFile: jest.fn().mockResolvedValue(),
       writeJson: jest.fn().mockResolvedValue()
     };
 
     const payload = await runScenePackageInstantiateCommand({
-      template: '.kiro/templates/scene-packages/kse.scene--erp-order-query--0.2.0/template.manifest.json',
+      template: '.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0/template.manifest.json',
       targetSpec: '68-00-scene-package-template-publish-and-instantiate',
-      values: '.kiro/templates/scene-packages/kse.scene--erp-order-query--0.2.0/values.json',
+      values: '.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0/values.json',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -4237,16 +4237,16 @@ Trace: doctor-trace-erp
 
   test('runScenePackageInstantiateCommand fails when required parameter is missing', async () => {
     const contract = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: {
-        group: 'kse.scene',
+        group: 'sce.scene',
         name: 'erp-order-query',
         version: '0.2.0'
       },
       compatibility: {
         kse_version: '>=1.24.0',
-        scene_api_version: 'kse.scene/v0.2'
+        scene_api_version: 'sce.scene/v0.2'
       },
       capabilities: {
         provides: ['scene.erp.query'],
@@ -4271,7 +4271,7 @@ Trace: doctor-trace-erp
         const normalized = normalizePath(targetPath);
         if (normalized.endsWith('/template.manifest.json')) {
           return {
-            apiVersion: 'kse.scene.template/v0.1',
+            apiVersion: 'sce.scene.template/v0.1',
             template: {
               package_contract: 'scene-package.json',
               scene_manifest: 'scene.template.yaml'
@@ -4291,7 +4291,7 @@ Trace: doctor-trace-erp
     };
 
     const payload = await runScenePackageInstantiateCommand({
-      template: '.kiro/templates/scene-packages/kse.scene--erp-order-query--0.2.0/template.manifest.json',
+      template: '.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0/template.manifest.json',
       targetSpec: '68-00-scene-package-template-publish-and-instantiate',
       json: true
     }, {
@@ -4307,12 +4307,12 @@ Trace: doctor-trace-erp
 
   test('runScenePackageRegistryCommand builds template registry with layer summary', async () => {
     const validTemplateManifest = {
-      apiVersion: 'kse.scene.template/v0.1',
+      apiVersion: 'sce.scene.template/v0.1',
       kind: 'scene-package-template',
       metadata: {
-        template_id: 'kse.scene--erp-order-query--0.2.0',
+        template_id: 'sce.scene--erp-order-query--0.2.0',
         source_spec: '67-00-scene-package-contract-declaration',
-        package_coordinate: 'kse.scene/erp-order-query@0.2.0',
+        package_coordinate: 'sce.scene/erp-order-query@0.2.0',
         package_kind: 'scene-template'
       },
       template: {
@@ -4323,16 +4323,16 @@ Trace: doctor-trace-erp
     };
 
     const validContract = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: {
-        group: 'kse.scene',
+        group: 'sce.scene',
         name: 'erp-order-query',
         version: '0.2.0'
       },
       compatibility: {
         kse_version: '>=1.24.0',
-        scene_api_version: 'kse.scene/v0.2'
+        scene_api_version: 'sce.scene/v0.2'
       },
       capabilities: {
         provides: ['scene.erp.query'],
@@ -4356,10 +4356,10 @@ Trace: doctor-trace-erp
         if (normalized === '/workspace/.kiro/templates/scene-packages') {
           return true;
         }
-        if (normalized.endsWith('/kse.scene--erp-order-query--0.2.0/template.manifest.json')) {
+        if (normalized.endsWith('/sce.scene--erp-order-query--0.2.0/template.manifest.json')) {
           return true;
         }
-        if (normalized.endsWith('/kse.scene--erp-order-query--0.2.0/scene-package.json')) {
+        if (normalized.endsWith('/sce.scene--erp-order-query--0.2.0/scene-package.json')) {
           return true;
         }
         if (normalized.endsWith('/broken-template/template.manifest.json')) {
@@ -4370,18 +4370,18 @@ Trace: doctor-trace-erp
         }
         return false;
       }),
-      readdir: jest.fn().mockResolvedValue(['kse.scene--erp-order-query--0.2.0', 'broken-template']),
+      readdir: jest.fn().mockResolvedValue(['sce.scene--erp-order-query--0.2.0', 'broken-template']),
       readJson: jest.fn().mockImplementation(async (targetPath) => {
         const normalized = normalizePath(targetPath);
-        if (normalized.endsWith('/kse.scene--erp-order-query--0.2.0/template.manifest.json')) {
+        if (normalized.endsWith('/sce.scene--erp-order-query--0.2.0/template.manifest.json')) {
           return validTemplateManifest;
         }
-        if (normalized.endsWith('/kse.scene--erp-order-query--0.2.0/scene-package.json')) {
+        if (normalized.endsWith('/sce.scene--erp-order-query--0.2.0/scene-package.json')) {
           return validContract;
         }
         if (normalized.endsWith('/broken-template/template.manifest.json')) {
           return {
-            apiVersion: 'kse.scene.template/v0.0',
+            apiVersion: 'sce.scene.template/v0.0',
             kind: 'bad-kind',
             metadata: {},
             template: {}
@@ -4433,7 +4433,7 @@ Trace: doctor-trace-erp
       }),
       readdir: jest.fn().mockResolvedValue(['broken-template']),
       readJson: jest.fn().mockResolvedValue({
-        apiVersion: 'kse.scene.template/v0.0',
+        apiVersion: 'sce.scene.template/v0.0',
         kind: 'bad-kind',
         metadata: {},
         template: {}
@@ -4495,7 +4495,7 @@ Trace: doctor-trace-erp
     };
 
     const policyPayload = {
-      apiVersion: 'kse.scene.package-gate/v0.1',
+      apiVersion: 'sce.scene.package-gate/v0.1',
       profile: 'three-layer',
       rules: {
         max_invalid_templates: 0,
@@ -4566,7 +4566,7 @@ Trace: doctor-trace-erp
     };
 
     const policyPayload = {
-      apiVersion: 'kse.scene.package-gate/v0.1',
+      apiVersion: 'sce.scene.package-gate/v0.1',
       profile: 'three-layer',
       rules: {
         max_invalid_templates: 0,
@@ -4629,7 +4629,7 @@ Trace: doctor-trace-erp
     };
 
     const policyPayload = {
-      apiVersion: 'kse.scene.package-gate/v0.1',
+      apiVersion: 'sce.scene.package-gate/v0.1',
       profile: 'three-layer',
       rules: {
         max_invalid_templates: 0,
@@ -4719,7 +4719,7 @@ Trace: doctor-trace-erp
     expect(runbookCall).toBeDefined();
     expect(runbookCall[1]).toContain('Scene Package Gate Remediation Runbook');
     expect(runbookCall[1]).toContain('### 1. [high] increase-valid-templates');
-    expect(runbookCall[1]).toContain('command: `kse scene package-registry --template-dir .kiro/templates/scene-packages --json`');
+    expect(runbookCall[1]).toContain('command: `sce scene package-registry --template-dir .kiro/templates/scene-packages --json`');
 
     const syncedTasksCall = fileSystem.writeFile.mock.calls.find((call) =>
       normalizePath(call[0]).endsWith('/71-00-scene-package-gate-task-draft-and-sync/tasks.md')
@@ -4745,7 +4745,7 @@ Trace: doctor-trace-erp
         }
         return true;
       }),
-      readFile: jest.fn().mockResolvedValue(`apiVersion: kse.scene/v0.2
+      readFile: jest.fn().mockResolvedValue(`apiVersion: sce.scene/v0.2
 kind: scene
 metadata:
   obj_id: scene.template.erp
@@ -4807,7 +4807,7 @@ spec:
         }
         return true;
       }),
-      readFile: jest.fn().mockResolvedValue(`apiVersion: kse.scene/v0.2
+      readFile: jest.fn().mockResolvedValue(`apiVersion: sce.scene/v0.2
 kind: scene
 metadata:
   obj_id: scene.template.hybrid
@@ -4860,7 +4860,7 @@ spec:
         }
         return true;
       }),
-      readFile: jest.fn().mockResolvedValue(`apiVersion: kse.scene/v0.2
+      readFile: jest.fn().mockResolvedValue(`apiVersion: sce.scene/v0.2
 kind: scene
 metadata:
   obj_id: scene.template.erp
@@ -5336,10 +5336,10 @@ spec:
 
   test('validatePackageForPublish returns valid result for well-formed package', async () => {
     const mockContract = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: {
-        group: 'kse.scene',
+        group: 'sce.scene',
         name: 'test-pkg',
         version: '1.0.0',
         description: 'A test package'
@@ -5414,10 +5414,10 @@ spec:
 
   test('validatePackageForPublish reports invalid semver version', async () => {
     const mockContract = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: {
-        group: 'kse.scene',
+        group: 'sce.scene',
         name: 'test-pkg',
         version: 'not-a-version',
         description: 'A test package'
@@ -5455,10 +5455,10 @@ spec:
 
   test('validatePackageForPublish reports missing entry_scene file', async () => {
     const mockContract = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: {
-        group: 'kse.scene',
+        group: 'sce.scene',
         name: 'test-pkg',
         version: '1.0.0',
         description: 'A test package'
@@ -5498,10 +5498,10 @@ spec:
 
   test('validatePackageForPublish reports missing generates files', async () => {
     const mockContract = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: {
-        group: 'kse.scene',
+        group: 'sce.scene',
         name: 'test-pkg',
         version: '1.0.0',
         description: 'A test package'
@@ -5543,10 +5543,10 @@ spec:
 
   test('validatePackageForPublish handles empty generates array', async () => {
     const mockContract = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: {
-        group: 'kse.scene',
+        group: 'sce.scene',
         name: 'test-pkg',
         version: '1.0.0',
         description: 'A test package'
@@ -5587,10 +5587,10 @@ spec:
 
   test('validatePackageForPublish accepts pre-release semver versions', async () => {
     const mockContract = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: {
-        group: 'kse.scene',
+        group: 'sce.scene',
         name: 'test-pkg',
         version: '1.0.0-beta.1',
         description: 'A test package'
@@ -5638,10 +5638,10 @@ spec:
 
   test('validatePackageForPublish collects files with correct absolutePath', async () => {
     const mockContract = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: {
-        group: 'kse.scene',
+        group: 'sce.scene',
         name: 'test-pkg',
         version: '2.0.0',
         description: 'A test package'
@@ -5694,13 +5694,13 @@ spec:
 
     const result = await loadRegistryIndex('/fake/registry', mockFileSystem);
 
-    expect(result).toEqual({ apiVersion: 'kse.scene.registry/v0.1', packages: {} });
+    expect(result).toEqual({ apiVersion: 'sce.scene.registry/v0.1', packages: {} });
     expect(mockFileSystem.readJson).not.toHaveBeenCalled();
   });
 
   test('loadRegistryIndex returns parsed index when file exists', async () => {
     const existingIndex = {
-      apiVersion: 'kse.scene.registry/v0.1',
+      apiVersion: 'sce.scene.registry/v0.1',
       packages: {
         'my-pkg': { name: 'my-pkg', latest: '1.0.0', versions: { '1.0.0': {} } }
       }
@@ -5731,7 +5731,7 @@ spec:
   test('loadRegistryIndex throws when packages object is missing', async () => {
     const mockFileSystem = {
       pathExists: jest.fn().mockResolvedValue(true),
-      readJson: jest.fn().mockResolvedValue({ apiVersion: 'kse.scene.registry/v0.1' })
+      readJson: jest.fn().mockResolvedValue({ apiVersion: 'sce.scene.registry/v0.1' })
     };
 
     await expect(loadRegistryIndex('/fake/registry', mockFileSystem))
@@ -5754,7 +5754,7 @@ spec:
 
   test('saveRegistryIndex writes index with 2-space indentation', async () => {
     const index = {
-      apiVersion: 'kse.scene.registry/v0.1',
+      apiVersion: 'sce.scene.registry/v0.1',
       packages: { 'test-pkg': { name: 'test-pkg' } }
     };
     const mockFileSystem = {
@@ -5786,11 +5786,11 @@ spec:
   // ---------------------------------------------------------------------------
 
   test('addVersionToIndex adds new package entry to empty index', () => {
-    const index = { apiVersion: 'kse.scene.registry/v0.1', packages: {} };
+    const index = { apiVersion: 'sce.scene.registry/v0.1', packages: {} };
     const contract = {
       metadata: {
         name: 'my-scene',
-        group: 'kse.scene',
+        group: 'sce.scene',
         description: 'A test scene',
         version: '1.0.0'
       }
@@ -5800,7 +5800,7 @@ spec:
 
     expect(result.packages['my-scene']).toBeDefined();
     expect(result.packages['my-scene'].name).toBe('my-scene');
-    expect(result.packages['my-scene'].group).toBe('kse.scene');
+    expect(result.packages['my-scene'].group).toBe('sce.scene');
     expect(result.packages['my-scene'].description).toBe('A test scene');
     expect(result.packages['my-scene'].latest).toBe('1.0.0');
     expect(result.packages['my-scene'].versions['1.0.0']).toEqual({
@@ -5812,11 +5812,11 @@ spec:
 
   test('addVersionToIndex adds second version and updates latest', () => {
     const index = {
-      apiVersion: 'kse.scene.registry/v0.1',
+      apiVersion: 'sce.scene.registry/v0.1',
       packages: {
         'my-scene': {
           name: 'my-scene',
-          group: 'kse.scene',
+          group: 'sce.scene',
           description: 'A test scene',
           latest: '1.0.0',
           versions: {
@@ -5832,7 +5832,7 @@ spec:
     const contract = {
       metadata: {
         name: 'my-scene',
-        group: 'kse.scene',
+        group: 'sce.scene',
         description: 'A test scene updated',
         version: '2.0.0'
       }
@@ -5852,7 +5852,7 @@ spec:
   });
 
   test('addVersionToIndex sets latest to highest semver not latest published', () => {
-    const index = { apiVersion: 'kse.scene.registry/v0.1', packages: {} };
+    const index = { apiVersion: 'sce.scene.registry/v0.1', packages: {} };
     const contract1 = {
       metadata: { name: 'pkg', group: 'g', description: 'd', version: '2.0.0' }
     };
@@ -5869,7 +5869,7 @@ spec:
 
   test('addVersionToIndex overwrites existing version entry', () => {
     const index = {
-      apiVersion: 'kse.scene.registry/v0.1',
+      apiVersion: 'sce.scene.registry/v0.1',
       packages: {
         'pkg': {
           name: 'pkg', group: 'g', description: 'd', latest: '1.0.0',
@@ -5895,7 +5895,7 @@ spec:
 
   test('removeVersionFromIndex removes version and updates latest', () => {
     const index = {
-      apiVersion: 'kse.scene.registry/v0.1',
+      apiVersion: 'sce.scene.registry/v0.1',
       packages: {
         'pkg': {
           name: 'pkg', group: 'g', description: 'd', latest: '2.0.0',
@@ -5917,7 +5917,7 @@ spec:
 
   test('removeVersionFromIndex deletes package entry when last version removed', () => {
     const index = {
-      apiVersion: 'kse.scene.registry/v0.1',
+      apiVersion: 'sce.scene.registry/v0.1',
       packages: {
         'pkg': {
           name: 'pkg', group: 'g', description: 'd', latest: '1.0.0',
@@ -5935,7 +5935,7 @@ spec:
   });
 
   test('removeVersionFromIndex returns removed false for non-existent package', () => {
-    const index = { apiVersion: 'kse.scene.registry/v0.1', packages: {} };
+    const index = { apiVersion: 'sce.scene.registry/v0.1', packages: {} };
 
     const result = removeVersionFromIndex(index, 'no-such-pkg', '1.0.0');
 
@@ -5945,7 +5945,7 @@ spec:
 
   test('removeVersionFromIndex returns removed false for non-existent version', () => {
     const index = {
-      apiVersion: 'kse.scene.registry/v0.1',
+      apiVersion: 'sce.scene.registry/v0.1',
       packages: {
         'pkg': {
           name: 'pkg', group: 'g', description: 'd', latest: '1.0.0',
@@ -5964,7 +5964,7 @@ spec:
 
   test('removeVersionFromIndex updates latest to next highest semver', () => {
     const index = {
-      apiVersion: 'kse.scene.registry/v0.1',
+      apiVersion: 'sce.scene.registry/v0.1',
       packages: {
         'pkg': {
           name: 'pkg', group: 'g', description: 'd', latest: '3.0.0',
@@ -6176,8 +6176,8 @@ spec:
       published: true,
       dry_run: false,
       overwritten: false,
-      coordinate: 'kse.scene/test-pkg@1.0.0',
-      package: { name: 'test-pkg', group: 'kse.scene', version: '1.0.0', kind: 'scene-template' },
+      coordinate: 'sce.scene/test-pkg@1.0.0',
+      package: { name: 'test-pkg', group: 'sce.scene', version: '1.0.0', kind: 'scene-template' },
       tarball: { path: '.kiro/registry/packages/test-pkg/1.0.0/test-pkg-1.0.0.tgz', size: 512, file_count: 2, integrity: 'sha256-abc' },
       registry: { index_path: '.kiro/registry/registry-index.json', total_packages: 1, total_versions: 1 }
     };
@@ -6185,7 +6185,7 @@ spec:
     expect(console.log).toHaveBeenCalled();
     const output = console.log.mock.calls.map(c => c[0]).join('\n');
     const parsed = JSON.parse(output);
-    expect(parsed.coordinate).toBe('kse.scene/test-pkg@1.0.0');
+    expect(parsed.coordinate).toBe('sce.scene/test-pkg@1.0.0');
   });
 
   test('printScenePackageRegistryPublishSummary outputs human-readable summary', () => {
@@ -6193,15 +6193,15 @@ spec:
       published: true,
       dry_run: false,
       overwritten: false,
-      coordinate: 'kse.scene/test-pkg@1.0.0',
-      package: { name: 'test-pkg', group: 'kse.scene', version: '1.0.0', kind: 'scene-template' },
+      coordinate: 'sce.scene/test-pkg@1.0.0',
+      package: { name: 'test-pkg', group: 'sce.scene', version: '1.0.0', kind: 'scene-template' },
       tarball: { path: '.kiro/registry/packages/test-pkg/1.0.0/test-pkg-1.0.0.tgz', size: 512, file_count: 2, integrity: 'sha256-abc' },
       registry: { index_path: '.kiro/registry/registry-index.json', total_packages: 1, total_versions: 1 }
     };
     printScenePackageRegistryPublishSummary({ json: false }, payload, '/project');
     const output = console.log.mock.calls.map(c => c[0]).join('\n');
     expect(output).toContain('Scene Package Publish');
-    expect(output).toContain('kse.scene/test-pkg@1.0.0');
+    expect(output).toContain('sce.scene/test-pkg@1.0.0');
     expect(output).toContain('512 bytes');
     expect(output).toContain('sha256-abc');
   });
@@ -6211,8 +6211,8 @@ spec:
       published: false,
       dry_run: true,
       overwritten: false,
-      coordinate: 'kse.scene/test-pkg@1.0.0',
-      package: { name: 'test-pkg', group: 'kse.scene', version: '1.0.0', kind: 'scene-template' },
+      coordinate: 'sce.scene/test-pkg@1.0.0',
+      package: { name: 'test-pkg', group: 'sce.scene', version: '1.0.0', kind: 'scene-template' },
       tarball: { path: '.kiro/registry/packages/test-pkg/1.0.0/test-pkg-1.0.0.tgz', size: 512, file_count: 2, integrity: 'sha256-abc' },
       registry: { index_path: '.kiro/registry/registry-index.json', total_packages: 0, total_versions: 0 }
     };
@@ -6244,10 +6244,10 @@ spec:
 
   test('runScenePackageRegistryPublishCommand dry-run returns payload without writing', async () => {
     const contractJson = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
-      metadata: { name: 'test-pkg', group: 'kse.scene', version: '1.0.0', description: 'Test' },
-      compatibility: { kse_version: '>=1.0.0', scene_api_version: 'kse.scene/v0.2' },
+      metadata: { name: 'test-pkg', group: 'sce.scene', version: '1.0.0', description: 'Test' },
+      compatibility: { kse_version: '>=1.0.0', scene_api_version: 'sce.scene/v0.2' },
       capabilities: { provides: ['test-cap'], requires: [] },
       artifacts: { entry_scene: 'scene.yaml', generates: ['template.yaml'] },
       governance: { risk_level: 'low', approval_required: false, rollback_supported: true },
@@ -6271,7 +6271,7 @@ spec:
     expect(result).not.toBeNull();
     expect(result.published).toBe(false);
     expect(result.dry_run).toBe(true);
-    expect(result.coordinate).toBe('kse.scene/test-pkg@1.0.0');
+    expect(result.coordinate).toBe('sce.scene/test-pkg@1.0.0');
     expect(result.tarball.file_count).toBe(3); // scene-package.json + entry_scene + 1 generates
     expect(result.tarball.size).toBeGreaterThan(0);
     expect(result.tarball.integrity).toMatch(/^sha256-/);
@@ -6282,10 +6282,10 @@ spec:
 
   test('runScenePackageRegistryPublishCommand full publish stores tarball and updates index', async () => {
     const contractJson = {
-      apiVersion: 'kse.scene.package/v0.1',
+      apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
-      metadata: { name: 'my-pkg', group: 'kse.scene', version: '2.0.0', description: 'My package' },
-      compatibility: { kse_version: '>=1.0.0', scene_api_version: 'kse.scene/v0.2' },
+      metadata: { name: 'my-pkg', group: 'sce.scene', version: '2.0.0', description: 'My package' },
+      compatibility: { kse_version: '>=1.0.0', scene_api_version: 'sce.scene/v0.2' },
       capabilities: { provides: ['my-cap'], requires: [] },
       artifacts: { entry_scene: 'scene.yaml', generates: ['output.yaml'] },
       governance: { risk_level: 'low', approval_required: false, rollback_supported: true },
@@ -6293,7 +6293,7 @@ spec:
     };
 
     const existingIndex = {
-      apiVersion: 'kse.scene.registry/v0.1',
+      apiVersion: 'sce.scene.registry/v0.1',
       packages: {}
     };
 
@@ -6334,7 +6334,7 @@ spec:
     expect(result).not.toBeNull();
     expect(result.published).toBe(true);
     expect(result.dry_run).toBe(false);
-    expect(result.coordinate).toBe('kse.scene/my-pkg@2.0.0');
+    expect(result.coordinate).toBe('sce.scene/my-pkg@2.0.0');
     expect(result.package.name).toBe('my-pkg');
     expect(result.package.version).toBe('2.0.0');
     expect(result.tarball.file_count).toBe(3); // scene-package.json + entry_scene + 1 generates
@@ -6410,7 +6410,7 @@ spec:
   test('printSceneUnpublishSummary outputs JSON in json mode', () => {
     const payload = {
       unpublished: true,
-      coordinate: 'kse.scene/test-pkg@1.0.0',
+      coordinate: 'sce.scene/test-pkg@1.0.0',
       package: { name: 'test-pkg', version: '1.0.0' },
       remaining_versions: 2,
       new_latest: '0.9.0',
@@ -6421,14 +6421,14 @@ spec:
     const output = console.log.mock.calls.map(c => c[0]).join('\n');
     const parsed = JSON.parse(output);
     expect(parsed.unpublished).toBe(true);
-    expect(parsed.coordinate).toBe('kse.scene/test-pkg@1.0.0');
+    expect(parsed.coordinate).toBe('sce.scene/test-pkg@1.0.0');
     expect(parsed.remaining_versions).toBe(2);
   });
 
   test('printSceneUnpublishSummary outputs human-readable summary', () => {
     const payload = {
       unpublished: true,
-      coordinate: 'kse.scene/test-pkg@1.0.0',
+      coordinate: 'sce.scene/test-pkg@1.0.0',
       package: { name: 'test-pkg', version: '1.0.0' },
       remaining_versions: 2,
       new_latest: '0.9.0',
@@ -6437,7 +6437,7 @@ spec:
     printSceneUnpublishSummary({ json: false }, payload, '/project');
     const output = console.log.mock.calls.map(c => c[0]).join('\n');
     expect(output).toContain('Scene Package Unpublish');
-    expect(output).toContain('kse.scene/test-pkg@1.0.0');
+    expect(output).toContain('sce.scene/test-pkg@1.0.0');
     expect(output).toContain('Remaining versions: 2');
     expect(output).toContain('New latest: 0.9.0');
   });
@@ -6445,7 +6445,7 @@ spec:
   test('printSceneUnpublishSummary omits new_latest when null', () => {
     const payload = {
       unpublished: true,
-      coordinate: 'kse.scene/test-pkg@1.0.0',
+      coordinate: 'sce.scene/test-pkg@1.0.0',
       package: { name: 'test-pkg', version: '1.0.0' },
       remaining_versions: 0,
       new_latest: null,
@@ -6474,7 +6474,7 @@ spec:
 
   test('runSceneUnpublishCommand returns null when package not found in index', async () => {
     const existingIndex = {
-      apiVersion: 'kse.scene.registry/v0.1',
+      apiVersion: 'sce.scene.registry/v0.1',
       packages: {}
     };
 
@@ -6494,11 +6494,11 @@ spec:
 
   test('runSceneUnpublishCommand returns null when version not found for package', async () => {
     const existingIndex = {
-      apiVersion: 'kse.scene.registry/v0.1',
+      apiVersion: 'sce.scene.registry/v0.1',
       packages: {
         'my-pkg': {
           name: 'my-pkg',
-          group: 'kse.scene',
+          group: 'sce.scene',
           latest: '1.0.0',
           versions: {
             '1.0.0': { published_at: '2025-01-01T00:00:00.000Z', integrity: 'sha256-abc' }
@@ -6523,11 +6523,11 @@ spec:
 
   test('runSceneUnpublishCommand successfully removes version and updates index', async () => {
     const existingIndex = {
-      apiVersion: 'kse.scene.registry/v0.1',
+      apiVersion: 'sce.scene.registry/v0.1',
       packages: {
         'my-pkg': {
           name: 'my-pkg',
-          group: 'kse.scene',
+          group: 'sce.scene',
           description: 'Test package',
           latest: '2.0.0',
           versions: {
@@ -6559,7 +6559,7 @@ spec:
 
     expect(result).not.toBeNull();
     expect(result.unpublished).toBe(true);
-    expect(result.coordinate).toBe('kse.scene/my-pkg@2.0.0');
+    expect(result.coordinate).toBe('sce.scene/my-pkg@2.0.0');
     expect(result.package.name).toBe('my-pkg');
     expect(result.package.version).toBe('2.0.0');
     expect(result.remaining_versions).toBe(1);
@@ -6575,11 +6575,11 @@ spec:
 
   test('runSceneUnpublishCommand removes package entry when last version is unpublished', async () => {
     const existingIndex = {
-      apiVersion: 'kse.scene.registry/v0.1',
+      apiVersion: 'sce.scene.registry/v0.1',
       packages: {
         'solo-pkg': {
           name: 'solo-pkg',
-          group: 'kse.scene',
+          group: 'sce.scene',
           description: 'Solo package',
           latest: '1.0.0',
           versions: {

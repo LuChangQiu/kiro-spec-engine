@@ -1,12 +1,12 @@
-# 在 Kiro 中使用 kse
+# 在 SCE 中使用 sce
 
-> kse 与 Kiro IDE 的原生集成 - 最无缝的体验
+> sce 与 AI IDE 的原生集成 - 最无缝的体验
 
 ---
 
 **版本**: 1.42.0  
 **最后更新**: 2026-02-11  
-**工具**: Kiro IDE  
+**工具**: AI IDE  
 **集成模式**: 原生集成  
 **预计设置时间**: 0 分钟（开箱即用）
 
@@ -14,15 +14,15 @@
 
 ## 概述
 
-**Kiro IDE** 是专为 Spec 驱动开发设计的 AI 驱动 IDE。kse (Kiro Spec Engine) 是 Kiro 的核心组件。
+**AI IDE** 是专为 Spec 驱动开发设计的 AI 驱动 IDE。sce (Scene Capability Engine) 是 SCE 的核心组件。
 
-**kse 与 Kiro 的集成**是**完全原生的** - 无需设置、无需手动导出、无需配置。一切都开箱即用！
+**sce 与 SCE 的集成**是**完全原生的** - 无需设置、无需手动导出、无需配置。一切都开箱即用！
 
-### 为什么在 Kiro 中使用 kse？
+### 为什么在 SCE 中使用 sce？
 
 - ✅ **零配置** - 开箱即用
-- ✅ **原生集成** - kse 是 Kiro 的一部分
-- ✅ **自动上下文** - Kiro 始终知道你的 Spec
+- ✅ **原生集成** - sce 是 SCE 的一部分
+- ✅ **自动上下文** - SCE 始终知道你的 Spec
 - ✅ **可视化工具** - Spec 浏览器、任务跟踪器等
 - ✅ **最佳体验** - 专为 Spec 驱动开发设计
 
@@ -33,10 +33,10 @@
 **模式：** 原生集成
 
 **工作原理：**
-1. Kiro 自动检测 `.kiro/` 目录
-2. Kiro 的 AI 始终可以访问你的 Spec
+1. SCE 自动检测 `.kiro/` 目录
+2. SCE 的 AI 始终可以访问你的 Spec
 3. 无需手动导出或粘贴
-4. Kiro 自动更新任务状态
+4. SCE 自动更新任务状态
 5. 可视化工具显示进度
 
 ---
@@ -45,13 +45,13 @@
 
 ### 无需设置！
 
-如果你使用 Kiro IDE，kse 已经集成。只需：
+如果你使用 AI IDE，sce 已经集成。只需：
 
-1. **打开你的项目** 在 Kiro 中
-2. **运行 `kse adopt`**（如果尚未采用）
+1. **打开你的项目** 在 SCE 中
+2. **运行 `sce adopt`**（如果尚未采用）
 3. **开始创建 Spec！**
 
-就是这样！Kiro 会处理其余的事情。
+就是这样！SCE 会处理其余的事情。
 
 ---
 
@@ -59,7 +59,7 @@
 
 ### 方法 1：使用 Spec 浏览器（推荐）
 
-Kiro 提供了一个可视化的 Spec 浏览器。
+SCE 提供了一个可视化的 Spec 浏览器。
 
 **步骤：**
 
@@ -74,7 +74,7 @@ Kiro 提供了一个可视化的 Spec 浏览器。
 
 3. **实现任务**
    - 点击任务旁边的"实现"按钮
-   - Kiro 的 AI 自动：
+   - SCE 的 AI 自动：
      - 读取 Spec 上下文
      - 生成代码
      - 更新任务状态
@@ -92,7 +92,7 @@ Kiro 提供了一个可视化的 Spec 浏览器。
    请实现 01-00-user-login 的任务 1.1
    ```
 
-3. **Kiro 的 AI 自动：**
+3. **SCE 的 AI 自动：**
    - 读取 Spec（无需手动导出！）
    - 理解需求和设计
    - 生成代码
@@ -108,18 +108,18 @@ Kiro 提供了一个可视化的 Spec 浏览器。
 
 2. **输入：**
    ```
-   kse: Implement Task
+   sce: Implement Task
    ```
 
 3. **选择：**
    - 选择 Spec（例如 01-00-user-login）
    - 选择任务（例如 1.1）
 
-4. **Kiro 自动实现任务**
+4. **SCE 自动实现任务**
 
 ---
 
-## Kiro 独有功能
+## SCE 独有功能
 
 ### 1. Spec 浏览器
 
@@ -139,7 +139,7 @@ Kiro 提供了一个可视化的 Spec 浏览器。
 
 ### 3. 需求验证
 
-Kiro 验证你的 Spec：
+SCE 验证你的 Spec：
 - 检查需求完整性
 - 验证设计追溯
 - 建议改进
@@ -155,7 +155,7 @@ Kiro 验证你的 Spec：
 
 ### 5. 自动上下文管理
 
-Kiro 自动管理上下文：
+SCE 自动管理上下文：
 - 无需手动导出
 - 始终最新
 - 智能上下文选择
@@ -168,16 +168,16 @@ Kiro 自动管理上下文：
 ### 完整功能实现工作流
 
 ```
-1. 在 Kiro 中创建 Spec
-   - 命令面板 → "kse: Create Spec"
+1. 在 SCE 中创建 Spec
+   - 命令面板 → "sce: Create Spec"
    - 输入名称：01-00-user-login
 
 2. 编写 Spec
-   - Kiro 打开 requirements.md
+   - SCE 打开 requirements.md
    - 编写需求
-   - Kiro 打开 design.md
+   - SCE 打开 design.md
    - 编写设计
-   - Kiro 打开 tasks.md
+   - SCE 打开 tasks.md
    - 编写任务
 
 3. 在 Spec 浏览器中查看 Spec
@@ -186,7 +186,7 @@ Kiro 自动管理上下文：
 
 4. 实现任务
    - 点击任务 1.1 旁边的"实现"
-   - Kiro 的 AI 生成代码
+   - SCE 的 AI 生成代码
    - 审查并接受
    - 任务自动标记为完成
 
@@ -205,14 +205,14 @@ Kiro 自动管理上下文：
 
 ### 1. 使用 Spec 浏览器
 
-Spec 浏览器是在 Kiro 中使用 kse 的最佳方式：
+Spec 浏览器是在 SCE 中使用 sce 的最佳方式：
 - 可视化进度
 - 快速访问 Spec
 - 一键任务实现
 
-### 2. 让 Kiro 管理任务状态
+### 2. 让 SCE 管理任务状态
 
-不要手动编辑 tasks.md 中的复选框。让 Kiro 的 AI 更新它们：
+不要手动编辑 tasks.md 中的复选框。让 SCE 的 AI 更新它们：
 - 更准确
 - 自动同步
 - 在 Spec 浏览器中反映
@@ -220,20 +220,20 @@ Spec 浏览器是在 Kiro 中使用 kse 的最佳方式：
 ### 3. 使用需求验证
 
 在实现前验证你的 Spec：
-- 命令面板 → "kse: Validate Spec"
+- 命令面板 → "sce: Validate Spec"
 - 修复任何问题
 - 然后开始实现
 
 ### 4. 利用设计可视化
 
 使用 Mermaid 图进行设计：
-- Kiro 渲染它们
+- SCE 渲染它们
 - 交互式视图
 - 更容易理解架构
 
-### 5. 使用 Kiro 的 AI 聊天
+### 5. 使用 SCE 的 AI 聊天
 
-Kiro 的 AI 始终知道你的 Spec：
+SCE 的 AI 始终知道你的 Spec：
 - 无需粘贴上下文
 - 只需询问："实现任务 1.1"
 - AI 自动读取 Spec
@@ -265,30 +265,30 @@ Kiro 的 AI 始终知道你的 Spec：
 
 ## 与其他工具的比较
 
-### Kiro vs Cursor
+### SCE vs Cursor
 
-| 功能 | Kiro | Cursor |
+| 功能 | SCE | Cursor |
 |------|------|--------|
-| kse 集成 | 原生 | 手动导出 |
+| sce 集成 | 原生 | 手动导出 |
 | Spec 浏览器 | ✅ | ❌ |
 | 任务跟踪器 | ✅ | ❌ |
 | 自动上下文 | ✅ | ❌ |
 | 设置时间 | 0 分钟 | 5 分钟 |
 
-### Kiro vs Windsurf
+### SCE vs Windsurf
 
-| 功能 | Kiro | Windsurf |
+| 功能 | SCE | Windsurf |
 |------|------|----------|
-| kse 集成 | 原生 | 命令执行 |
+| sce 集成 | 原生 | 命令执行 |
 | Spec 浏览器 | ✅ | ❌ |
 | 可视化工具 | ✅ | ❌ |
 | Watch 模式 | 内置 | 需要设置 |
 
-### Kiro vs Claude
+### SCE vs Claude
 
-| 功能 | Kiro | Claude |
+| 功能 | SCE | Claude |
 |------|------|--------|
-| kse 集成 | 原生 | 手动粘贴 |
+| sce 集成 | 原生 | 手动粘贴 |
 | IDE 功能 | ✅ | ❌ |
 | 自动上下文 | ✅ | ❌ |
 | 任务管理 | ✅ | ❌ |
@@ -300,21 +300,21 @@ Kiro 的 AI 始终知道你的 Spec：
 ### 问题：Spec 浏览器为空
 
 **解决方案：**
-1. 确保你已运行 `kse adopt`
+1. 确保你已运行 `sce adopt`
 2. 检查 `.kiro/specs/` 目录是否存在
 3. 刷新 Spec 浏览器（右键 → 刷新）
 
 ### 问题：AI 不读取我的 Spec
 
 **解决方案：**
-1. 这不应该发生在 Kiro 中！
-2. 如果发生，重启 Kiro
+1. 这不应该发生在 SCE 中！
+2. 如果发生，重启 SCE
 3. 验证 Spec 文件格式正确
 
 ### 问题：任务状态未更新
 
 **解决方案：**
-1. 让 Kiro 的 AI 更新任务，不要手动编辑
+1. 让 SCE 的 AI 更新任务，不要手动编辑
 2. 如果手动编辑，刷新 Spec 浏览器
 3. 检查 tasks.md 格式是否正确
 
@@ -322,7 +322,7 @@ Kiro 的 AI 始终知道你的 Spec：
 
 ## 相关文档
 
-- 📖 [快速入门指南](../quick-start.md) - 开始使用 kse
+- 📖 [快速入门指南](../quick-start.md) - 开始使用 sce
 - 🔌 [集成模式](../integration-modes.md) - 理解原生集成
 - 📋 [Spec 工作流](../spec-workflow.md) - 创建有效的 Spec
 - 🔧 [故障排除](../troubleshooting.md) - 常见问题

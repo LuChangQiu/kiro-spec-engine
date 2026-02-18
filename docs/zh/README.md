@@ -1,6 +1,6 @@
-# kse 文档索引
+# sce 文档索引
 
-> kse (Kiro Spec Engine) 的完整文档 - AI 辅助开发的上下文管理系统
+> sce (Scene Capability Engine) 的完整文档 - AI 辅助开发的上下文管理系统
 
 ---
 
@@ -12,35 +12,35 @@
 
 ## 📚 文档概述
 
-本文档集合提供了使用 kse 进行 Spec 驱动开发所需的一切。无论你是初学者还是高级用户，你都会在这里找到所需的指导。
+本文档集合提供了使用 sce 进行 Spec 驱动开发所需的一切。无论你是初学者还是高级用户，你都会在这里找到所需的指导。
 
 ---
 
-## ⭐ 为什么团队选择 kse
+## ⭐ 为什么团队选择 sce
 
 - **结构化交付**：先需求、后设计、再任务，实现路径可追踪。
 - **可并行扩展**：支持依赖感知的多 Spec 编排，减少串行等待。
-- **双轨交接闭环**：`kse auto handoff run` 一条命令完成 plan/queue/batch/observability，支持 `--continue-from` 续跑，并输出可直接执行的后续建议命令。
+- **双轨交接闭环**：`sce auto handoff run` 一条命令完成 plan/queue/batch/observability，支持 `--continue-from` 续跑，并输出可直接执行的后续建议命令。
 - **结果可量化**：通过 KPI 快照、基线、趋势命令持续度量交付质量。
-- **工具无锁定**：可与 Claude、Cursor、Windsurf、Copilot、Kiro 协作。
+- **工具无锁定**：可与 Claude、Cursor、Windsurf、Copilot、SCE 协作。
 - **治理能力内建**：文档治理、锁管理、环境/工作区控制和审计链路。
 
 ---
 
 ## 🚀 入门指南
 
-从这里开始你的 kse 之旅：
+从这里开始你的 sce 之旅：
 
 ### [快速入门指南](quick-start.md)
 **5 分钟教程** - 从安装到第一个 AI 辅助功能实现
-- 安装 kse
+- 安装 sce
 - 创建你的第一个 Spec
 - 导出上下文
 - 使用 AI 工具实现功能
 
 ### [常见问题 (FAQ)](faq.md)
-**常见问题解答** - 关于 kse 的快速答案
-- kse 是什么？
+**常见问题解答** - 关于 sce 的快速答案
+- sce 是什么？
 - 它如何与 AI 工具配合使用？
 - 我应该使用哪个 AI 工具？
 - 常见误解
@@ -56,7 +56,7 @@
 
 ## 📋 核心概念
 
-深入理解 kse 的工作原理：
+深入理解 sce 的工作原理：
 
 ### [Spec 工作流](spec-workflow.md)
 **深入指南** - 理解 Spec 驱动开发
@@ -67,13 +67,13 @@
 
 ### [集成模式](integration-modes.md)
 **三种集成方式** - 选择最适合你的模式
-- 原生集成（Kiro、Windsurf）
+- 原生集成（SCE、Windsurf）
 - 手动导出（Claude、Cursor、ChatGPT）
 - Watch 模式（所有工具）
 - 每种模式的优缺点
 
 ### [命令参考](../command-reference.md)
-**完整命令列表** - 所有 kse 命令及示例
+**完整命令列表** - 所有 sce 命令及示例
 - 项目设置命令
 - 上下文管理命令
 - 任务管理命令
@@ -99,8 +99,8 @@
 - Watch 模式
 - 自动化工作流
 
-#### [Kiro 指南](tools/kiro-guide.md)
-**Kiro IDE** - 专为 Spec 驱动开发设计
+#### [SCE 指南](tools/SCE-guide.md)
+**AI IDE** - 专为 Spec 驱动开发设计
 - 完全原生集成
 - 可视化工具
 - 零配置
@@ -160,7 +160,7 @@
 对于有经验的用户：
 
 ### [采用指南](adoption-guide.md)
-**在现有项目中采用 kse** - 迁移策略
+**在现有项目中采用 sce** - 迁移策略
 - 评估你的项目
 - 采用策略
 - 迁移现有文档
@@ -179,13 +179,13 @@
 - remediation 队列回灌闭环
 
 ### [331-poc 双轨协同对接手册](../331-poc-dual-track-integration-guide.md)
-**331-poc 与 kse 协同执行指南** - 交接契约、接入命令链、主从闭环验收
+**331-poc 与 sce 协同执行指南** - 交接契约、接入命令链、主从闭环验收
 - 331 深化成果输入约束
-- KSE 侧模板/ontology/gate 验证流程
+- sce 侧模板/ontology/gate 验证流程
 - 双仓协同失败回退策略
 
 ### [331-poc 适配路线图](../331-poc-adaptation-roadmap.md)
-**KSE 侧持续适配清单** - 已完成、下一阶段、中期增强与长期目标
+**sce 侧持续适配清单** - 已完成、下一阶段、中期增强与长期目标
 - handoff 自动化命令演进
 - 主从编排与门禁增强
 - 跨轮次回归与发布治理集成
@@ -197,7 +197,7 @@
 - Day30/Day60 门禁输入复用
 
 ### [升级指南](upgrade-guide.md)
-**版本升级** - 保持 kse 最新
+**版本升级** - 保持 sce 最新
 - 升级过程
 - 版本兼容性
 - 迁移指南
@@ -229,7 +229,7 @@
 - 审查工作流
 
 ### [开发者指南](developer-guide.md)
-**贡献和扩展 kse** - 对于贡献者
+**贡献和扩展 sce** - 对于贡献者
 - 项目结构
 - 开发设置
 - 贡献指南
@@ -332,7 +332,7 @@
 
 **准备好开始了吗？** 🚀
 
-从[快速入门指南](quick-start.md)开始你的 kse 之旅！
+从[快速入门指南](quick-start.md)开始你的 sce 之旅！
 
 ---
 

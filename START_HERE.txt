@@ -1,24 +1,24 @@
 ===============================================================
-  kiro-spec-engine (kse) - Start Here
+  scene-capability-engine (sce) - Start Here
 ===============================================================
 
 Version: v1.46.2
 Last Updated: 2026-02-14
 
-This file is the fastest way to understand what kse does and how to
+This file is the fastest way to understand what sce does and how to
 validate value in minutes.
 
 
-1) Why kse is different
+1) Why sce is different
 ---------------------------------------------------------------
 
-kse is not just "AI prompt helpers". It gives you:
+sce is not just "AI prompt helpers". It gives you:
 
 - Structured delivery: Requirements -> Design -> Tasks
 - Multi-Spec orchestration: run multiple specs in parallel safely
 - Measurable outcomes: KPI snapshot/baseline/trend for weekly review
 - Built-in governance: lock/doc/env/workspace controls for teams
-- Tool-agnostic usage: works with Claude/Cursor/Windsurf/Copilot/Kiro
+- Tool-agnostic usage: works with Claude/Cursor/Windsurf/Copilot/SCE
 
 
 2) 90-second value proof
@@ -26,10 +26,10 @@ kse is not just "AI prompt helpers". It gives you:
 
 Run these commands in your project:
 
-  kse adopt
-  kse spec bootstrap --name 01-00-demo-feature --non-interactive
-  kse value metrics sample --out ./kpi-input.json --json
-  kse value metrics snapshot --input ./kpi-input.json --json
+  sce adopt
+  sce spec bootstrap --name 01-00-demo-feature --non-interactive
+  sce value metrics sample --out ./kpi-input.json --json
+  sce value metrics snapshot --input ./kpi-input.json --json
 
 If command 4 succeeds, you get machine-readable KPI output with risk
 signal and evidence paths.
@@ -38,29 +38,29 @@ signal and evidence paths.
 3) Recommended workflow (single Spec)
 ---------------------------------------------------------------
 
-  kse spec bootstrap --name 01-00-user-login --non-interactive
-  kse spec pipeline run --spec 01-00-user-login
-  kse spec gate run --spec 01-00-user-login --json
+  sce spec bootstrap --name 01-00-user-login --non-interactive
+  sce spec pipeline run --spec 01-00-user-login
+  sce spec gate run --spec 01-00-user-login --json
 
 
 4) Recommended workflow (multi Spec / parallel)
 ---------------------------------------------------------------
 
-  kse orchestrate run --specs "spec-a,spec-b,spec-c" --max-parallel 3
-  kse orchestrate status
-  kse orchestrate stop
+  sce orchestrate run --specs "spec-a,spec-b,spec-c" --max-parallel 3
+  sce orchestrate status
+  sce orchestrate stop
 
-Note: `kse spec bootstrap|pipeline run|gate run --specs ...` defaults
+Note: `sce spec bootstrap|pipeline run|gate run --specs ...` defaults
 to orchestrate mode.
 
 
 5) KPI observability quick commands
 ---------------------------------------------------------------
 
-  kse value metrics sample --out ./kpi-input.json --json
-  kse value metrics snapshot --input ./kpi-input.json --json
-  kse value metrics baseline --from-history 3 --json
-  kse value metrics trend --window 6 --json
+  sce value metrics sample --out ./kpi-input.json --json
+  sce value metrics snapshot --input ./kpi-input.json --json
+  sce value metrics baseline --from-history 3 --json
+  sce value metrics trend --window 6 --json
 
 
 6) Where to read next

@@ -17,7 +17,7 @@ describe('Workspace Integration', () => {
   let stateManager;
   let stateFilePath;
 
-  // Helper function to create a valid kse project directory
+  // Helper function to create a valid sce project directory
   async function createValidWorkspaceDir(relativePath) {
     const workspacePath = fixture.getAbsolutePath(relativePath);
     await fs.ensureDir(path.join(workspacePath, '.kiro'));

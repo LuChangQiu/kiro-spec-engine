@@ -103,7 +103,7 @@
     "malformed_version": "无法解析 Python 版本: {version}",
     "error_header": "✗ Ultrawork 质量增强功能需要 Python",
     "install_header": "安装说明:",
-    "help_footer": "获取更多帮助，请访问: https://github.com/USERNAME/kiro-spec-engine#python-setup",
+    "help_footer": "获取更多帮助，请访问: https://github.com/USERNAME/scene-capability-engine#python-setup",
     "install": {
       "windows": "Windows:\n1. 从 https://www.python.org/downloads/ 下载 Python\n2. 运行安装程序并勾选 'Add Python to PATH'\n3. 重启终端并运行: python --version",
       "macos": "macOS:\n1. 如果尚未安装 Homebrew，请先安装: /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"\n2. 安装 Python: brew install python\n3. 验证安装: python3 --version",

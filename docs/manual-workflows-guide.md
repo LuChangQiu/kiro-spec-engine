@@ -6,7 +6,7 @@
 
 ## Overview
 
-This guide provides step-by-step instructions for common workflows when using kiro-spec-engine without automation (watch mode or agent hooks). These workflows are designed to be efficient and easy to follow.
+This guide provides step-by-step instructions for common workflows when using scene-capability-engine without automation (watch mode or agent hooks). These workflows are designed to be efficient and easy to follow.
 
 **When to use manual workflows:**
 - When automation is not set up
@@ -35,7 +35,7 @@ Keep your workspace synchronized with task progress across multiple users or too
 - Subsequent syncs: 30-60 seconds
 
 ### Prerequisites
-- Project adopted with kiro-spec-engine
+- Project adopted with scene-capability-engine
 - Active spec with tasks.md file
 - Write access to .kiro/specs/ directory
 
@@ -43,7 +43,7 @@ Keep your workspace synchronized with task progress across multiple users or too
 
 #### 1. Check Current Status
 ```bash
-kse status
+sce status
 ```
 
 **What to look for:**
@@ -75,7 +75,7 @@ Open your spec's `tasks.md` file and review:
 
 #### 3. Sync Workspace
 ```bash
-kse workspace sync
+sce workspace sync
 ```
 
 **What this does:**
@@ -90,7 +90,7 @@ kse workspace sync
 
 #### 4. Verify Sync
 ```bash
-kse status
+sce status
 ```
 
 **Verify:**
@@ -116,7 +116,7 @@ kse status
 
 3. **Team Coordination**
    - Communicate task claims in team chat
-   - Use task claiming feature: `kse task claim <spec> <task-id>`
+   - Use task claiming feature: `sce task claim <spec> <task-id>`
    - Check for claimed tasks before starting work
 
 ---
@@ -138,7 +138,7 @@ Export spec context for sharing with AI assistants or team members.
 
 #### 1. Identify Spec to Export
 ```bash
-kse status
+sce status
 ```
 
 Note the spec name you want to export.
@@ -149,7 +149,7 @@ Note the spec name you want to export.
 
 #### 2. Export Context
 ```bash
-kse context export <spec-name>
+sce context export <spec-name>
 ```
 
 **Options:**
@@ -159,7 +159,7 @@ kse context export <spec-name>
 
 **Example:**
 ```bash
-kse context export my-feature --include-steering --steering-files CORE_PRINCIPLES.md,ENVIRONMENT.md
+sce context export my-feature --include-steering --steering-files CORE_PRINCIPLES.md,ENVIRONMENT.md
 ```
 
 **Time:** ~10-20 seconds
@@ -238,16 +238,16 @@ cat .kiro/specs/<spec-name>/tasks.md
 
 #### 2. Generate Prompt
 ```bash
-kse prompt generate <spec-name> <task-id>
+sce prompt generate <spec-name> <task-id>
 ```
 
 **Options:**
-- `--target <tool>`: Target tool (kiro, vscode, cursor, other)
+- `--target <tool>`: Target tool (SCE, vscode, cursor, other)
 - `--output <path>`: Custom output path
 
 **Example:**
 ```bash
-kse prompt generate my-feature 1.2 --target vscode
+sce prompt generate my-feature 1.2 --target vscode
 ```
 
 **Time:** ~10-15 seconds
@@ -281,7 +281,7 @@ For multiple tasks:
 ```bash
 # Generate prompts for all incomplete tasks
 for task in 1.1 1.2 1.3; do
-  kse prompt generate my-feature $task
+  sce prompt generate my-feature $task
 done
 ```
 
@@ -316,8 +316,8 @@ done
 ### Daily Workflow Checklist
 
 **Morning (Start of Work)**
-- [ ] Sync workspace: `kse workspace sync`
-- [ ] Check status: `kse status`
+- [ ] Sync workspace: `sce workspace sync`
+- [ ] Check status: `sce status`
 - [ ] Review task list
 - [ ] Claim tasks you'll work on
 - [ ] Export context for active tasks
@@ -331,7 +331,7 @@ done
 **End of Day**
 - [ ] Mark completed tasks
 - [ ] Update in-progress tasks
-- [ ] Final sync: `kse workspace sync`
+- [ ] Final sync: `sce workspace sync`
 - [ ] Commit changes to version control
 
 ---
@@ -351,7 +351,7 @@ done
 
 ### Spec Creation Checklist
 
-- [ ] Create spec: `kse spec bootstrap --name <name> --non-interactive`
+- [ ] Create spec: `sce spec bootstrap --name <name> --non-interactive`
 - [ ] Write requirements.md
 - [ ] Write design.md
 - [ ] Generate tasks.md
@@ -396,8 +396,8 @@ done
 
 1. **Set Up Automation:** Consider using watch mode for automatic workflows
    ```bash
-   kse watch init
-   kse watch install auto-sync
+   sce watch init
+   sce watch install auto-sync
    ```
 
 2. **Learn More:**
@@ -406,7 +406,7 @@ done
    - [Architecture](./architecture.md)
 
 3. **Get Help:**
-   - Run `kse --help` for command reference
+   - Run `sce --help` for command reference
    - Check [GitHub Issues](https://github.com/heguangyong/scene-capability-engine/issues)
    - Review [Contributing Guide](../CONTRIBUTING.md)
 

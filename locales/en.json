@@ -103,7 +103,7 @@
     "malformed_version": "Unable to parse Python version: {version}",
     "error_header": "✗ Python is required for Ultrawork quality enhancement features",
     "install_header": "Installation instructions:",
-    "help_footer": "For more help, visit: https://github.com/USERNAME/kiro-spec-engine#python-setup",
+    "help_footer": "For more help, visit: https://github.com/USERNAME/scene-capability-engine#python-setup",
     "install": {
       "windows": "Windows:\n1. Download Python from https://www.python.org/downloads/\n2. Run the installer and check 'Add Python to PATH'\n3. Restart your terminal and run: python --version",
       "macos": "macOS:\n1. Install Homebrew if not already installed: /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"\n2. Install Python: brew install python\n3. Verify installation: python3 --version",

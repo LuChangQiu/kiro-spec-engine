@@ -19,6 +19,6 @@
 
 | Template | Score | Graph | Baseline | Gaps |
 | --- | ---: | --- | --- | --- |
-| kse.scene--erp-inventory-reserve-adjust--0.1.0 | 100 | valid | pass | none |
-| kse.scene--erp-order-fulfillment-workflow--0.1.0 | 100 | valid | pass | none |
-| kse.scene--erp-order-query-read--0.1.0 | 100 | valid | pass | none |
+| sce.scene--erp-inventory-reserve-adjust--0.1.0 | 100 | valid | pass | none |
+| sce.scene--erp-order-fulfillment-workflow--0.1.0 | 100 | valid | pass | none |
+| sce.scene--erp-order-query-read--0.1.0 | 100 | valid | pass | none |

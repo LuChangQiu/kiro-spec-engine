@@ -1,6 +1,6 @@
 # Integration Tests
 
-This directory contains end-to-end integration tests for the Kiro Spec Engine (kse).
+This directory contains end-to-end integration tests for the Scene Capability Engine (sce).
 
 ## Overview
 
@@ -269,5 +269,5 @@ When adding tests for new commands:
 ---
 
 **Last Updated**: 2026-01-29  
-**Maintained by**: kse Development Team
+**Maintained by**: sce Development Team
 

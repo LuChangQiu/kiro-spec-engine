@@ -128,7 +128,7 @@ describe('ErrorFormatter', () => {
       expect(formatted).toContain('Possible causes:');
       expect(formatted).toContain('Solutions:');
       expect(formatted).toContain('💡 Need help?');
-      expect(formatted).toContain('kse doctor');
+      expect(formatted).toContain('sce doctor');
     });
 
     test('formats causes as bullet points', () => {
@@ -154,8 +154,8 @@ describe('ErrorFormatter', () => {
       const error = new Error('Test error');
       const formatted = ErrorFormatter.format(error);
       
-      expect(formatted).toContain('kse doctor');
-      expect(formatted).toContain('https://github.com/kiro-ai/kiro-spec-engine#troubleshooting');
+      expect(formatted).toContain('sce doctor');
+      expect(formatted).toContain('https://github.com/SCE-ai/scene-capability-engine#troubleshooting');
     });
   });
 
@@ -198,7 +198,7 @@ describe('ErrorFormatter', () => {
         
         expect(formatted).toContain('Validation Failed');
         expect(formatted).toContain('validation checks');
-        expect(formatted).toContain('kse doctor');
+        expect(formatted).toContain('sce doctor');
       });
     });
   });
@@ -255,7 +255,7 @@ describe('ErrorFormatter', () => {
       expect(formatted).toContain('1. First error');
       expect(formatted).toContain('2. Second error');
       expect(formatted).toContain('3. Third error message');
-      expect(formatted).toContain('kse doctor');
+      expect(formatted).toContain('sce doctor');
     });
 
     test('accepts custom title', () => {
@@ -269,7 +269,7 @@ describe('ErrorFormatter', () => {
       const formatted = ErrorFormatter.formatMultiple([]);
       
       expect(formatted).toContain('❌');
-      expect(formatted).toContain('kse doctor');
+      expect(formatted).toContain('sce doctor');
     });
   });
 

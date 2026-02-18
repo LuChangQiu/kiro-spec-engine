@@ -11,7 +11,7 @@ describe('spec-bootstrap command', () => {
   let logOutput;
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-spec-bootstrap-'));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-spec-bootstrap-'));
     await fs.ensureDir(path.join(tempDir, '.kiro', 'specs'));
 
     originalCwd = process.cwd;

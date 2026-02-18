@@ -302,11 +302,11 @@ describe('SmartOrchestrator', () => {
       });
 
       mockVersionManager.readVersion.mockResolvedValue({
-        'kse-version': '1.0.0'
+        'sce-version': '1.0.0'
       });
 
       mockVersionManager.addUpgradeHistory.mockReturnValue({
-        'kse-version': '1.8.0'
+        'sce-version': '1.8.0'
       });
 
       const result = await orchestrator.orchestrate('/test/project');
@@ -356,11 +356,11 @@ describe('SmartOrchestrator', () => {
       });
 
       mockVersionManager.readVersion.mockResolvedValue({
-        'kse-version': '1.0.0'
+        'sce-version': '1.0.0'
       });
 
       mockVersionManager.addUpgradeHistory.mockReturnValue({
-        'kse-version': '1.8.0'
+        'sce-version': '1.8.0'
       });
 
       const result = await orchestrator.orchestrate('/test/project', { skipBackup: true });
@@ -493,7 +493,7 @@ describe('SmartOrchestrator', () => {
       });
 
       mockVersionManager.createVersionInfo.mockReturnValue({
-        'kse-version': '1.8.0'
+        'sce-version': '1.8.0'
       });
 
       const result = await orchestrator.orchestrate('/test/project');
@@ -562,11 +562,11 @@ describe('SmartOrchestrator', () => {
       });
 
       mockVersionManager.readVersion.mockResolvedValue({
-        'kse-version': '1.0.0'
+        'sce-version': '1.0.0'
       });
 
       mockVersionManager.addUpgradeHistory.mockReturnValue({
-        'kse-version': '1.8.0'
+        'sce-version': '1.8.0'
       });
 
       // Mock fs for file existence checks
@@ -616,7 +616,7 @@ describe('SmartOrchestrator', () => {
       });
 
       mockVersionManager.createVersionInfo.mockReturnValue({
-        'kse-version': '1.8.0'
+        'sce-version': '1.8.0'
       });
 
       const result = await orchestrator.orchestrate('/test/project');
@@ -688,7 +688,7 @@ describe('SmartOrchestrator', () => {
       expect(summary).toContain('Updated: 2 file(s)');
       expect(summary).toContain('Created: 1 file(s)');
       expect(summary).toContain('Preserved: 2 file(s)');
-      expect(summary).toContain('kse rollback backup-20260127-143022');
+      expect(summary).toContain('sce rollback backup-20260127-143022');
     });
 
     test('should include warnings in summary', () => {

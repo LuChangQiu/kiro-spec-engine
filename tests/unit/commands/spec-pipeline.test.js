@@ -9,7 +9,7 @@ describe('spec-pipeline command', () => {
   let originalLog;
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-spec-pipeline-'));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-spec-pipeline-'));
     await fs.ensureDir(path.join(tempDir, '.kiro', 'specs', '110-01-pipeline-test'));
     await fs.ensureDir(path.join(tempDir, '.kiro', 'specs', '110-02-pipeline-test'));
 

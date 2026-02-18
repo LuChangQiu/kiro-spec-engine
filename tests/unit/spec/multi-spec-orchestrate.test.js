@@ -12,7 +12,7 @@ describe('multi-spec-orchestrate helper', () => {
   let originalLog;
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-multi-spec-helper-'));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-multi-spec-helper-'));
     originalLog = console.log;
     console.log = jest.fn();
   });

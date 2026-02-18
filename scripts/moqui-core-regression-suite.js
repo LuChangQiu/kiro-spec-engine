@@ -258,7 +258,7 @@ async function main() {
     {
       name: 'scene-package-publish-batch-dry-run',
       args: [
-        path.join(projectRoot, 'bin', 'kiro-spec-engine.js'),
+        path.join(projectRoot, 'bin', 'scene-capability-engine.js'),
         'scene',
         'package-publish-batch',
         '--manifest',
@@ -272,7 +272,7 @@ async function main() {
     {
       name: 'auto-handoff-dry-run',
       args: [
-        path.join(projectRoot, 'bin', 'kiro-spec-engine.js'),
+        path.join(projectRoot, 'bin', 'scene-capability-engine.js'),
         'auto',
         'handoff',
         'run',

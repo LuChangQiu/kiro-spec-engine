@@ -14,7 +14,7 @@ describe('Configuration Directory Auto-Creation', () => {
 
   beforeEach(async () => {
     // Create a temporary directory for testing
-    tempDir = path.join(os.tmpdir(), `kse-test-${Date.now()}`);
+    tempDir = path.join(os.tmpdir(), `sce-test-${Date.now()}`);
     await fs.ensureDir(tempDir);
   });
 
@@ -34,7 +34,7 @@ describe('Configuration Directory Auto-Creation', () => {
       const stateDir = path.dirname(statePath);
       expect(await fs.pathExists(stateDir)).toBe(false);
 
-      // Create a valid kse project directory
+      // Create a valid sce project directory
       const projectDir = path.join(tempDir, 'test-project');
       await fs.ensureDir(path.join(projectDir, '.kiro'));
 
@@ -50,7 +50,7 @@ describe('Configuration Directory Auto-Creation', () => {
       const statePath = path.join(tempDir, 'level1', 'level2', 'level3', 'workspace-state.json');
       const stateManager = new WorkspaceStateManager(statePath);
 
-      // Create a valid kse project directory
+      // Create a valid sce project directory
       const projectDir = path.join(tempDir, 'test-project2');
       await fs.ensureDir(path.join(projectDir, '.kiro'));
 
@@ -70,7 +70,7 @@ describe('Configuration Directory Auto-Creation', () => {
       const statePath = path.join(stateDir, 'workspace-state.json');
       const stateManager = new WorkspaceStateManager(statePath);
 
-      // Create a valid kse project directory
+      // Create a valid sce project directory
       const projectDir = path.join(tempDir, 'test-project3');
       await fs.ensureDir(path.join(projectDir, '.kiro'));
 
@@ -130,7 +130,7 @@ describe('Configuration Directory Auto-Creation', () => {
       const statePath = path.join(readOnlyDir, 'subdir', 'workspace-state.json');
       const stateManager = new WorkspaceStateManager(statePath);
 
-      // Create a valid kse project directory
+      // Create a valid sce project directory
       const projectDir = path.join(tempDir, 'test-project4');
       await fs.ensureDir(path.join(projectDir, '.kiro'));
 

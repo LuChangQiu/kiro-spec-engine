@@ -1,4 +1,4 @@
-﻿const fs = require('fs-extra');
+const fs = require('fs-extra');
 const path = require('path');
 const os = require('os');
 
@@ -16,7 +16,7 @@ describe('BindingPluginLoader', () => {
   let tempRoot;
 
   beforeEach(async () => {
-    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-binding-plugin-loader-'));
+    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-binding-plugin-loader-'));
   });
 
   afterEach(async () => {

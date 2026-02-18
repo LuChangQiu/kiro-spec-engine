@@ -504,7 +504,7 @@ describe('calculateQualityScore agent_readiness dimension', () => {
         }
       },
       manifest: {
-        apiVersion: 'kse.scene.manifest/v0.1',
+        apiVersion: 'sce.scene.manifest/v0.1',
         kind: 'SceneManifest',
         metadata: { name: 'test', version: '1.0.0' },
         spec: {}

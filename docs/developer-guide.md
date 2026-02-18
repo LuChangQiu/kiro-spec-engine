@@ -1,6 +1,6 @@
 # Developer Guide
 
-This guide is for developers who want to contribute to Kiro Spec Engine or extend its functionality.
+This guide is for developers who want to contribute to Scene Capability Engine or extend its functionality.
 
 ## Table of Contents
 
@@ -16,12 +16,12 @@ This guide is for developers who want to contribute to Kiro Spec Engine or exten
 
 ## Architecture Overview
 
-Kiro Spec Engine follows a modular architecture with clear separation of concerns:
+Scene Capability Engine follows a modular architecture with clear separation of concerns:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                        CLI Layer                             │
-│  (bin/kiro-spec-engine.js, lib/commands/*.js)              │
+│  (bin/scene-capability-engine.js, lib/commands/*.js)              │
 └─────────────────────────────────────────────────────────────┘
                             │
                             ▼
@@ -400,7 +400,7 @@ module.exports = {
   }
 };
 
-// Register in bin/kiro-spec-engine.js
+// Register in bin/scene-capability-engine.js
 program
   .command('my-command')
   .description('My custom command')
@@ -559,7 +559,7 @@ npm run test:integration
 1. Clone the repository:
 ```bash
 git clone https://github.com/heguangyong/scene-capability-engine.git
-cd kiro-spec-engine
+cd scene-capability-engine
 ```
 
 2. Install dependencies:

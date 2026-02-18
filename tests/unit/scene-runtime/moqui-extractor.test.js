@@ -56,12 +56,12 @@ describe('MoquiExtractor', () => {
       expect(HEADER_ITEM_SUFFIXES[2]).toEqual({ header: 'Master', item: 'Detail' });
     });
 
-    test('SCENE_API_VERSION is kse.scene/v0.2', () => {
-      expect(SCENE_API_VERSION).toBe('kse.scene/v0.2');
+    test('SCENE_API_VERSION is sce.scene/v0.2', () => {
+      expect(SCENE_API_VERSION).toBe('sce.scene/v0.2');
     });
 
-    test('PACKAGE_API_VERSION is kse.scene.package/v0.1', () => {
-      expect(PACKAGE_API_VERSION).toBe('kse.scene.package/v0.1');
+    test('PACKAGE_API_VERSION is sce.scene.package/v0.1', () => {
+      expect(PACKAGE_API_VERSION).toBe('sce.scene.package/v0.1');
     });
   });
 
@@ -99,7 +99,7 @@ describe('MoquiExtractor', () => {
 
     test('returns false for simple strings', () => {
       expect(needsYamlQuoting('hello')).toBe(false);
-      expect(needsYamlQuoting('kse.scene/v0.2')).toBe(false);
+      expect(needsYamlQuoting('sce.scene/v0.2')).toBe(false);
       expect(needsYamlQuoting('moqui.OrderHeader.list')).toBe(false);
     });
   });
@@ -170,7 +170,7 @@ describe('MoquiExtractor', () => {
 
     test('parses unquoted strings', () => {
       expect(parseScalarValue('hello')).toBe('hello');
-      expect(parseScalarValue('kse.scene/v0.2')).toBe('kse.scene/v0.2');
+      expect(parseScalarValue('sce.scene/v0.2')).toBe('sce.scene/v0.2');
     });
 
     test('handles escape sequences in double-quoted strings', () => {
@@ -193,9 +193,9 @@ describe('MoquiExtractor', () => {
     });
 
     test('serializes flat object', () => {
-      const obj = { apiVersion: 'kse.scene/v0.2', kind: 'scene' };
+      const obj = { apiVersion: 'sce.scene/v0.2', kind: 'scene' };
       const yaml = serializeManifestToYaml(obj);
-      expect(yaml).toContain('apiVersion: kse.scene/v0.2');
+      expect(yaml).toContain('apiVersion: sce.scene/v0.2');
       expect(yaml).toContain('kind: scene');
     });
 
@@ -267,7 +267,7 @@ describe('MoquiExtractor', () => {
 
     test('serializes a full scene manifest example', () => {
       const manifest = {
-        apiVersion: 'kse.scene/v0.2',
+        apiVersion: 'sce.scene/v0.2',
         kind: 'scene',
         metadata: {
           obj_id: 'scene.extracted.crud-order',
@@ -299,7 +299,7 @@ describe('MoquiExtractor', () => {
 
       const yaml = serializeManifestToYaml(manifest);
 
-      expect(yaml).toContain('apiVersion: kse.scene/v0.2');
+      expect(yaml).toContain('apiVersion: sce.scene/v0.2');
       expect(yaml).toContain('kind: scene');
       expect(yaml).toContain('  obj_id: scene.extracted.crud-order');
       expect(yaml).toContain('  domain: erp');
@@ -319,9 +319,9 @@ describe('MoquiExtractor', () => {
     });
 
     test('parses flat key-value pairs', () => {
-      const yaml = 'apiVersion: kse.scene/v0.2\nkind: scene\n';
+      const yaml = 'apiVersion: sce.scene/v0.2\nkind: scene\n';
       const result = parseYaml(yaml);
-      expect(result.apiVersion).toBe('kse.scene/v0.2');
+      expect(result.apiVersion).toBe('sce.scene/v0.2');
       expect(result.kind).toBe('scene');
     });
 
@@ -410,7 +410,7 @@ describe('MoquiExtractor', () => {
 
   describe('YAML round-trip', () => {
     test('round-trips a flat object', () => {
-      const obj = { apiVersion: 'kse.scene/v0.2', kind: 'scene' };
+      const obj = { apiVersion: 'sce.scene/v0.2', kind: 'scene' };
       const yaml = serializeManifestToYaml(obj);
       const parsed = parseYaml(yaml);
       expect(parsed).toEqual(obj);
@@ -464,7 +464,7 @@ describe('MoquiExtractor', () => {
 
     test('round-trips a full scene manifest', () => {
       const manifest = {
-        apiVersion: 'kse.scene/v0.2',
+        apiVersion: 'sce.scene/v0.2',
         kind: 'scene',
         metadata: {
           obj_id: 'scene.extracted.crud-order',
@@ -524,7 +524,7 @@ describe('MoquiExtractor', () => {
     test('round-trips string values that need quoting', () => {
       const obj = {
         version: '0.1.0',
-        apiVersion: 'kse.scene/v0.2'
+        apiVersion: 'sce.scene/v0.2'
       };
       const yaml = serializeManifestToYaml(obj);
       const parsed = parseYaml(yaml);
@@ -1343,7 +1343,7 @@ describe('MoquiExtractor', () => {
       const manifest = generateSceneManifest(match);
 
       expect(manifest).not.toBeNull();
-      expect(manifest.apiVersion).toBe('kse.scene/v0.2');
+      expect(manifest.apiVersion).toBe('sce.scene/v0.2');
       expect(manifest.kind).toBe('scene');
       expect(manifest.metadata.obj_id).toBe('scene.extracted.crud-order');
       expect(manifest.metadata.obj_version).toBe('0.1.0');
@@ -1466,7 +1466,7 @@ describe('MoquiExtractor', () => {
 
       const manifest = generateSceneManifest(match);
 
-      expect(manifest.apiVersion).toBe('kse.scene/v0.2');
+      expect(manifest.apiVersion).toBe('sce.scene/v0.2');
       expect(manifest.kind).toBe('scene');
       expect(manifest.metadata.obj_id).toBe('scene.extracted.query-product');
       expect(manifest.spec.intent.goal).toBe('Read-only access to Product entity');
@@ -1571,7 +1571,7 @@ describe('MoquiExtractor', () => {
 
       const manifest = generateSceneManifest(match);
 
-      expect(manifest.apiVersion).toBe('kse.scene/v0.2');
+      expect(manifest.apiVersion).toBe('sce.scene/v0.2');
       expect(manifest.kind).toBe('scene');
       expect(manifest.metadata.obj_id).toBe('scene.extracted.workflow-reserve-inventory');
       expect(manifest.spec.intent.goal).toBe('Workflow orchestration for ReserveInventory service');
@@ -1728,9 +1728,9 @@ describe('MoquiExtractor', () => {
       const contract = generatePackageContract(match);
 
       expect(contract).not.toBeNull();
-      expect(contract.apiVersion).toBe('kse.scene.package/v0.1');
+      expect(contract.apiVersion).toBe('sce.scene.package/v0.1');
       expect(contract.kind).toBe('scene-template');
-      expect(contract.metadata.group).toBe('kse.scene');
+      expect(contract.metadata.group).toBe('sce.scene');
       expect(contract.metadata.name).toBe('crud-order');
       expect(contract.metadata.version).toBe('0.1.0');
       expect(contract.metadata.summary).toBe('CRUD template for Order entity extracted from Moqui ERP');
@@ -1750,7 +1750,7 @@ describe('MoquiExtractor', () => {
       const contract = generatePackageContract(match);
 
       expect(contract.compatibility.kse_version).toBe('>=1.39.0');
-      expect(contract.compatibility.scene_api_version).toBe('kse.scene/v0.2');
+      expect(contract.compatibility.scene_api_version).toBe('sce.scene/v0.2');
     });
 
     test('crud contract has timeout_ms and retry_count parameters', () => {
@@ -1895,7 +1895,7 @@ describe('MoquiExtractor', () => {
 
       const contract = generatePackageContract(match);
 
-      expect(contract.apiVersion).toBe('kse.scene.package/v0.1');
+      expect(contract.apiVersion).toBe('sce.scene.package/v0.1');
       expect(contract.kind).toBe('scene-template');
       expect(contract.metadata.name).toBe('query-product');
       expect(contract.metadata.summary).toBe('Query template for Product entity extracted from Moqui ERP');
@@ -1934,7 +1934,7 @@ describe('MoquiExtractor', () => {
 
       const contract = generatePackageContract(match);
 
-      expect(contract.apiVersion).toBe('kse.scene.package/v0.1');
+      expect(contract.apiVersion).toBe('sce.scene.package/v0.1');
       expect(contract.kind).toBe('scene-template');
       expect(contract.metadata.name).toBe('workflow-reserve-inventory');
       expect(contract.metadata.summary).toBe('Workflow template for ReserveInventory service extracted from Moqui ERP');
@@ -2119,10 +2119,10 @@ describe('MoquiExtractor', () => {
     function createBundle(name, pattern = 'crud') {
       return {
         bundleDir: `${pattern}-${name}`,
-        manifest: { apiVersion: 'kse.scene/v0.2', kind: 'scene' },
-        contract: { apiVersion: 'kse.scene.package/v0.1', kind: 'scene-template' },
-        manifestYaml: `apiVersion: kse.scene/v0.2\nkind: scene\n`,
-        contractJson: `{"apiVersion":"kse.scene.package/v0.1","kind":"scene-template"}`
+        manifest: { apiVersion: 'sce.scene/v0.2', kind: 'scene' },
+        contract: { apiVersion: 'sce.scene.package/v0.1', kind: 'scene-template' },
+        manifestYaml: `apiVersion: sce.scene/v0.2\nkind: scene\n`,
+        contractJson: `{"apiVersion":"sce.scene.package/v0.1","kind":"scene-template"}`
       };
     }
 

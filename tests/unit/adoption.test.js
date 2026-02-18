@@ -78,7 +78,7 @@ describe('Adoption System', () => {
       const versionInfo = manager.createVersionInfo('1.2.0');
       
       expect(versionInfo).toBeDefined();
-      expect(versionInfo['kse-version']).toBe('1.2.0');
+      expect(versionInfo['sce-version']).toBe('1.2.0');
       expect(versionInfo['template-version']).toBe('1.2.0');
       expect(versionInfo['created']).toBeDefined();
       expect(versionInfo['last-upgraded']).toBeDefined();
@@ -88,7 +88,7 @@ describe('Adoption System', () => {
     test('should validate version info structure', () => {
       const manager = new VersionManager();
       const validInfo = {
-        'kse-version': '1.0.0',
+        'sce-version': '1.0.0',
         'template-version': '1.0.0',
         'created': '2026-01-23T10:00:00Z',
         'last-upgraded': '2026-01-23T10:00:00Z',
@@ -101,7 +101,7 @@ describe('Adoption System', () => {
     test('should detect invalid version info', () => {
       const manager = new VersionManager();
       const invalidInfo = {
-        'kse-version': '1.0.0'
+        'sce-version': '1.0.0'
         // Missing required fields
       };
       
@@ -146,7 +146,7 @@ describe('Adoption System', () => {
       expect(updated['upgrade-history'][0].from).toBe('1.0.0');
       expect(updated['upgrade-history'][0].to).toBe('1.1.0');
       expect(updated['upgrade-history'][0].success).toBe(true);
-      expect(updated['kse-version']).toBe('1.1.0');
+      expect(updated['sce-version']).toBe('1.1.0');
     });
   });
 

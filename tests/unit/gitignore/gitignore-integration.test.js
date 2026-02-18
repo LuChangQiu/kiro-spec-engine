@@ -15,7 +15,7 @@ describe('GitignoreIntegration', () => {
 
   beforeEach(async () => {
     // Create temporary test directory
-    testDir = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-gitignore-integration-'));
+    testDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-gitignore-integration-'));
     integration = new GitignoreIntegration();
   });
 

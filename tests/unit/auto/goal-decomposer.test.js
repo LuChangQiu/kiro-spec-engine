@@ -11,7 +11,7 @@ describe('goal-decomposer', () => {
   let tempDir;
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-goal-decomposer-'));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-goal-decomposer-'));
     await fs.ensureDir(path.join(tempDir, '.kiro', 'specs', '115-00-existing-program'));
   });
 
@@ -23,7 +23,7 @@ describe('goal-decomposer', () => {
 
   test('decomposes close-loop + master/sub goal into deterministic portfolio', async () => {
     const result = await decomposeGoalToSpecPortfolio(
-      'kse should support closed-loop automation and master/sub multi-spec orchestration',
+      'sce should support closed-loop automation and master/sub multi-spec orchestration',
       { projectPath: tempDir }
     );
 
@@ -50,7 +50,7 @@ describe('goal-decomposer', () => {
 
   test('auto-escalates to five sub-specs for highly complex goals', async () => {
     const complexGoal = [
-      'kse should provide closed-loop autonomous execution and master/sub decomposition,',
+      'sce should provide closed-loop autonomous execution and master/sub decomposition,',
       'parallel orchestration runtime and scheduler resilience,',
       'quality gate with observability KPI, tests, and acceptance evidence,',
       'plus documentation rollout guide, migration plan, and operator training for enterprise teams.'

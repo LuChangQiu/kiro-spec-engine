@@ -2,7 +2,7 @@
  * Property 2: Bootstrap Prompt 包含所有必要上下文
  *
  * *对于任何* Spec 名称，BootstrapPromptBuilder 生成的 prompt 应同时包含：
- * 该 Spec 的路径（`.kiro/specs/{specName}/`）、kse 项目规范/steering 上下文引用、
+ * 该 Spec 的路径（`.kiro/specs/{specName}/`）、sce 项目规范/steering 上下文引用、
  * 以及任务执行指令。
  *
  * **Validates: Requirements 2.1, 2.2, 2.3**
@@ -30,7 +30,7 @@ let tempCounter = 0;
 function createTempDir() {
   const dir = path.join(
     os.tmpdir(),
-    `kse-pbt-bpb-${Date.now()}-${++tempCounter}-${Math.random().toString(36).substr(2, 6)}`
+    `sce-pbt-bpb-${Date.now()}-${++tempCounter}-${Math.random().toString(36).substr(2, 6)}`
   );
   fs.mkdirSync(dir, { recursive: true });
   return dir;
@@ -70,7 +70,7 @@ describe('Property 2: Bootstrap Prompt 完整性 (Bootstrap Prompt Completeness)
     );
   });
 
-  test('prompt contains kse steering context references for any valid Spec name (Req 2.2)', async () => {
+  test('prompt contains sce steering context references for any valid Spec name (Req 2.2)', async () => {
     await fc.assert(
       fc.asyncProperty(arbSpecName, async (specName) => {
         const tempDir = createTempDir();

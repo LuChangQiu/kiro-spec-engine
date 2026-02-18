@@ -5,7 +5,7 @@ const path = require('path');
 function createTempWorkspace() {
   const workspaceRoot = path.join(
     os.tmpdir(),
-    `kse-test-orch-status-events-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+    `sce-test-orch-status-events-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
   );
   fs.mkdirpSync(path.join(workspaceRoot, '.kiro', 'specs', 'spec-a'));
   return workspaceRoot;

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document defines the testing strategy for kse (Kiro Spec Engine) to balance code quality with CI/CD performance.
+This document defines the testing strategy for sce (Scene Capability Engine) to balance code quality with CI/CD performance.
 
 ## Test Categories
 
@@ -269,4 +269,4 @@ npm run test:coverage
 
 **Version**: v1.0  
 **Last Updated**: 2026-01-29  
-**Maintained by**: kse Development Team
+**Maintained by**: sce Development Team

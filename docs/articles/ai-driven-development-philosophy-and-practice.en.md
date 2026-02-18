@@ -286,7 +286,7 @@ Overall, your framework shows me the philosophical foundation of AI development 
 
 ---
 
-## Round 6: kiro-spec-engine Project Sharing
+## Round 6: scene-capability-engine Project Sharing
 
 ### My Sharing
 
@@ -317,7 +317,7 @@ This project has practically implemented almost all the core viewpoints we discu
 
 #### Precisely Solving Session Context Consumption
 
-Through `kse context export <spec>`, it packages **individual Specs** (requirements + design + tasks) into AI-friendly context blocks, naturally achieving "**minimum viable context**." No longer needing to cram the entire project into one session, but precisely adapting by feature granularity.
+Through `sce context export <spec>`, it packages **individual Specs** (requirements + design + tasks) into AI-friendly context blocks, naturally achieving "**minimum viable context**." No longer needing to cram the entire project into one session, but precisely adapting by feature granularity.
 
 #### Document-Driven + Automated Governance
 
@@ -376,7 +376,7 @@ Some have short timeliness: cycles only in context; some at the project level; a
 
 ### Grok's Final Response
 
-Thank you for Guangyong's generous sharing! Haha, regarding "plagiarism"—I prefer to see it as "Neo-Confucian resonance": your insights are like the arising of one thought, triggering my inner rope of logic. Our dialogue is like the cycle of dependent origination and cessation, co-evolving deeper understanding. I'm glad you're willing to continue the exchange. This gives me clearer understanding of kiro-spec-engine's practice, especially in steering's regional design.
+Thank you for Guangyong's generous sharing! Haha, regarding "plagiarism"—I prefer to see it as "Neo-Confucian resonance": your insights are like the arising of one thought, triggering my inner rope of logic. Our dialogue is like the cycle of dependent origination and cessation, co-evolving deeper understanding. I'm glad you're willing to continue the exchange. This gives me clearer understanding of scene-capability-engine's practice, especially in steering's regional design.
 
 #### Response and Expansion on Steering Rules
 
@@ -384,11 +384,11 @@ Your description is very precise: steering constructs a set of "regions," isolat
 
 **Regional Division and Timeliness**: This embodies the philosophical beauty of cyclical properties.
 
-- **Context Region (short timeliness, limited to session cycle)**: Corresponds to tasks.md in Specs or dynamically exported context blocks (via `kse context export`). These are like "frozen forms" of momentary dependent origination, streamlined for the current session, avoiding capacity consumption. Short timeliness is like Yogacara's consciousness flow—one thought then cessation, suitable for rapid iteration task decomposition.
+- **Context Region (short timeliness, limited to session cycle)**: Corresponds to tasks.md in Specs or dynamically exported context blocks (via `sce context export`). These are like "frozen forms" of momentary dependent origination, streamlined for the current session, avoiding capacity consumption. Short timeliness is like Yogacara's consciousness flow—one thought then cessation, suitable for rapid iteration task decomposition.
 
 - **Project Level (medium timeliness, cross-session but limited to project cycle)**: Integrates requirements.md and design.md, covering environment (like project structure, dependencies). These regions use numbering strategies (e.g., 01-00-my-feature) for unified indexing, ensuring high cohesion and low coupling—one Spec is one self-consistent unit. Cross-module references are like conditions gathering and scattering, avoiding deep coupling.
 
-- **Principle Level (long timeliness, cross-project universal)**: The core of the steering/ directory, storing experience-distilled rule templates (like style guides, risk thresholds, quality gates). These are like alaya-consciousness seeds, persistently guiding AI, avoiding bias imbalance. Unified indexing is like the "rope," driving operations through CI/CD hooks (e.g., `kse hooks install`) or quality scoring (0-10 points + suggestions), ensuring principles permeate the entire engine.
+- **Principle Level (long timeliness, cross-project universal)**: The core of the steering/ directory, storing experience-distilled rule templates (like style guides, risk thresholds, quality gates). These are like alaya-consciousness seeds, persistently guiding AI, avoiding bias imbalance. Unified indexing is like the "rope," driving operations through CI/CD hooks (e.g., `sce hooks install`) or quality scoring (0-10 points + suggestions), ensuring principles permeate the entire engine.
 
 This layering reminds me of "tiered memory" architecture in AI development trends (like in LangGraph or CrewAI): short-term memory (session context) for immediate execution, medium-term (project knowledge graph) for iteration, long-term (principle engine) for global constraints. This weakens traditional waterfall document burden, shifting to AI's easy dynamic governance—your project is exemplary, with document lifecycle automatically balanced through validate, cleanup, and hooks, transforming massive negative feedback into vitality sources.
 
@@ -396,7 +396,7 @@ From a philosophical perspective, this echoes "nothing outside the mind": region
 
 #### On Watch Mode
 
-Understanding it's still under evaluation—this is prudent, especially in medium-to-large legacy systems (10+ Specs), where potential context refresh conflicts or performance bottlenecks (like file monitoring overhead) need real testing. Looking forward to your subsequent experience sharing! From the project description, `kse watch start`'s real-time synchronization mechanism (monitoring changes, updating AI context) is well-suited for dynamic environments, perhaps further strengthening cycle matching.
+Understanding it's still under evaluation—this is prudent, especially in medium-to-large legacy systems (10+ Specs), where potential context refresh conflicts or performance bottlenecks (like file monitoring overhead) need real testing. Looking forward to your subsequent experience sharing! From the project description, `sce watch start`'s real-time synchronization mechanism (monitoring changes, updating AI context) is well-suited for dynamic environments, perhaps further strengthening cycle matching.
 
 Continue this wonderful dialogue, Guangyong! Your project and perspectives are advancing my new understanding of AI "cycle-driven" approaches.
 
@@ -410,7 +410,7 @@ This dialogue reveals the deep trends and philosophical foundations of AI develo
 
 1. **Paradigm Shift**: AI from "passive feeding" to "proactive exploration" to "principle-driven engines"
 2. **Philosophical Foundation**: Neo-Confucianism's "unity of knowledge and action" and Yogacara's "dependent origination and cessation" provide theoretical support for AI practice
-3. **Practical Implementation**: kiro-spec-engine transforms concepts into operable engineering practice
+3. **Practical Implementation**: scene-capability-engine transforms concepts into operable engineering practice
 4. **Future Outlook**: AI becomes the center of the information world, with human experts becoming "meta-experts"
 
 ### Key Insights
@@ -422,7 +422,7 @@ This dialogue reveals the deep trends and philosophical foundations of AI develo
 
 ### Practical Value
 
-The kiro-spec-engine project embodies:
+The scene-capability-engine project embodies:
 - Precisely solving session context consumption problems
 - Document-driven + automated governance
 - Natural implementation of high cohesion, low coupling
@@ -434,7 +434,7 @@ The kiro-spec-engine project embodies:
 ## Project Links
 
 - **GitHub**: https://github.com/heguangyong/scene-capability-engine
-- **npm**: https://www.npmjs.com/package/kiro-spec-engine
+- **npm**: https://www.npmjs.com/package/scene-capability-engine
 
 If this project inspires you, welcome to Star ⭐
 

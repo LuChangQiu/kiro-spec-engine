@@ -10,7 +10,7 @@ describe('close-loop-runner', () => {
   let output;
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-close-loop-runner-'));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-close-loop-runner-'));
     await fs.ensureDir(path.join(tempDir, '.kiro', 'specs'));
 
     originalLog = console.log;
@@ -53,7 +53,7 @@ describe('close-loop-runner', () => {
     });
 
     const result = await runAutoCloseLoop(
-      'Build closed-loop and multi-spec master/sub execution in kse',
+      'Build closed-loop and multi-spec master/sub execution in sce',
       {
         maxParallel: 4
       },

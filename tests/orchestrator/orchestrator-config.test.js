@@ -19,7 +19,7 @@ describe('OrchestratorConfig', () => {
   let config;
 
   beforeEach(() => {
-    tempDir = path.join(os.tmpdir(), `kse-test-oc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
+    tempDir = path.join(os.tmpdir(), `sce-test-oc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
     fs.mkdirSync(tempDir, { recursive: true });
     config = new OrchestratorConfig(tempDir);
   });

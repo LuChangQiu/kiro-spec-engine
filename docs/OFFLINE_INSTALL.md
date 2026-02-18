@@ -1,4 +1,4 @@
-# kse 离线安装指南
+# sce 离线安装指南
 
 > 适用于无法直接访问 npm registry 的环境。
 
@@ -25,18 +25,18 @@ npm --version
 
 ## 方式 1：使用 `.tgz` 离线包安装（推荐）
 
-1. 获取离线包文件（示例：`kiro-spec-engine-1.46.2.tgz`）。
+1. 获取离线包文件（示例：`scene-capability-engine-1.46.2.tgz`）。
 2. 在目标机器执行：
 
 ```bash
-npm install -g kiro-spec-engine-1.46.2.tgz
+npm install -g scene-capability-engine-1.46.2.tgz
 ```
 
 3. 验证：
 
 ```bash
-kse --version
-kse --help
+sce --version
+sce --help
 ```
 
 ---
@@ -54,7 +54,7 @@ npm install -g .
 3. 验证：
 
 ```bash
-kse --version
+sce --version
 ```
 
 ---
@@ -78,10 +78,10 @@ npm --version
 
 ```bash
 cd your-project
-kse adopt
-kse spec bootstrap --name 01-00-demo-feature --non-interactive
-kse value metrics sample --out ./kpi-input.json --json
-kse value metrics snapshot --input ./kpi-input.json --json
+sce adopt
+sce spec bootstrap --name 01-00-demo-feature --non-interactive
+sce value metrics sample --out ./kpi-input.json --json
+sce value metrics snapshot --input ./kpi-input.json --json
 ```
 
 如果最后一步成功，说明你的环境已经可以输出机器可读 KPI 结果（用于周度评审和门禁证据）。

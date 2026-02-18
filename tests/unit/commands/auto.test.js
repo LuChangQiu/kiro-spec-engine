@@ -19,7 +19,7 @@ describe('auto close-loop command', () => {
 
   beforeEach(async () => {
     jest.resetAllMocks();
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-auto-command-'));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-auto-command-'));
     const baselineScript = path.join(tempDir, 'scripts', 'moqui-template-baseline-report.js');
     await fs.ensureDir(path.dirname(baselineScript));
     await fs.writeFile(
@@ -105,7 +105,7 @@ if (process.argv.includes('--json')) {
     runAutoCloseLoop.mockResolvedValue({ status: 'prepared' });
     const program = buildProgram();
 
-    await program.parseAsync(['node', 'kse', 'auto', 'close-loop', '--resume', 'latest']);
+    await program.parseAsync(['node', 'sce', 'auto', 'close-loop', '--resume', 'latest']);
 
     expect(runAutoCloseLoop).toHaveBeenCalledWith(
       undefined,
@@ -119,7 +119,7 @@ if (process.argv.includes('--json')) {
     runAutoCloseLoop.mockResolvedValue({ status: 'prepared' });
     const program = buildProgram();
 
-    await program.parseAsync(['node', 'kse', 'auto', 'close-loop', '--resume', 'interrupted']);
+    await program.parseAsync(['node', 'sce', 'auto', 'close-loop', '--resume', 'interrupted']);
 
     expect(runAutoCloseLoop).toHaveBeenCalledWith(
       undefined,
@@ -133,7 +133,7 @@ if (process.argv.includes('--json')) {
     runAutoCloseLoop.mockResolvedValue({ status: 'prepared' });
     const program = buildProgram();
 
-    await program.parseAsync(['node', 'kse', 'auto', 'close-loop', 'continue']);
+    await program.parseAsync(['node', 'sce', 'auto', 'close-loop', 'continue']);
 
     expect(runAutoCloseLoop).toHaveBeenCalledWith(
       undefined,
@@ -147,7 +147,7 @@ if (process.argv.includes('--json')) {
     runAutoCloseLoop.mockResolvedValue({ status: 'prepared' });
     const program = buildProgram();
 
-    await program.parseAsync(['node', 'kse', 'auto', 'close-loop', '继续']);
+    await program.parseAsync(['node', 'sce', 'auto', 'close-loop', '继续']);
 
     expect(runAutoCloseLoop).toHaveBeenCalledWith(
       undefined,
@@ -161,7 +161,7 @@ if (process.argv.includes('--json')) {
     runAutoCloseLoop.mockResolvedValue({ status: 'prepared' });
     const program = buildProgram();
 
-    await program.parseAsync(['node', 'kse', 'auto', 'continue']);
+    await program.parseAsync(['node', 'sce', 'auto', 'continue']);
 
     expect(runAutoCloseLoop).toHaveBeenCalledWith(
       undefined,
@@ -176,7 +176,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
 
     await expect(
-      program.parseAsync(['node', 'kse', 'auto', 'close-loop'])
+      program.parseAsync(['node', 'sce', 'auto', 'close-loop'])
     ).rejects.toThrow('process.exit called');
 
     const errorOutput = errorSpy.mock.calls.map(call => call.join(' ')).join('\n');
@@ -189,10 +189,10 @@ if (process.argv.includes('--json')) {
 
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop',
-      'deliver kse autonomous close-loop',
+      'deliver sce autonomous close-loop',
       '--replan-strategy',
       'fixed',
       '--replan-attempts',
@@ -206,7 +206,7 @@ if (process.argv.includes('--json')) {
     ]);
 
     expect(runAutoCloseLoop).toHaveBeenCalledWith(
-      'deliver kse autonomous close-loop',
+      'deliver sce autonomous close-loop',
       expect.objectContaining({
         replanStrategy: 'fixed',
         replanAttempts: 2,
@@ -251,7 +251,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -324,7 +324,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -363,7 +363,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -401,7 +401,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -432,7 +432,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -495,7 +495,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -550,7 +550,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -608,7 +608,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       '--resume-from-summary',
@@ -663,7 +663,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       '--resume-from-summary',
@@ -719,7 +719,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       '--resume-from-summary',
@@ -746,7 +746,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -771,7 +771,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -796,10 +796,10 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-program',
-      'build autonomous close-loop, master/sub decomposition, orchestration and quality rollout for kse',
+      'build autonomous close-loop, master/sub decomposition, orchestration and quality rollout for sce',
       '--program-goals',
       '3',
       '--json'
@@ -845,7 +845,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-program',
       'build autonomous close-loop and orchestrate multi-spec program',
@@ -874,7 +874,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-program',
       'build autonomous close-loop and orchestrate multi-spec program',
@@ -910,7 +910,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-program',
       'build autonomous close-loop and orchestrate multi-spec program',
@@ -941,7 +941,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-program',
         'deliver resilient autonomous rollout',
@@ -972,7 +972,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-program',
         'deliver resilient autonomous rollout',
@@ -1015,7 +1015,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-program',
         'deliver resilient autonomous rollout',
@@ -1058,7 +1058,7 @@ if (process.argv.includes('--json')) {
       await expect(
         program.parseAsync([
           'node',
-          'kse',
+          'sce',
           'auto',
           'close-loop-program',
           'deliver resilient autonomous rollout',
@@ -1093,7 +1093,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-program',
         'deliver resilient autonomous rollout',
@@ -1112,7 +1112,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-program',
         'deliver resilient autonomous rollout',
@@ -1131,7 +1131,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-program',
         'deliver resilient autonomous rollout',
@@ -1150,7 +1150,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-program',
         'deliver resilient autonomous rollout',
@@ -1170,7 +1170,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-program',
         'deliver resilient autonomous rollout',
@@ -1195,7 +1195,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-program',
       'deliver resilient autonomous rollout',
@@ -1240,7 +1240,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-program',
       'deliver resilient autonomous rollout',
@@ -1285,7 +1285,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-program',
       'deliver resilient autonomous rollout',
@@ -1355,7 +1355,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-program',
       'deliver resilient autonomous rollout',
@@ -1398,7 +1398,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-controller',
         queueFile,
@@ -1422,7 +1422,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-controller',
       queueFile,
@@ -1463,7 +1463,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-controller',
       queueFile,
@@ -1507,7 +1507,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-controller',
       '--controller-resume',
@@ -1548,7 +1548,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-controller',
         queueFile
@@ -1569,7 +1569,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-program',
         'deliver resilient autonomous rollout',
@@ -1602,7 +1602,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-program',
       'deliver resilient autonomous rollout',
@@ -1641,7 +1641,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-program',
       'deliver resilient autonomous rollout',
@@ -1677,7 +1677,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-program',
       'deliver autonomous close-loop with master/sub multi-spec execution and quality guardrails',
@@ -1714,7 +1714,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-program',
         'build autonomous close-loop and orchestrate multi-spec program',
@@ -1773,14 +1773,14 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-recover',
       summaryFile,
       '--use-action',
       '2',
       '--recovery-memory-scope',
-      'kse-scope-a',
+      'sce-scope-a',
       '--dry-run',
       '--json'
     ]);
@@ -1790,12 +1790,12 @@ if (process.argv.includes('--json')) {
     const secondProgram = buildProgram();
     await secondProgram.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-recover',
       summaryFile,
       '--recovery-memory-scope',
-      'kse-scope-a',
+      'sce-scope-a',
       '--dry-run',
       '--json'
     ]);
@@ -1811,7 +1811,7 @@ if (process.argv.includes('--json')) {
       mode: 'memory'
     }));
     expect(summary.recovery_memory).toEqual(expect.objectContaining({
-      scope: 'kse-scope-a',
+      scope: 'sce-scope-a',
       selection_source: 'memory',
       selected_action_index: 2
     }));
@@ -1849,7 +1849,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-recover',
       summaryFile,
@@ -1916,7 +1916,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-recover',
         summaryFile,
@@ -1974,7 +1974,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-recover',
       summaryFile,
@@ -2025,7 +2025,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-recover',
         summaryFile,
@@ -2064,7 +2064,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-recover',
         summaryFile,
@@ -2103,7 +2103,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-recover',
         summaryFile,
@@ -2124,7 +2124,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         'missing-goals.json'
@@ -2142,7 +2142,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch'
       ])
@@ -2162,11 +2162,11 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       '--decompose-goal',
-      'build autonomous close-loop, master/sub decomposition, orchestration, and quality gate rollout for kse',
+      'build autonomous close-loop, master/sub decomposition, orchestration, and quality gate rollout for sce',
       '--program-goals',
       '3',
       '--json'
@@ -2192,7 +2192,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       '--decompose-goal',
@@ -2217,7 +2217,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         '--decompose-goal',
@@ -2245,7 +2245,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2267,7 +2267,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         '--resume-from-summary',
@@ -2290,7 +2290,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2309,7 +2309,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         '--decompose-goal',
@@ -2334,7 +2334,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2356,7 +2356,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         '--resume-from-summary',
@@ -2379,7 +2379,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2401,7 +2401,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2423,7 +2423,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2445,7 +2445,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2467,7 +2467,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2489,7 +2489,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2514,7 +2514,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -2538,7 +2538,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2561,7 +2561,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2589,7 +2589,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -2627,7 +2627,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -2652,7 +2652,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2674,7 +2674,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2696,7 +2696,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2718,7 +2718,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2740,7 +2740,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2765,7 +2765,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2786,7 +2786,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2807,7 +2807,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -2838,7 +2838,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -2869,7 +2869,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -2919,7 +2919,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -2959,7 +2959,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -2991,7 +2991,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -3022,7 +3022,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -3081,7 +3081,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -3133,7 +3133,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -3178,7 +3178,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -3221,7 +3221,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -3261,7 +3261,7 @@ if (process.argv.includes('--json')) {
     }, { spaces: 2 });
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'session', 'list', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'session', 'list', '--json']);
 
     const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
     const parsed = JSON.parse(output.trim());
@@ -3290,7 +3290,7 @@ if (process.argv.includes('--json')) {
     }, { spaces: 2 });
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'session', 'list', '--status', 'completed', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'session', 'list', '--status', 'completed', '--json']);
 
     const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
     const parsed = JSON.parse(output.trim());
@@ -3327,7 +3327,7 @@ if (process.argv.includes('--json')) {
     }, { spaces: 2 });
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'session', 'stats', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'session', 'stats', '--json']);
 
     const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
     const parsed = JSON.parse(output.trim());
@@ -3373,7 +3373,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'session',
       'stats',
@@ -3404,7 +3404,7 @@ if (process.argv.includes('--json')) {
     await fs.utimes(specB, new Date('2026-01-02T00:00:00.000Z'), new Date('2026-01-02T00:00:00.000Z'));
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'spec-session', 'list', '--limit', '1', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'spec-session', 'list', '--limit', '1', '--json']);
 
     const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
     const parsed = JSON.parse(output.trim());
@@ -3424,7 +3424,7 @@ if (process.argv.includes('--json')) {
     await fs.utimes(newSpec, new Date('2026-01-01T00:00:00.000Z'), new Date('2026-01-01T00:00:00.000Z'));
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'spec-session', 'prune', '--keep', '1', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'spec-session', 'prune', '--keep', '1', '--json']);
 
     const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
     const parsed = JSON.parse(output.trim());
@@ -3449,7 +3449,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'spec-session',
       'prune',
@@ -3481,7 +3481,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'spec-session',
       'prune',
@@ -3505,7 +3505,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'spec-session',
       'prune',
@@ -3535,7 +3535,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'spec-session',
       'prune',
@@ -3574,7 +3574,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'spec-session',
       'prune',
@@ -3655,7 +3655,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'spec-session',
       'prune',
@@ -3699,7 +3699,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -3735,7 +3735,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'close-loop-batch',
       goalsFile,
@@ -3775,7 +3775,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -3808,7 +3808,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -3843,7 +3843,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'close-loop-batch',
         goalsFile,
@@ -3871,7 +3871,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'spec-session',
         'prune',
@@ -3889,7 +3889,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'spec-session',
         'prune',
@@ -3920,7 +3920,7 @@ if (process.argv.includes('--json')) {
     }, { spaces: 2 });
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'batch-session', 'list', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'batch-session', 'list', '--json']);
 
     const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
     const parsed = JSON.parse(output.trim());
@@ -3951,7 +3951,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'batch-session',
       'list',
@@ -3991,7 +3991,7 @@ if (process.argv.includes('--json')) {
     }, { spaces: 2 });
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'batch-session', 'stats', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'batch-session', 'stats', '--json']);
 
     const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
     const parsed = JSON.parse(output.trim());
@@ -4039,7 +4039,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'batch-session',
       'stats',
@@ -4072,7 +4072,7 @@ if (process.argv.includes('--json')) {
     await fs.utimes(newSession, new Date('2026-01-01T00:00:00.000Z'), new Date('2026-01-01T00:00:00.000Z'));
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'session', 'prune', '--keep', '1', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'session', 'prune', '--keep', '1', '--json']);
 
     const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
     const parsed = JSON.parse(output.trim());
@@ -4092,7 +4092,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'session',
       'prune',
@@ -4128,7 +4128,7 @@ if (process.argv.includes('--json')) {
     await fs.utimes(newSession, new Date('2026-01-01T00:00:00.000Z'), new Date('2026-01-01T00:00:00.000Z'));
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'batch-session', 'prune', '--keep', '1', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'batch-session', 'prune', '--keep', '1', '--json']);
 
     const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
     const parsed = JSON.parse(output.trim());
@@ -4157,7 +4157,7 @@ if (process.argv.includes('--json')) {
     }, { spaces: 2 });
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'controller-session', 'list', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'controller-session', 'list', '--json']);
 
     const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
     const parsed = JSON.parse(output.trim());
@@ -4188,7 +4188,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'controller-session',
       'list',
@@ -4230,7 +4230,7 @@ if (process.argv.includes('--json')) {
     }, { spaces: 2 });
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'controller-session', 'stats', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'controller-session', 'stats', '--json']);
 
     const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
     const parsed = JSON.parse(output.trim());
@@ -4280,7 +4280,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'controller-session',
       'stats',
@@ -4368,7 +4368,7 @@ if (process.argv.includes('--json')) {
     }, { spaces: 2 });
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'governance', 'stats', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'governance', 'stats', '--json']);
 
     const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
     const parsed = JSON.parse(output.trim());
@@ -4471,7 +4471,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'stats',
@@ -4558,7 +4558,7 @@ if (process.argv.includes('--json')) {
     }, { spaces: 2 });
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'governance', 'stats', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'governance', 'stats', '--json']);
 
     const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
     const parsed = JSON.parse(output.trim());
@@ -4573,7 +4573,7 @@ if (process.argv.includes('--json')) {
       expect.stringContaining('Latest release gate evaluation is failed')
     ]));
     expect(parsed.health.recommendations).toEqual(expect.arrayContaining([
-      expect.stringContaining('kse auto handoff evidence --window 5 --json')
+      expect.stringContaining('sce auto handoff evidence --window 5 --json')
     ]));
   });
 
@@ -4688,7 +4688,7 @@ if (process.argv.includes('--json')) {
     }, { spaces: 2 });
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'governance', 'stats', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'governance', 'stats', '--json']);
 
     const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
     const parsed = JSON.parse(output.trim());
@@ -4705,7 +4705,7 @@ if (process.argv.includes('--json')) {
       expect.stringContaining('Latest handoff run status is failed')
     ]));
     expect(parsed.health.recommendations).toEqual(expect.arrayContaining([
-      expect.stringContaining('kse auto handoff evidence --window 5 --json')
+      expect.stringContaining('sce auto handoff evidence --window 5 --json')
     ]));
   });
 
@@ -4748,7 +4748,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'maintain',
@@ -4802,7 +4802,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'maintain',
@@ -4868,7 +4868,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'maintain',
@@ -4980,7 +4980,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'maintain',
@@ -5056,7 +5056,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'close-loop',
@@ -5156,7 +5156,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'close-loop',
@@ -5215,7 +5215,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'close-loop',
@@ -5238,7 +5238,7 @@ if (process.argv.includes('--json')) {
       expect.stringContaining('latest-release-gate-failed')
     ]));
     expect(parsed.recommendations).toEqual(expect.arrayContaining([
-      expect.stringContaining('kse auto handoff evidence --window 5 --json')
+      expect.stringContaining('sce auto handoff evidence --window 5 --json')
     ]));
   });
 
@@ -5301,7 +5301,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'close-loop',
@@ -5324,7 +5324,7 @@ if (process.argv.includes('--json')) {
       expect.stringContaining('handoff-latest-status:failed')
     ]));
     expect(parsed.recommendations).toEqual(expect.arrayContaining([
-      expect.stringContaining('kse auto handoff evidence --window 5 --json'),
+      expect.stringContaining('sce auto handoff evidence --window 5 --json'),
       expect.stringContaining('--continue-from latest --continue-strategy failed-only')
     ]));
   });
@@ -5390,7 +5390,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'close-loop',
@@ -5445,7 +5445,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'close-loop',
@@ -5491,7 +5491,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'close-loop',
@@ -5519,7 +5519,7 @@ if (process.argv.includes('--json')) {
     const resumedProgram = buildProgram();
     await resumedProgram.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'close-loop',
@@ -5549,7 +5549,7 @@ if (process.argv.includes('--json')) {
     const firstProgram = buildProgram();
     await firstProgram.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'close-loop',
@@ -5572,7 +5572,7 @@ if (process.argv.includes('--json')) {
     const resumedProgram = buildProgram();
     await resumedProgram.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'close-loop',
@@ -5599,7 +5599,7 @@ if (process.argv.includes('--json')) {
     const firstProgram = buildProgram();
     await firstProgram.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'close-loop',
@@ -5619,7 +5619,7 @@ if (process.argv.includes('--json')) {
     await expect(
       rejectedProgram.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'governance',
         'close-loop',
@@ -5642,7 +5642,7 @@ if (process.argv.includes('--json')) {
     const overrideProgram = buildProgram();
     await overrideProgram.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'close-loop',
@@ -5679,7 +5679,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'close-loop',
@@ -5830,7 +5830,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'session',
@@ -5858,7 +5858,7 @@ if (process.argv.includes('--json')) {
     const resumedListProgram = buildProgram();
     await resumedListProgram.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'session',
@@ -5880,7 +5880,7 @@ if (process.argv.includes('--json')) {
     const statsProgram = buildProgram();
     await statsProgram.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'session',
@@ -5922,7 +5922,7 @@ if (process.argv.includes('--json')) {
     const pruneProgram = buildProgram();
     await pruneProgram.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'governance',
       'session',
@@ -5957,7 +5957,7 @@ if (process.argv.includes('--json')) {
     await fs.utimes(newSession, new Date('2026-01-01T00:00:00.000Z'), new Date('2026-01-01T00:00:00.000Z'));
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'controller-session', 'prune', '--keep', '1', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'controller-session', 'prune', '--keep', '1', '--json']);
 
     const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
     const parsed = JSON.parse(output.trim());
@@ -6020,7 +6020,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'kpi',
       'trend',
@@ -6110,7 +6110,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'kpi',
       'trend',
@@ -6180,7 +6180,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'kpi',
       'trend',
@@ -6239,7 +6239,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'kpi',
       'trend',
@@ -6264,7 +6264,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'kpi',
         'trend',
@@ -6282,7 +6282,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'kpi',
         'trend',
@@ -6319,7 +6319,7 @@ if (process.argv.includes('--json')) {
     }, { spaces: 2 });
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'recovery-memory', 'show', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'recovery-memory', 'show', '--json']);
 
     const parsed = JSON.parse(`${logSpy.mock.calls[0][0]}`);
     expect(parsed.mode).toBe('auto-recovery-memory-show');
@@ -6369,7 +6369,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'recovery-memory',
       'prune',
@@ -6383,7 +6383,7 @@ if (process.argv.includes('--json')) {
     expect(pruned.signatures_removed).toBeGreaterThanOrEqual(1);
 
     logSpy.mockClear();
-    await program.parseAsync(['node', 'kse', 'auto', 'recovery-memory', 'clear', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'recovery-memory', 'clear', '--json']);
     const cleared = JSON.parse(`${logSpy.mock.calls[0][0]}`);
     expect(cleared.mode).toBe('auto-recovery-memory-clear');
     expect(await fs.pathExists(memoryFile)).toBe(false);
@@ -6431,7 +6431,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'recovery-memory',
       'show',
@@ -6446,7 +6446,7 @@ if (process.argv.includes('--json')) {
     logSpy.mockClear();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'recovery-memory',
       'prune',
@@ -6493,7 +6493,7 @@ if (process.argv.includes('--json')) {
     }, { spaces: 2 });
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'recovery-memory', 'scopes', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'recovery-memory', 'scopes', '--json']);
     const parsed = JSON.parse(`${logSpy.mock.calls[0][0]}`);
     expect(parsed.mode).toBe('auto-recovery-memory-scopes');
     expect(parsed.total_scopes).toBe(2);
@@ -6571,7 +6571,7 @@ if (process.argv.includes('--json')) {
     }, { spaces: 2 });
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'observability', 'snapshot', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'observability', 'snapshot', '--json']);
 
     const parsed = JSON.parse(`${logSpy.mock.calls[0][0]}`);
     expect(parsed.mode).toBe('auto-observability-snapshot');
@@ -6603,7 +6603,7 @@ if (process.argv.includes('--json')) {
 
     const program = buildProgram();
     await program.parseAsync([
-      'node', 'kse', 'auto', 'spec', 'status', '121-00-agent-interface', '--json'
+      'node', 'sce', 'auto', 'spec', 'status', '121-00-agent-interface', '--json'
     ]);
     const statusPayload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
     expect(statusPayload.mode).toBe('auto-spec-status');
@@ -6614,7 +6614,7 @@ if (process.argv.includes('--json')) {
 
     logSpy.mockClear();
     await program.parseAsync([
-      'node', 'kse', 'auto', 'spec', 'instructions', '121-00-agent-interface', '--json'
+      'node', 'sce', 'auto', 'spec', 'instructions', '121-00-agent-interface', '--json'
     ]);
     const instructionsPayload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
     expect(instructionsPayload.mode).toBe('auto-spec-instructions');
@@ -6651,7 +6651,7 @@ if (process.argv.includes('--json')) {
     await fs.writeFile(path.join(governanceSessionDir, 'schema-invalid.json'), '{ invalid json', 'utf8');
 
     const program = buildProgram();
-    await program.parseAsync(['node', 'kse', 'auto', 'schema', 'check', '--json']);
+    await program.parseAsync(['node', 'sce', 'auto', 'schema', 'check', '--json']);
     const parsed = JSON.parse(`${logSpy.mock.calls[0][0]}`);
     expect(parsed.mode).toBe('auto-schema-check');
     expect(parsed.summary.total_files).toBe(4);
@@ -6682,7 +6682,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'schema',
       'migrate',
@@ -6699,7 +6699,7 @@ if (process.argv.includes('--json')) {
     logSpy.mockClear();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'schema',
       'migrate',
@@ -6733,7 +6733,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'plan',
@@ -6753,8 +6753,8 @@ if (process.argv.includes('--json')) {
       id: 'spec-validation'
     }));
     expect(payload.phases[1].commands).toEqual(expect.arrayContaining([
-      'kse auto spec status 60-06-project-wbs-management --json',
-      'kse scene package-validate --spec 60-06-project-wbs-management --spec-package custom/scene-package.json --strict --json'
+      'sce auto spec status 60-06-project-wbs-management --json',
+      'sce scene package-validate --spec 60-06-project-wbs-management --spec-package custom/scene-package.json --strict --json'
     ]));
   });
 
@@ -6778,7 +6778,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'plan',
@@ -6808,7 +6808,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'queue',
@@ -6842,7 +6842,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'queue',
@@ -6888,7 +6888,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'template-diff',
@@ -6930,7 +6930,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'capability-matrix',
@@ -6960,7 +6960,7 @@ if (process.argv.includes('--json')) {
     expect(await fs.pathExists(remediationQueueFile)).toBe(true);
     const queueContent = await fs.readFile(remediationQueueFile, 'utf8');
     expect(queueContent).toContain('order-fulfillment');
-    expect(payload.recommendations.some(item => item.includes('kse auto close-loop-batch'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('sce auto close-loop-batch'))).toBe(true);
   });
 
   test('supports capability matrix markdown format output file', async () => {
@@ -7004,7 +7004,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'capability-matrix',
@@ -7055,7 +7055,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'capability-matrix',
@@ -7096,7 +7096,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'capability-matrix',
@@ -7141,7 +7141,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'capability-matrix',
@@ -7188,7 +7188,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'run',
@@ -7210,7 +7210,7 @@ if (process.argv.includes('--json')) {
       generated: true
     }));
     expect(Array.isArray(payload.recommendations)).toBe(true);
-    expect(payload.recommendations.some(item => item.includes('kse auto handoff regression --session-id'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('sce auto handoff regression --session-id'))).toBe(true);
     expect(payload.release_evidence).toEqual(expect.objectContaining({
       mode: 'auto-handoff-release-evidence',
       merged: true,
@@ -7286,7 +7286,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'run',
@@ -7332,7 +7332,7 @@ if (process.argv.includes('--json')) {
       const firstProgram = buildProgram();
       await firstProgram.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'run',
@@ -7346,7 +7346,7 @@ if (process.argv.includes('--json')) {
       const secondProgram = buildProgram();
       await secondProgram.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'run',
@@ -7397,7 +7397,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'run',
@@ -7485,7 +7485,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'run',
@@ -7561,7 +7561,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'run',
@@ -7632,7 +7632,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'run',
@@ -7705,7 +7705,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'run',
@@ -7766,7 +7766,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'run',
@@ -7796,7 +7796,7 @@ if (process.argv.includes('--json')) {
     );
     expect(Array.isArray(payload.warnings)).toBe(true);
     expect(payload.warnings.some(item => item.includes('release gate preflight is blocked'))).toBe(true);
-    expect(payload.recommendations.some(item => item.includes('kse auto handoff evidence --window 5 --json'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('sce auto handoff evidence --window 5 --json'))).toBe(true);
     expect(await fs.pathExists(queueFile)).toBe(false);
     expect(runAutoCloseLoop).not.toHaveBeenCalled();
     expect(await fs.pathExists(payload.output_file)).toBe(true);
@@ -7851,7 +7851,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'run',
@@ -7872,7 +7872,7 @@ if (process.argv.includes('--json')) {
       available: true,
       blocked: true
     }));
-    expect(payload.recommendations.some(item => item.includes('kse auto handoff evidence --window 5 --json'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('sce auto handoff evidence --window 5 --json'))).toBe(true);
     expect(runAutoCloseLoop).not.toHaveBeenCalled();
   });
 
@@ -7902,7 +7902,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'run',
@@ -7964,7 +7964,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'run',
@@ -7990,7 +7990,7 @@ if (process.argv.includes('--json')) {
       expect.stringContaining('release_gate_preflight')
     ]));
     expect(payload.recommendations.some(item => item.includes('Ensure manifest ontology_validation is present and passed'))).toBe(true);
-    expect(payload.recommendations.some(item => item.includes('kse auto handoff evidence --window 5 --json'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('sce auto handoff evidence --window 5 --json'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('--continue-from'))).toBe(false);
     expect(runAutoCloseLoop).not.toHaveBeenCalled();
   });
@@ -8015,7 +8015,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'run',
@@ -8049,7 +8049,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'run',
@@ -8084,7 +8084,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'run',
@@ -8128,7 +8128,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'run',
@@ -8174,7 +8174,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'run',
@@ -8222,7 +8222,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'run',
@@ -8255,7 +8255,7 @@ if (process.argv.includes('--json')) {
     expect(await fs.pathExists(payload.remediation_queue.file)).toBe(true);
     const queueContent = await fs.readFile(payload.remediation_queue.file, 'utf8');
     expect(queueContent).toContain('order-fulfillment');
-    expect(payload.recommendations.some(item => item.includes('kse auto close-loop-batch'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('sce auto close-loop-batch'))).toBe(true);
     expect(runAutoCloseLoop).not.toHaveBeenCalled();
   });
 
@@ -8287,7 +8287,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'run',
@@ -8346,7 +8346,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'run',
@@ -8393,7 +8393,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'run',
@@ -8438,7 +8438,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'run',
@@ -8498,7 +8498,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'run',
@@ -8535,7 +8535,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'run',
@@ -8554,7 +8554,7 @@ if (process.argv.includes('--json')) {
     await expect(
       secondProgram.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'run',
@@ -8585,7 +8585,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'run',
@@ -8645,7 +8645,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'regression',
@@ -8725,7 +8725,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'regression',
@@ -8812,7 +8812,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'regression',
@@ -8884,7 +8884,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'regression',
@@ -8940,7 +8940,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'regression',
@@ -8953,7 +8953,7 @@ if (process.argv.includes('--json')) {
     expect(payload.mode).toBe('auto-handoff-regression');
     expect(payload.trend).toBe('degraded');
     expect(payload.recommendations.some(item => item.includes('--continue-from handoff-bad'))).toBe(true);
-    expect(payload.recommendations).toContain('kse auto governance stats --days 14 --json');
+    expect(payload.recommendations).toContain('sce auto governance stats --days 14 --json');
   });
 
   test('supports handoff regression out file option', async () => {
@@ -8989,7 +8989,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'regression',
@@ -9040,7 +9040,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'regression',
@@ -9087,7 +9087,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'regression',
@@ -9214,7 +9214,7 @@ if (process.argv.includes('--json')) {
               },
               failed_templates: {
                 newly_failed: [],
-                recovered: ['kse.scene--legacy-order--0.1.0']
+                recovered: ['sce.scene--legacy-order--0.1.0']
               }
             },
             output: {
@@ -9249,7 +9249,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'evidence',
@@ -9362,7 +9362,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'evidence',
@@ -9431,7 +9431,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'evidence',
@@ -9510,7 +9510,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'evidence',
@@ -9645,7 +9645,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'gate-index',
@@ -9732,7 +9732,7 @@ if (process.argv.includes('--json')) {
     const program = buildProgram();
     await program.parseAsync([
       'node',
-      'kse',
+      'sce',
       'auto',
       'handoff',
       'gate-index',
@@ -9776,7 +9776,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'gate-index',
@@ -9830,7 +9830,7 @@ if (process.argv.includes('--json')) {
     await expect(
       program.parseAsync([
         'node',
-        'kse',
+        'sce',
         'auto',
         'handoff',
         'evidence',

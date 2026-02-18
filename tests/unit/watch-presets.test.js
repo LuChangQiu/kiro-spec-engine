@@ -80,7 +80,7 @@ describe('Watch Presets', () => {
       
       expect(merged.patterns).toContain('**/tasks.md');
       expect(merged.actions['**/tasks.md']).toBeDefined();
-      expect(merged.actions['**/tasks.md'].command).toBe('kse workspace sync');
+      expect(merged.actions['**/tasks.md'].command).toBe('sce workspace sync');
     });
     
     it('should not overwrite existing actions', () => {

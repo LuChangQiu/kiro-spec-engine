@@ -16,7 +16,7 @@ describe('BackupManager', () => {
 
   beforeEach(async () => {
     // Create temporary test directory
-    testProjectPath = path.join(os.tmpdir(), `kse-test-${Date.now()}`);
+    testProjectPath = path.join(os.tmpdir(), `sce-test-${Date.now()}`);
     await fs.ensureDir(testProjectPath);
     await fs.ensureDir(path.join(testProjectPath, '.kiro'));
 

@@ -1,6 +1,6 @@
-# Using kse with Cursor
+# Using sce with Cursor
 
-> Complete guide to integrating kse with Cursor IDE for AI-assisted development
+> Complete guide to integrating sce with Cursor IDE for AI-assisted development
 
 ---
 
@@ -16,9 +16,9 @@
 
 **Cursor** is an AI-powered IDE built on VS Code that provides intelligent code completion, chat-based coding, and AI pair programming through Composer mode.
 
-**kse integration with Cursor** uses the **Manual Export** mode, where you export Spec context and provide it to Cursor's AI features (Chat, Composer, or inline suggestions).
+**sce integration with Cursor** uses the **Manual Export** mode, where you export Spec context and provide it to Cursor's AI features (Chat, Composer, or inline suggestions).
 
-### Why Use kse with Cursor?
+### Why Use sce with Cursor?
 
 - ✅ **Structured context** - Cursor understands your requirements and design
 - ✅ **Better code generation** - AI follows your architecture decisions
@@ -32,8 +32,8 @@
 **Mode:** Manual Export
 
 **How it works:**
-1. You create Specs in kse (requirements, design, tasks)
-2. You export context using `kse context export`
+1. You create Specs in sce (requirements, design, tasks)
+2. You export context using `sce context export`
 3. You provide context to Cursor (Chat, Composer, or .cursorrules)
 4. Cursor generates code based on your Spec
 5. You update task status in tasks.md
@@ -45,17 +45,17 @@
 ### Prerequisites
 
 - **Cursor IDE** installed ([Download](https://cursor.sh/))
-- **kse** installed globally (`npm install -g kiro-spec-engine`)
-- **Project adopted** by kse (`kse adopt`)
+- **sce** installed globally (`npm install -g scene-capability-engine`)
+- **Project adopted** by sce (`sce adopt`)
 
-### Step 1: Configure Cursor for kse
+### Step 1: Configure Cursor for sce
 
 Create a `.cursorrules` file in your project root:
 
 ```markdown
 # Project Rules
 
-This project uses kse (Kiro Spec Engine) for spec-driven development.
+This project uses sce (Scene Capability Engine) for spec-driven development.
 
 ## Spec Location
 All Specs are in `.kiro/specs/` directory.
@@ -87,10 +87,10 @@ Add to your `~/.bashrc` or `~/.zshrc`:
 
 ```bash
 # Quick export and copy to clipboard
-alias kse-clip='kse context export $1 && cat .kiro/specs/$1/context-export.md | pbcopy && echo "✅ Context copied to clipboard"'
+alias sce-clip='sce context export $1 && cat .kiro/specs/$1/context-export.md | pbcopy && echo "✅ Context copied to clipboard"'
 
 # Generate task-specific prompt
-alias kse-task='kse prompt generate $1 $2 --tool=cursor'
+alias sce-task='sce prompt generate $1 $2 --tool=cursor'
 ```
 
 Reload your shell:
@@ -108,7 +108,7 @@ source ~/.bashrc  # or source ~/.zshrc
 
 **Step 1: Export context**
 ```bash
-kse context export 01-00-user-login
+sce context export 01-00-user-login
 ```
 
 **Step 2: Copy context**
@@ -120,7 +120,7 @@ cat .kiro/specs/01-00-user-login/context-export.md | pbcopy
 type .kiro\specs\01-00-user-login\context-export.md | clip
 
 # Or use alias
-kse-clip 01-00-user-login
+sce-clip 01-00-user-login
 ```
 
 **Step 3: Open Cursor Composer**
@@ -156,7 +156,7 @@ Edit `.kiro/specs/01-00-user-login/tasks.md`:
 
 **Step 1: Generate task-specific prompt**
 ```bash
-kse prompt generate 01-00-user-login 1.1 --tool=cursor
+sce prompt generate 01-00-user-login 1.1 --tool=cursor
 ```
 
 **Step 2: Open Cursor Chat**
@@ -213,13 +213,13 @@ class AuthController {
 
 **1. Create and write Spec**
 ```bash
-kse spec bootstrap --name 01-00-user-login --non-interactive
+sce spec bootstrap --name 01-00-user-login --non-interactive
 # Edit requirements.md, design.md, tasks.md
 ```
 
 **2. Export context**
 ```bash
-kse-clip 01-00-user-login
+sce-clip 01-00-user-login
 ```
 
 **3. Open Cursor Composer (Cmd+K)**
@@ -366,10 +366,10 @@ Implement task 1.3: Add authentication logic
 **Re-export after Spec changes:**
 ```bash
 # After editing design.md
-kse context export 01-00-user-login
+sce context export 01-00-user-login
 
 # Copy new context
-kse-clip 01-00-user-login
+sce-clip 01-00-user-login
 
 # Provide to Cursor again
 ```
@@ -379,7 +379,7 @@ kse-clip 01-00-user-login
 **For large Specs (>5KB context):**
 ```bash
 # Instead of exporting entire Spec
-kse prompt generate 01-00-user-login 1.1 --tool=cursor
+sce prompt generate 01-00-user-login 1.1 --tool=cursor
 
 # Generates focused prompt for just task 1.1
 ```
@@ -458,7 +458,7 @@ Please implement exactly as specified.
 
 **Solution:** Use task-specific prompts
 ```bash
-kse prompt generate 01-00-user-login 1.1 --tool=cursor --max-length=5000
+sce prompt generate 01-00-user-login 1.1 --tool=cursor --max-length=5000
 ```
 
 ### Issue: Cursor suggests wrong file locations
@@ -576,7 +576,7 @@ Please fix the implementation."
 
 ```bash
 # Export context for reviewer
-kse context export 01-00-user-login
+sce context export 01-00-user-login
 
 # Share context-export.md with reviewer
 # Reviewer can see requirements and design
@@ -662,18 +662,18 @@ Please help debug and fix the issue.
 
 ## Related Documentation
 
-- **[Quick Start Guide](../quick-start.md)** - Get started with kse
+- **[Quick Start Guide](../quick-start.md)** - Get started with sce
 - **[Integration Modes](../integration-modes.md)** - Understanding integration modes
 - **[Spec Workflow](../spec-workflow.md)** - Creating effective Specs
-- **[Command Reference](../command-reference.md)** - All kse commands
+- **[Command Reference](../command-reference.md)** - All sce commands
 
 ---
 
 ## Summary
 
-**Cursor + kse workflow:**
-1. Create Spec in kse (requirements, design, tasks)
-2. Export context: `kse context export spec-name`
+**Cursor + sce workflow:**
+1. Create Spec in sce (requirements, design, tasks)
+2. Export context: `sce context export spec-name`
 3. Use Cursor Composer (Cmd+K) or Chat (Cmd+L)
 4. Provide context and implement tasks
 5. Update tasks.md as you complete tasks
@@ -691,11 +691,11 @@ Please help debug and fix the issue.
 - Re-export context after Spec changes
 - Review all AI suggestions
 
-**Start using kse with Cursor:** 🚀
+**Start using sce with Cursor:** 🚀
 ```bash
-kse adopt
-kse spec bootstrap --name 01-00-my-feature --non-interactive
-kse context export 01-00-my-feature
+sce adopt
+sce spec bootstrap --name 01-00-my-feature --non-interactive
+sce context export 01-00-my-feature
 # Open Cursor Composer (Cmd+K) and paste context
 ```
 

@@ -14,6 +14,14 @@ const LEGACY_PATTERNS = [
     regex: /\bkse-spec-templates\b/gi
   },
   {
+    label: 'legacy product naming',
+    regex: /\bKiro Spec Engine\b/gi
+  },
+  {
+    label: 'legacy Kiro IDE wording',
+    regex: /\bKiro IDE\b/gi
+  },
+  {
     label: 'legacy English product name',
     regex: /\bScene Capability Orchestrator\b/gi
   },

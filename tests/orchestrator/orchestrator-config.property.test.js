@@ -52,7 +52,7 @@ let tempCounter = 0;
 function createTempDir() {
   const dir = path.join(
     os.tmpdir(),
-    `kse-pbt-oc-${Date.now()}-${++tempCounter}-${Math.random().toString(36).substr(2, 6)}`
+    `sce-pbt-oc-${Date.now()}-${++tempCounter}-${Math.random().toString(36).substr(2, 6)}`
   );
   fs.mkdirSync(dir, { recursive: true });
   return dir;

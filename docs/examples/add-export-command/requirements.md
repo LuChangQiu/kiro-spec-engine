@@ -12,7 +12,7 @@
 
 ## Overview
 
-This Spec demonstrates how to add a new CLI command to kse. We'll implement `kse export` command that exports Spec data in various formats (JSON, Markdown, HTML).
+This Spec demonstrates how to add a new CLI command to sce. We'll implement `sce export` command that exports Spec data in various formats (JSON, Markdown, HTML).
 
 **Learning Points:**
 - CLI command structure
@@ -31,7 +31,7 @@ This Spec demonstrates how to add a new CLI command to kse. We'll implement `kse
 **So that** I can process it programmatically
 
 **Acceptance Criteria:**
-- WHEN I run `kse export 01-00-feature --format json` THEN I get a JSON file
+- WHEN I run `sce export 01-00-feature --format json` THEN I get a JSON file
 - WHEN export succeeds THEN I see success message with file path
 - WHEN Spec doesn't exist THEN I see error message
 
@@ -41,7 +41,7 @@ This Spec demonstrates how to add a new CLI command to kse. We'll implement `kse
 **So that** I can share it easily
 
 **Acceptance Criteria:**
-- WHEN I run `kse export 01-00-feature --format md` THEN I get a Markdown file
+- WHEN I run `sce export 01-00-feature --format md` THEN I get a Markdown file
 - WHEN I don't specify format THEN Markdown is default
 - WHEN export succeeds THEN file contains all three Spec documents
 
@@ -51,7 +51,7 @@ This Spec demonstrates how to add a new CLI command to kse. We'll implement `kse
 **So that** I can view it in a browser
 
 **Acceptance Criteria:**
-- WHEN I run `kse export 01-00-feature --format html` THEN I get an HTML file
+- WHEN I run `sce export 01-00-feature --format html` THEN I get an HTML file
 - WHEN I open HTML THEN it has proper styling
 - WHEN HTML includes code blocks THEN they have syntax highlighting
 
@@ -61,7 +61,7 @@ This Spec demonstrates how to add a new CLI command to kse. We'll implement `kse
 
 ### FR-1: Command Interface
 ```bash
-kse export <spec-name> [options]
+sce export <spec-name> [options]
 
 Options:
   --format, -f    Output format (json|md|html) [default: md]

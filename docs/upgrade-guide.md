@@ -1,6 +1,6 @@
 # Project Upgrade Guide
 
-This guide explains how to upgrade your Kiro Spec Engine (KSE) project to newer versions.
+This guide explains how to upgrade your Scene Capability Engine (sce) project to newer versions.
 
 ## Table of Contents
 
@@ -15,7 +15,7 @@ This guide explains how to upgrade your Kiro Spec Engine (KSE) project to newer 
 
 ## Overview
 
-The `kse upgrade` command safely upgrades your project to newer KSE versions. It handles version gaps, runs migration scripts, and preserves all your content.
+The `sce upgrade` command safely upgrades your project to newer sce versions. It handles version gaps, runs migration scripts, and preserves all your content.
 
 **Key Features**:
 - ✅ Automatic version gap detection
@@ -33,37 +33,37 @@ The `kse upgrade` command safely upgrades your project to newer KSE versions. It
 
 ```bash
 # Check project version
-kse version-info
+sce version-info
 
 # Output:
 # 📦 Version Information
 # 
 # Project:
-#   kse version: 1.0.0
+#   sce version: 1.0.0
 #   Template version: 1.0.0
 #   Created: 2026-01-20 10:00:00
 #   Last upgraded: 2026-01-20 10:00:00
 # 
 # Installed:
-#   kse version: 1.2.1
+#   sce version: 1.2.1
 # 
 # ⚠️  Upgrade available
-#   Run kse upgrade to update to v1.2.1
+#   Run sce upgrade to update to v1.2.1
 ```
 
 ### Check for Version Mismatch
 
-KSE automatically warns you when versions don't match:
+sce automatically warns you when versions don't match:
 
 ```bash
-kse status
+sce status
 
 # Output:
 # ⚠️  Version Mismatch Detected
-#   Project initialized with kse v1.0.0
-#   Current kse version: v1.2.1
+#   Project initialized with sce v1.0.0
+#   Current sce version: v1.2.1
 # 
-# 💡 Tip: Run kse upgrade to update project templates
+# 💡 Tip: Run sce upgrade to update project templates
 #   Or use --no-version-check to suppress this warning
 ```
 
@@ -72,7 +72,7 @@ kse status
 1. **Commit your changes** (if using version control):
    ```bash
    git add -A
-   git commit -m "Before KSE upgrade"
+   git commit -m "Before sce upgrade"
    ```
 
 2. **Ensure no pending work**:
@@ -91,7 +91,7 @@ kse status
 
 1. **Run the upgrade command**:
    ```bash
-   kse upgrade
+   sce upgrade
    ```
 
 2. **Review the upgrade plan**:
@@ -148,7 +148,7 @@ kse status
         - No migration script needed
    
    📦 Backup: upgrade-2026-01-23-110000
-     Run kse rollback if you encounter issues
+     Run sce rollback if you encounter issues
    
    🔥 Upgrade complete!
    ```
@@ -158,7 +158,7 @@ kse status
 Preview the upgrade plan without making changes:
 
 ```bash
-kse upgrade --dry-run
+sce upgrade --dry-run
 ```
 
 **Output**:
@@ -178,7 +178,7 @@ Migrations that would be executed:
 Skip all confirmations:
 
 ```bash
-kse upgrade --auto
+sce upgrade --auto
 ```
 
 **Use cases**:
@@ -191,7 +191,7 @@ kse upgrade --auto
 Target a specific version instead of latest:
 
 ```bash
-kse upgrade --to 1.2.0
+sce upgrade --to 1.2.0
 ```
 
 ---
@@ -204,7 +204,7 @@ kse upgrade --to 1.2.0
 
 **Command**:
 ```bash
-kse upgrade
+sce upgrade
 ```
 
 **What happens**:
@@ -220,7 +220,7 @@ kse upgrade
 
 **Command**:
 ```bash
-kse upgrade
+sce upgrade
 ```
 
 **What happens**:
@@ -241,7 +241,7 @@ kse upgrade
 
 **Command**:
 ```bash
-kse upgrade
+sce upgrade
 ```
 
 **What happens**:
@@ -274,7 +274,7 @@ Proceed with upgrade? (Y/n)
 
 **Command**:
 ```bash
-kse upgrade
+sce upgrade
 ```
 
 **Output**:
@@ -302,16 +302,16 @@ kse upgrade
   Migration 1.1.0 → 1.2.0 failed: File not found
 
 📦 Backup available: upgrade-2026-01-23-110000
-  Run kse rollback to restore
+  Run sce rollback to restore
 ```
 
 **Solution**:
 ```bash
 # Rollback to previous state
-kse rollback
+sce rollback
 
 # Check what went wrong
-kse doctor
+sce doctor
 
 # Try again or report issue
 ```
@@ -368,7 +368,7 @@ Check what a migration will do:
 
 ```bash
 # Dry run shows migration details
-kse upgrade --dry-run
+sce upgrade --dry-run
 ```
 
 ---
@@ -377,12 +377,12 @@ kse upgrade --dry-run
 
 ### Problem: "No version.json found"
 
-**Cause**: Project not initialized with KSE
+**Cause**: Project not initialized with sce
 
 **Solution**:
 ```bash
 # Use adopt instead of upgrade
-kse adopt
+sce adopt
 ```
 
 ---
@@ -394,11 +394,11 @@ kse adopt
 **Solution**:
 ```bash
 # Check current version
-kse version-info
+sce version-info
 
 # Upgrade only works forward
 # To go back, use rollback:
-kse rollback
+sce rollback
 ```
 
 ---
@@ -416,7 +416,7 @@ kse rollback
 
 **Step 2**: Rollback
 ```bash
-kse rollback
+sce rollback
 ```
 
 **Step 3**: Report the issue
@@ -460,7 +460,7 @@ ls .kiro/backups/
 rm -rf .kiro/backups/old-backup-id
 
 # Try upgrade again
-kse upgrade
+sce upgrade
 ```
 
 ---
@@ -473,7 +473,7 @@ kse upgrade
 
 **Temporary**:
 ```bash
-kse status --no-version-check
+sce status --no-version-check
 ```
 
 **Permanent** (not recommended):
@@ -491,10 +491,10 @@ export KIRO_NO_VERSION_CHECK=1
 Don't fall too far behind:
 ```bash
 # Check for updates monthly
-kse version-info
+sce version-info
 
 # Upgrade when available
-kse upgrade
+sce upgrade
 ```
 
 ### 2. Test After Upgrade
@@ -502,13 +502,13 @@ kse upgrade
 Verify everything works:
 ```bash
 # Check status
-kse status
+sce status
 
 # Run doctor
-kse doctor
+sce doctor
 
 # Test your specs
-kse enhance requirements .kiro/specs/your-spec/requirements.md
+sce enhance requirements .kiro/specs/your-spec/requirements.md
 ```
 
 ### 3. Keep Upgrade History
@@ -522,7 +522,7 @@ ls -lt .kiro/backups/ | head -6
 ### 4. Read Release Notes
 
 Check what changed:
-- See CHANGELOG.md in KSE repository
+- See CHANGELOG.md in sce repository
 - Review breaking changes
 - Understand new features
 
@@ -531,8 +531,8 @@ Check what changed:
 For large version gaps:
 ```bash
 # Instead of 1.0.0 → 2.0.0 directly
-# Let KSE handle incremental upgrades
-kse upgrade  # Automatically: 1.0.0 → 1.1.0 → 1.2.0 → 2.0.0
+# Let sce handle incremental upgrades
+sce upgrade  # Automatically: 1.0.0 → 1.1.0 → 1.2.0 → 2.0.0
 ```
 
 ---
@@ -551,8 +551,8 @@ kse upgrade  # Automatically: 1.0.0 → 1.1.0 → 1.2.0 → 2.0.0
 ### Checking Compatibility
 
 ```bash
-# KSE automatically checks compatibility
-kse upgrade
+# sce automatically checks compatibility
+sce upgrade
 
 # If incompatible, you'll see:
 # ❌ Error: Incompatible versions
@@ -570,7 +570,7 @@ If upgrade fails or causes issues:
 
 ```bash
 # List backups
-kse rollback
+sce rollback
 
 # Select the upgrade backup
 # Restore to previous state
@@ -599,14 +599,14 @@ After successful upgrade:
 
 1. **Verify the upgrade**:
    ```bash
-   kse version-info
-   kse status
+   sce version-info
+   sce status
    ```
 
 2. **Check .gitignore configuration**:
    The upgrade process automatically checks and fixes your `.gitignore` for team collaboration. If you see a warning about .gitignore, you can manually fix it:
    ```bash
-   kse doctor --fix-gitignore
+   sce doctor --fix-gitignore
    ```
    Learn more: [Team Collaboration Guide](./team-collaboration-guide.md)
 
@@ -630,9 +630,9 @@ After successful upgrade:
 
 - **Documentation**: Check README.md
 - **Issues**: https://github.com/heguangyong/scene-capability-engine/issues
-- **Version Info**: `kse version-info`
-- **System Check**: `kse doctor`
-- **Rollback**: `kse rollback`
+- **Version Info**: `sce version-info`
+- **System Check**: `sce doctor`
+- **Rollback**: `sce rollback`
 
 ---
 

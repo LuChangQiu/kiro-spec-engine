@@ -4,7 +4,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 
 function runCli(args, options = {}) {
-  const binPath = path.join(__dirname, '..', '..', 'bin', 'kiro-spec-engine.js');
+  const binPath = path.join(__dirname, '..', '..', 'bin', 'scene-capability-engine.js');
   const cwd = options.cwd || process.cwd();
   const timeoutMs = options.timeoutMs || 60000;
   const nodeArgs = Array.isArray(options.nodeArgs) ? options.nodeArgs : [];
@@ -69,7 +69,7 @@ describe('auto close-loop CLI integration', () => {
   let originalCwd;
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-auto-close-loop-cli-'));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-auto-close-loop-cli-'));
     originalCwd = process.cwd();
     process.chdir(tempDir);
   });
@@ -445,7 +445,7 @@ describe('auto close-loop CLI integration', () => {
 
   test('auto-scales to five sub-specs for highly complex goals in dry-run mode', async () => {
     const complexGoal = [
-      'kse should deliver closed-loop automation and master/sub decomposition,',
+      'sce should deliver closed-loop automation and master/sub decomposition,',
       'parallel orchestration runtime and scheduler resilience,',
       'quality gate with observability KPI plus test evidence,',
       'and documentation rollout with migration and operator enablement.'
@@ -506,7 +506,7 @@ describe('auto close-loop CLI integration', () => {
       'auto',
       'close-loop-batch',
       '--decompose-goal',
-      'kse should deliver autonomous close-loop progression, master/sub decomposition, parallel orchestration, quality gate and observability rollout',
+      'sce should deliver autonomous close-loop progression, master/sub decomposition, parallel orchestration, quality gate and observability rollout',
       '--program-goals',
       '3',
       '--dry-run',
@@ -530,7 +530,7 @@ describe('auto close-loop CLI integration', () => {
     const run = await runCli([
       'auto',
       'close-loop-program',
-      'kse should deliver autonomous close-loop progression, master/sub decomposition, parallel orchestration, quality gate and observability rollout',
+      'sce should deliver autonomous close-loop progression, master/sub decomposition, parallel orchestration, quality gate and observability rollout',
       '--program-goals',
       '3',
       '--dry-run',
@@ -579,7 +579,7 @@ describe('auto close-loop CLI integration', () => {
     const run = await runCli([
       'auto',
       'close-loop-program',
-      'kse should deliver autonomous close-loop progression, master/sub decomposition and quality rollout',
+      'sce should deliver autonomous close-loop progression, master/sub decomposition and quality rollout',
       '--program-goals',
       '2',
       '--program-gate-profile',
@@ -603,7 +603,7 @@ describe('auto close-loop CLI integration', () => {
     const run = await runCli([
       'auto',
       'close-loop-program',
-      'kse should deliver autonomous close-loop progression, master/sub decomposition and quality rollout',
+      'sce should deliver autonomous close-loop progression, master/sub decomposition and quality rollout',
       '--program-goals',
       '2',
       '--batch-agent-budget',
@@ -631,7 +631,7 @@ describe('auto close-loop CLI integration', () => {
     const run = await runCli([
       'auto',
       'close-loop-program',
-      'kse should deliver autonomous close-loop progression, master/sub decomposition and quality rollout',
+      'sce should deliver autonomous close-loop progression, master/sub decomposition and quality rollout',
       '--program-goals',
       '2',
       '--batch-agent-budget',
@@ -665,7 +665,7 @@ describe('auto close-loop CLI integration', () => {
     const run = await runCli([
       'auto',
       'close-loop-program',
-      'kse should deliver autonomous close-loop progression, master/sub decomposition and quality rollout',
+      'sce should deliver autonomous close-loop progression, master/sub decomposition and quality rollout',
       '--program-goals',
       '2',
       '--batch-retry-rounds',
@@ -851,7 +851,7 @@ describe('auto close-loop CLI integration', () => {
     const run = await runCli([
       'auto',
       'close-loop-program',
-      'kse should deliver autonomous close-loop progression, master/sub decomposition and quality rollout',
+      'sce should deliver autonomous close-loop progression, master/sub decomposition and quality rollout',
       '--program-goals',
       '2',
       '--program-gate-profile',
@@ -877,7 +877,7 @@ describe('auto close-loop CLI integration', () => {
     const run = await runCli([
       'auto',
       'close-loop-program',
-      'kse should deliver autonomous close-loop progression, master/sub decomposition and quality rollout',
+      'sce should deliver autonomous close-loop progression, master/sub decomposition and quality rollout',
       '--program-goals',
       '2',
       '--program-gate-profile',
@@ -955,7 +955,7 @@ describe('auto close-loop CLI integration', () => {
     const run = await runCli([
       'auto',
       'close-loop-program',
-      'kse should deliver autonomous close-loop progression, master/sub decomposition, parallel orchestration and quality gate rollout',
+      'sce should deliver autonomous close-loop progression, master/sub decomposition, parallel orchestration and quality gate rollout',
       '--program-goals',
       '2',
       '--program-kpi-out',
@@ -984,7 +984,7 @@ describe('auto close-loop CLI integration', () => {
     const run = await runCli([
       'auto',
       'close-loop-program',
-      'kse should deliver autonomous close-loop progression and master/sub orchestration',
+      'sce should deliver autonomous close-loop progression and master/sub orchestration',
       '--program-goals',
       '2',
       '--program-audit-out',

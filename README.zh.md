@@ -4,8 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 > **⚠️ 重要说明**: `scene-capability-engine`（`sce`）是一个 **npm 包和 CLI 工具**，用于 Spec 驱动开发。  
-> 它**不是** Kiro IDE 桌面应用程序。如果你在寻找 Kiro IDE，请访问 https://kiro.dev
-> 兼容保留命令：`sco`、`kse` 与 `kiro-spec-engine`。
+> 主命令为 `sce`，兼容别名保留用于迁移。
 
 **AI 编码工具的上下文提供者** - 结构化你的项目需求、设计和任务，让 AI 助手帮你构建更好的软件。
 
@@ -59,7 +58,7 @@ graph LR
 | 队列驱动自治执行 | `auto close-loop-controller` 持续消费目标队列 | 程序级积压目标无需人工反复触发 |
 | 自治收敛治理 | Program Gate（最小成功率 + 最大风险）+ 审计 JSON 导出 | 完成结果可按策略验收且全程可追溯 |
 | 结果可量化 | KPI 自动化（`value metrics snapshot/baseline/trend`） | 周度趋势可追踪、可审计 |
-| 工具无锁定 | 兼容 Claude/Cursor/Windsurf/Copilot/Kiro | 团队可保留现有 AI 工具链 |
+| 工具无锁定 | 兼容 Claude/Cursor/Windsurf/Copilot | 团队可保留现有 AI 工具链 |
 | 治理内建 | 文档治理、锁机制、审计、环境/工作区管理 | 协作更稳定，过程可回放 |
 
 ### 90 秒价值验证
@@ -132,7 +131,7 @@ sce adopt
 
 #### 步骤 3：告诉 AI 项目的开发方法（30 秒）
 
-**在你的 AI 工具中（Cursor、Claude、Windsurf、Kiro 等），说：**
+**在你的 AI 工具中（Cursor、Claude、Windsurf 等），说：**
 
 ```
 请阅读 .kiro/README.md 了解项目的开发方法。
@@ -199,7 +198,7 @@ sce adopt
 
 sce 支持三种与 AI 工具协作的方式：
 
-1. **原生集成** - AI 工具直接访问 sce（Kiro IDE）
+1. **工作区直连集成** - AI 工具直接在你的工作区访问 sce
 2. **手动导出** - 你导出并粘贴上下文（Claude、ChatGPT、Cursor）
 3. **Watch 模式** - 文件更改时自动更新上下文（所有工具）
 
@@ -216,7 +215,6 @@ sce 适用于任何 AI 编码助手。选择你的工具获取具体指导：
 - **[Cursor](docs/zh/tools/cursor-guide.md)** - 带 AI 结对编程的 IDE
 - **[Claude Code](docs/zh/tools/claude-guide.md)** - Anthropic 的编码助手
 - **[Windsurf](docs/zh/tools/windsurf-guide.md)** - 支持命令执行的 AI 代理
-- **[Kiro](docs/zh/tools/kiro-guide.md)** - 原生集成，无需手动导出
 - **[VS Code + Copilot](docs/zh/tools/vscode-guide.md)** - GitHub Copilot 集成
 - **[通用 AI 工具](docs/zh/tools/generic-guide.md)** - 适用于任何 AI 助手
 
@@ -260,7 +258,6 @@ sequenceDiagram
 - [Cursor 集成](docs/zh/tools/cursor-guide.md)
 - [Claude Code 集成](docs/zh/tools/claude-guide.md)
 - [Windsurf 集成](docs/zh/tools/windsurf-guide.md)
-- [Kiro 集成](docs/zh/tools/kiro-guide.md)
 - [VS Code + Copilot 集成](docs/zh/tools/vscode-guide.md)
 - [通用 AI 工具](docs/zh/tools/generic-guide.md)
 
@@ -320,7 +317,7 @@ sequenceDiagram
 - **跨平台**：在 Windows、Linux 和 macOS 上无缝工作
 
 ### Moqui ERP 集成 🚀 v1.39.0 新增
-- **Moqui ERP 适配器**: 将 KSE 场景运行时连接到 Moqui ERP 实例
+- **Moqui ERP 适配器**: 将 sce 场景运行时连接到 Moqui ERP 实例
   - `MoquiClient` — 支持 JWT 认证生命周期（登录、刷新、重登录、登出）和重试逻辑的 HTTP 客户端
   - `MoquiAdapter` — 处理 `spec.erp.*` 和 `moqui.*` 引用的绑定处理器，支持实体 CRUD、服务调用、屏幕发现
 - **场景模板提取器**（v1.40.0）: 分析 Moqui 资源，识别业务模式，生成可复用场景模板
@@ -592,7 +589,7 @@ sce workflows                      # 列出可用工作流
 
 ```bash
 git clone https://github.com/heguangyong/scene-capability-engine.git
-cd kiro-spec-engine
+cd scene-capability-engine
 npm install
 npm link  # 用于本地开发
 npm test  # 运行测试
@@ -609,7 +606,7 @@ MIT 许可证 - 详见 [LICENSE](LICENSE) 文件。
 ## 致谢
 
 - 受 **西西弗斯** 神话和高贵奋斗概念的启发
-- 建立在 **Kiro** Spec 驱动开发的基础上
+- 建立在务实的 **Spec 驱动开发** 方法论基础上
 - 受 **oh-my-opencode** 和 Ultrawork 宣言的影响
 
 ---

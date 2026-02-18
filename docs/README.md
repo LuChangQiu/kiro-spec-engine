@@ -1,6 +1,6 @@
-# kse Documentation Index
+# sce Documentation Index
 
-> Complete guide to kse (Kiro Spec Engine)
+> Complete guide to sce (Scene Capability Engine)
 
 ---
 
@@ -11,30 +11,30 @@
 
 ## 🚀 Getting Started
 
-**New to kse?** Start here:
+**New to sce?** Start here:
 
 - **[Quick Start Guide](quick-start.md)** - Get up and running in 5 minutes
 - **[FAQ](faq.md)** - Frequently asked questions
 - **[Troubleshooting](troubleshooting.md)** - Common issues and solutions
 
-## ⭐ Why Teams Choose kse
+## ⭐ Why Teams Choose sce
 
 - **Structured AI delivery**: Specs enforce Requirements → Design → Tasks before implementation.
 - **Parallel execution at scale**: Orchestrate multiple Specs with dependency-aware scheduling.
-- **Dual-track handoff closure**: `kse auto handoff run` executes plan/queue/batch/observability in one closed loop, supports `--continue-from` resume, and emits executable follow-up recommendations.
+- **Dual-track handoff closure**: `sce auto handoff run` executes plan/queue/batch/observability in one closed loop, supports `--continue-from` resume, and emits executable follow-up recommendations.
 - **Measurable outcomes**: KPI snapshot/baseline/trend commands make delivery quality auditable.
-- **Tool-agnostic workflow**: Works across Claude, Cursor, Windsurf, Copilot, and Kiro.
+- **Tool-agnostic workflow**: Works across Claude, Cursor, Windsurf, Copilot, and SCE.
 - **Built-in governance**: Locks, document governance, environment/workspace controls, and audit trails.
 
 ---
 
 ## 📖 Core Concepts
 
-Understand how kse works:
+Understand how sce works:
 
 - **[Spec Workflow](spec-workflow.md)** - Understanding the Spec-driven development process
-- **[Integration Modes](integration-modes.md)** - Three ways to integrate kse with AI tools
-- **[Command Reference](command-reference.md)** - Complete list of all kse commands
+- **[Integration Modes](integration-modes.md)** - Three ways to integrate sce with AI tools
+- **[Command Reference](command-reference.md)** - Complete list of all sce commands
 
 ---
 
@@ -43,18 +43,18 @@ Understand how kse works:
 Choose your AI tool and learn how to integrate:
 
 ### Native Integration
-- **[Kiro IDE Guide](tools/kiro-guide.md)** - Fully automatic integration
+- **[AI IDE Guide](tools/SCE-guide.md)** - Fully automatic integration
 
 ### Manual Export Integration
-- **[Cursor Guide](tools/cursor-guide.md)** - Using kse with Cursor IDE
-- **[Claude Code Guide](tools/claude-guide.md)** - Using kse with Claude Code
-- **[VS Code + Copilot Guide](tools/vscode-guide.md)** - Using kse with VS Code and GitHub Copilot
+- **[Cursor Guide](tools/cursor-guide.md)** - Using sce with Cursor IDE
+- **[Claude Code Guide](tools/claude-guide.md)** - Using sce with Claude Code
+- **[VS Code + Copilot Guide](tools/vscode-guide.md)** - Using sce with VS Code and GitHub Copilot
 
 ### Watch Mode Integration
-- **[Windsurf Guide](tools/windsurf-guide.md)** - Using kse with Windsurf (supports watch mode)
+- **[Windsurf Guide](tools/windsurf-guide.md)** - Using sce with Windsurf (supports watch mode)
 
 ### Universal Integration
-- **[Generic AI Tools Guide](tools/generic-guide.md)** - Using kse with any AI tool
+- **[Generic AI Tools Guide](tools/generic-guide.md)** - Using sce with any AI tool
 
 ---
 
@@ -86,14 +86,14 @@ Learn by example with complete Spec demonstrations:
 
 Detailed technical documentation:
 
-- **[Command Reference](command-reference.md)** - All kse commands with examples
+- **[Command Reference](command-reference.md)** - All sce commands with examples
 - **[Environment Management Guide](environment-management-guide.md)** - Multi-environment configuration management
 - **[Multi-Repository Management Guide](multi-repo-management-guide.md)** - Managing multiple Git repositories
 - **[Value Observability Guide](value-observability-guide.md)** - KPI snapshot, baseline, trend, and gate evidence workflow
 - **[Scene Runtime Guide](scene-runtime-guide.md)** - Scene template engine, quality pipeline, ontology, and Moqui ERP integration
-- **[Moqui Template Core Library Playbook](moqui-template-core-library-playbook.md)** - Default-gated intake flow for absorbing Moqui capabilities into KSE templates
-- **[331-poc Dual-Track Integration Guide](331-poc-dual-track-integration-guide.md)** - Handoff contract and integration playbook between 331-poc and kse
-- **[331-poc Adaptation Roadmap](331-poc-adaptation-roadmap.md)** - Ongoing KSE-side adaptation backlog and rollout phases
+- **[Moqui Template Core Library Playbook](moqui-template-core-library-playbook.md)** - Default-gated intake flow for absorbing Moqui capabilities into sce templates
+- **[331-poc Dual-Track Integration Guide](331-poc-dual-track-integration-guide.md)** - Handoff contract and integration playbook between 331-poc and sce
+- **[331-poc Adaptation Roadmap](331-poc-adaptation-roadmap.md)** - Ongoing sce-side adaptation backlog and rollout phases
 - **[Multi-Agent Coordination Guide](multi-agent-coordination-guide.md)** - Multi-agent parallel coordination for concurrent development
 - **[Troubleshooting](troubleshooting.md)** - Solutions to common problems
 - **[FAQ](faq.md)** - Answers to frequently asked questions
@@ -102,8 +102,8 @@ Detailed technical documentation:
 
 ## 📋 Additional Guides
 
-- **[Adoption Guide](adoption-guide.md)** - Adopting kse in existing projects
-- **[Upgrade Guide](upgrade-guide.md)** - Upgrading kse to newer versions
+- **[Adoption Guide](adoption-guide.md)** - Adopting sce in existing projects
+- **[Upgrade Guide](upgrade-guide.md)** - Upgrading sce to newer versions
 - **[Release Checklist](release-checklist.md)** - Repeatable pre-release verification flow
 - **[Release Archive](releases/README.md)** - Index of release notes and validation reports
 - **[Release Notes v1.46.2](releases/v1.46.2.md)** - Summary of value observability and onboarding improvements
@@ -112,8 +112,8 @@ Detailed technical documentation:
 - **[Multi-Repository Management Guide](multi-repo-management-guide.md)** - Managing multiple Git repositories
 - **[Scene Runtime Guide](scene-runtime-guide.md)** - Scene template engine, quality pipeline, ontology, and Moqui ERP integration
 - **[Multi-Agent Coordination Guide](multi-agent-coordination-guide.md)** - Multi-agent parallel coordination for concurrent development
-- **[Developer Guide](developer-guide.md)** - Contributing to kse development
-- **[Architecture](architecture.md)** - kse system architecture
+- **[Developer Guide](developer-guide.md)** - Contributing to sce development
+- **[Architecture](architecture.md)** - sce system architecture
 
 ---
 
@@ -139,7 +139,7 @@ Detailed technical documentation:
 4. [Troubleshooting](troubleshooting.md) - Solve problems
 
 ### For Advanced Users
-1. [Developer Guide](developer-guide.md) - Contribute to kse
+1. [Developer Guide](developer-guide.md) - Contribute to sce
 2. [Architecture](architecture.md) - Understand internals
 3. [Manual Workflows Guide](manual-workflows-guide.md) - Advanced workflows
 

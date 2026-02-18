@@ -1,6 +1,6 @@
 # Multi-Agent Parallel Coordination Guide
 
-> Enable multiple AI agents to work on the same kse project simultaneously without conflicts.
+> Enable multiple AI agents to work on the same sce project simultaneously without conflicts.
 
 **Version**: 1.44.0  
 **Last Updated**: 2026-02-12
@@ -9,7 +9,7 @@
 
 ## Overview
 
-When multiple AI agent instances (e.g., multiple Kiro IDE windows, Claude Code sessions, or Cursor instances) work on the same project, they can accidentally overwrite each other's changes, claim the same tasks, or corrupt shared files like `tasks.md`.
+When multiple AI agent instances (e.g., multiple AI IDE windows, Claude Code sessions, or Cursor instances) work on the same project, they can accidentally overwrite each other's changes, claim the same tasks, or corrupt shared files like `tasks.md`.
 
 The Multi-Agent Parallel Coordination system solves this with six layers of protection:
 
@@ -56,7 +56,7 @@ Create the configuration file `.kiro/config/multi-agent.json`:
 When an agent starts working, it registers with the AgentRegistry:
 
 ```javascript
-const { AgentRegistry } = require('kiro-spec-engine/lib/collab');
+const { AgentRegistry } = require('scene-capability-engine/lib/collab');
 
 const registry = new AgentRegistry(workspaceRoot);
 const { agentId } = await registry.register();
@@ -67,7 +67,7 @@ const { agentId } = await registry.register();
 ### 3. Lock Tasks Before Working
 
 ```javascript
-const { TaskLockManager } = require('kiro-spec-engine/lib/lock');
+const { TaskLockManager } = require('scene-capability-engine/lib/lock');
 
 const lockManager = new TaskLockManager(workspaceRoot);
 const result = await lockManager.acquireTaskLock('my-spec', '1.1', agentId);
@@ -124,7 +124,7 @@ Manages agent lifecycle with heartbeat-based health monitoring.
 **Storage**: `.kiro/config/agent-registry.json`
 
 ```javascript
-const { AgentRegistry } = require('kiro-spec-engine/lib/collab');
+const { AgentRegistry } = require('scene-capability-engine/lib/collab');
 const registry = new AgentRegistry(workspaceRoot);
 
 // Register a new agent
@@ -157,7 +157,7 @@ File-based mutual exclusion for task ownership.
 **Lock files**: `.kiro/specs/{specName}/locks/{taskId}.lock`
 
 ```javascript
-const { TaskLockManager } = require('kiro-spec-engine/lib/lock');
+const { TaskLockManager } = require('scene-capability-engine/lib/lock');
 const lockManager = new TaskLockManager(workspaceRoot);
 
 // Acquire a task lock
@@ -194,7 +194,7 @@ Concurrent-safe updates to `tasks.md` with conflict detection and retry.
 **File**: `lib/task/task-status-store.js`
 
 ```javascript
-const { TaskStatusStore } = require('kiro-spec-engine/lib/task');
+const { TaskStatusStore } = require('scene-capability-engine/lib/task');
 const store = new TaskStatusStore(workspaceRoot);
 
 // Update task status with file locking
@@ -223,7 +223,7 @@ Write serialization for steering files (`.kiro/steering/*.md`).
 **File**: `lib/lock/steering-file-lock.js`
 
 ```javascript
-const { SteeringFileLock } = require('kiro-spec-engine/lib/lock');
+const { SteeringFileLock } = require('scene-capability-engine/lib/lock');
 const steeringLock = new SteeringFileLock(workspaceRoot);
 
 // Execute callback with lock held
@@ -249,7 +249,7 @@ Git branch isolation per agent for conflict-free parallel development.
 **File**: `lib/collab/merge-coordinator.js`
 
 ```javascript
-const { MergeCoordinator } = require('kiro-spec-engine/lib/collab');
+const { MergeCoordinator } = require('scene-capability-engine/lib/collab');
 const merger = new MergeCoordinator(workspaceRoot);
 
 // Create agent-specific branch
@@ -277,7 +277,7 @@ When `coordinator: true` in config, provides intelligent task assignment based o
 **Log**: `.kiro/config/coordination-log.json`
 
 ```javascript
-const { Coordinator } = require('kiro-spec-engine/lib/collab');
+const { Coordinator } = require('scene-capability-engine/lib/collab');
 const coordinator = new Coordinator(workspaceRoot, depManager, registry, lockManager);
 
 // Get tasks ready to execute (dependencies satisfied, not locked)
@@ -303,7 +303,7 @@ Per-Spec `steering.md` providing independent constraints, notes, and decisions f
 **Storage**: `.kiro/specs/{spec-name}/steering.md`
 
 ```javascript
-const { SpecSteering } = require('kiro-spec-engine/lib/steering');
+const { SpecSteering } = require('scene-capability-engine/lib/steering');
 const specSteering = new SpecSteering(workspaceRoot);
 
 // Create a steering template for a new Spec
@@ -330,7 +330,7 @@ Unified loader that merges all four steering layers (L1-L4) into a single contex
 **File**: `lib/steering/steering-loader.js`
 
 ```javascript
-const { SteeringLoader } = require('kiro-spec-engine/lib/steering');
+const { SteeringLoader } = require('scene-capability-engine/lib/steering');
 const loader = new SteeringLoader(workspaceRoot);
 
 // Load a specific layer
@@ -351,7 +351,7 @@ Multi-agent friendly maintenance of `CURRENT_CONTEXT.md` with structured Spec pr
 **File**: `lib/steering/context-sync-manager.js`
 
 ```javascript
-const { ContextSyncManager } = require('kiro-spec-engine/lib/steering');
+const { ContextSyncManager } = require('scene-capability-engine/lib/steering');
 const syncManager = new ContextSyncManager(workspaceRoot);
 
 // Read current context
@@ -382,7 +382,7 @@ State machine managing Spec lifecycle transitions with auto-completion detection
 Valid transitions: `planned → assigned → in-progress → completed → released`
 
 ```javascript
-const { SpecLifecycleManager } = require('kiro-spec-engine/lib/collab');
+const { SpecLifecycleManager } = require('scene-capability-engine/lib/collab');
 const lifecycle = new SpecLifecycleManager(workspaceRoot);
 
 // Get current Spec status
@@ -407,7 +407,7 @@ Ensures agents synchronize state before switching between Specs.
 **File**: `lib/collab/sync-barrier.js`
 
 ```javascript
-const { SyncBarrier } = require('kiro-spec-engine/lib/collab');
+const { SyncBarrier } = require('scene-capability-engine/lib/collab');
 const barrier = new SyncBarrier(workspaceRoot);
 
 // Check before switching Specs
@@ -532,16 +532,16 @@ All components check `MultiAgentConfig.isEnabled()` before doing anything:
 
 ```javascript
 // Collaboration modules
-const { AgentRegistry, Coordinator, MergeCoordinator, MultiAgentConfig, SpecLifecycleManager, SyncBarrier } = require('kiro-spec-engine/lib/collab');
+const { AgentRegistry, Coordinator, MergeCoordinator, MultiAgentConfig, SpecLifecycleManager, SyncBarrier } = require('scene-capability-engine/lib/collab');
 
 // Steering modules
-const { SpecSteering, SteeringLoader, ContextSyncManager } = require('kiro-spec-engine/lib/steering');
+const { SpecSteering, SteeringLoader, ContextSyncManager } = require('scene-capability-engine/lib/steering');
 
 // Lock modules
-const { TaskLockManager, SteeringFileLock } = require('kiro-spec-engine/lib/lock');
+const { TaskLockManager, SteeringFileLock } = require('scene-capability-engine/lib/lock');
 
 // Task modules
-const { TaskStatusStore } = require('kiro-spec-engine/lib/task');
+const { TaskStatusStore } = require('scene-capability-engine/lib/task');
 ```
 
 ---

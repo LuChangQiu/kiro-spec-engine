@@ -92,7 +92,7 @@ describe('AdoptionLogger', () => {
       expect(fs.existsSync(logFilePath)).toBe(true);
 
       const content = fs.readFileSync(logFilePath, 'utf8');
-      expect(content).toContain('Kiro Spec Engine - Adoption Log');
+      expect(content).toContain('Scene Capability Engine - Adoption Log');
       expect(content).toContain(`Adoption ID: ${adoptionId}`);
       expect(content).toContain('Log Level: INFO');
     });

@@ -3,7 +3,7 @@
  *
  * Validates: Requirements 2.1-2.4
  * - 2.1: Prompt contains Spec path (.kiro/specs/{specName}/)
- * - 2.2: Prompt contains kse project norms and steering context
+ * - 2.2: Prompt contains sce project norms and steering context
  * - 2.3: Prompt contains task execution instructions
  * - 2.4: Configurable template format via orchestrator.json
  */
@@ -22,7 +22,7 @@ describe('BootstrapPromptBuilder', () => {
   beforeEach(() => {
     tempDir = path.join(
       os.tmpdir(),
-      `kse-test-bpb-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      `sce-test-bpb-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     );
     fs.mkdirSync(tempDir, { recursive: true });
     orchestratorConfig = new OrchestratorConfig(tempDir);
@@ -95,11 +95,11 @@ describe('BootstrapPromptBuilder', () => {
     });
 
     test('includes README summary in project overview', async () => {
-      createReadme('# kse Project\n\nSome overview text.\n\n---\n\nCapabilities\n\n---\n\nMore');
+      createReadme('# sce Project\n\nSome overview text.\n\n---\n\nCapabilities\n\n---\n\nMore');
 
       const prompt = await builder.buildPrompt('any-spec');
 
-      expect(prompt).toContain('# kse Project');
+      expect(prompt).toContain('# sce Project');
       expect(prompt).toContain('Some overview text.');
     });
 

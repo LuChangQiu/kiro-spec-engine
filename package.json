@@ -1,13 +1,11 @@
 {
   "name": "scene-capability-engine",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "SCE (Scene Capability Engine) - A CLI tool and npm package for spec-driven development with AI coding assistants.",
   "main": "index.js",
   "bin": {
     "sce": "bin/sce.js",
-    "sco": "bin/sco.js",
-    "kse": "bin/kse.js",
-    "kiro-spec-engine": "bin/kiro-spec-engine.js"
+    "sco": "bin/sco.js"
   },
   "files": [
     "bin/",
@@ -45,7 +43,7 @@
     "uninstall-global": "npm uninstall -g scene-capability-engine"
   },
   "keywords": [
-    "kiro",
+    "SCE",
     "spec",
     "spec-driven",
     "engine",

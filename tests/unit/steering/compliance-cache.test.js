@@ -9,7 +9,7 @@ describe('ComplianceCache', () => {
 
   beforeEach(() => {
     // Create a unique temp cache file for each test
-    const tempDir = path.join(os.tmpdir(), `kse-cache-test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
+    const tempDir = path.join(os.tmpdir(), `sce-cache-test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
     tempCachePath = path.join(tempDir, 'steering-check-cache.json');
     cache = new ComplianceCache(tempCachePath);
   });

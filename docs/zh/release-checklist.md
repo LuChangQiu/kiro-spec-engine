@@ -20,8 +20,8 @@ npm run test:skip-audit
 npm test -- tests/unit/commands/value-metrics.test.js
 
 # CLI 冒烟
-node bin/kiro-spec-engine.js --help
-node bin/kiro-spec-engine.js value metrics --help
+node bin/scene-capability-engine.js --help
+node bin/scene-capability-engine.js value metrics --help
 ```
 
 ---
@@ -29,8 +29,8 @@ node bin/kiro-spec-engine.js value metrics --help
 ## 2. Value 可观测冒烟流程
 
 ```bash
-kse value metrics sample --out ./kpi-input.json --json
-kse value metrics snapshot --input ./kpi-input.json --json
+sce value metrics sample --out ./kpi-input.json --json
+sce value metrics snapshot --input ./kpi-input.json --json
 ```
 
 预期：
@@ -70,7 +70,7 @@ npm pack --dry-run
 rg -n "yourusername|support@example.com" README.md README.zh.md docs docs/zh -S
 
 # canonical 仓库链接扫描（应返回空）
-rg -n "github.com/kiro-spec-engine/kse" README.md README.zh.md docs START_HERE.txt INSTALL_OFFLINE.txt -S -g "!docs/release-checklist.md" -g "!docs/zh/release-checklist.md"
+rg -n "github.com/scene-capability-engine/sce" README.md README.zh.md docs START_HERE.txt INSTALL_OFFLINE.txt -S -g "!docs/release-checklist.md" -g "!docs/zh/release-checklist.md"
 ```
 
 ---
@@ -116,6 +116,6 @@ git log --oneline -n 15
   - `KSE_RELEASE_DRIFT_HARD_GATE_BLOCK_STREAK_MIN`：hard-gate preflight 连续 blocked 告警阈值（最近窗口，默认 `2`）
   - `KSE_RELEASE_DRIFT_PREFLIGHT_UNAVAILABLE_STREAK_MIN`：release preflight 连续 unavailable 告警阈值（最近窗口，默认 `2`）
 - 可选本地预演 release gate 历史索引产物：
-  - `kse auto handoff gate-index --dir .kiro/reports/release-evidence --out .kiro/reports/release-evidence/release-gate-history.json --json`
+  - `sce auto handoff gate-index --dir .kiro/reports/release-evidence --out .kiro/reports/release-evidence/release-gate-history.json --json`
 
 然后再执行你的正式发布流程（打 tag、push、npm publish、GitHub Release）。

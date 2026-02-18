@@ -111,7 +111,7 @@ describe('StrategySelector', () => {
     test('should detect existing .kiro/ with version file', async () => {
       mockFs.pathExists.mockResolvedValue(true);
       mockVersionManager.readVersion.mockResolvedValue({
-        'kse-version': '1.0.0'
+        'sce-version': '1.0.0'
       });
       mockVersionManager.compareVersions.mockReturnValue(-1);
 
@@ -164,10 +164,10 @@ describe('StrategySelector', () => {
       expect(state.versionComparison).toBeNull();
     });
 
-    test('should handle missing kse-version field', async () => {
+    test('should handle missing sce-version field', async () => {
       mockFs.pathExists.mockResolvedValue(true);
       mockVersionManager.readVersion.mockResolvedValue({
-        // Missing 'kse-version' field
+        // Missing 'sce-version' field
         'some-other-field': 'value'
       });
 
@@ -282,7 +282,7 @@ describe('StrategySelector', () => {
     test('should return correct mode for existing project', async () => {
       mockFs.pathExists.mockResolvedValue(true);
       mockVersionManager.readVersion.mockResolvedValue({
-        'kse-version': '1.0.0'
+        'sce-version': '1.0.0'
       });
       mockVersionManager.compareVersions.mockReturnValue(-1);
 
@@ -458,7 +458,7 @@ describe('StrategySelector', () => {
     test('should handle complete smart update scenario', async () => {
       mockFs.pathExists.mockResolvedValue(true);
       mockVersionManager.readVersion.mockResolvedValue({
-        'kse-version': '1.0.0'
+        'sce-version': '1.0.0'
       });
       mockVersionManager.compareVersions.mockReturnValue(-1);
 
@@ -478,7 +478,7 @@ describe('StrategySelector', () => {
       
       mockFs.pathExists.mockResolvedValue(true);
       mockVersionManager.readVersion.mockResolvedValue({
-        'kse-version': packageJson.version
+        'sce-version': packageJson.version
       });
       mockVersionManager.compareVersions.mockReturnValue(0);
 
@@ -512,7 +512,7 @@ describe('StrategySelector', () => {
     test('should handle complete warning scenario', async () => {
       mockFs.pathExists.mockResolvedValue(true);
       mockVersionManager.readVersion.mockResolvedValue({
-        'kse-version': '99.0.0'
+        'sce-version': '99.0.0'
       });
       mockVersionManager.compareVersions.mockReturnValue(1);
 

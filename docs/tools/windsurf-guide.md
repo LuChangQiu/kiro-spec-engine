@@ -1,6 +1,6 @@
-# Using kse with Windsurf
+# Using sce with Windsurf
 
-> Complete guide to integrating kse with Windsurf for automated AI-assisted development
+> Complete guide to integrating sce with Windsurf for automated AI-assisted development
 
 ---
 
@@ -16,17 +16,17 @@
 
 **Windsurf** is an AI coding agent that can execute commands, modify files, and interact with your development environment autonomously.
 
-**kse integration with Windsurf** supports all three modes:
-- **Native-like**: Windsurf can execute kse commands directly
+**sce integration with Windsurf** supports all three modes:
+- **Native-like**: Windsurf can execute sce commands directly
 - **Manual Export**: Traditional export and paste workflow
 - **Watch Mode**: Automatic context updates
 
-### Why Use kse with Windsurf?
+### Why Use sce with Windsurf?
 
-- ✅ **Fully automated** - Windsurf can run kse commands itself
+- ✅ **Fully automated** - Windsurf can run sce commands itself
 - ✅ **Command execution** - No manual copy-paste needed
 - ✅ **File modification** - Windsurf updates tasks.md automatically
-- ✅ **Best automation** - Most seamless kse integration after Kiro
+- ✅ **Best automation** - Most seamless sce integration after SCE
 
 ---
 
@@ -36,17 +36,17 @@
 
 **How it works:**
 1. You tell Windsurf what to build
-2. Windsurf executes `kse context export` automatically
+2. Windsurf executes `sce context export` automatically
 3. Windsurf reads the exported context
 4. Windsurf implements the feature
 5. Windsurf updates tasks.md automatically
 
 **Example:**
 ```
-You: "Implement the user login feature using kse"
+You: "Implement the user login feature using sce"
 
 Windsurf:
-  [Executes] kse context export 01-00-user-login
+  [Executes] sce context export 01-00-user-login
   [Reads] .kiro/specs/01-00-user-login/context-export.md
   [Implements] Code according to design
   [Updates] tasks.md with completed tasks
@@ -55,7 +55,7 @@ Windsurf:
 ### Mode 2: Watch Mode + Windsurf
 
 **How it works:**
-1. Start kse watch mode
+1. Start sce watch mode
 2. Edit Specs, context auto-updates
 3. Windsurf always has latest context
 4. Fully automated workflow
@@ -67,37 +67,37 @@ Windsurf:
 ### Prerequisites
 
 - **Windsurf installed** ([Download](https://windsurf.ai/))
-- **kse installed** globally (`npm install -g kiro-spec-engine`)
-- **Project adopted** by kse (`kse adopt`)
+- **sce installed** globally (`npm install -g scene-capability-engine`)
+- **Project adopted** by sce (`sce adopt`)
 
 ### Step 1: Configure Windsurf System Prompt
 
 Add to Windsurf's system prompt or project instructions:
 
 ```markdown
-# kse Integration
+# sce Integration
 
-This project uses kse (Kiro Spec Engine) for spec-driven development.
+This project uses sce (Scene Capability Engine) for spec-driven development.
 
 ## Before Implementing Features
 
-1. Check if a Spec exists: `kse status`
-2. Export Spec context: `kse context export <spec-name>`
+1. Check if a Spec exists: `sce status`
+2. Export Spec context: `sce context export <spec-name>`
 3. Read the exported context file
 4. Follow the design document exactly
 5. Update tasks.md when completing tasks
 
-## kse Commands
+## sce Commands
 
-- `kse status` - Show project status and available Specs
-- `kse context export <spec-name>` - Export Spec context
-- `kse task claim <spec-name> <task-id>` - Claim a task
-- `kse prompt generate <spec-name> <task-id>` - Generate task prompt
+- `sce status` - Show project status and available Specs
+- `sce context export <spec-name>` - Export Spec context
+- `sce task claim <spec-name> <task-id>` - Claim a task
+- `sce prompt generate <spec-name> <task-id>` - Generate task prompt
 
 ## Workflow
 
 When user asks to implement a feature:
-1. Run `kse context export <spec-name>`
+1. Run `sce context export <spec-name>`
 2. Read `.kiro/specs/<spec-name>/context-export.md`
 3. Implement according to design
 4. Update `.kiro/specs/<spec-name>/tasks.md` (change [ ] to [x])
@@ -106,7 +106,7 @@ When user asks to implement a feature:
 
 User: "Implement user login"
 You should:
-1. `kse context export 01-00-user-login`
+1. `sce context export 01-00-user-login`
 2. Read context file
 3. Implement AuthController, AuthService, etc.
 4. Update tasks.md: `- [x] 1.1 Create AuthController`
@@ -115,9 +115,9 @@ You should:
 ### Step 2: Enable Watch Mode (Optional)
 
 ```bash
-kse watch init
-kse watch install context-export
-kse watch start
+sce watch init
+sce watch install context-export
+sce watch start
 ```
 
 ---
@@ -128,16 +128,16 @@ kse watch start
 
 **Step 1: Tell Windsurf what to build**
 ```
-You: "I need to implement the user login feature. Use kse to get the Spec and implement it."
+You: "I need to implement the user login feature. Use sce to get the Spec and implement it."
 ```
 
 **Step 2: Windsurf executes automatically**
 ```
 Windsurf:
-  [Executes] kse status
+  [Executes] sce status
   [Output] Found Spec: 01-00-user-login
   
-  [Executes] kse context export 01-00-user-login
+  [Executes] sce context export 01-00-user-login
   [Output] Context exported to context-export.md
   
   [Reads] .kiro/specs/01-00-user-login/context-export.md
@@ -166,10 +166,10 @@ Windsurf:
 
 **More control over implementation:**
 ```
-You: "Use kse to get the user login Spec, then implement task 1.1 only"
+You: "Use sce to get the user login Spec, then implement task 1.1 only"
 
 Windsurf:
-  [Executes] kse context export 01-00-user-login
+  [Executes] sce context export 01-00-user-login
   [Reads] context
   [Implements] Only task 1.1
   [Updates] tasks.md
@@ -186,7 +186,7 @@ Windsurf:
 **Setup once, use forever:**
 ```bash
 # Terminal 1: Start watch mode
-kse watch start
+sce watch start
 
 # Terminal 2: Work with Windsurf
 # Edit Specs → Context auto-updates → Windsurf always has latest
@@ -202,7 +202,7 @@ kse watch start
 
 **1. Create Spec**
 ```bash
-kse spec bootstrap --name 01-00-user-login --non-interactive
+sce spec bootstrap --name 01-00-user-login --non-interactive
 # Edit requirements.md, design.md, tasks.md
 ```
 
@@ -211,7 +211,7 @@ kse spec bootstrap --name 01-00-user-login --non-interactive
 You: "I've created a Spec for user login at .kiro/specs/01-00-user-login/
 
 Please:
-1. Use kse to export the context
+1. Use sce to export the context
 2. Read the requirements and design
 3. Implement all tasks in order
 4. Update tasks.md as you complete each task
@@ -241,11 +241,11 @@ Windsurf:
 
 ## Tips & Best Practices
 
-### 1. Let Windsurf Execute kse Commands
+### 1. Let Windsurf Execute sce Commands
 
 **Good:**
 ```
-"Use kse to get the Spec for user login and implement it"
+"Use sce to get the Spec for user login and implement it"
 ```
 
 **Not as good:**
@@ -263,7 +263,7 @@ Windsurf:
 ### 3. Use Task Claiming
 
 ```
-"Before implementing, claim task 1.1 using: kse task claim 01-00-user-login 1.1"
+"Before implementing, claim task 1.1 using: sce task claim 01-00-user-login 1.1"
 ```
 
 ### 4. Request Progress Updates
@@ -276,7 +276,7 @@ Windsurf:
 
 ```bash
 # Keep watch mode running
-kse watch start
+sce watch start
 
 # Tell Windsurf
 "The Spec context auto-updates. Just read the latest context-export.md file"
@@ -329,9 +329,9 @@ kse watch start
 
 ## Troubleshooting
 
-### Issue: Windsurf doesn't know about kse
+### Issue: Windsurf doesn't know about sce
 
-**Solution:** Add kse instructions to system prompt (see Setup section)
+**Solution:** Add sce instructions to system prompt (see Setup section)
 
 ### Issue: Windsurf doesn't update tasks.md
 
@@ -354,34 +354,34 @@ to:
 
 ## Related Documentation
 
-- **[Quick Start Guide](../quick-start.md)** - Get started with kse
+- **[Quick Start Guide](../quick-start.md)** - Get started with sce
 - **[Integration Modes](../integration-modes.md)** - Understanding integration modes
-- **[Command Reference](../command-reference.md)** - All kse commands
+- **[Command Reference](../command-reference.md)** - All sce commands
 
 ---
 
 ## Summary
 
-**Windsurf + kse = Most Automated Workflow**
+**Windsurf + sce = Most Automated Workflow**
 
 **Key advantages:**
-- ✅ Windsurf executes kse commands automatically
+- ✅ Windsurf executes sce commands automatically
 - ✅ No manual copy-paste needed
 - ✅ Automatic task tracking
 - ✅ Full feature implementation with minimal intervention
 
 **Best practices:**
-- Configure system prompt with kse instructions
-- Let Windsurf execute kse commands
+- Configure system prompt with sce instructions
+- Let Windsurf execute sce commands
 - Use watch mode for auto-updates
 - Request progress updates
 - Review before approving changes
 
 **Start using:** 🚀
 ```bash
-kse adopt
-kse spec bootstrap --name 01-00-my-feature --non-interactive
-# Tell Windsurf: "Use kse to implement 01-00-my-feature"
+sce adopt
+sce spec bootstrap --name 01-00-my-feature --non-interactive
+# Tell Windsurf: "Use sce to implement 01-00-my-feature"
 ```
 
 ---

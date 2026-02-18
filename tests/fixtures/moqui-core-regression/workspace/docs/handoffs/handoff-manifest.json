@@ -10,7 +10,7 @@
     }
   ],
   "templates": [
-    "kse.scene--erp-order-query-read--0.1.0"
+    "sce.scene--erp-order-query-read--0.1.0"
   ],
   "capabilities": [
     "order-query-read",

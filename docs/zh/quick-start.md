@@ -1,6 +1,6 @@
 # 快速入门指南
 
-> 5 分钟上手 kse - 从安装到第一个 AI 辅助功能实现
+> 5 分钟上手 sce - 从安装到第一个 AI 辅助功能实现
 
 ---
 
@@ -14,7 +14,7 @@
 ## 你将学到什么
 
 完成本指南后，你将能够：
-- ✅ 安装 kse 并设置你的第一个项目
+- ✅ 安装 sce 并设置你的第一个项目
 - ✅ 创建完整的 Spec（需求 → 设计 → 任务）
 - ✅ 为你的 AI 工具导出上下文
 - ✅ 使用 AI 基于 Spec 实现功能
@@ -44,12 +44,12 @@ npm --version   # 应显示 8.0.0 或更高
 
 ---
 
-## 步骤 1：安装 kse（30 秒）
+## 步骤 1：安装 sce（30 秒）
 
-使用 npm 全局安装 kse：
+使用 npm 全局安装 sce：
 
 ```bash
-npm install -g kiro-spec-engine
+npm install -g scene-capability-engine
 ```
 
 **预期输出：**
@@ -59,7 +59,7 @@ added 50 packages in 5s
 
 **验证安装：**
 ```bash
-kse --version
+sce --version
 ```
 
 **预期输出：**
@@ -68,13 +68,13 @@ kse --version
 ```
 
 **故障排除：**
-- **"kse: command not found"** → 重启终端或检查 PATH
-- **macOS/Linux 权限错误** → 使用 `sudo npm install -g kiro-spec-engine`
+- **"sce: command not found"** → 重启终端或检查 PATH
+- **macOS/Linux 权限错误** → 使用 `sudo npm install -g scene-capability-engine`
 - **Windows 权限错误** → 以管理员身份运行终端
 
 ---
 
-## 步骤 2：在项目中采用 kse（1 分钟）
+## 步骤 2：在项目中采用 sce（1 分钟）
 
 进入你的项目目录（或创建新项目）：
 
@@ -85,12 +85,12 @@ cd your-project
 # 或创建新项目
 mkdir my-awesome-app
 cd my-awesome-app
-git init  # kse 最适合与 git 项目配合使用
+git init  # sce 最适合与 git 项目配合使用
 ```
 
-**采用 kse：**
+**采用 sce：**
 ```bash
-kse adopt
+sce adopt
 ```
 
 **预期输出：**
@@ -103,10 +103,10 @@ kse adopt
 ✓ 生成 ENVIRONMENT.md
 ✓ 生成 CURRENT_CONTEXT.md
 
-✅ 项目成功采用 kse！
+✅ 项目成功采用 sce！
 
 下一步：
-  1. 创建你的第一个 Spec：kse spec bootstrap --name 01-00-my-feature --non-interactive
+  1. 创建你的第一个 Spec：sce spec bootstrap --name 01-00-my-feature --non-interactive
   2. 阅读指南：.kiro/README.md
 ```
 
@@ -119,12 +119,12 @@ your-project/
 │   │   ├── CORE_PRINCIPLES.md
 │   │   ├── ENVIRONMENT.md
 │   │   └── CURRENT_CONTEXT.md
-│   └── README.md           # Kiro 系统文档
+│   └── README.md           # SCE 系统文档
 ```
 
 **验证：**
 ```bash
-kse status
+sce status
 ```
 
 **预期输出：**
@@ -141,7 +141,7 @@ Status: Ready
 让我们为用户登录功能生成一个 Spec 初稿：
 
 ```bash
-kse spec bootstrap --name 01-00-user-login --non-interactive
+sce spec bootstrap --name 01-00-user-login --non-interactive
 ```
 
 **预期输出：**
@@ -160,7 +160,7 @@ kse spec bootstrap --name 01-00-user-login --non-interactive
 多 Spec 场景下可直接使用：
 
 ```bash
-kse spec bootstrap --specs "01-00-user-login,01-01-user-session" --max-parallel 3
+sce spec bootstrap --specs "01-00-user-login,01-01-user-session" --max-parallel 3
 ```
 
 上述命令会默认切换到 orchestrate 模式并并行推进。
@@ -170,13 +170,13 @@ kse spec bootstrap --specs "01-00-user-login,01-01-user-session" --max-parallel 
 先生成输入样例：
 
 ```bash
-kse value metrics sample --out ./kpi-input.json --period 2026-W10 --json
+sce value metrics sample --out ./kpi-input.json --period 2026-W10 --json
 ```
 
 再执行：
 
 ```bash
-kse value metrics snapshot --input ./kpi-input.json --json
+sce value metrics snapshot --input ./kpi-input.json --json
 ```
 
 如果你想手工编辑输入，也可以创建 `kpi-input.json`：
@@ -525,12 +525,12 @@ graph TD
 （可选）先执行标准化流程和闸口检查：
 
 ```bash
-kse spec pipeline run --spec 01-00-user-login
-kse spec gate run --spec 01-00-user-login --json
+sce spec pipeline run --spec 01-00-user-login
+sce spec gate run --spec 01-00-user-login --json
 ```
 
 ```bash
-kse context export 01-00-user-login
+sce context export 01-00-user-login
 ```
 
 **预期输出：**
@@ -585,7 +585,7 @@ kse context export 01-00-user-login
 
 1. **生成任务特定提示：**
    ```bash
-   kse prompt generate 01-00-user-login 1.1
+   sce prompt generate 01-00-user-login 1.1
    ```
 
 2. **打开 Cursor Composer**（Cmd+K 或 Ctrl+K）
@@ -601,11 +601,11 @@ kse context export 01-00-user-login
 
 1. **简单地告诉 AI：**
    ```
-   使用 kse 检查 01-00-user-login 的 spec 并实现任务 1.1
+   使用 sce 检查 01-00-user-login 的 spec 并实现任务 1.1
    ```
 
 2. **AI 将：**
-   - 自动运行 `kse context export 01-00-user-login`
+   - 自动运行 `sce context export 01-00-user-login`
    - 读取导出的上下文
    - 实现任务
    - 更新任务状态
@@ -642,7 +642,7 @@ kse context export 01-00-user-login
 
 **检查你的进度：**
 ```bash
-kse status
+sce status
 ```
 
 **预期输出：**
@@ -676,7 +676,7 @@ Spec: 01-00-user-login
 
 - **[集成模式](../integration-modes.md)** - 原生、手动和 Watch 模式
 - **[Spec 工作流](../spec-workflow.md)** - 深入了解 Spec 创建
-- **[命令参考](../command-reference.md)** - 所有 kse 命令
+- **[命令参考](../command-reference.md)** - 所有 sce 命令
 
 ### 查看真实示例
 
@@ -688,7 +688,7 @@ Spec: 01-00-user-login
 
 ## 故障排除
 
-### 问题："kse: command not found"
+### 问题："sce: command not found"
 
 **解决方案：**
 1. 重启终端
@@ -705,7 +705,7 @@ Spec: 01-00-user-login
 
 **解决方案：** 生成任务特定提示：
 ```bash
-kse prompt generate 01-00-user-login 1.1
+sce prompt generate 01-00-user-login 1.1
 ```
 
 这会为该任务创建一个更小、更集中的上下文。
@@ -718,7 +718,7 @@ kse prompt generate 01-00-user-login 1.1
 3. 在提示中明确说明："严格遵循设计文档"
 4. 包含 steering 规则：
    ```bash
-   kse context export 01-00-user-login --steering
+   sce context export 01-00-user-login --steering
    ```
 
 ### 问题：找不到我的 Spec 文件
@@ -740,13 +740,13 @@ ls .kiro/specs/
 ## 总结
 
 你已学会如何：
-- ✅ 安装和设置 kse
+- ✅ 安装和设置 sce
 - ✅ 创建包含需求、设计和任务的结构化 Spec
 - ✅ 为 AI 工具导出上下文
 - ✅ 使用 AI 基于 Spec 实现功能
 - ✅ 跟踪实现进度
 
-**kse 工作流：**
+**sce 工作流：**
 ```
 bootstrap Spec → pipeline/gate → 导出上下文 → AI 实现 → 更新任务 → 重复
 ```
@@ -754,7 +754,7 @@ bootstrap Spec → pipeline/gate → 导出上下文 → AI 实现 → 更新任
 **准备好构建你的下一个功能了吗？** 🚀
 
 ```bash
-kse spec bootstrap --name 02-00-your-next-feature --non-interactive
+sce spec bootstrap --name 02-00-your-next-feature --non-interactive
 ```
 
 ---

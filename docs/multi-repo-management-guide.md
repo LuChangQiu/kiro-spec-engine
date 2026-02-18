@@ -11,7 +11,7 @@ The Multi-Repository Management feature enables you to manage multiple Git subre
 Navigate to your project root and run:
 
 ```bash
-kse repo init
+sce repo init
 ```
 
 This command:
@@ -36,7 +36,7 @@ Configuration saved to .kiro/project-repos.json
 View the status of all repositories at once:
 
 ```bash
-kse repo status
+sce repo status
 ```
 
 **Example output:**
@@ -53,7 +53,7 @@ kse repo status
 For detailed file-level changes:
 
 ```bash
-kse repo status --verbose
+sce repo status --verbose
 ```
 
 ### 3. Execute Commands Across Repositories
@@ -61,7 +61,7 @@ kse repo status --verbose
 Run the same Git command in all repositories:
 
 ```bash
-kse repo exec "git pull"
+sce repo exec "git pull"
 ```
 
 **Example output:**
@@ -84,7 +84,7 @@ Summary: 3 succeeded, 0 failed
 Preview commands without executing (dry-run):
 
 ```bash
-kse repo exec "git pull" --dry-run
+sce repo exec "git pull" --dry-run
 ```
 
 ### 4. Health Check
@@ -92,7 +92,7 @@ kse repo exec "git pull" --dry-run
 Verify that all repositories are properly configured:
 
 ```bash
-kse repo health
+sce repo health
 ```
 
 **Example output:**
@@ -197,7 +197,7 @@ Paths can be specified as:
 
 ### Overview
 
-Starting with v1.21.0, you can manually create and edit the `.kiro/project-repos.json` configuration file without relying solely on `kse repo init`. This is useful for:
+Starting with v1.21.0, you can manually create and edit the `.kiro/project-repos.json` configuration file without relying solely on `sce repo init`. This is useful for:
 
 - Curating a specific list of repositories
 - Removing false positives from auto-scan
@@ -292,7 +292,7 @@ For more detailed configurations, you can include all optional fields:
 
 ### Validation Rules
 
-When you manually create or edit the configuration, `kse` validates:
+When you manually create or edit the configuration, `sce` validates:
 
 1. **File Format**: Must be valid JSON
 2. **Structure**: Must have a `repositories` array
@@ -332,10 +332,10 @@ Create `.kiro/project-repos.json` with your repositories:
 **Step 3: Verify the configuration**
 
 ```bash
-kse repo status
+sce repo status
 ```
 
-If there are validation errors, `kse` will display clear error messages:
+If there are validation errors, `sce` will display clear error messages:
 
 ```
 Error: Repository path validation failed
@@ -451,7 +451,7 @@ git init
 
 ### Overview
 
-Nested repository support allows `kse` to discover and manage Git repositories that are nested inside other Git repositories. This is useful for projects with complex structures where components are organized as independent Git repositories within a parent repository.
+Nested repository support allows `sce` to discover and manage Git repositories that are nested inside other Git repositories. This is useful for projects with complex structures where components are organized as independent Git repositories within a parent repository.
 
 **Example structure:**
 ```
@@ -473,19 +473,19 @@ project-root/
 
 ### Enabling Nested Scanning
 
-Nested scanning is **enabled by default** in `kse repo init`. To explicitly control this behavior:
+Nested scanning is **enabled by default** in `sce repo init`. To explicitly control this behavior:
 
 ```bash
 # Enable nested scanning (default)
-kse repo init --nested
+sce repo init --nested
 
 # Disable nested scanning (stop at first repo)
-kse repo init --no-nested
+sce repo init --no-nested
 ```
 
 ### Parent-Child Relationships
 
-When nested repositories are discovered, `kse` tracks the parent-child relationship in the configuration file:
+When nested repositories are discovered, `sce` tracks the parent-child relationship in the configuration file:
 
 ```json
 {
@@ -526,7 +526,7 @@ When nested repositories are discovered, `kse` tracks the parent-child relations
 When nested repositories are present, commands display the parent-child relationship:
 
 ```bash
-$ kse repo status
+$ sce repo status
 
 ┌────────────┬─────────┬────────┬──────────┬───────┬────────┬─────────┐
 │ Name       │ Branch  │ Status │ Modified │ Ahead │ Behind │ Parent  │
@@ -614,7 +614,7 @@ app/
 
 ### Directory Exclusions
 
-To improve performance and avoid scanning unnecessary directories, `kse` automatically excludes common non-repository directories:
+To improve performance and avoid scanning unnecessary directories, `sce` automatically excludes common non-repository directories:
 
 - `node_modules` - Node.js dependencies
 - `.git` - Git metadata
@@ -626,12 +626,12 @@ To improve performance and avoid scanning unnecessary directories, `kse` automat
 You can add custom exclusions using the `--exclude` option:
 
 ```bash
-kse repo init --exclude "node_modules,vendor,custom-dir"
+sce repo init --exclude "node_modules,vendor,custom-dir"
 ```
 
 ### Circular Symlink Detection
 
-`kse` automatically detects and skips circular symbolic links to prevent infinite loops during scanning:
+`sce` automatically detects and skips circular symbolic links to prevent infinite loops during scanning:
 
 ```bash
 # This structure is handled safely
@@ -648,17 +648,17 @@ Nested scanning may take longer for large directory structures. To optimize:
 
 1. **Reduce scan depth**: Use `--max-depth` to limit how deep to scan
    ```bash
-   kse repo init --max-depth 4
+   sce repo init --max-depth 4
    ```
 
 2. **Exclude directories**: Skip known non-repository directories
    ```bash
-   kse repo init --exclude "node_modules,build,dist"
+   sce repo init --exclude "node_modules,build,dist"
    ```
 
 3. **Disable nested scanning**: If you only need top-level repositories
    ```bash
-   kse repo init --no-nested
+   sce repo init --no-nested
    ```
 
 ### Troubleshooting Nested Repositories
@@ -669,17 +669,17 @@ If nested repositories are not discovered:
 
 1. **Check scan depth**: Increase `--max-depth` if repositories are deeply nested
    ```bash
-   kse repo init --max-depth 5
+   sce repo init --max-depth 5
    ```
 
 2. **Verify nested scanning is enabled**: Ensure `--no-nested` is not used
    ```bash
-   kse repo init --nested
+   sce repo init --nested
    ```
 
 3. **Check exclusions**: Ensure the directory is not excluded
    ```bash
-   kse repo init --exclude "node_modules"  # Don't exclude the parent directory
+   sce repo init --exclude "node_modules"  # Don't exclude the parent directory
    ```
 
 #### Circular Reference Errors
@@ -694,7 +694,7 @@ Error: Circular parent reference detected: repo-a -> repo-b -> repo-a
 1. Open `.kiro/project-repos.json`
 2. Check the `parent` fields
 3. Remove or fix the circular reference
-4. Run `kse repo health` to verify
+4. Run `sce repo health` to verify
 
 #### Parent Repository Not Found
 
@@ -707,7 +707,7 @@ Error: Parent repository not found: backend
 **Solution:**
 1. Ensure the parent repository is in the configuration
 2. Check that the `parent` field matches the parent's `path` field exactly
-3. Run `kse repo init` to regenerate the configuration
+3. Run `sce repo init` to regenerate the configuration
 
 ### Backward Compatibility
 
@@ -716,7 +716,7 @@ Nested repository support is fully backward compatible:
 - Existing configurations without `parent` fields work unchanged
 - Repositories without `parent` are treated as top-level repositories
 - The `parent` field is optional and can be omitted
-- Old configurations can be upgraded by running `kse repo init`
+- Old configurations can be upgraded by running `sce repo init`
 
 ### Migration from Non-Nested to Nested
 
@@ -727,22 +727,22 @@ To migrate an existing configuration to use nested scanning:
 cp .kiro/project-repos.json .kiro/project-repos.json.backup
 
 # Re-initialize with nested scanning
-kse repo init --nested -y
+sce repo init --nested -y
 
 # Verify the new configuration
-kse repo status
-kse repo health
+sce repo status
+sce repo health
 ```
 
 ## Commands
 
-### `kse repo init`
+### `sce repo init`
 
 Initialize repository configuration by scanning the project directory.
 
 **Usage:**
 ```bash
-kse repo init [options]
+sce repo init [options]
 ```
 
 **Options:**
@@ -764,28 +764,28 @@ kse repo init [options]
 **Example:**
 ```bash
 # Initialize with default settings (nested scanning enabled)
-kse repo init
+sce repo init
 
 # Skip confirmation prompts
-kse repo init -y
+sce repo init -y
 
 # Disable nested repository scanning
-kse repo init --no-nested
+sce repo init --no-nested
 
 # Scan deeper directory structure
-kse repo init --max-depth 5
+sce repo init --max-depth 5
 
 # Exclude specific directories
-kse repo init --exclude "node_modules,vendor"
+sce repo init --exclude "node_modules,vendor"
 ```
 
-### `kse repo status`
+### `sce repo status`
 
 Display the Git status of all repositories.
 
 **Usage:**
 ```bash
-kse repo status [options]
+sce repo status [options]
 ```
 
 **Options:**
@@ -802,22 +802,22 @@ kse repo status [options]
 **Example:**
 ```bash
 # Basic status
-kse repo status
+sce repo status
 
 # Detailed status with file changes
-kse repo status --verbose
+sce repo status --verbose
 
 # JSON output for scripting
-kse repo status --json
+sce repo status --json
 ```
 
-### `kse repo exec`
+### `sce repo exec`
 
 Execute a Git command in all repositories.
 
 **Usage:**
 ```bash
-kse repo exec "<command>" [options]
+sce repo exec "<command>" [options]
 ```
 
 **Options:**
@@ -833,28 +833,28 @@ kse repo exec "<command>" [options]
 **Example:**
 ```bash
 # Pull latest changes
-kse repo exec "git pull"
+sce repo exec "git pull"
 
 # Create and checkout new branch
-kse repo exec "git checkout -b feature/new-feature"
+sce repo exec "git checkout -b feature/new-feature"
 
 # Preview without executing
-kse repo exec "git push" --dry-run
+sce repo exec "git push" --dry-run
 
 # Fetch all remotes
-kse repo exec "git fetch --all"
+sce repo exec "git fetch --all"
 
 # Show commit history
-kse repo exec "git log --oneline -5"
+sce repo exec "git log --oneline -5"
 ```
 
-### `kse repo health`
+### `sce repo health`
 
 Perform health checks on all repositories.
 
 **Usage:**
 ```bash
-kse repo health [options]
+sce repo health [options]
 ```
 
 **Options:**
@@ -874,10 +874,10 @@ kse repo health [options]
 **Example:**
 ```bash
 # Run health check
-kse repo health
+sce repo health
 
 # JSON output for automation
-kse repo health --json
+sce repo health --json
 ```
 
 ## Common Workflows
@@ -888,13 +888,13 @@ Start your day by syncing all repositories:
 
 ```bash
 # Check status of all repos
-kse repo status
+sce repo status
 
 # Pull latest changes
-kse repo exec "git pull"
+sce repo exec "git pull"
 
 # Verify everything is healthy
-kse repo health
+sce repo health
 ```
 
 ### Workflow 2: Feature Branch Creation
@@ -903,10 +903,10 @@ Create a feature branch across all repositories:
 
 ```bash
 # Create and checkout feature branch
-kse repo exec "git checkout -b feature/user-authentication"
+sce repo exec "git checkout -b feature/user-authentication"
 
 # Verify all repos are on the new branch
-kse repo status
+sce repo status
 ```
 
 ### Workflow 3: Release Preparation
@@ -915,20 +915,20 @@ Prepare all repositories for a release:
 
 ```bash
 # Ensure all repos are clean
-kse repo status
+sce repo status
 
 # Pull latest changes
-kse repo exec "git pull"
+sce repo exec "git pull"
 
 # Create release branch
-kse repo exec "git checkout -b release/v1.2.0"
+sce repo exec "git checkout -b release/v1.2.0"
 
 # Tag the release
-kse repo exec "git tag -a v1.2.0 -m 'Release v1.2.0'"
+sce repo exec "git tag -a v1.2.0 -m 'Release v1.2.0'"
 
 # Push branches and tags
-kse repo exec "git push origin release/v1.2.0"
-kse repo exec "git push --tags"
+sce repo exec "git push origin release/v1.2.0"
+sce repo exec "git push --tags"
 ```
 
 ### Workflow 4: Troubleshooting
@@ -937,16 +937,16 @@ Diagnose issues across repositories:
 
 ```bash
 # Run health check
-kse repo health
+sce repo health
 
 # Check detailed status
-kse repo status --verbose
+sce repo status --verbose
 
 # Verify remote connectivity
-kse repo exec "git remote -v"
+sce repo exec "git remote -v"
 
 # Check for uncommitted changes
-kse repo exec "git status --short"
+sce repo exec "git status --short"
 ```
 
 ### Workflow 5: Bulk Updates
@@ -955,17 +955,17 @@ Update dependencies or configuration across all repos:
 
 ```bash
 # Update npm dependencies
-kse repo exec "npm update"
+sce repo exec "npm update"
 
 # Run tests
-kse repo exec "npm test"
+sce repo exec "npm test"
 
 # Commit changes
-kse repo exec "git add ."
-kse repo exec "git commit -m 'chore: update dependencies'"
+sce repo exec "git add ."
+sce repo exec "git commit -m 'chore: update dependencies'"
 
 # Push changes
-kse repo exec "git push"
+sce repo exec "git push"
 ```
 
 ## Manual Configuration
@@ -1039,7 +1039,7 @@ You can manually edit `.kiro/project-repos.json` to:
 ### Directory Not Detected as Repository
 
 **Problem:**
-`kse repo init` doesn't detect a directory that you know contains a Git repository.
+`sce repo init` doesn't detect a directory that you know contains a Git repository.
 
 **Cause:**
 The scanner only identifies directories that contain a `.git` subdirectory. Regular subdirectories within a Git repository are not detected as separate repositories.
@@ -1061,7 +1061,7 @@ The scanner only identifies directories that contain a `.git` subdirectory. Regu
 ### Too Many Repositories Detected
 
 **Problem:**
-`kse repo init` detects many more repositories than you actually have (e.g., 34 detected when you only have 8).
+`sce repo init` detects many more repositories than you actually have (e.g., 34 detected when you only have 8).
 
 **Cause:**
 If you're using a version prior to v1.20.5, the scanner may incorrectly identify regular subdirectories as repositories.
@@ -1069,11 +1069,11 @@ If you're using a version prior to v1.20.5, the scanner may incorrectly identify
 **Solution:**
 1. Upgrade to v1.20.5 or later:
    ```bash
-   npm install -g kiro-spec-engine@latest
+   npm install -g scene-capability-engine@latest
    ```
 2. Re-run the initialization:
    ```bash
-   kse repo init
+   sce repo init
    ```
 3. The scanner will now only detect directories with `.git` subdirectories.
 
@@ -1085,7 +1085,7 @@ Error: Configuration file not found at .kiro/project-repos.json
 ```
 
 **Solution:**
-Run `kse repo init` to create the configuration file.
+Run `sce repo init` to create the configuration file.
 
 ### Repository Path Not Found
 
@@ -1138,7 +1138,7 @@ Error in backend: fatal: not a git repository
 1. Verify the path is a Git repository
 2. Run `git init` if needed
 3. Check file permissions
-4. Run `kse repo health` to diagnose
+4. Run `sce repo health` to diagnose
 
 ### Permission Denied
 
@@ -1217,7 +1217,7 @@ Run health checks regularly:
 
 ```bash
 # Add to your daily workflow
-kse repo health
+sce repo health
 ```
 
 ### 7. Dry-Run Before Bulk Operations
@@ -1226,7 +1226,7 @@ Always preview destructive operations:
 
 ```bash
 # Preview before executing
-kse repo exec "git push --force" --dry-run
+sce repo exec "git push --force" --dry-run
 ```
 
 ### 8. Document Custom Workflows
@@ -1238,13 +1238,13 @@ Create scripts for common workflows:
 # sync-all.sh - Sync all repositories
 
 echo "Checking status..."
-kse repo status
+sce repo status
 
 echo "Pulling changes..."
-kse repo exec "git pull"
+sce repo exec "git pull"
 
 echo "Running health check..."
-kse repo health
+sce repo health
 ```
 
 ## Advanced Usage
@@ -1255,13 +1255,13 @@ Use JSON output for automation:
 
 ```bash
 # Get status as JSON
-kse repo status --json > status.json
+sce repo status --json > status.json
 
 # Parse with jq
-kse repo status --json | jq '.[] | select(.isClean == false)'
+sce repo status --json | jq '.[] | select(.isClean == false)'
 
 # Check health in CI/CD
-if kse repo health --json | jq -e '.[] | select(.healthy == false)' > /dev/null; then
+if sce repo health --json | jq -e '.[] | select(.healthy == false)' > /dev/null; then
   echo "Health check failed!"
   exit 1
 fi
@@ -1282,14 +1282,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
-      - name: Install kse
-        run: npm install -g kiro-spec-engine
+      - name: Install sce
+        run: npm install -g scene-capability-engine
       
       - name: Check repository health
-        run: kse repo health
+        run: sce repo health
       
       - name: Check repository status
-        run: kse repo status
+        run: sce repo status
 ```
 
 ### Custom Configuration Validation
@@ -1300,7 +1300,7 @@ Validate configuration before committing:
 # Add to pre-commit hook
 #!/bin/bash
 if [ -f .kiro/project-repos.json ]; then
-  kse repo health || exit 1
+  sce repo health || exit 1
 fi
 ```
 

@@ -1,4 +1,4 @@
-# Agent Hooks Analysis for kiro-spec-engine
+# Agent Hooks Analysis for scene-capability-engine
 
 **Status**: Initial Analysis  
 **Date**: 2026-01-23  
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-This document analyzes the potential integration of Kiro IDE's agent hooks feature into kiro-spec-engine (kse). Based on available information about agent hooks functionality, we identify potential use cases, evaluate benefits and trade-offs, and provide recommendations for integration.
+This document analyzes the potential integration of AI IDE's agent hooks feature into scene-capability-engine (sce). Based on available information about agent hooks functionality, we identify potential use cases, evaluate benefits and trade-offs, and provide recommendations for integration.
 
 **Recommendation**: ✅ **Integrate agent hooks** - High value for automation and user experience
 
@@ -18,7 +18,7 @@ This document analyzes the potential integration of Kiro IDE's agent hooks featu
 
 ### Overview
 
-Agent hooks are automation triggers in Kiro IDE that allow automatic agent actions based on IDE events. They enable:
+Agent hooks are automation triggers in AI IDE that allow automatic agent actions based on IDE events. They enable:
 
 - **Event-Driven Automation**: Trigger AI actions on file changes, prompts, or other events
 - **Workflow Automation**: Automate repetitive tasks in development workflow
@@ -26,7 +26,7 @@ Agent hooks are automation triggers in Kiro IDE that allow automatic agent actio
 
 ### Hook Types
 
-Based on Kiro IDE documentation, agent hooks support various event types:
+Based on AI IDE documentation, agent hooks support various event types:
 
 1. **fileEdited**: Triggered when a file is saved
 2. **fileCreated**: Triggered when a new file is created
@@ -44,7 +44,7 @@ Hooks can perform two types of actions:
 
 ---
 
-## Use Cases for kse
+## Use Cases for sce
 
 ### High-Priority Use Cases
 
@@ -68,7 +68,7 @@ Hooks can perform two types of actions:
   },
   "then": {
     "type": "askAgent",
-    "prompt": "Task file was updated. Run 'kse workspace sync' to synchronize changes with the team."
+    "prompt": "Task file was updated. Run 'sce workspace sync' to synchronize changes with the team."
   }
 }
 ```
@@ -92,7 +92,7 @@ Hooks can perform two types of actions:
   },
   "then": {
     "type": "runCommand",
-    "command": "kse context export $(kse current-spec)"
+    "command": "sce context export $(sce current-spec)"
   }
 }
 ```
@@ -116,7 +116,7 @@ Hooks can perform two types of actions:
   },
   "then": {
     "type": "runCommand",
-    "command": "kse doctor && kse status"
+    "command": "sce doctor && sce status"
   }
 }
 ```
@@ -141,7 +141,7 @@ Hooks can perform two types of actions:
   },
   "then": {
     "type": "askAgent",
-    "prompt": "Spec file was updated. Consider regenerating prompts with 'kse prompt generate' for affected tasks."
+    "prompt": "Spec file was updated. Consider regenerating prompts with 'sce prompt generate' for affected tasks."
   }
 }
 ```
@@ -264,7 +264,7 @@ Hooks can perform two types of actions:
 
 ### Disadvantages
 
-1. **Kiro IDE Only**: Only works in Kiro IDE
+1. **AI IDE Only**: Only works in AI IDE
 2. **Learning Curve**: Users need to understand hooks
 3. **Configuration**: Requires initial setup
 4. **Debugging**: Hook failures can be confusing
@@ -272,7 +272,7 @@ Hooks can perform two types of actions:
 
 ### Mitigation Strategies
 
-**For Kiro IDE Dependency**:
+**For AI IDE Dependency**:
 - Provide fallback CLI commands for other tools
 - Document manual workflows
 - Make hooks optional
@@ -285,7 +285,7 @@ Hooks can perform two types of actions:
 **For Configuration**:
 - Provide sensible defaults
 - Auto-generate common hooks
-- Include in `kse adopt` workflow
+- Include in `sce adopt` workflow
 
 **For Debugging**:
 - Add hook execution logging
@@ -303,16 +303,16 @@ Hooks can perform two types of actions:
 
 ### Phase 1: Foundation (Immediate)
 
-**Goal**: Basic hook support in kse
+**Goal**: Basic hook support in sce
 
 **Tasks**:
 1. Add hook configuration to `.kiro/hooks/` directory
 2. Create hook templates for common use cases
-3. Add `kse hooks` command group:
-   - `kse hooks list` - List all hooks
-   - `kse hooks enable <hook>` - Enable a hook
-   - `kse hooks disable <hook>` - Disable a hook
-   - `kse hooks test <hook>` - Test a hook
+3. Add `sce hooks` command group:
+   - `sce hooks list` - List all hooks
+   - `sce hooks enable <hook>` - Enable a hook
+   - `sce hooks disable <hook>` - Disable a hook
+   - `sce hooks test <hook>` - Test a hook
 
 **Deliverables**:
 - Hook configuration schema
@@ -411,7 +411,7 @@ Hooks can perform two types of actions:
 
 ### Hook Execution
 
-1. **Event Detection**: Kiro IDE detects event
+1. **Event Detection**: AI IDE detects event
 2. **Hook Matching**: Find hooks matching event type and patterns
 3. **Condition Check**: Verify hook is enabled
 4. **Action Execution**: Execute askAgent or runCommand
@@ -433,16 +433,16 @@ Hooks can perform two types of actions:
 ### Immediate Actions
 
 1. ✅ **Integrate agent hooks** - High value, low risk
-2. ✅ **Implement watch mode for non-Kiro tools** - Ensure cross-tool parity
+2. ✅ **Implement watch mode for non-SCE tools** - Ensure cross-tool parity
 3. ✅ **Start with Phase 1** - Foundation and templates
 4. ✅ **Focus on high-priority use cases** - Maximum impact
 5. ✅ **Provide opt-in defaults** - Easy adoption
 
 ### Cross-Tool Automation Strategy
 
-To address the Kiro IDE limitation, we will implement a **three-tier automation strategy**:
+To address the AI IDE limitation, we will implement a **three-tier automation strategy**:
 
-#### Tier 1: Kiro IDE (Native Hooks)
+#### Tier 1: AI IDE (Native Hooks)
 - **Mechanism**: Native agent hooks
 - **Experience**: Seamless, automatic
 - **Setup**: One-time configuration
@@ -451,7 +451,7 @@ To address the Kiro IDE limitation, we will implement a **three-tier automation 
 #### Tier 2: Other IDEs (Watch Mode)
 - **Mechanism**: File system watcher + command execution
 - **Experience**: Near-automatic (background process)
-- **Setup**: `kse watch start`
+- **Setup**: `sce watch start`
 - **Maintenance**: Occasional restart
 
 #### Tier 3: Manual Workflows
@@ -462,7 +462,7 @@ To address the Kiro IDE limitation, we will implement a **three-tier automation 
 
 ### Feature Parity Table
 
-| Feature | Kiro IDE | Watch Mode | Manual |
+| Feature | AI IDE | Watch Mode | Manual |
 |---------|----------|------------|--------|
 | **Auto-sync on task update** | ✅ Automatic | ✅ Automatic | ⚠️ Manual |
 | **Context export on completion** | ✅ Automatic | ✅ Automatic | ⚠️ Manual |
@@ -475,7 +475,7 @@ To address the Kiro IDE limitation, we will implement a **three-tier automation 
 
 ### Implementation Priority
 
-**Phase 1A: Kiro IDE Hooks** (1-2 weeks)
+**Phase 1A: AI IDE Hooks** (1-2 weeks)
 - Implement native agent hooks
 - Create 5 core templates
 - Add CLI management commands
@@ -526,11 +526,11 @@ To address the Kiro IDE limitation, we will implement a **three-tier automation 
 
 ---
 
-## Watch Mode for Non-Kiro Tools
+## Watch Mode for Non-SCE Tools
 
 ### Overview
 
-Watch mode provides automation for developers not using Kiro IDE. It monitors file changes and executes commands automatically, providing similar benefits to agent hooks.
+Watch mode provides automation for developers not using AI IDE. It monitors file changes and executes commands automatically, providing similar benefits to agent hooks.
 
 ### Architecture
 
@@ -549,7 +549,7 @@ Watch mode provides automation for developers not using Kiro IDE. It monitors fi
                ▼
 ┌─────────────────────────────────────┐
 │     Command Executor                │
-│  (run kse commands)                 │
+│  (run sce commands)                 │
 └──────────────┬──────────────────────┘
                │
                ▼
@@ -563,19 +563,19 @@ Watch mode provides automation for developers not using Kiro IDE. It monitors fi
 
 ```bash
 # Start watch mode
-kse watch start
+sce watch start
 
 # Start with specific patterns
-kse watch start --patterns="**/tasks.md,**/requirements.md"
+sce watch start --patterns="**/tasks.md,**/requirements.md"
 
 # Check status
-kse watch status
+sce watch status
 
 # View logs
-kse watch logs
+sce watch logs
 
 # Stop watch mode
-kse watch stop
+sce watch stop
 ```
 
 ### Configuration
@@ -592,11 +592,11 @@ Watch mode uses `.kiro/watch-config.json`:
   ],
   "actions": {
     "**/tasks.md": {
-      "command": "kse workspace sync",
+      "command": "sce workspace sync",
       "debounce": 2000
     },
     "**/requirements.md": {
-      "command": "kse prompt generate ${spec} ${task}",
+      "command": "sce prompt generate ${spec} ${task}",
       "debounce": 5000
     }
   },
@@ -610,7 +610,7 @@ Watch mode uses `.kiro/watch-config.json`:
 
 ### Equivalent Functionality
 
-| Kiro Hook | Watch Mode Equivalent |
+| SCE Hook | Watch Mode Equivalent |
 |-----------|----------------------|
 | `fileEdited` on tasks.md | Watch `**/tasks.md` → run sync |
 | `agentStop` | Watch completion marker → export context |
@@ -644,12 +644,12 @@ vim .kiro/specs/my-spec/tasks.md
 # 2. Save file
 
 # 3. Manually sync
-kse workspace sync
+sce workspace sync
 ```
 
 **Time**: ~30 seconds per update
 
-**With Kiro Hooks**: Automatic (0 seconds)  
+**With SCE Hooks**: Automatic (0 seconds)  
 **With Watch Mode**: Automatic (0 seconds)
 
 ### Workflow 2: Context Export
@@ -659,7 +659,7 @@ kse workspace sync
 # 1. Complete work
 
 # 2. Remember to export
-kse context export my-spec
+sce context export my-spec
 
 # 3. Copy to other tool
 cat .kiro/specs/my-spec/context-export.md
@@ -667,7 +667,7 @@ cat .kiro/specs/my-spec/context-export.md
 
 **Time**: ~1 minute per export
 
-**With Kiro Hooks**: Automatic on `agentStop`  
+**With SCE Hooks**: Automatic on `agentStop`  
 **With Watch Mode**: Automatic on completion marker
 
 ### Workflow 3: Quality Gate
@@ -675,17 +675,17 @@ cat .kiro/specs/my-spec/context-export.md
 **Without Automation**:
 ```bash
 # 1. Before starting work, remember to check
-kse doctor
+sce doctor
 
 # 2. Check status
-kse status
+sce status
 
 # 3. Start work if all good
 ```
 
 **Time**: ~30 seconds per session
 
-**With Kiro Hooks**: Automatic on `promptSubmit`  
+**With SCE Hooks**: Automatic on `promptSubmit`  
 **With Watch Mode**: Manual (no equivalent)
 
 ### Workflow 4: Prompt Regeneration
@@ -697,19 +697,19 @@ kse status
 # 2. Remember which tasks are affected
 
 # 3. Regenerate prompts
-kse prompt generate my-spec 1.1
-kse prompt generate my-spec 1.2
+sce prompt generate my-spec 1.1
+sce prompt generate my-spec 1.2
 # ... repeat for each task
 ```
 
 **Time**: ~2-5 minutes for multiple tasks
 
-**With Kiro Hooks**: Automatic  
+**With SCE Hooks**: Automatic  
 **With Watch Mode**: Automatic
 
 ### Time Savings Summary
 
-| Workflow | Manual | Kiro Hooks | Watch Mode | Savings |
+| Workflow | Manual | SCE Hooks | Watch Mode | Savings |
 |----------|--------|------------|------------|---------|
 | Task sync | 30s | 0s | 0s | 100% |
 | Context export | 60s | 0s | 0s | 100% |
@@ -721,7 +721,7 @@ kse prompt generate my-spec 1.2
 
 ## Conclusion
 
-Agent hooks integration is **highly recommended** for kiro-spec-engine. The benefits significantly outweigh the costs:
+Agent hooks integration is **highly recommended** for scene-capability-engine. The benefits significantly outweigh the costs:
 
 **Benefits**:
 - 30-50% reduction in manual commands
@@ -731,7 +731,7 @@ Agent hooks integration is **highly recommended** for kiro-spec-engine. The bene
 
 **Costs**:
 - 1-2 weeks initial development
-- Kiro IDE dependency (mitigated by fallbacks)
+- AI IDE dependency (mitigated by fallbacks)
 - Configuration overhead (mitigated by templates)
 
 **Recommendation**: ✅ **Proceed with integration**
@@ -766,7 +766,7 @@ Start with Phase 1 (foundation) to validate the approach, then expand to Phase 2
   },
   "then": {
     "type": "askAgent",
-    "prompt": "Tasks were updated. Run 'kse workspace sync' to synchronize with the team."
+    "prompt": "Tasks were updated. Run 'sce workspace sync' to synchronize with the team."
   }
 }
 ```
@@ -784,7 +784,7 @@ Start with Phase 1 (foundation) to validate the approach, then expand to Phase 2
   },
   "then": {
     "type": "runCommand",
-    "command": "kse doctor"
+    "command": "sce doctor"
   }
 }
 ```
@@ -802,7 +802,7 @@ Start with Phase 1 (foundation) to validate the approach, then expand to Phase 2
   },
   "then": {
     "type": "runCommand",
-    "command": "kse context export $(kse current-spec)"
+    "command": "sce context export $(sce current-spec)"
   }
 }
 ```

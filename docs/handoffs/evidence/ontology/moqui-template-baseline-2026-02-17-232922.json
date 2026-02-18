@@ -21,9 +21,9 @@
   },
   "templates": [
     {
-      "template_id": "kse.scene--erp-inventory-reserve-adjust--0.1.0",
-      "template_path": ".kiro\\templates\\scene-packages\\kse.scene--erp-inventory-reserve-adjust--0.1.0",
-      "contract_path": ".kiro\\templates\\scene-packages\\kse.scene--erp-inventory-reserve-adjust--0.1.0\\scene-package.json",
+      "template_id": "sce.scene--erp-inventory-reserve-adjust--0.1.0",
+      "template_path": ".kiro\\templates\\scene-packages\\sce.scene--erp-inventory-reserve-adjust--0.1.0",
+      "contract_path": ".kiro\\templates\\scene-packages\\sce.scene--erp-inventory-reserve-adjust--0.1.0\\scene-package.json",
       "ontology": {
         "valid": true,
         "error_count": 0
@@ -65,9 +65,9 @@
       }
     },
     {
-      "template_id": "kse.scene--erp-order-fulfillment-workflow--0.1.0",
-      "template_path": ".kiro\\templates\\scene-packages\\kse.scene--erp-order-fulfillment-workflow--0.1.0",
-      "contract_path": ".kiro\\templates\\scene-packages\\kse.scene--erp-order-fulfillment-workflow--0.1.0\\scene-package.json",
+      "template_id": "sce.scene--erp-order-fulfillment-workflow--0.1.0",
+      "template_path": ".kiro\\templates\\scene-packages\\sce.scene--erp-order-fulfillment-workflow--0.1.0",
+      "contract_path": ".kiro\\templates\\scene-packages\\sce.scene--erp-order-fulfillment-workflow--0.1.0\\scene-package.json",
       "ontology": {
         "valid": true,
         "error_count": 0
@@ -109,9 +109,9 @@
       }
     },
     {
-      "template_id": "kse.scene--erp-order-query-read--0.1.0",
-      "template_path": ".kiro\\templates\\scene-packages\\kse.scene--erp-order-query-read--0.1.0",
-      "contract_path": ".kiro\\templates\\scene-packages\\kse.scene--erp-order-query-read--0.1.0\\scene-package.json",
+      "template_id": "sce.scene--erp-order-query-read--0.1.0",
+      "template_path": ".kiro\\templates\\scene-packages\\sce.scene--erp-order-query-read--0.1.0",
+      "contract_path": ".kiro\\templates\\scene-packages\\sce.scene--erp-order-query-read--0.1.0\\scene-package.json",
       "ontology": {
         "valid": true,
         "error_count": 0

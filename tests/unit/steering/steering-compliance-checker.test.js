@@ -10,7 +10,7 @@ describe('SteeringComplianceChecker', () => {
   beforeEach(() => {
     checker = new SteeringComplianceChecker();
     // Create a unique temp directory for each test
-    tempDir = path.join(os.tmpdir(), `kse-test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
+    tempDir = path.join(os.tmpdir(), `sce-test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
   });
 
   afterEach(() => {

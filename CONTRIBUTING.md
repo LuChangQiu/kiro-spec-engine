@@ -1,10 +1,10 @@
-# Contributing to Kiro Spec Engine
+# Contributing to Scene Capability Engine
 
-Thank you for your interest in contributing to Kiro Spec Engine! 🔥
+Thank you for your interest in contributing to Scene Capability Engine! 🔥
 
 ## 🌍 Adding New Languages
 
-We welcome translations to make Kiro Spec Engine accessible to more developers worldwide.
+We welcome translations to make Scene Capability Engine accessible to more developers worldwide.
 
 ### Steps to Add a New Language
 
@@ -38,7 +38,7 @@ We welcome translations to make Kiro Spec Engine accessible to more developers w
 6. **Test Your Translation**
    ```bash
    npm link
-   kse --lang [language-code] init
+   sce --lang [language-code] init
    ```
 
 7. **Submit Pull Request**
@@ -83,4 +83,4 @@ When contributing, embody the Ultrawork spirit:
 
 ---
 
-Thank you for helping make Kiro Spec Engine better! 🙏
+Thank you for helping make Scene Capability Engine better! 🙏

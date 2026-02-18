@@ -2,9 +2,9 @@
  * Orchestrate CLI Command Unit Tests
  *
  * Validates: Requirements 6.1-6.5
- * - 6.1: kse orchestrate run --specs --max-parallel
- * - 6.2: kse orchestrate status
- * - 6.3: kse orchestrate stop
+ * - 6.1: sce orchestrate run --specs --max-parallel
+ * - 6.2: sce orchestrate status
+ * - 6.3: sce orchestrate stop
  * - 6.4: Spec existence validation
  * - 6.5: maxParallel validation
  */
@@ -23,7 +23,7 @@ let tempDir;
 beforeEach(() => {
   tempDir = path.join(
     os.tmpdir(),
-    `kse-test-orch-cmd-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    `sce-test-orch-cmd-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
   );
   fs.mkdirSync(tempDir, { recursive: true });
 });
@@ -127,7 +127,7 @@ describe('orchestrate run — parameter validation', () => {
     registerOrchestrateCommands(program);
 
     await expect(
-      program.parseAsync(['node', 'kse', 'orchestrate', 'run', '--specs', '  ,  , '])
+      program.parseAsync(['node', 'sce', 'orchestrate', 'run', '--specs', '  ,  , '])
     ).rejects.toThrow();
 
     expect(exitSpy).toHaveBeenCalledWith(1);
@@ -140,7 +140,7 @@ describe('orchestrate run — parameter validation', () => {
     registerOrchestrateCommands(program);
 
     await expect(
-      program.parseAsync(['node', 'kse', 'orchestrate', 'run', '--specs', 'spec-a', '--max-parallel', '0'])
+      program.parseAsync(['node', 'sce', 'orchestrate', 'run', '--specs', 'spec-a', '--max-parallel', '0'])
     ).rejects.toThrow();
 
     expect(exitSpy).toHaveBeenCalledWith(1);
@@ -153,7 +153,7 @@ describe('orchestrate run — parameter validation', () => {
     registerOrchestrateCommands(program);
 
     await expect(
-      program.parseAsync(['node', 'kse', 'orchestrate', 'run', '--specs', 'spec-a', '--max-parallel', 'abc'])
+      program.parseAsync(['node', 'sce', 'orchestrate', 'run', '--specs', 'spec-a', '--max-parallel', 'abc'])
     ).rejects.toThrow();
 
     expect(exitSpy).toHaveBeenCalledWith(1);
@@ -166,7 +166,7 @@ describe('orchestrate run — parameter validation', () => {
     registerOrchestrateCommands(program);
 
     await expect(
-      program.parseAsync(['node', 'kse', 'orchestrate', 'run', '--specs', 'nonexistent-spec-xyz'])
+      program.parseAsync(['node', 'sce', 'orchestrate', 'run', '--specs', 'nonexistent-spec-xyz'])
     ).rejects.toThrow();
 
     expect(exitSpy).toHaveBeenCalledWith(1);
@@ -182,7 +182,7 @@ describe('orchestrate run — parameter validation', () => {
     registerOrchestrateCommands(program);
 
     await expect(
-      program.parseAsync(['node', 'kse', 'orchestrate', 'run', '--specs', 'missing-spec', '--json'])
+      program.parseAsync(['node', 'sce', 'orchestrate', 'run', '--specs', 'missing-spec', '--json'])
     ).rejects.toThrow();
 
     expect(exitSpy).toHaveBeenCalledWith(1);
@@ -219,7 +219,7 @@ describe('orchestrate status', () => {
     program.exitOverride();
     registerOrchestrateCommands(program);
 
-    await program.parseAsync(['node', 'kse', 'orchestrate', 'status']);
+    await program.parseAsync(['node', 'sce', 'orchestrate', 'status']);
 
     const output = logSpy.mock.calls.map(c => c.join(' ')).join(' ');
     expect(output).toContain('No orchestration data found');
@@ -231,7 +231,7 @@ describe('orchestrate status', () => {
     program.exitOverride();
     registerOrchestrateCommands(program);
 
-    await program.parseAsync(['node', 'kse', 'orchestrate', 'status', '--json']);
+    await program.parseAsync(['node', 'sce', 'orchestrate', 'status', '--json']);
 
     const output = logSpy.mock.calls.map(c => c.join(' ')).join(' ');
     const parsed = JSON.parse(output.trim());
@@ -262,7 +262,7 @@ describe('orchestrate status', () => {
     program.exitOverride();
     registerOrchestrateCommands(program);
 
-    await program.parseAsync(['node', 'kse', 'orchestrate', 'status']);
+    await program.parseAsync(['node', 'sce', 'orchestrate', 'status']);
 
     const output = logSpy.mock.calls.map(c => c.join(' ')).join(' ');
     expect(output).toContain('Orchestration Status');
@@ -293,7 +293,7 @@ describe('orchestrate status', () => {
     program.exitOverride();
     registerOrchestrateCommands(program);
 
-    await program.parseAsync(['node', 'kse', 'orchestrate', 'status']);
+    await program.parseAsync(['node', 'sce', 'orchestrate', 'status']);
 
     const output = logSpy.mock.calls.map(c => c.join(' ')).join(' ');
     expect(output).toContain('Rate-limit launch hold: 1500ms remaining');
@@ -327,7 +327,7 @@ describe('orchestrate status', () => {
     program.exitOverride();
     registerOrchestrateCommands(program);
 
-    await program.parseAsync(['node', 'kse', 'orchestrate', 'status']);
+    await program.parseAsync(['node', 'sce', 'orchestrate', 'status']);
 
     const output = logSpy.mock.calls.map(c => c.join(' ')).join(' ');
     expect(output).toContain('Launch budget: 12/12 in 60000ms (holds: 1)');
@@ -352,7 +352,7 @@ describe('orchestrate status', () => {
     program.exitOverride();
     registerOrchestrateCommands(program);
 
-    await program.parseAsync(['node', 'kse', 'orchestrate', 'status', '--json']);
+    await program.parseAsync(['node', 'sce', 'orchestrate', 'status', '--json']);
 
     const output = logSpy.mock.calls.map(c => c.join(' ')).join(' ');
     const parsed = JSON.parse(output.trim());
@@ -389,7 +389,7 @@ describe('orchestrate stop', () => {
     program.exitOverride();
     registerOrchestrateCommands(program);
 
-    await program.parseAsync(['node', 'kse', 'orchestrate', 'stop']);
+    await program.parseAsync(['node', 'sce', 'orchestrate', 'stop']);
 
     const output = logSpy.mock.calls.map(c => c.join(' ')).join(' ');
     expect(output).toContain('No running orchestration');
@@ -407,7 +407,7 @@ describe('orchestrate stop', () => {
     program.exitOverride();
     registerOrchestrateCommands(program);
 
-    await program.parseAsync(['node', 'kse', 'orchestrate', 'stop']);
+    await program.parseAsync(['node', 'sce', 'orchestrate', 'stop']);
 
     const output = logSpy.mock.calls.map(c => c.join(' ')).join(' ');
     expect(output).toContain('Stop signal sent');
@@ -431,7 +431,7 @@ describe('orchestrate stop', () => {
     program.exitOverride();
     registerOrchestrateCommands(program);
 
-    await program.parseAsync(['node', 'kse', 'orchestrate', 'stop']);
+    await program.parseAsync(['node', 'sce', 'orchestrate', 'stop']);
 
     const output = logSpy.mock.calls.map(c => c.join(' ')).join(' ');
     expect(output).toContain('No running orchestration');

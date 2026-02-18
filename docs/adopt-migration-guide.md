@@ -21,10 +21,10 @@ This guide helps users transition from the old interactive adoption mode to the 
 
 ### Old Behavior (v1.8.x and earlier)
 
-The `kse adopt` command was **interactive** and required user input:
+The `sce adopt` command was **interactive** and required user input:
 
 ```bash
-$ kse adopt
+$ sce adopt
 
 📦 Analyzing project structure...
 
@@ -51,12 +51,12 @@ $ kse adopt
 
 ### New Behavior (v1.9.0+)
 
-The `kse adopt` command is now **smart and automatic**:
+The `sce adopt` command is now **smart and automatic**:
 
 ```bash
-$ kse adopt
+$ sce adopt
 
-🔥 Kiro Spec Engine - Project Adoption
+🔥 Scene Capability Engine - Project Adoption
 
 📦 Analyzing project structure... ✅
 📋 Creating adoption plan... ✅
@@ -82,7 +82,7 @@ Adoption Plan:
   Preserved: 3 specs, 2 custom files
   
 💡 Your original files are safely backed up.
-   To restore: kse rollback backup-20260128-143022
+   To restore: sce rollback backup-20260128-143022
 ```
 
 **Characteristics**:
@@ -162,15 +162,15 @@ Automatic resolution based on file type:
 **Old Behavior**:
 ```bash
 # Backup was optional
-kse adopt              # No backup
-kse adopt --backup     # With backup
+sce adopt              # No backup
+sce adopt --backup     # With backup
 ```
 
 **New Behavior**:
 ```bash
 # Backup is mandatory
-kse adopt              # Always creates backup
-kse adopt --no-backup  # Requires confirmation (dangerous)
+sce adopt              # Always creates backup
+sce adopt --no-backup  # Requires confirmation (dangerous)
 ```
 
 ---
@@ -179,26 +179,26 @@ kse adopt --no-backup  # Requires confirmation (dangerous)
 
 ### For Individual Users
 
-**Step 1**: Upgrade KSE
+**Step 1**: Upgrade sce
 ```bash
-npm install -g kiro-spec-engine@latest
+npm install -g scene-capability-engine@latest
 ```
 
 **Step 2**: Test with dry-run (optional)
 ```bash
 cd your-project
-kse adopt --dry-run
+sce adopt --dry-run
 ```
 
 **Step 3**: Run adoption
 ```bash
-kse adopt
+sce adopt
 ```
 
 **Step 4**: Verify results
 ```bash
-kse status
-kse version-info
+sce status
+sce version-info
 ```
 
 ### For Teams
@@ -211,8 +211,8 @@ kse version-info
 **Step 2**: Test on non-critical project
 ```bash
 cd test-project
-kse adopt --dry-run
-kse adopt
+sce adopt --dry-run
+sce adopt
 ```
 
 **Step 3**: Roll out gradually
@@ -232,16 +232,16 @@ kse adopt
 **Old Script**:
 ```bash
 # Old: Required --auto flag
-kse adopt --auto
+sce adopt --auto
 ```
 
 **New Script**:
 ```bash
 # New: No flag needed (already automatic)
-kse adopt
+sce adopt
 
 # Or with verbose logging
-kse adopt --verbose
+sce adopt --verbose
 ```
 
 ---
@@ -261,7 +261,7 @@ You might prefer interactive mode if:
 Simply add the `--interactive` flag:
 
 ```bash
-kse adopt --interactive
+sce adopt --interactive
 ```
 
 This enables the old behavior:
@@ -272,7 +272,7 @@ This enables the old behavior:
 ### Example
 
 ```bash
-$ kse adopt --interactive
+$ sce adopt --interactive
 
 📦 Analyzing project structure...
 
@@ -301,7 +301,7 @@ $ kse adopt --interactive
 
 **A**: Use the `--interactive` flag:
 ```bash
-kse adopt --interactive
+sce adopt --interactive
 ```
 
 ---
@@ -320,12 +320,12 @@ kse adopt --interactive
 
 **A**: You can easily rollback:
 ```bash
-kse rollback backup-20260128-143022
+sce rollback backup-20260128-143022
 ```
 
 Then use interactive mode:
 ```bash
-kse adopt --interactive
+sce adopt --interactive
 ```
 
 ---
@@ -334,7 +334,7 @@ kse adopt --interactive
 
 **A**: Use dry-run mode:
 ```bash
-kse adopt --dry-run
+sce adopt --dry-run
 ```
 
 ---
@@ -343,7 +343,7 @@ kse adopt --dry-run
 
 **A**: Yes, use the `--force` flag:
 ```bash
-kse adopt --force
+sce adopt --force
 ```
 
 This will:
@@ -375,7 +375,7 @@ This will:
 
 For more details, use verbose mode:
 ```bash
-kse adopt --verbose
+sce adopt --verbose
 ```
 
 ---
@@ -384,7 +384,7 @@ kse adopt --verbose
 
 **A**: Not recommended, but possible:
 ```bash
-kse adopt --no-backup
+sce adopt --no-backup
 ```
 
 ⚠️ **Warning**: This is dangerous and requires confirmation.
@@ -403,12 +403,12 @@ kse adopt --no-backup
 
 **Old**:
 ```bash
-kse adopt --auto
+sce adopt --auto
 ```
 
 **New**:
 ```bash
-kse adopt
+sce adopt
 ```
 
 ---
@@ -430,7 +430,7 @@ Problem: Unable to create backup
 Solutions:
   1. Free up disk space
   2. Check permissions
-  3. Run kse doctor
+  3. Run sce doctor
 ```
 
 ---
@@ -442,7 +442,7 @@ Solutions:
 ```bash
 for dir in project1 project2 project3; do
   cd $dir
-  kse adopt
+  sce adopt
   cd ..
 done
 ```
@@ -452,7 +452,7 @@ done
 ### Q: How do I report issues?
 
 **A**: 
-1. Run with verbose mode: `kse adopt --verbose`
+1. Run with verbose mode: `sce adopt --verbose`
 2. Check the logs
 3. Report at: https://github.com/heguangyong/scene-capability-engine/issues
 
@@ -464,7 +464,7 @@ done
 
 **Solution**: Use interactive mode:
 ```bash
-kse adopt --interactive
+sce adopt --interactive
 ```
 
 ---
@@ -473,7 +473,7 @@ kse adopt --interactive
 
 **Solution**: Use verbose mode:
 ```bash
-kse adopt --verbose
+sce adopt --verbose
 ```
 
 ---
@@ -482,7 +482,7 @@ kse adopt --verbose
 
 **Solution**: Use rollback:
 ```bash
-kse rollback backup-20260128-143022
+sce rollback backup-20260128-143022
 ```
 
 ---
@@ -493,7 +493,7 @@ kse rollback backup-20260128-143022
 
 1. Rollback immediately:
    ```bash
-   kse rollback backup-20260128-143022
+   sce rollback backup-20260128-143022
    ```
 
 2. Report the issue:
@@ -510,8 +510,8 @@ kse rollback backup-20260128-143022
 Always test on a non-critical project first:
 ```bash
 cd test-project
-kse adopt --dry-run
-kse adopt
+sce adopt --dry-run
+sce adopt
 ```
 
 ### 2. Use Version Control
@@ -519,8 +519,8 @@ kse adopt
 Commit before adopting:
 ```bash
 git add -A
-git commit -m "Before KSE v1.9.0 adoption"
-kse adopt
+git commit -m "Before sce v1.9.0 adoption"
+sce adopt
 ```
 
 ### 3. Keep Backups
@@ -535,8 +535,8 @@ ls .kiro/backups/
 
 After adoption, verify:
 ```bash
-kse status
-kse version-info
+sce status
+sce version-info
 npm test  # If you have tests
 ```
 
@@ -567,22 +567,22 @@ If you customize files, document it:
 For most users:
 ```bash
 # Just run it!
-kse adopt
+sce adopt
 ```
 
 For cautious users:
 ```bash
 # Preview first
-kse adopt --dry-run
+sce adopt --dry-run
 
 # Then apply
-kse adopt
+sce adopt
 ```
 
 For advanced users:
 ```bash
 # Use interactive mode
-kse adopt --interactive
+sce adopt --interactive
 ```
 
 ---
@@ -590,8 +590,8 @@ kse adopt --interactive
 ## Getting Help
 
 - **Documentation**: [Adoption Guide](adoption-guide.md)
-- **System Check**: `kse doctor`
-- **Version Info**: `kse version-info`
+- **System Check**: `sce doctor`
+- **Version Info**: `sce version-info`
 - **Issues**: https://github.com/heguangyong/scene-capability-engine/issues
 
 ---

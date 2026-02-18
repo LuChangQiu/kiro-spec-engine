@@ -1,6 +1,6 @@
 # Moqui Template Core Library Playbook
 
-This playbook defines a generic (project-agnostic) path to absorb Moqui capabilities into the KSE core template library.
+This playbook defines a generic (project-agnostic) path to absorb Moqui capabilities into the sce core template library.
 
 ## Objectives
 
@@ -10,14 +10,14 @@ This playbook defines a generic (project-agnostic) path to absorb Moqui capabili
 
 ## Default Gate Baseline
 
-KSE defaults already enforce the baseline below:
+sce defaults already enforce the baseline below:
 
-- `kse auto handoff run`: ontology validation is required by default.
-- `kse auto handoff run`: generates Moqui baseline snapshot by default and appends it to release-evidence sessions.
-- `kse auto handoff run`: requires Moqui baseline portfolio pass by default.
-- `kse auto handoff run`: evaluates capability coverage matrix by default when manifest `capabilities` is declared (default minimum `100%`).
-- `kse auto handoff capability-matrix`: enforces both capability coverage and capability semantic completeness (default minimum `100%` for each).
-- `kse scene package-publish-batch`:
+- `sce auto handoff run`: ontology validation is required by default.
+- `sce auto handoff run`: generates Moqui baseline snapshot by default and appends it to release-evidence sessions.
+- `sce auto handoff run`: requires Moqui baseline portfolio pass by default.
+- `sce auto handoff run`: evaluates capability coverage matrix by default when manifest `capabilities` is declared (default minimum `100%`).
+- `sce auto handoff capability-matrix`: enforces both capability coverage and capability semantic completeness (default minimum `100%` for each).
+- `sce scene package-publish-batch`:
   - ontology validation required by default
   - batch ontology gate defaults:
     - average ontology score `>= 70`
@@ -33,16 +33,16 @@ Emergency bypass exists but is not recommended:
 
 ```bash
 # 0) Generate template baseline scoreboard (Moqui/ERP templates by default)
-kse scene moqui-baseline --json
+sce scene moqui-baseline --json
 
 # 0.1) CI/release mode: compare against previous baseline and enforce portfolio gate
-kse scene moqui-baseline \
+sce scene moqui-baseline \
   --compare-with .kiro/reports/release-evidence/moqui-template-baseline-prev.json \
   --fail-on-portfolio-fail \
   --json
 
 # 0.2) Fast capability matrix gate (recommended before full handoff run)
-kse auto handoff capability-matrix \
+sce auto handoff capability-matrix \
   --manifest docs/handoffs/handoff-manifest.json \
   --format markdown \
   --out .kiro/reports/handoff-capability-matrix.md \
@@ -50,24 +50,24 @@ kse auto handoff capability-matrix \
   --json
 
 # 1) Handoff close-loop
-kse auto handoff run --manifest docs/handoffs/handoff-manifest.json --json
+sce auto handoff run --manifest docs/handoffs/handoff-manifest.json --json
 
 # 2) Publish templates from scene packages (with default ontology gates)
-kse scene package-publish-batch \
+sce scene package-publish-batch \
   --manifest docs/handoffs/handoff-manifest.json \
   --json
 
 # 3) Persist ontology publish evidence for governance/review
-kse scene package-publish-batch \
+sce scene package-publish-batch \
   --manifest docs/handoffs/handoff-manifest.json \
   --dry-run \
   --ontology-report-out .kiro/reports/scene-package-ontology-batch.json \
   --json
 
 # 4) Validate registry + package gate
-kse scene package-registry --template-dir .kiro/templates/scene-packages --strict --json
-kse scene package-gate-template --out .kiro/templates/scene-package-gate-policy.json --profile three-layer --force --json
-kse scene package-gate --registry .kiro/templates/scene-packages/registry.json --policy .kiro/templates/scene-package-gate-policy.json --strict --json
+sce scene package-registry --template-dir .kiro/templates/scene-packages --strict --json
+sce scene package-gate-template --out .kiro/templates/scene-package-gate-policy.json --profile three-layer --force --json
+sce scene package-gate --registry .kiro/templates/scene-packages/registry.json --policy .kiro/templates/scene-package-gate-policy.json --strict --json
 ```
 
 ## Evidence Contract
@@ -80,7 +80,7 @@ Required artifacts for each intake batch:
 - `.kiro/reports/release-evidence/moqui-template-baseline.md`
 - `.kiro/reports/release-evidence/moqui-capability-coverage.json`
 - `.kiro/reports/release-evidence/moqui-capability-coverage.md`
-- `.kiro/reports/handoff-capability-matrix.md` (or JSON equivalent from `kse auto handoff capability-matrix`)
+- `.kiro/reports/handoff-capability-matrix.md` (or JSON equivalent from `sce auto handoff capability-matrix`)
 - `.kiro/reports/handoff-runs/<session>.json`
 - `.kiro/reports/scene-package-ontology-batch.json`
 - `.kiro/auto/moqui-remediation.lines` (when baseline/coverage gaps exist)
@@ -99,11 +99,11 @@ Each accepted template should include ontology semantics for:
 If any area is weak, export remediation queue lines and feed back to close-loop:
 
 ```bash
-kse scene package-publish-batch \
+sce scene package-publish-batch \
   --manifest docs/handoffs/handoff-manifest.json \
   --dry-run \
   --ontology-task-queue-out .kiro/auto/ontology-remediation.lines \
   --json
 
-kse auto close-loop-batch .kiro/auto/ontology-remediation.lines --format lines --json
+sce auto close-loop-batch .kiro/auto/ontology-remediation.lines --format lines --json
 ```

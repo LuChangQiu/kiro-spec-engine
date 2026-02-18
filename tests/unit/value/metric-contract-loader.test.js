@@ -8,7 +8,7 @@ describe('MetricContractLoader', () => {
   let tempDir;
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-metric-contract-'));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-metric-contract-'));
   });
 
   afterEach(async () => {

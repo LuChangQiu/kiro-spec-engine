@@ -1,6 +1,6 @@
 # Project Development Guide
 
-> **AI Tools: Read this first!** This project follows Spec-driven development methodology powered by kse (Kiro Spec Engine).
+> **AI Tools: Read this first!** This project follows Spec-driven development methodology powered by sce (Scene Capability Engine).
 
 ---
 
@@ -19,46 +19,46 @@ This project uses **Spec-driven development** - a structured approach where:
 
 ---
 
-## 🚀 kse Capabilities (v1.45.x)
+## 🚀 sce Capabilities (v1.45.x)
 
-**IMPORTANT**: After installing or updating kse, read this section to understand all available capabilities. Using the right tool for the job ensures efficient, high-quality development.
+**IMPORTANT**: After installing or updating sce, read this section to understand all available capabilities. Using the right tool for the job ensures efficient, high-quality development.
 
 ### Core: Spec-Driven Development
-- `kse adopt` — Initialize kse in a project (creates `.kiro/` structure)
-- `kse create-spec <name>` — Create a new Spec (requirements + design + tasks)
-- `kse status` — Show project status and Spec progress
-- `kse workflows` — List available Specs and workflows
-- `kse context export <spec-name>` — Export Spec context for AI consumption
-- `kse prompt generate <spec> <task>` — Generate task-specific prompt
+- `sce adopt` — Initialize sce in a project (creates `.kiro/` structure)
+- `sce create-spec <name>` — Create a new Spec (requirements + design + tasks)
+- `sce status` — Show project status and Spec progress
+- `sce workflows` — List available Specs and workflows
+- `sce context export <spec-name>` — Export Spec context for AI consumption
+- `sce prompt generate <spec> <task>` — Generate task-specific prompt
 
 ### Task Management
-- `kse task claim <spec> <task-id>` — Claim a task for execution
-- `kse task list <spec>` — List claimed tasks
+- `sce task claim <spec> <task-id>` — Claim a task for execution
+- `sce task list <spec>` — List claimed tasks
 - Task status tracking in `tasks.md`: `[ ]` not started, `[-]` in progress, `[x]` completed
 
 ### Spec Locking (Multi-User)
-- `kse lock acquire <spec>` — Lock a Spec to prevent conflicts
-- `kse lock release <spec>` / `kse unlock <spec>` — Release lock
-- `kse lock status` — Check lock status
-- `kse lock cleanup` — Remove stale locks (24h timeout)
-- `kse lock whoami` — Show machine identifier
+- `sce lock acquire <spec>` — Lock a Spec to prevent conflicts
+- `sce lock release <spec>` / `sce unlock <spec>` — Release lock
+- `sce lock status` — Check lock status
+- `sce lock cleanup` — Remove stale locks (24h timeout)
+- `sce lock whoami` — Show machine identifier
 
 ### Workspace Management
-- `kse workspace create/list/switch/info/remove` — Manage multiple kse projects
+- `sce workspace create/list/switch/info/remove` — Manage multiple sce projects
 - Global state: `~/.kse/workspace-state.json`
 
 ### Environment Configuration
-- `kse env list/switch/info/register/unregister/rollback/verify/run` — Multi-environment management
+- `sce env list/switch/info/register/unregister/rollback/verify/run` — Multi-environment management
 - Automatic backup before each switch, instant rollback support
 
 ### Multi-Repository Management
-- `kse repo init [--nested]` — Auto-discover Git repositories
-- `kse repo status [--verbose]` — Status of all repositories
-- `kse repo exec "<command>"` — Execute command across all repos
-- `kse repo health` — Check repository health
+- `sce repo init [--nested]` — Auto-discover Git repositories
+- `sce repo status [--verbose]` — Status of all repositories
+- `sce repo exec "<command>"` — Execute command across all repos
+- `sce repo health` — Check repository health
 
 ### Spec-Level Collaboration
-- `kse collab init/status/assign/verify/integrate/migrate` — Coordinate parallel Spec development
+- `sce collab init/status/assign/verify/integrate/migrate` — Coordinate parallel Spec development
 - Master Spec + Sub-Specs with dependency management
 - Interface contracts for cross-Spec compatibility
 
@@ -86,16 +86,16 @@ Fourth steering layer (L4) and Spec lifecycle coordination for multi-agent scena
 - See `docs/multi-agent-coordination-guide.md` for full API reference
 
 ### Autonomous Control
-- `kse auto create <description>` — Create and execute Spec autonomously
-- `kse auto run <spec>` — Execute existing Spec tasks autonomously
-- `kse auto status/resume/stop/config` — Manage autonomous execution
+- `sce auto create <description>` — Create and execute Spec autonomously
+- `sce auto run <spec>` — Execute existing Spec tasks autonomously
+- `sce auto status/resume/stop/config` — Manage autonomous execution
 - Intelligent error recovery, checkpoint system, learning from history
 
 ### Agent Orchestrator — Multi-Agent Spec Execution (v1.45.0)
 Automate parallel Spec execution via Codex CLI sub-agents (replaces manual multi-terminal workflow):
-- `kse orchestrate run --specs "spec-a,spec-b,spec-c" --max-parallel 3` — Start multi-agent orchestration
-- `kse orchestrate status` — View orchestration progress (per-Spec status, overall state)
-- `kse orchestrate stop` — Gracefully stop all sub-agents
+- `sce orchestrate run --specs "spec-a,spec-b,spec-c" --max-parallel 3` — Start multi-agent orchestration
+- `sce orchestrate status` — View orchestration progress (per-Spec status, overall state)
+- `sce orchestrate stop` — Gracefully stop all sub-agents
 - **OrchestratorConfig** (`lib/orchestrator`) — Configuration management (agent backend, parallelism, timeout, retries) via `.kiro/config/orchestrator.json`
 - **BootstrapPromptBuilder** (`lib/orchestrator`) — Builds bootstrap prompts with Spec path, steering context, execution instructions
 - **AgentSpawner** (`lib/orchestrator`) — Process manager for Codex CLI sub-agents with timeout detection, graceful termination (SIGTERM → SIGKILL)
@@ -105,23 +105,23 @@ Automate parallel Spec execution via Codex CLI sub-agents (replaces manual multi
 - 11 correctness properties verified via property-based testing
 
 ### Scene Runtime (Template Engine + Quality + ERP)
-- **Template Engine**: `kse scene template-validate/resolve/render` — Variable schema, multi-file rendering, 3-layer inheritance
-- **Package Registry**: `kse scene publish/unpublish/install/list/search/info/diff/version` — Local package management
-- **Quality Pipeline**: `kse scene lint/score/contribute` — 10-category lint, quality scoring, one-stop publish
-- **Ontology**: `kse scene ontology show/deps/validate/actions/lineage/agent-info` — Semantic relationship graph
-- **Moqui ERP**: `kse scene connect/discover/extract` — ERP integration and template extraction
-- **Registry Ops**: `kse scene deprecate/audit/owner/tag/lock/stats` — Advanced registry management
+- **Template Engine**: `sce scene template-validate/resolve/render` — Variable schema, multi-file rendering, 3-layer inheritance
+- **Package Registry**: `sce scene publish/unpublish/install/list/search/info/diff/version` — Local package management
+- **Quality Pipeline**: `sce scene lint/score/contribute` — 10-category lint, quality scoring, one-stop publish
+- **Ontology**: `sce scene ontology show/deps/validate/actions/lineage/agent-info` — Semantic relationship graph
+- **Moqui ERP**: `sce scene connect/discover/extract` — ERP integration and template extraction
+- **Registry Ops**: `sce scene deprecate/audit/owner/tag/lock/stats` — Advanced registry management
 
 ### Document Governance
-- `kse docs diagnose/cleanup/validate/archive/hooks` — Document lifecycle management
+- `sce docs diagnose/cleanup/validate/archive/hooks` — Document lifecycle management
 - Automatic compliance checking and cleanup
 
 ### DevOps Integration
-- `kse ops init/validate/audit/takeover/feedback` — Operations Spec management
+- `sce ops init/validate/audit/takeover/feedback` — Operations Spec management
 - Progressive AI autonomy levels (L1-L5)
 
 ### Knowledge Management
-- `kse knowledge init/add/list/search/show/delete/stats` — Personal knowledge base
+- `sce knowledge init/add/list/search/show/delete/stats` — Personal knowledge base
 
 ---
 
@@ -235,13 +235,13 @@ A Spec is a complete feature definition with three parts:
 | What to work on | `.kiro/specs/{spec-name}/tasks.md` |
 | Project context | `.kiro/steering/CURRENT_CONTEXT.md` |
 | Development rules | `.kiro/steering/CORE_PRINCIPLES.md` |
-| Project status | `kse status` |
+| Project status | `sce status` |
 | Multi-agent setup | `.kiro/config/multi-agent.json` |
 | Full documentation | `docs/` directory |
 
 ---
 
 **Project Type**: Spec-driven development  
-**kse Version**: 1.44.x  
+**sce Version**: 1.44.x  
 **Last Updated**: 2026-02-12  
 **Purpose**: Guide AI tools to work effectively with this project

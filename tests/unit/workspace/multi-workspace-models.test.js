@@ -57,7 +57,7 @@ describe('WorkspaceRegistry', () => {
   let registry;
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-test-'));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-test-'));
     const configPath = path.join(tempDir, 'workspaces.json');
     registry = new WorkspaceRegistry(configPath);
   });
@@ -90,7 +90,7 @@ describe('WorkspaceRegistry', () => {
 
     it('should reject invalid inputs', async () => {
       await expect(registry.createWorkspace('', '/path')).rejects.toThrow('cannot be empty');
-      await expect(registry.createWorkspace('test', '/nonexistent')).rejects.toThrow('not a valid kse project');
+      await expect(registry.createWorkspace('test', '/nonexistent')).rejects.toThrow('not a valid sce project');
       
       const projectPath = path.join(tempDir, 'project');
       await fs.ensureDir(path.join(projectPath, '.kiro'));
@@ -137,7 +137,7 @@ describe('GlobalConfig', () => {
   let config;
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-test-'));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-test-'));
     const configPath = path.join(tempDir, 'config.json');
     config = new GlobalConfig(configPath);
   });

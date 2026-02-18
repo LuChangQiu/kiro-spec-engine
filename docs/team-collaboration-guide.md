@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide explains how to effectively collaborate on kse projects with your team, covering version control strategies, Spec sharing, and multi-user workflows.
+This guide explains how to effectively collaborate on sce projects with your team, covering version control strategies, Spec sharing, and multi-user workflows.
 
 ---
 
@@ -10,7 +10,7 @@ This guide explains how to effectively collaborate on kse projects with your tea
 
 ### What to Commit
 
-kse uses a **layered .gitignore strategy** to balance team collaboration and personal workflow:
+sce uses a **layered .gitignore strategy** to balance team collaboration and personal workflow:
 
 #### ✅ DO Commit (Team Shared)
 
@@ -78,15 +78,15 @@ kse uses a **layered .gitignore strategy** to balance team collaboration and per
 # Developer A
 git clone <repo>
 cd project
-npm install -g kiro-spec-engine
-kse adopt
+npm install -g scene-capability-engine
+sce adopt
 .kiro/create-workspace.bat alice
 
 # Developer B
 git clone <repo>
 cd project
-npm install -g kiro-spec-engine
-kse adopt
+npm install -g scene-capability-engine
+sce adopt
 .kiro/create-workspace.bat bob
 ```
 
@@ -97,7 +97,7 @@ kse adopt
 .kiro/switch-workspace.bat alice
 
 # Work on your tasks
-kse status
+sce status
 # ... make changes ...
 
 # Commit Spec changes (shared)
@@ -119,7 +119,7 @@ git commit -m "feat: complete task 3.2 in Spec 15-00"
 
 ```bash
 # Create new Spec
-kse workflows create user-authentication
+sce workflows create user-authentication
 
 # Edit requirements, design, tasks
 # ... work on Spec documents ...
@@ -137,7 +137,7 @@ git push
 git pull
 
 # Check available Specs
-kse status
+sce status
 
 # Read Spec documents
 cat .kiro/specs/21-00-user-authentication/requirements.md
@@ -191,17 +191,17 @@ project-root/
 git clone <repo>
 cd project
 
-# Install kse
-npm install -g kiro-spec-engine
-kse adopt
+# Install sce
+npm install -g scene-capability-engine
+sce adopt
 
 # Register environments from templates
-kse env register config/env-local.json
-kse env register config/env-staging.json
-kse env register config/env-production.json
+sce env register config/env-local.json
+sce env register config/env-staging.json
+sce env register config/env-production.json
 
 # Switch to local environment
-kse env switch local
+sce env switch local
 ```
 
 **Benefits**:
@@ -267,7 +267,7 @@ git add .kiro/specs/22-00-feature-name/reports/performance-analysis.md
 
 ```bash
 # 1. Create Spec
-kse workflows create payment-integration
+sce workflows create payment-integration
 
 # 2. Write requirements
 # Edit .kiro/specs/23-00-payment-integration/requirements.md
@@ -294,7 +294,7 @@ git push
 git pull
 
 # 2. Review Spec
-kse status
+sce status
 cat .kiro/specs/23-00-payment-integration/requirements.md
 cat .kiro/specs/23-00-payment-integration/design.md
 
@@ -347,18 +347,18 @@ cat .kiro/specs/23-00-payment-integration/tasks.md
 # 1. Clone and setup
 git clone <repo>
 cd project
-npm install -g kiro-spec-engine
-kse adopt
+npm install -g scene-capability-engine
+sce adopt
 
 # 2. Create personal workspace
 .kiro/create-workspace.bat john
 
 # 3. Register environments
-kse env register config/env-local.json
-kse env switch local
+sce env register config/env-local.json
+sce env switch local
 
 # 4. Review project Specs
-kse status
+sce status
 # See all features and their status
 
 # 5. Pick a task

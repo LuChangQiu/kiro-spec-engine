@@ -1,6 +1,6 @@
-# 在 VS Code + Copilot 中使用 kse
+# 在 VS Code + Copilot 中使用 sce
 
-> 将 kse 与 VS Code 和 GitHub Copilot 集成进行 AI 辅助开发的完整指南
+> 将 sce 与 VS Code 和 GitHub Copilot 集成进行 AI 辅助开发的完整指南
 
 ---
 
@@ -16,14 +16,14 @@
 
 **VS Code** 是最流行的代码编辑器，**GitHub Copilot** 提供 AI 驱动的代码补全。
 
-**kse 与 VS Code + Copilot 的集成**使用**手动导出**和**内联注释**，让 Copilot 理解你的 Spec 并生成匹配你设计的代码。
+**sce 与 VS Code + Copilot 的集成**使用**手动导出**和**内联注释**，让 Copilot 理解你的 Spec 并生成匹配你设计的代码。
 
-### 为什么在 VS Code + Copilot 中使用 kse？
+### 为什么在 VS Code + Copilot 中使用 sce？
 
 - ✅ **熟悉的环境** - 使用你已知的编辑器
 - ✅ **智能补全** - Copilot 遵循你的 Spec
 - ✅ **内联建议** - 在你输入时获得上下文感知的代码
-- ✅ **灵活集成** - 多种使用 kse 的方式
+- ✅ **灵活集成** - 多种使用 sce 的方式
 
 ---
 
@@ -32,7 +32,7 @@
 **模式：** 手动导出 + 内联注释
 
 **工作原理：**
-1. 你在 kse 中创建 Spec（需求、设计、任务）
+1. 你在 sce 中创建 Spec（需求、设计、任务）
 2. 你在代码中添加引用 Spec 的注释
 3. Copilot 读取注释和 Spec 文件
 4. Copilot 生成匹配你设计的代码
@@ -46,8 +46,8 @@
 
 - 已安装 **VS Code**（[下载](https://code.visualstudio.com/)）
 - 已安装 **GitHub Copilot** 扩展
-- 已全局安装 **kse**（`npm install -g kiro-spec-engine`）
-- 项目已被 kse **采用**（`kse adopt`）
+- 已全局安装 **sce**（`npm install -g scene-capability-engine`）
+- 项目已被 sce **采用**（`sce adopt`）
 
 ### 步骤 1：安装推荐的扩展
 
@@ -80,12 +80,12 @@
 
 ### 步骤 3：创建 Workspace 片段（可选但推荐）
 
-创建 `.vscode/kse.code-snippets`：
+创建 `.vscode/sce.code-snippets`：
 
 ```json
 {
-  "kse Spec Reference": {
-    "prefix": "kse-ref",
+  "sce Spec Reference": {
+    "prefix": "sce-ref",
     "body": [
       "// Task ${1:1.1}: ${2:Task description}",
       "// Spec: .kiro/specs/${3:spec-name}/",
@@ -93,10 +93,10 @@
       "// Requirements: ${5:FR-1, FR-2}",
       "//"
     ],
-    "description": "Add kse Spec reference comment"
+    "description": "Add sce Spec reference comment"
   },
-  "kse Task Header": {
-    "prefix": "kse-task",
+  "sce Task Header": {
+    "prefix": "sce-task",
     "body": [
       "/**",
       " * Task ${1:1.1}: ${2:Task description}",
@@ -109,7 +109,7 @@
       " * - ${6:Note 1}",
       " */"
     ],
-    "description": "Add kse task header comment"
+    "description": "Add sce task header comment"
   }
 }
 ```
@@ -187,7 +187,7 @@
 
 1. **在文件中输入：**
    ```
-   kse-ref
+   sce-ref
    ```
 
 2. **按 Tab** - 片段展开为：
@@ -211,7 +211,7 @@
 
 ```bash
 # 1. 创建 Spec
-kse spec bootstrap --name 01-00-user-login --non-interactive
+sce spec bootstrap --name 01-00-user-login --non-interactive
 
 # 2. 在 VS Code 中编写 Spec
 # - 打开 requirements.md
@@ -221,8 +221,8 @@ kse spec bootstrap --name 01-00-user-login --non-interactive
 # 3. 创建实现文件
 # src/auth/AuthController.js
 
-# 4. 添加 Spec 引用（使用 kse-ref 片段）
-kse-ref [Tab]
+# 4. 添加 Spec 引用（使用 sce-ref 片段）
+sce-ref [Tab]
 
 # 5. 开始编码 - Copilot 建议代码
 
@@ -428,7 +428,7 @@ Copilot 使用所有打开文件的上下文。
 
 ## 相关文档
 
-- 📖 [快速入门指南](../quick-start.md) - 开始使用 kse
+- 📖 [快速入门指南](../quick-start.md) - 开始使用 sce
 - 🔌 [集成模式](../integration-modes.md) - 理解手动导出模式
 - 📋 [Spec 工作流](../spec-workflow.md) - 创建有效的 Spec
 - 🔧 [故障排除](../troubleshooting.md) - 常见问题

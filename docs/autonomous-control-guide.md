@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Autonomous Control feature transforms kse from an interactive assistant into an autonomous development partner. AI can independently manage entire development workflows - from understanding user goals to delivering production-ready features.
+The Autonomous Control feature transforms sce from an interactive assistant into an autonomous development partner. AI can independently manage entire development workflows - from understanding user goals to delivering production-ready features.
 
 **Key Capabilities**:
 - **Autonomous Spec Creation**: Generate requirements, design, and tasks without step-by-step confirmation
@@ -25,43 +25,43 @@ The Autonomous Control feature transforms kse from an interactive assistant into
 # 1) auto decompose goal into master/sub specs
 # 2) initialize collaboration metadata and assignments
 # 3) run orchestration to terminal state
-kse auto close-loop "build autonomous close-loop and master/sub multi-spec execution for kse"
+sce auto close-loop "build autonomous close-loop and master/sub multi-spec execution for sce"
 
 # Disable live status stream output when running in quiet terminals
-kse auto close-loop "build autonomous close-loop and master/sub multi-spec execution for kse" --no-stream
+sce auto close-loop "build autonomous close-loop and master/sub multi-spec execution for sce" --no-stream
 
 # Add final Definition-of-Done (DoD) test gate
-kse auto close-loop "build autonomous close-loop and master/sub multi-spec execution for kse" \
+sce auto close-loop "build autonomous close-loop and master/sub multi-spec execution for sce" \
   --dod-tests "npm run test:smoke"
 
 # Strict DoD: require all tasks checklists are closed
-kse auto close-loop "build autonomous close-loop and master/sub multi-spec execution for kse" \
+sce auto close-loop "build autonomous close-loop and master/sub multi-spec execution for sce" \
   --dod-tasks-closed
 
 # Persist DoD evidence into a custom report file
-kse auto close-loop "build autonomous close-loop and master/sub multi-spec execution for kse" \
+sce auto close-loop "build autonomous close-loop and master/sub multi-spec execution for sce" \
   --dod-report ".kiro/reports/close-loop-dod.json"
 
 # Resume interrupted close-loop from latest session
-kse auto close-loop --resume latest
+sce auto close-loop --resume latest
 
 # Resume interrupted close-loop from a specific session id
-kse auto close-loop --resume 117-20260214230000
+sce auto close-loop --resume 117-20260214230000
 
 # Increase automatic replan budget after orchestration failures
-kse auto close-loop "build autonomous close-loop and master/sub multi-spec execution for kse" \
+sce auto close-loop "build autonomous close-loop and master/sub multi-spec execution for sce" \
   --replan-attempts 2
 
 # Use fixed replan budget strategy (adaptive is default)
-kse auto close-loop "build autonomous close-loop and master/sub multi-spec execution for kse" \
+sce auto close-loop "build autonomous close-loop and master/sub multi-spec execution for sce" \
   --replan-attempts 2 \
   --replan-strategy fixed
 
 # Batch mode: run multiple goals autonomously (each goal gets its own master/sub portfolio)
-kse auto close-loop-batch .kiro/goals.json --json
+sce auto close-loop-batch .kiro/goals.json --json
 
 # Program mode: decompose one broad goal into multiple batch goals automatically
-kse auto close-loop-batch \
+sce auto close-loop-batch \
   --decompose-goal "build autonomous close-loop, master/sub decomposition, orchestration and quality rollout" \
   --program-goals 4 \
   --program-min-quality-score 85 \
@@ -69,7 +69,7 @@ kse auto close-loop-batch \
   --json
 
 # Program command: broad goal -> semantic decomposition -> autonomous batch closed-loop
-kse auto close-loop-program \
+sce auto close-loop-program \
   "build autonomous close-loop, master/sub decomposition, orchestration and quality rollout" \
   --program-goals 4 \
   --program-quality-gate \
@@ -88,7 +88,7 @@ kse auto close-loop-program \
   --json
 
 # Controller command: drain queue goals with autonomous close-loop-program runtime
-kse auto close-loop-controller .kiro/auto/program-queue.lines \
+sce auto close-loop-controller .kiro/auto/program-queue.lines \
   --dequeue-limit 2 \
   --max-cycles 20 \
   --controller-done-file .kiro/auto/program-done.lines \
@@ -96,18 +96,18 @@ kse auto close-loop-controller .kiro/auto/program-queue.lines \
   --json
 
 # Persistent controller mode: keep polling queue and execute new goals automatically
-kse auto close-loop-controller .kiro/auto/program-queue.lines \
+sce auto close-loop-controller .kiro/auto/program-queue.lines \
   --wait-on-empty \
   --poll-seconds 30 \
   --max-cycles 1000 \
   --max-minutes 240
 
 # Resume from latest persisted controller session
-kse auto close-loop-controller --controller-resume latest --json
+sce auto close-loop-controller --controller-resume latest --json
 
 # Recovery command: consume diagnostics and auto-recover unresolved goals
-kse auto close-loop-recover latest --json
-kse auto close-loop-recover .kiro/auto/close-loop-batch-summaries/batch-20260215090000.json \
+sce auto close-loop-recover latest --json
+sce auto close-loop-recover .kiro/auto/close-loop-batch-summaries/batch-20260215090000.json \
   --use-action 2 \
   --recover-until-complete \
   --recover-max-rounds 3 \
@@ -118,52 +118,52 @@ kse auto close-loop-recover .kiro/auto/close-loop-batch-summaries/batch-20260215
   --dry-run --json
 
 # Default autonomous batch run (continue-on-error + adaptive scheduling + retry-until-complete)
-kse auto close-loop-batch .kiro/goals.json --json
+sce auto close-loop-batch .kiro/goals.json --json
 
 # Batch parallel mode: run multiple goals concurrently
-kse auto close-loop-batch .kiro/goals.json --batch-parallel 3 --json
+sce auto close-loop-batch .kiro/goals.json --batch-parallel 3 --json
 
 # Batch with global agent budget (automatic per-goal maxParallel throttling)
-kse auto close-loop-batch .kiro/goals.json \
+sce auto close-loop-batch .kiro/goals.json \
   --batch-parallel 3 \
   --batch-agent-budget 6 \
   --json
 
 # Batch priority scheduling with aging (favor complex goals, prevent starvation)
-kse auto close-loop-batch .kiro/goals.json \
+sce auto close-loop-batch .kiro/goals.json \
   --batch-priority critical-first \
   --batch-aging-factor 3 \
   --json
 
 # Auto-retry failed/stopped goals in the same batch run
-kse auto close-loop-batch .kiro/goals.json \
+sce auto close-loop-batch .kiro/goals.json \
   --batch-retry-rounds 1 \
   --batch-retry-strategy adaptive \
   --json
 
 # Keep retrying until all goals complete (bounded)
-kse auto close-loop-batch .kiro/goals.json \
+sce auto close-loop-batch .kiro/goals.json \
   --batch-retry-until-complete \
   --batch-retry-max-rounds 10 \
   --json
 
 # Disable autonomous closed-loop batch policy (only when you need legacy/manual tuning)
-kse auto close-loop-batch .kiro/goals.json \
+sce auto close-loop-batch .kiro/goals.json \
   --no-batch-autonomous \
   --json
 
 # Resume a stopped/failed batch from previous summary output
-kse auto close-loop-batch --resume-from-summary .kiro/reports/close-loop-batch.json --json
+sce auto close-loop-batch --resume-from-summary .kiro/reports/close-loop-batch.json --json
 
 # Resume from latest persisted batch summary session
-kse auto close-loop-batch --resume-from-summary latest --json
+sce auto close-loop-batch --resume-from-summary latest --json
 
 # Resume only failed/error goals from summary
-kse auto close-loop-batch --resume-from-summary .kiro/reports/close-loop-batch.json \
+sce auto close-loop-batch --resume-from-summary .kiro/reports/close-loop-batch.json \
   --resume-strategy failed-only --json
 
 # Batch dry-run for portfolio planning only
-kse auto close-loop-batch .kiro/goals.txt --format lines --dry-run --json
+sce auto close-loop-batch .kiro/goals.txt --format lines --dry-run --json
 ```
 
 Default DoD gates:
@@ -188,15 +188,15 @@ Session persistence and resume:
 - `--no-session`: disable session snapshot persistence
 - `--session-keep <n>`: automatically prune old snapshots and keep newest `n` after each close-loop run
 - `--session-older-than-days <n>`: when pruning, only delete snapshots older than `n` days
-- `kse auto session list [--limit <n>] [--status <csv>]`: inspect persisted sessions (`--status` supports comma-separated, case-insensitive filters)
-- `kse auto session stats [--days <n>] [--status <csv>] [--json]`: aggregate session status/topology telemetry in an optional recent-day window
-- `kse auto session prune --keep <n> [--older-than-days <n>]`: enforce retention policy
+- `sce auto session list [--limit <n>] [--status <csv>]`: inspect persisted sessions (`--status` supports comma-separated, case-insensitive filters)
+- `sce auto session stats [--days <n>] [--status <csv>] [--json]`: aggregate session status/topology telemetry in an optional recent-day window
+- `sce auto session prune --keep <n> [--older-than-days <n>]`: enforce retention policy
   - List JSON output includes `status_filter` and `status_counts` for filtered session distributions.
   - Stats JSON output includes `criteria`, completion/failure rates, `sub_spec_count_sum`, `master_spec_counts`, and `latest_sessions`.
 
 Spec directory maintenance:
-- `kse auto spec-session list [--limit <n>] [--json]`: inspect spec directory inventory under `.kiro/specs`
-- `kse auto spec-session prune --keep <n> [--older-than-days <n>] [--no-protect-active] [--protect-window-days <n>] [--show-protection-reasons] [--dry-run] [--json]`: prune old spec directories by retention policy (default protects active/recent specs)
+- `sce auto spec-session list [--limit <n>] [--json]`: inspect spec directory inventory under `.kiro/specs`
+- `sce auto spec-session prune --keep <n> [--older-than-days <n>] [--no-protect-active] [--protect-window-days <n>] [--show-protection-reasons] [--dry-run] [--json]`: prune old spec directories by retention policy (default protects active/recent specs)
   - Protection sources include collaboration state, close-loop sessions, batch summaries, and controller sessions (via nested batch summary references).
   - JSON output always includes `protection_ranking_top`; enable `--show-protection-reasons` for full `protection_ranking` and per-spec reason payload.
 
@@ -206,9 +206,9 @@ Batch summary session persistence and maintenance:
 - `--batch-session-keep <n>`: auto-prune archive and keep newest `n` summaries after each batch run
 - `--batch-session-older-than-days <n>`: when pruning, only delete summaries older than `n` days
 - `--no-batch-session`: disable batch summary archive for the current run
-- `kse auto batch-session list [--limit <n>] [--status <csv>]`: inspect persisted batch summary sessions (`--status` supports comma-separated, case-insensitive filters)
-- `kse auto batch-session stats [--days <n>] [--status <csv>] [--json]`: aggregate batch session status/goal-volume telemetry in an optional recent-day window
-- `kse auto batch-session prune --keep <n> [--older-than-days <n>]`: enforce batch summary retention policy
+- `sce auto batch-session list [--limit <n>] [--status <csv>]`: inspect persisted batch summary sessions (`--status` supports comma-separated, case-insensitive filters)
+- `sce auto batch-session stats [--days <n>] [--status <csv>] [--json]`: aggregate batch session status/goal-volume telemetry in an optional recent-day window
+- `sce auto batch-session prune --keep <n> [--older-than-days <n>]`: enforce batch summary retention policy
   - List JSON output includes `status_filter` and `status_counts` for filtered status composition.
   - Stats JSON output includes `criteria`, completion/failure rates, goal-volume sums, processed ratio, and `latest_sessions`.
 
@@ -218,36 +218,36 @@ Controller summary session persistence and maintenance:
 - `--controller-session-keep <n>`: auto-prune archive and keep newest `n` summaries after each controller run
 - `--controller-session-older-than-days <n>`: when pruning, only delete summaries older than `n` days
 - `--no-controller-session`: disable controller summary archive for the current run
-- `kse auto controller-session list [--limit <n>] [--status <csv>]`: inspect persisted controller summary sessions (`--status` supports comma-separated, case-insensitive filters)
-- `kse auto controller-session stats [--days <n>] [--status <csv>] [--json]`: aggregate controller session status/throughput telemetry in an optional recent-day window
-- `kse auto controller-session prune --keep <n> [--older-than-days <n>]`: enforce controller summary retention policy
+- `sce auto controller-session list [--limit <n>] [--status <csv>]`: inspect persisted controller summary sessions (`--status` supports comma-separated, case-insensitive filters)
+- `sce auto controller-session stats [--days <n>] [--status <csv>] [--json]`: aggregate controller session status/throughput telemetry in an optional recent-day window
+- `sce auto controller-session prune --keep <n> [--older-than-days <n>]`: enforce controller summary retention policy
   - List JSON output includes `status_filter` and `status_counts` for filtered status composition.
   - Stats JSON output includes `criteria`, `status_counts`, `queue_format_counts`, completion/failure rates, goal-volume sums, and `latest_sessions`.
 
 Cross-archive governance snapshot:
-- `kse auto governance stats [--days <n>] [--status <csv>] [--json]`: aggregate a unified governance cockpit over session/batch/controller archives plus recovery memory state.
+- `sce auto governance stats [--days <n>] [--status <csv>] [--json]`: aggregate a unified governance cockpit over session/batch/controller archives plus recovery memory state.
   - JSON output includes `totals`, `throughput`, `top_master_specs`, per-archive `archives.*` stats payloads, and `health` diagnostics (`risk_level`, `concerns`, `recommendations`) for one-command close-loop governance checks.
-- `kse auto governance maintain [--days <n>] [--status <csv>] [--session-keep <n>] [--batch-session-keep <n>] [--controller-session-keep <n>] [--recovery-memory-older-than-days <n>] [--apply] [--dry-run] [--json]`: close-loop governance maintenance entrypoint.
+- `sce auto governance maintain [--days <n>] [--status <csv>] [--session-keep <n>] [--batch-session-keep <n>] [--controller-session-keep <n>] [--recovery-memory-older-than-days <n>] [--apply] [--dry-run] [--json]`: close-loop governance maintenance entrypoint.
   - Default is plan-only (`assessment` + `plan`).
   - `--apply` executes maintenance actions for archive hygiene (session/batch/controller pruning + recovery-memory stale-entry pruning).
   - `--dry-run` can be combined with `--apply` to validate maintenance impact before deletion.
-- `kse auto governance close-loop [--max-rounds <n>] [--target-risk <low|medium|high>] [--governance-resume <session|latest|file>] [--governance-resume-allow-drift] [--governance-session-id <id>] [--no-governance-session] [--governance-session-keep <n>] [--governance-session-older-than-days <n>] [--execute-advisory] [--advisory-recover-max-rounds <n>] [--advisory-controller-max-cycles <n>] [--plan-only] [--dry-run] [--json]`: governance round-loop runner.
+- `sce auto governance close-loop [--max-rounds <n>] [--target-risk <low|medium|high>] [--governance-resume <session|latest|file>] [--governance-resume-allow-drift] [--governance-session-id <id>] [--no-governance-session] [--governance-session-keep <n>] [--governance-session-older-than-days <n>] [--execute-advisory] [--advisory-recover-max-rounds <n>] [--advisory-controller-max-cycles <n>] [--plan-only] [--dry-run] [--json]`: governance round-loop runner.
   - Orchestrates repeated `governance maintain` rounds until target risk or stop condition is reached.
   - Governance close-loop sessions persist by default at `.kiro/auto/governance-close-loop-sessions`; use `--governance-resume` to continue interrupted governance loops.
   - Resume defaults inherit persisted governance policy (`target_risk`, `execute_advisory`, `advisory_policy`) to avoid accidental configuration drift; explicit drift is blocked unless `--governance-resume-allow-drift` is set.
   - `--governance-session-keep` enables automatic post-run governance session pruning (optional age window via `--governance-session-older-than-days`) while preserving the current run session file.
   - `--execute-advisory` enables automatic advisory action execution when detected (`recover-latest`, `controller-resume-latest`), with autonomous source selection (latest recoverable summary / latest pending controller session) and `skipped` telemetry when no actionable source exists.
   - Emits round history (`risk_before`/`risk_after`, planned/applicable/applied/failed actions), advisory telemetry (`advisory_*` fields), plus initial/final assessments for auditable autonomous governance convergence.
-- `kse auto governance session list [--limit <n>] [--status <csv>] [--resume-only] [--json]`: inspect persisted governance close-loop session archive (optional resumed-chain filter).
-- `kse auto governance session stats [--days <n>] [--status <csv>] [--resume-only] [--json]`: aggregate governance session completion/failure/convergence/risk telemetry with resumed-session ratio/source breakdown.
-- `kse auto governance session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: enforce governance session retention policy.
+- `sce auto governance session list [--limit <n>] [--status <csv>] [--resume-only] [--json]`: inspect persisted governance close-loop session archive (optional resumed-chain filter).
+- `sce auto governance session stats [--days <n>] [--status <csv>] [--resume-only] [--json]`: aggregate governance session completion/failure/convergence/risk telemetry with resumed-session ratio/source breakdown.
+- `sce auto governance session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: enforce governance session retention policy.
 
 Recovery memory maintenance:
 - Default recovery memory file: `.kiro/auto/close-loop-recovery-memory.json`
-- `kse auto recovery-memory show [--scope <scope>] [--json]`: inspect learned failure signatures and action stats (optionally by scope)
-- `kse auto recovery-memory scopes [--json]`: inspect aggregated recovery-memory metrics grouped by scope
-- `kse auto recovery-memory prune [--older-than-days <n>] [--scope <scope>] [--dry-run] [--json]`: prune stale memory entries (optionally by scope)
-- `kse auto recovery-memory clear [--json]`: clear learned recovery memory
+- `sce auto recovery-memory show [--scope <scope>] [--json]`: inspect learned failure signatures and action stats (optionally by scope)
+- `sce auto recovery-memory scopes [--json]`: inspect aggregated recovery-memory metrics grouped by scope
+- `sce auto recovery-memory prune [--older-than-days <n>] [--scope <scope>] [--dry-run] [--json]`: prune stale memory entries (optionally by scope)
+- `sce auto recovery-memory clear [--json]`: clear learned recovery memory
 
 Automatic decomposition scale:
 - Default sub-spec count is inferred from goal complexity (typically `3-5`)
@@ -262,7 +262,7 @@ Automatic failure replanning:
 - Repeated failed-spec signatures auto-stop replanning to prevent infinite low-value retry loops
 
 Batch multi-goal autonomous execution:
-- Command: `kse auto close-loop-batch <goals-file>`
+- Command: `sce auto close-loop-batch <goals-file>`
 - Goals file formats: JSON array / JSON `{ "goals": [] }` / line-based text
 - `--format <auto|json|lines>`: force parser mode when needed
 - `--decompose-goal <goal>`: generate batch goals from one broad goal using semantic decomposition
@@ -306,14 +306,14 @@ Batch multi-goal autonomous execution:
 - Each goal still keeps independent session snapshots and governance artifacts
 
 Close-loop program command:
-- Command: `kse auto close-loop-program "<goal>"`
+- Command: `sce auto close-loop-program "<goal>"`
 - Built for broad, multi-track goals and defaults to autonomous batch closed-loop policy.
 - Automatically performs semantic decomposition into multiple goals and executes them as one program.
 - `--program-goals <n>` tunes decomposition width (`2-12`, default adaptive).
 - Reuses batch execution controls and summary/session persistence controls.
 - Program command now includes built-in auto recovery loop by default; it does not require a second manual command.
 - `--no-program-auto-recover` disables built-in recovery loop.
-- `--program-recover-use-action <n>` pins remediation action for built-in recovery; if omitted, KSE picks from recovery memory or falls back to action `1`.
+- `--program-recover-use-action <n>` pins remediation action for built-in recovery; if omitted, sce picks from recovery memory or falls back to action `1`.
 - `--program-recover-resume-strategy <pending|failed-only>` controls recovery scope.
 - `--program-recover-max-rounds <n>` sets bounded built-in recovery rounds (`1-20`, default `5`).
 - `--program-recover-max-minutes <n>` sets elapsed-time budget for built-in recovery loop (minutes, default unlimited).
@@ -339,7 +339,7 @@ Close-loop program command:
 - Summary includes `program_coordination` (master/sub topology, unresolved goal indexes, scheduler telemetry) and `auto_recovery` metadata.
 
 Close-loop controller command:
-- Command: `kse auto close-loop-controller [queue-file]`
+- Command: `sce auto close-loop-controller [queue-file]`
 - Runs a queue-driven autonomous loop: dequeue broad goals, execute each by `close-loop-program`, persist remaining queue, and continue until stop condition.
 - Queue file defaults to `.kiro/auto/close-loop-controller-goals.lines`; supports `auto|json|lines` parsing via `--queue-format`.
 - `--controller-resume <session-or-file>` resumes queue/controller context from persisted controller session (`latest`, session id, or file path).
@@ -356,7 +356,7 @@ Close-loop controller command:
 - Output summary includes `history`, `results`, final `pending_goals`, `stop_reason`, `exhausted`, dedupe/lock/session, and resume-source telemetry.
 
 Close-loop recovery command:
-- Command: `kse auto close-loop-recover [summary]` (defaults to `latest` if summary is omitted).
+- Command: `sce auto close-loop-recover [summary]` (defaults to `latest` if summary is omitted).
 - Loads unresolved goals from a prior summary and applies selected remediation strategy patch automatically.
 - `--use-action <n>` chooses which remediation action to execute.
 - `--recover-until-complete` + `--recover-max-rounds` enables self-healing multi-round recovery until convergence.
@@ -369,7 +369,7 @@ Close-loop recovery command:
 - `--spec-session-max-total <n>` + `--spec-session-budget-hard-fail` add optional spec-count budget governance for autonomous recovery loops.
 - `--program-gate-profile <profile>` + `--program-gate-fallback-*` + `--program-min-success-rate` + `--program-max-risk-level` + `--program-max-*` make recovery use the same convergence/budget gate strategy as program mode.
 - `--no-program-gate-auto-remediate` disables automatic remediation patch/prune hints after recovery gate failure.
-- When `--use-action` is omitted, KSE can auto-select action from learned recovery memory.
+- When `--use-action` is omitted, sce can auto-select action from learned recovery memory.
 - `--program-audit-out <path>` exports full recovery/program audit JSON.
 - Output includes `recovered_from_summary`, `recovery_plan` (including `selection_explain`), `recovery_cycle` (with elapsed/budget metadata), and `recovery_memory` (including scope + selection explanation) for full auditability of applied strategy changes.
 
@@ -383,7 +383,7 @@ Program governance loop (for `close-loop-program`):
 - Output includes `program_governance`, `program_kpi_trend`, and `program_kpi_anomalies` for traceable autonomous stabilization history.
 
 KPI trend command:
-- `kse auto kpi trend --weeks <n> --mode <all|batch|program|recover|controller> --period <week|day> --json` aggregates periodic success/completion, failure, sub-spec, and spec-growth telemetry from persisted autonomous session summaries.
+- `sce auto kpi trend --weeks <n> --mode <all|batch|program|recover|controller> --period <week|day> --json` aggregates periodic success/completion, failure, sub-spec, and spec-growth telemetry from persisted autonomous session summaries.
 - Add `--csv` to print/export trend buckets as CSV (`--out` writes CSV when `--csv` is enabled).
 - JSON output now includes `mode_breakdown` (batch/program/recover/controller/other distribution), `anomaly_detection`, and `anomalies` for latest-period regression signals (success-rate drop, failed-goal spike, spec-growth spike).
 
@@ -391,7 +391,7 @@ KPI trend command:
 
 ```bash
 # Create a new Spec and execute it autonomously
-kse auto create "user authentication with JWT tokens"
+sce auto create "user authentication with JWT tokens"
 ```
 
 This single command will:
@@ -407,28 +407,28 @@ This single command will:
 
 ```bash
 # Run an existing Spec autonomously
-kse auto run 33-00-ai-autonomous-control
+sce auto run 33-00-ai-autonomous-control
 ```
 
 ### Check Status
 
 ```bash
 # View current execution status
-kse auto status
+sce auto status
 ```
 
 ### Resume After Pause
 
 ```bash
 # Resume from last checkpoint
-kse auto resume
+sce auto resume
 ```
 
 ### Stop Execution
 
 ```bash
 # Gracefully stop and save state
-kse auto stop
+sce auto stop
 ```
 
 ## Execution Modes
@@ -551,16 +551,16 @@ Per-spec configuration overrides global settings.
 
 ```bash
 # View current configuration
-kse auto config
+sce auto config
 
 # Set mode
-kse auto config --mode aggressive
+sce auto config --mode aggressive
 
 # Enable/disable checkpoints
-kse auto config --checkpoint phaseCompletion=false
+sce auto config --checkpoint phaseCompletion=false
 
 # Set error recovery attempts
-kse auto config --error-recovery maxAttempts=5
+sce auto config --error-recovery maxAttempts=5
 ```
 
 ## Error Recovery
@@ -606,13 +606,13 @@ The error recovery system learns from experience:
 
 ```bash
 # List available checkpoints
-kse auto checkpoints
+sce auto checkpoints
 
 # Rollback to specific checkpoint
-kse auto rollback <checkpoint-id>
+sce auto rollback <checkpoint-id>
 
 # Rollback to last checkpoint
-kse auto rollback --last
+sce auto rollback --last
 ```
 
 **What Gets Rolled Back**:
@@ -634,10 +634,10 @@ kse auto rollback --last
 
 ```bash
 # Allow specific operation
-kse auto config --safety allowedOperations=api-call,network-request
+sce auto config --safety allowedOperations=api-call,network-request
 
 # Block specific operation
-kse auto config --safety blockedOperations=delete-file,drop-database
+sce auto config --safety blockedOperations=delete-file,drop-database
 ```
 
 ## Progress Tracking
@@ -645,7 +645,7 @@ kse auto config --safety blockedOperations=delete-file,drop-database
 ### Real-Time Status
 
 ```bash
-kse auto status
+sce auto status
 ```
 
 **Output**:
@@ -679,8 +679,8 @@ Recent Actions:
 
 ```bash
 # Generate detailed report
-kse auto report --format markdown --output report.md
-kse auto report --format json --output report.json
+sce auto report --format markdown --output report.md
+sce auto report --format json --output report.json
 ```
 
 ## Best Practices
@@ -713,7 +713,7 @@ kse auto report --format json --output report.json
 **Graceful Stop**:
 ```bash
 # Stop and save state
-kse auto stop
+sce auto stop
 ```
 
 **Emergency Stop** (Ctrl+C):
@@ -724,7 +724,7 @@ kse auto stop
 **Resume**:
 ```bash
 # Resume from where you left off
-kse auto resume
+sce auto resume
 ```
 
 ## Troubleshooting
@@ -734,10 +734,10 @@ kse auto resume
 **Symptom**: Progress not advancing
 
 **Solutions**:
-1. Check status: `kse auto status`
+1. Check status: `sce auto status`
 2. Review recent actions for errors
 3. Check if waiting for user input
-4. Stop and resume: `kse auto stop && kse auto resume`
+4. Stop and resume: `sce auto stop && sce auto resume`
 
 ### Repeated Errors
 
@@ -755,7 +755,7 @@ kse auto resume
 
 **Solutions**:
 1. Check mode configuration
-2. Verify checkpoint settings: `kse auto config`
+2. Verify checkpoint settings: `sce auto config`
 3. Ensure phase actually completed
 
 ### Rollback Failed
@@ -763,7 +763,7 @@ kse auto resume
 **Symptom**: Cannot rollback to checkpoint
 
 **Solutions**:
-1. Check if checkpoint exists: `kse auto checkpoints`
+1. Check if checkpoint exists: `sce auto checkpoints`
 2. Verify no external file modifications
 3. Try earlier checkpoint
 4. Manual recovery if needed
@@ -802,10 +802,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install kse
-        run: npm install -g kiro-spec-engine
+      - name: Install sce
+        run: npm install -g scene-capability-engine
       - name: Create feature autonomously
-        run: kse auto create "${{ github.event.issue.title }}"
+        run: sce auto create "${{ github.event.issue.title }}"
       - name: Create pull request
         uses: peter-evans/create-pull-request@v4
 ```
@@ -814,10 +814,10 @@ jobs:
 
 ```bash
 # Enable notifications
-kse auto config --notifications enabled=true onError=true onCompletion=true
+sce auto config --notifications enabled=true onError=true onCompletion=true
 
 # Export logs for monitoring
-kse auto report --format json | jq '.errors'
+sce auto report --format json | jq '.errors'
 ```
 
 ## FAQ
@@ -826,10 +826,10 @@ kse auto report --format json | jq '.errors'
 A: Depends on feature complexity. Simple features: 5-15 minutes. Complex features: 30-60 minutes. The system provides real-time estimates.
 
 **Q: Can I interrupt autonomous execution?**
-A: Yes, use `kse auto stop` or Ctrl+C. State is saved and you can resume later.
+A: Yes, use `sce auto stop` or Ctrl+C. State is saved and you can resume later.
 
 **Q: What happens if my computer crashes during execution?**
-A: State is saved periodically. Resume from last checkpoint with `kse auto resume`.
+A: State is saved periodically. Resume from last checkpoint with `sce auto resume`.
 
 **Q: How accurate is error recovery?**
 A: Improves over time. Initial success rate ~60-70%, improves to ~85-90% with learning.
@@ -838,10 +838,10 @@ A: Improves over time. Initial success rate ~60-70%, improves to ~85-90% with le
 A: Yes, use conservative mode with checkpoint reviews enabled.
 
 **Q: Does autonomous mode work with existing Specs?**
-A: Yes, use `kse auto run <spec-name>` to execute existing Specs autonomously.
+A: Yes, use `sce auto run <spec-name>` to execute existing Specs autonomously.
 
 **Q: How do I disable autonomous mode?**
-A: Simply don't use `kse auto` commands. Use regular `kse` commands for interactive mode.
+A: Simply don't use `sce auto` commands. Use regular `sce` commands for interactive mode.
 
 ## See Also
 

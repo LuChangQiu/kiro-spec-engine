@@ -417,7 +417,7 @@ describe('DiagnosticEngine', () => {
       
       expect(report.recommendations).toEqual(
         expect.arrayContaining([
-          expect.stringContaining('kse cleanup')
+          expect.stringContaining('sce cleanup')
         ])
       );
     });
@@ -435,7 +435,7 @@ describe('DiagnosticEngine', () => {
       
       expect(report.recommendations).toEqual(
         expect.arrayContaining([
-          expect.stringContaining('kse docs archive')
+          expect.stringContaining('sce docs archive')
         ])
       );
     });
@@ -448,7 +448,7 @@ describe('DiagnosticEngine', () => {
       
       expect(report.recommendations).toEqual(
         expect.arrayContaining([
-          expect.stringContaining('kse validate')
+          expect.stringContaining('sce validate')
         ])
       );
     });

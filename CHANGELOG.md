@@ -8,40 +8,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **SCE naming consolidation + compatibility bridge**: Rebranded product naming to `Scene Capability Engine`, moved package to `scene-capability-engine`, promoted `sce` as the primary CLI command, and preserved `sco` / `kse` / `kiro-spec-engine` aliases for migration continuity.
+- **SCE naming consolidation + compatibility bridge**: Rebranded product naming to `Scene Capability Engine`, moved package to `scene-capability-engine`, promoted `sce` as the primary CLI command, and preserved `sco` / `sce` / `scene-capability-engine` aliases for migration continuity.
 - **Branding consistency release guard**: Added `test:brand-consistency` to block publish when legacy repository/package/product naming reappears in tracked source files.
 - **Rate-limit launch budget safety guard**: Hardened orchestration launch-budget bookkeeping to safely handle partially initialized engine instances in property/instrumentation scenarios.
 - **Property test CI stability (`orchestration-engine.property`)**: Disabled launch-budget waiting in parallel invariant property harness to avoid artificial 60s hold windows and intermittent Jest worker crashes under high-concurrency CI runs.
-- **Moqui runtime binding config overrides**: Added `--moqui-config <path>` to `kse scene run` and `kse scene doctor`, allowing runtime binding resolution to use an explicit `moqui-adapter.json` path per execution context.
+- **Moqui runtime binding config overrides**: Added `--moqui-config <path>` to `sce scene run` and `sce scene doctor`, allowing runtime binding resolution to use an explicit `moqui-adapter.json` path per execution context.
 - **Moqui client rate-limit resilience tests**: Added dedicated unit coverage for `429 Too Many Requests` retry/exhaustion handling and retryable network error recovery in `tests/unit/scene-runtime/moqui-client.test.js`.
 - **Template ontology contract completeness**: Hardened scene package template contract examples to include ontology entities/relations plus governance lineage/rules/decision sections required by strict lint and ontology validation flows.
-- **Scene ontology impact/path analysis commands**: Added `kse scene ontology impact` (reverse dependency blast-radius analysis with `--relation` and `--max-depth`) and `kse scene ontology path` (shortest relation path between refs with optional `--undirected`) to improve ontology-driven change planning and explainability.
+- **Scene ontology impact/path analysis commands**: Added `sce scene ontology impact` (reverse dependency blast-radius analysis with `--relation` and `--max-depth`) and `sce scene ontology path` (shortest relation path between refs with optional `--undirected`) to improve ontology-driven change planning and explainability.
 - **Close-loop quantitative DoD gates**: Added `--dod-max-risk-level`, `--dod-kpi-min-completion-rate`, `--dod-max-success-rate-drop`, and `--dod-baseline-window` so autonomous closure can enforce explicit risk/KPI/baseline thresholds beyond binary checks.
 - **Close-loop conflict/ontology execution planning**: Added lease-conflict scheduling governance and scene ontology scheduling guidance with opt-out controls (`--no-conflict-governance`, `--no-ontology-guidance`), and surfaced planning telemetry in `portfolio.execution_plan` plus agent sync plan output.
 - **Close-loop strategy memory feedback loop**: Added persisted strategy memory (`.kiro/auto/close-loop-strategy-memory.json`) to reuse prior goal-level policy hints and track-level feedback bias during decomposition, with run telemetry under `strategy_memory`.
-- **Unified autonomous observability snapshot**: Added `kse auto observability snapshot` to aggregate close-loop, batch, controller, governance, and KPI-trend telemetry into one machine-readable payload.
-- **Agent-facing spec JSON interfaces**: Added `kse auto spec status <spec-name> --json` and `kse auto spec instructions <spec-name> --json` for structured status/instruction retrieval in master-sub agent workflows.
-- **Autonomous archive schema compatibility tooling**: Added `kse auto schema check` and `kse auto schema migrate` (dry-run by default, `--apply` to persist) to audit and migrate `schema_version` across autonomous archives.
-- **Governance resumed-session filtering and ratio telemetry**: `kse auto governance session list|stats` now support `--resume-only`, with new resumed/fresh counters and resume lineage composition telemetry (`resumed_rate_percent`, `resumed_from_counts`) for resumed-chain observability.
-- **Governance close-loop post-run retention hook**: Added `--governance-session-keep` and `--governance-session-older-than-days` to `kse auto governance close-loop` for automatic governance session archive pruning after each run, with current session protection and telemetry in `governance_session_prune`.
-- **Governance resume drift guardrails**: `kse auto governance close-loop --governance-resume` now reuses persisted target/advisory policy defaults by default and blocks explicit policy drift unless `--governance-resume-allow-drift` is set, reducing accidental resume misconfiguration.
-- **Governance session maintenance commands**: Added `kse auto governance session list|stats|prune` for persisted governance close-loop session observability and retention management, including status/day filters, convergence/risk telemetry, and archive cleanup controls (`--keep`, `--older-than-days`, `--dry-run`).
+- **Unified autonomous observability snapshot**: Added `sce auto observability snapshot` to aggregate close-loop, batch, controller, governance, and KPI-trend telemetry into one machine-readable payload.
+- **Agent-facing spec JSON interfaces**: Added `sce auto spec status <spec-name> --json` and `sce auto spec instructions <spec-name> --json` for structured status/instruction retrieval in master-sub agent workflows.
+- **Autonomous archive schema compatibility tooling**: Added `sce auto schema check` and `sce auto schema migrate` (dry-run by default, `--apply` to persist) to audit and migrate `schema_version` across autonomous archives.
+- **Governance resumed-session filtering and ratio telemetry**: `sce auto governance session list|stats` now support `--resume-only`, with new resumed/fresh counters and resume lineage composition telemetry (`resumed_rate_percent`, `resumed_from_counts`) for resumed-chain observability.
+- **Governance close-loop post-run retention hook**: Added `--governance-session-keep` and `--governance-session-older-than-days` to `sce auto governance close-loop` for automatic governance session archive pruning after each run, with current session protection and telemetry in `governance_session_prune`.
+- **Governance resume drift guardrails**: `sce auto governance close-loop --governance-resume` now reuses persisted target/advisory policy defaults by default and blocks explicit policy drift unless `--governance-resume-allow-drift` is set, reducing accidental resume misconfiguration.
+- **Governance session maintenance commands**: Added `sce auto governance session list|stats|prune` for persisted governance close-loop session observability and retention management, including status/day filters, convergence/risk telemetry, and archive cleanup controls (`--keep`, `--older-than-days`, `--dry-run`).
 - **Governance close-loop session persistence and resume**: Added default governance loop session archiving (`.kiro/auto/governance-close-loop-sessions`) with controls `--governance-session-id`, `--no-governance-session`, and `--governance-resume <session|latest|file>` so interrupted governance rounds can be resumed without restarting from round 1.
-- **Governance close-loop advisory execution**: Added optional advisory action execution to `kse auto governance close-loop` via `--execute-advisory`, including bounded controls `--advisory-recover-max-rounds` and `--advisory-controller-max-cycles`, with per-round advisory telemetry (`advisory_actions`, advisory action counts) and top-level advisory policy/summary output. Advisory source selection is now autonomous (latest recoverable batch summary / latest controller session with pending goals) and emits `skipped` instead of hard-failing when no actionable advisory source exists.
-- **Governance close-loop rounds command**: Added `kse auto governance close-loop` to run bounded governance-maintenance rounds toward a target risk (`--target-risk`) with convergence telemetry (`rounds`, `initial_assessment`, `final_assessment`, `stop_reason`, `converged`) and non-mutating planning support (`--plan-only`, `--dry-run`).
-- **Governance maintenance close-loop command**: Added `kse auto governance maintain` to combine governance assessment and optional maintenance execution (`--apply`) across session/batch/controller archives and recovery memory, with policy knobs (`--session-keep`, `--batch-session-keep`, `--controller-session-keep`, `--recovery-memory-older-than-days`), dry-run support, and before/after telemetry.
-- **Cross-archive governance stats command**: Added `kse auto governance stats` with optional `--days` / `--status` filters to unify session/batch-session/controller-session telemetry and recovery-memory state into one governance snapshot (`totals`, `throughput`, `health` risk diagnostics, `top_master_specs`, and per-archive detail payloads).
-- **Session and batch session stats commands**: Added `kse auto session stats` and `kse auto batch-session stats` with optional `--days` / `--status` filters and JSON telemetry (completion/failure rates, volume aggregates, composition breakdowns, latest-session snapshots) for autonomous archive observability.
-- **Controller session stats command**: Added `kse auto controller-session stats` with optional `--days` / `--status` filters and JSON telemetry (`status_counts`, `queue_format_counts`, completion/failure rates, goal-volume sums, and latest-session snapshot) for controller archive observability.
-- **Session list status filtering + composition telemetry**: `kse auto session list`, `kse auto batch-session list`, and `kse auto controller-session list` now support `--status <csv>` (case-insensitive) and emit `status_filter` / `status_counts` in JSON output for faster archive triage.
-- **KPI mode composition telemetry**: `kse auto kpi trend` JSON output now includes `mode_breakdown` (batch/program/recover/controller/other) to expose mixed-run trend composition.
+- **Governance close-loop advisory execution**: Added optional advisory action execution to `sce auto governance close-loop` via `--execute-advisory`, including bounded controls `--advisory-recover-max-rounds` and `--advisory-controller-max-cycles`, with per-round advisory telemetry (`advisory_actions`, advisory action counts) and top-level advisory policy/summary output. Advisory source selection is now autonomous (latest recoverable batch summary / latest controller session with pending goals) and emits `skipped` instead of hard-failing when no actionable advisory source exists.
+- **Governance close-loop rounds command**: Added `sce auto governance close-loop` to run bounded governance-maintenance rounds toward a target risk (`--target-risk`) with convergence telemetry (`rounds`, `initial_assessment`, `final_assessment`, `stop_reason`, `converged`) and non-mutating planning support (`--plan-only`, `--dry-run`).
+- **Governance maintenance close-loop command**: Added `sce auto governance maintain` to combine governance assessment and optional maintenance execution (`--apply`) across session/batch/controller archives and recovery memory, with policy knobs (`--session-keep`, `--batch-session-keep`, `--controller-session-keep`, `--recovery-memory-older-than-days`), dry-run support, and before/after telemetry.
+- **Cross-archive governance stats command**: Added `sce auto governance stats` with optional `--days` / `--status` filters to unify session/batch-session/controller-session telemetry and recovery-memory state into one governance snapshot (`totals`, `throughput`, `health` risk diagnostics, `top_master_specs`, and per-archive detail payloads).
+- **Session and batch session stats commands**: Added `sce auto session stats` and `sce auto batch-session stats` with optional `--days` / `--status` filters and JSON telemetry (completion/failure rates, volume aggregates, composition breakdowns, latest-session snapshots) for autonomous archive observability.
+- **Controller session stats command**: Added `sce auto controller-session stats` with optional `--days` / `--status` filters and JSON telemetry (`status_counts`, `queue_format_counts`, completion/failure rates, goal-volume sums, and latest-session snapshot) for controller archive observability.
+- **Session list status filtering + composition telemetry**: `sce auto session list`, `sce auto batch-session list`, and `sce auto controller-session list` now support `--status <csv>` (case-insensitive) and emit `status_filter` / `status_counts` in JSON output for faster archive triage.
+- **KPI mode composition telemetry**: `sce auto kpi trend` JSON output now includes `mode_breakdown` (batch/program/recover/controller/other) to expose mixed-run trend composition.
 - **Spec protection source expansion**: `spec-session prune` now protects specs referenced by recent/incomplete controller sessions (via nested batch summary references), reducing accidental cleanup during controller-driven autonomous runs.
-- **Controller session maintenance commands**: Added `kse auto controller-session list` / `kse auto controller-session prune` (retention + age filters + dry-run/json) for persisted close-loop-controller summary archives.
-- **Controller-aware autonomous KPI trend mode**: `kse auto kpi trend` now supports `--mode controller` and includes persisted controller session telemetry in trend aggregation (including nested program sub-spec/spec-growth rollups when available).
+- **Controller session maintenance commands**: Added `sce auto controller-session list` / `sce auto controller-session prune` (retention + age filters + dry-run/json) for persisted close-loop-controller summary archives.
+- **Controller-aware autonomous KPI trend mode**: `sce auto kpi trend` now supports `--mode controller` and includes persisted controller session telemetry in trend aggregation (including nested program sub-spec/spec-growth rollups when available).
 - **Controller checkpoint resume**: `close-loop-controller` now supports `--controller-resume <latest|id|file>` plus persisted controller session snapshots (`.kiro/auto/close-loop-controller-sessions`) with retention controls (`--controller-session-id`, `--controller-session-keep`, `--controller-session-older-than-days`, `--no-controller-session`).
 - **Controller concurrency lease lock**: Added queue lease lock controls (`--controller-lock-file`, `--controller-lock-ttl-seconds`, `--no-controller-lock`) to prevent concurrent queue corruption and allow stale-lock takeover under bounded TTL.
-- **Persistent close-loop queue controller**: Added `kse auto close-loop-controller [queue-file]` with queue drain/poll runtime (`--queue-format`, `--dequeue-limit`, `--wait-on-empty`, `--poll-seconds`, runtime budgets, done/failed archives) so broad goals can be continuously executed through `close-loop-program` without manual re-invocation.
-- **KPI sample generator command**: Added `kse value metrics sample` to generate a ready-to-use KPI input JSON scaffold (`kpi-input.json`) for first-time observability runs.
+- **Persistent close-loop queue controller**: Added `sce auto close-loop-controller [queue-file]` with queue drain/poll runtime (`--queue-format`, `--dequeue-limit`, `--wait-on-empty`, `--poll-seconds`, runtime budgets, done/failed archives) so broad goals can be continuously executed through `close-loop-program` without manual re-invocation.
+- **KPI sample generator command**: Added `sce value metrics sample` to generate a ready-to-use KPI input JSON scaffold (`kpi-input.json`) for first-time observability runs.
 - **Value observability documentation track**: Added dedicated EN/ZH guides for KPI snapshot/baseline/trend workflow (`docs/value-observability-guide.md`, `docs/zh/value-observability-guide.md`) and wired entry links from README + docs indexes for faster discovery of measurable delivery capabilities.
 - **Release communication assets**: Added bilingual v1.46.2 release notes (`docs/releases/v1.46.2.md`, `docs/zh/releases/v1.46.2.md`) and a reusable pre-release checklist (`docs/release-checklist.md`).
 - **Release validation artifacts**: Added release-readiness evidence reports in EN/ZH (`docs/releases/v1.46.2-validation.md`, `docs/zh/releases/v1.46.2-validation.md`) with test and package dry-run results.
@@ -49,13 +49,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Value metrics helper test coverage**: Added deterministic tests for ISO week period derivation and sample payload structure in command-level unit tests.
 - **Spec 115 quality hardening program**: Added a master/sub-spec collaboration portfolio (`115-00` + `115-01..115-04`) to parallelize CI trust, Jest open-handle governance, watch follow completion, and doc link canonicalization.
 - **Test governance scripts**: Added `test:smoke`, `test:full`, `test:handles`, `test:skip-audit`, plus `scripts/check-skip-allowlist.js` and `tests/skip-allowlist.txt` for skip-test regression guardrails.
-- **Autonomous close-loop command**: Added `kse auto close-loop "<goal>"` to perform one-command goal decomposition (master/sub specs), collaboration bootstrap, and orchestration until terminal state.
-- **Definition-of-Done gates for close-loop**: Added configurable completion gates for `kse auto close-loop` (`--dod-tests`, `--dod-tasks-closed`, `--no-dod*`) so autonomous runs only report success when required evidence checks pass.
+- **Autonomous close-loop command**: Added `sce auto close-loop "<goal>"` to perform one-command goal decomposition (master/sub specs), collaboration bootstrap, and orchestration until terminal state.
+- **Definition-of-Done gates for close-loop**: Added configurable completion gates for `sce auto close-loop` (`--dod-tests`, `--dod-tasks-closed`, `--no-dod*`) so autonomous runs only report success when required evidence checks pass.
 - **DoD evidence archive for close-loop**: Added automatic DoD report persistence to `.kiro/specs/<master>/custom/dod-report.json` with CLI controls (`--dod-report`, `--no-dod-report`) for audit-ready closure evidence.
-- **Close-loop session resume**: Added session snapshot persistence for `kse auto close-loop` (`.kiro/auto/close-loop-sessions`) plus resume controls (`--resume`, `--session-id`, `--no-session`) to continue interrupted master/sub executions.
-- **Close-loop session hygiene commands**: Added `kse auto session list` and `kse auto session prune` (retention + age filters + dry-run/json) so long-running autonomous programs can maintain session archives without manual file cleanup.
-- **Spec directory retention commands**: Added `kse auto spec-session list|prune` (retention + age filters + dry-run/json) to control `.kiro/specs` growth for continuous autonomous runs.
-- **Active spec protection in retention prune**: `kse auto spec-session prune` now protects active/recently referenced specs by default (`--no-protect-active` to override).
+- **Close-loop session resume**: Added session snapshot persistence for `sce auto close-loop` (`.kiro/auto/close-loop-sessions`) plus resume controls (`--resume`, `--session-id`, `--no-session`) to continue interrupted master/sub executions.
+- **Close-loop session hygiene commands**: Added `sce auto session list` and `sce auto session prune` (retention + age filters + dry-run/json) so long-running autonomous programs can maintain session archives without manual file cleanup.
+- **Spec directory retention commands**: Added `sce auto spec-session list|prune` (retention + age filters + dry-run/json) to control `.kiro/specs` growth for continuous autonomous runs.
+- **Active spec protection in retention prune**: `sce auto spec-session prune` now protects active/recently referenced specs by default (`--no-protect-active` to override).
 - **Automatic spec retention policy for program/batch/recover**: Added `--spec-session-keep` / `--spec-session-older-than-days` (`--no-spec-session-protect-active` optional) so autonomous multi-goal runs can auto-prune `.kiro/specs` after execution.
 - **Configurable spec protection window**: Added `--spec-session-protect-window-days` (and `spec-session prune --protect-window-days`) so teams can tune recent-reference protection horizon for retention safety.
 - **Spec protection reason observability**: `spec-session prune` now emits `protection_ranking_top` by default and supports `--show-protection-reasons` for per-spec reason detail (`protected_specs[*].reasons`, `protection_ranking`) during retention audits.
@@ -63,10 +63,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Unified program budget gate**: Added `--program-max-elapsed-minutes`, `--program-max-agent-budget`, and `--program-max-total-sub-specs` so `close-loop-program` convergence gate can enforce time/concurrency/sub-spec budgets together with success/risk policy.
 - **Program/recover gate policy parity + auto-remediation hooks**: `close-loop-recover` now supports the same gate/fallback/budget policy flags as program mode and can emit `program_gate_auto_remediation` (auto patch/prune hints) when gate/budget checks fail.
 - **Spec growth/duplicate guardrails**: Added `--spec-session-max-created`, `--spec-session-max-created-per-goal`, and `--spec-session-max-duplicate-goals` (with hard-fail option) plus summary telemetry (`goal_input_guard`, `spec_session_growth_guard`) to reduce runaway autonomous portfolio expansion.
-- **Autonomous KPI trend command**: Added `kse auto kpi trend` to aggregate weekly success/completion, failure, sub-spec, and spec-growth telemetry from persisted autonomous summary sessions.
-- **Autonomous KPI trend period/csv/anomaly enhancement**: Extended `kse auto kpi trend` with `--period week|day`, `--csv` export mode, and JSON anomaly diagnostics (`anomaly_detection`, `anomalies`) for latest-period regression checks.
+- **Autonomous KPI trend command**: Added `sce auto kpi trend` to aggregate weekly success/completion, failure, sub-spec, and spec-growth telemetry from persisted autonomous summary sessions.
+- **Autonomous KPI trend period/csv/anomaly enhancement**: Extended `sce auto kpi trend` with `--period week|day`, `--csv` export mode, and JSON anomaly diagnostics (`anomaly_detection`, `anomalies`) for latest-period regression checks.
 - **Program governance stabilization loop**: Added `close-loop-program` governance controls (`--program-govern-until-stable`, `--program-govern-max-rounds`, `--program-govern-max-minutes`, anomaly knobs, `--program-govern-use-action`, `--no-program-govern-auto-action`) so gate/anomaly failures can trigger bounded replay/recover rounds with remediation action execution until stable, with `program_governance`, `program_kpi_trend`, and `program_kpi_anomalies` telemetry.
-- **Close-loop multi-goal batch command**: Added `kse auto close-loop-batch <goals-file>` with file-format autodetect (`json|lines`), `--continue-on-error`, and per-goal summary output so autonomous master/sub execution can scale across multiple goals in one run.
+- **Close-loop multi-goal batch command**: Added `sce auto close-loop-batch <goals-file>` with file-format autodetect (`json|lines`), `--continue-on-error`, and per-goal summary output so autonomous master/sub execution can scale across multiple goals in one run.
 - **Close-loop batch global scheduler**: Added `--batch-parallel` (`1-20`) to execute multiple goals concurrently in `close-loop-batch`, enabling master/sub portfolios to progress in parallel without manual orchestration handoffs.
 - **Close-loop batch resume from summary**: Added `--resume-from-summary <path>` to recover pending goals from a prior batch run and continue autonomous delivery without rebuilding the entire goal queue manually.
 - **Close-loop batch resume strategy selector**: Added `--resume-strategy pending|failed-only` so operators can choose whether summary resume should include unprocessed goals (`pending`) or only failed/error goals (`failed-only`).
@@ -76,10 +76,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Close-loop batch program decomposition mode**: Added `--decompose-goal` + `--program-goals` so one broad goal can be auto-split into multiple batch goals and executed as a master batch without manually authoring a goals file.
 - **Close-loop batch automatic retry rounds**: Added `--batch-retry-rounds` + `--batch-retry-strategy` (`adaptive|strict`) with `batch_retry` summary telemetry so failed/stopped goals can be retried in the same autonomous batch run without manual re-invocation.
 - **Close-loop batch session archive + latest resume**: Added automatic batch summary session persistence (`.kiro/auto/close-loop-batch-summaries`) with controls (`--batch-session-id`, `--batch-session-keep`, `--no-batch-session`) and support for `--resume-from-summary latest`.
-- **Close-loop batch session maintenance commands**: Added `kse auto batch-session list` / `kse auto batch-session prune` plus age-based retention control (`--batch-session-older-than-days`) for persisted batch summary archives.
+- **Close-loop batch session maintenance commands**: Added `sce auto batch-session list` / `sce auto batch-session prune` plus age-based retention control (`--batch-session-older-than-days`) for persisted batch summary archives.
 - **Close-loop batch until-complete retry mode**: Added `--batch-retry-until-complete` + `--batch-retry-max-rounds` so multi-goal runs can auto-drain failed/stopped goals to completion within one command invocation under bounded retry policy.
 - **Close-loop batch autonomous policy mode**: Added `--batch-autonomous` to apply closed-loop defaults automatically (continue-on-error, adaptive parallelism, complexity-first scheduling, aging boost, retry-until-complete) for hands-off program execution.
-- **Close-loop program command**: Added `kse auto close-loop-program "<goal>"` to auto-decompose one broad objective into multi-goal autonomous execution (master/sub portfolios) with closed-loop batch policy enabled by default.
+- **Close-loop program command**: Added `sce auto close-loop-program "<goal>"` to auto-decompose one broad objective into multi-goal autonomous execution (master/sub portfolios) with closed-loop batch policy enabled by default.
 - **Close-loop program KPI snapshot**: Added `program_kpi` in `close-loop-program` summary plus `--program-kpi-out` for standalone KPI export (convergence state, risk level, retry recovery, complexity/wait profile).
 - **Close-loop program convergence gate + audit output**: Added policy gates (`--program-min-success-rate`, `--program-max-risk-level`) plus `--program-audit-out` for governance-grade audit JSON; program exits non-zero when gate policy is not met.
 - **Close-loop program gate profiles**: Added `--program-gate-profile` (`default|dev|staging|prod`) so teams can switch convergence policy baselines by environment while still allowing explicit threshold overrides.
@@ -87,30 +87,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Close-loop program gate fallback chain**: Added `--program-gate-fallback-chain <profiles>` so gate evaluation can try multiple fallback policy profiles in order after primary gate failure.
 - **Close-loop program recovery time budget**: Added `--program-recover-max-minutes` so built-in auto recovery loops can stop on elapsed-time limits, with `recovery_cycle` budget telemetry.
 - **Close-loop program remediation diagnostics**: Added `program_diagnostics` (`failure_clusters` + prioritized `remediation_actions`) to turn program KPI output into actionable convergence guidance.
-- **Close-loop recovery command**: Added `kse auto close-loop-recover [summary]` with remediation-action selection (`--use-action`) to automatically replay unresolved goals using strategy patches derived from diagnostics.
+- **Close-loop recovery command**: Added `sce auto close-loop-recover [summary]` with remediation-action selection (`--use-action`) to automatically replay unresolved goals using strategy patches derived from diagnostics.
 - **Close-loop recovery self-healing rounds**: Added `--recover-until-complete` + `--recover-max-rounds` with `recovery_cycle` history so recovery can run multiple rounds autonomously until convergence or bounded exhaustion.
 - **Close-loop recovery time/memory governance**: Added `--recover-max-minutes` and `--recovery-memory-ttl-days` so recovery loops can enforce elapsed-time budgets and stale-memory pruning during action selection.
-- **Recovery memory lifecycle commands**: Added `kse auto recovery-memory show|prune|clear` to inspect, prune, and reset persisted recovery strategy memory.
-- **Recovery memory scope analytics command**: Added `kse auto recovery-memory scopes` to inspect aggregate recovery-memory statistics grouped by scope.
+- **Recovery memory lifecycle commands**: Added `sce auto recovery-memory show|prune|clear` to inspect, prune, and reset persisted recovery strategy memory.
+- **Recovery memory scope analytics command**: Added `sce auto recovery-memory scopes` to inspect aggregate recovery-memory statistics grouped by scope.
 - **Criticality-priority scheduler mode**: Added `--batch-priority critical-first` with per-goal criticality telemetry in `resource_plan` and result summaries.
 - **Goal decomposition quality diagnostics**: Added `generated_from_goal.quality` (score, coverage ratio, warnings) for program/batch semantic decomposition observability.
 - **Goal decomposition quality auto-refinement**: Added `--program-min-quality-score` with automatic second-pass goal refinement and `quality.refinement` telemetry, so weak decompositions are improved before execution.
 - **Goal decomposition hard quality gate**: Added `--program-quality-gate` to fail execution when final decomposition quality remains below threshold after refinement.
 - **Recovery memory scope isolation + explainability**: Added `--recovery-memory-scope` and selection explanation metadata (`selection_explain`) so remediation memory can be isolated by scope and action selection is auditable.
-- **Scoped recovery memory maintenance**: `kse auto recovery-memory show|prune` now support `--scope <scope>` for targeted inspection and cleanup.
+- **Scoped recovery memory maintenance**: `sce auto recovery-memory show|prune` now support `--scope <scope>` for targeted inspection and cleanup.
 - **Program gate fallback observability**: Program outputs now include `program_gate_fallbacks` and `program_gate_effective` fields for full fallback decision traceability.
-- **Program-level auto recovery loop**: `kse auto close-loop-program` now auto-enters bounded recovery rounds by default (`--program-recover-max-rounds`, `--no-program-auto-recover`) so one command can drive program execution to closure without manual follow-up.
+- **Program-level auto recovery loop**: `sce auto close-loop-program` now auto-enters bounded recovery rounds by default (`--program-recover-max-rounds`, `--no-program-auto-recover`) so one command can drive program execution to closure without manual follow-up.
 - **Recovery strategy memory**: Added persisted recovery memory (`.kiro/auto/close-loop-recovery-memory.json`) so `close-loop-recover` and program auto-recovery can reuse previously successful remediation actions when `--use-action` is omitted.
 - **Program coordination telemetry**: Added `program_coordination` output (master/sub topology, unresolved goals, scheduler snapshot) for multi-spec orchestration observability in both program and recover summaries.
 - **Close-loop batch KPI summary**: Added aggregate `metrics` in batch output (success rate, status breakdown, average sub-spec count, average replan cycles) for portfolio-level observability.
-- **Close-loop auto session retention policy**: Added `--session-keep` and `--session-older-than-days` to `kse auto close-loop` so each autonomous run can prune stale session snapshots automatically.
+- **Close-loop auto session retention policy**: Added `--session-keep` and `--session-older-than-days` to `sce auto close-loop` so each autonomous run can prune stale session snapshots automatically.
 - **Automatic replan loop for close-loop failures**: Added remediation replan cycles (`--replan-attempts`, `--no-replan`) so failed orchestration runs can auto-generate recovery specs and retry autonomously.
 - **Replan stall guard**: Added failed-spec signature deduplication so close-loop auto-replan stops early when the same failure set repeats, preventing low-value remediation loops.
 - **Replan no-progress stall guard**: Added `--replan-no-progress-window` so close-loop retries terminate when consecutive failed cycles show no net progress, improving autonomous convergence and reducing retry noise.
 - **Goal decomposition engine**: Added heuristic portfolio planner for automatic sub-spec splitting, dependency wiring, and deterministic spec prefix allocation.
 - **Complex-goal auto-split scaling**: Enhanced decomposition heuristic to auto-escalate sub-spec count up to 5 for high-complexity goals, strengthening master/sub parallel delivery for larger feature sets.
 - **Autonomous close-loop tests**: Added unit coverage for decomposition strategy and close-loop runner behavior (plan-only and execution paths).
-- **Autonomous CLI end-to-end regression**: Added integration coverage for `kse auto close-loop --resume latest`, `kse auto close-loop-batch --dry-run --json`, and `kse auto session list/prune` via real `bin/kiro-spec-engine.js` execution.
+- **Autonomous CLI end-to-end regression**: Added integration coverage for `sce auto close-loop --resume latest`, `sce auto close-loop-batch --dry-run --json`, and `sce auto session list/prune` via real `bin/scene-capability-engine.js` execution.
 - **Program gate fallback-chain integration fixture**: Added deterministic non-dry-run CLI integration coverage for primary-gate failure + fallback-chain acceptance to harden convergence policy regression checks.
 - **Spec 116 autonomous-closure portfolio**: Added `116-00` master with `116-01..116-03` sub-specs as a live master/sub example generated through the close-loop workflow, including `custom/agent-sync-plan.md`.
 - **Spec 117 autonomous hardening portfolio**: Added `117-00` master with `117-01..117-04` sub-specs to continue parallel delivery on no-confirmation closed-loop execution, master/sub decomposition, orchestration runtime, and observability gates.
@@ -124,15 +124,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Default ERP binding routing now prefers Moqui when configured**: Runtime default handler order now resolves `spec.erp.*` through `moqui.adapter` first when adapter config is present, while preserving deterministic fallback to `builtin.erp-sim` when config is unavailable.
 - **Moqui extraction output enriched for AI-native ontology usage**: Extracted manifests/contracts now emit action intent semantics, dependency chains, governance lineage, ontology model entities/relations, and agent hints for downstream planning.
 - **Controller queue hygiene default**: `close-loop-controller` now deduplicates duplicate broad goals by default (`--no-controller-dedupe` to preserve raw duplicates), and summary telemetry includes dedupe/lock/session metadata.
-- **Positioning and onboarding messaging**: Strengthened EN/ZH README and quick-start docs with explicit kse advantage matrix, 90-second value proof, and KPI observability positioning to improve first-contact clarity.
-- **CLI first-screen positioning text**: Updated `kse --help` top description in EN/ZH locales to reflect current core strengths: Spec workflow, orchestration, and KPI observability.
+- **Positioning and onboarding messaging**: Strengthened EN/ZH README and quick-start docs with explicit sce advantage matrix, 90-second value proof, and KPI observability positioning to improve first-contact clarity.
+- **CLI first-screen positioning text**: Updated `sce --help` top description in EN/ZH locales to reflect current core strengths: Spec workflow, orchestration, and KPI observability.
 - **Offline onboarding consistency**: Refreshed `START_HERE.txt`, `INSTALL_OFFLINE.txt`, and `docs/OFFLINE_INSTALL.md` to v1.46.2 guidance and aligned quick-start prerequisites with current runtime requirement (Node.js >= 16).
-- **Value metrics operator guidance**: Enhanced snapshot/baseline/trend failure messages with actionable follow-up commands (including `kse value metrics sample`) to reduce first-run friction.
+- **Value metrics operator guidance**: Enhanced snapshot/baseline/trend failure messages with actionable follow-up commands (including `sce value metrics sample`) to reduce first-run friction.
 - **Top-level release navigation**: Updated EN/ZH root READMEs to expose release archive and validation report links directly from Advanced Topics for faster proof-of-value discovery.
 - **Observability guide usability**: Added EN/ZH expected JSON output examples for `snapshot --json` and `trend --json` to speed up first-run verification and integration scripting.
-- **Watch log operator flow**: Implemented `kse watch logs --follow` streaming behavior and documented follow examples in command reference.
+- **Watch log operator flow**: Implemented `sce watch logs --follow` streaming behavior and documented follow examples in command reference.
 - **Canonical documentation links**: Standardized mixed repository links to `https://github.com/heguangyong/scene-capability-engine` and wired canonical-link scan commands into EN/ZH release checklists.
-- **Autonomy positioning clarity**: Strengthened EN/ZH docs and command reference to emphasize closed-loop delivery and automatic master/sub spec decomposition as kse core strengths.
+- **Autonomy positioning clarity**: Strengthened EN/ZH docs and command reference to emphasize closed-loop delivery and automatic master/sub spec decomposition as sce core strengths.
 - **Autonomous operator UX**: Expanded docs with semantic decomposition and live stream behavior for close-loop command usage.
 
 ### Fixed
@@ -161,21 +161,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.46.1] - 2026-02-13
 
 ### Fixed
-- **NPM publish metadata normalization**: Updated `package.json` `bin` entries to use `bin/kiro-spec-engine.js` (without `./`) so npm no longer strips CLI bin mappings during publish.
+- **NPM publish metadata normalization**: Updated `package.json` `bin` entries to use `bin/scene-capability-engine.js` (without `./`) so npm no longer strips CLI bin mappings during publish.
 - **Repository metadata format**: Normalized `repository.url` to `git+https://github.com/heguangyong/scene-capability-engine.git` to remove npm publish auto-correction warnings.
 
 ## [1.46.0] - 2026-02-13
 
 ### Added
-- **Spec bootstrap command**: Added `kse spec bootstrap` to generate `requirements.md`, `design.md`, and `tasks.md` drafts in one step.
-- **Spec pipeline command**: Added `kse spec pipeline run` for staged Spec workflow execution with structured progress output.
-- **Spec gate command**: Added `kse spec gate run` to standardize gate checks and produce machine-readable gate reports.
+- **Spec bootstrap command**: Added `sce spec bootstrap` to generate `requirements.md`, `design.md`, and `tasks.md` drafts in one step.
+- **Spec pipeline command**: Added `sce spec pipeline run` for staged Spec workflow execution with structured progress output.
+- **Spec gate command**: Added `sce spec gate run` to standardize gate checks and produce machine-readable gate reports.
 - **Multi-spec orchestrate helper**: Added shared helper logic for parsing multi-spec targets and routing execution through orchestrate runtime.
 - **Coverage for new spec workflow**: Added unit tests for bootstrap/pipeline/gate commands and multi-spec orchestrate default behavior.
 
 ### Changed
-- **Default multi-spec execution mode**: `kse spec bootstrap`, `kse spec pipeline run`, and `kse spec gate run` now default to orchestrate mode when `--specs` is provided.
-- **CLI spec command routing**: Improved `kse spec` command routing for new subcommands while preserving backward compatibility for legacy paths.
+- **Default multi-spec execution mode**: `sce spec bootstrap`, `sce spec pipeline run`, and `sce spec gate run` now default to orchestrate mode when `--specs` is provided.
+- **CLI spec command routing**: Improved `sce spec` command routing for new subcommands while preserving backward compatibility for legacy paths.
 - **Documentation alignment**: Updated EN/ZH docs to promote the new spec-first workflow and document multi-spec default orchestrate behavior.
 
 ## [1.45.13] - 2026-02-13
@@ -232,12 +232,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.45.4] - 2026-02-13
 
 ### Fixed
-- **Version upgrade path fallback**: `checkCompatibility()` and `calculateUpgradePath()` now use semver-based logic for versions not in the legacy compatibility matrix, fixing `Unknown source version: 1.45.2` error when running `kse upgrade`
+- **Version upgrade path fallback**: `checkCompatibility()` and `calculateUpgradePath()` now use semver-based logic for versions not in the legacy compatibility matrix, fixing `Unknown source version: 1.45.2` error when running `sce upgrade`
 
 ## [1.45.3] - 2026-02-13
 
 ### Fixed
-- **Self-dependency removed**: Removed erroneous `kiro-spec-engine` self-dependency from `package.json` that caused npm to install stale old versions inside the package, resulting in `error: unknown command 'orchestrate'` and other missing commands in target projects
+- **Self-dependency removed**: Removed erroneous `scene-capability-engine` self-dependency from `package.json` that caused npm to install stale old versions inside the package, resulting in `error: unknown command 'orchestrate'` and other missing commands in target projects
 
 ## [1.45.2] - 2026-02-13
 
@@ -261,10 +261,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **AgentSpawner** (`lib/orchestrator/agent-spawner.js`): Process manager for Codex CLI sub-agents with timeout detection, graceful termination (SIGTERM → SIGKILL), and event emission
   - **StatusMonitor** (`lib/orchestrator/status-monitor.js`): Codex JSON Lines event parsing, per-Spec status tracking, orchestration-level status aggregation
   - **OrchestrationEngine** (`lib/orchestrator/orchestration-engine.js`): Core engine with DAG-based dependency analysis, batch scheduling, parallel execution (≤ maxParallel), failure propagation, and retry mechanism
-  - **CLI Commands** (`kse orchestrate`):
-    - `kse orchestrate run --specs "spec-a,spec-b" --max-parallel 3` — Start multi-agent orchestration
-    - `kse orchestrate status` — View orchestration progress
-    - `kse orchestrate stop` — Gracefully stop all sub-agents
+  - **CLI Commands** (`sce orchestrate`):
+    - `sce orchestrate run --specs "spec-a,spec-b" --max-parallel 3` — Start multi-agent orchestration
+    - `sce orchestrate status` — View orchestration progress
+    - `sce orchestrate stop` — Gracefully stop all sub-agents
   - 11 correctness properties verified via property-based testing (fast-check)
   - 236+ new tests across unit, property, and integration test suites
 
@@ -286,8 +286,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.43.1] - 2026-02-11
 
 ### Changed
-- **Agent Onboarding Document** (`template/.kiro/README.md`, `.kiro/README.md`): Comprehensive rewrite of "kse Capabilities" section listing all commands and features (Core, Task, Spec Locking, Workspace, Environment, Multi-Repo, Collab, Multi-Agent Coordination, Autonomous Control, Scene Runtime, Document Governance, DevOps, Knowledge Management)
-- **CORE_PRINCIPLES Principle 9**: Strengthened version sync and steering refresh principle — `.kiro/README.md` is now the authoritative agent onboarding entry point for understanding all kse capabilities
+- **Agent Onboarding Document** (`template/.kiro/README.md`, `.kiro/README.md`): Comprehensive rewrite of "sce Capabilities" section listing all commands and features (Core, Task, Spec Locking, Workspace, Environment, Multi-Repo, Collab, Multi-Agent Coordination, Autonomous Control, Scene Runtime, Document Governance, DevOps, Knowledge Management)
+- **CORE_PRINCIPLES Principle 9**: Strengthened version sync and steering refresh principle — `.kiro/README.md` is now the authoritative agent onboarding entry point for understanding all sce capabilities
 
 ## [1.43.0] - 2026-02-11
 
@@ -320,13 +320,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `LINEAGE_SOURCE_NOT_IN_BINDINGS`, `LINEAGE_SINK_NOT_IN_BINDINGS`
     - `EMPTY_AGENT_SUMMARY`, `INVALID_AGENT_COMPLEXITY`, `INVALID_AGENT_DURATION`
   - **Agent Readiness Score**: New bonus dimension (max +10) in quality score calculator
-  - **CLI Commands** (`kse scene ontology`):
-    - `kse scene ontology show` — Display ontology graph
-    - `kse scene ontology deps --ref <ref>` — Query dependency chain
-    - `kse scene ontology validate` — Validate graph consistency
-    - `kse scene ontology actions --ref <ref>` — Show action abstraction
-    - `kse scene ontology lineage --ref <ref>` — Show data lineage
-    - `kse scene ontology agent-info` — Show agent hints
+  - **CLI Commands** (`sce scene ontology`):
+    - `sce scene ontology show` — Display ontology graph
+    - `sce scene ontology deps --ref <ref>` — Query dependency chain
+    - `sce scene ontology validate` — Validate graph consistency
+    - `sce scene ontology actions --ref <ref>` — Show action abstraction
+    - `sce scene ontology lineage --ref <ref>` — Show data lineage
+    - `sce scene ontology agent-info` — Show agent hints
 
 ## [1.41.0] - 2026-02-11
 
@@ -343,15 +343,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Quality Score Calculator**: 4-dimension scoring with 0-100 scale
     - Contract validity, lint pass rate, documentation quality, governance completeness
     - Configurable dimension weights
-  - `kse scene lint` — Lint scene package for quality issues
+  - `sce scene lint` — Lint scene package for quality issues
     - `--package <path>` scene package directory
     - `--strict` treat warnings as errors
     - `--json` structured JSON output
-  - `kse scene score` — Calculate quality score (0-100)
+  - `sce scene score` — Calculate quality score (0-100)
     - `--package <path>` scene package directory
     - `--strict` fail if score below threshold (default 60)
     - `--json` structured JSON output
-  - `kse scene contribute` — One-stop contribute pipeline: validate → lint → score → publish
+  - `sce scene contribute` — One-stop contribute pipeline: validate → lint → score → publish
     - `--package <path>` scene package directory
     - `--registry <dir>` custom registry directory
     - `--skip-lint` skip lint step
@@ -363,12 +363,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Moqui Scene Template Extractor**: Extract reusable scene templates from live Moqui ERP instances
   - `MoquiExtractor` — Analyze discovered Moqui resources, identify business patterns (crud/query/workflow), generate scene template bundles
-  - Built-in YAML serializer for scene manifests (`kse.scene/v0.2` apiVersion)
+  - Built-in YAML serializer for scene manifests (`sce.scene/v0.2` apiVersion)
   - Entity grouping by Header/Item suffix patterns (e.g., OrderHeader + OrderItem → composite pattern)
   - Pattern-based manifest generation with governance contracts (risk_level, approval, idempotency)
-  - Package contract generation (`kse.scene.package/v0.1` apiVersion) with template parameters
+  - Package contract generation (`sce.scene.package/v0.1` apiVersion) with template parameters
   - Template bundle file writing with partial failure resilience
-  - `kse scene extract` — Extract scene templates from Moqui ERP instance
+  - `sce scene extract` — Extract scene templates from Moqui ERP instance
     - `--config <path>` custom adapter config path
     - `--type <type>` filter discovery by resource type (entities|services|screens)
     - `--pattern <pattern>` filter by business pattern (crud|query|workflow)
@@ -385,10 +385,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Moqui ERP Adapter**: Integrate Moqui ERP instance into KSE scene runtime
   - `MoquiClient` — HTTP client with JWT auth lifecycle (login, refresh, re-login, logout), retry logic using Node.js built-in `http`/`https`
   - `MoquiAdapter` — Binding handler for `spec.erp.*` and `moqui.*` refs, entity CRUD, service invocation, screen discovery
-  - `kse scene connect` — Test connectivity and authentication to Moqui ERP instance
+  - `sce scene connect` — Test connectivity and authentication to Moqui ERP instance
     - `--config <path>` custom adapter config path
     - `--json` structured JSON output
-  - `kse scene discover` — Discover available entities, services, and screens from Moqui ERP
+  - `sce scene discover` — Discover available entities, services, and screens from Moqui ERP
     - `--config <path>` custom adapter config path
     - `--type <type>` filter by catalog type (entities|services|screens)
     - `--json` structured JSON output
@@ -400,13 +400,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Scene Registry Statistics**: Dashboard for local scene package registry metrics
-  - `kse scene stats` show aggregate statistics (packages, versions, tags, ownership, deprecation, last publish)
+  - `sce scene stats` show aggregate statistics (packages, versions, tags, ownership, deprecation, last publish)
     - `--registry <dir>` custom registry directory
     - `--json` structured JSON output
 - **Scene Version Locking**: Protect specific package versions from accidental unpublish
-  - `kse scene lock set --name <pkg> --version <ver>` lock a version
-  - `kse scene lock rm --name <pkg> --version <ver>` unlock a version
-  - `kse scene lock ls --name <pkg>` list locked versions
+  - `sce scene lock set --name <pkg> --version <ver>` lock a version
+  - `sce scene lock rm --name <pkg> --version <ver>` unlock a version
+  - `sce scene lock ls --name <pkg>` list locked versions
     - `--registry <dir>` custom registry directory
     - `--json` structured JSON output
   - Lock state stored as `locked: true` on version entries in `registry-index.json`
@@ -415,9 +415,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Scene Distribution Tags**: Manage distribution tags on scene packages in local registry
-  - `kse scene tag add --name <pkg> --tag <tag> --version <ver>` add a distribution tag
-  - `kse scene tag rm --name <pkg> --tag <tag>` remove a distribution tag
-  - `kse scene tag ls --name <pkg>` list all tags and latest version
+  - `sce scene tag add --name <pkg> --tag <tag> --version <ver>` add a distribution tag
+  - `sce scene tag rm --name <pkg> --tag <tag>` remove a distribution tag
+  - `sce scene tag ls --name <pkg>` list all tags and latest version
     - `--registry <dir>` custom registry directory
     - `--json` structured JSON output
   - Tags stored as `tags` object on package entry, separate from `latest` field
@@ -427,10 +427,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Scene Package Ownership**: Manage package ownership metadata in local registry
-  - `kse scene owner set --name <pkg> --owner <owner>` set package owner
-  - `kse scene owner show --name <pkg>` display current owner
-  - `kse scene owner list --owner <owner>` list packages by owner (case-insensitive)
-  - `kse scene owner transfer --name <pkg> --from <old> --to <new>` transfer ownership
+  - `sce scene owner set --name <pkg> --owner <owner>` set package owner
+  - `sce scene owner show --name <pkg>` display current owner
+  - `sce scene owner list --owner <owner>` list packages by owner (case-insensitive)
+  - `sce scene owner transfer --name <pkg> --from <old> --to <new>` transfer ownership
     - `--remove` clear owner field
     - `--registry <dir>` custom registry directory
     - `--json` structured JSON output
@@ -441,7 +441,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Scene Registry Audit**: Health check for local scene package registry
-  - `kse scene audit` scan registry index, verify tarball existence and SHA-256 integrity
+  - `sce scene audit` scan registry index, verify tarball existence and SHA-256 integrity
     - `--registry <dir>` custom registry directory (default `.kiro/registry`)
     - `--fix` auto-remove orphaned tarballs and clean missing-tarball index entries
     - `--json` structured JSON output
@@ -452,7 +452,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Scene Package Deprecation**: Mark/unmark package versions as deprecated in local registry
-  - `kse scene deprecate --name <pkg> --message <msg>` deprecate all versions
+  - `sce scene deprecate --name <pkg> --message <msg>` deprecate all versions
     - `--version <v>` target specific version
     - `--undo` remove deprecation marker
     - `--registry <dir>` custom registry directory
@@ -467,7 +467,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Scene Package Directory Validation**: Comprehensive validation for scene package directories
-  - `kse scene package-validate --package <dir>` now supports directory-level validation
+  - `sce scene package-validate --package <dir>` now supports directory-level validation
     - `--strict` treat warnings as errors (exit code 1)
     - `--json` structured JSON output
   - Validates `scene-package.json` existence and required fields
@@ -484,7 +484,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Scene Package Info**: Display detailed package information from local registry
-  - `kse scene info --name <packageName>` show package details
+  - `sce scene info --name <packageName>` show package details
     - `--registry <dir>` custom registry directory
     - `--json` structured JSON output
     - `--versions-only` show only version list
@@ -498,7 +498,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Scene Package Diff**: Compare two versions of a scene package in the local registry
-  - `kse scene diff --name <pkg> --from <v1> --to <v2>` compare package versions
+  - `sce scene diff --name <pkg> --from <v1> --to <v2>` compare package versions
     - `--registry <dir>` custom registry directory
     - `--json` structured JSON output
     - `--stat` show only file change summary
@@ -513,7 +513,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Scene Version Bump**: Bump version in scene-package.json following semver
-  - `kse scene version --bump <major|minor|patch|x.y.z>` bump scene package version
+  - `sce scene version --bump <major|minor|patch|x.y.z>` bump scene package version
     - `--package <dir>` scene package directory (default: current directory)
     - `--dry-run` preview without writing
     - `--json` structured JSON output
@@ -526,10 +526,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Scene Registry Query**: List and search scene packages in local registry
-  - `kse scene list` list all packages in registry
+  - `sce scene list` list all packages in registry
     - `--registry <dir>` custom registry directory
     - `--json` structured JSON output
-  - `kse scene search --query <term>` search packages by keyword
+  - `sce scene search --query <term>` search packages by keyword
     - Case-insensitive substring matching on name, description, and group
     - `--registry <dir>` custom registry directory
     - `--json` structured JSON output
@@ -541,7 +541,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Scene Package Install**: Install published scene packages from local registry
-  - `kse scene install --name <packageName>` install scene package from registry
+  - `sce scene install --name <packageName>` install scene package from registry
     - `--version <version>` exact version or omit for latest
     - `--out <dir>` custom target directory (default: `./{packageName}`)
     - `--registry <dir>` custom registry directory
@@ -559,12 +559,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Scene Package Registry Publish/Unpublish**: Local registry-based publish and unpublish for scene packages
-  - `kse scene publish --package <path>` publish scene package to local registry
+  - `sce scene publish --package <path>` publish scene package to local registry
     - `--registry <dir>` custom registry directory
     - `--dry-run` preview without writing
     - `--force` overwrite existing version
     - `--json` structured JSON output
-  - `kse scene unpublish --name <name> --version <version>` remove published version
+  - `sce scene unpublish --name <name> --version <version>` remove published version
     - `--registry <dir>` custom registry directory
     - `--json` structured JSON output
   - Tarball bundling with SHA-256 integrity verification
@@ -577,7 +577,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.26.0] - 2026-02-10
 
 ### Added
-- **Scene Template Instantiation**: Complete `kse scene instantiate` command for template package instantiation
+- **Scene Template Instantiation**: Complete `sce scene instantiate` command for template package instantiation
   - `--package <name>` select template package, `--values <json|file>` supply variables
   - `--out <dir>` output directory, `--template-dir <dir>` custom template root
   - `--list` list available packages, `--dry-run` preview without writing
@@ -587,13 +587,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Post-instantiate hook execution via `post-instantiate` script in scene-package.json
   - Implements Spec 76-00-scene-template-instantiation
 
-- **Default Agent Hooks in Adopt**: `kse adopt` now creates 3 default hooks in `.kiro/hooks/`
+- **Default Agent Hooks in Adopt**: `sce adopt` now creates 3 default hooks in `.kiro/hooks/`
   - `run-tests-on-save.kiro.hook` - Manual trigger to run tests (userTriggered)
   - `check-spec-on-create.kiro.hook` - Validate spec structure on creation (fileCreated)
   - `sync-tasks-on-edit.kiro.hook` - Sync workspace on tasks.md edit (fileEdited)
   - Hooks directory added to all adoption strategies (fresh/partial/full)
 
-- **Kiro IDE MCP Auto-Configuration**: When Kiro IDE is detected during `kse adopt`, automatically creates `.kiro/settings/mcp.json` with shell MCP server (`mcp-server-commands`). Skips if config already exists.
+- **AI IDE MCP Auto-Configuration**: When AI IDE is detected during `sce adopt`, automatically creates `.kiro/settings/mcp.json` with shell MCP server (`mcp-server-commands`). Skips if config already exists.
 
 ## [1.25.0] - 2026-02-09
 
@@ -604,9 +604,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Multi-File Template Rendering**: Recursive file processing with `{{variable}}` substitution, `{{#if}}` conditionals, `{{#each}}` loops, and unresolved placeholder passthrough
   - **Three-Layer Inheritance Resolution**: L1-Capability / L2-Domain / L3-Instance package hierarchy with variable schema and file merging, cycle detection
   - **CLI Commands**:
-    - `kse scene template-validate --package <path>` - Validate template variable schema in scene-package.json
-    - `kse scene template-resolve --package <name>` - Resolve full inheritance chain and display merged schema
-    - `kse scene template-render --package <name> --values <json> --out <dir>` - Render template package with variable substitution
+    - `sce scene template-validate --package <path>` - Validate template variable schema in scene-package.json
+    - `sce scene template-resolve --package <name>` - Resolve full inheritance chain and display merged schema
+    - `sce scene template-render --package <name> --values <json> --out <dir>` - Render template package with variable substitution
   - All commands support `--json` output mode
   - Reuses existing package registry and contract validation infrastructure
 
@@ -659,13 +659,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **User Knowledge Management System (MVP)**: Personal knowledge base for capturing project experiences
   - **Knowledge Base**: Organize patterns, lessons, workflows, checklists, and references
   - **CLI Commands**: Complete command set for knowledge management
-    - `kse knowledge init` - Initialize knowledge base
-    - `kse knowledge add <type> <title>` - Add new entry (pattern/lesson/workflow/checklist/reference)
-    - `kse knowledge list` - List all entries with filtering and sorting
-    - `kse knowledge search <keyword>` - Search entries (title, tags, content)
-    - `kse knowledge show <id>` - Display entry details
-    - `kse knowledge delete <id>` - Delete entry with backup
-    - `kse knowledge stats` - Show statistics
+    - `sce knowledge init` - Initialize knowledge base
+    - `sce knowledge add <type> <title>` - Add new entry (pattern/lesson/workflow/checklist/reference)
+    - `sce knowledge list` - List all entries with filtering and sorting
+    - `sce knowledge search <keyword>` - Search entries (title, tags, content)
+    - `sce knowledge show <id>` - Display entry details
+    - `sce knowledge delete <id>` - Delete entry with backup
+    - `sce knowledge stats` - Show statistics
   - **Entry Types**: Five built-in types with customizable templates
     - Pattern: Design patterns and architectural solutions
     - Lesson: Lessons learned from experience
@@ -712,7 +712,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Weighted average estimation (more weight to recent data)
     - Improved completion time estimates over multiple executions
     - Historical data persistence to `.kiro/auto/historical-data.json`
-  - **CORE_PRINCIPLES Compliance**: Automatic verification of kse project structure
+  - **CORE_PRINCIPLES Compliance**: Automatic verification of sce project structure
     - Checks for `.kiro` directory (adoption marker)
     - Validates `version.json`, `specs/`, `steering/` directories
     - Ensures Spec-driven development workflow compliance
@@ -756,12 +756,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `CheckpointManager`: Checkpoint creation and rollback with user approval workflow
     - `AutonomousEngine`: Central orchestrator integrating all managers
   - **CLI Commands**: Complete command set for autonomous execution
-    - `kse auto create <description>`: Create and run Spec autonomously from feature description
-    - `kse auto run <spec>`: Execute existing Spec tasks autonomously
-    - `kse auto status`: Display current execution state and progress
-    - `kse auto resume`: Resume from last checkpoint after pause
-    - `kse auto stop`: Gracefully stop execution and save state
-    - `kse auto config`: View and update autonomous execution configuration
+    - `sce auto create <description>`: Create and run Spec autonomously from feature description
+    - `sce auto run <spec>`: Execute existing Spec tasks autonomously
+    - `sce auto status`: Display current execution state and progress
+    - `sce auto resume`: Resume from last checkpoint after pause
+    - `sce auto stop`: Gracefully stop execution and save state
+    - `sce auto config`: View and update autonomous execution configuration
   - **Key Features**:
     - Continuous task execution without interruption
     - Automatic error recovery with strategy learning
@@ -818,12 +818,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Integration Testing**: Run cross-Spec integration tests to verify modules work together correctly
   - **Dependency Visualization**: View dependency graphs with critical path highlighting
   - **CLI Commands**: Complete set of commands for collaboration management
-    - `kse collab init` - Initialize Master Spec with Sub-Specs
-    - `kse collab status` - Display collaboration status and dependency graph
-    - `kse collab assign` - Assign Specs to Kiro instances
-    - `kse collab verify` - Verify interface contract compliance
-    - `kse collab integrate` - Run integration tests across Specs
-    - `kse collab migrate` - Convert standalone Spec to collaborative mode
+    - `sce collab init` - Initialize Master Spec with Sub-Specs
+    - `sce collab status` - Display collaboration status and dependency graph
+    - `sce collab assign` - Assign Specs to SCE instances
+    - `sce collab verify` - Verify interface contract compliance
+    - `sce collab integrate` - Run integration tests across Specs
+    - `sce collab migrate` - Convert standalone Spec to collaborative mode
   - **Backward Compatible**: Opt-in system that doesn't affect existing single-Spec workflows
   - **Comprehensive Documentation**: Complete guide with examples and best practices
 
@@ -965,7 +965,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Parent reference validation now correctly matches parent paths with repository paths
   - Improved error messages to include available paths when validation fails
 - **Git Command Duplication**: Fixed command execution that duplicated "git" prefix
-  - `kse repo exec "git branch"` now correctly executes "git branch" instead of "git git branch"
+  - `sce repo exec "git branch"` now correctly executes "git branch" instead of "git git branch"
   - Command trimming and prefix detection added to RepoManager.execInRepo()
 - **Backward Compatibility**: All existing configurations work without changes
   - Existing single-repository configurations function identically
@@ -981,7 +981,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Nested Repository Support**: Discover and manage Git repositories nested inside other repositories
-  - `kse repo init` now scans inside Git repositories to find nested subrepositories by default
+  - `sce repo init` now scans inside Git repositories to find nested subrepositories by default
   - Added `--nested` and `--no-nested` flags to control scanning behavior
   - Parent-child relationships tracked in configuration with `parent` field
   - Display parent relationships in status and health commands
@@ -1043,10 +1043,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Multi-Repository Management**: Complete feature for managing multiple Git subrepositories
-  - `kse repo init`: Auto-discover and initialize repository configuration
-  - `kse repo status`: View status of all repositories in unified table
-  - `kse repo exec`: Execute Git commands across all repositories
-  - `kse repo health`: Verify repository configuration and connectivity
+  - `sce repo init`: Auto-discover and initialize repository configuration
+  - `sce repo status`: View status of all repositories in unified table
+  - `sce repo exec`: Execute Git commands across all repositories
+  - `sce repo health`: Verify repository configuration and connectivity
   - Configuration stored in `.kiro/project-repos.json`
   - Support for repository groups, tags, and metadata
   - Cross-platform path handling (Windows/Linux/macOS)
@@ -1095,7 +1095,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Steering Rules**: Enhanced with automatic version sync workflow
 
 ### Notes
-- This release ensures AI tools stay synchronized with kse version updates
+- This release ensures AI tools stay synchronized with sce version updates
 - All 1491 tests passing
 
 ## [1.18.0] - 2026-01-31
@@ -1128,7 +1128,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Template Creation from Existing Spec**: Automated workflow to convert completed Specs into reusable templates
-  - CLI command: `kse templates create-from-spec --spec <identifier> [options]`
+  - CLI command: `sce templates create-from-spec --spec <identifier> [options]`
   - Automatic content generalization (replaces project-specific details with template variables)
   - Interactive metadata collection (name, description, category, tags, author, version)
   - YAML frontmatter generation for all template files
@@ -1182,10 +1182,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Spec Template Library**: Complete template management system for rapid Spec creation
   - Browse, search, and apply pre-built Spec templates from official and custom sources
-  - Template discovery: `kse templates list`, `kse templates search <keyword>`, `kse templates show <template-id>`
-  - Template management: `kse templates update`, `kse templates cache`, `kse templates guide`
-  - Custom sources: `kse templates add-source <name> <url>`, `kse templates remove-source <name>`, `kse templates sources`
-  - Create Spec from template: `kse spec create <name> --template <template-id>`
+  - Template discovery: `sce templates list`, `sce templates search <keyword>`, `sce templates show <template-id>`
+  - Template management: `sce templates update`, `sce templates cache`, `sce templates guide`
+  - Custom sources: `sce templates add-source <name> <url>`, `sce templates remove-source <name>`, `sce templates sources`
+  - Create Spec from template: `sce spec create <name> --template <template-id>`
   - Local caching for offline use (~/.kse/templates/)
   - Multi-source support with conflict resolution (source:template-id format)
   - Automatic variable substitution ({{SPEC_NAME}}, {{DATE}}, {{AUTHOR}}, etc.)
@@ -1210,7 +1210,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Only requires user intervention for: fatal errors, external resources, major architecture decisions, final acceptance
 - Added "避免重复测试" (Avoid Redundant Testing) clarification
   - Skip tests if just executed during Spec implementation
-  - Handles Kiro's file-save-triggered subagent scenario
+  - Handles SCE's file-save-triggered subagent scenario
 
 ### Notes
 - All existing tests pass (1491 tests)
@@ -1224,8 +1224,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **.gitignore Auto-Fix for Team Collaboration**: Automatic detection and fixing of .gitignore configuration
   - Detects old blanket `.kiro/` exclusion patterns that prevent Spec sharing
   - Replaces with layered strategy: commit Specs, exclude personal state
-  - Integrated into `kse adopt` and `kse upgrade` flows (automatic)
-  - Standalone command: `kse doctor --fix-gitignore`
+  - Integrated into `sce adopt` and `sce upgrade` flows (automatic)
+  - Standalone command: `sce doctor --fix-gitignore`
   - Creates backup before modification (stored in `.kiro/backups/gitignore-{timestamp}`)
   - Preserves all user rules (non-.kiro patterns)
   - Handles different line endings (CRLF/LF) correctly
@@ -1254,7 +1254,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Rollback capability to restore previous environment state
   - Support for multiple configuration file mappings per environment
   - Environment verification with custom commands (optional)
-  - Commands: `kse env list`, `kse env switch`, `kse env info`, `kse env register`, `kse env unregister`, `kse env rollback`
+  - Commands: `sce env list`, `sce env switch`, `sce env info`, `sce env register`, `sce env unregister`, `sce env rollback`
   - Comprehensive user documentation in `docs/environment-management-guide.md`
   - 66 unit tests covering all core functionality
 
@@ -1262,7 +1262,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **EnvironmentRegistry**: JSON-based persistent storage (`.kiro/environments.json`)
 - **EnvironmentManager**: Core logic for environment operations
 - **BackupSystem**: Automatic backup/restore with history management
-- **CLI Integration**: Seamless integration with existing kse commands
+- **CLI Integration**: Seamless integration with existing sce commands
 - **Cross-platform**: Consistent behavior on Windows, Linux, and Mac
 
 ## [1.13.1] - 2026-01-29
@@ -1309,9 +1309,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added complete directory structure documentation with purpose explanations
   - Added workspace management section with detailed usage examples
   - Added document governance section with validation commands
-  - Added data storage location details for `kse workspace` feature
+  - Added data storage location details for `sce workspace` feature
   - Added JSON data structure examples for workspace-state.json
-  - Clarified difference between `kse workspace` (cross-project) and `contexts/` (multi-user)
+  - Clarified difference between `sce workspace` (cross-project) and `contexts/` (multi-user)
   - Added key features list for workspace management
 
 ### Changed
@@ -1341,7 +1341,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **Critical**: Registered `workspace` command in CLI that was missing from v1.12.0
-  - Added workspace command registration in `bin/kiro-spec-engine.js`
+  - Added workspace command registration in `bin/scene-capability-engine.js`
   - All workspace subcommands now available: create, list, switch, remove, info
   - Fixes issue where users couldn't access multi-workspace management features
 
@@ -1401,11 +1401,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed - CRITICAL: Workspace Context Pollution 🚨
 
-**HOTFIX**: Fixed critical bug where Kiro IDE reads all workspace contexts
+**HOTFIX**: Fixed critical bug where AI IDE reads all workspace contexts
 
 **Critical Issue**:
 - Workspace contexts were stored in `.kiro/steering/workspaces/`
-- Kiro IDE reads ALL `.md` files in `steering/` directory
+- AI IDE reads ALL `.md` files in `steering/` directory
 - This caused ALL personal CURRENT_CONTEXT.md files to be read simultaneously
 - Result: Context pollution, confusion, and incorrect AI behavior
 
@@ -1418,8 +1418,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ```
 .kiro/
 ├── steering/
-│   └── CURRENT_CONTEXT.md  ← Only active context (read by Kiro)
-└── contexts/               ← Personal workspaces (NOT read by Kiro)
+│   └── CURRENT_CONTEXT.md  ← Only active context (read by SCE)
+└── contexts/               ← Personal workspaces (NOT read by SCE)
     ├── developer1/
     │   └── CURRENT_CONTEXT.md
     └── developer2/
@@ -1501,15 +1501,15 @@ rm -rf .kiro/steering/workspaces
 
 ### Added - Multi-Workspace Management 🚀
 
-**Spec 16-00**: Complete multi-workspace management system for managing multiple kse projects
+**Spec 16-00**: Complete multi-workspace management system for managing multiple sce projects
 
 **New Features**:
 - **Workspace Management Commands**
-  - `kse workspace create <name> [path]` - Register a new workspace
-  - `kse workspace list` - List all registered workspaces
-  - `kse workspace switch <name>` - Switch active workspace
-  - `kse workspace remove <name>` - Remove workspace from registry
-  - `kse workspace info [name]` - Display workspace details
+  - `sce workspace create <name> [path]` - Register a new workspace
+  - `sce workspace list` - List all registered workspaces
+  - `sce workspace switch <name>` - Switch active workspace
+  - `sce workspace remove <name>` - Remove workspace from registry
+  - `sce workspace info [name]` - Display workspace details
 - **Data Atomicity Architecture**
   - Single source of truth: `~/.kse/workspace-state.json`
   - Atomic operations for all workspace state changes
@@ -1546,7 +1546,7 @@ rm -rf .kiro/steering/workspaces
 - Session summary and completion report
 
 **Benefits**:
-- Manage multiple kse projects from a single location
+- Manage multiple sce projects from a single location
 - Quick workspace switching without directory navigation
 - Consistent workspace state across all operations
 - Foundation for future cross-workspace features
@@ -1600,7 +1600,7 @@ rm -rf .kiro/steering/workspaces
 
 ### Added - Adopt Command UX Improvement 🎉
 
-**Spec 14-00**: Complete UX overhaul for the `kse adopt` command with zero-interaction smart adoption
+**Spec 14-00**: Complete UX overhaul for the `sce adopt` command with zero-interaction smart adoption
 
 **Phase 1: Core Smart Adoption**
 - **Smart Orchestrator**: Zero-interaction adoption coordinator
@@ -1688,7 +1688,7 @@ rm -rf .kiro/steering/workspaces
   - Clear problem descriptions (non-technical language)
   - Possible causes listing
   - Actionable solutions
-  - Help references (kse doctor, documentation)
+  - Help references (sce doctor, documentation)
   - Consistent formatting across all errors
 
 **Phase 3: Advanced Features**
@@ -1788,11 +1788,11 @@ rm -rf .kiro/steering/workspaces
   - Clear error reporting with missing elements
 
 **New CLI Commands**:
-- `kse ops init <project-name>` - Initialize operations specs from templates
-- `kse ops validate [<project-name>]` - Validate operations spec completeness
-- `kse ops audit [options]` - Query audit logs with filtering
-- `kse ops takeover <action> [options]` - Manage takeover levels
-- `kse ops feedback <action> [options]` - Manage user feedback
+- `sce ops init <project-name>` - Initialize operations specs from templates
+- `sce ops validate [<project-name>]` - Validate operations spec completeness
+- `sce ops audit [options]` - Query audit logs with filtering
+- `sce ops takeover <action> [options]` - Manage takeover levels
+- `sce ops feedback <action> [options]` - Manage user feedback
 
 **New Components**:
 - `lib/operations/operations-manager.js` - Operations spec lifecycle management
@@ -1851,7 +1851,7 @@ rm -rf .kiro/steering/workspaces
 
 ### Added - Interactive Conflict Resolution System 🎯
 
-**Spec 10-00**: Complete overhaul of `kse adopt` conflict handling with interactive resolution
+**Spec 10-00**: Complete overhaul of `sce adopt` conflict handling with interactive resolution
 
 **Core Features**:
 - **Interactive Conflict Resolution**: Choose how to handle each conflicting file
@@ -1907,19 +1907,19 @@ rm -rf .kiro/steering/workspaces
 **Usage Examples**:
 ```bash
 # Interactive mode (default) - prompts for each conflict
-kse adopt
+sce adopt
 
 # Force mode - overwrite all conflicts with backup
-kse adopt --force
+sce adopt --force
 
 # Auto mode - skip all conflicts automatically
-kse adopt --auto
+sce adopt --auto
 
 # Auto + force - overwrite all conflicts without prompts
-kse adopt --auto --force
+sce adopt --auto --force
 
 # Dry run - preview what would happen
-kse adopt --dry-run
+sce adopt --dry-run
 ```
 
 **Benefits**:
@@ -1941,35 +1941,35 @@ kse adopt --dry-run
 ## [1.6.4] - 2026-01-24
 
 ### Added
-- **Prominent clarification to prevent confusion with Kiro IDE** 🎯
+- **Prominent clarification to prevent confusion with AI IDE** 🎯
   - Added warning box at top of README.md and README.zh.md
-  - Clarifies that kse is an npm package/CLI tool, NOT the Kiro IDE desktop application
+  - Clarifies that sce is an npm package/CLI tool, NOT the AI IDE desktop application
   - Updated package.json description to explicitly state the difference
-  - **Triggered by**: Real user feedback - iFlow (using GLM-4.7) confused kse with Kiro IDE and tried to download the wrong software
+  - **Triggered by**: Real user feedback - iFlow (using GLM-4.7) confused sce with AI IDE and tried to download the wrong software
 
 **Why this matters:**
-- Prevents AI tools (especially smaller models) from confusing kse with Kiro IDE
-- Saves users time by immediately clarifying what kse is
+- Prevents AI tools (especially smaller models) from confusing sce with AI IDE
+- Saves users time by immediately clarifying what sce is
 - Improves first-time user experience
 - Sets foundation for Spec 11 (comprehensive documentation alignment)
 
 **User feedback that triggered this:**
-> "iFlow 用 GLM-4.7 好傻 下载 kiro 了"  
-> (iFlow using GLM-4.7 was silly and downloaded Kiro [IDE] instead)
+> "iFlow 用 GLM-4.7 好傻 下载 SCE 了"  
+> (iFlow using GLM-4.7 was silly and downloaded SCE [IDE] instead)
 
 ## [1.6.3] - 2026-01-24
 
 ### Fixed
 - **Fixed incorrect command recommendations in diagnostic tools** 🐛
-  - Updated `lib/governance/diagnostic-engine.js` to recommend `kse docs archive --spec <spec-name>` instead of `kse archive --spec <spec-name>`
+  - Updated `lib/governance/diagnostic-engine.js` to recommend `sce docs archive --spec <spec-name>` instead of `sce archive --spec <spec-name>`
   - Updated `lib/commands/status.js` to show correct archive command in quick fix suggestions
   - Fixed all related test expectations to match actual command structure
-  - **Impact**: Users will now see correct commands when `kse doctor --docs` or `kse status` detect misplaced artifacts
-  - **Root cause**: Documentation/functionality mismatch - the actual command is `kse docs archive`, not `kse archive`
+  - **Impact**: Users will now see correct commands when `sce doctor --docs` or `sce status` detect misplaced artifacts
+  - **Root cause**: Documentation/functionality mismatch - the actual command is `sce docs archive`, not `sce archive`
 
 **Discovered from real user feedback:**
-> User's AI (Codex) tried to run `kse archive --spec 01-00-user-space-diagnosis` 
-> based on `kse doctor --docs` recommendation, but got `error: unknown command 'archive'`
+> User's AI (Codex) tried to run `sce archive --spec 01-00-user-space-diagnosis` 
+> based on `sce doctor --docs` recommendation, but got `error: unknown command 'archive'`
 
 **Why this matters:**
 - Prevents user confusion when following system recommendations
@@ -1982,19 +1982,19 @@ kse adopt --dry-run
 - **Simplified Quick Start based on real user feedback** 📝
   - Added "The Simplest Way" section (30 seconds, one command to AI)
   - Moved detailed steps into collapsible section
-  - Reflects actual user experience: "Just tell AI to install and use kse"
+  - Reflects actual user experience: "Just tell AI to install and use sce"
   - AI handles everything automatically (install, adopt, read docs, start working)
   - Updated both English and Chinese README files
 
 **User feedback:**
-> "I just told Codex to install kse, and it figured out how to use it. 
+> "I just told Codex to install sce, and it figured out how to use it. 
 > Then I just said 'use this mode to manage the project' and it worked."
 
 **Why this matters:**
 - Reduces perceived complexity from "5 minutes, 4 steps" to "30 seconds, 1 command"
 - Matches real-world usage pattern
 - Emphasizes AI autonomy rather than manual steps
-- Makes kse feel even more like "invisible infrastructure"
+- Makes sce feel even more like "invisible infrastructure"
 
 ## [1.6.1] - 2026-01-24
 
@@ -2009,68 +2009,68 @@ kse adopt --dry-run
 **Why this matters:**
 - Previous code used string replacement which failed on Windows paths
 - Could cause backup creation to fail silently or create backups in wrong locations
-- Critical for `kse adopt --force` conflict resolution feature
+- Critical for `sce adopt --force` conflict resolution feature
 
 ## [1.6.0] - 2026-01-24
 
 ### Changed - BREAKING CONCEPTUAL CHANGE 🎯
 
-**Repositioned kse from "tool" to "methodology enforcer"**
+**Repositioned sce from "tool" to "methodology enforcer"**
 
-This is a fundamental shift in how kse should be understood and used:
+This is a fundamental shift in how sce should be understood and used:
 
 **Before (WRONG approach):**
-- `.kiro/README.md` was a "kse command manual"
-- Taught AI "how to use kse tool"
+- `.kiro/README.md` was a "sce command manual"
+- Taught AI "how to use sce tool"
 - Listed 20+ commands with examples
-- Users had to "learn kse" before using it
+- Users had to "learn sce" before using it
 
 **After (CORRECT approach):**
 - `.kiro/README.md` is a "project development guide"
 - Explains project follows Spec-driven methodology
 - AI's role: follow the methodology, not learn the tool
-- kse commands are helpers used automatically when needed
+- sce commands are helpers used automatically when needed
 
 **Key insight from user feedback:**
-> "After installing kse, just tell AI to read .kiro/README.md. 
-> AI will understand the methodology and naturally use kse commands 
+> "After installing sce, just tell AI to read .kiro/README.md. 
+> AI will understand the methodology and naturally use sce commands 
 > to solve problems, rather than memorizing command syntax."
 
 **What changed:**
 - `.kiro/README.md` - Completely rewritten as methodology guide (not tool manual)
-- `kse adopt` completion message - Now says "Tell AI to read README" instead of "Create your first spec"
+- `sce adopt` completion message - Now says "Tell AI to read README" instead of "Create your first spec"
 - `docs/quick-start.md` - Simplified from 5-minute tool tutorial to 2-minute methodology introduction
 - Removed detailed Spec creation examples (that's AI's job, not user's manual work)
 
 **Impact:**
-- Users don't need to "learn kse" anymore
+- Users don't need to "learn sce" anymore
 - AI tools understand project methodology by reading README
 - Natural workflow: User asks for feature → AI creates Spec → AI implements
-- kse becomes invisible infrastructure, not a tool to master
+- sce becomes invisible infrastructure, not a tool to master
 
 **Migration:**
-- Existing projects: Run `kse adopt --force` to get new README
+- Existing projects: Run `sce adopt --force` to get new README
 - Tell your AI: "Please read .kiro/README.md to understand project methodology"
 - AI will automatically understand and follow Spec-driven approach
 
-This aligns kse with its true purpose: **enforcing development methodology**, not being a CLI tool to learn.
+This aligns sce with its true purpose: **enforcing development methodology**, not being a CLI tool to learn.
 
 ## [1.5.5] - 2026-01-24
 
 ### Added
-- AI-friendly `.kiro/README.md` template explaining kse commands and usage
-- Comprehensive kse command reference for AI tools (status, workflows, context export, etc.)
+- AI-friendly `.kiro/README.md` template explaining sce commands and usage
+- Comprehensive sce command reference for AI tools (status, workflows, context export, etc.)
 - AI workflow guide with step-by-step instructions for common tasks
 - Spec structure documentation for AI understanding
-- Best practices section for AI tools using kse
+- Best practices section for AI tools using sce
 
 ### Changed
-- Updated `.kiro/README.md` template to focus on kse CLI usage instead of Kiro Spec system philosophy
+- Updated `.kiro/README.md` template to focus on sce CLI usage instead of SCE Spec system philosophy
 - Simplified template file list in adoption strategy (removed obsolete files)
 - Fixed template path in adoption strategy to point to correct location (`template/.kiro`)
 
 ### Fixed
-- AI tools can now understand what kse is and how to use it by reading `.kiro/README.md`
+- AI tools can now understand what sce is and how to use it by reading `.kiro/README.md`
 - Adoption command now correctly copies README from template
 
 ## [1.5.4] - 2026-01-24
@@ -2096,13 +2096,13 @@ This aligns kse with its true purpose: **enforcing development methodology**, no
 ## [1.5.0] - 2026-01-24
 
 ### Added
-- **Interactive conflict resolution for kse adopt** 🎯 - Choose how to handle conflicting files
+- **Interactive conflict resolution for sce adopt** 🎯 - Choose how to handle conflicting files
   - Three resolution strategies: skip all, overwrite all, or review each file
   - Per-file review with diff viewing capability
   - Selective backup system (only backs up files being overwritten)
   - Full support for --force, --auto, and --dry-run modes
   - Clear conflict categorization (steering, documentation, tools)
-  - Usage: `kse adopt` (interactive prompts when conflicts detected)
+  - Usage: `sce adopt` (interactive prompts when conflicts detected)
 
 **Benefits**:
 - Full control over which files to keep or overwrite
@@ -2113,11 +2113,11 @@ This aligns kse with its true purpose: **enforcing development methodology**, no
 ## [1.4.6] - 2026-01-24
 
 ### Added
-- **--force option for kse adopt** 🔥 - Force overwrite conflicting files during adoption
+- **--force option for sce adopt** 🔥 - Force overwrite conflicting files during adoption
   - Automatically creates backup before overwriting
   - Shows clear warning when enabled
   - Useful for upgrading template files to latest version
-  - Usage: `kse adopt --force`
+  - Usage: `sce adopt --force`
 
 ### Fixed
 - Cross-platform path normalization test compatibility
@@ -2141,7 +2141,7 @@ This aligns kse with its true purpose: **enforcing development methodology**, no
 
 **Benefits**:
 - Clear guidance on when to use major vs minor numbers
-- Practical examples from real projects (kiro-spec-engine, e-commerce, SaaS)
+- Practical examples from real projects (scene-capability-engine, e-commerce, SaaS)
 - Decision tree for quick strategy selection
 - Best practices and common pitfalls
 - Supports both simple and complex project needs
@@ -2190,46 +2190,46 @@ This aligns kse with its true purpose: **enforcing development methodology**, no
 
 **Documentation Improvements**:
 - Corrected Integration Workflow diagram in README.md and README.zh.md
-- Changed flow from "User → kse → User → AI Tool" to "User ↔ AI Tool ↔ kse"
+- Changed flow from "User → sce → User → AI Tool" to "User ↔ AI Tool ↔ sce"
 - Added key insight: "You stay in your AI tool. The AI reads the Spec and generates code."
 - Both English and Chinese versions updated
 
 ### Why This Matters
 
-This patch ensures CI/CD pipeline works correctly and reinforces the correct mental model: users stay in their AI tool, which calls kse behind the scenes.
+This patch ensures CI/CD pipeline works correctly and reinforces the correct mental model: users stay in their AI tool, which calls sce behind the scenes.
 
 ## [1.4.1] - 2026-01-23
 
 ### Fixed - Documentation Clarity 🎯
 
 **Corrected Integration Flow**:
-- **Fixed sequence diagrams** - Now correctly show "User ↔ AI Tool ↔ kse" instead of "User → kse → AI Tool"
-- **Emphasized AI-driven workflow** - AI tools call kse directly, users stay in their familiar interface
-- **Clarified positioning** - kse works behind the scenes, users don't "switch tools"
+- **Fixed sequence diagrams** - Now correctly show "User ↔ AI Tool ↔ sce" instead of "User → sce → AI Tool"
+- **Emphasized AI-driven workflow** - AI tools call sce directly, users stay in their familiar interface
+- **Clarified positioning** - sce works behind the scenes, users don't "switch tools"
 
 **Updated Documentation**:
-- `README.md` - Rewrote Step 4 to emphasize AI tool calls kse automatically
+- `README.md` - Rewrote Step 4 to emphasize AI tool calls sce automatically
 - `README.zh.md` - Chinese version updated to match
 - `docs/integration-modes.md` - Fixed sequence diagrams and workflow descriptions
 
 **Key Message**:
 - ✅ Users continue using their preferred AI tool (Cursor, Claude, Windsurf, etc.)
-- ✅ AI tool calls kse commands during conversation
+- ✅ AI tool calls sce commands during conversation
 - ✅ No "tool switching" - seamless integration
-- ✅ kse is the "context provider" working behind the scenes
+- ✅ sce is the "context provider" working behind the scenes
 
 ### Why This Matters
 
-Users are already comfortable with their AI tools. kse enhances their existing workflow by providing structured context, not by replacing their tools. This patch clarifies that positioning.
+Users are already comfortable with their AI tools. sce enhances their existing workflow by providing structured context, not by replacing their tools. This patch clarifies that positioning.
 
 ## [1.4.0] - 2026-01-23
 
 ### Added - User Onboarding and Documentation Overhaul 📚
 
 **Complete Documentation Restructure**:
-- **New Positioning**: Repositioned kse as "A context provider for AI coding tools"
+- **New Positioning**: Repositioned sce as "A context provider for AI coding tools"
 - **Three-Tier Structure**: README → Core Guides → Tool-Specific Guides
-- **"What kse is NOT" Section**: Clear clarification of kse's role
+- **"What sce is NOT" Section**: Clear clarification of sce's role
 
 **New Documentation** (20+ new files):
 - **Quick Start Guide** (`docs/quick-start.md`): Complete 5-minute tutorial with user-login example
@@ -2237,7 +2237,7 @@ Users are already comfortable with their AI tools. kse enhances their existing w
   - Cursor Integration Guide
   - Claude Code Integration Guide
   - Windsurf Integration Guide
-  - Kiro Integration Guide
+  - SCE Integration Guide
   - VS Code + Copilot Integration Guide
   - Generic AI Tools Guide
 - **Core Guides**:
@@ -2274,7 +2274,7 @@ Users are already comfortable with their AI tools. kse enhances their existing w
 
 - **README.md**: Complete restructure with embedded quick start and clear positioning
 - **README.zh.md**: Updated to match new English structure
-- All documentation now emphasizes kse's role as a context provider for AI tools
+- All documentation now emphasizes sce's role as a context provider for AI tools
 
 ### Improved
 
@@ -2313,13 +2313,13 @@ Users are already comfortable with their AI tools. kse enhances their existing w
   - Status reporting and metrics
 
 **CLI Commands** (7 commands):
-- `kse watch init` - Initialize watch configuration
-- `kse watch start/stop` - Control watch mode
-- `kse watch status` - Show current status
-- `kse watch logs` - View execution logs (with tail/follow)
-- `kse watch metrics` - Display automation metrics
-- `kse watch presets` - List available presets
-- `kse watch install <preset>` - Install automation preset
+- `sce watch init` - Initialize watch configuration
+- `sce watch start/stop` - Control watch mode
+- `sce watch status` - Show current status
+- `sce watch logs` - View execution logs (with tail/follow)
+- `sce watch metrics` - Display automation metrics
+- `sce watch presets` - List available presets
+- `sce watch install <preset>` - Install automation preset
 
 **Automation Presets** (4 presets):
 - `auto-sync` - Automatically sync workspace when tasks.md changes
@@ -2328,14 +2328,14 @@ Users are already comfortable with their AI tools. kse enhances their existing w
 - `test-runner` - Run tests when source files change
 
 **Tool Detection & Auto-Configuration**:
-- Automatic IDE detection (Kiro IDE, VS Code, Cursor)
+- Automatic IDE detection (AI IDE, VS Code, Cursor)
 - Tool-specific automation recommendations
 - Auto-configuration during project adoption
 - Confidence-based suggestions
 
 **Manual Workflows** (6 workflows):
 - Complete workflow guide (300+ lines)
-- `kse workflows` command for workflow management
+- `sce workflows` command for workflow management
 - Step-by-step instructions with time estimates
 - Interactive checklists for common tasks
 - Workflows: task-sync, context-export, prompt-generation, daily, task-completion, spec-creation
@@ -2399,9 +2399,9 @@ Users are already comfortable with their AI tools. kse enhances their existing w
   - `validateProject()`: Complete project validation
 - **Automatic Version Checking**: Detect version mismatches
   - VersionChecker class for automatic version detection
-  - Warning display when project version differs from installed kse
+  - Warning display when project version differs from installed sce
   - `--no-version-check` flag to suppress warnings
-  - `kse version-info` command for detailed version information
+  - `sce version-info` command for detailed version information
 - **Enhanced Testing**: Added tests for validation and version checking
   - 7 new unit tests for validation system
   - 4 new unit tests for version checker
@@ -2428,9 +2428,9 @@ Users are already comfortable with their AI tools. kse enhances their existing w
   - Backup validation and integrity checking
   - Easy rollback to previous states
 - **New CLI Commands**:
-  - `kse adopt`: Adopt existing projects into Kiro Spec Engine
-  - `kse upgrade`: Upgrade project to newer version
-  - `kse rollback`: Restore project from backup
+  - `sce adopt`: Adopt existing projects into Scene Capability Engine
+  - `sce upgrade`: Upgrade project to newer version
+  - `sce rollback`: Restore project from backup
 - **Core Components**:
   - DetectionEngine: Analyzes project structure and determines adoption strategy
   - AdoptionStrategy: Implements fresh, partial, and full adoption modes
@@ -2470,7 +2470,7 @@ Users are already comfortable with their AI tools. kse enhances their existing w
 - Added semver dependency for version comparison
 - Created lib/version/ directory for version management
 - Created lib/utils/ directory for shared utilities
-- Prepared foundation for kse adopt and kse upgrade commands
+- Prepared foundation for sce adopt and sce upgrade commands
 
 ### Documentation
 - Created spec 02-00-project-adoption-and-upgrade

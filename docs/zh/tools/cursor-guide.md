@@ -1,6 +1,6 @@
-# 在 Cursor 中使用 kse
+# 在 Cursor 中使用 sce
 
-> 将 kse 与 Cursor IDE 集成进行 AI 辅助开发的完整指南
+> 将 sce 与 Cursor IDE 集成进行 AI 辅助开发的完整指南
 
 ---
 
@@ -16,9 +16,9 @@
 
 **Cursor** 是一个基于 VS Code 构建的 AI 驱动 IDE，通过 Composer 模式提供智能代码补全、基于聊天的编码和 AI 结对编程。
 
-**kse 与 Cursor 的集成**使用**手动导出**模式，你导出 Spec 上下文并将其提供给 Cursor 的 AI 功能（Chat、Composer 或内联建议）。
+**sce 与 Cursor 的集成**使用**手动导出**模式，你导出 Spec 上下文并将其提供给 Cursor 的 AI 功能（Chat、Composer 或内联建议）。
 
-### 为什么在 Cursor 中使用 kse？
+### 为什么在 Cursor 中使用 sce？
 
 - ✅ **结构化上下文** - Cursor 理解你的需求和设计
 - ✅ **更好的代码生成** - AI 遵循你的架构决策
@@ -32,8 +32,8 @@
 **模式：** 手动导出
 
 **工作原理：**
-1. 你在 kse 中创建 Spec（需求、设计、任务）
-2. 你使用 `kse context export` 导出上下文
+1. 你在 sce 中创建 Spec（需求、设计、任务）
+2. 你使用 `sce context export` 导出上下文
 3. 你将上下文提供给 Cursor（Chat、Composer 或 .cursorrules）
 4. Cursor 基于你的 Spec 生成代码
 5. 你在 tasks.md 中更新任务状态
@@ -45,17 +45,17 @@
 ### 前置条件
 
 - 已安装 **Cursor IDE**（[下载](https://cursor.sh/)）
-- 已全局安装 **kse**（`npm install -g kiro-spec-engine`）
-- 项目已被 kse **采用**（`kse adopt`）
+- 已全局安装 **sce**（`npm install -g scene-capability-engine`）
+- 项目已被 sce **采用**（`sce adopt`）
 
-### 步骤 1：为 kse 配置 Cursor
+### 步骤 1：为 sce 配置 Cursor
 
 在项目根目录创建 `.cursorrules` 文件：
 
 ```markdown
 # 项目规则
 
-此项目使用 kse (Kiro Spec Engine) 进行规范驱动开发。
+此项目使用 sce (Scene Capability Engine) 进行规范驱动开发。
 
 ## Spec 位置
 所有 Spec 都在 `.kiro/specs/` 目录中。
@@ -93,7 +93,7 @@
 
 1. **导出 Spec 上下文：**
    ```bash
-   kse context export 01-00-user-login
+   sce context export 01-00-user-login
    ```
 
 2. **打开 Composer：**
@@ -133,7 +133,7 @@
 
 1. **生成任务特定提示：**
    ```bash
-   kse prompt generate 01-00-user-login 1.1
+   sce prompt generate 01-00-user-login 1.1
    ```
 
 2. **打开 Chat：**
@@ -173,12 +173,12 @@
 
 ```bash
 # 1. 创建 Spec
-kse spec bootstrap --name 01-00-user-login --non-interactive
+sce spec bootstrap --name 01-00-user-login --non-interactive
 
 # 2. 编写 requirements.md、design.md、tasks.md
 
 # 3. 导出上下文
-kse context export 01-00-user-login
+sce context export 01-00-user-login
 
 # 4. 在 Cursor Composer 中（Cmd+K）：
 "请实现 .kiro/specs/01-00-user-login/ 中的任务 1.1"
@@ -197,13 +197,13 @@ kse context export 01-00-user-login
 
 ### 1. 使用 .cursorrules
 
-始终在项目根目录创建 `.cursorrules` 文件，告诉 Cursor 关于你的 kse Spec。
+始终在项目根目录创建 `.cursorrules` 文件，告诉 Cursor 关于你的 sce Spec。
 
 ### 2. 任务特定提示
 
 对于大型 Spec，使用任务特定提示：
 ```bash
-kse prompt generate 01-00-user-login 1.1
+sce prompt generate 01-00-user-login 1.1
 ```
 
 这会创建一个更小、更集中的上下文。
@@ -247,7 +247,7 @@ kse prompt generate 01-00-user-login 1.1
 **解决方案：**
 使用任务特定提示：
 ```bash
-kse prompt generate 01-00-user-login 1.1
+sce prompt generate 01-00-user-login 1.1
 ```
 
 ### 问题：Cursor 看不到我的 Spec 文件
@@ -261,7 +261,7 @@ kse prompt generate 01-00-user-login 1.1
 
 ## 相关文档
 
-- 📖 [快速入门指南](../quick-start.md) - 开始使用 kse
+- 📖 [快速入门指南](../quick-start.md) - 开始使用 sce
 - 🔌 [集成模式](../integration-modes.md) - 理解手动导出模式
 - 📋 [Spec 工作流](../spec-workflow.md) - 创建有效的 Spec
 - 🔧 [故障排除](../troubleshooting.md) - 常见问题

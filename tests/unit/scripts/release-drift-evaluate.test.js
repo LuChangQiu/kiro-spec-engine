@@ -7,7 +7,7 @@ const path = require('path');
 const { evaluateReleaseDrift } = require('../../../scripts/release-drift-evaluate');
 
 function makeTempDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'kse-release-drift-evaluate-'));
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'sce-release-drift-evaluate-'));
 }
 
 function readFixture(name) {

@@ -11,8 +11,8 @@
 
 The CLI provides three command aliases:
 - `sce` - **Recommended primary command** (use this in all documentation)
-- `kse` - Legacy short alias (compatible)
-- `kiro-spec-engine` - Legacy full alias (compatible)
+- `sce` - Legacy short alias (compatible)
+- `scene-capability-engine` - Legacy full alias (compatible)
 
 **Always use `sce` in new examples and documentation.**
 
@@ -24,7 +24,7 @@ The CLI provides three command aliases:
 npm install -g scene-capability-engine
 ```
 
-This creates the `sce` command globally. Legacy aliases `kse` and `kiro-spec-engine` are still available.
+This creates the `sce` command globally. Legacy aliases `sce` and `scene-capability-engine` are still available.
 
 ---
 
@@ -615,7 +615,7 @@ Close-loop program (`sce auto close-loop-program "<goal>"`) options:
   - Includes `--spec-session-protect-window-days` to tune recent-reference protection window.
   - Includes `--spec-session-max-total` and optional `--spec-session-budget-hard-fail` for spec-count budget governance.
 - `--no-program-auto-recover`: disable built-in recovery loop after non-completed program runs
-- `--program-recover-use-action <n>`: pin remediation action for auto recovery (otherwise KSE uses learned memory or default action `1`)
+- `--program-recover-use-action <n>`: pin remediation action for auto recovery (otherwise sce uses learned memory or default action `1`)
 - `--program-recover-resume-strategy <pending|failed-only>`: resume scope for built-in program recovery (default `pending`)
 - `--program-recover-max-rounds <n>`: bounded recovery rounds for built-in program recovery (`1-20`, default `5`)
 - `--program-recover-max-minutes <n>`: elapsed-time budget for built-in program recovery loop (minutes, default unlimited)
@@ -691,7 +691,7 @@ Close-loop recovery (`sce auto close-loop-recover [summary]`) options:
 - Supports program gate controls (`--program-gate-profile`, `--program-gate-fallback-*`, `--program-min-success-rate`, `--program-max-risk-level`, `--program-max-elapsed-minutes`, `--program-max-agent-budget`, `--program-max-total-sub-specs`)
   - Includes `--no-program-gate-auto-remediate` to disable automatic remediation hints/prune attempts.
 - Supports quality/session controls (`--dod*`, `--replan*`, `--batch-session*`, `--program-kpi-out`, `--program-audit-out`, `--out`, `--dry-run`, `--json`)
-- If `--use-action` is omitted, KSE automatically selects remediation action from learned recovery memory when available.
+- If `--use-action` is omitted, sce automatically selects remediation action from learned recovery memory when available.
 - Output includes `recovered_from_summary`, `recovery_plan` (`applied_patch`, available remediation actions, `selection_source`, `selection_explain`), `recovery_cycle` (round history, convergence/exhausted state, elapsed/budget metadata), and `recovery_memory` (signature, scope, action stats, selection explanation).
 
 Close-loop session maintenance:
@@ -732,9 +732,9 @@ Cross-archive autonomous governance maintenance:
 - `sce auto governance close-loop [--days <n>] [--status <csv>] [--session-keep <n>] [--batch-session-keep <n>] [--controller-session-keep <n>] [--recovery-memory-older-than-days <n>] [--max-rounds <n>] [--target-risk <low|medium|high>] [--governance-resume <session|latest|file>] [--governance-resume-allow-drift] [--governance-session-id <id>] [--no-governance-session] [--governance-session-keep <n>] [--governance-session-older-than-days <n>] [--execute-advisory] [--advisory-recover-max-rounds <n>] [--advisory-controller-max-cycles <n>] [--plan-only] [--dry-run] [--json]`: run governance rounds until stop condition (target risk reached, release gate blocked, no actionable maintenance/advisory, non-mutating mode, maintenance/advisory failures, or max rounds).
   - `--plan-only` runs a single non-mutating planning round.
   - Governance close-loop sessions are persisted by default at `.kiro/auto/governance-close-loop-sessions/*.json`; use `--governance-resume` to continue interrupted governance loops.
-  - On resume, KSE reuses persisted policy defaults (`target_risk`, `execute_advisory`, `advisory_policy`) unless explicitly overridden. Explicit policy drift is blocked by default; add `--governance-resume-allow-drift` to force override.
+  - On resume, sce reuses persisted policy defaults (`target_risk`, `execute_advisory`, `advisory_policy`) unless explicitly overridden. Explicit policy drift is blocked by default; add `--governance-resume-allow-drift` to force override.
   - `--governance-session-keep` (with optional `--governance-session-older-than-days`) enables post-run governance session retention pruning while protecting the current session snapshot.
-  - `--execute-advisory` enables automatic advisory action execution (`recover-latest`, `controller-resume-latest`) when governance assessment detects failed sessions or controller pending goals; KSE auto-selects the latest actionable advisory source and reports `skipped` (not `failed`) when no actionable source exists.
+  - `--execute-advisory` enables automatic advisory action execution (`recover-latest`, `controller-resume-latest`) when governance assessment detects failed sessions or controller pending goals; sce auto-selects the latest actionable advisory source and reports `skipped` (not `failed`) when no actionable source exists.
   - JSON output includes round-by-round risk/action telemetry (`rounds`, with `risk_before/risk_after` and `release_gate_before/release_gate_after`), advisory telemetry (`execute_advisory`, `advisory_policy`, `advisory_summary`, `rounds[*].advisory_actions`), `stop_detail` + `recommendations` for explicit blocking reasons, plus `initial_assessment`, `final_assessment`, and convergence metadata.
 - `sce auto governance session list [--limit <n>] [--status <csv>] [--resume-only] [--json]`: list persisted governance close-loop sessions (`--resume-only` filters to resumed-chain sessions only).
 - `sce auto governance session stats [--days <n>] [--status <csv>] [--resume-only] [--json]`: aggregate governance close-loop session telemetry (completion/failure/convergence, rounds, risk/stop composition, resumed-chain ratios/source counts, and aggregated `release_gate` round telemetry trends).
@@ -766,13 +766,13 @@ Autonomous archive schema compatibility:
   - Default mode is dry-run; use `--apply` to persist changes.
 
 Dual-track handoff integration:
-- `sce auto handoff plan --manifest <path> [--out <path>] [--strict] [--strict-warnings] [--json]`: parse handoff manifest (source project, specs, templates, known gaps) and generate an executable KSE integration phase plan.
+- `sce auto handoff plan --manifest <path> [--out <path>] [--strict] [--strict-warnings] [--json]`: parse handoff manifest (source project, specs, templates, known gaps) and generate an executable sce integration phase plan.
 - `sce auto handoff queue --manifest <path> [--out <path>] [--append] [--no-include-known-gaps] [--dry-run] [--json]`: generate close-loop batch goal queue from handoff manifest and optionally persist line-based queue file (default `.kiro/auto/handoff-goals.lines`).
 - `sce auto handoff template-diff --manifest <path> [--json]`: compare manifest templates against local template exports/registry and report `missing_in_local` and `extra_in_local`.
 - `sce auto handoff capability-matrix --manifest <path> [--strict] [--strict-warnings] [--min-capability-coverage <n>] [--min-capability-semantic <n>] [--no-require-capability-semantic] [--format <json|markdown>] [--out <path>] [--remediation-queue-out <path>] [--fail-on-gap] [--json]`: generate a fast Moqui capability matrix (`template-diff + baseline + capability coverage + semantic completeness`) and optionally fail fast on gaps.
 - `sce auto handoff run --manifest <path> [--out <path>] [--queue-out <path>] [--append] [--no-include-known-gaps] [--continue-from <session|latest|file>] [--continue-strategy <auto|pending|failed-only>] [--dry-run] [--strict] [--strict-warnings] [--no-dependency-batching] [--min-spec-success-rate <n>] [--max-risk-level <level>] [--no-require-ontology-validation] [--no-require-moqui-baseline] [--min-capability-coverage <n>] [--no-require-capability-coverage] [--require-release-gate-preflight] [--release-evidence-window <n>] [--json]`: execute handoff end-to-end (`plan -> queue -> close-loop-batch -> observability`) with automatic report archive to `.kiro/reports/handoff-runs/<session>.json`.
   - Default mode is dependency-aware: spec integration goals are grouped into dependency batches and executed in topological order.
-  - `--continue-from` resumes pending goals from an existing handoff run report (`latest`, session id, or JSON file path). For safety, KSE enforces manifest-path consistency between the previous report and current run.
+  - `--continue-from` resumes pending goals from an existing handoff run report (`latest`, session id, or JSON file path). For safety, sce enforces manifest-path consistency between the previous report and current run.
   - `--continue-strategy auto|pending|failed-only` controls resumed scope. `auto` (default) derives the best strategy from prior run state (`pending` when unprocessed/planned goals exist, otherwise `failed-only` for pure failure replay).
   - Non-dry runs auto-merge release evidence into `.kiro/reports/release-evidence/handoff-runs.json` with session-level gate/ontology/regression/moqui-baseline/capability-coverage snapshots. Merge failures are recorded as warnings without aborting the run.
   - `--release-evidence-window` controls trend snapshot window size (2-50, default `5`) used in merged release evidence (`latest_trend_window` and per-session `trend_window`).
@@ -780,7 +780,7 @@ Dual-track handoff integration:
   - Run output includes `moqui_capability_coverage` snapshot by default (when manifest `capabilities` is declared), with artifacts at `.kiro/reports/release-evidence/moqui-capability-coverage.json` and `.kiro/reports/release-evidence/moqui-capability-coverage.md`.
   - Run output includes `release_gate_preflight` (latest release gate history signal snapshot + blocked reasons) and carries this context into `warnings`.
   - `release_gate_preflight` is advisory by default; use `--require-release-gate-preflight` to hard-fail when preflight is unavailable/blocked.
-  - When Moqui baseline/capability gates fail, KSE auto-generates remediation queue lines at `.kiro/auto/moqui-remediation.lines`.
+  - When Moqui baseline/capability gates fail, sce auto-generates remediation queue lines at `.kiro/auto/moqui-remediation.lines`.
   - Run result includes `failure_summary` (failed phase/gate/release-gate preflight highlights) and `recommendations` with executable follow-up commands (for example, auto-generated `--continue-from <session>` on failed/incomplete batches).
   - Gate defaults: `--min-spec-success-rate` defaults to `100`, `--max-risk-level` defaults to `high`, ontology validation requirement is enabled by default, Moqui baseline requirement is enabled by default, and capability coverage minimum defaults to `100` when manifest `capabilities` is declared.
   - Use `--no-require-ontology-validation`, `--no-require-moqui-baseline`, or `--no-require-capability-coverage` only for emergency bypass.
@@ -1145,7 +1145,7 @@ sce env rollback
 
 ## Tips
 
-1. **Use `sce` not compatibility aliases** (`sco` / `kse` / `kiro-spec-engine`) - Shorter and easier to type
+1. **Use `sce` not compatibility aliases** (`sco` / `sce` / `scene-capability-engine`) - Shorter and easier to type
 2. **Add `--help` to any command** - Get detailed usage information
 3. **Use tab completion** - Most shells support command completion
 4. **Check `sce doctor`** - Diagnose issues quickly

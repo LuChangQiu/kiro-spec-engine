@@ -3,7 +3,7 @@
 > 对话文章的深度分析与评价
 
 **评价对象**：[AI 驱动开发的哲学与实践：与 Grok 的深度对话](./ai-driven-development-philosophy-and-practice.md)  
-**评价者**：Kiro AI Assistant  
+**评价者**：SCE AI Assistant  
 **评价日期**：2026-01-25
 
 ---
@@ -30,7 +30,7 @@
 
 **真实经验**：2000+ 小时 AI 编程实践，不是纸上谈兵
 
-**可落地**：kiro-spec-engine 项目是理念的具体实现
+**可落地**：scene-capability-engine 项目是理念的具体实现
 
 **解决痛点**：
 - Session 上下文吞噬问题
@@ -105,7 +105,7 @@
 
 这种对"偏置"的正面理解，打破了传统 AI 伦理讨论中的二元对立。
 
-**4. kiro-spec-engine 的实践落地**
+**4. scene-capability-engine 的实践落地**
 
 理论不是空中楼阁，而是有具体的工程实现，这让整篇文章更有说服力。
 
@@ -150,7 +150,7 @@
 
 2. **实践验证**：不是理论推演，而是基于 2000+ 小时真实经验的总结
 
-3. **方法论输出**：kiro-spec-engine 提供了可复制的实践路径
+3. **方法论输出**：scene-capability-engine 提供了可复制的实践路径
 
 4. **思想启发**：即使不做 AI 开发，这些哲学思考也很有价值
 

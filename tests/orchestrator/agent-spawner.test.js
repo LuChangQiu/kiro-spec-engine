@@ -335,7 +335,7 @@ describe('AgentSpawner', () => {
         expect(opts.shell).toBe(false);
         // Temp file should have been written with the prompt
         expect(capturedTmpContent).toBe('Execute Spec test-spec with full context.');
-        expect(capturedTmpPath).toMatch(/kse-prompt-/);
+        expect(capturedTmpPath).toMatch(/sce-prompt-/);
       } finally {
         require('fs').writeFileSync = originalWriteFileSync;
       }
@@ -353,7 +353,7 @@ describe('AgentSpawner', () => {
       try {
         await spawner.spawn('my-spec');
         const tmpFilename = path.basename(capturedTmpPath);
-        expect(tmpFilename).toMatch(/^kse-prompt-/);
+        expect(tmpFilename).toMatch(/^sce-prompt-/);
         expect(tmpFilename).not.toMatch(/[<>:"/\\|?*]/);
       } finally {
         fsModule.writeFileSync = originalWriteFileSync;

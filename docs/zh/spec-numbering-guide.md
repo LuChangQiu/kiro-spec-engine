@@ -4,7 +4,7 @@
 
 ## 概述
 
-Kiro Spec Engine 使用两部分编号系统：`{主序号}-{从序号}-{描述}`
+Scene Capability Engine 使用两部分编号系统：`{主序号}-{从序号}-{描述}`
 
 - **主序号**：代表功能领域或主题（01, 02, 03, ...）
 - **从序号**：代表该领域内的迭代或子功能（00, 01, 02, ...）
@@ -169,7 +169,7 @@ Kiro Spec Engine 使用两部分编号系统：`{主序号}-{从序号}-{描述}
 
 ## 实际案例
 
-### 案例 1：工具/库项目（kiro-spec-engine）
+### 案例 1：工具/库项目（scene-capability-engine）
 
 **项目类型**：具有独立功能的 CLI 工具
 
@@ -314,17 +314,17 @@ Kiro Spec Engine 使用两部分编号系统：`{主序号}-{从序号}-{描述}
 
 ## 工具支持
 
-Kiro Spec Engine 提供命令帮助编号：
+Scene Capability Engine 提供命令帮助编号：
 
 ```bash
 # 列出所有 Spec 及其编号
-kse status
+sce status
 
 # 按主序号分组查看 Spec
-kse workflows
+sce workflows
 
 # 获取下一个可用编号建议
-kse workflows --suggest-next
+sce workflows --suggest-next
 ```
 
 ## 总结

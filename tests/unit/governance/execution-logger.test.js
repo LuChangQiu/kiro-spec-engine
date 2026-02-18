@@ -13,7 +13,7 @@ describe('ExecutionLogger', () => {
   
   beforeEach(async () => {
     // Create temporary directory for testing
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-logger-test-'));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-logger-test-'));
     logger = new ExecutionLogger(tempDir);
   });
   

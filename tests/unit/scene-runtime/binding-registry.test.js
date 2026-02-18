@@ -79,7 +79,7 @@ describe('BindingRegistry', () => {
 
   test('default handlers fall back to erp-sim when moqui config is missing', () => {
     const registry = new BindingRegistry({
-      projectRoot: path.join(os.tmpdir(), `kse-binding-registry-missing-${Date.now()}`)
+      projectRoot: path.join(os.tmpdir(), `sce-binding-registry-missing-${Date.now()}`)
     });
 
     const handler = registry.resolve({
@@ -91,7 +91,7 @@ describe('BindingRegistry', () => {
   });
 
   test('default handlers prefer moqui adapter for spec.erp refs when config is present', async () => {
-    const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-binding-registry-'));
+    const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-binding-registry-'));
 
     try {
       await fs.writeJson(path.join(tempRoot, 'moqui-adapter.json'), {
@@ -116,7 +116,7 @@ describe('BindingRegistry', () => {
 
   test('default handlers route moqui refs to moqui adapter even without config', () => {
     const registry = new BindingRegistry({
-      projectRoot: path.join(os.tmpdir(), `kse-binding-registry-moqui-${Date.now()}`)
+      projectRoot: path.join(os.tmpdir(), `sce-binding-registry-moqui-${Date.now()}`)
     });
 
     const handler = registry.resolve({

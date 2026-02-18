@@ -1,6 +1,6 @@
 # Project Adoption Guide
 
-This guide explains how to adopt existing projects into Kiro Spec Engine (KSE) using the new **zero-interaction smart adoption system**.
+This guide explains how to adopt existing projects into Scene Capability Engine (sce) using the new **zero-interaction smart adoption system**.
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@ This guide explains how to adopt existing projects into Kiro Spec Engine (KSE) u
 
 ## Overview
 
-The `kse adopt` command now features **smart, zero-interaction adoption** that automatically handles project integration without asking any questions.
+The `sce adopt` command now features **smart, zero-interaction adoption** that automatically handles project integration without asking any questions.
 
 **Key Features**:
 - ✅ **Zero Questions** - No user input required
@@ -38,7 +38,7 @@ The `kse adopt` command now features **smart, zero-interaction adoption** that a
 Simply run:
 ```bash
 cd your-project
-kse adopt
+sce adopt
 ```
 
 That's it! The system will:
@@ -50,7 +50,7 @@ That's it! The system will:
 
 **Example Output**:
 ```
-🔥 Kiro Spec Engine - Project Adoption
+🔥 Scene Capability Engine - Project Adoption
 
 📦 Analyzing project structure... ✅
 📋 Creating adoption plan... ✅
@@ -77,14 +77,14 @@ Adoption Plan:
   Preserved: 3 specs, 2 custom files
   
 💡 Your original files are safely backed up.
-   To restore: kse rollback backup-20260128-143022
+   To restore: sce rollback backup-20260128-143022
 ```
 
 ### Preview Changes First
 
 Want to see what would happen without making changes?
 ```bash
-kse adopt --dry-run
+sce adopt --dry-run
 ```
 
 ---
@@ -146,7 +146,7 @@ Before any modifications:
 
 **Example**:
 ```bash
-$ kse adopt
+$ sce adopt
 
 Mode: Fresh
 Actions:
@@ -168,14 +168,14 @@ Actions:
 
 **Example**:
 ```bash
-$ kse adopt
+$ sce adopt
 
 ✅ Project already adopted with latest version (v1.9.0)
 No changes needed.
 
 💡 Next steps:
-   - Create a spec: kse spec bootstrap --name 01-00-my-feature --non-interactive
-   - Check status: kse status
+   - Create a spec: sce spec bootstrap --name 01-00-my-feature --non-interactive
+   - Check status: sce status
 ```
 
 ### 3. Smart Update
@@ -190,7 +190,7 @@ No changes needed.
 
 **Example**:
 ```bash
-$ kse adopt
+$ sce adopt
 
 Mode: Smart Update (v1.8.0 → v1.9.0)
 Backup: backup-20260128-143022
@@ -212,7 +212,7 @@ Preserved: 3 specs, CURRENT_CONTEXT.md
 
 **Example**:
 ```bash
-$ kse adopt
+$ sce adopt
 
 Mode: Smart Adopt
 Backup: backup-20260128-143022
@@ -224,26 +224,26 @@ Preserved: 5 specs, 3 custom files
 
 ### 5. Warning Mode
 
-**When**: Local version is newer than KSE version
+**When**: Local version is newer than sce version
 
 **Actions**:
 - Displays warning message
 - No changes made
-- Suggests upgrading KSE
+- Suggests upgrading sce
 
 **Example**:
 ```bash
-$ kse adopt
+$ sce adopt
 
-⚠️  Warning: Project version (v2.0.0) is newer than KSE version (v1.9.0)
+⚠️  Warning: Project version (v2.0.0) is newer than sce version (v1.9.0)
 
 Possible causes:
-  - You downgraded KSE
-  - Project was adopted with newer KSE version
+  - You downgraded sce
+  - Project was adopted with newer sce version
 
 Solutions:
-  1. Upgrade KSE: npm install -g kiro-spec-engine@latest
-  2. Force adopt: kse adopt --force (not recommended)
+  1. Upgrade sce: npm install -g scene-capability-engine@latest
+  2. Force adopt: sce adopt --force (not recommended)
 
 No changes made.
 ```
@@ -256,29 +256,29 @@ No changes made.
 
 ```bash
 # Default: Smart, automatic, safe
-kse adopt
+sce adopt
 
 # Preview changes without executing
-kse adopt --dry-run
+sce adopt --dry-run
 
 # Show detailed logs
-kse adopt --verbose
+sce adopt --verbose
 
 # Force overwrite (with backup)
-kse adopt --force
+sce adopt --force
 ```
 
 ### Advanced Options
 
 ```bash
 # Skip backup (dangerous, not recommended)
-kse adopt --no-backup
+sce adopt --no-backup
 
 # Skip template updates
-kse adopt --skip-update
+sce adopt --skip-update
 
 # Enable interactive mode (legacy behavior)
-kse adopt --interactive
+sce adopt --interactive
 ```
 
 ### Option Details
@@ -298,25 +298,25 @@ kse adopt --interactive
 
 ### Scenario 1: First Time User
 
-**Situation**: You just installed KSE and want to adopt your project.
+**Situation**: You just installed sce and want to adopt your project.
 
 **Solution**:
 ```bash
 cd your-project
-kse adopt
+sce adopt
 ```
 
 **What happens**: Fresh adoption creates complete structure, no questions asked.
 
 ---
 
-### Scenario 2: Upgrading KSE Version
+### Scenario 2: Upgrading sce Version
 
-**Situation**: You upgraded KSE from v1.8.0 to v1.9.0.
+**Situation**: You upgraded sce from v1.8.0 to v1.9.0.
 
 **Solution**:
 ```bash
-kse adopt
+sce adopt
 ```
 
 **What happens**: Smart Update backs up and updates template files, preserves your specs.
@@ -329,7 +329,7 @@ kse adopt
 
 **Solution**:
 ```bash
-kse adopt --dry-run
+sce adopt --dry-run
 ```
 
 **What happens**: Shows detailed plan without making any changes.
@@ -342,7 +342,7 @@ kse adopt --dry-run
 
 **Solution**:
 ```bash
-kse adopt --verbose
+sce adopt --verbose
 ```
 
 **What happens**: Shows detailed logs of every operation.
@@ -355,7 +355,7 @@ kse adopt --verbose
 
 **Solution**:
 ```bash
-kse rollback backup-20260128-143022
+sce rollback backup-20260128-143022
 ```
 
 **What happens**: Restores all files from backup.
@@ -371,7 +371,7 @@ kse rollback backup-20260128-143022
 # Bash script
 for dir in project1 project2 project3; do
   cd $dir
-  kse adopt
+  sce adopt
   cd ..
 done
 ```
@@ -429,16 +429,16 @@ chmod -R u+w .kiro/
 
 **Error**:
 ```
-⚠️  Warning: Project version (v2.0.0) is newer than KSE version (v1.9.0)
+⚠️  Warning: Project version (v2.0.0) is newer than sce version (v1.9.0)
 ```
 
 **Solutions**:
 ```bash
-# Upgrade KSE to latest
-npm install -g kiro-spec-engine@latest
+# Upgrade sce to latest
+npm install -g scene-capability-engine@latest
 
 # Then adopt again
-kse adopt
+sce adopt
 ```
 
 ---
@@ -449,7 +449,7 @@ kse adopt
 
 **Solution**:
 ```bash
-kse adopt --interactive
+sce adopt --interactive
 ```
 
 **What happens**: Enables legacy interactive mode with prompts.
@@ -486,7 +486,7 @@ kse adopt --interactive
 
 If you prefer the old interactive behavior:
 ```bash
-kse adopt --interactive
+sce adopt --interactive
 ```
 
 This enables:
@@ -510,8 +510,8 @@ For most users, the new smart mode is recommended:
 
 For peace of mind:
 ```bash
-kse adopt --dry-run
-kse adopt
+sce adopt --dry-run
+sce adopt
 ```
 
 ### 2. Commit Before Adoption
@@ -519,16 +519,16 @@ kse adopt
 If using version control:
 ```bash
 git add -A
-git commit -m "Before KSE adoption"
-kse adopt
+git commit -m "Before sce adoption"
+sce adopt
 ```
 
 ### 3. Verify After Adoption
 
 Check everything is correct:
 ```bash
-kse status
-kse version-info
+sce status
+sce version-info
 ```
 
 ### 4. Keep Backups
@@ -543,7 +543,7 @@ ls .kiro/backups/
 
 If something seems wrong:
 ```bash
-kse adopt --verbose
+sce adopt --verbose
 ```
 
 ---
@@ -554,7 +554,7 @@ After adoption, your project will have:
 
 ```
 your-project/
-├── .kiro/                          # KSE core directory
+├── .kiro/                          # sce core directory
 │   ├── version.json                # Version tracking
 │   ├── specs/                      # Spec storage
 │   ├── steering/                   # AI behavior rules
@@ -579,18 +579,18 @@ After successful adoption:
 1. **Verify .gitignore configuration**:
    The adoption process automatically checks and fixes your `.gitignore` for team collaboration. If you see a warning about .gitignore, you can manually fix it:
    ```bash
-   kse doctor --fix-gitignore
+   sce doctor --fix-gitignore
    ```
    Learn more: [Team Collaboration Guide](./team-collaboration-guide.md)
 
 2. **Create your first spec**:
    ```bash
-   kse spec bootstrap --name 01-00-my-feature --non-interactive
+   sce spec bootstrap --name 01-00-my-feature --non-interactive
    ```
 
 3. **Check project status**:
    ```bash
-   kse status
+   sce status
    ```
 
 4. **Read the spec workflow guide**:
@@ -598,7 +598,7 @@ After successful adoption:
 
 5. **Explore Ultrawork**:
    ```bash
-   kse enhance requirements .kiro/specs/01-00-my-feature/requirements.md
+   sce enhance requirements .kiro/specs/01-00-my-feature/requirements.md
    ```
 
 ---
@@ -606,8 +606,8 @@ After successful adoption:
 ## Getting Help
 
 - **Documentation**: Check README.md in your `.kiro/` directory
-- **System Check**: `kse doctor`
-- **Version Info**: `kse version-info`
+- **System Check**: `sce doctor`
+- **Version Info**: `sce version-info`
 - **Issues**: https://github.com/heguangyong/scene-capability-engine/issues
 
 ---

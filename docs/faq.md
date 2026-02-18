@@ -1,6 +1,6 @@
 # Frequently Asked Questions (FAQ)
 
-> Common questions about kse and Spec-driven development
+> Common questions about sce and Spec-driven development
 
 ---
 
@@ -23,17 +23,17 @@
 
 ## General Questions
 
-### What is kse?
+### What is sce?
 
-**kse** (Kiro Spec Engine) is a context provider for AI-assisted development. It helps you structure your feature development using Specs (specifications) and provides that context to AI coding tools.
+**sce** (Scene Capability Engine) is a context provider for AI-assisted development. It helps you structure your feature development using Specs (specifications) and provides that context to AI coding tools.
 
-Think of it as a **bridge between your brain and AI tools** - you describe what you want to build in a structured way, and kse formats that information so AI tools can understand and implement it effectively.
+Think of it as a **bridge between your brain and AI tools** - you describe what you want to build in a structured way, and sce formats that information so AI tools can understand and implement it effectively.
 
 ---
 
-### Why do I need kse?
+### Why do I need sce?
 
-**Without kse:**
+**Without sce:**
 ```
 You: "Build a user login feature"
 AI: "Sure! Here's some code..." [generates generic code]
@@ -41,7 +41,7 @@ You: "No, I need JWT tokens and PostgreSQL"
 AI: "Oh, let me rewrite..." [starts over]
 ```
 
-**With kse:**
+**With sce:**
 ```
 You: [Create Spec with requirements and design]
 You: [Export context] "Implement task 1.1"
@@ -57,9 +57,9 @@ AI: [Reads your Spec] "Here's the code following your exact design..."
 
 ---
 
-### Is kse only for AI development?
+### Is sce only for AI development?
 
-**No!** While kse is optimized for AI-assisted development, it's useful for any development:
+**No!** While sce is optimized for AI-assisted development, it's useful for any development:
 
 **For AI development:**
 - Provides structured context to AI tools
@@ -80,11 +80,11 @@ AI: [Reads your Spec] "Here's the code following your exact design..."
 
 ---
 
-### Do I need to use Kiro IDE?
+### Do I need to use AI IDE?
 
-**No!** kse works with any AI tool:
+**No!** sce works with any AI tool:
 
-- **Kiro IDE** - Native integration (fully automatic)
+- **AI IDE** - Native integration (fully automatic)
 - **Claude Code** - Manual export (copy-paste context)
 - **ChatGPT** - Manual export
 - **Cursor** - Manual export
@@ -96,9 +96,9 @@ See [Integration Modes](integration-modes.md) for details.
 
 ---
 
-### Is kse free?
+### Is sce free?
 
-**Yes!** kse is open source and free to use.
+**Yes!** sce is open source and free to use.
 
 - **License:** MIT
 - **Source code:** https://github.com/heguangyong/scene-capability-engine
@@ -107,7 +107,7 @@ See [Integration Modes](integration-modes.md) for details.
 
 ---
 
-### What's the difference between kse and [other tool]?
+### What's the difference between sce and [other tool]?
 
 See [Comparison Questions](#comparison-questions) below.
 
@@ -115,12 +115,12 @@ See [Comparison Questions](#comparison-questions) below.
 
 ## Integration Questions
 
-### Which AI tools work with kse?
+### Which AI tools work with sce?
 
-**All of them!** kse provides three integration modes:
+**All of them!** sce provides three integration modes:
 
 **Native Integration** (automatic):
-- Kiro IDE
+- AI IDE
 
 **Manual Export** (copy-paste):
 - Claude Code
@@ -137,19 +137,19 @@ See [Integration Modes Guide](integration-modes.md) for details.
 
 ---
 
-### How do I use kse with Claude Code?
+### How do I use sce with Claude Code?
 
 **Quick workflow:**
 
 1. **Create Spec:**
 ```bash
-kse spec bootstrap --name 01-00-user-login --non-interactive
+sce spec bootstrap --name 01-00-user-login --non-interactive
 # Edit requirements.md, design.md, tasks.md
 ```
 
 2. **Export context:**
 ```bash
-kse context export 01-00-user-login
+sce context export 01-00-user-login
 ```
 
 3. **Copy to clipboard:**
@@ -175,13 +175,13 @@ See [Claude Guide](tools/claude-guide.md) for detailed instructions.
 
 ---
 
-### Can I use kse with GitHub Copilot?
+### Can I use sce with GitHub Copilot?
 
 **Yes!** Two approaches:
 
 **Approach 1: Manual export**
 ```bash
-kse context export 01-00-user-login
+sce context export 01-00-user-login
 # Reference context in code comments
 ```
 
@@ -203,14 +203,14 @@ See [VS Code Guide](tools/vscode-guide.md) for details.
 
 | Mode | Automation | Setup | Best For |
 |------|-----------|-------|----------|
-| **Native** | Fully automatic | None | Kiro IDE users |
+| **Native** | Fully automatic | None | AI IDE users |
 | **Manual Export** | Semi-manual | None | Quick start, any tool |
 | **Watch Mode** | Auto-refresh | 5 minutes | Active development |
 
 **Native Integration:**
 - AI reads Specs directly
 - No manual export needed
-- Only works with Kiro IDE
+- Only works with AI IDE
 
 **Manual Export:**
 - You export context manually
@@ -305,7 +305,7 @@ vim .kiro/specs/01-00-user-login/design.md
 
 # If using watch mode, context auto-updates
 # If using manual export, re-export:
-kse context export 01-00-user-login
+sce context export 01-00-user-login
 ```
 
 **Best practices:**
@@ -334,7 +334,7 @@ kse context export 01-00-user-login
 
 **Check progress:**
 ```bash
-kse status
+sce status
 ```
 
 **Output:**
@@ -345,18 +345,18 @@ Progress: 1/2 tasks complete (50%)
 - [ ] 1.2 Create AuthService
 ```
 
-**With Kiro IDE:**
+**With AI IDE:**
 - AI updates tasks automatically
 - No manual checkbox editing needed
 
 ---
 
-### Can I use kse for bug fixes?
+### Can I use sce for bug fixes?
 
 **Yes!** Create a Spec for the bug:
 
 ```bash
-kse spec bootstrap --name 01-01-fix-login-timeout --non-interactive
+sce spec bootstrap --name 01-01-fix-login-timeout --non-interactive
 ```
 
 **requirements.md:**
@@ -393,12 +393,12 @@ JWT token expiration set to 300 seconds instead of 1800 seconds
 
 ---
 
-### Can I use kse for refactoring?
+### Can I use sce for refactoring?
 
 **Absolutely!** Specs are great for refactoring:
 
 ```bash
-kse spec bootstrap --name 02-00-refactor-auth-module --non-interactive
+sce spec bootstrap --name 02-00-refactor-auth-module --non-interactive
 ```
 
 **requirements.md:**
@@ -438,7 +438,7 @@ kse spec bootstrap --name 02-00-refactor-auth-module --non-interactive
 
 ### Can I customize Spec templates?
 
-**Yes!** kse uses templates from `.kiro/templates/`:
+**Yes!** sce uses templates from `.kiro/templates/`:
 
 ```bash
 # View current templates
@@ -469,25 +469,25 @@ vim .kiro/templates/tasks.md
 
 ---
 
-### Can I use kse with multiple projects?
+### Can I use sce with multiple projects?
 
-**Yes!** Each project has its own kse installation:
+**Yes!** Each project has its own sce installation:
 
 ```bash
 # Project 1
 cd ~/projects/project1
-kse adopt
-kse spec bootstrap --name 01-00-feature-a --non-interactive
+sce adopt
+sce spec bootstrap --name 01-00-feature-a --non-interactive
 
 # Project 2
 cd ~/projects/project2
-kse adopt
-kse spec bootstrap --name 01-00-feature-b --non-interactive
+sce adopt
+sce spec bootstrap --name 01-00-feature-b --non-interactive
 ```
 
 **Each project has:**
 - Own `.kiro/` directory
-- Own `kse.json` config
+- Own `sce.json` config
 - Own Specs
 - Own templates
 
@@ -507,7 +507,7 @@ git push
 **Via export:**
 ```bash
 # Export Spec as single file
-kse context export 01-00-user-login
+sce context export 01-00-user-login
 
 # Share context-export.md
 ```
@@ -526,13 +526,13 @@ kse context export 01-00-user-login
 
 ```bash
 # Main feature
-kse spec bootstrap --name 01-00-user-management --non-interactive
+sce spec bootstrap --name 01-00-user-management --non-interactive
 
 # Sub-features
-kse spec bootstrap --name 01-01-user-registration --non-interactive
-kse spec bootstrap --name 01-02-user-login --non-interactive
-kse spec bootstrap --name 01-03-user-profile --non-interactive
-kse spec bootstrap --name 01-04-password-reset --non-interactive
+sce spec bootstrap --name 01-01-user-registration --non-interactive
+sce spec bootstrap --name 01-02-user-login --non-interactive
+sce spec bootstrap --name 01-03-user-profile --non-interactive
+sce spec bootstrap --name 01-04-password-reset --non-interactive
 ```
 
 **Or use phases in tasks.md:**
@@ -552,23 +552,23 @@ kse spec bootstrap --name 01-04-password-reset --non-interactive
 
 ---
 
-### Can I use kse for non-code projects?
+### Can I use sce for non-code projects?
 
 **Yes!** Specs work for any structured work:
 
 **Documentation project:**
 ```bash
-kse spec bootstrap --name 01-00-api-documentation --non-interactive
+sce spec bootstrap --name 01-00-api-documentation --non-interactive
 ```
 
 **Design project:**
 ```bash
-kse spec bootstrap --name 02-00-ui-redesign --non-interactive
+sce spec bootstrap --name 02-00-ui-redesign --non-interactive
 ```
 
 **Process improvement:**
 ```bash
-kse spec bootstrap --name 03-00-ci-cd-pipeline --non-interactive
+sce spec bootstrap --name 03-00-ci-cd-pipeline --non-interactive
 ```
 
 **Specs provide structure for any project** with requirements, design, and tasks.
@@ -577,101 +577,101 @@ kse spec bootstrap --name 03-00-ci-cd-pipeline --non-interactive
 
 ## Comparison Questions
 
-### kse vs. GitHub Issues
+### sce vs. GitHub Issues
 
 **GitHub Issues:**
 - Track bugs and feature requests
 - Discussion and collaboration
 - Project management
 
-**kse:**
+**sce:**
 - Structure feature implementation
 - Provide context to AI tools
 - Document design decisions
 
 **Use both:**
 - GitHub Issue: "Add user login feature"
-- kse Spec: Detailed requirements, design, tasks for implementation
+- sce Spec: Detailed requirements, design, tasks for implementation
 
 ---
 
-### kse vs. Jira/Linear
+### sce vs. Jira/Linear
 
 **Jira/Linear:**
 - Project management
 - Sprint planning
 - Team coordination
 
-**kse:**
+**sce:**
 - Feature specification
 - AI context provider
 - Implementation documentation
 
 **Use both:**
 - Jira ticket: "USER-123: Implement login"
-- kse Spec: Technical specification for implementation
+- sce Spec: Technical specification for implementation
 
 ---
 
-### kse vs. Confluence/Notion
+### sce vs. Confluence/Notion
 
 **Confluence/Notion:**
 - General documentation
 - Knowledge base
 - Team wiki
 
-**kse:**
+**sce:**
 - Feature-specific documentation
 - Structured format (requirements/design/tasks)
 - AI-optimized context
 
 **Use both:**
 - Confluence: Architecture overview, team processes
-- kse: Individual feature specifications
+- sce: Individual feature specifications
 
 ---
 
-### kse vs. OpenAPI/Swagger
+### sce vs. OpenAPI/Swagger
 
 **OpenAPI/Swagger:**
 - API documentation
 - API contract
 - API testing
 
-**kse:**
+**sce:**
 - Full feature specification (not just API)
 - Requirements and design rationale
 - Implementation tasks
 
 **Use both:**
-- kse design.md: Include OpenAPI spec
+- sce design.md: Include OpenAPI spec
 - Generate OpenAPI from implementation
-- Reference OpenAPI in kse Spec
+- Reference OpenAPI in sce Spec
 
 ---
 
-### kse vs. ADRs (Architecture Decision Records)
+### sce vs. ADRs (Architecture Decision Records)
 
 **ADRs:**
 - Document architectural decisions
 - Explain why decisions were made
 - Historical record
 
-**kse:**
+**sce:**
 - Document feature implementation
 - Provide context for AI
 - Track implementation progress
 
 **Use both:**
 - ADR: "We chose PostgreSQL over MongoDB"
-- kse Spec: "User login feature uses PostgreSQL"
+- sce Spec: "User login feature uses PostgreSQL"
 
 ---
 
 ## Related Documentation
 
-- **[Quick Start Guide](quick-start.md)** - Get started with kse
-- **[Integration Modes](integration-modes.md)** - How to use kse with AI tools
+- **[Quick Start Guide](quick-start.md)** - Get started with sce
+- **[Integration Modes](integration-modes.md)** - How to use sce with AI tools
 - **[Spec Workflow](spec-workflow.md)** - Understanding Specs
 - **[Troubleshooting](troubleshooting.md)** - Common issues and solutions
 
@@ -681,7 +681,7 @@ kse spec bootstrap --name 03-00-ci-cd-pipeline --non-interactive
 
 **Ask the community:**
 - GitHub Discussions: https://github.com/heguangyong/scene-capability-engine/discussions
-- Discord: [Join our Discord](https://discord.gg/kse)
+- Discord: [Join our Discord](https://discord.gg/sce)
 - Twitter: [@kse_dev](https://twitter.com/kse_dev)
 
 **Report issues:**

@@ -1,6 +1,6 @@
 # Spec Workflow Guide
 
-> Understanding the Spec-driven development workflow in kse
+> Understanding the Spec-driven development workflow in sce
 
 ---
 
@@ -13,7 +13,7 @@
 
 ## Overview
 
-A **Spec** (specification) is the fundamental unit of work in kse. It's a structured description of a feature or component that guides both human developers and AI assistants through the implementation process.
+A **Spec** (specification) is the fundamental unit of work in sce. It's a structured description of a feature or component that guides both human developers and AI assistants through the implementation process.
 
 Every Spec follows a three-stage workflow: **Requirements → Design → Tasks**
 
@@ -251,7 +251,7 @@ Response: { ... }
 
 **1. Create the Spec:**
 ```bash
-kse spec bootstrap --name 01-00-user-login --non-interactive
+sce spec bootstrap --name 01-00-user-login --non-interactive
 ```
 
 **2. Write Requirements** (`.kiro/specs/01-00-user-login/requirements.md`):
@@ -292,7 +292,7 @@ Response: { token } or { error }
 
 **5. Export Context:**
 ```bash
-kse context export 01-00-user-login
+sce context export 01-00-user-login
 ```
 
 **6. Implement with AI:**
@@ -302,22 +302,22 @@ kse context export 01-00-user-login
 
 **7. Track Progress:**
 ```bash
-kse status
+sce status
 ```
 
 **8. Maintain Document Governance:**
 ```bash
 # Check for document violations
-kse docs diagnose
+sce docs diagnose
 
 # Clean up temporary files
-kse docs cleanup --spec 01-00-user-login
+sce docs cleanup --spec 01-00-user-login
 
 # Organize artifacts (reports, scripts, etc.)
-kse docs archive --spec 01-00-user-login
+sce docs archive --spec 01-00-user-login
 
 # Validate final structure
-kse docs validate --spec 01-00-user-login
+sce docs validate --spec 01-00-user-login
 ```
 
 ---
@@ -371,16 +371,16 @@ graph TD
 ```mermaid
 sequenceDiagram
     participant Dev as Developer
-    participant kse as kse
+    participant sce as sce
     participant AI as AI Tool
     
-    Dev->>kse: Create Spec (requirements, design, tasks)
-    Dev->>kse: kse context export spec-name
-    kse->>Dev: context-export.md
+    Dev->>sce: Create Spec (requirements, design, tasks)
+    Dev->>sce: sce context export spec-name
+    sce->>Dev: context-export.md
     Dev->>AI: Provide context
     AI->>Dev: Generate code
-    Dev->>kse: Update task status
-    Dev->>kse: kse status (check progress)
+    Dev->>sce: Update task status
+    Dev->>sce: sce status (check progress)
 ```
 
 ### Automated Workflow (Windsurf/Cline)
@@ -389,13 +389,13 @@ sequenceDiagram
 sequenceDiagram
     participant Dev as Developer
     participant AI as AI Tool
-    participant kse as kse
+    participant sce as sce
     
     Dev->>AI: "Implement user login feature"
-    AI->>kse: kse context export 01-00-user-login
-    kse->>AI: Return context
+    AI->>sce: sce context export 01-00-user-login
+    sce->>AI: Return context
     AI->>AI: Generate code
-    AI->>kse: kse task claim 01-00-user-login 1.1
+    AI->>sce: sce task claim 01-00-user-login 1.1
     AI->>Dev: Code generated, task claimed
 ```
 
@@ -422,10 +422,10 @@ sequenceDiagram
 4. **Be AI-friendly** - Tasks should be clear enough for AI to implement
 
 ### Document Governance
-1. **Keep Specs clean** - Use `kse docs archive` to organize artifacts
-2. **Remove temporary files** - Use `kse docs cleanup` regularly
-3. **Validate structure** - Use `kse docs validate` before committing
-4. **Install Git hooks** - Use `kse docs hooks install` to prevent violations
+1. **Keep Specs clean** - Use `sce docs archive` to organize artifacts
+2. **Remove temporary files** - Use `sce docs cleanup` regularly
+3. **Validate structure** - Use `sce docs validate` before committing
+4. **Install Git hooks** - Use `sce docs hooks install` to prevent violations
 
 ### Throughout
 1. **Keep it updated** - Specs are living documents
@@ -486,7 +486,7 @@ sequenceDiagram
 - **[Quick Start Guide](quick-start.md)** - Get started with your first Spec
 - **[Document Governance](document-governance.md)** - Keep your Specs clean and organized
 - **[Integration Modes](integration-modes.md)** - How to use Specs with AI tools
-- **[Command Reference](command-reference.md)** - All kse commands
+- **[Command Reference](command-reference.md)** - All sce commands
 - **[Examples](examples/)** - Complete example Specs
 
 ---
@@ -509,7 +509,7 @@ The Spec workflow is:
 
 **Start your next Spec:** 🚀
 ```bash
-kse spec bootstrap --name 02-00-your-feature --non-interactive
+sce spec bootstrap --name 02-00-your-feature --non-interactive
 ```
 
 ---

@@ -1,6 +1,6 @@
-# Using kse with VS Code + Copilot
+# Using sce with VS Code + Copilot
 
-> Integration guide for kse with Visual Studio Code and GitHub Copilot
+> Integration guide for sce with Visual Studio Code and GitHub Copilot
 
 ---
 
@@ -16,12 +16,12 @@
 
 **VS Code + Copilot** provides AI-powered code completion and suggestions as you type.
 
-**kse integration** uses a hybrid approach:
+**sce integration** uses a hybrid approach:
 - Export context for understanding
 - Reference Specs in code comments
 - Copilot suggests code based on Spec files
 
-### Why Use kse with VS Code + Copilot?
+### Why Use sce with VS Code + Copilot?
 
 - ✅ **IDE you already use** - No need to switch tools
 - ✅ **Inline suggestions** - AI helps as you type
@@ -35,7 +35,7 @@
 **Mode:** Manual Export + Inline Context
 
 **How it works:**
-1. Create Specs in kse
+1. Create Specs in sce
 2. Reference Specs in code comments
 3. Copilot reads Spec files and suggests code
 4. Optionally export context for Copilot Chat
@@ -48,8 +48,8 @@
 
 - **VS Code installed** ([Download](https://code.visualstudio.com/))
 - **GitHub Copilot extension** ([Install](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot))
-- **kse installed** globally (`npm install -g kiro-spec-engine`)
-- **Project adopted** by kse (`kse adopt`)
+- **sce installed** globally (`npm install -g scene-capability-engine`)
+- **Project adopted** by sce (`sce adopt`)
 
 ### Step 1: Configure VS Code Settings
 
@@ -69,12 +69,12 @@ Add to `.vscode/settings.json`:
 
 ### Step 2: Create Workspace Snippet (Optional)
 
-Create `.vscode/kse.code-snippets`:
+Create `.vscode/sce.code-snippets`:
 
 ```json
 {
-  "kse Spec Reference": {
-    "prefix": "kse-ref",
+  "sce Spec Reference": {
+    "prefix": "sce-ref",
     "body": [
       "/**",
       " * Spec: .kiro/specs/${1:spec-name}/",
@@ -84,7 +84,7 @@ Create `.vscode/kse.code-snippets`:
       " * Design: ${4:design-summary}",
       " */"
     ],
-    "description": "Reference kse Spec in code"
+    "description": "Reference sce Spec in code"
   }
 }
 ```
@@ -133,7 +133,7 @@ class AuthController {
 
 **Step 1: Export context**
 ```bash
-kse context export 01-00-user-login
+sce context export 01-00-user-login
 ```
 
 **Step 2: Open Copilot Chat** (Ctrl+Shift+I or Cmd+Shift+I)
@@ -174,7 +174,7 @@ Please help me implement the AuthController.
 
 **1. Create Spec**
 ```bash
-kse spec bootstrap --name 01-00-user-login --non-interactive
+sce spec bootstrap --name 01-00-user-login --non-interactive
 # Edit requirements.md, design.md, tasks.md
 ```
 
@@ -403,7 +403,7 @@ Copilot considers all referenced files.
 
 ## Related Documentation
 
-- **[Quick Start Guide](../quick-start.md)** - Get started with kse
+- **[Quick Start Guide](../quick-start.md)** - Get started with sce
 - **[Integration Modes](../integration-modes.md)** - Understanding integration modes
 - **[Spec Workflow](../spec-workflow.md)** - Creating effective Specs
 
@@ -411,8 +411,8 @@ Copilot considers all referenced files.
 
 ## Summary
 
-**VS Code + Copilot + kse workflow:**
-1. Create Spec in kse
+**VS Code + Copilot + sce workflow:**
+1. Create Spec in sce
 2. Reference Spec in code comments
 3. Let Copilot suggest implementations
 4. Use Copilot Chat for complex logic
@@ -433,8 +433,8 @@ Copilot considers all referenced files.
 
 **Start using:** 🚀
 ```bash
-kse adopt
-kse spec bootstrap --name 01-00-my-feature --non-interactive
+sce adopt
+sce spec bootstrap --name 01-00-my-feature --non-interactive
 # Open VS Code and start coding with Spec references
 ```
 

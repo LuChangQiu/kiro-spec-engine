@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-> Common issues and solutions for kse
+> Common issues and solutions for sce
 
 ---
 
@@ -26,7 +26,7 @@
 
 ## Installation Issues
 
-### Error: "npm install -g kse" fails
+### Error: "npm install -g scene-capability-engine" fails
 
 **Symptoms:**
 ```
@@ -42,8 +42,8 @@ npm ERR! path /usr/local/lib/node_modules
 **Option 1: Use npx (Recommended)**
 ```bash
 # No installation needed, run directly
-npx kse status
-npx kse adopt
+npx sce status
+npx sce adopt
 ```
 
 **Option 2: Fix npm permissions (macOS/Linux)**
@@ -59,31 +59,31 @@ export PATH=~/.npm-global/bin:$PATH
 source ~/.bashrc  # or source ~/.zshrc
 
 # Now install
-npm install -g kse
+npm install -g scene-capability-engine
 ```
 
 **Option 3: Use sudo (Not Recommended)**
 ```bash
-sudo npm install -g kse
+sudo npm install -g scene-capability-engine
 ```
 
 ---
 
-### Error: "kse: command not found"
+### Error: "sce: command not found"
 
 **Symptoms:**
 ```bash
-$ kse status
-bash: kse: command not found
+$ sce status
+bash: sce: command not found
 ```
 
-**Cause:** kse is not in your PATH
+**Cause:** sce is not in your PATH
 
 **Solutions:**
 
-**Check if kse is installed:**
+**Check if sce is installed:**
 ```bash
-npm list -g kse
+npm list -g sce
 ```
 
 **If installed, find where:**
@@ -103,8 +103,8 @@ export PATH="/usr/local/bin:$PATH"
 
 **Verify:**
 ```bash
-which kse  # macOS/Linux
-where kse  # Windows
+which sce  # macOS/Linux
+where sce  # Windows
 ```
 
 ---
@@ -113,11 +113,11 @@ where kse  # Windows
 
 **Symptoms:**
 ```
-Error: kse requires Node.js 14 or higher
+Error: sce requires Node.js 14 or higher
 Current version: v12.x.x
 ```
 
-**Cause:** kse requires Node.js 14+
+**Cause:** sce requires Node.js 14+
 
 **Solution:**
 
@@ -145,12 +145,12 @@ node --version
 
 **Symptoms:**
 ```bash
-$ kse adopt
+$ sce adopt
 Error: Not a git repository
-kse requires a git repository to track Specs
+sce requires a git repository to track Specs
 ```
 
-**Cause:** kse requires git for version control
+**Cause:** sce requires git for version control
 
 **Solution:**
 
@@ -160,33 +160,33 @@ git init
 git add .
 git commit -m "Initial commit"
 
-# Now adopt kse
-kse adopt
+# Now adopt sce
+sce adopt
 ```
 
 **Why git is required:**
 - Specs should be version controlled
 - Team collaboration needs git
-- kse uses git to detect project root
+- sce uses git to detect project root
 
 ---
 
-### Error: "kse.json already exists"
+### Error: "sce.json already exists"
 
 **Symptoms:**
 ```bash
-$ kse adopt
-Error: kse.json already exists
-Use 'kse upgrade' to update existing installation
+$ sce adopt
+Error: sce.json already exists
+Use 'sce upgrade' to update existing installation
 ```
 
-**Cause:** Project already has kse installed
+**Cause:** Project already has sce installed
 
 **Solutions:**
 
 **If you want to upgrade:**
 ```bash
-kse upgrade
+sce upgrade
 ```
 
 **If you want to start fresh:**
@@ -194,12 +194,12 @@ kse upgrade
 # Backup existing Specs
 cp -r .kiro .kiro.backup
 
-# Remove kse
-rm kse.json
+# Remove sce
+rm sce.json
 rm -rf .kiro
 
 # Re-adopt
-kse adopt
+sce adopt
 ```
 
 ---
@@ -208,7 +208,7 @@ kse adopt
 
 **Symptoms:**
 ```bash
-$ kse adopt
+$ sce adopt
 Error: EACCES: permission denied, mkdir '.kiro'
 ```
 
@@ -228,7 +228,7 @@ sudo chown -R $USER:$USER .
 
 # Or run in a directory you own
 cd ~/projects/my-project
-kse adopt
+sce adopt
 ```
 
 ---
@@ -239,7 +239,7 @@ kse adopt
 
 **Symptoms:**
 ```bash
-$ kse status
+$ sce status
 No Specs found in .kiro/specs/
 ```
 
@@ -249,7 +249,7 @@ No Specs found in .kiro/specs/
 
 **Create your first Spec:**
 ```bash
-kse spec bootstrap --name 01-00-my-feature --non-interactive
+sce spec bootstrap --name 01-00-my-feature --non-interactive
 ```
 
 **Or check if Specs exist:**
@@ -263,7 +263,7 @@ ls -la .kiro/specs/
 
 **Symptoms:**
 ```bash
-$ kse spec bootstrap --name my-feature --non-interactive
+$ sce spec bootstrap --name my-feature --non-interactive
 Error: Invalid Spec name format
 Expected: {number}-{number}-{kebab-case-name}
 ```
@@ -275,13 +275,13 @@ Expected: {number}-{number}-{kebab-case-name}
 **Use correct format:**
 ```bash
 # ✅ Correct
-kse spec bootstrap --name 01-00-user-login --non-interactive
-kse spec bootstrap --name 02-01-fix-auth-bug --non-interactive
+sce spec bootstrap --name 01-00-user-login --non-interactive
+sce spec bootstrap --name 02-01-fix-auth-bug --non-interactive
 
 # ❌ Wrong
-kse spec bootstrap --name user-login --non-interactive
-kse spec bootstrap --name 01-user-login --non-interactive
-kse spec bootstrap --name UserLogin --non-interactive
+sce spec bootstrap --name user-login --non-interactive
+sce spec bootstrap --name 01-user-login --non-interactive
+sce spec bootstrap --name UserLogin --non-interactive
 ```
 
 ---
@@ -290,7 +290,7 @@ kse spec bootstrap --name UserLogin --non-interactive
 
 **Symptoms:**
 ```bash
-$ kse context export 01-00-user-login
+$ sce context export 01-00-user-login
 Error: Failed to export context
 ```
 
@@ -302,7 +302,7 @@ Error: Failed to export context
 ls .kiro/specs/01-00-user-login/
 
 # If not, create it
-kse spec bootstrap --name 01-00-user-login --non-interactive
+sce spec bootstrap --name 01-00-user-login --non-interactive
 ```
 
 **2. Missing Spec files:**
@@ -329,7 +329,7 @@ chmod 644 .kiro/specs/01-00-user-login/*.md
 
 **Symptoms:**
 ```bash
-$ kse task claim 01-00-user-login 1.1
+$ sce task claim 01-00-user-login 1.1
 Error: Task 1.1 not found in tasks.md
 ```
 
@@ -385,13 +385,13 @@ cat .kiro/specs/01-00-user-login/context-export.md
 **3. Break down large contexts:**
 ```bash
 # Instead of entire Spec, export specific task
-kse prompt generate 01-00-user-login 1.1
+sce prompt generate 01-00-user-login 1.1
 ```
 
 **4. Use steering rules:**
 ```bash
 # Include project-specific rules
-kse context export 01-00-user-login --include-steering
+sce context export 01-00-user-login --include-steering
 ```
 
 ---
@@ -408,7 +408,7 @@ kse context export 01-00-user-login --include-steering
 **1. Use task-specific prompts:**
 ```bash
 # Export just one task
-kse prompt generate 01-00-user-login 1.1
+sce prompt generate 01-00-user-login 1.1
 ```
 
 **2. Simplify your Spec:**
@@ -471,7 +471,7 @@ class AuthController {
 
 **Symptoms:**
 ```bash
-$ kse watch status
+$ sce watch status
 Status: Running
 
 # But editing Spec files doesn't trigger actions
@@ -481,13 +481,13 @@ Status: Running
 
 **1. Restart watch mode:**
 ```bash
-kse watch stop
-kse watch start
+sce watch stop
+sce watch start
 ```
 
 **2. Check watch patterns:**
 ```bash
-kse watch config
+sce watch config
 # Verify patterns include your files
 ```
 
@@ -500,7 +500,7 @@ kse watch config
 **4. Increase watch delay:**
 ```bash
 # If changes are too rapid
-kse watch config --delay 1000
+sce watch config --delay 1000
 ```
 
 ---
@@ -516,7 +516,7 @@ kse watch config --delay 1000
 **1. Reduce watch scope:**
 ```bash
 # Watch only specific Specs
-kse watch start --spec 01-00-user-login
+sce watch start --spec 01-00-user-login
 ```
 
 **2. Exclude unnecessary files:**
@@ -534,7 +534,7 @@ kse watch start --spec 01-00-user-login
 **3. Stop when not needed:**
 ```bash
 # Stop watch mode when not actively developing
-kse watch stop
+sce watch stop
 ```
 
 ---
@@ -549,20 +549,20 @@ kse watch stop
 
 **1. Check action configuration:**
 ```bash
-kse watch config
+sce watch config
 # Verify actions are properly configured
 ```
 
 **2. Check action logs:**
 ```bash
-kse watch logs
+sce watch logs
 # Look for error messages
 ```
 
 **3. Test action manually:**
 ```bash
 # Try running the action command directly
-kse context export 01-00-user-login
+sce context export 01-00-user-login
 ```
 
 ---
@@ -573,7 +573,7 @@ kse context export 01-00-user-login
 
 **Symptoms:**
 ```bash
-$ kse docs diagnose
+$ sce docs diagnose
 ✅ Project is compliant
 # But you know there are temporary files
 ```
@@ -584,13 +584,13 @@ $ kse docs diagnose
 
 **1. Check what patterns are configured:**
 ```bash
-kse docs config
+sce docs config
 # Look at "Temporary Patterns" section
 ```
 
 **2. Add custom patterns if needed:**
 ```bash
-kse docs config --set temporary-patterns "*-SUMMARY.md,SESSION-*.md,*-COMPLETE.md,TEMP-*.md,WIP-*.md,MVP-*.md,DRAFT-*.md"
+sce docs config --set temporary-patterns "*-SUMMARY.md,SESSION-*.md,*-COMPLETE.md,TEMP-*.md,WIP-*.md,MVP-*.md,DRAFT-*.md"
 ```
 
 **3. Manually check for violations:**
@@ -607,7 +607,7 @@ ls *.md
 
 **Symptoms:**
 ```bash
-$ kse docs cleanup
+$ sce docs cleanup
 Deleted 0 file(s)
 # But temporary files still exist
 ```
@@ -622,7 +622,7 @@ ls *.md
 # If file is "notes.md" (doesn't match patterns)
 # Either rename it to match pattern or delete manually
 mv notes.md TEMP-notes.md
-kse docs cleanup
+sce docs cleanup
 ```
 
 **2. Files are in subdirectories:**
@@ -639,7 +639,7 @@ ls -la *.md
 
 # Fix if needed
 chmod u+w filename.md
-kse docs cleanup
+sce docs cleanup
 ```
 
 ---
@@ -648,7 +648,7 @@ kse docs cleanup
 
 **Symptoms:**
 ```bash
-$ kse docs archive --spec my-spec
+$ sce docs archive --spec my-spec
 # Files moved to unexpected subdirectories
 ```
 
@@ -672,7 +672,7 @@ mv data.md analysis-report.md
 mv tool.js test-script.js
 
 # Then archive
-kse docs archive --spec my-spec
+sce docs archive --spec my-spec
 ```
 
 ---
@@ -690,10 +690,10 @@ $ git commit -m "Add feature"
 **1. Hooks not installed:**
 ```bash
 # Check status
-kse docs hooks status
+sce docs hooks status
 
 # If not installed
-kse docs hooks install
+sce docs hooks install
 ```
 
 **2. Hook file not executable:**
@@ -721,7 +721,7 @@ ls -la .git/
 
 # If not, initialize git
 git init
-kse docs hooks install
+sce docs hooks install
 ```
 
 ---
@@ -730,7 +730,7 @@ kse docs hooks install
 
 **Symptoms:**
 ```bash
-$ kse docs validate --spec my-spec
+$ sce docs validate --spec my-spec
 ❌ Missing required file: requirements.md
 # But the file exists
 ```
@@ -751,7 +751,7 @@ ls -la .kiro/specs/my-spec/requirements.md
 ls .kiro/specs/
 
 # Use exact name
-kse docs validate --spec 01-00-my-feature
+sce docs validate --spec 01-00-my-feature
 ```
 
 **3. Case sensitivity (Linux/macOS):**
@@ -766,10 +766,10 @@ mv Requirements.md requirements.md
 
 **Symptoms:**
 ```bash
-$ kse docs config --set root-allowed-files "README.md,CUSTOM.md"
+$ sce docs config --set root-allowed-files "README.md,CUSTOM.md"
 ✅ Configuration updated
 
-$ kse docs diagnose
+$ sce docs diagnose
 # Still reports CUSTOM.md as violation
 ```
 
@@ -790,14 +790,14 @@ cat .kiro/config/docs.json
 # Wrong: root-files
 # Correct: root-allowed-files
 
-kse docs config --set root-allowed-files "README.md,CUSTOM.md"
+sce docs config --set root-allowed-files "README.md,CUSTOM.md"
 ```
 
 **3. Restart any running processes:**
 ```bash
 # If watch mode is running
-kse watch stop
-kse watch start
+sce watch stop
+sce watch start
 ```
 
 ---
@@ -806,7 +806,7 @@ kse watch start
 
 **Symptoms:**
 ```bash
-$ kse docs hooks install
+$ sce docs hooks install
 Error: EACCES: permission denied, open '.git/hooks/pre-commit'
 ```
 
@@ -825,7 +825,7 @@ ls -la .git/hooks/
 chmod u+w .git/hooks/
 
 # Try again
-kse docs hooks install
+sce docs hooks install
 ```
 
 **3. Check if file is read-only:**
@@ -843,7 +843,7 @@ chmod u+w .git/hooks/pre-commit
 
 **Symptoms:**
 ```bash
-$ kse docs stats
+$ sce docs stats
 ⚠️  No execution history found
 ```
 
@@ -854,13 +854,13 @@ $ kse docs stats
 **Run some governance commands:**
 ```bash
 # Run diagnostic
-kse docs diagnose
+sce docs diagnose
 
 # Run cleanup
-kse docs cleanup --dry-run
+sce docs cleanup --dry-run
 
 # Now check stats
-kse docs stats
+sce docs stats
 ```
 
 **Note:** Only actual operations are logged (not --dry-run for cleanup/archive)
@@ -871,7 +871,7 @@ kse docs stats
 
 **Symptoms:**
 ```bash
-$ kse docs report
+$ sce docs report
 Error: ENOENT: no such file or directory, open '.kiro/reports/...'
 ```
 
@@ -884,16 +884,16 @@ Error: ENOENT: no such file or directory, open '.kiro/reports/...'
 mkdir -p .kiro/reports
 
 # Try again
-kse docs report
+sce docs report
 ```
 
-**Or let kse create it:**
+**Or let sce create it:**
 ```bash
 # Run diagnostic first (creates directory structure)
-kse docs diagnose
+sce docs diagnose
 
 # Then generate report
-kse docs report
+sce docs report
 ```
 
 ---
@@ -908,8 +908,8 @@ kse docs report
 
 **Solution:**
 ```powershell
-# Use CMD for kse commands
-cmd /c kse status
+# Use CMD for sce commands
+cmd /c sce status
 
 # Or configure PowerShell execution policy
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
@@ -922,13 +922,13 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 **Solution:**
 ```bash
 # ❌ Wrong on Windows
-kse context export .kiro/specs/01-00-user-login
+sce context export .kiro/specs/01-00-user-login
 
 # ✅ Correct on Windows
-kse context export .kiro\specs\01-00-user-login
+sce context export .kiro\specs\01-00-user-login
 
-# ✅ Or use forward slashes (kse handles both)
-kse context export 01-00-user-login
+# ✅ Or use forward slashes (sce handles both)
+sce context export 01-00-user-login
 ```
 
 #### Line endings
@@ -948,15 +948,15 @@ echo "*.md text eol=lf" >> .gitattributes
 
 ### macOS Issues
 
-#### Gatekeeper blocking kse
+#### Gatekeeper blocking sce
 
-**Issue:** "kse cannot be opened because it is from an unidentified developer"
+**Issue:** "sce cannot be opened because it is from an unidentified developer"
 
 **Solution:**
 ```bash
-# kse is installed via npm, so this shouldn't happen
+# sce is installed via npm, so this shouldn't happen
 # But if it does:
-xattr -d com.apple.quarantine $(which kse)
+xattr -d com.apple.quarantine $(which sce)
 ```
 
 #### Permission issues
@@ -980,7 +980,7 @@ xattr -d com.apple.quarantine $(which kse)
 
 **Solution:**
 ```bash
-# Add kse to PATH in your shell config
+# Add sce to PATH in your shell config
 # For bash: ~/.bashrc
 # For zsh: ~/.zshrc
 export PATH="$HOME/.npm-global/bin:$PATH"
@@ -996,10 +996,10 @@ source ~/.bashrc  # or ~/.zshrc
 **Solution:**
 ```bash
 # Check file permissions
-ls -la $(which kse)
+ls -la $(which sce)
 
 # Should be executable
-chmod +x $(which kse)
+chmod +x $(which sce)
 ```
 
 ---
@@ -1010,8 +1010,8 @@ chmod +x $(which kse)
 
 **Gather information:**
 ```bash
-# kse version
-kse --version
+# sce version
+sce --version
 
 # Node.js version
 node --version
@@ -1044,7 +1044,7 @@ ls -la .kiro/
 - Connect with other users
 
 **4. Community:**
-- Discord: [Join our Discord](https://discord.gg/kse)
+- Discord: [Join our Discord](https://discord.gg/sce)
 - Twitter: [@kse_dev](https://twitter.com/kse_dev)
 
 ### Creating a Good Issue Report
@@ -1054,7 +1054,7 @@ ls -la .kiro/
 2. **What you expected to happen**
 3. **What actually happened**
 4. **Error messages** (full text)
-5. **Environment info** (OS, Node version, kse version)
+5. **Environment info** (OS, Node version, sce version)
 6. **Steps to reproduce**
 
 **Example:**
@@ -1063,8 +1063,8 @@ ls -la .kiro/
 Context export fails for Spec with Chinese characters in filename
 
 ## Steps to Reproduce
-1. Create Spec: kse spec bootstrap --name 01-00-用户登录 --non-interactive
-2. Run: kse context export 01-00-用户登录
+1. Create Spec: sce spec bootstrap --name 01-00-用户登录 --non-interactive
+2. Run: sce context export 01-00-用户登录
 3. Error occurs
 
 ## Expected Behavior
@@ -1076,7 +1076,7 @@ Error: Invalid filename
 ## Environment
 - OS: macOS 13.0
 - Node: v18.12.0
-- kse: v1.0.0
+- sce: v1.0.0
 
 ## Error Message
 ```
@@ -1088,10 +1088,10 @@ Error: EINVAL: invalid filename
 
 ## Related Documentation
 
-- **[Quick Start Guide](quick-start.md)** - Get started with kse
+- **[Quick Start Guide](quick-start.md)** - Get started with sce
 - **[FAQ](faq.md)** - Frequently asked questions
-- **[Command Reference](command-reference.md)** - All kse commands
-- **[Integration Modes](integration-modes.md)** - Using kse with AI tools
+- **[Command Reference](command-reference.md)** - All sce commands
+- **[Integration Modes](integration-modes.md)** - Using sce with AI tools
 
 ---
 
@@ -1099,7 +1099,7 @@ Error: EINVAL: invalid filename
 
 **Most Common Issues:**
 1. **Installation** - Use npx or fix npm permissions
-2. **Command not found** - Add kse to PATH
+2. **Command not found** - Add sce to PATH
 3. **Spec name format** - Use XX-YY-feature-name format
 4. **Context too large** - Use task-specific prompts
 5. **Watch mode** - Restart or check configuration
@@ -1107,23 +1107,23 @@ Error: EINVAL: invalid filename
 
 **Quick Fixes:**
 ```bash
-# Restart kse watch mode
-kse watch stop && kse watch start
+# Restart sce watch mode
+sce watch stop && sce watch start
 
 # Verify installation
-kse --version
+sce --version
 
 # Check Spec structure
 ls -la .kiro/specs/
 
 # Test context export
-kse context export spec-name
+sce context export spec-name
 
 # Check document compliance
-kse docs diagnose
+sce docs diagnose
 
 # Clean up temporary files
-kse docs cleanup --dry-run
+sce docs cleanup --dry-run
 ```
 
 **Still stuck?** → [Create an issue](https://github.com/heguangyong/scene-capability-engine/issues/new)

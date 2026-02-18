@@ -1,6 +1,6 @@
 # Export Command - Tasks
 
-> Implementation plan for kse export command
+> Implementation plan for sce export command
 
 ---
 
@@ -50,7 +50,7 @@
 ## Phase 3: CLI Integration
 
 - [ ] 3.1 Register command in CLI
-  - Add command to bin/kiro-spec-engine.js
+  - Add command to bin/scene-capability-engine.js
   - Define options and arguments
   - Wire up to ExportCommand
 

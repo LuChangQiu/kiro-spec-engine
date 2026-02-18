@@ -1,4 +1,4 @@
-﻿const fs = require('fs-extra');
+const fs = require('fs-extra');
 const os = require('os');
 const path = require('path');
 const { Command } = require('commander');
@@ -18,7 +18,7 @@ describe('lock commands integration', () => {
   let logSpy;
 
   beforeEach(async () => {
-    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-lock-cmd-'));
+    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-lock-cmd-'));
     originalCwd = process.cwd();
     originalExitCode = process.exitCode;
     process.chdir(tempRoot);

@@ -27,7 +27,7 @@ describe('WorkspaceContextResolver', () => {
 
   beforeEach(async () => {
     // Create temporary test directory
-    testDir = path.join(os.tmpdir(), `kse-test-${Date.now()}`);
+    testDir = path.join(os.tmpdir(), `sce-test-${Date.now()}`);
     await fs.ensureDir(testDir);
 
     // Set up config paths
@@ -153,7 +153,7 @@ describe('WorkspaceContextResolver', () => {
   });
 
   describe('isValidKseDirectory', () => {
-    test('should return true for valid kse directory', async () => {
+    test('should return true for valid sce directory', async () => {
       const isValid = await resolver.isValidKseDirectory(workspace1Dir);
       
       expect(isValid).toBe(true);
@@ -253,7 +253,7 @@ describe('WorkspaceContextResolver', () => {
   });
 
   describe('shouldPromptForRegistration', () => {
-    test('should return true for unregistered kse directory', async () => {
+    test('should return true for unregistered sce directory', async () => {
       const newKseDir = path.join(testDir, 'new-kse');
       await fs.ensureDir(path.join(newKseDir, '.kiro'));
       
@@ -288,7 +288,7 @@ describe('WorkspaceContextResolver', () => {
       expect(workspace.name).toBe('workspace-1');
     });
 
-    test('should throw helpful error for unregistered kse directory', async () => {
+    test('should throw helpful error for unregistered sce directory', async () => {
       const newKseDir = path.join(testDir, 'new-kse');
       await fs.ensureDir(path.join(newKseDir, '.kiro'));
       

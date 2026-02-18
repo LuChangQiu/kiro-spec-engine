@@ -1,6 +1,6 @@
 {
   "version": "2026.02.17",
-  "source": "kse-moqui-core",
+  "source": "sce-moqui-core",
   "capabilities": [
     {
       "canonical": "erp-order-query-read",

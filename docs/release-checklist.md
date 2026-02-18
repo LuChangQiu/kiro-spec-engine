@@ -1,6 +1,6 @@
 # Release Checklist
 
-> Minimal, repeatable checklist before publishing a new kse version.
+> Minimal, repeatable checklist before publishing a new sce version.
 
 ---
 
@@ -20,8 +20,8 @@ npm run test:skip-audit
 npm test -- tests/unit/commands/value-metrics.test.js
 
 # CLI smoke checks
-node bin/kiro-spec-engine.js --help
-node bin/kiro-spec-engine.js value metrics --help
+node bin/scene-capability-engine.js --help
+node bin/scene-capability-engine.js value metrics --help
 ```
 
 ---
@@ -29,8 +29,8 @@ node bin/kiro-spec-engine.js value metrics --help
 ## 2. Value Observability Smoke Flow
 
 ```bash
-kse value metrics sample --out ./kpi-input.json --json
-kse value metrics snapshot --input ./kpi-input.json --json
+sce value metrics sample --out ./kpi-input.json --json
+sce value metrics snapshot --input ./kpi-input.json --json
 ```
 
 Expected:
@@ -70,7 +70,7 @@ Optional sanity scan:
 rg -n "yourusername|support@example.com" README.md README.zh.md docs docs/zh -S
 
 # Canonical repository link check (should return no matches)
-rg -n "github.com/kiro-spec-engine/kse" README.md README.zh.md docs START_HERE.txt INSTALL_OFFLINE.txt -S -g "!docs/release-checklist.md" -g "!docs/zh/release-checklist.md"
+rg -n "github.com/scene-capability-engine/sce" README.md README.zh.md docs START_HERE.txt INSTALL_OFFLINE.txt -S -g "!docs/release-checklist.md" -g "!docs/zh/release-checklist.md"
 ```
 
 ---
@@ -116,6 +116,6 @@ Ensure:
   - `KSE_RELEASE_DRIFT_HARD_GATE_BLOCK_STREAK_MIN`: minimum consecutive hard-gate preflight blocked streak (latest window, default `2`)
   - `KSE_RELEASE_DRIFT_PREFLIGHT_UNAVAILABLE_STREAK_MIN`: minimum consecutive release preflight unavailable streak (latest window, default `2`)
 - Optional local dry-run for gate history index artifact:
-  - `kse auto handoff gate-index --dir .kiro/reports/release-evidence --out .kiro/reports/release-evidence/release-gate-history.json --json`
+  - `sce auto handoff gate-index --dir .kiro/reports/release-evidence --out .kiro/reports/release-evidence/release-gate-history.json --json`
 
 Then proceed with your release workflow (tag, push, npm publish, GitHub release).

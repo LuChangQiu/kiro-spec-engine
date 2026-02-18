@@ -1,17 +1,17 @@
-# 331-poc 适配持续推进路线图（KSE 侧）
+# 331-poc 适配持续推进路线图（sce 侧）
 
-> 范围：`kiro-spec-engine` 侧围绕 331-poc handoff 的持续适配工作，不包含 331 业务实现本身。
+> 范围：`scene-capability-engine` 侧围绕 331-poc handoff 的持续适配工作，不包含 331 业务实现本身。
 
 ## 已完成（本轮）
 
 1. 新增 handoff 自动化命令：
-   - `kse auto handoff plan`
-   - `kse auto handoff queue`
+   - `sce auto handoff plan`
+   - `sce auto handoff queue`
 2. 将 handoff manifest 解析为可执行阶段计划（precheck/spec validation/execution/observability）。
 3. 将 handoff manifest 生成 close-loop-batch 目标队列（支持 dry-run、append、known-gaps 开关）。
 4. 补齐单测覆盖（plan/queue/dry-run 分支）。
 5. 更新命令参考与中英文文档入口。
-6. 新增 `kse auto handoff run`：
+6. 新增 `sce auto handoff run`：
    - 一条命令串行执行 `plan -> queue -> close-loop-batch -> observability`。
    - 支持 `--dry-run` 与失败自动中断。
 7. 新增 handoff 结果归档：
@@ -25,12 +25,12 @@
    - 从 manifest `specs[].depends_on` 构建依赖拓扑批次。
    - `handoff run` 默认按依赖批次顺序执行 spec 集成目标。
 10. 新增模板差异检测：
-   - `kse auto handoff template-diff` 对比 manifest 模板与本地模板库。
+   - `sce auto handoff template-diff` 对比 manifest 模板与本地模板库。
 11. 新增跨轮次回归分析：
-   - `kse auto handoff regression` 对比相邻批次成功率/风险/失败目标/耗时变化。
+   - `sce auto handoff regression` 对比相邻批次成功率/风险/失败目标/耗时变化。
    - `handoff run` 结果中自动附加 regression 摘要。
 12. 新增断点续跑能力：
-   - `kse auto handoff run --continue-from <session|latest|file>`。
+   - `sce auto handoff run --continue-from <session|latest|file>`。
    - 支持 `--continue-strategy auto|pending|failed-only`。
 13. 新增 release evidence 自动归并：
    - `handoff run` 结束后自动将批次结果合并到 `.kiro/reports/release-evidence/handoff-runs.json`。
@@ -42,10 +42,10 @@
    - `handoff run` 支持 `--release-evidence-window <n>`（默认 5）。
    - release evidence 自动写入 `latest_trend_window` 与每个 session 的 `trend_window`，支持发布包一键审阅。
 16. 新增 release evidence 快速审阅命令：
-   - `kse auto handoff evidence` 直接聚合当前批次 gate/ontology/regression/risk-layer 概览。
+   - `sce auto handoff evidence` 直接聚合当前批次 gate/ontology/regression/risk-layer 概览。
    - 支持 JSON/markdown 输出与 `--window` 会话窗口聚合。
 17. 新增 release draft 自动生成：
-   - `kse auto handoff evidence --release-draft <path>` 一次命令生成 evidence 审阅 markdown + release notes 草稿。
+   - `sce auto handoff evidence --release-draft <path>` 一次命令生成 evidence 审阅 markdown + release notes 草稿。
    - 草稿自动注入当前批次 gate/ontology/regression/risk-layer 摘要与证据路径。
 18. 新增 CI 发布链路集成：
    - `release.yml` 在 tag 发布时自动尝试基于 `handoff-runs.json` 生成 release notes 草稿。
@@ -63,7 +63,7 @@
    - 编排引擎在 429/RateLimit 错误重试时，支持解析 `Retry-After`/`try again in` 提示并抬升 backoff。
    - 减少服务端限流窗口内的无效重试与“卡死感”。
 23. 新增 release gate 历史索引命令：
-   - `kse auto handoff gate-index` 聚合 `release-gate-*.json` 为跨版本历史索引。
+   - `sce auto handoff gate-index` 聚合 `release-gate-*.json` 为跨版本历史索引。
    - 支持与已有历史索引合并去重（按 tag/file），输出门禁通过率与风险分布聚合指标。
 24. 发布流程自动产出门禁历史索引：
    - `release.yml` 在 gate 评估后自动执行 `handoff gate-index`，生成 `release-gate-history.json` 与当次 summary。
@@ -75,7 +75,7 @@
    - `release.yml` 在发布前将 `release-gate-history` 的近 5 版趋势追加到 Release Notes。
    - 发布页可直接看到 gate pass ratio、风险分布与近期版本轨迹。
 27. 新增 gate-index Markdown 趋势卡片：
-   - `kse auto handoff gate-index --markdown-out <path>` 直接产出可读趋势卡片。
+   - `sce auto handoff gate-index --markdown-out <path>` 直接产出可读趋势卡片。
    - 便于在 PR/Issue 中复用，降低历史门禁审阅成本。
 28. 发布流程附带趋势卡片资产：
    - `release.yml` 自动生成并上传 `release-gate-history-<tag>.md`。
@@ -96,34 +96,34 @@
    - `release.yml` 将 drift 评估结果回写到 `release-gate-<tag>.json` 的 `drift` 字段。
    - 单一门禁产物同时覆盖 gate 与 drift 审计口径，便于回放。
 34. gate-index 漂移趋势聚合：
-   - `kse auto handoff gate-index` 聚合 `drift_alert_count/drift_blocked` 指标并输出 markdown 趋势。
+   - `sce auto handoff gate-index` 聚合 `drift_alert_count/drift_blocked` 指标并输出 markdown 趋势。
    - 发布流程在 drift 合并后自动刷新一次 gate-index，确保当次 release 资产包含 drift 最新状态。
 35. 治理默认评估接入 handoff 发布信号：
-   - `kse auto governance stats` 默认读取 `release-gate-history.json`，将 gate/drift/scene-batch 信号纳入风险评估。
+   - `sce auto governance stats` 默认读取 `release-gate-history.json`，将 gate/drift/scene-batch 信号纳入风险评估。
    - 治理健康输出新增 `health.release_gate` 快照，concerns/recommendations 自动给出 release 质量回归处置建议。
 36. 治理 close-loop 轮次遥测接入发布信号：
-   - `kse auto governance close-loop` 每轮输出 `release_gate_before/release_gate_after`，与 `risk_before/risk_after` 对齐。
+   - `sce auto governance close-loop` 每轮输出 `release_gate_before/release_gate_after`，与 `risk_before/risk_after` 对齐。
    - 轮次级审计可直接追踪 release gate/drift/scene-batch 信号在治理动作前后的变化。
 37. 治理会话统计聚合 release gate 轮次趋势：
-   - `kse auto governance session stats` 新增 `release_gate` 聚合区块，覆盖 gate fail/drift alert/blocked 与通过率均值。
+   - `sce auto governance session stats` 新增 `release_gate` 聚合区块，覆盖 gate fail/drift alert/blocked 与通过率均值。
    - 会话统计输出同时汇总 `round_telemetry_observed/changed`，可量化治理轮次对发布质量信号的影响。
 38. 治理 close-loop 接入 release gate 阻断语义：
-   - `kse auto governance close-loop` 在 release gate/drift 信号异常时输出 `stop_reason=release-gate-blocked`。
+   - `sce auto governance close-loop` 在 release gate/drift 信号异常时输出 `stop_reason=release-gate-blocked`。
    - 结果新增 `stop_detail` 与 `recommendations`，显式给出阻断原因与处置命令。
 39. 治理 maintain 计划默认优先 release gate 修复：
-   - `kse auto governance maintain` 在 release gate 阻断时优先产出 `release-gate-evidence-review` / `release-gate-scene-batch-remediate`。
+   - `sce auto governance maintain` 在 release gate 阻断时优先产出 `release-gate-evidence-review` / `release-gate-scene-batch-remediate`。
    - 发布质量阻断先处理，再执行常规会话/内存清理动作。
 40. handoff run 接入 release gate preflight 与失败摘要：
-   - `kse auto handoff run` 默认输出 `release_gate_preflight`，在 precheck 阶段给出 release gate 阻断提示。
+   - `sce auto handoff run` 默认输出 `release_gate_preflight`，在 precheck 阶段给出 release gate 阻断提示。
    - 失败结果新增 `failure_summary`，统一汇总 phase/gate/release-gate 阻断原因并联动推荐命令。
 41. handoff run 增加 release gate 可选硬门禁：
    - 新增 `--require-release-gate-preflight`，可在生产场景将 release gate preflight 从 advisory 升级为 hard-fail。
    - 默认保持 advisory，避免对现有项目引入破坏性变更。
 42. release draft/evidence review 纳入 preflight 与失败摘要信号：
-   - `kse auto handoff evidence --format markdown` 新增 `Current Release Gate Preflight` 与 `Current Failure Summary`。
+   - `sce auto handoff evidence --format markdown` 新增 `Current Release Gate Preflight` 与 `Current Failure Summary`。
    - release notes draft 摘要新增 preflight 可用性、阻断状态、hard-gate 模式与失败高亮。
 43. gate-index 趋势卡片纳入 preflight/hard-gate 聚合：
-   - `kse auto handoff gate-index` 聚合 `release_gate_preflight_*` 指标并在 markdown 趋势卡片展示。
+   - `sce auto handoff gate-index` 聚合 `release_gate_preflight_*` 指标并在 markdown 趋势卡片展示。
    - Recent entries 行新增 `preflight-blocked` / `hard-gate` 维度，便于跨版本定位阻断模式。
 44. release workflow 漂移判定纳入 preflight/hard-gate 趋势：
    - `release.yml` 的 drift alert 增加 preflight blocked rate、hard-gate blocked streak、preflight unavailable streak 三类阈值。
@@ -142,12 +142,12 @@
    - `release.yml` 的 Evaluate drift 步骤改为直接调用脚本，消除大段内联 heredoc，降低语法错误与维护成本。
    - 新增 `tests/unit/scripts/release-drift-evaluate.test.js` 覆盖 advisory/enforce/missing history/gate report 写回四类场景。
 2. handoff 质量指标接入 governance 默认评估闭环：
-   - `kse auto governance stats` 默认聚合 `.kiro/reports/release-evidence/handoff-runs.json`，输出 `health.handoff_quality` 快照。
+   - `sce auto governance stats` 默认聚合 `.kiro/reports/release-evidence/handoff-runs.json`，输出 `health.handoff_quality` 快照。
    - `risk/concerns/recommendations` 自动纳入 handoff 最新状态、gate、ontology、capability、preflight 阻断等信号。
-   - `kse auto governance close-loop` 的阻断判断纳入 handoff 严重质量信号，统一通过 `stop_reason=release-gate-blocked` 回传处置语义。
-   - `kse auto governance maintain` 在 handoff 质量阻断时新增 `release-gate-handoff-remediate` 建议动作。
+   - `sce auto governance close-loop` 的阻断判断纳入 handoff 严重质量信号，统一通过 `stop_reason=release-gate-blocked` 回传处置语义。
+   - `sce auto governance maintain` 在 handoff 质量阻断时新增 `release-gate-handoff-remediate` 建议动作。
 3. release evidence 与治理视图合并：
-   - `kse auto handoff evidence` 报告新增 `governance_snapshot`（risk/concerns/recommendations + release/handoff health）。
+   - `sce auto handoff evidence` 报告新增 `governance_snapshot`（risk/concerns/recommendations + release/handoff health）。
    - evidence markdown 与 release draft 同步输出 `Governance Snapshot` 区块，形成可发布的一体化治理审阅材料。
 
 ## 下一阶段（新）

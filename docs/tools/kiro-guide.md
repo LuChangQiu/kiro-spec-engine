@@ -1,12 +1,12 @@
-# Using kse with Kiro IDE
+# Using sce with AI IDE
 
-> Native integration guide for kse with Kiro IDE
+> Native integration guide for sce with AI IDE
 
 ---
 
 **Version**: 1.42.0  
 **Last Updated**: 2026-02-11  
-**Tool**: Kiro IDE  
+**Tool**: AI IDE  
 **Integration Mode**: Native Integration  
 **Estimated Setup Time**: None (built-in)
 
@@ -14,17 +14,17 @@
 
 ## Overview
 
-**Kiro IDE** is the native development environment for kse with built-in Spec-driven development support.
+**AI IDE** is the native development environment for sce with built-in Spec-driven development support.
 
-**kse integration with Kiro** uses **Native Integration** - no manual export needed, everything is automatic.
+**sce integration with SCE** uses **Native Integration** - no manual export needed, everything is automatic.
 
-### Why Use kse with Kiro?
+### Why Use sce with SCE?
 
 - ✅ **Zero setup** - Works out of the box
 - ✅ **Fully automatic** - No manual commands needed
 - ✅ **Seamless workflow** - AI reads Specs directly
 - ✅ **Auto task tracking** - Tasks update automatically
-- ✅ **Best experience** - Purpose-built for kse
+- ✅ **Best experience** - Purpose-built for sce
 
 ---
 
@@ -33,10 +33,10 @@
 **Mode:** Native Integration (Fully Automatic)
 
 **How it works:**
-1. You create Specs in kse
-2. Kiro AI automatically reads Spec files
-3. Kiro AI implements features based on Specs
-4. Kiro AI updates tasks.md automatically
+1. You create Specs in sce
+2. SCE AI automatically reads Spec files
+3. SCE AI implements features based on Specs
+4. SCE AI updates tasks.md automatically
 5. No manual export or copy-paste needed
 
 ---
@@ -45,12 +45,12 @@
 
 ### Prerequisites
 
-- **Kiro IDE installed**
+- **AI IDE installed**
 - **Project with .kiro/ directory**
 
 ### No Setup Required!
 
-Kiro IDE automatically detects and uses kse Specs. Just start working.
+AI IDE automatically detects and uses sce Specs. Just start working.
 
 ---
 
@@ -58,12 +58,12 @@ Kiro IDE automatically detects and uses kse Specs. Just start working.
 
 ### Method 1: Natural Language (Recommended) ⭐
 
-**Simply tell Kiro what you want:**
+**Simply tell SCE what you want:**
 
 ```
 You: "Implement the user login feature"
 
-Kiro AI:
+SCE AI:
   [Automatically reads] .kiro/specs/01-00-user-login/
   [Understands] Requirements, Design, Tasks
   [Implements] Code according to design
@@ -78,7 +78,7 @@ Kiro AI:
 ```
 You: "Check the Spec for 01-00-user-login and implement task 2.1"
 
-Kiro AI:
+SCE AI:
   [Reads Spec]
   [Implements task 2.1]
   [Updates tasks.md]
@@ -90,7 +90,7 @@ Kiro AI:
 ```
 You: "Review the design for user login and suggest improvements"
 
-Kiro AI:
+SCE AI:
   [Reads design.md]
   [Analyzes architecture]
   [Provides feedback]
@@ -103,11 +103,11 @@ Kiro AI:
 
 ### Complete Feature Implementation
 
-**1. Create Spec (using Kiro or command line)**
+**1. Create Spec (using SCE or command line)**
 ```
 You: "Create a new Spec for user login"
 
-Kiro AI:
+SCE AI:
   [Creates] .kiro/specs/01-00-user-login/
   [Generates] requirements.md, design.md, tasks.md templates
   [Opens] Files for editing
@@ -117,7 +117,7 @@ Kiro AI:
 ```
 You: "Help me write the requirements for user login"
 
-Kiro AI:
+SCE AI:
   [Suggests] User stories
   [Suggests] Acceptance criteria
   [Suggests] Non-functional requirements
@@ -127,7 +127,7 @@ Kiro AI:
 ```
 You: "Implement this Spec"
 
-Kiro AI:
+SCE AI:
   [Reads all Spec files]
   [Implements all tasks]
   [Runs tests]
@@ -139,7 +139,7 @@ Kiro AI:
 ```
 You: "Show me what you implemented"
 
-Kiro AI:
+SCE AI:
   [Shows] File changes
   [Shows] Completed tasks
   [Shows] Test results
@@ -151,39 +151,39 @@ Kiro AI:
 
 ### 1. Automatic Spec Detection
 
-Kiro automatically finds and reads Specs. No need to specify paths.
+SCE automatically finds and reads Specs. No need to specify paths.
 
 ```
 You: "What Specs do we have?"
-Kiro: "Found 3 Specs: 01-00-user-login, 02-00-password-reset, 03-00-user-profile"
+SCE: "Found 3 Specs: 01-00-user-login, 02-00-password-reset, 03-00-user-profile"
 ```
 
 ### 2. Intelligent Task Management
 
-Kiro tracks tasks automatically.
+SCE tracks tasks automatically.
 
 ```
 You: "What's the status of user login?"
-Kiro: "5 tasks complete, 3 in progress, 2 not started. Next: Implement rate limiting"
+SCE: "5 tasks complete, 3 in progress, 2 not started. Next: Implement rate limiting"
 ```
 
 ### 3. Design-First Development
 
-Kiro enforces following the design.
+SCE enforces following the design.
 
 ```
 You: "Implement AuthController"
-Kiro: [Reads design.md] [Implements exactly as designed] [No deviations]
+SCE: [Reads design.md] [Implements exactly as designed] [No deviations]
 ```
 
 ### 4. Continuous Validation
 
-Kiro validates against requirements.
+SCE validates against requirements.
 
 ```
-Kiro: "Implementation complete. Validating against requirements..."
-Kiro: "✓ All acceptance criteria met"
-Kiro: "✓ All non-functional requirements satisfied"
+SCE: "Implementation complete. Validating against requirements..."
+SCE: "✓ All acceptance criteria met"
+SCE: "✓ All non-functional requirements satisfied"
 ```
 
 ---
@@ -192,7 +192,7 @@ Kiro: "✓ All non-functional requirements satisfied"
 
 ### 1. Trust the Automation
 
-Let Kiro handle Spec reading and task tracking. Don't manually export context.
+Let SCE handle Spec reading and task tracking. Don't manually export context.
 
 ### 2. Use Natural Language
 
@@ -255,22 +255,22 @@ Also good: "Let's work on authentication"
 
 ## Troubleshooting
 
-### Issue: Kiro doesn't see my Spec
+### Issue: SCE doesn't see my Spec
 
 **Check:**
 1. Spec is in `.kiro/specs/` directory
 2. Spec has requirements.md, design.md, tasks.md
 3. Files are not empty
 
-### Issue: Kiro doesn't follow design
+### Issue: SCE doesn't follow design
 
-**This shouldn't happen with Kiro.** If it does:
+**This shouldn't happen with SCE.** If it does:
 1. Check design.md is complete and clear
 2. Report as a bug
 
 ### Issue: Tasks not updating
 
-**This shouldn't happen with Kiro.** If it does:
+**This shouldn't happen with SCE.** If it does:
 1. Check tasks.md file permissions
 2. Report as a bug
 
@@ -278,7 +278,7 @@ Also good: "Let's work on authentication"
 
 ## Related Documentation
 
-- **[Quick Start Guide](../quick-start.md)** - Get started with kse
+- **[Quick Start Guide](../quick-start.md)** - Get started with sce
 - **[Integration Modes](../integration-modes.md)** - Understanding integration modes
 - **[Spec Workflow](../spec-workflow.md)** - Creating effective Specs
 
@@ -286,19 +286,19 @@ Also good: "Let's work on authentication"
 
 ## Summary
 
-**Kiro + kse = Perfect Integration**
+**SCE + sce = Perfect Integration**
 
 **Zero setup, zero manual work:**
 1. Create Spec
-2. Tell Kiro what to build
-3. Kiro does everything automatically
+2. Tell SCE what to build
+3. SCE does everything automatically
 4. Review and approve
 
-**This is the ideal kse experience.** All other tools require workarounds because they weren't built for kse. Kiro was.
+**This is the ideal sce experience.** All other tools require workarounds because they weren't built for sce. SCE was.
 
 **Start using:** 🚀
 ```
-Just open Kiro IDE and say:
+Just open AI IDE and say:
 "Create a Spec for user login and implement it"
 ```
 

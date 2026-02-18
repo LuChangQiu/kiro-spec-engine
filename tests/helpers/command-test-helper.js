@@ -25,7 +25,7 @@ class CommandTestHelper {
       const env = { ...process.env, ...options.env };
 
       // Construct command path
-      const binPath = path.join(__dirname, '../../bin/kse.js');
+      const binPath = path.join(__dirname, '../../bin/sce.js');
       const fullArgs = [commandName, ...args];
 
       let stdout = '';

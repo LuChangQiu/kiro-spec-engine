@@ -1,6 +1,6 @@
 # Scene Runtime Guide
 
-> Complete guide to kse Scene features: Template Engine, Quality Pipeline, Ontology, and Moqui ERP Integration
+> Complete guide to sce Scene features: Template Engine, Quality Pipeline, Ontology, and Moqui ERP Integration
 
 ---
 
@@ -11,7 +11,7 @@
 
 ## Overview
 
-The kse Scene Runtime is a suite of features for building, validating, scoring, and analyzing reusable scene template packages. Scene packages describe business capabilities (e.g., ERP inventory management) as structured templates that AI agents can understand and instantiate.
+The sce Scene Runtime is a suite of features for building, validating, scoring, and analyzing reusable scene template packages. Scene packages describe business capabilities (e.g., ERP inventory management) as structured templates that AI agents can understand and instantiate.
 
 ### Feature Timeline
 
@@ -76,16 +76,16 @@ Each layer can extend the parent's variable schema and template files. The `temp
 
 ```bash
 # Validate variable schema
-kse scene template-validate --package <path>
-kse scene template-validate --package ./my-package --json
+sce scene template-validate --package <path>
+sce scene template-validate --package ./my-package --json
 
 # Resolve inheritance chain
-kse scene template-resolve --package <name>
-kse scene template-resolve --package scene-erp-inventory --json
+sce scene template-resolve --package <name>
+sce scene template-resolve --package scene-erp-inventory --json
 
 # Render templates with variable values
-kse scene template-render --package <name> --values <json-or-path> --out <dir>
-kse scene template-render --package scene-erp --values '{"entity_name":"Order"}' --out ./output --json
+sce scene template-render --package <name> --values <json-or-path> --out <dir>
+sce scene template-render --package scene-erp --values '{"entity_name":"Order"}' --out ./output --json
 ```
 
 ---
@@ -125,17 +125,17 @@ Analyzes Moqui ERP resources and generates reusable scene templates:
 
 ```bash
 # Test connectivity
-kse scene connect --config <path>
-kse scene connect --config ./moqui-config.json --json
+sce scene connect --config <path>
+sce scene connect --config ./moqui-config.json --json
 
 # Discover entities, services, screens
-kse scene discover --config <path>
-kse scene discover --config ./moqui-config.json --type entities --json
+sce scene discover --config <path>
+sce scene discover --config ./moqui-config.json --type entities --json
 
 # Extract scene templates
-kse scene extract --config <path> --out <dir>
-kse scene extract --config ./moqui-config.json --type entities --pattern crud --out ./templates --json
-kse scene extract --config ./moqui-config.json --dry-run --json
+sce scene extract --config <path> --out <dir>
+sce scene extract --config ./moqui-config.json --type entities --pattern crud --out ./templates --json
+sce scene extract --config ./moqui-config.json --dry-run --json
 ```
 
 ### Configuration File
@@ -190,30 +190,30 @@ One-stop workflow: validate → lint → score → preview → publish.
 
 ```bash
 # Full pipeline
-kse scene contribute --package <path>
+sce scene contribute --package <path>
 
 # With registry target
-kse scene contribute --package ./my-package --registry ./registry --json
+sce scene contribute --package ./my-package --registry ./registry --json
 
 # Dry-run (preview only)
-kse scene contribute --package ./my-package --dry-run
+sce scene contribute --package ./my-package --dry-run
 
 # Skip lint step
-kse scene contribute --package ./my-package --skip-lint --json
+sce scene contribute --package ./my-package --skip-lint --json
 ```
 
 ### CLI Commands
 
 ```bash
 # Lint
-kse scene lint --package <path>
-kse scene lint --package ./my-package --json
-kse scene lint --package ./my-package --strict
+sce scene lint --package <path>
+sce scene lint --package ./my-package --json
+sce scene lint --package ./my-package --strict
 
 # Score
-kse scene score --package <path>
-kse scene score --package ./my-package --json
-kse scene score --package ./my-package --strict
+sce scene score --package <path>
+sce scene score --package ./my-package --json
+sce scene score --package ./my-package --strict
 ```
 
 ---
@@ -301,36 +301,36 @@ Quality scoring bonus dimension (max +10 points) based on:
 
 ```bash
 # Show ontology graph
-kse scene ontology show --package <path>
-kse scene ontology show --package ./my-package --json
+sce scene ontology show --package <path>
+sce scene ontology show --package ./my-package --json
 
 # Query dependency chain
-kse scene ontology deps --package <path> --ref <node-ref>
-kse scene ontology deps --package ./my-package --ref entity:Order --json
+sce scene ontology deps --package <path> --ref <node-ref>
+sce scene ontology deps --package ./my-package --ref entity:Order --json
 
 # Query reverse impact radius
-kse scene ontology impact --package <path> --ref <node-ref>
-kse scene ontology impact --package ./my-package --ref service:createOrder --relation depends_on,composes --max-depth 2 --json
+sce scene ontology impact --package <path> --ref <node-ref>
+sce scene ontology impact --package ./my-package --ref service:createOrder --relation depends_on,composes --max-depth 2 --json
 
 # Query shortest relation path between two refs
-kse scene ontology path --package <path> --from <source-ref> --to <target-ref>
-kse scene ontology path --package ./my-package --from service:createOrder --to entity:Order --undirected --json
+sce scene ontology path --package <path> --from <source-ref> --to <target-ref>
+sce scene ontology path --package ./my-package --from service:createOrder --to entity:Order --undirected --json
 
 # Validate graph (dangling edges, cycles)
-kse scene ontology validate --package <path>
-kse scene ontology validate --package ./my-package --json
+sce scene ontology validate --package <path>
+sce scene ontology validate --package ./my-package --json
 
 # Show action abstraction
-kse scene ontology actions --package <path>
-kse scene ontology actions --package ./my-package --ref service:createOrder --json
+sce scene ontology actions --package <path>
+sce scene ontology actions --package ./my-package --ref service:createOrder --json
 
 # Show data lineage
-kse scene ontology lineage --package <path>
-kse scene ontology lineage --package ./my-package --ref entity:Order --json
+sce scene ontology lineage --package <path>
+sce scene ontology lineage --package ./my-package --ref entity:Order --json
 
 # Show agent hints
-kse scene ontology agent-info --package <path>
-kse scene ontology agent-info --package ./my-package --json
+sce scene ontology agent-info --package <path>
+sce scene ontology agent-info --package ./my-package --json
 ```
 
 ---
@@ -339,7 +339,7 @@ kse scene ontology agent-info --package ./my-package --json
 
 - [Command Reference](command-reference.md) — Complete CLI command documentation
 - [Architecture](architecture.md) — System architecture overview
-- [Developer Guide](developer-guide.md) — Contributing and extending kse
+- [Developer Guide](developer-guide.md) — Contributing and extending sce
 
 ---
 

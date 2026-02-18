@@ -114,7 +114,7 @@ describe('Doctor Command', () => {
       // Verify: Should show brief violation summary
       const output = consoleLogSpy.mock.calls.map(call => call.join(' ')).join('\n');
       expect(output).toContain('Document Compliance');
-      expect(output).toContain('kse doctor --docs');
+      expect(output).toContain('sce doctor --docs');
     });
     
     test('should handle missing .kiro directory gracefully', async () => {
@@ -180,7 +180,7 @@ describe('Doctor Command', () => {
       // Verify: Should show recommendations
       const output = consoleLogSpy.mock.calls.map(call => call.join(' ')).join('\n');
       expect(output).toContain('Recommended Actions');
-      expect(output).toContain('kse docs archive');
+      expect(output).toContain('sce docs archive');
     });
     
     test('should group violations by type', async () => {

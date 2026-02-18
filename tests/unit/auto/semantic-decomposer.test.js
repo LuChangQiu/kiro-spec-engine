@@ -14,7 +14,7 @@ describe('semantic-decomposer', () => {
 
   test('scores major intent categories from goal semantics', () => {
     const analysis = analyzeGoalSemantics(
-      'kse should support closed-loop automation and master/sub multi-spec orchestration with quality gate'
+      'sce should support closed-loop automation and master/sub multi-spec orchestration with quality gate'
     );
 
     expect(analysis.categoryScores.closeLoop).toBeGreaterThan(0);

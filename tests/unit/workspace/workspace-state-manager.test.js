@@ -10,7 +10,7 @@ describe('WorkspaceStateManager', () => {
 
   beforeEach(async () => {
     // Create temporary directory
-    tempDir = path.join(os.tmpdir(), `kse-state-test-${Date.now()}`);
+    tempDir = path.join(os.tmpdir(), `sce-state-test-${Date.now()}`);
     await fs.ensureDir(tempDir);
     statePath = path.join(tempDir, 'workspace-state.json');
     manager = new WorkspaceStateManager(statePath);
@@ -135,7 +135,7 @@ describe('WorkspaceStateManager', () => {
       await fs.ensureDir(invalidPath);
 
       await expect(manager.createWorkspace('test-ws', invalidPath))
-        .rejects.toThrow('not a valid kse project');
+        .rejects.toThrow('not a valid sce project');
     });
 
     it('should reject empty workspace names', async () => {

@@ -1,6 +1,6 @@
-# Using kse with Any AI Tool
+# Using sce with Any AI Tool
 
-> Universal integration guide for kse with any AI coding assistant
+> Universal integration guide for sce with any AI coding assistant
 
 ---
 
@@ -14,7 +14,7 @@
 
 ## Overview
 
-This guide shows how to use kse with **any AI coding tool**, including:
+This guide shows how to use sce with **any AI coding tool**, including:
 - ChatGPT
 - Gemini
 - Codeium
@@ -22,7 +22,7 @@ This guide shows how to use kse with **any AI coding tool**, including:
 - Amazon CodeWhisperer
 - Any other AI assistant
 
-**kse works with any tool that can:**
+**sce works with any tool that can:**
 - Accept text input
 - Generate code
 - Understand context
@@ -34,7 +34,7 @@ This guide shows how to use kse with **any AI coding tool**, including:
 ### The Basic Workflow
 
 ```
-1. Create Spec in kse
+1. Create Spec in sce
    ↓
 2. Export context
    ↓
@@ -54,12 +54,12 @@ This pattern works with **every AI tool**.
 ### Prerequisites
 
 - **Any AI tool** (web-based, IDE plugin, or CLI)
-- **kse installed** (`npm install -g kiro-spec-engine`)
-- **Project adopted** (`kse adopt`)
+- **sce installed** (`npm install -g scene-capability-engine`)
+- **Project adopted** (`sce adopt`)
 
 ### No Tool-Specific Setup Required
 
-kse exports plain text that any AI can understand.
+sce exports plain text that any AI can understand.
 
 ---
 
@@ -68,14 +68,14 @@ kse exports plain text that any AI can understand.
 ### Step 1: Create Your Spec
 
 ```bash
-kse spec bootstrap --name 01-00-user-login --non-interactive
+sce spec bootstrap --name 01-00-user-login --non-interactive
 # Edit requirements.md, design.md, tasks.md
 ```
 
 ### Step 2: Export Context
 
 ```bash
-kse context export 01-00-user-login
+sce context export 01-00-user-login
 ```
 
 This creates `.kiro/specs/01-00-user-login/context-export.md`
@@ -187,7 +187,7 @@ class AuthController {
 **Workflow:**
 ```bash
 # Export context
-kse context export 01-00-user-login
+sce context export 01-00-user-login
 
 # Provide to CLI tool
 your-ai-tool --context .kiro/specs/01-00-user-login/context-export.md
@@ -270,7 +270,7 @@ After each completed task, update `tasks.md` immediately.
 
 **Solution:** Use task-specific prompts
 ```bash
-kse prompt generate 01-00-user-login 1.1 --max-length=5000
+sce prompt generate 01-00-user-login 1.1 --max-length=5000
 ```
 
 ### No File Access
@@ -290,11 +290,11 @@ Please implement AuthService that uses this User model.
 
 ### No Command Execution
 
-**Problem:** AI can't run kse commands
+**Problem:** AI can't run sce commands
 
 **Solution:** Run commands yourself and provide output
 ```bash
-kse status
+sce status
 # Copy output
 
 # In AI tool:
@@ -377,15 +377,15 @@ What's wrong and how do I fix it?
 
 If you're building an AI coding tool, consider:
 
-**1. Native kse Support**
+**1. Native sce Support**
 - Read `.kiro/specs/` directory
 - Parse requirements.md, design.md, tasks.md
 - Update tasks.md automatically
 
 **2. Command Execution**
-- Allow executing `kse context export`
+- Allow executing `sce context export`
 - Read exported context files
-- Execute `kse task claim` and `kse task unclaim`
+- Execute `sce task claim` and `sce task unclaim`
 
 **3. File Watching**
 - Watch for Spec file changes
@@ -400,7 +400,7 @@ If you're building an AI coding tool, consider:
 
 ## Related Documentation
 
-- **[Quick Start Guide](../quick-start.md)** - Get started with kse
+- **[Quick Start Guide](../quick-start.md)** - Get started with sce
 - **[Integration Modes](../integration-modes.md)** - Understanding integration modes
 - **[Spec Workflow](../spec-workflow.md)** - Creating effective Specs
 - **[Tool-Specific Guides](../tools/)** - Guides for specific tools
@@ -409,7 +409,7 @@ If you're building an AI coding tool, consider:
 
 ## Summary
 
-**kse works with any AI tool:**
+**sce works with any AI tool:**
 
 **Universal workflow:**
 1. Create Spec
@@ -433,9 +433,9 @@ If you're building an AI coding tool, consider:
 
 **Start using:** 🚀
 ```bash
-kse adopt
-kse spec bootstrap --name 01-00-my-feature --non-interactive
-kse context export 01-00-my-feature
+sce adopt
+sce spec bootstrap --name 01-00-my-feature --non-interactive
+sce context export 01-00-my-feature
 # Provide context to your AI tool
 ```
 

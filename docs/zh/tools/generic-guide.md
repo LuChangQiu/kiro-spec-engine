@@ -1,6 +1,6 @@
-# 在任何 AI 工具中使用 kse
+# 在任何 AI 工具中使用 sce
 
-> 将 kse 与任何 AI 编码助手集成的通用指南
+> 将 sce 与任何 AI 编码助手集成的通用指南
 
 ---
 
@@ -14,9 +14,9 @@
 
 ## 概述
 
-**kse 适用于任何 AI 编码工具。** 本指南展示了如何将 kse 与任何 AI 助手集成，无论是 IDE、聊天机器人还是命令行工具。
+**sce 适用于任何 AI 编码工具。** 本指南展示了如何将 sce 与任何 AI 助手集成，无论是 IDE、聊天机器人还是命令行工具。
 
-### 为什么在任何 AI 工具中使用 kse？
+### 为什么在任何 AI 工具中使用 sce？
 
 - ✅ **工具无关** - 适用于任何 AI 助手
 - ✅ **灵活集成** - 选择最适合你的模式
@@ -27,35 +27,35 @@
 
 ## 三种集成模式
 
-kse 支持三种集成模式。选择最适合你的 AI 工具的一种：
+sce 支持三种集成模式。选择最适合你的 AI 工具的一种：
 
 ### 模式 1：原生集成
 
 **最佳用于：** 可以执行 shell 命令的 AI 工具
 
-**工具示例：** Windsurf、Cline、Kiro、Aider
+**工具示例：** Windsurf、Cline、SCE、Aider
 
 **工作原理：**
-1. AI 工具直接运行 kse 命令
+1. AI 工具直接运行 sce 命令
 2. AI 读取导出的上下文
 3. AI 生成代码
 4. AI 可以更新任务状态
 
 **设置：**
 ```bash
-# 确保 kse 已安装并在 PATH 中
-kse --version
+# 确保 sce 已安装并在 PATH 中
+sce --version
 
 # 采用项目
-kse adopt
+sce adopt
 
 # 创建 Spec
-kse spec bootstrap --name 01-00-my-feature --non-interactive
+sce spec bootstrap --name 01-00-my-feature --non-interactive
 ```
 
 **使用：**
 ```
-告诉 AI："使用 kse 检查 01-00-my-feature 的 spec 并实现任务 1.1"
+告诉 AI："使用 sce 检查 01-00-my-feature 的 spec 并实现任务 1.1"
 ```
 
 ### 模式 2：手动导出
@@ -65,27 +65,27 @@ kse spec bootstrap --name 01-00-my-feature --non-interactive
 **工具示例：** Claude、ChatGPT、Cursor、Copilot
 
 **工作原理：**
-1. 你使用 kse 导出上下文
+1. 你使用 sce 导出上下文
 2. 你将上下文复制到 AI 工具
 3. AI 生成代码
 4. 你手动更新任务状态
 
 **设置：**
 ```bash
-# 安装 kse
-npm install -g kiro-spec-engine
+# 安装 sce
+npm install -g scene-capability-engine
 
 # 采用项目
-kse adopt
+sce adopt
 
 # 创建 Spec
-kse spec bootstrap --name 01-00-my-feature --non-interactive
+sce spec bootstrap --name 01-00-my-feature --non-interactive
 ```
 
 **使用：**
 ```bash
 # 导出上下文
-kse context export 01-00-my-feature
+sce context export 01-00-my-feature
 
 # 复制到剪贴板
 cat .kiro/specs/01-00-my-feature/context-export.md | pbcopy
@@ -107,11 +107,11 @@ cat .kiro/specs/01-00-my-feature/context-export.md | pbcopy
 **设置：**
 ```bash
 # 启动 Watch 模式
-kse watch start
+sce watch start
 
 # 配置自动导出
-kse watch add --pattern ".kiro/specs/*/requirements.md" --action "kse context export {spec}"
-kse watch add --pattern ".kiro/specs/*/design.md" --action "kse context export {spec}"
+sce watch add --pattern ".kiro/specs/*/requirements.md" --action "sce context export {spec}"
+sce watch add --pattern ".kiro/specs/*/design.md" --action "sce context export {spec}"
 ```
 
 **使用：**
@@ -128,7 +128,7 @@ kse watch add --pattern ".kiro/specs/*/design.md" --action "kse context export {
 ### 步骤 1：创建 Spec
 
 ```bash
-kse spec bootstrap --name 01-00-my-feature --non-interactive
+sce spec bootstrap --name 01-00-my-feature --non-interactive
 ```
 
 ### 步骤 2：编写 Spec
@@ -142,18 +142,18 @@ kse spec bootstrap --name 01-00-my-feature --non-interactive
 
 **选项 A：原生模式**
 ```
-告诉 AI："使用 kse 检查 spec 并实现任务 1.1"
+告诉 AI："使用 sce 检查 spec 并实现任务 1.1"
 ```
 
 **选项 B：手动导出**
 ```bash
-kse context export 01-00-my-feature
+sce context export 01-00-my-feature
 # 将 context-export.md 复制到 AI 工具
 ```
 
 **选项 C：任务特定提示**
 ```bash
-kse prompt generate 01-00-my-feature 1.1
+sce prompt generate 01-00-my-feature 1.1
 # 将生成的提示复制到 AI 工具
 ```
 
@@ -253,7 +253,7 @@ AI 工具需要清晰的指令：
 
 对于大型 Spec，使用任务特定提示：
 ```bash
-kse prompt generate 01-00-my-feature 1.1
+sce prompt generate 01-00-my-feature 1.1
 ```
 
 这会创建一个更小、更集中的上下文。
@@ -292,11 +292,11 @@ kse prompt generate 01-00-my-feature 1.1
 
 ```bash
 # 1. 创建并编写 Spec
-kse spec bootstrap --name 01-00-user-login --non-interactive
+sce spec bootstrap --name 01-00-user-login --non-interactive
 # 编辑 requirements.md、design.md、tasks.md
 
 # 2. 导出上下文
-kse context export 01-00-user-login
+sce context export 01-00-user-login
 
 # 3. 复制到剪贴板
 cat .kiro/specs/01-00-user-login/context-export.md | pbcopy
@@ -315,10 +315,10 @@ cat .kiro/specs/01-00-user-login/context-export.md | pbcopy
 
 ```bash
 # 1. 创建并编写 Spec
-kse spec bootstrap --name 01-00-user-login --non-interactive
+sce spec bootstrap --name 01-00-user-login --non-interactive
 
 # 2. 生成任务特定提示
-kse prompt generate 01-00-user-login 1.1
+sce prompt generate 01-00-user-login 1.1
 
 # 3. 在 Cursor Composer 中（Cmd+K）：
 # - 粘贴生成的提示
@@ -334,13 +334,13 @@ kse prompt generate 01-00-user-login 1.1
 
 ```bash
 # 1. 创建并编写 Spec
-kse spec bootstrap --name 01-00-user-login --non-interactive
+sce spec bootstrap --name 01-00-user-login --non-interactive
 
 # 2. 在 Windsurf 中告诉 AI：
-"使用 kse 检查 01-00-user-login 的 spec 并实现任务 1.1"
+"使用 sce 检查 01-00-user-login 的 spec 并实现任务 1.1"
 
 # 3. Windsurf 自动：
-# - 运行 kse context export
+# - 运行 sce context export
 # - 读取 Spec
 # - 生成代码
 # - 更新 tasks.md
@@ -352,7 +352,7 @@ kse spec bootstrap --name 01-00-user-login --non-interactive
 
 ```bash
 # 1. 创建并编写 Spec
-kse spec bootstrap --name 01-00-user-login --non-interactive
+sce spec bootstrap --name 01-00-user-login --non-interactive
 
 # 2. 创建实现文件
 # src/auth/AuthController.js
@@ -388,7 +388,7 @@ kse spec bootstrap --name 01-00-user-login --non-interactive
 **解决方案：**
 1. 使用任务特定提示：
    ```bash
-   kse prompt generate 01-00-my-feature 1.1
+   sce prompt generate 01-00-my-feature 1.1
    ```
 2. 将大型 Spec 分解为更小的 Spec
 3. 仅包含相关部分
@@ -429,10 +429,10 @@ SPEC=$1
 TASK=$2
 
 # 导出上下文
-kse context export $SPEC
+sce context export $SPEC
 
 # 生成提示
-kse prompt generate $SPEC $TASK
+sce prompt generate $SPEC $TASK
 
 # 复制到剪贴板
 cat .kiro/specs/$SPEC/context-export.md | pbcopy
@@ -449,7 +449,7 @@ echo "现在粘贴到你的 AI 工具并请求实现"
 # 添加你的编码标准、约定等
 
 # 使用 steering 导出
-kse context export 01-00-my-feature --steering
+sce context export 01-00-my-feature --steering
 ```
 
 ### 4. 模板化你的 Spec
@@ -470,7 +470,7 @@ cp -r .kiro/templates/api-feature-template .kiro/specs/02-00-new-feature
 
 ## 相关文档
 
-- 📖 [快速入门指南](../quick-start.md) - 开始使用 kse
+- 📖 [快速入门指南](../quick-start.md) - 开始使用 sce
 - 🔌 [集成模式](../integration-modes.md) - 深入了解三种模式
 - 📋 [Spec 工作流](../spec-workflow.md) - 创建有效的 Spec
 - 🔧 [故障排除](../troubleshooting.md) - 常见问题
@@ -480,7 +480,7 @@ cp -r .kiro/templates/api-feature-template .kiro/specs/02-00-new-feature
 - [Cursor 指南](cursor-guide.md) - Cursor IDE 集成
 - [Claude 指南](claude-guide.md) - Claude Code 集成
 - [Windsurf 指南](windsurf-guide.md) - Windsurf IDE 集成
-- [Kiro 指南](kiro-guide.md) - Kiro IDE 原生集成
+- [SCE 指南](SCE-guide.md) - AI IDE 原生集成
 - [VS Code 指南](vscode-guide.md) - VS Code + Copilot 集成
 
 ---

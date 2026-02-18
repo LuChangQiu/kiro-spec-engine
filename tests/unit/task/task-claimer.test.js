@@ -1,4 +1,4 @@
-﻿const fs = require('fs-extra');
+const fs = require('fs-extra');
 const os = require('os');
 const path = require('path');
 
@@ -9,7 +9,7 @@ describe('TaskClaimer', () => {
   let claimer;
 
   beforeEach(async () => {
-    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-task-claimer-'));
+    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-task-claimer-'));
     claimer = new TaskClaimer();
   });
 

@@ -16,7 +16,7 @@ describe('value metrics snapshot command', () => {
   let originalLog;
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-value-metrics-'));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-value-metrics-'));
 
     originalLog = console.log;
     console.log = jest.fn();
@@ -147,7 +147,7 @@ threshold_policy:
   test('snapshot missing input error includes sample tip', async () => {
     await expect(runValueMetricsSnapshot({}, { projectPath: tempDir }))
       .rejects
-      .toThrow('kse value metrics sample');
+      .toThrow('sce value metrics sample');
   });
 
   test('generates sample input using default path', async () => {

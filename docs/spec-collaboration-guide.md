@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Spec-level collaboration system enables multiple AI instances (Kiro) to work on different Specs in parallel within a large project. This guide explains how to use the collaboration features to coordinate parallel development efforts.
+The Spec-level collaboration system enables multiple AI instances (SCE) to work on different Specs in parallel within a large project. This guide explains how to use the collaboration features to coordinate parallel development efforts.
 
 ## Key Concepts
 
@@ -23,9 +23,9 @@ Specs can depend on other Specs in three ways:
 
 Interface contracts formally define the APIs, data structures, and behaviors that a Spec provides or consumes. They ensure compatibility between independently developed Specs.
 
-### Kiro Instances
+### SCE Instances
 
-A Kiro instance is an AI assistant working on a specific Spec. You can assign Specs to different instances to enable parallel development.
+A SCE instance is an AI assistant working on a specific Spec. You can assign Specs to different instances to enable parallel development.
 
 ## Quick Start
 
@@ -34,7 +34,7 @@ A Kiro instance is an AI assistant working on a specific Spec. You can assign Sp
 Create a Master Spec with Sub-Specs:
 
 ```bash
-kse collab init user-management \
+sce collab init user-management \
   --sub-specs user-service auth-service session-manager \
   --dependencies "auth-service:user-service" \
   --dependencies "session-manager:auth-service"
@@ -50,23 +50,23 @@ This creates:
 View all Specs and their status:
 
 ```bash
-kse collab status
+sce collab status
 ```
 
 View dependency graph:
 
 ```bash
-kse collab status --graph
+sce collab status --graph
 ```
 
-### 3. Assign Specs to Kiro Instances
+### 3. Assign Specs to SCE Instances
 
 Assign Specs to different AI instances:
 
 ```bash
-kse collab assign user-service kiro-1
-kse collab assign auth-service kiro-2
-kse collab assign session-manager kiro-3
+sce collab assign user-service SCE-1
+sce collab assign auth-service SCE-2
+sce collab assign session-manager SCE-3
 ```
 
 ### 4. Define Interface Contracts
@@ -115,7 +115,7 @@ Create an interface contract for a Spec (in `.kiro/specs/{spec-name}/interfaces/
 Verify that implementations match contracts:
 
 ```bash
-kse collab verify user-service
+sce collab verify user-service
 ```
 
 ### 6. Run Integration Tests
@@ -123,7 +123,7 @@ kse collab verify user-service
 Run integration tests across multiple Specs:
 
 ```bash
-kse collab integrate user-service auth-service session-manager
+sce collab integrate user-service auth-service session-manager
 ```
 
 ## Workflow Example
@@ -133,7 +133,7 @@ kse collab integrate user-service auth-service session-manager
 **Step 1: Architect creates Master Spec**
 
 ```bash
-kse collab init user-management \
+sce collab init user-management \
   --sub-specs database-layer user-service auth-service notification-service \
   --dependencies "user-service:database-layer" \
   --dependencies "auth-service:user-service" \
@@ -143,7 +143,7 @@ kse collab init user-management \
 **Step 2: Check which Specs are ready**
 
 ```bash
-kse collab status
+sce collab status
 ```
 
 Output:
@@ -163,79 +163,79 @@ Ready to start: database-layer
 **Step 3: Assign and start development**
 
 ```bash
-kse collab assign database-layer kiro-1
-kse collab assign user-service kiro-2
-kse collab assign auth-service kiro-3
+sce collab assign database-layer SCE-1
+sce collab assign user-service SCE-2
+sce collab assign auth-service SCE-3
 ```
 
 **Step 4: Define interfaces**
 
-Each Kiro instance defines the interface contract for their Spec.
+Each SCE instance defines the interface contract for their Spec.
 
 **Step 5: Verify and integrate**
 
 ```bash
-kse collab verify database-layer
-kse collab verify user-service
-kse collab integrate database-layer user-service
+sce collab verify database-layer
+sce collab verify user-service
+sce collab integrate database-layer user-service
 ```
 
 ## Commands Reference
 
-### `kse collab init`
+### `sce collab init`
 
 Initialize a Master Spec with Sub-Specs.
 
 ```bash
-kse collab init <master-spec> [options]
+sce collab init <master-spec> [options]
 ```
 
 Options:
 - `-s, --sub-specs <specs...>`: Sub-spec names
 - `-d, --dependencies <deps...>`: Dependencies in format "spec:dep1,dep2"
 
-### `kse collab status`
+### `sce collab status`
 
 Display collaboration status.
 
 ```bash
-kse collab status [spec-name] [options]
+sce collab status [spec-name] [options]
 ```
 
 Options:
 - `-g, --graph`: Show dependency graph
 - `--critical-path`: Highlight critical path in graph
 
-### `kse collab assign`
+### `sce collab assign`
 
-Assign a Spec to a Kiro instance.
+Assign a Spec to a SCE instance.
 
 ```bash
-kse collab assign <spec-name> <kiro-instance>
+sce collab assign <spec-name> <SCE-instance>
 ```
 
-### `kse collab verify`
+### `sce collab verify`
 
 Verify interface contracts for a Spec.
 
 ```bash
-kse collab verify <spec-name>
+sce collab verify <spec-name>
 ```
 
-### `kse collab integrate`
+### `sce collab integrate`
 
 Run integration tests across Specs.
 
 ```bash
-kse collab integrate <spec-names...>
+sce collab integrate <spec-names...>
 ```
 
-### `kse collab migrate`
+### `sce collab migrate`
 
 Convert a standalone Spec to collaborative mode.
 
 ```bash
-kse collab migrate <spec-name>
+sce collab migrate <spec-name>
 ```
 
 ## Best Practices
@@ -250,7 +250,7 @@ Keep dependencies minimal and well-justified. Too many dependencies create bottl
 
 ### 3. Regular Verification
 
-Run `kse collab verify` frequently to catch interface mismatches early.
+Run `sce collab verify` frequently to catch interface mismatches early.
 
 ### 4. Integration Testing
 
@@ -258,11 +258,11 @@ Write integration tests that span multiple Specs to verify they work together co
 
 ### 5. Status Updates
 
-Update Spec status regularly so other Kiro instances know when dependencies are ready.
+Update Spec status regularly so other SCE instances know when dependencies are ready.
 
 ### 6. Critical Path Awareness
 
-Use `kse collab status --graph --critical-path` to identify bottlenecks and prioritize work.
+Use `sce collab status --graph --critical-path` to identify bottlenecks and prioritize work.
 
 ## Troubleshooting
 
@@ -276,7 +276,7 @@ Use `kse collab status --graph --critical-path` to identify bottlenecks and prio
 
 **Error**: `Implementation does not match contract for 'UserService'`
 
-**Solution**: Update either the implementation or the contract to match. Run `kse collab verify` to see specific mismatches.
+**Solution**: Update either the implementation or the contract to match. Run `sce collab verify` to see specific mismatches.
 
 ### Spec Blocked
 
@@ -291,8 +291,8 @@ Use `kse collab status --graph --critical-path` to identify bottlenecks and prio
 You can create nested structures with Sub-Sub-Specs:
 
 ```bash
-kse collab init backend-system --sub-specs api-layer business-logic data-layer
-kse collab init api-layer --sub-specs rest-api graphql-api
+sce collab init backend-system --sub-specs api-layer business-logic data-layer
+sce collab init api-layer --sub-specs rest-api graphql-api
 ```
 
 ### Breaking Changes
@@ -301,8 +301,8 @@ When you need to make breaking changes to an interface:
 
 1. Version the interface (e.g., `UserServiceV2.json`)
 2. Update consumers to use the new version
-3. Run `kse collab verify` to detect breaking changes
-4. Coordinate with affected Kiro instances
+3. Run `sce collab verify` to detect breaking changes
+4. Coordinate with affected SCE instances
 
 ### Custom Integration Tests
 
@@ -348,7 +348,7 @@ Collaboration metadata is stored in `.kiro/specs/{spec-name}/collaboration.json`
     }
   ],
   "assignment": {
-    "kiroInstance": "kiro-1",
+    "kiroInstance": "SCE-1",
     "assignedAt": "2026-02-01T10:00:00Z"
   },
   "status": {

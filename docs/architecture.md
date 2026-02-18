@@ -1,6 +1,6 @@
 # Architecture Documentation
 
-This document provides detailed architecture diagrams and explanations for Kiro Spec Engine.
+This document provides detailed architecture diagrams and explanations for Scene Capability Engine.
 
 ## Table of Contents
 
@@ -20,9 +20,9 @@ This document provides detailed architecture diagrams and explanations for Kiro 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                          User Interface                              │
-│                    (CLI Commands: kse adopt,                        │
-│                     kse upgrade, kse rollback,                      │
-│                     kse scene ...)                                   │
+│                    (CLI Commands: sce adopt,                        │
+│                     sce upgrade, sce rollback,                      │
+│                     sce scene ...)                                   │
 └─────────────────────────────────────────────────────────────────────┘
                                   │
                                   ▼
@@ -107,7 +107,7 @@ This document provides detailed architecture diagrams and explanations for Kiro 
 ┌──────────┐
 │   User   │
 └────┬─────┘
-     │ kse adopt
+     │ sce adopt
      ▼
 ┌─────────────────┐
 │  adopt.js       │
@@ -164,7 +164,7 @@ This document provides detailed architecture diagrams and explanations for Kiro 
 ┌──────────┐
 │   User   │
 └────┬─────┘
-     │ kse upgrade
+     │ sce upgrade
      ▼
 ┌─────────────────┐
 │  upgrade.js     │

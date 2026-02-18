@@ -1,6 +1,6 @@
 # Document Governance Guide
 
-> Automated document lifecycle management for kse projects
+> Automated document lifecycle management for sce projects
 
 ---
 
@@ -13,7 +13,7 @@
 
 ## Overview
 
-The **Document Governance System** automatically enforces document lifecycle management rules in your kse project. It helps you maintain clean, well-organized documentation by detecting violations, cleaning up temporary files, validating structure, and organizing artifacts.
+The **Document Governance System** automatically enforces document lifecycle management rules in your sce project. It helps you maintain clean, well-organized documentation by detecting violations, cleaning up temporary files, validating structure, and organizing artifacts.
 
 ### What is Document Governance?
 
@@ -39,7 +39,7 @@ Document governance ensures your project follows these rules:
 ### 1. Check Your Project's Compliance
 
 ```bash
-kse docs diagnose
+sce docs diagnose
 ```
 
 **Output:**
@@ -63,48 +63,48 @@ Spec Violations (1)
      → Move to reports/ subdirectory
 
 💡 Recommended Actions
-  • Run 'kse docs cleanup' to remove temporary files
-  • Run 'kse docs archive --spec 01-00-user-login' to organize artifacts
+  • Run 'sce docs cleanup' to remove temporary files
+  • Run 'sce docs archive --spec 01-00-user-login' to organize artifacts
 ```
 
 ### 2. Clean Up Temporary Files
 
 ```bash
 # Preview what would be deleted
-kse docs cleanup --dry-run
+sce docs cleanup --dry-run
 
 # Actually delete temporary files
-kse docs cleanup
+sce docs cleanup
 ```
 
 ### 3. Organize Spec Artifacts
 
 ```bash
 # Preview what would be moved
-kse docs archive --spec 01-00-user-login --dry-run
+sce docs archive --spec 01-00-user-login --dry-run
 
 # Actually move artifacts to subdirectories
-kse docs archive --spec 01-00-user-login
+sce docs archive --spec 01-00-user-login
 ```
 
 ### 4. Validate Structure
 
 ```bash
 # Validate root directory
-kse docs validate
+sce docs validate
 
 # Validate all Specs
-kse docs validate --all
+sce docs validate --all
 
 # Validate specific Spec
-kse docs validate --spec 01-00-user-login
+sce docs validate --spec 01-00-user-login
 ```
 
 ### 5. Prevent Future Violations
 
 ```bash
 # Install Git pre-commit hook
-kse docs hooks install
+sce docs hooks install
 
 # Now commits will be blocked if violations exist
 git commit -m "Add feature"
@@ -115,13 +115,13 @@ git commit -m "Add feature"
 
 ## Commands Reference
 
-### `kse docs diagnose`
+### `sce docs diagnose`
 
 Scan your project for document violations.
 
 **Usage:**
 ```bash
-kse docs diagnose
+sce docs diagnose
 ```
 
 **What it checks:**
@@ -143,7 +143,7 @@ kse docs diagnose
 
 **Example:**
 ```bash
-$ kse docs diagnose
+$ sce docs diagnose
 
 🔥 Document Governance Diagnostic
 
@@ -153,13 +153,13 @@ All documents follow the lifecycle management rules.
 
 ---
 
-### `kse docs cleanup`
+### `sce docs cleanup`
 
 Remove temporary documents from your project.
 
 **Usage:**
 ```bash
-kse docs cleanup [options]
+sce docs cleanup [options]
 ```
 
 **Options:**
@@ -180,7 +180,7 @@ kse docs cleanup [options]
 
 **Preview cleanup:**
 ```bash
-$ kse docs cleanup --dry-run
+$ sce docs cleanup --dry-run
 
 🔥 Cleanup Preview (Dry Run)
 
@@ -195,7 +195,7 @@ Run without --dry-run to actually delete these files
 
 **Interactive cleanup:**
 ```bash
-$ kse docs cleanup --interactive
+$ sce docs cleanup --interactive
 
 Delete /project/MVP-PLAN.md? (y/n): y
 ✓ Deleted
@@ -208,7 +208,7 @@ Deleted 1 file(s)
 
 **Clean specific Spec:**
 ```bash
-$ kse docs cleanup --spec 01-00-user-login
+$ sce docs cleanup --spec 01-00-user-login
 
 🔥 Cleanup Complete
 
@@ -224,13 +224,13 @@ Deleted 1 file(s):
 
 ---
 
-### `kse docs validate`
+### `sce docs validate`
 
 Validate document structure against governance rules.
 
 **Usage:**
 ```bash
-kse docs validate [options]
+sce docs validate [options]
 ```
 
 **Options:**
@@ -247,7 +247,7 @@ kse docs validate [options]
 
 **Validate root directory:**
 ```bash
-$ kse docs validate
+$ sce docs validate
 
 🔥 Document Structure Validation
 
@@ -257,7 +257,7 @@ All document structures are compliant.
 
 **Validate with errors:**
 ```bash
-$ kse docs validate --all
+$ sce docs validate --all
 
 🔥 Document Structure Validation
 
@@ -284,13 +284,13 @@ $ kse docs validate --all
 
 ---
 
-### `kse docs archive`
+### `sce docs archive`
 
 Organize Spec artifacts into proper subdirectories.
 
 **Usage:**
 ```bash
-kse docs archive --spec <spec-name> [options]
+sce docs archive --spec <spec-name> [options]
 ```
 
 **Options:**
@@ -312,7 +312,7 @@ kse docs archive --spec <spec-name> [options]
 
 **Preview archive:**
 ```bash
-$ kse docs archive --spec 01-00-user-login --dry-run
+$ sce docs archive --spec 01-00-user-login --dry-run
 
 🔥 Archive Preview (Dry Run)
 
@@ -332,7 +332,7 @@ Run without --dry-run to actually move these files
 
 **Actually archive:**
 ```bash
-$ kse docs archive --spec 01-00-user-login
+$ sce docs archive --spec 01-00-user-login
 
 🔥 Archive Complete
 
@@ -351,13 +351,13 @@ Moved 3 file(s):
 
 ---
 
-### `kse docs hooks`
+### `sce docs hooks`
 
 Manage Git hooks for document governance.
 
 **Usage:**
 ```bash
-kse docs hooks <action>
+sce docs hooks <action>
 ```
 
 **Actions:**
@@ -366,7 +366,7 @@ kse docs hooks <action>
 - `status` - Check if hooks are installed
 
 **What the hook does:**
-- Runs `kse docs validate` before each commit
+- Runs `sce docs validate` before each commit
 - Blocks commit if violations are found
 - Shows violations and how to fix them
 - Can be bypassed with `git commit --no-verify`
@@ -375,7 +375,7 @@ kse docs hooks <action>
 
 **Install hooks:**
 ```bash
-$ kse docs hooks install
+$ sce docs hooks install
 
 🔧 Installing document governance hooks...
 
@@ -388,7 +388,7 @@ To bypass validation, use: git commit --no-verify
 
 **Check status:**
 ```bash
-$ kse docs hooks status
+$ sce docs hooks status
 
 🔍 Checking Git hooks status...
 
@@ -398,7 +398,7 @@ $ kse docs hooks status
 
 **Uninstall hooks:**
 ```bash
-$ kse docs hooks uninstall
+$ sce docs hooks uninstall
 
 🔧 Uninstalling document governance hooks...
 
@@ -419,7 +419,7 @@ Found 2 violation(s):
 
 Fix violations and try again, or use --no-verify to bypass.
 
-Run 'kse docs diagnose' for details.
+Run 'sce docs diagnose' for details.
 ```
 
 **Exit codes:**
@@ -428,13 +428,13 @@ Run 'kse docs diagnose' for details.
 
 ---
 
-### `kse docs config`
+### `sce docs config`
 
 Display or modify document governance configuration.
 
 **Usage:**
 ```bash
-kse docs config [options]
+sce docs config [options]
 ```
 
 **Options:**
@@ -450,7 +450,7 @@ kse docs config [options]
 
 **Display configuration:**
 ```bash
-$ kse docs config
+$ sce docs config
 
 ⚙️  Document Governance Configuration
 
@@ -476,13 +476,13 @@ Temporary Patterns:
   • MVP-*.md
 
 Configuration file: .kiro/config/docs.json
-To modify: kse docs config --set <key> <value>
-To reset: kse docs config --reset
+To modify: sce docs config --set <key> <value>
+To reset: sce docs config --reset
 ```
 
 **Set configuration:**
 ```bash
-$ kse docs config --set root-allowed-files "README.md,CUSTOM.md,LICENSE.md"
+$ sce docs config --set root-allowed-files "README.md,CUSTOM.md,LICENSE.md"
 
 ✅ Configuration updated: root-allowed-files
    New value: README.md, CUSTOM.md, LICENSE.md
@@ -490,12 +490,12 @@ $ kse docs config --set root-allowed-files "README.md,CUSTOM.md,LICENSE.md"
 
 **Reset configuration:**
 ```bash
-$ kse docs config --reset
+$ sce docs config --reset
 
 ⚠️  Resetting configuration to defaults...
 
 ✅ Configuration reset to defaults
-   Run "kse docs config" to view current configuration
+   Run "sce docs config" to view current configuration
 ```
 
 **Exit codes:**
@@ -505,13 +505,13 @@ $ kse docs config --reset
 
 ---
 
-### `kse docs stats`
+### `sce docs stats`
 
 Display document compliance statistics.
 
 **Usage:**
 ```bash
-kse docs stats
+sce docs stats
 ```
 
 **What it shows:**
@@ -525,7 +525,7 @@ kse docs stats
 
 **Example:**
 ```bash
-$ kse docs stats
+$ sce docs stats
 
 📊 Document Compliance Statistics
 
@@ -558,13 +558,13 @@ Recent Activity:
 
 ---
 
-### `kse docs report`
+### `sce docs report`
 
 Generate a comprehensive compliance report.
 
 **Usage:**
 ```bash
-kse docs report
+sce docs report
 ```
 
 **What it generates:**
@@ -576,7 +576,7 @@ kse docs report
 
 **Example:**
 ```bash
-$ kse docs report
+$ sce docs report
 
 ✅ Compliance report generated
    Saved to: .kiro/reports/document-compliance-2024-01-24.md
@@ -613,18 +613,18 @@ $ kse docs report
 
 **1. Start of day - Check compliance:**
 ```bash
-kse docs diagnose
+sce docs diagnose
 ```
 
 **2. Before committing - Validate:**
 ```bash
-kse docs validate --all
+sce docs validate --all
 ```
 
 **3. End of feature - Clean up:**
 ```bash
-kse docs cleanup
-kse docs archive --spec your-spec
+sce docs cleanup
+sce docs archive --spec your-spec
 ```
 
 ### Spec Lifecycle
@@ -632,30 +632,30 @@ kse docs archive --spec your-spec
 **When creating a Spec:**
 ```bash
 # 1. Create Spec
-kse spec bootstrap --name 01-00-new-feature --non-interactive
+sce spec bootstrap --name 01-00-new-feature --non-interactive
 
 # 2. Verify structure
-kse docs validate --spec 01-00-new-feature
+sce docs validate --spec 01-00-new-feature
 ```
 
 **During development:**
 ```bash
 # Keep artifacts organized
-kse docs archive --spec 01-00-new-feature --dry-run
+sce docs archive --spec 01-00-new-feature --dry-run
 # Review what would be moved, then:
-kse docs archive --spec 01-00-new-feature
+sce docs archive --spec 01-00-new-feature
 ```
 
 **When completing a Spec:**
 ```bash
 # 1. Clean up temporary files
-kse docs cleanup --spec 01-00-new-feature
+sce docs cleanup --spec 01-00-new-feature
 
 # 2. Organize all artifacts
-kse docs archive --spec 01-00-new-feature
+sce docs archive --spec 01-00-new-feature
 
 # 3. Validate final structure
-kse docs validate --spec 01-00-new-feature
+sce docs validate --spec 01-00-new-feature
 ```
 
 ### Team Collaboration
@@ -663,19 +663,19 @@ kse docs validate --spec 01-00-new-feature
 **Project setup:**
 ```bash
 # 1. Install hooks for all team members
-kse docs hooks install
+sce docs hooks install
 
 # 2. Configure project-specific rules (if needed)
-kse docs config --set root-allowed-files "README.md,README.zh.md,CHANGELOG.md,CONTRIBUTING.md,LICENSE.md"
+sce docs config --set root-allowed-files "README.md,README.zh.md,CHANGELOG.md,CONTRIBUTING.md,LICENSE.md"
 ```
 
 **Code review:**
 ```bash
 # Check compliance before reviewing
-kse docs diagnose
+sce docs diagnose
 
 # Generate report for team
-kse docs report
+sce docs report
 ```
 
 ### Automation
@@ -693,15 +693,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
-      - run: npm install -g kiro-spec-engine
-      - run: kse docs diagnose
-      - run: kse docs validate --all
+      - run: npm install -g scene-capability-engine
+      - run: sce docs diagnose
+      - run: sce docs validate --all
 ```
 
 **Pre-commit hook (automatic):**
 ```bash
 # Install once
-kse docs hooks install
+sce docs hooks install
 
 # Now every commit is validated automatically
 git commit -m "Add feature"
@@ -746,17 +746,17 @@ The default configuration is:
 
 **Add custom allowed files:**
 ```bash
-kse docs config --set root-allowed-files "README.md,README.zh.md,CHANGELOG.md,CONTRIBUTING.md,LICENSE.md,SECURITY.md"
+sce docs config --set root-allowed-files "README.md,README.zh.md,CHANGELOG.md,CONTRIBUTING.md,LICENSE.md,SECURITY.md"
 ```
 
 **Add custom subdirectories:**
 ```bash
-kse docs config --set spec-subdirs "reports,scripts,tests,results,docs,diagrams,examples"
+sce docs config --set spec-subdirs "reports,scripts,tests,results,docs,diagrams,examples"
 ```
 
 **Add custom temporary patterns:**
 ```bash
-kse docs config --set temporary-patterns "*-SUMMARY.md,SESSION-*.md,*-COMPLETE.md,TEMP-*.md,WIP-*.md,MVP-*.md,DRAFT-*.md"
+sce docs config --set temporary-patterns "*-SUMMARY.md,SESSION-*.md,*-COMPLETE.md,TEMP-*.md,WIP-*.md,MVP-*.md,DRAFT-*.md"
 ```
 
 ### Configuration File Location
@@ -796,22 +796,22 @@ chmod -R u+w .kiro/
 git init
 
 # Then install hooks
-kse docs hooks install
+sce docs hooks install
 ```
 
 **"Configuration file corrupted":**
 ```bash
 # Reset to defaults
-kse docs config --reset
+sce docs config --reset
 ```
 
 **"Cleanup not removing files":**
 ```bash
 # Check if files match temporary patterns
-kse docs diagnose
+sce docs diagnose
 
 # Use interactive mode to confirm
-kse docs cleanup --interactive
+sce docs cleanup --interactive
 ```
 
 ---
@@ -819,7 +819,7 @@ kse docs cleanup --interactive
 ## Related Documentation
 
 - **[Spec Workflow Guide](spec-workflow.md)** - Understanding Specs
-- **[Command Reference](command-reference.md)** - All kse commands
+- **[Command Reference](command-reference.md)** - All sce commands
 - **[Troubleshooting Guide](troubleshooting.md)** - Common issues
 - **[Quick Start Guide](quick-start.md)** - Getting started
 
@@ -828,34 +828,34 @@ kse docs cleanup --interactive
 ## Summary
 
 **Document Governance Commands:**
-- `kse docs diagnose` - Find violations
-- `kse docs cleanup` - Remove temporary files
-- `kse docs validate` - Check structure
-- `kse docs archive` - Organize artifacts
-- `kse docs hooks` - Manage Git hooks
-- `kse docs config` - Configure rules
-- `kse docs stats` - View statistics
-- `kse docs report` - Generate report
+- `sce docs diagnose` - Find violations
+- `sce docs cleanup` - Remove temporary files
+- `sce docs validate` - Check structure
+- `sce docs archive` - Organize artifacts
+- `sce docs hooks` - Manage Git hooks
+- `sce docs config` - Configure rules
+- `sce docs stats` - View statistics
+- `sce docs report` - Generate report
 
 **Quick Workflow:**
 ```bash
 # 1. Check compliance
-kse docs diagnose
+sce docs diagnose
 
 # 2. Fix violations
-kse docs cleanup
-kse docs archive --spec your-spec
+sce docs cleanup
+sce docs archive --spec your-spec
 
 # 3. Validate
-kse docs validate --all
+sce docs validate --all
 
 # 4. Prevent future violations
-kse docs hooks install
+sce docs hooks install
 ```
 
 **Start using document governance:** 🚀
 ```bash
-kse docs diagnose
+sce docs diagnose
 ```
 
 ---

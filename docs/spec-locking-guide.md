@@ -1,6 +1,6 @@
 # Spec Locking Guide
 
-This guide explains how to use the Spec locking mechanism for multi-user collaboration in kse projects.
+This guide explains how to use the Spec locking mechanism for multi-user collaboration in sce projects.
 
 ## Overview
 
@@ -10,13 +10,13 @@ When multiple developers work on the same project, they may accidentally edit th
 
 ```bash
 # Before editing a Spec, acquire a lock
-kse lock acquire my-feature --reason "Implementing user authentication"
+sce lock acquire my-feature --reason "Implementing user authentication"
 
 # Check who has locks on which Specs
-kse lock status
+sce lock status
 
 # When done editing, release the lock
-kse unlock my-feature
+sce unlock my-feature
 ```
 
 ## Commands
@@ -24,7 +24,7 @@ kse unlock my-feature
 ### Acquire a Lock
 
 ```bash
-kse lock acquire <spec-name> [options]
+sce lock acquire <spec-name> [options]
 ```
 
 Options:
@@ -33,15 +33,15 @@ Options:
 
 Example:
 ```bash
-kse lock acquire 01-00-user-auth --reason "Adding OAuth support" --timeout 48
+sce lock acquire 01-00-user-auth --reason "Adding OAuth support" --timeout 48
 ```
 
 ### Release a Lock
 
 ```bash
-kse unlock <spec-name> [options]
+sce unlock <spec-name> [options]
 # or
-kse lock release <spec-name> [options]
+sce lock release <spec-name> [options]
 ```
 
 Options:
@@ -49,18 +49,18 @@ Options:
 
 Example:
 ```bash
-kse unlock 01-00-user-auth
-kse unlock 01-00-user-auth --force  # Override someone else's lock
+sce unlock 01-00-user-auth
+sce unlock 01-00-user-auth --force  # Override someone else's lock
 ```
 
 ### Check Lock Status
 
 ```bash
 # View all locked Specs
-kse lock status
+sce lock status
 
 # View specific Spec lock status
-kse lock status <spec-name>
+sce lock status <spec-name>
 ```
 
 Output includes:
@@ -73,7 +73,7 @@ Output includes:
 ### Clean Up Stale Locks
 
 ```bash
-kse lock cleanup
+sce lock cleanup
 ```
 
 Removes all locks that have exceeded their timeout period. This is useful when:
@@ -84,14 +84,14 @@ Removes all locks that have exceeded their timeout period. This is useful when:
 ### View Machine Identifier
 
 ```bash
-kse lock whoami
+sce lock whoami
 ```
 
 Shows your machine's unique identifier, which is used to track lock ownership.
 
 ## Integration with Status Command
 
-The `kse status` command now shows lock indicators for each Spec:
+The `sce status` command now shows lock indicators for each Spec:
 
 ```
 📁 Specs (5)
@@ -117,19 +117,19 @@ Lock indicators:
 
 ```bash
 # Good practice
-kse lock acquire my-feature --reason "Refactoring task structure"
+sce lock acquire my-feature --reason "Refactoring task structure"
 # ... make your changes ...
-kse unlock my-feature
+sce unlock my-feature
 ```
 
 ### 2. Use Meaningful Reasons
 
 ```bash
 # Good - explains what you're doing
-kse lock acquire api-spec --reason "Adding pagination to list endpoints"
+sce lock acquire api-spec --reason "Adding pagination to list endpoints"
 
 # Bad - no context
-kse lock acquire api-spec
+sce lock acquire api-spec
 ```
 
 ### 3. Release Locks Promptly
@@ -140,10 +140,10 @@ Don't hold locks longer than necessary. Release as soon as you're done editing.
 
 ```bash
 # Check if anyone is working on the Spec
-kse lock status my-feature
+sce lock status my-feature
 
 # If unlocked, acquire and start working
-kse lock acquire my-feature
+sce lock acquire my-feature
 ```
 
 ### 5. Communicate Before Force Unlocking
@@ -155,10 +155,10 @@ If you need to force unlock someone else's lock:
 
 ```bash
 # Check if stale
-kse lock status their-spec
+sce lock status their-spec
 
 # If stale or confirmed with owner
-kse unlock their-spec --force
+sce unlock their-spec --force
 ```
 
 ## Configuration
@@ -168,8 +168,8 @@ kse unlock their-spec --force
 Default timeout is 24 hours. You can customize per-lock:
 
 ```bash
-kse lock acquire my-spec --timeout 48  # 48 hours
-kse lock acquire quick-fix --timeout 2  # 2 hours
+sce lock acquire my-spec --timeout 48  # 48 hours
+sce lock acquire quick-fix --timeout 2  # 2 hours
 ```
 
 ### Machine ID Storage
@@ -195,7 +195,7 @@ You're trying to unlock a Spec locked by another machine. Options:
 
 Run periodic cleanup:
 ```bash
-kse lock cleanup
+sce lock cleanup
 ```
 
 Consider adding this to your CI/CD pipeline or team workflow.

@@ -1,6 +1,6 @@
 # Value 可观测指南
 
-> 使用 `kse value metrics` 将 Spec 交付变成可量化、可审计的周度结果。
+> 使用 `sce value metrics` 将 Spec 交付变成可量化、可审计的周度结果。
 
 ---
 
@@ -12,7 +12,7 @@
 - 质量是在改善还是恶化？
 - Day30/Day60 是否应该放行？
 
-kse 通过机器可读 KPI 快照、基线生成、趋势分析和门禁摘要，解决以上问题。
+sce 通过机器可读 KPI 快照、基线生成、趋势分析和门禁摘要，解决以上问题。
 
 ---
 
@@ -20,16 +20,16 @@ kse 通过机器可读 KPI 快照、基线生成、趋势分析和门禁摘要�
 
 ```bash
 # 0) 首次使用先生成输入样例
-kse value metrics sample --out ./kpi-input.json --period 2026-W10 --json
+sce value metrics sample --out ./kpi-input.json --period 2026-W10 --json
 
 # 1) 生成当周快照
-kse value metrics snapshot --input ./kpi-input.json --period 2026-W10 --checkpoint day-60 --json
+sce value metrics snapshot --input ./kpi-input.json --period 2026-W10 --checkpoint day-60 --json
 
 # 2) 从最早历史快照生成 baseline
-kse value metrics baseline --from-history 3 --period 2026-W10 --json
+sce value metrics baseline --from-history 3 --period 2026-W10 --json
 
 # 3) 基于最近窗口输出趋势与风险
-kse value metrics trend --window 6 --json
+sce value metrics trend --window 6 --json
 ```
 
 ---

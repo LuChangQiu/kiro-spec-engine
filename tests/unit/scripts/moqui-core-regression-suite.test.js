@@ -8,7 +8,7 @@ describe('moqui-core-regression-suite script', () => {
   let fixtureWorkspace;
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-moqui-core-regression-'));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-moqui-core-regression-'));
     const projectRoot = path.resolve(__dirname, '..', '..', '..');
     fixtureWorkspace = path.join(
       projectRoot,

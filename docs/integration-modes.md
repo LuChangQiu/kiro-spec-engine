@@ -1,6 +1,6 @@
 # Integration Modes Guide
 
-> Three ways to integrate kse with your AI coding tools
+> Three ways to integrate sce with your AI coding tools
 
 ---
 
@@ -13,14 +13,14 @@
 
 ## Overview
 
-kse supports three integration modes to work with different AI coding tools. Each mode offers different levels of automation and suits different workflows.
+sce supports three integration modes to work with different AI coding tools. Each mode offers different levels of automation and suits different workflows.
 
 ```mermaid
 graph TD
-    A[kse Integration] --> B[Native Integration]
+    A[sce Integration] --> B[Native Integration]
     A --> C[Manual Export]
     A --> D[Watch Mode]
-    B --> E[Kiro IDE]
+    B --> E[AI IDE]
     C --> F[Cursor/Claude/VS Code]
     D --> G[All Tools]
 ```
@@ -29,38 +29,38 @@ graph TD
 
 ## Mode 1: Native Integration ⭐
 
-**Best for:** Kiro IDE users  
+**Best for:** AI IDE users  
 **Automation Level:** Fully Automatic  
 **Setup Complexity:** None (built-in)
 
 ### How It Works
 
-With native integration, the AI tool directly accesses kse without any manual steps. The AI can read Specs, export context, and update tasks automatically.
+With native integration, the AI tool directly accesses sce without any manual steps. The AI can read Specs, export context, and update tasks automatically.
 
 ```mermaid
 sequenceDiagram
     participant User
     participant AI Tool
-    participant kse
+    participant sce
     
     User->>AI Tool: "Implement user login"
-    AI Tool->>kse: Read Spec files directly
-    kse->>AI Tool: Spec content
+    AI Tool->>sce: Read Spec files directly
+    sce->>AI Tool: Spec content
     AI Tool->>AI Tool: Generate code
-    AI Tool->>kse: Update task status
+    AI Tool->>sce: Update task status
     AI Tool->>User: Code generated
 ```
 
 ### Supported Tools
 
-- **Kiro IDE** - Full native support
+- **AI IDE** - Full native support
 
 ### Workflow Example
 
 ```
 You: "Implement the user login feature"
 
-Kiro AI: 
+SCE AI: 
   [Automatically reads .kiro/specs/01-00-user-login/]
   [Understands requirements and design]
   [Generates code]
@@ -80,7 +80,7 @@ Kiro AI:
 
 ### Limitations
 
-- ❌ **Tool-specific** - Only works with Kiro IDE currently
+- ❌ **Tool-specific** - Only works with AI IDE currently
 - ❌ **Requires compatible AI** - AI must support file system access
 
 ---
@@ -93,20 +93,20 @@ Kiro AI:
 
 ### How It Works
 
-The AI tool can directly call kse commands during your conversation. You stay in your familiar AI tool interface - the AI handles kse interaction automatically.
+The AI tool can directly call sce commands during your conversation. You stay in your familiar AI tool interface - the AI handles sce interaction automatically.
 
 ```mermaid
 sequenceDiagram
     participant User
     participant AI Tool
-    participant kse
+    participant sce
     
     User->>AI Tool: "Implement user login feature"
-    AI Tool->>kse: kse context export user-login
-    kse->>AI Tool: context-export.md content
+    AI Tool->>sce: sce context export user-login
+    sce->>AI Tool: context-export.md content
     AI Tool->>AI Tool: Generate code based on Spec
     AI Tool->>User: Here's the implementation
-    AI Tool->>kse: Update tasks.md
+    AI Tool->>sce: Update tasks.md
 ```
 
 **Note:** For AI tools without command execution (like ChatGPT web), you can manually export and paste as a fallback.
@@ -128,7 +128,7 @@ You: "I have a Spec for user login at 01-00-user-login.
      Please implement task 1.1: Create AuthController"
 
 AI Tool: 
-  [Executes: kse context export 01-00-user-login]
+  [Executes: sce context export 01-00-user-login]
   [Reads the exported context]
   [Generates AuthController code]
   [Updates tasks.md automatically]
@@ -141,7 +141,7 @@ AI Tool:
 
 ```bash
 # You run this once
-kse context export 01-00-user-login
+sce context export 01-00-user-login
 cat .kiro/specs/01-00-user-login/context-export.md | pbcopy
 
 # Then paste into AI tool
@@ -157,7 +157,7 @@ AI: [Generates code based on your Spec]
 ### Advantages
 
 - ✅ **Works with any AI tool** - Universal compatibility
-- ✅ **AI can call kse directly** - For tools with command execution
+- ✅ **AI can call sce directly** - For tools with command execution
 - ✅ **Fallback to manual** - Copy-paste for web-based tools
 - ✅ **Simple setup** - No configuration needed
 - ✅ **Reliable** - No dependencies on special integrations
@@ -174,17 +174,17 @@ AI: [Generates code based on your Spec]
 
 ```bash
 # Add to ~/.bashrc or ~/.zshrc
-alias kse-clip='kse context export $1 && cat .kiro/specs/$1/context-export.md | pbcopy && echo "✅ Context copied to clipboard"'
+alias sce-clip='sce context export $1 && cat .kiro/specs/$1/context-export.md | pbcopy && echo "✅ Context copied to clipboard"'
 
 # Usage
-kse-clip 01-00-user-login
+sce-clip 01-00-user-login
 # Now just paste into your AI tool
 ```
 
 **Generate task-specific prompts:**
 ```bash
 # Instead of exporting entire Spec
-kse prompt generate 01-00-user-login 1.1
+sce prompt generate 01-00-user-login 1.1
 
 # Generates focused prompt for just task 1.1
 ```
@@ -199,19 +199,19 @@ kse prompt generate 01-00-user-login 1.1
 
 ### How It Works
 
-kse monitors your Spec files for changes and automatically re-exports context. Your AI tool can always access the latest context without manual export.
+sce monitors your Spec files for changes and automatically re-exports context. Your AI tool can always access the latest context without manual export.
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant kse Watch
+    participant sce Watch
     participant Spec Files
     participant AI Tool
     
     User->>Spec Files: Edit requirements.md
-    Spec Files->>kse Watch: File changed event
-    kse Watch->>kse Watch: Auto-export context
-    kse Watch->>Spec Files: Update context-export.md
+    Spec Files->>sce Watch: File changed event
+    sce Watch->>sce Watch: Auto-export context
+    sce Watch->>Spec Files: Update context-export.md
     User->>AI Tool: Use latest context
     AI Tool->>Spec Files: Read context-export.md
 ```
@@ -226,22 +226,22 @@ sequenceDiagram
 
 **1. Initialize watch mode:**
 ```bash
-kse watch init
+sce watch init
 ```
 
 **2. Install auto-export preset:**
 ```bash
-kse watch install context-export
+sce watch install context-export
 ```
 
 **3. Start watching:**
 ```bash
-kse watch start
+sce watch start
 ```
 
 **4. Verify it's running:**
 ```bash
-kse watch status
+sce watch status
 ```
 
 Expected output:
@@ -261,7 +261,7 @@ Last execution: 2 minutes ago
    # Edit .kiro/specs/01-00-user-login/requirements.md
    ```
 
-2. **kse automatically detects the change**
+2. **sce automatically detects the change**
    ```
    [Watch Mode] Detected change: requirements.md
    [Watch Mode] Exporting context for 01-00-user-login...
@@ -300,7 +300,7 @@ Last execution: 2 minutes ago
   "actions": [
     {
       "name": "auto-export",
-      "command": "kse context export ${spec-name}"
+      "command": "sce context export ${spec-name}"
     }
   ]
 }
@@ -309,9 +309,9 @@ Last execution: 2 minutes ago
 **Multiple actions:**
 ```bash
 # Install multiple presets
-kse watch install context-export
-kse watch install prompt-regen
-kse watch install auto-sync
+sce watch install context-export
+sce watch install prompt-regen
+sce watch install auto-sync
 ```
 
 ---
@@ -324,21 +324,21 @@ kse watch install auto-sync
 |--------|--------|---------------|------------|
 | **Setup Time** | None | None | 5 minutes |
 | **Automation** | Full | None | Partial |
-| **Tool Support** | Kiro only | All tools | All tools |
+| **Tool Support** | SCE only | All tools | All tools |
 | **Context Freshness** | Always fresh | Manual refresh | Auto-refresh |
 | **Task Tracking** | Automatic | Manual | Manual |
-| **Best For** | Kiro users | Quick start | Active development |
+| **Best For** | SCE users | Quick start | Active development |
 
 ### Recommendations by Tool
 
-**Kiro IDE:**
+**AI IDE:**
 - ✅ Use **Native Integration** (built-in)
 - No setup needed, fully automatic
 
 **Windsurf / Cline:**
 - ✅ Use **Manual Export** initially
 - ⭐ Upgrade to **Watch Mode** for active projects
-- These tools can execute kse commands directly
+- These tools can execute sce commands directly
 
 **Claude Code / ChatGPT:**
 - ✅ Use **Manual Export**
@@ -370,7 +370,7 @@ Use watch mode to keep context fresh, but still manually provide context to AI:
 
 ```bash
 # Terminal 1: Keep watch mode running
-kse watch start
+sce watch start
 
 # Terminal 2: Work normally
 # Edit Specs, context auto-updates
@@ -388,15 +388,15 @@ cat .kiro/specs/01-00-user-login/context-export.md | pbcopy
 Use native integration primarily, but export for sharing:
 
 ```bash
-# Work with Kiro IDE (native integration)
+# Work with AI IDE (native integration)
 # When sharing with team member using different tool:
-kse context export 01-00-user-login
+sce context export 01-00-user-login
 # Send context-export.md to teammate
 ```
 
 **Benefits:**
 - Seamless personal workflow
-- Easy collaboration with non-Kiro users
+- Easy collaboration with non-SCE users
 
 ---
 
@@ -407,12 +407,12 @@ kse context export 01-00-user-login
 ```mermaid
 sequenceDiagram
     participant Dev as Developer
-    participant kse as kse
+    participant sce as sce
     participant Spec as Spec Files
     participant AI as AI Tool
     
-    Dev->>kse: Create Spec
-    kse->>Spec: Generate requirements.md, design.md, tasks.md
+    Dev->>sce: Create Spec
+    sce->>Spec: Generate requirements.md, design.md, tasks.md
     Dev->>Spec: Edit Spec files
     
     alt Native Integration
@@ -420,14 +420,14 @@ sequenceDiagram
         AI->>Dev: Generate code
         AI->>Spec: Update tasks.md
     else Manual Export
-        Dev->>kse: kse context export
-        kse->>Spec: Generate context-export.md
+        Dev->>sce: sce context export
+        sce->>Spec: Generate context-export.md
         Dev->>AI: Provide context
         AI->>Dev: Generate code
         Dev->>Spec: Update tasks.md
     else Watch Mode
-        Spec->>kse: File change event
-        kse->>Spec: Auto-generate context-export.md
+        Spec->>sce: File change event
+        sce->>Spec: Auto-generate context-export.md
         Dev->>AI: Provide context
         AI->>Dev: Generate code
         Dev->>Spec: Update tasks.md
@@ -473,7 +473,7 @@ sequenceDiagram
 **Problem:** Context file too large for AI tool  
 **Solution:** Use task-specific prompts:
 ```bash
-kse prompt generate spec-name task-id
+sce prompt generate spec-name task-id
 ```
 
 **Problem:** AI doesn't follow Spec  
@@ -484,24 +484,24 @@ kse prompt generate spec-name task-id
 **Problem:** Watch mode not detecting changes  
 **Solution:** 
 ```bash
-kse watch stop
-kse watch start
+sce watch stop
+sce watch start
 ```
 
 **Problem:** Context not updating  
 **Solution:** Check watch logs:
 ```bash
-kse watch logs
+sce watch logs
 ```
 
 ---
 
 ## Related Documentation
 
-- **[Quick Start Guide](quick-start.md)** - Get started with kse
+- **[Quick Start Guide](quick-start.md)** - Get started with sce
 - **[Tool-Specific Guides](tools/)** - Detailed guides for each AI tool
 - **[Spec Workflow](spec-workflow.md)** - Understanding Specs
-- **[Command Reference](command-reference.md)** - All kse commands
+- **[Command Reference](command-reference.md)** - All sce commands
 
 ---
 
@@ -509,7 +509,7 @@ kse watch logs
 
 **Three Integration Modes:**
 
-1. **Native Integration** - Fully automatic (Kiro IDE)
+1. **Native Integration** - Fully automatic (AI IDE)
 2. **Manual Export** - Universal compatibility (all tools)
 3. **Watch Mode** - Auto-refresh context (all tools)
 

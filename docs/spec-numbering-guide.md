@@ -4,7 +4,7 @@
 
 ## Overview
 
-Kiro Spec Engine uses a two-part numbering system: `{major}-{minor}-{description}`
+Scene Capability Engine uses a two-part numbering system: `{major}-{minor}-{description}`
 
 - **Major number**: Represents a feature domain or theme (01, 02, 03, ...)
 - **Minor number**: Represents iterations or sub-features within that domain (00, 01, 02, ...)
@@ -169,7 +169,7 @@ Group Specs that:
 
 ## Practical Examples
 
-### Example 1: Tool/Library Project (kiro-spec-engine)
+### Example 1: Tool/Library Project (scene-capability-engine)
 
 **Project Type**: CLI tool with independent features
 
@@ -314,17 +314,17 @@ If you started with simple numbering and need to add structure:
 
 ## Tool Support
 
-Kiro Spec Engine provides commands to help with numbering:
+Scene Capability Engine provides commands to help with numbering:
 
 ```bash
 # List all Specs with their numbers
-kse status
+sce status
 
 # View Specs grouped by major number
-kse workflows
+sce workflows
 
 # Get next available number suggestion
-kse workflows --suggest-next
+sce workflows --suggest-next
 ```
 
 ## Summary

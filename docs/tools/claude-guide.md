@@ -1,6 +1,6 @@
-# Using kse with Claude Code
+# Using sce with Claude Code
 
-> Complete guide to integrating kse with Claude Code for AI-assisted development
+> Complete guide to integrating sce with Claude Code for AI-assisted development
 
 ---
 
@@ -16,9 +16,9 @@
 
 **Claude Code** is Anthropic's AI coding assistant with a large context window (200K tokens), excellent code understanding, and conversational development capabilities.
 
-**kse integration with Claude** uses the **Manual Export** mode, where you export Spec context and paste it into Claude conversations.
+**sce integration with Claude** uses the **Manual Export** mode, where you export Spec context and paste it into Claude conversations.
 
-### Why Use kse with Claude?
+### Why Use sce with Claude?
 
 - ✅ **Large context window** - Can handle entire Specs at once
 - ✅ **Excellent understanding** - Claude deeply understands requirements and design
@@ -32,8 +32,8 @@
 **Mode:** Manual Export
 
 **How it works:**
-1. Create Specs in kse (requirements, design, tasks)
-2. Export context: `kse context export spec-name`
+1. Create Specs in sce (requirements, design, tasks)
+2. Export context: `sce context export spec-name`
 3. Copy entire context and paste into Claude conversation
 4. Claude implements features based on your Spec
 5. Update task status manually in tasks.md
@@ -45,8 +45,8 @@
 ### Prerequisites
 
 - **Claude Code access** ([Get access](https://claude.ai/))
-- **kse installed** globally (`npm install -g kiro-spec-engine`)
-- **Project adopted** by kse (`kse adopt`)
+- **sce installed** globally (`npm install -g scene-capability-engine`)
+- **Project adopted** by sce (`sce adopt`)
 
 ### Step 1: Create Shell Alias (Recommended)
 
@@ -54,10 +54,10 @@ Add to your `~/.bashrc` or `~/.zshrc`:
 
 ```bash
 # Quick export and copy to clipboard
-alias kse-clip='kse context export $1 && cat .kiro/specs/$1/context-export.md | pbcopy && echo "✅ Context copied to clipboard"'
+alias sce-clip='sce context export $1 && cat .kiro/specs/$1/context-export.md | pbcopy && echo "✅ Context copied to clipboard"'
 
 # Windows PowerShell (add to $PROFILE)
-function kse-clip { kse context export $args[0]; Get-Content ".kiro\specs\$($args[0])\context-export.md" | Set-Clipboard; Write-Host "✅ Context copied to clipboard" }
+function sce-clip { sce context export $args[0]; Get-Content ".kiro\specs\$($args[0])\context-export.md" | Set-Clipboard; Write-Host "✅ Context copied to clipboard" }
 ```
 
 ---
@@ -70,8 +70,8 @@ function kse-clip { kse context export $args[0]; Get-Content ".kiro\specs\$($arg
 
 **Step 1: Export and copy context**
 ```bash
-kse context export 01-00-user-login
-kse-clip 01-00-user-login  # Or manually copy
+sce context export 01-00-user-login
+sce-clip 01-00-user-login  # Or manually copy
 ```
 
 **Step 2: Start new Claude conversation**
@@ -116,7 +116,7 @@ Edit `.kiro/specs/01-00-user-login/tasks.md`:
 
 **Step 1: Generate task-specific prompt**
 ```bash
-kse prompt generate 01-00-user-login 2.1 --tool=claude-code
+sce prompt generate 01-00-user-login 2.1 --tool=claude-code
 ```
 
 **Step 2: Copy and paste into Claude**
@@ -136,9 +136,9 @@ Please implement this task following the design document.
 
 **1. Create and prepare Spec**
 ```bash
-kse spec bootstrap --name 01-00-user-login --non-interactive
+sce spec bootstrap --name 01-00-user-login --non-interactive
 # Edit requirements.md, design.md, tasks.md
-kse-clip 01-00-user-login
+sce-clip 01-00-user-login
 ```
 
 **2. Start Claude conversation**
@@ -507,7 +507,7 @@ Please implement exactly as specified."
 
 **Solution:** Use task-specific prompts
 ```bash
-kse prompt generate 01-00-user-login 2.1 --tool=claude-code --max-length=10000
+sce prompt generate 01-00-user-login 2.1 --tool=claude-code --max-length=10000
 ```
 
 ### Issue: Lost context in long conversation
@@ -559,7 +559,7 @@ Please fix the implementation."
 ### With Code Review
 ```
 # Share context with reviewer
-kse context export 01-00-user-login
+sce context export 01-00-user-login
 
 # Reviewer can see:
 # - What was supposed to be built (requirements)
@@ -609,18 +609,18 @@ kse context export 01-00-user-login
 
 ## Related Documentation
 
-- **[Quick Start Guide](../quick-start.md)** - Get started with kse
+- **[Quick Start Guide](../quick-start.md)** - Get started with sce
 - **[Integration Modes](../integration-modes.md)** - Understanding integration modes
 - **[Spec Workflow](../spec-workflow.md)** - Creating effective Specs
-- **[Command Reference](../command-reference.md)** - All kse commands
+- **[Command Reference](../command-reference.md)** - All sce commands
 
 ---
 
 ## Summary
 
-**Claude + kse workflow:**
-1. Create Spec in kse (requirements, design, tasks)
-2. Export context: `kse context export spec-name`
+**Claude + sce workflow:**
+1. Create Spec in sce (requirements, design, tasks)
+2. Export context: `sce context export spec-name`
 3. Start fresh Claude conversation
 4. Paste complete context
 5. Implement tasks iteratively
@@ -639,11 +639,11 @@ kse context export 01-00-user-login
 - Reference design document explicitly
 - Review all generated code
 
-**Start using kse with Claude:** 🚀
+**Start using sce with Claude:** 🚀
 ```bash
-kse adopt
-kse spec bootstrap --name 01-00-my-feature --non-interactive
-kse-clip 01-00-my-feature
+sce adopt
+sce spec bootstrap --name 01-00-my-feature --non-interactive
+sce-clip 01-00-my-feature
 # Open Claude and paste context
 ```
 

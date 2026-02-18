@@ -1,10 +1,10 @@
-﻿# [TODO: 项目名称 - 请修改此标题]
+# [TODO: 项目名称 - 请修改此标题]
 
 > ⚠️ **这是模板文件**: 请搜索并替换所有 `[TODO: ...]` 占位符为实际项目信息
 
 ## 🎯 项目概述
 
-这是一个集成了 **Sisyphus Ultrawork 精神** 的 Kiro Spec 驱动开发项目。
+这是一个集成了 **Sisyphus Ultrawork 精神** 的 SCE Spec 驱动开发项目。
 
 ### 核心特性
 
@@ -103,7 +103,7 @@ python .kiro\tools\ultrawork_enhancer.py tasks <path-to-tasks.md>
 
 ## 📚 参考文档
 
-- `.kiro/README.md` - Kiro 系统说明
+- `.kiro/README.md` - SCE 系统说明
 - `.kiro/steering/CORE_PRINCIPLES.md` - 核心原则（包含 Ultrawork 精神）
 
 ---

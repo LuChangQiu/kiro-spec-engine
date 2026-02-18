@@ -1,4 +1,4 @@
-﻿const fs = require('fs-extra');
+const fs = require('fs-extra');
 const path = require('path');
 const os = require('os');
 
@@ -9,7 +9,7 @@ const RuntimeExecutor = require('../../../lib/scene-runtime/runtime-executor');
 
 function createErpScene() {
   return {
-    apiVersion: 'kse.scene/v0.2',
+    apiVersion: 'sce.scene/v0.2',
     kind: 'scene',
     metadata: {
       obj_id: 'scene.order.query',
@@ -46,7 +46,7 @@ function createErpScene() {
 
 function createPluginScene() {
   return {
-    apiVersion: 'kse.scene/v0.2',
+    apiVersion: 'sce.scene/v0.2',
     kind: 'scene',
     metadata: {
       obj_id: 'scene.custom.plugin-query',
@@ -83,7 +83,7 @@ function createPluginScene() {
 
 function createHybridScene() {
   return {
-    apiVersion: 'kse.scene/v0.2',
+    apiVersion: 'sce.scene/v0.2',
     kind: 'scene',
     metadata: {
       obj_id: 'scene.fulfillment.robot-pick-confirm',
@@ -130,7 +130,7 @@ describe('Scene Runtime Execution Pilot', () => {
   let tempRoot;
 
   beforeEach(async () => {
-    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-scene-runtime-'));
+    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-scene-runtime-'));
   });
 
   afterEach(async () => {
@@ -141,7 +141,7 @@ describe('Scene Runtime Execution Pilot', () => {
     const loader = new SceneLoader();
     const invalidManifestPath = path.join(tempRoot, 'invalid-scene.yaml');
 
-    await fs.writeFile(invalidManifestPath, 'apiVersion: kse.scene/v0.2\nkind: scene\nmetadata: {}\nspec: {}\n', 'utf8');
+    await fs.writeFile(invalidManifestPath, 'apiVersion: sce.scene/v0.2\nkind: scene\nmetadata: {}\nspec: {}\n', 'utf8');
 
     await expect(loader.loadFromFile(invalidManifestPath)).rejects.toThrow('Invalid scene manifest');
   });

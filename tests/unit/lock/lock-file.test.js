@@ -1,4 +1,4 @@
-﻿const fs = require('fs-extra');
+const fs = require('fs-extra');
 const os = require('os');
 const path = require('path');
 
@@ -10,7 +10,7 @@ describe('LockFile', () => {
   let lockFile;
 
   beforeEach(async () => {
-    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-lock-file-'));
+    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-lock-file-'));
     specsDir = path.join(tempRoot, '.kiro', 'specs');
     lockFile = new LockFile(specsDir);
     await fs.ensureDir(path.join(specsDir, 'spec-a'));

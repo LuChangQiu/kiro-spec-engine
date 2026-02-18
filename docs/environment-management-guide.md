@@ -2,15 +2,15 @@
 
 ## Overview
 
-The Environment Configuration Management feature provides a lightweight solution for managing multiple environment configurations (development, staging, production, etc.) within your kse projects.
+The Environment Configuration Management feature provides a lightweight solution for managing multiple environment configurations (development, staging, production, etc.) within your sce projects.
 
 ## Quick Start
 
 ### Installation and Project Adoption
 
-**⚠️ Important**: When you install kse in a project, it automatically adopts the project and operates in autonomous mode by default. This means:
+**⚠️ Important**: When you install sce in a project, it automatically adopts the project and operates in autonomous mode by default. This means:
 
-- ✅ kse takes ownership of the project structure
+- ✅ sce takes ownership of the project structure
 - ✅ AI assistants can make changes autonomously without frequent confirmations
 - ✅ Faster development workflow with less interruption
 - ✅ All changes are tracked and can be rolled back if needed
@@ -18,25 +18,25 @@ The Environment Configuration Management feature provides a lightweight solution
 **Recommended Workflow**:
 
 ```bash
-# Install kse globally or in your project
-npm install -g kiro-spec-engine
+# Install sce globally or in your project
+npm install -g scene-capability-engine
 
 # Navigate to your project
 cd your-project
 
 # Check project status first (recommended)
-kse status
+sce status
 
 # If issues are detected, run diagnostics
-kse doctor
+sce doctor
 
 # Adopt the project (creates .kiro/ directory)
-kse adopt
+sce adopt
 
-# kse is now managing your project autonomously
+# sce is now managing your project autonomously
 ```
 
-**Note**: Future versions of kse will automatically check project status after installation/upgrade and prompt for diagnostics if needed.
+**Note**: Future versions of sce will automatically check project status after installation/upgrade and prompt for diagnostics if needed.
 
 ### 1. Register an Environment
 
@@ -62,19 +62,19 @@ Create a configuration file (e.g., `env-local.json`):
 Register the environment:
 
 ```bash
-kse env register env-local.json
+sce env register env-local.json
 ```
 
 ### 2. List Environments
 
 ```bash
-kse env list
+sce env list
 ```
 
 ### 3. Switch Environments
 
 ```bash
-kse env switch local-dev
+sce env switch local-dev
 ```
 
 The system automatically:
@@ -85,7 +85,7 @@ The system automatically:
 ### 4. View Active Environment
 
 ```bash
-kse env info
+sce env info
 ```
 
 ### 5. Rollback
@@ -93,40 +93,40 @@ kse env info
 If something goes wrong, rollback to the previous state:
 
 ```bash
-kse env rollback
+sce env rollback
 ```
 
 ## Commands
 
-### `kse env list`
+### `sce env list`
 
 List all registered environments with their status.
 
-### `kse env switch <name>`
+### `sce env switch <name>`
 
 Switch to the specified environment. Creates automatic backups before switching.
 
-### `kse env info`
+### `sce env info`
 
 Display details about the currently active environment.
 
-### `kse env register <config-file>`
+### `sce env register <config-file>`
 
 Register a new environment from a JSON configuration file.
 
-### `kse env unregister <name> --force`
+### `sce env unregister <name> --force`
 
 Remove an environment from the registry. Requires `--force` flag for confirmation.
 
-### `kse env rollback`
+### `sce env rollback`
 
 Restore the most recent backup, reverting to the previous environment state.
 
-### `kse env verify`
+### `sce env verify`
 
 Verify the current environment configuration by running the verification command defined in the environment. If no verification rules are configured, reports success.
 
-### `kse env run "<command>"`
+### `sce env run "<command>"`
 
 Run a command in the context of the current environment. Ensures the active environment is set before executing the command.
 
@@ -166,7 +166,7 @@ The backup system automatically:
 
 ## Best Practices
 
-1. **Adopt projects with kse**: Run `kse adopt` to let kse manage your project autonomously, enabling faster AI-assisted development without constant confirmations
+1. **Adopt projects with sce**: Run `sce adopt` to let sce manage your project autonomously, enabling faster AI-assisted development without constant confirmations
 2. **Use descriptive names**: Choose clear, descriptive names for your environments
 3. **Keep source files in version control**: Store all environment-specific configuration files in your repository
 4. **Selective .kiro/ version control**: Use layered .gitignore strategy:
@@ -228,7 +228,7 @@ Ensure all source files specified in your configuration exist before registering
 
 ### "Environment already exists"
 
-Each environment must have a unique name. Use `kse env unregister <name> --force` to remove the existing environment first.
+Each environment must have a unique name. Use `sce env unregister <name> --force` to remove the existing environment first.
 
 ### "Cannot unregister active environment"
 
@@ -240,7 +240,7 @@ Backups are only created during environment switches. If you haven't switched en
 
 ## Integration with Multi-Workspace
 
-When using kse's multi-workspace feature, each workspace maintains its own independent environment registry. This allows different projects to have different environment configurations without interference.
+When using sce's multi-workspace feature, each workspace maintains its own independent environment registry. This allows different projects to have different environment configurations without interference.
 
 ## See Also
 
@@ -252,7 +252,7 @@ When using kse's multi-workspace feature, each workspace maintains its own indep
 
 ### Migrating from Manual Configuration Management
 
-If you're currently managing environment configurations manually (e.g., copying files, using shell scripts), here's how to migrate to kse environment management:
+If you're currently managing environment configurations manually (e.g., copying files, using shell scripts), here's how to migrate to sce environment management:
 
 #### Step 1: Identify Your Environments
 
@@ -342,12 +342,12 @@ For each environment, create a JSON configuration file:
 
 #### Step 5: Register Environments
 
-Register each environment with kse:
+Register each environment with sce:
 
 ```bash
-kse env register local-env.json
-kse env register staging-env.json
-kse env register production-env.json
+sce env register local-env.json
+sce env register staging-env.json
+sce env register production-env.json
 ```
 
 #### Step 6: Verify Registration
@@ -355,7 +355,7 @@ kse env register production-env.json
 List all registered environments:
 
 ```bash
-kse env list
+sce env list
 ```
 
 #### Step 7: Test Environment Switching
@@ -364,18 +364,18 @@ Switch to an environment and verify:
 
 ```bash
 # Switch to local environment
-kse env switch local
+sce env switch local
 
 # Verify the switch
-kse env info
+sce env info
 
 # Verify configuration is correct
-kse env verify
+sce env verify
 ```
 
 #### Step 8: Update Your Workflow
 
-Replace your manual configuration management with kse commands:
+Replace your manual configuration management with sce commands:
 
 **Before**:
 ```bash
@@ -386,8 +386,8 @@ cp config/database.local.json config/database.json
 
 **After**:
 ```bash
-# kse approach
-kse env switch local
+# sce approach
+sce env switch local
 ```
 
 #### Step 9: Add to .gitignore
@@ -395,7 +395,7 @@ kse env switch local
 Add target files to `.gitignore` to avoid committing environment-specific configurations:
 
 ```gitignore
-# Environment target files (managed by kse)
+# Environment target files (managed by sce)
 .env
 config/database.json
 config/app.json
@@ -414,17 +414,17 @@ config/app.json
 If you're using direnv, you can migrate by:
 
 1. Keep your `.envrc` files as source files
-2. Create kse environment configurations that copy `.envrc.local` → `.envrc`
+2. Create sce environment configurations that copy `.envrc.local` → `.envrc`
 3. Continue using direnv for environment variable loading
-4. Use kse for switching between environment configurations
+4. Use sce for switching between environment configurations
 
 #### From Docker Compose
 
 If you're using Docker Compose with multiple environment files:
 
 1. Keep your `docker-compose.yml` and environment-specific files
-2. Create kse environments that switch between different compose files
-3. Use kse to manage which compose configuration is active
+2. Create sce environments that switch between different compose files
+3. Use sce to manage which compose configuration is active
 
 **Example**:
 ```json
@@ -449,8 +449,8 @@ If you're using Docker Compose with multiple environment files:
 If you're using Kubernetes ConfigMaps for configuration:
 
 1. Export ConfigMaps to local files for development
-2. Create kse environments for local development
-3. Use kse for local environment switching
+2. Create sce environments for local development
+3. Use sce for local environment switching
 4. Keep ConfigMaps for production deployments
 
 ### Best Practices for Migration
@@ -475,24 +475,24 @@ If you're using Kubernetes ConfigMaps for configuration:
 cp .env .env.local
 
 # Register environment
-kse env register local-env.json
+sce env register local-env.json
 ```
 
 #### Issue: Target Files Already Exist
 
 **Problem**: Target files exist and you're worried about overwriting them.
 
-**Solution**: kse automatically creates backups before switching. You can also manually backup first.
+**Solution**: sce automatically creates backups before switching. You can also manually backup first.
 
 ```bash
-# Manual backup (optional, kse does this automatically)
+# Manual backup (optional, sce does this automatically)
 cp .env .env.backup
 
 # Switch environment (creates automatic backup)
-kse env switch local
+sce env switch local
 
 # If needed, rollback
-kse env rollback
+sce env rollback
 ```
 
 #### Issue: Verification Fails
@@ -503,11 +503,11 @@ kse env rollback
 
 ```bash
 # Check what went wrong
-kse env verify
+sce env verify
 
 # Update environment configuration
 # Edit the JSON file and re-register
-kse env register local-env.json
+sce env register local-env.json
 ```
 
 ### Migration Checklist
@@ -516,7 +516,7 @@ kse env register local-env.json
 - [ ] Identify all configuration files
 - [ ] Create source files for each environment
 - [ ] Create environment configuration JSON files
-- [ ] Register all environments with kse
+- [ ] Register all environments with sce
 - [ ] Test switching between environments
 - [ ] Create verification scripts (optional but recommended)
 - [ ] Update .gitignore

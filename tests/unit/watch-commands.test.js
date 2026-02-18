@@ -53,7 +53,7 @@ describe('Watch Commands', () => {
       expect(config.enabled).toBe(true);
       expect(config.patterns).toContain('**/tasks.md');
       expect(config.actions['**/tasks.md']).toBeDefined();
-      expect(config.actions['**/tasks.md'].command).toBe('kse workspace sync');
+      expect(config.actions['**/tasks.md'].command).toBe('sce workspace sync');
     });
     
     it('should not overwrite existing config without force', async () => {

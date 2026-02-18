@@ -6,7 +6,7 @@
 
 ## What You'll Learn
 
-- ✅ Install kse and adopt it in your project
+- ✅ Install sce and adopt it in your project
 - ✅ Tell your AI about the methodology
 - ✅ Let AI work according to Spec-driven approach
 
@@ -18,15 +18,15 @@
 
 ---
 
-## Step 1: Install kse (30 seconds)
+## Step 1: Install sce (30 seconds)
 
 ```bash
-npm install -g kiro-spec-engine
+npm install -g scene-capability-engine
 ```
 
 Verify:
 ```bash
-kse --version
+sce --version
 ```
 
 ---
@@ -35,7 +35,7 @@ kse --version
 
 ```bash
 cd your-project
-kse adopt
+sce adopt
 ```
 
 This creates `.kiro/` directory with:
@@ -78,17 +78,17 @@ I need a user login feature with email and password.
 
 ```bash
 # Single-Spec recommended flow
-kse spec bootstrap --name 01-00-user-login --non-interactive
-kse spec pipeline run --spec 01-00-user-login
-kse spec gate run --spec 01-00-user-login --json
+sce spec bootstrap --name 01-00-user-login --non-interactive
+sce spec pipeline run --spec 01-00-user-login
+sce spec gate run --spec 01-00-user-login --json
 
 # Multi-Spec flow (defaults to orchestrate mode)
-kse spec bootstrap --specs "01-00-user-login,01-01-user-session" --max-parallel 3
-kse spec pipeline run --specs "01-00-user-login,01-01-user-session" --max-parallel 3
-kse spec gate run --specs "01-00-user-login,01-01-user-session" --max-parallel 3
+sce spec bootstrap --specs "01-00-user-login,01-01-user-session" --max-parallel 3
+sce spec pipeline run --specs "01-00-user-login,01-01-user-session" --max-parallel 3
+sce spec gate run --specs "01-00-user-login,01-01-user-session" --max-parallel 3
 ```
 
-**The AI uses kse commands automatically** - you don't need to learn them.
+**The AI uses sce commands automatically** - you don't need to learn them.
 
 ---
 
@@ -97,13 +97,13 @@ kse spec gate run --specs "01-00-user-login,01-01-user-session" --max-parallel 3
 Generate a sample KPI input file:
 
 ```bash
-kse value metrics sample --out ./kpi-input.json --period 2026-W10 --json
+sce value metrics sample --out ./kpi-input.json --period 2026-W10 --json
 ```
 
 Then run:
 
 ```bash
-kse value metrics snapshot --input ./kpi-input.json --json
+sce value metrics snapshot --input ./kpi-input.json --json
 ```
 
 If you prefer manual input, use:
@@ -129,13 +129,13 @@ This gives you a machine-readable snapshot with risk level and output paths.
 
 You're now using Spec-driven development. Your AI understands the methodology and will follow it.
 
-**Key insight:** You don't "use kse" - your project "follows Spec-driven methodology" and kse helps enforce it.
+**Key insight:** You don't "use sce" - your project "follows Spec-driven methodology" and sce helps enforce it.
 
 ---
 
 ## Next Steps
 
-- **[Integration Modes](integration-modes.md)** - Understand how AI tools work with kse
+- **[Integration Modes](integration-modes.md)** - Understand how AI tools work with sce
 - **[Spec Workflow](spec-workflow.md)** - Deep dive into Spec creation
 - **[Tool Guides](tools/)** - Tool-specific tips
 

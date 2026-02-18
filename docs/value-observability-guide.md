@@ -1,6 +1,6 @@
 # Value Observability Guide
 
-> Turn Spec delivery into measurable weekly outcomes with `kse value metrics`.
+> Turn Spec delivery into measurable weekly outcomes with `sce value metrics`.
 
 ---
 
@@ -12,7 +12,7 @@ Most AI-assisted workflows can ship code, but they often cannot answer:
 - Is quality improving or degrading?
 - Should we pass Day30/Day60 gate based on evidence?
 
-kse solves this with machine-readable KPI snapshots, baseline derivation, trend analysis, and gate-ready summaries.
+sce solves this with machine-readable KPI snapshots, baseline derivation, trend analysis, and gate-ready summaries.
 
 ---
 
@@ -20,16 +20,16 @@ kse solves this with machine-readable KPI snapshots, baseline derivation, trend 
 
 ```bash
 # 0) Generate sample input (first-time setup)
-kse value metrics sample --out ./kpi-input.json --period 2026-W10 --json
+sce value metrics sample --out ./kpi-input.json --period 2026-W10 --json
 
 # 1) Snapshot this week
-kse value metrics snapshot --input ./kpi-input.json --period 2026-W10 --checkpoint day-60 --json
+sce value metrics snapshot --input ./kpi-input.json --period 2026-W10 --checkpoint day-60 --json
 
 # 2) Build baseline from earliest history snapshots
-kse value metrics baseline --from-history 3 --period 2026-W10 --json
+sce value metrics baseline --from-history 3 --period 2026-W10 --json
 
 # 3) Analyze trend risk from latest snapshots
-kse value metrics trend --window 6 --json
+sce value metrics trend --window 6 --json
 ```
 
 ---

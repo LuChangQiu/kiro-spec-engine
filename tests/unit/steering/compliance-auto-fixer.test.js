@@ -10,7 +10,7 @@ describe('ComplianceAutoFixer', () => {
 
   beforeEach(async () => {
     fixer = new ComplianceAutoFixer();
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-test-'));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-test-'));
     steeringPath = path.join(tempDir, '.kiro', 'steering');
     await fs.ensureDir(steeringPath);
   });

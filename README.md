@@ -4,8 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 > **⚠️ Important Clarification**: `scene-capability-engine` (`sce`) is an **npm package and CLI tool** for spec-driven development.  
-> It is **NOT** the Kiro IDE desktop application. If you're looking for Kiro IDE, visit https://kiro.dev
-> Legacy/compatibility commands `sco`, `kse`, and `kiro-spec-engine` remain available.
+> Primary command is `sce`. Compatibility aliases are preserved for migration.
 
 **A context provider for AI coding tools** - Structure your project requirements, design, and tasks so AI assistants can help you build better software.
 
@@ -61,7 +60,7 @@ graph LR
 | Queue-driven autonomous runtime | `auto close-loop-controller` persistent queue drain | Program-scale backlogs continue without manual re-triggering |
 | Autonomous convergence governance | Program gate (`min-success-rate` + `max-risk-level`) + audit JSON output | Program completion is policy-verified and traceable |
 | Measurable outcomes | KPI automation (`value metrics snapshot/baseline/trend`) | Delivery quality can be tracked week-over-week |
-| Tool-agnostic adoption | Works across Claude/Cursor/Windsurf/Copilot/Kiro | No lock-in to a single AI IDE |
+| Tool-agnostic adoption | Works across Claude/Cursor/Windsurf/Copilot | No lock-in to a single AI IDE |
 | Built-in governance | Docs governance, lock management, audit, env/workspace controls | Team collaboration stays auditable and stable |
 
 ### 90-Second Value Proof
@@ -134,7 +133,7 @@ This creates a `.kiro/` directory with:
 
 #### Step 3: Tell Your AI About the Methodology (30 seconds)
 
-**In your AI tool (Cursor, Claude, Windsurf, Kiro, etc.), say:**
+**In your AI tool (Cursor, Claude, Windsurf, etc.), say:**
 
 ```
 Please read .kiro/README.md to understand how this project works.
@@ -201,7 +200,7 @@ A **Spec** is a structured description of a feature or project component. Each S
 
 sce supports three ways to work with AI tools:
 
-1. **Native Integration** - AI tool directly accesses sce (Kiro IDE)
+1. **Direct Workspace Integration** - AI tool directly accesses sce in your workspace
 2. **Manual Export** - You export and paste context (Claude, ChatGPT, Cursor)
 3. **Watch Mode** - Automatic context updates on file changes (all tools)
 
@@ -218,7 +217,6 @@ sce works with any AI coding assistant. Choose your tool for specific guidance:
 - **[Cursor](docs/tools/cursor-guide.md)** - IDE with AI pair programming
 - **[Claude Code](docs/tools/claude-guide.md)** - Anthropic's coding assistant
 - **[Windsurf](docs/tools/windsurf-guide.md)** - AI agent with command execution
-- **[Kiro](docs/tools/kiro-guide.md)** - Native integration, no manual export needed
 - **[VS Code + Copilot](docs/tools/vscode-guide.md)** - GitHub Copilot integration
 - **[Generic AI Tools](docs/tools/generic-guide.md)** - Works with any AI assistant
 
@@ -264,7 +262,6 @@ sequenceDiagram
 - [Cursor Integration](docs/tools/cursor-guide.md)
 - [Claude Code Integration](docs/tools/claude-guide.md)
 - [Windsurf Integration](docs/tools/windsurf-guide.md)
-- [Kiro Integration](docs/tools/kiro-guide.md)
 - [VS Code + Copilot Integration](docs/tools/vscode-guide.md)
 - [Generic AI Tools](docs/tools/generic-guide.md)
 
@@ -364,7 +361,7 @@ Structure your work with Requirements → Design → Tasks workflow
 - **Smart Exclusions**: Automatically skip common non-repository directories (node_modules, build, etc.)
 
 ### Moqui ERP Integration 🚀 NEW in v1.39.0
-- **Moqui ERP Adapter**: Connect KSE scene runtime to live Moqui ERP instances
+- **Moqui ERP Adapter**: Connect sce scene runtime to live Moqui ERP instances
   - `MoquiClient` — HTTP client with JWT auth lifecycle (login, refresh, re-login, logout) and retry logic
   - `MoquiAdapter` — Binding handler for `spec.erp.*` and `moqui.*` refs, entity CRUD, service invocation, screen discovery
 - **Scene Template Extractor** (v1.40.0): Analyze Moqui resources, identify business patterns, generate reusable scene templates
@@ -601,7 +598,7 @@ sce repo exec "<command>"          # Execute command in all repositories
 # Spec-level collaboration (NEW in v1.22.0)
 sce collab init <master> [options] # Initialize Master Spec with Sub-Specs
 sce collab status [spec] [--graph] # Display collaboration status
-sce collab assign <spec> <kiro>    # Assign Spec to Kiro instance
+sce collab assign <spec> <assignee> # Assign Spec to an assignee
 sce collab verify <spec>           # Verify interface contracts
 sce collab integrate <specs...>    # Run integration tests
 sce collab migrate <spec>          # Convert standalone Spec to collaborative
@@ -697,7 +694,7 @@ We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for:
 
 ```bash
 git clone https://github.com/heguangyong/scene-capability-engine.git
-cd kiro-spec-engine
+cd scene-capability-engine
 npm install
 npm link  # For local development
 npm test  # Run tests
@@ -714,7 +711,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## Acknowledgments
 
 - Inspired by the **Sisyphus** myth and the concept of noble struggle
-- Built on the foundation of **Kiro** spec-driven development
+- Built on practical **Spec-driven development** methodology
 - Influenced by **oh-my-opencode** and the Ultrawork Manifesto
 
 ---

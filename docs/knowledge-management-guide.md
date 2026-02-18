@@ -2,14 +2,14 @@
 
 ## Overview
 
-The Knowledge Management system allows you to build and maintain a personal knowledge base within your kse projects. Capture experiences, patterns, best practices, and lessons learned as you work.
+The Knowledge Management system allows you to build and maintain a personal knowledge base within your sce projects. Capture experiences, patterns, best practices, and lessons learned as you work.
 
 ## Quick Start
 
 ### Initialize Knowledge Base
 
 ```bash
-kse knowledge init
+sce knowledge init
 ```
 
 This creates `.kiro/knowledge/` directory with:
@@ -23,12 +23,12 @@ This creates `.kiro/knowledge/` directory with:
 
 ```bash
 # Add a design pattern
-kse knowledge add pattern "Repository Pattern Best Practices" \
+sce knowledge add pattern "Repository Pattern Best Practices" \
   --tags "design-pattern,database" \
   --category backend
 
 # Add a lesson learned
-kse knowledge add lesson "Avoid N+1 Queries" \
+sce knowledge add lesson "Avoid N+1 Queries" \
   --tags "performance,database" \
   --category optimization
 ```
@@ -37,51 +37,51 @@ kse knowledge add lesson "Avoid N+1 Queries" \
 
 ```bash
 # List all entries
-kse knowledge list
+sce knowledge list
 
 # Filter by type
-kse knowledge list --type pattern
+sce knowledge list --type pattern
 
 # Filter by tag
-kse knowledge list --tag database
+sce knowledge list --tag database
 
 # Sort by date
-kse knowledge list --sort created:desc
+sce knowledge list --sort created:desc
 ```
 
 ### Search
 
 ```bash
 # Search in titles and tags
-kse knowledge search "database"
+sce knowledge search "database"
 
 # Full-text search in content
-kse knowledge search "repository" --full-text
+sce knowledge search "repository" --full-text
 ```
 
 ### View Entry
 
 ```bash
-kse knowledge show kb-1770099318706-4dmali
+sce knowledge show kb-1770099318706-4dmali
 ```
 
 ### Delete Entry
 
 ```bash
 # With confirmation
-kse knowledge delete kb-xxx
+sce knowledge delete kb-xxx
 
 # Skip confirmation
-kse knowledge delete kb-xxx --force
+sce knowledge delete kb-xxx --force
 
 # Without backup
-kse knowledge delete kb-xxx --force --no-backup
+sce knowledge delete kb-xxx --force --no-backup
 ```
 
 ### Statistics
 
 ```bash
-kse knowledge stats
+sce knowledge stats
 ```
 
 ## Entry Types
@@ -190,10 +190,10 @@ Content here...
 
 ```bash
 # Export all entries
-kse knowledge export --output my-knowledge.zip
+sce knowledge export --output my-knowledge.zip
 
 # Import entries
-kse knowledge import my-knowledge.zip
+sce knowledge import my-knowledge.zip
 ```
 
 ### Integration with Project
@@ -214,7 +214,7 @@ See implementation in `lib/repository/user-repository.js`
 Error: Knowledge base not initialized
 ```
 
-**Solution**: Run `kse knowledge init`
+**Solution**: Run `sce knowledge init`
 
 ### Entry Not Found
 
@@ -222,7 +222,7 @@ Error: Knowledge base not initialized
 Error: Entry not found: kb-xxx
 ```
 
-**Solution**: Check ID with `kse knowledge list`
+**Solution**: Check ID with `sce knowledge list`
 
 ### Corrupted Index
 
@@ -236,7 +236,7 @@ Error: Failed to load index
 rm .kiro/knowledge/index.json
 
 # Reinitialize
-kse knowledge init
+sce knowledge init
 ```
 
 ## FAQ
@@ -254,7 +254,7 @@ A: Commit `.kiro/knowledge/` to git (except `.backups/`).
 A: Yes, create custom templates in `.kiro/knowledge/.templates/`.
 
 **Q: How do I backup my knowledge?**  
-A: Use `kse knowledge export` or commit to git.
+A: Use `sce knowledge export` or commit to git.
 
 ## See Also
 

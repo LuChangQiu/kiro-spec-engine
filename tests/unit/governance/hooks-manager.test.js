@@ -73,7 +73,7 @@ describe('HooksManager', () => {
       await fs.ensureDir(path.join(testDir, '.git/hooks'));
       await fs.writeFile(
         path.join(testDir, '.git/hooks/pre-commit'),
-        '#!/bin/sh\n# BEGIN kiro-spec-engine document governance\necho "test"\n# END kiro-spec-engine document governance'
+        '#!/bin/sh\n# BEGIN scene-capability-engine document governance\necho "test"\n# END scene-capability-engine document governance'
       );
       
       const status = await manager.checkHooksInstalled();
@@ -113,8 +113,8 @@ describe('HooksManager', () => {
       
       const content = await fs.readFile(path.join(testDir, '.git/hooks/pre-commit'), 'utf8');
       expect(content).toContain('#!/bin/sh');
-      expect(content).toContain('BEGIN kiro-spec-engine document governance');
-      expect(content).toContain('END kiro-spec-engine document governance');
+      expect(content).toContain('BEGIN scene-capability-engine document governance');
+      expect(content).toContain('END scene-capability-engine document governance');
       expect(content).toContain('ValidationEngine');
     });
     
@@ -137,7 +137,7 @@ describe('HooksManager', () => {
       // Check combined hook
       const content = await fs.readFile(path.join(testDir, '.git/hooks/pre-commit'), 'utf8');
       expect(content).toContain('Existing hook');
-      expect(content).toContain('BEGIN kiro-spec-engine document governance');
+      expect(content).toContain('BEGIN scene-capability-engine document governance');
     });
     
     test('should not reinstall if already installed', async () => {
@@ -223,7 +223,7 @@ describe('HooksManager', () => {
       // Check that existing hook is still there
       const content = await fs.readFile(path.join(testDir, '.git/hooks/pre-commit'), 'utf8');
       expect(content).toContain('Existing hook');
-      expect(content).not.toContain('BEGIN kiro-spec-engine document governance');
+      expect(content).not.toContain('BEGIN scene-capability-engine document governance');
     });
     
     test('should remove backup when removing hook completely', async () => {
@@ -257,13 +257,13 @@ describe('HooksManager', () => {
     test('should generate valid hook content', () => {
       const content = manager.generateHookContent();
       
-      expect(content).toContain('BEGIN kiro-spec-engine document governance');
-      expect(content).toContain('END kiro-spec-engine document governance');
+      expect(content).toContain('BEGIN scene-capability-engine document governance');
+      expect(content).toContain('END scene-capability-engine document governance');
       expect(content).toContain('node -e');
       expect(content).toContain('ValidationEngine');
-      expect(content).toContain('kse doctor --docs');
-      expect(content).toContain('kse cleanup');
-      expect(content).toContain('kse validate --all');
+      expect(content).toContain('sce doctor --docs');
+      expect(content).toContain('sce cleanup');
+      expect(content).toContain('sce validate --all');
     });
     
     test('should include error handling in hook content', () => {
@@ -302,9 +302,9 @@ describe('HooksManager', () => {
       const content = `#!/bin/sh
 echo "before"
 
-# BEGIN kiro-spec-engine document governance
+# BEGIN scene-capability-engine document governance
 echo "our hook"
-# END kiro-spec-engine document governance
+# END scene-capability-engine document governance
 
 echo "after"`;
       
@@ -312,16 +312,16 @@ echo "after"`;
       
       expect(result).toContain('echo "before"');
       expect(result).toContain('echo "after"');
-      expect(result).not.toContain('BEGIN kiro-spec-engine document governance');
+      expect(result).not.toContain('BEGIN scene-capability-engine document governance');
       expect(result).not.toContain('our hook');
     });
     
     test('should handle hook at beginning', () => {
       const content = `#!/bin/sh
 
-# BEGIN kiro-spec-engine document governance
+# BEGIN scene-capability-engine document governance
 echo "our hook"
-# END kiro-spec-engine document governance
+# END scene-capability-engine document governance
 
 echo "after"`;
       
@@ -335,9 +335,9 @@ echo "after"`;
       const content = `#!/bin/sh
 echo "before"
 
-# BEGIN kiro-spec-engine document governance
+# BEGIN scene-capability-engine document governance
 echo "our hook"
-# END kiro-spec-engine document governance`;
+# END scene-capability-engine document governance`;
       
       const result = manager.removeOurHook(content);
       
@@ -346,9 +346,9 @@ echo "our hook"
     });
     
     test('should return empty when only our hook exists', () => {
-      const content = `# BEGIN kiro-spec-engine document governance
+      const content = `# BEGIN scene-capability-engine document governance
 echo "our hook"
-# END kiro-spec-engine document governance`;
+# END scene-capability-engine document governance`;
       
       const result = manager.removeOurHook(content);
       

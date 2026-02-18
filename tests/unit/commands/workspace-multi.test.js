@@ -22,7 +22,7 @@ describe('Multi-Workspace Commands', () => {
 
   beforeEach(async () => {
     // Create temporary test directory
-    testDir = path.join(os.tmpdir(), `kse-test-${Date.now()}`);
+    testDir = path.join(os.tmpdir(), `sce-test-${Date.now()}`);
     await fs.ensureDir(testDir);
 
     // Create test workspace directory

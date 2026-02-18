@@ -5,12 +5,12 @@
 
 ## Overview
 
-Kiro Spec Engine (kse) is designed to work seamlessly across multiple AI coding assistants. This guide explains how to use kse specs with different tools, including Kiro IDE, Claude Code, Cursor, GitHub Copilot, and other AI assistants.
+Scene Capability Engine (sce) is designed to work seamlessly across multiple AI coding assistants. This guide explains how to use sce specs with different tools, including AI IDE, Claude Code, Cursor, GitHub Copilot, and other AI assistants.
 
 ## Table of Contents
 
 - [Quick Start](#quick-start)
-- [Kiro IDE (Native)](#kiro-ide-native)
+- [AI IDE (Native)](#SCE-ide-native)
 - [Claude Code](#claude-code)
 - [Cursor](#cursor)
 - [GitHub Copilot](#github-copilot)
@@ -26,35 +26,35 @@ Kiro Spec Engine (kse) is designed to work seamlessly across multiple AI coding 
 
 ```bash
 # Export complete spec context
-kse context export <spec-name>
+sce context export <spec-name>
 
 # Export with steering rules
-kse context export <spec-name> --steering --steering-files=CORE_PRINCIPLES.md
+sce context export <spec-name> --steering --steering-files=CORE_PRINCIPLES.md
 
 # Generate task-specific prompt
-kse prompt generate <spec-name> <task-id>
-kse prompt generate <spec-name> <task-id> --tool=claude-code
+sce prompt generate <spec-name> <task-id>
+sce prompt generate <spec-name> <task-id> --tool=claude-code
 ```
 
 ### Basic Workflow
 
-1. **Export context** from kse
+1. **Export context** from sce
 2. **Load context** into your AI tool
 3. **Work on tasks** with AI assistance
 4. **Update task status** in original `tasks.md`
 
 ---
 
-## Kiro IDE (Native)
+## AI IDE (Native)
 
 ### Setup
 
-Kiro IDE has native kse integration with automatic steering rule loading.
+AI IDE has native sce integration with automatic steering rule loading.
 
 **Installation**:
 ```bash
-npm install -g kiro-spec-engine
-kse adopt
+npm install -g scene-capability-engine
+sce adopt
 ```
 
 **Features**:
@@ -68,14 +68,14 @@ kse adopt
 
 1. **Create or adopt project**:
    ```bash
-   kse init "My Project"
+   sce init "My Project"
    # or
-   kse adopt
+   sce adopt
    ```
 
 2. **Create spec**:
    ```bash
-   kse spec bootstrap --name 01-00-user-authentication --non-interactive
+   sce spec bootstrap --name 01-00-user-authentication --non-interactive
    ```
 
 3. **Work with AI**:
@@ -85,7 +85,7 @@ kse adopt
 
 4. **Track progress**:
    ```bash
-   kse status
+   sce status
    ```
 
 ### Best Practices
@@ -104,14 +104,14 @@ kse adopt
 Claude Code requires manual context loading via exported files.
 
 **Prerequisites**:
-- kse installed: `npm install -g kiro-spec-engine`
-- Project adopted: `kse adopt`
+- sce installed: `npm install -g scene-capability-engine`
+- Project adopted: `sce adopt`
 
 ### Workflow
 
 1. **Export context**:
    ```bash
-   kse context export 01-00-user-authentication
+   sce context export 01-00-user-authentication
    ```
 
 2. **Copy exported file**:
@@ -127,7 +127,7 @@ Claude Code requires manual context loading via exported files.
 
 4. **Generate task prompt** (optional):
    ```bash
-   kse prompt generate 01-00-user-authentication 1.1 --tool=claude-code
+   sce prompt generate 01-00-user-authentication 1.1 --tool=claude-code
    ```
 
 5. **Work on task**:
@@ -178,18 +178,18 @@ Cursor works similarly to Claude Code but with IDE integration.
 
 **Prerequisites**:
 - Cursor IDE installed
-- kse installed: `npm install -g kiro-spec-engine`
+- sce installed: `npm install -g scene-capability-engine`
 
 ### Workflow
 
 1. **Export context**:
    ```bash
-   kse context export 01-00-user-authentication
+   sce context export 01-00-user-authentication
    ```
 
 2. **Generate task prompt**:
    ```bash
-   kse prompt generate 01-00-user-authentication 1.1 --tool=cursor
+   sce prompt generate 01-00-user-authentication 1.1 --tool=cursor
    ```
 
 3. **Load into Cursor**:
@@ -224,7 +224,7 @@ Cursor works similarly to Claude Code but with IDE integration.
 
 ```bash
 # 1. Generate prompt
-kse prompt generate 01-00-user-auth 1.1 --tool=cursor
+sce prompt generate 01-00-user-auth 1.1 --tool=cursor
 
 # 2. Open Cursor Composer (Cmd+K)
 # 3. Paste prompt content
@@ -247,18 +247,18 @@ GitHub Copilot works best with inline comments and code context.
 
 **Prerequisites**:
 - GitHub Copilot subscription
-- kse installed: `npm install -g kiro-spec-engine`
+- sce installed: `npm install -g scene-capability-engine`
 
 ### Workflow
 
 1. **Export context**:
    ```bash
-   kse context export 01-00-user-authentication
+   sce context export 01-00-user-authentication
    ```
 
 2. **Generate task prompt**:
    ```bash
-   kse prompt generate 01-00-user-authentication 1.1 --tool=codex
+   sce prompt generate 01-00-user-authentication 1.1 --tool=codex
    ```
 
 3. **Use in code**:
@@ -324,13 +324,13 @@ class AuthModule {
 
 ### Setup
 
-Any AI tool that accepts Markdown context can work with kse.
+Any AI tool that accepts Markdown context can work with sce.
 
 ### Workflow
 
 1. **Export context**:
    ```bash
-   kse context export <spec-name>
+   sce context export <spec-name>
    ```
 
 2. **Load into tool**:
@@ -358,7 +358,7 @@ Any AI tool that accepts Markdown context can work with kse.
 
 ## Feature Comparison
 
-| Feature | Kiro IDE | Claude Code | Cursor | Copilot | Generic |
+| Feature | AI IDE | Claude Code | Cursor | Copilot | Generic |
 |---------|----------|-------------|--------|---------|---------|
 | **Steering Auto-Load** | ✅ | ❌ | ❌ | ❌ | ❌ |
 | **Context Export** | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -377,20 +377,20 @@ Any AI tool that accepts Markdown context can work with kse.
 - ✅ Full support
 - ⚠️ Partial support / Manual steps required
 - ❌ Not supported
-- \* If available in Kiro IDE
+- \* If available in AI IDE
 
 ---
 
 ## Limitations and Trade-offs
 
-### Kiro IDE
+### AI IDE
 **Pros**:
 - Native integration, no manual steps
 - Full feature support
 - Real-time collaboration
 
 **Cons**:
-- Requires Kiro IDE
+- Requires AI IDE
 - Learning curve for IDE features
 
 ### Claude Code
@@ -448,27 +448,27 @@ Any AI tool that accepts Markdown context can work with kse.
 **Solutions**:
 ```bash
 # Export without steering
-kse context export <spec> --no-steering
+sce context export <spec> --no-steering
 
 # Generate task-specific prompt (smaller)
-kse prompt generate <spec> <task-id>
+sce prompt generate <spec> <task-id>
 
 # Export specific sections only
-kse context export <spec> --no-design
+sce context export <spec> --no-design
 ```
 
 ### Task Status Not Syncing
 
-**Problem**: Changes in AI tool don't update kse
+**Problem**: Changes in AI tool don't update sce
 
-**Solution**: Manual update required for non-Kiro tools
+**Solution**: Manual update required for non-SCE tools
 ```bash
 # Edit tasks.md manually
 vim .kiro/specs/<spec-name>/tasks.md
 
-# Or use kse commands
-kse task claim <spec> <task-id>
-kse task unclaim <spec> <task-id>
+# Or use sce commands
+sce task claim <spec> <task-id>
+sce task unclaim <spec> <task-id>
 ```
 
 ### Steering Rules Not Applied
@@ -477,7 +477,7 @@ kse task unclaim <spec> <task-id>
 
 **Solution**: Include steering in export
 ```bash
-kse context export <spec> --steering --steering-files=CORE_PRINCIPLES.md,ENVIRONMENT.md
+sce context export <spec> --steering --steering-files=CORE_PRINCIPLES.md,ENVIRONMENT.md
 ```
 
 ### Generated Code Doesn't Match Design
@@ -494,11 +494,11 @@ kse context export <spec> --steering --steering-files=CORE_PRINCIPLES.md,ENVIRON
 
 **Problem**: Multiple developers working on same task
 
-**Solution**: Use kse task claiming (Kiro IDE only)
+**Solution**: Use sce task claiming (AI IDE only)
 ```bash
-kse task claim <spec> <task-id>
+sce task claim <spec> <task-id>
 # Work on task
-kse task unclaim <spec> <task-id>
+sce task unclaim <spec> <task-id>
 ```
 
 For other tools: Manual coordination required
@@ -515,7 +515,7 @@ For other tools: Manual coordination required
 4. **Update status promptly**: Keep tasks.md current
 5. **Commit frequently**: Small, focused commits
 
-### For Non-Kiro Tools
+### For Non-SCE Tools
 
 1. **Manual task tracking**: Update tasks.md after each task
 2. **Context refresh**: Re-export if spec changes
@@ -523,7 +523,7 @@ For other tools: Manual coordination required
 4. **Code review**: Always review AI-generated code
 5. **Documentation**: Keep README and comments updated
 
-### For Kiro IDE
+### For AI IDE
 
 1. **Use steering rules**: Leverage automatic loading
 2. **Multi-user workspaces**: Enable for team projects
@@ -535,7 +535,7 @@ For other tools: Manual coordination required
 
 ## Additional Resources
 
-- [kse Documentation](../README.md)
+- [sce Documentation](../README.md)
 - [Spec Workflow Guide](../.kiro/specs/SPEC_WORKFLOW_GUIDE.md)
 - [Steering Strategy Guide](./steering-strategy-guide.md)
 - [Phase 1 Summary](../.kiro/specs/03-00-multi-user-and-cross-tool-support/docs/phase-1-summary.md)

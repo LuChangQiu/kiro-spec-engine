@@ -1,4 +1,4 @@
-﻿const fs = require('fs-extra');
+const fs = require('fs-extra');
 const os = require('os');
 const path = require('path');
 
@@ -8,7 +8,7 @@ describe('MachineIdentifier', () => {
   let tempRoot;
 
   beforeEach(async () => {
-    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'kse-machine-id-'));
+    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-machine-id-'));
   });
 
   afterEach(async () => {

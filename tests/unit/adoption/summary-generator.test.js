@@ -241,7 +241,7 @@ describe('SummaryGenerator', () => {
       const summary = generator.generateSummary();
 
       expect(summary.rollback.available).toBe(true);
-      expect(summary.rollback.command).toBe('kse rollback backup-123');
+      expect(summary.rollback.command).toBe('sce rollback backup-123');
       expect(summary.rollback.backupId).toBe('backup-123');
     });
 
@@ -306,7 +306,7 @@ describe('SummaryGenerator', () => {
       const text = generator.generateTextSummary({ color: false });
 
       expect(text).toContain('Your original files are safely backed up');
-      expect(text).toContain('kse rollback backup-123');
+      expect(text).toContain('sce rollback backup-123');
     });
 
     it('should include next steps', () => {
@@ -442,7 +442,7 @@ describe('SummaryGenerator', () => {
       const summary = generator.generateSummary();
 
       expect(summary.rollback.available).toBe(true);
-      expect(summary.rollback.command).toBe('kse rollback backup-456');
+      expect(summary.rollback.command).toBe('sce rollback backup-456');
       expect(summary.rollback.backupId).toBe('backup-456');
       expect(summary.rollback.backupLocation).toBe('.kiro/backups/backup-456');
     });

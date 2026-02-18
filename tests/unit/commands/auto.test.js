@@ -7384,6 +7384,77 @@ if (process.argv.includes('--json')) {
     expect(payload.recommendations.some(item => item.includes('sce auto close-loop-batch'))).toBe(true);
   });
 
+  test('infers manifest capabilities from templates when capabilities are not declared', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-23b-capability-matrix-inferred'],
+      templates: ['order-management'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'order-management');
+    await fs.ensureDir(templateDir);
+    await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
+      capabilities: {
+        provides: ['erp-order-management']
+      },
+      governance_contract: {
+        business_rules: [
+          { id: 'rule.order.status' }
+        ],
+        decision_logic: [
+          { id: 'decision.order.route' }
+        ]
+      },
+      ontology_model: {
+        entities: [
+          { id: 'order_header' }
+        ],
+        relations: [
+          { source: 'order_header', target: 'order_projection', type: 'produces' }
+        ]
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'sce',
+      'auto',
+      'handoff',
+      'capability-matrix',
+      '--manifest',
+      manifestFile,
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-capability-matrix');
+    expect(payload.handoff).toEqual(expect.objectContaining({
+      capability_count: 1,
+      capability_source: 'inferred-from-templates',
+      capabilities: ['erp-order-management']
+    }));
+    expect(payload.handoff.capability_inference).toEqual(expect.objectContaining({
+      applied: true,
+      inferred_count: 1,
+      unresolved_template_count: 0
+    }));
+    expect(payload.capability_coverage.summary).toEqual(expect.objectContaining({
+      total_capabilities: 1,
+      covered_capabilities: 1,
+      coverage_percent: 100,
+      passed: true,
+      semantic_complete_percent: 100,
+      semantic_passed: true
+    }));
+    expect(payload.gates.passed).toBe(true);
+  });
+
   test('supports capability matrix markdown format output file', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
     const outFile = path.join(tempDir, '.kiro', 'reports', 'handoff-capability-matrix.md');

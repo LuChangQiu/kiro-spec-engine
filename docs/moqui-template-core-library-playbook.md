@@ -32,7 +32,7 @@ Emergency bypass exists but is not recommended:
 ## One-Shot Intake Flow
 
 ```bash
-# 0) Generate template baseline scoreboard (Moqui/ERP templates by default)
+# 0) Generate template baseline scoreboard (Moqui + scene orchestration templates by default)
 sce scene moqui-baseline --json
 
 # 0.1) CI/release mode: compare against previous baseline and enforce portfolio gate

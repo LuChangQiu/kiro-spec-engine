@@ -904,13 +904,14 @@ sce scene package-ontology-backfill-batch --from-331 --dry-run --out-report .kir
 ### Moqui Template Baseline Scorecard
 
 ```bash
-# Preferred CLI entry: score Moqui/ERP templates in the local template library (default filter: moqui|erp)
+# Preferred CLI entry: score Moqui + scene orchestration templates in the local template library
+# (default filter: moqui|erp|suite|playbook|runbook|decision|action|governance)
 sce scene moqui-baseline --json
 
 # Script alias (same behavior)
 npm run report:moqui-baseline
 
-# Score all scene templates instead of Moqui/ERP subset
+# Score all scene templates instead of the default Moqui + orchestration subset
 sce scene moqui-baseline --include-all --json
 
 # Customize score thresholds and output paths

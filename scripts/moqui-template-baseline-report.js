@@ -11,7 +11,7 @@ const {
 const DEFAULT_TEMPLATE_DIR = '.kiro/templates/scene-packages';
 const DEFAULT_OUT = '.kiro/reports/moqui-template-baseline.json';
 const DEFAULT_MARKDOWN_OUT = '.kiro/reports/moqui-template-baseline.md';
-const DEFAULT_MATCH = '(moqui|erp)';
+const DEFAULT_MATCH = '(moqui|erp|suite|playbook|runbook|decision|action|governance)';
 const DEFAULT_MIN_SCORE = 70;
 const DEFAULT_MIN_VALID_RATE = 100;
 
@@ -149,6 +149,116 @@ function collectGapReasons(flags) {
   return gaps;
 }
 
+function detectTemplateScope(templateId) {
+  const text = `${templateId || ''}`.toLowerCase();
+  if (/(moqui|erp)/.test(text)) {
+    return 'moqui_erp';
+  }
+  if (/(scene|suite|playbook|runbook|decision|action|governance)/.test(text)) {
+    return 'scene_orchestration';
+  }
+  return 'other';
+}
+
+function summarizeScopeBreakdown(templates) {
+  const breakdown = {
+    moqui_erp: 0,
+    scene_orchestration: 0,
+    other: 0
+  };
+  for (const item of templates) {
+    const scope = detectTemplateScope(item && item.template_id);
+    breakdown[scope] = Number(breakdown[scope] || 0) + 1;
+  }
+  return breakdown;
+}
+
+function countFlag(templates, flagName) {
+  return templates.filter(
+    (item) => item && item.baseline && item.baseline.flags && item.baseline.flags[flagName] === true
+  ).length;
+}
+
+function buildCoverageMatrix(templates) {
+  const total = templates.length;
+  const entityCoverage = countFlag(templates, 'entity_coverage');
+  const relationCoverage = countFlag(templates, 'relation_coverage');
+  const businessRuleCoverage = countFlag(templates, 'business_rule_coverage');
+  const businessRuleClosed = countFlag(templates, 'business_rule_closed');
+  const decisionCoverage = countFlag(templates, 'decision_coverage');
+  const decisionClosed = countFlag(templates, 'decision_closed');
+  const graphValid = countFlag(templates, 'graph_valid');
+  const scorePassed = countFlag(templates, 'score_passed');
+  const baselinePassed = countFlag(templates, 'baseline_passed');
+
+  return {
+    total_templates: total,
+    graph_valid: {
+      count: graphValid,
+      rate_percent: toRate(graphValid, total)
+    },
+    score_passed: {
+      count: scorePassed,
+      rate_percent: toRate(scorePassed, total)
+    },
+    entity_coverage: {
+      count: entityCoverage,
+      rate_percent: toRate(entityCoverage, total)
+    },
+    relation_coverage: {
+      count: relationCoverage,
+      rate_percent: toRate(relationCoverage, total)
+    },
+    business_rule_coverage: {
+      count: businessRuleCoverage,
+      rate_percent: toRate(businessRuleCoverage, total)
+    },
+    business_rule_closed: {
+      count: businessRuleClosed,
+      rate_percent: toRate(businessRuleClosed, total),
+      among_covered_rate_percent: toRate(businessRuleClosed, businessRuleCoverage)
+    },
+    decision_coverage: {
+      count: decisionCoverage,
+      rate_percent: toRate(decisionCoverage, total)
+    },
+    decision_closed: {
+      count: decisionClosed,
+      rate_percent: toRate(decisionClosed, total),
+      among_covered_rate_percent: toRate(decisionClosed, decisionCoverage)
+    },
+    baseline_passed: {
+      count: baselinePassed,
+      rate_percent: toRate(baselinePassed, total)
+    }
+  };
+}
+
+function buildGapFrequency(templates) {
+  const counter = new Map();
+  for (const item of templates) {
+    const gaps = Array.isArray(item && item.baseline && item.baseline.gaps)
+      ? item.baseline.gaps
+      : [];
+    for (const gap of gaps) {
+      const key = `${gap || ''}`.trim();
+      if (!key) {
+        continue;
+      }
+      counter.set(key, Number(counter.get(key) || 0) + 1);
+    }
+  }
+
+  return Array.from(counter.entries())
+    .map(([gap, count]) => ({ gap, count }))
+    .sort((a, b) => {
+      if (b.count !== a.count) {
+        return b.count - a.count;
+      }
+      return a.gap.localeCompare(b.gap);
+    });
+}
+
 function toDelta(currentValue, previousValue) {
   if (!Number.isFinite(Number(currentValue)) || !Number.isFinite(Number(previousValue))) {
     return null;
@@ -221,6 +331,32 @@ function buildMarkdownReport(report) {
   lines.push(`- Baseline passed: ${report.summary.baseline_passed}`);
   lines.push(`- Baseline failed: ${report.summary.baseline_failed}`);
   lines.push(`- Portfolio pass: ${report.summary.portfolio_passed ? 'yes' : 'no'}`);
+  if (report.summary.scope_breakdown) {
+    const scopes = report.summary.scope_breakdown;
+    lines.push(`- Scope mix: moqui/erp=${scopes.moqui_erp || 0}, scene-orchestration=${scopes.scene_orchestration || 0}, other=${scopes.other || 0}`);
+  }
+  lines.push('');
+  lines.push('## Capability Matrix');
+  lines.push('');
+  lines.push('| Dimension | Count | Rate |');
+  lines.push('| --- | ---: | ---: |');
+  const matrix = report.summary.coverage_matrix || {};
+  const matrixRows = [
+    ['Graph valid', matrix.graph_valid],
+    ['Score passed', matrix.score_passed],
+    ['Entity coverage', matrix.entity_coverage],
+    ['Relation coverage', matrix.relation_coverage],
+    ['Business-rule coverage', matrix.business_rule_coverage],
+    ['Business-rule closed', matrix.business_rule_closed],
+    ['Decision coverage', matrix.decision_coverage],
+    ['Decision closed', matrix.decision_closed],
+    ['Baseline passed', matrix.baseline_passed]
+  ];
+  for (const [name, item] of matrixRows) {
+    const count = item && Number.isFinite(Number(item.count)) ? Number(item.count) : 0;
+    const rate = item && Number.isFinite(Number(item.rate_percent)) ? `${item.rate_percent}%` : 'n/a';
+    lines.push(`| ${name} | ${count} | ${rate} |`);
+  }
   lines.push('');
   lines.push('## Templates');
   lines.push('');
@@ -228,6 +364,16 @@ function buildMarkdownReport(report) {
   lines.push('| --- | ---: | --- | --- | --- |');
   for (const item of report.templates) {
     lines.push(`| ${item.template_id} | ${item.semantic.score} | ${item.ontology.valid ? 'valid' : 'invalid'} | ${item.baseline.flags.baseline_passed ? 'pass' : 'fail'} | ${item.baseline.gaps.join(', ') || 'none'} |`);
+  }
+  lines.push('');
+  lines.push('## Top Gaps');
+  lines.push('');
+  if (Array.isArray(report.summary.gap_frequency) && report.summary.gap_frequency.length > 0) {
+    for (const item of report.summary.gap_frequency.slice(0, 10)) {
+      lines.push(`- ${item.gap}: ${item.count}`);
+    }
+  } else {
+    lines.push('- none');
   }
   if (report.compare) {
     const compare = report.compare;
@@ -329,6 +475,8 @@ async function main() {
   const validCount = templates.filter((item) => item.ontology.valid).length;
   const scores = templates.map((item) => Number(item.semantic.score)).filter((value) => Number.isFinite(value));
   const baselinePassedCount = templates.filter((item) => item.baseline.flags.baseline_passed).length;
+  const coverageMatrix = buildCoverageMatrix(templates);
+  const gapFrequency = buildGapFrequency(templates);
   const summary = {
     total_templates: contracts.length,
     scoped_templates: templates.length,
@@ -338,6 +486,9 @@ async function main() {
     valid_rate_percent: toRate(validCount, templates.length),
     baseline_passed: baselinePassedCount,
     baseline_failed: templates.length - baselinePassedCount,
+    scope_breakdown: summarizeScopeBreakdown(templates),
+    coverage_matrix: coverageMatrix,
+    gap_frequency: gapFrequency,
     portfolio_passed: (
       templates.length > 0 &&
       Number(toRate(validCount, templates.length)) >= Number(options.minValidRate) &&

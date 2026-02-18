@@ -312,8 +312,8 @@ jobs:
           const maxRiskLevel = parseRiskLevel('RELEASE_GATE_MAX_RISK_LEVEL', 'unknown');
           const maxUnmappedRules = parseNumber('RELEASE_GATE_MAX_UNMAPPED_RULES', Number.POSITIVE_INFINITY);
           const maxUndecidedDecisions = parseNumber('RELEASE_GATE_MAX_UNDECIDED_DECISIONS', Number.POSITIVE_INFINITY);
-          const requireSceneBatchPass = parseBoolean('RELEASE_GATE_REQUIRE_SCENE_BATCH_PASS', false);
-          const maxSceneBatchFailures = parseNumber('RELEASE_GATE_MAX_SCENE_BATCH_FAILURES', Number.POSITIVE_INFINITY);
+          const requireSceneBatchPass = parseBoolean('RELEASE_GATE_REQUIRE_SCENE_BATCH_PASS', true);
+          const maxSceneBatchFailures = parseNumber('RELEASE_GATE_MAX_SCENE_BATCH_FAILURES', 0);
           const evidenceUsed = parseBoolean('RELEASE_EVIDENCE_USED', false);
           const summaryFile = read('RELEASE_EVIDENCE_SUMMARY_FILE', '');
           const gateReportFile = read('RELEASE_GATE_REPORT_FILE', '');

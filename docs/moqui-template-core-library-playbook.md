@@ -92,6 +92,7 @@ Required artifacts for each intake batch:
 - `coverage_matrix` (entity/relation/business-rule/decision coverage and closure rates)
 - `gap_frequency` (top recurring ontology gaps for remediation prioritization)
 - `compare.coverage_matrix_deltas` (trend deltas used to detect matrix regression/plateau between runs)
+- `compare.coverage_matrix_regressions` (negative-delta signals consumed by auto remediation/recommendation flows)
 
 ## Minimum Semantic Coverage
 

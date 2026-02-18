@@ -286,10 +286,109 @@ describe('moqui-template-baseline-report script', () => {
         decision_closed: expect.objectContaining({
           rate_percent: 50
         })
-      })
+      }),
+      coverage_matrix_regressions: []
     }));
     const markdown = await fs.readFile(markdownFile, 'utf8');
     expect(markdown).toContain('Delta business-rule closed: 50%');
     expect(markdown).toContain('Delta decision closed: 50%');
+    expect(markdown).toContain('Matrix regressions: none');
+  });
+
+  test('emits coverage matrix regressions for negative deltas', async () => {
+    const compareFile = path.join(tempDir, 'baseline-previous-regression.json');
+
+    await fs.writeJson(compareFile, {
+      generated_at: '2026-02-16T00:00:00.000Z',
+      template_root: '.kiro/templates/scene-packages',
+      summary: {
+        scoped_templates: 2,
+        avg_score: 92,
+        valid_rate_percent: 100,
+        baseline_passed: 2,
+        baseline_failed: 0,
+        portfolio_passed: true,
+        coverage_matrix: {
+          graph_valid: { count: 2, rate_percent: 100 },
+          score_passed: { count: 2, rate_percent: 100 },
+          entity_coverage: { count: 2, rate_percent: 100 },
+          relation_coverage: { count: 2, rate_percent: 100 },
+          business_rule_coverage: { count: 2, rate_percent: 100 },
+          business_rule_closed: { count: 2, rate_percent: 100, among_covered_rate_percent: 100 },
+          decision_coverage: { count: 2, rate_percent: 100 },
+          decision_closed: { count: 2, rate_percent: 100, among_covered_rate_percent: 100 },
+          baseline_passed: { count: 2, rate_percent: 100 }
+        }
+      },
+      templates: [
+        {
+          template_id: 'sce.scene--moqui-order-fulfillment--0.1.0',
+          baseline: { flags: { baseline_passed: true } }
+        },
+        {
+          template_id: 'sce.scene--suite-action-pack-followup--0.1.0',
+          baseline: { flags: { baseline_passed: true } }
+        }
+      ]
+    }, { spaces: 2 });
+
+    await writeTemplate(
+      templateRoot,
+      'sce.scene--moqui-order-fulfillment--0.1.0',
+      buildContract({
+        templateName: 'moqui-order-fulfillment-template',
+        provides: ['moqui-order-fulfillment'],
+        businessRules: true,
+        decisionLogic: true
+      })
+    );
+    await writeTemplate(
+      templateRoot,
+      'sce.scene--suite-action-pack-followup--0.1.0',
+      buildContract({
+        templateName: 'suite-action-pack-followup-template',
+        provides: ['scene-action-pack-followup'],
+        businessRules: false,
+        decisionLogic: false
+      })
+    );
+
+    const result = spawnSync(
+      process.execPath,
+      [
+        scriptPath,
+        '--template-dir',
+        templateRoot,
+        '--out',
+        outFile,
+        '--markdown-out',
+        markdownFile,
+        '--include-all',
+        '--compare-with',
+        compareFile,
+        '--json'
+      ],
+      {
+        cwd: projectRoot,
+        encoding: 'utf8'
+      }
+    );
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.compare.coverage_matrix_regressions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        metric: 'business_rule_closed',
+        delta_rate_percent: -50
+      }),
+      expect.objectContaining({
+        metric: 'decision_closed',
+        delta_rate_percent: -50
+      })
+    ]));
+    const markdown = await fs.readFile(markdownFile, 'utf8');
+    expect(markdown).toContain('Matrix regressions:');
+    expect(markdown).toContain('business-rule-closed:-50%');
+    expect(markdown).toContain('decision-closed:-50%');
   });
 });

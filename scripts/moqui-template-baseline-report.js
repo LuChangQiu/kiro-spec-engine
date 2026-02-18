@@ -273,6 +273,21 @@ function formatDeltaPercent(metric = {}) {
   return value === null ? 'n/a' : `${value}%`;
 }
 
+function metricLabel(metricName) {
+  const labels = {
+    graph_valid: 'graph-valid',
+    score_passed: 'score-passed',
+    entity_coverage: 'entity-coverage',
+    relation_coverage: 'relation-coverage',
+    business_rule_coverage: 'business-rule-coverage',
+    business_rule_closed: 'business-rule-closed',
+    decision_coverage: 'decision-coverage',
+    decision_closed: 'decision-closed',
+    baseline_passed: 'baseline-passed'
+  };
+  return labels[metricName] || metricName;
+}
+
 function readCoverageMetric(summary = {}, metricName = '') {
   const matrix = summary && summary.coverage_matrix && typeof summary.coverage_matrix === 'object'
     ? summary.coverage_matrix
@@ -317,6 +332,34 @@ function buildCoverageMatrixDeltas(currentSummary = {}, previousSummary = {}) {
   return deltas;
 }
 
+function buildCoverageMatrixRegressions(coverageMatrixDeltas = {}) {
+  const regressions = [];
+  const deltaMatrix = coverageMatrixDeltas && typeof coverageMatrixDeltas === 'object'
+    ? coverageMatrixDeltas
+    : {};
+  for (const [metric, value] of Object.entries(deltaMatrix)) {
+    if (!value || typeof value !== 'object') {
+      continue;
+    }
+    const deltaRate = Number(value.rate_percent);
+    if (!Number.isFinite(deltaRate) || deltaRate >= 0) {
+      continue;
+    }
+    regressions.push({
+      metric,
+      label: metricLabel(metric),
+      delta_rate_percent: Number(deltaRate.toFixed(2))
+    });
+  }
+
+  return regressions.sort((a, b) => {
+    if (a.delta_rate_percent !== b.delta_rate_percent) {
+      return a.delta_rate_percent - b.delta_rate_percent;
+    }
+    return a.metric.localeCompare(b.metric);
+  });
+}
+
 function readFailedTemplates(report) {
   const templates = Array.isArray(report && report.templates) ? report.templates : [];
   return templates
@@ -339,6 +382,7 @@ function buildComparison(report, previousReport) {
   const recovered = previousFailedTemplates
     .filter((item) => !currentFailedSet.has(item))
     .sort((a, b) => a.localeCompare(b));
+  const coverageMatrixDeltas = buildCoverageMatrixDeltas(currentSummary, previousSummary);
 
   return {
     previous_generated_at: previousReport && previousReport.generated_at ? previousReport.generated_at : null,
@@ -350,7 +394,8 @@ function buildComparison(report, previousReport) {
       baseline_passed: toDelta(currentSummary.baseline_passed, previousSummary.baseline_passed),
       baseline_failed: toDelta(currentSummary.baseline_failed, previousSummary.baseline_failed)
     },
-    coverage_matrix_deltas: buildCoverageMatrixDeltas(currentSummary, previousSummary),
+    coverage_matrix_deltas: coverageMatrixDeltas,
+    coverage_matrix_regressions: buildCoverageMatrixRegressions(coverageMatrixDeltas),
     portfolio: {
       previous_passed: previousSummary.portfolio_passed === true,
       current_passed: currentSummary.portfolio_passed === true,
@@ -431,6 +476,9 @@ function buildMarkdownReport(report) {
     const compare = report.compare;
     const deltas = compare.deltas || {};
     const matrixDeltas = compare.coverage_matrix_deltas || {};
+    const matrixRegressions = Array.isArray(compare.coverage_matrix_regressions)
+      ? compare.coverage_matrix_regressions
+      : [];
     const failedTemplates = compare.failed_templates || {};
     lines.push('');
     lines.push('## Trend vs Previous');
@@ -445,6 +493,11 @@ function buildMarkdownReport(report) {
     lines.push(`- Delta entity coverage: ${formatDeltaPercent(matrixDeltas.entity_coverage)}`);
     lines.push(`- Delta business-rule closed: ${formatDeltaPercent(matrixDeltas.business_rule_closed)}`);
     lines.push(`- Delta decision closed: ${formatDeltaPercent(matrixDeltas.decision_closed)}`);
+    lines.push(
+      `- Matrix regressions: ${matrixRegressions.length > 0
+        ? matrixRegressions.slice(0, 5).map(item => `${item.label}:${item.delta_rate_percent}%`).join(' | ')
+        : 'none'}`
+    );
     lines.push(`- Portfolio transition: ${compare.portfolio.previous_passed ? 'pass' : 'fail'} -> ${compare.portfolio.current_passed ? 'pass' : 'fail'}`);
     lines.push(`- Newly failed templates: ${failedTemplates.newly_failed && failedTemplates.newly_failed.length > 0 ? failedTemplates.newly_failed.join(', ') : 'none'}`);
     lines.push(`- Recovered templates: ${failedTemplates.recovered && failedTemplates.recovered.length > 0 ? failedTemplates.recovered.join(', ') : 'none'}`);

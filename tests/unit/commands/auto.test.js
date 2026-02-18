@@ -74,6 +74,7 @@ const payload = {
       business_rule_closed: { count: 0, rate_percent: 0 },
       decision_closed: { count: 0, rate_percent: 0 }
     },
+    coverage_matrix_regressions: [],
     failed_templates: {
       previous: [],
       current: [],
@@ -7286,7 +7287,8 @@ if (process.argv.includes('--json')) {
     expect(releaseEvidence.sessions[0].moqui_baseline.compare).toEqual(expect.objectContaining({
       coverage_matrix_deltas: expect.objectContaining({
         business_rule_closed: expect.objectContaining({ rate_percent: 0 })
-      })
+      }),
+      coverage_matrix_regressions: []
     }));
     expect(releaseEvidence.sessions[0].handoff_report_file).toContain('.kiro/reports/handoff-runs/');
     expect(releaseEvidence.sessions[0].trend_window).toEqual(expect.objectContaining({
@@ -7849,6 +7851,127 @@ if (process.argv.includes('--json')) {
     }));
     const releaseEvidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
     expect(await fs.pathExists(releaseEvidenceFile)).toBe(false);
+  });
+
+  test('adds Moqui matrix regression recommendations when baseline trend degrades', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-09-moqui-matrix-regression'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const baselineScript = path.join(tempDir, 'scripts', 'moqui-template-baseline-report.js');
+    await fs.writeFile(
+      baselineScript,
+      `'use strict';
+const fs = require('fs');
+const path = require('path');
+const readArg = flag => {
+  const index = process.argv.indexOf(flag);
+  return index >= 0 ? process.argv[index + 1] : null;
+};
+const outFile = readArg('--out');
+const markdownFile = readArg('--markdown-out');
+const payload = {
+  mode: 'moqui-template-baseline',
+  generated_at: '2026-02-17T00:00:00.000Z',
+  summary: {
+    total_templates: 4,
+    scoped_templates: 4,
+    avg_score: 92,
+    valid_rate_percent: 100,
+    baseline_passed: 4,
+    baseline_failed: 0,
+    portfolio_passed: true,
+    scope_breakdown: {
+      moqui_erp: 2,
+      scene_orchestration: 2,
+      other: 0
+    },
+    coverage_matrix: {
+      entity_coverage: { count: 4, rate_percent: 100 },
+      relation_coverage: { count: 4, rate_percent: 100 },
+      business_rule_coverage: { count: 4, rate_percent: 100 },
+      business_rule_closed: { count: 3, rate_percent: 75 },
+      decision_coverage: { count: 4, rate_percent: 100 },
+      decision_closed: { count: 3, rate_percent: 75 }
+    },
+    gap_frequency: []
+  },
+  compare: {
+    previous_generated_at: '2026-02-16T00:00:00.000Z',
+    deltas: {
+      scoped_templates: 0,
+      avg_score: 0,
+      valid_rate_percent: 0,
+      baseline_passed: 0,
+      baseline_failed: 0
+    },
+    coverage_matrix_deltas: {
+      entity_coverage: { count: 0, rate_percent: 0 },
+      relation_coverage: { count: 0, rate_percent: 0 },
+      business_rule_closed: { count: -1, rate_percent: -25 },
+      decision_closed: { count: -1, rate_percent: -25 }
+    },
+    failed_templates: {
+      previous: [],
+      current: [],
+      newly_failed: [],
+      recovered: []
+    }
+  }
+};
+if (outFile) {
+  fs.mkdirSync(path.dirname(outFile), { recursive: true });
+  fs.writeFileSync(outFile, JSON.stringify(payload, null, 2), 'utf8');
+}
+if (markdownFile) {
+  fs.mkdirSync(path.dirname(markdownFile), { recursive: true });
+  fs.writeFileSync(markdownFile, '# Mock Moqui Baseline Regression\\n', 'utf8');
+}
+if (process.argv.includes('--json')) {
+  process.stdout.write(JSON.stringify(payload));
+}
+`,
+      'utf8'
+    );
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'sce',
+      'auto',
+      'handoff',
+      'run',
+      '--manifest',
+      manifestFile,
+      '--dry-run',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.status).toBe('dry-run');
+    expect(payload.recommendations.some(item => item.includes('Recover Moqui matrix regressions'))).toBe(true);
+    expect(payload.failure_summary).toEqual(expect.objectContaining({
+      moqui_matrix_regressions: expect.arrayContaining([
+        expect.objectContaining({
+          metric: 'business_rule_closed',
+          delta_rate_percent: -25
+        })
+      ])
+    }));
+    expect(payload.remediation_queue).toEqual(expect.objectContaining({
+      goal_count: expect.any(Number)
+    }));
+    expect(await fs.pathExists(payload.remediation_queue.file)).toBe(true);
+    const queueContent = await fs.readFile(payload.remediation_queue.file, 'utf8');
+    expect(queueContent).toContain('recover moqui matrix regression business-rule-closed (-25%)');
+    expect(runAutoCloseLoop).not.toHaveBeenCalled();
   });
 
   test('enforces release gate preflight when --require-release-gate-preflight is set', async () => {
@@ -9657,6 +9780,7 @@ if (process.argv.includes('--json')) {
     expect(releaseDraft).toContain('Moqui entity coverage: 100%');
     expect(releaseDraft).toContain('Moqui business-rule closed: 83.33%');
     expect(releaseDraft).toContain('Moqui business-rule closed delta: 16.67%');
+    expect(releaseDraft).toContain('Moqui matrix regressions: none');
     expect(releaseDraft).toContain('Moqui top baseline gaps: unmapped business rules remain:1');
     expect(releaseDraft).toContain('## Risk Layer Snapshot');
     expect(releaseDraft).toContain('## Governance Snapshot');
@@ -9668,6 +9792,7 @@ if (process.argv.includes('--json')) {
     expect(reviewMarkdown).toContain('## Current Release Gate Preflight');
     expect(reviewMarkdown).toContain('## Current Failure Summary');
     expect(reviewMarkdown).toContain('Delta business-rule closed: 16.67%');
+    expect(reviewMarkdown).toContain('Matrix regressions: none');
   });
 
   test('builds release gate history index by merging reports with seed history', async () => {

@@ -59,8 +59,14 @@ describe('moqui-core-regression-suite script', () => {
     expect(Array.isArray(payload.failed_stages)).toBe(true);
     expect(payload.failed_stages).toHaveLength(0);
     expect(Array.isArray(payload.stages)).toBe(true);
-    expect(payload.stages).toHaveLength(3);
+    expect(payload.stages).toHaveLength(4);
     expect(payload.stages.every(stage => stage.passed === true)).toBe(true);
+    expect(payload.stages.map(stage => stage.name)).toEqual(expect.arrayContaining([
+      'moqui-baseline',
+      'scene-package-publish-batch-dry-run',
+      'moqui-lexicon-audit',
+      'auto-handoff-dry-run'
+    ]));
     expect(await fs.pathExists(outFile)).toBe(true);
     expect(await fs.pathExists(markdownFile)).toBe(true);
   });

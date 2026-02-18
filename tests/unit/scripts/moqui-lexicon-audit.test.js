@@ -1,0 +1,122 @@
+const fs = require('fs-extra');
+const os = require('os');
+const path = require('path');
+const { spawnSync } = require('child_process');
+
+describe('moqui-lexicon-audit script', () => {
+  let tempDir;
+  let fixtureWorkspace;
+
+  beforeEach(async () => {
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-moqui-lexicon-audit-'));
+    const projectRoot = path.resolve(__dirname, '..', '..', '..');
+    fixtureWorkspace = path.join(
+      projectRoot,
+      'tests',
+      'fixtures',
+      'moqui-core-regression',
+      'workspace'
+    );
+  });
+
+  afterEach(async () => {
+    if (tempDir) {
+      await fs.remove(tempDir);
+    }
+  });
+
+  test('audits fixture manifest and template capabilities against lexicon', async () => {
+    const projectRoot = path.resolve(__dirname, '..', '..', '..');
+    const scriptPath = path.join(projectRoot, 'scripts', 'moqui-lexicon-audit.js');
+    const outFile = path.join(tempDir, 'moqui-lexicon-audit.json');
+    const markdownFile = path.join(tempDir, 'moqui-lexicon-audit.md');
+
+    const result = spawnSync(
+      process.execPath,
+      [
+        scriptPath,
+        '--manifest',
+        'docs/handoffs/handoff-manifest.json',
+        '--template-dir',
+        '.kiro/templates/scene-packages',
+        '--lexicon',
+        path.join(projectRoot, 'lib', 'data', 'moqui-capability-lexicon.json'),
+        '--out',
+        outFile,
+        '--markdown-out',
+        markdownFile,
+        '--json',
+      ],
+      {
+        cwd: fixtureWorkspace,
+        encoding: 'utf8',
+      }
+    );
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.mode).toBe('moqui-lexicon-audit');
+    expect(payload.summary).toEqual(expect.objectContaining({
+      expected_total: 3,
+      expected_unknown_count: 0,
+      provided_unknown_count: 0,
+      uncovered_expected_count: 0,
+      passed: true,
+    }));
+    expect(payload.coverage.coverage_percent).toBe(100);
+    expect(await fs.pathExists(outFile)).toBe(true);
+    expect(await fs.pathExists(markdownFile)).toBe(true);
+  });
+
+  test('fails with exit code 2 when unknown lexicon gaps exist and --fail-on-gap is set', async () => {
+    const projectRoot = path.resolve(__dirname, '..', '..', '..');
+    const scriptPath = path.join(projectRoot, 'scripts', 'moqui-lexicon-audit.js');
+    const workspace = path.join(tempDir, 'workspace');
+    const manifestFile = path.join(workspace, 'docs', 'handoffs', 'handoff-manifest.json');
+    const templateDir = path.join(workspace, '.kiro', 'templates', 'scene-packages', 'tpl-a');
+    const outFile = path.join(tempDir, 'moqui-lexicon-audit-gap.json');
+
+    await fs.ensureDir(path.dirname(manifestFile));
+    await fs.ensureDir(templateDir);
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-18T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['66-01-gap-sample'],
+      templates: ['tpl-a'],
+      capabilities: ['mystery-capability']
+    }, { spaces: 2 });
+    await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
+      capabilities: {
+        provides: ['mystery-capability']
+      }
+    }, { spaces: 2 });
+
+    const result = spawnSync(
+      process.execPath,
+      [
+        scriptPath,
+        '--manifest',
+        'docs/handoffs/handoff-manifest.json',
+        '--template-dir',
+        '.kiro/templates/scene-packages',
+        '--lexicon',
+        path.join(projectRoot, 'lib', 'data', 'moqui-capability-lexicon.json'),
+        '--out',
+        outFile,
+        '--json',
+        '--fail-on-gap',
+      ],
+      {
+        cwd: workspace,
+        encoding: 'utf8',
+      }
+    );
+
+    expect(result.status).toBe(2);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.mode).toBe('moqui-lexicon-audit');
+    expect(payload.summary.passed).toBe(false);
+    expect(payload.summary.expected_unknown_count).toBe(1);
+    expect(payload.summary.provided_unknown_count).toBe(1);
+  });
+});

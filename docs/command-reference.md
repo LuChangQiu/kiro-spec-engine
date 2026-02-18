@@ -817,6 +817,9 @@ Dual-track handoff integration:
   - Aggregates include scene package batch, drift, and release-preflight/hard-gate signals (`scene_package_batch_*`, `drift_alert_*`, `drift_block_*`, `release_gate_preflight_*`) when present in gate reports.
   - `--markdown-out <path>` writes a human-readable trend card markdown for PR/Issue handoff.
 
+Moqui template library lexicon audit (script-level governance helper):
+- `node scripts/moqui-lexicon-audit.js [--manifest <path>] [--template-dir <path>] [--lexicon <path>] [--out <path>] [--markdown-out <path>] [--fail-on-gap] [--json]`: audit manifest/template capability names against canonical Moqui lexicon; reports unknown aliases and uncovered expected capabilities.
+
 Recommended `.kiro/config/orchestrator.json`:
 
 ```json

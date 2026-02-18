@@ -131,6 +131,16 @@ function summarizeStageOutput(stage) {
       batch_gate_passed: batchGate.passed === true,
     };
   }
+  if (stage.name === 'moqui-lexicon-audit') {
+    const summary = payload.summary && typeof payload.summary === 'object' ? payload.summary : {};
+    return {
+      passed: summary.passed === true,
+      expected_unknown_count: Number(summary.expected_unknown_count),
+      provided_unknown_count: Number(summary.provided_unknown_count),
+      uncovered_expected_count: Number(summary.uncovered_expected_count),
+      coverage_percent: Number(summary.coverage_percent),
+    };
+  }
   if (stage.name === 'auto-handoff-dry-run') {
     const gates = payload.gates && typeof payload.gates === 'object' ? payload.gates : {};
     return {
@@ -164,6 +174,19 @@ function evaluateStage(stage) {
       return {
         passed: false,
         reason: 'portfolio baseline gate failed',
+      };
+    }
+  } else if (stage.name === 'moqui-lexicon-audit') {
+    const summary = payload.summary && typeof payload.summary === 'object' ? payload.summary : {};
+    if (summary.passed !== true) {
+      return {
+        passed: false,
+        reason: (
+          'moqui lexicon audit gate failed: ' +
+          `expected_unknown=${Number(summary.expected_unknown_count) || 0}, ` +
+          `provided_unknown=${Number(summary.provided_unknown_count) || 0}, ` +
+          `uncovered_expected=${Number(summary.uncovered_expected_count) || 0}`
+        ),
       };
     }
   } else if (stage.name === 'scene-package-publish-batch-dry-run') {
@@ -239,6 +262,8 @@ async function main() {
 
   const baselineJsonFile = path.join(stageArtifactDir, 'moqui-template-baseline.json');
   const baselineMarkdownFile = path.join(stageArtifactDir, 'moqui-template-baseline.md');
+  const lexiconAuditJsonFile = path.join(stageArtifactDir, 'moqui-lexicon-audit.json');
+  const lexiconAuditMarkdownFile = path.join(stageArtifactDir, 'moqui-lexicon-audit.md');
 
   const stageDefinitions = [
     {
@@ -268,6 +293,20 @@ async function main() {
       ],
       artifact_json: null,
       artifact_markdown: null,
+    },
+    {
+      name: 'moqui-lexicon-audit',
+      args: [
+        path.join(projectRoot, 'scripts', 'moqui-lexicon-audit.js'),
+        '--manifest', 'docs/handoffs/handoff-manifest.json',
+        '--template-dir', '.kiro/templates/scene-packages',
+        '--lexicon', path.join(projectRoot, 'lib', 'data', 'moqui-capability-lexicon.json'),
+        '--out', lexiconAuditJsonFile,
+        '--markdown-out', lexiconAuditMarkdownFile,
+        '--json',
+      ],
+      artifact_json: lexiconAuditJsonFile,
+      artifact_markdown: lexiconAuditMarkdownFile,
     },
     {
       name: 'auto-handoff-dry-run',

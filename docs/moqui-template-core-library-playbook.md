@@ -51,6 +51,13 @@ sce auto handoff capability-matrix \
   --fail-on-gap \
   --json
 
+# 0.3) Capability lexicon audit (expected/provided canonical alignment)
+node scripts/moqui-lexicon-audit.js \
+  --manifest docs/handoffs/handoff-manifest.json \
+  --template-dir .kiro/templates/scene-packages \
+  --fail-on-gap \
+  --json
+
 # 1) Handoff close-loop
 sce auto handoff run --manifest docs/handoffs/handoff-manifest.json --json
 
@@ -88,6 +95,8 @@ Required artifacts for each intake batch:
 - `.kiro/reports/release-evidence/moqui-template-baseline.md`
 - `.kiro/reports/release-evidence/moqui-capability-coverage.json`
 - `.kiro/reports/release-evidence/moqui-capability-coverage.md`
+- `.kiro/reports/release-evidence/moqui-lexicon-audit.json`
+- `.kiro/reports/release-evidence/moqui-lexicon-audit.md`
 - `.kiro/reports/handoff-capability-matrix.md` (or JSON equivalent from `sce auto handoff capability-matrix`)
 - `.kiro/reports/handoff-runs/<session>.json`
 - `.kiro/reports/scene-package-ontology-batch.json`

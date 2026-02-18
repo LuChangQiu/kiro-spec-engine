@@ -721,7 +721,7 @@ Close-loop controller session maintenance:
 
 Cross-archive autonomous governance maintenance:
 - `kse auto governance stats [--days <n>] [--status <csv>] [--json]`: aggregate a unified governance snapshot from session/batch-session/controller-session archives plus recovery memory state.
-  - JSON output includes `totals`, `throughput`, `health` (`risk_level`, `concerns`, `recommendations`), `top_master_specs`, `recovery_memory`, and full per-archive stats under `archives`.
+  - JSON output includes `totals`, `throughput`, `health` (`risk_level`, `concerns`, `recommendations`, `release_gate`), `top_master_specs`, `recovery_memory`, and full per-archive stats under `archives`.
 - `kse auto governance maintain [--days <n>] [--status <csv>] [--session-keep <n>] [--batch-session-keep <n>] [--controller-session-keep <n>] [--recovery-memory-older-than-days <n>] [--apply] [--dry-run] [--json]`: run governance-maintenance planning and optional execution in one command.
   - Plan-only mode is default; add `--apply` to execute maintenance actions (`session prune`, `batch-session prune`, `controller-session prune`, `recovery-memory prune`).
   - JSON output includes `assessment` (pre-maintenance governance snapshot), `plan`, `executed_actions`, `summary`, and `after_assessment` (only when `--apply` without `--dry-run`).

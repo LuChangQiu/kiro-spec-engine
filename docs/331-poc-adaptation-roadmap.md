@@ -98,10 +98,13 @@
 34. gate-index 漂移趋势聚合：
    - `kse auto handoff gate-index` 聚合 `drift_alert_count/drift_blocked` 指标并输出 markdown 趋势。
    - 发布流程在 drift 合并后自动刷新一次 gate-index，确保当次 release 资产包含 drift 最新状态。
+35. 治理默认评估接入 handoff 发布信号：
+   - `kse auto governance stats` 默认读取 `release-gate-history.json`，将 gate/drift/scene-batch 信号纳入风险评估。
+   - 治理健康输出新增 `health.release_gate` 快照，concerns/recommendations 自动给出 release 质量回归处置建议。
 
 ## 下一阶段（P2）
 
-1. 将 handoff 质量指标纳入 `kse auto governance close-loop` 默认评估维度（含发布门禁与趋势信号）。
+1. 将 release gate 历史信号进一步接入 `kse auto governance close-loop` 轮次级 telemetry（round before/after）。
 
 ## 长期目标（P3）
 

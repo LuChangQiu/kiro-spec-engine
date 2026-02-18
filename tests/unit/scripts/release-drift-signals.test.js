@@ -26,7 +26,9 @@ describe('release drift signals', () => {
       highRiskShareDeltaMinPercent: 0,
       preflightBlockRateMinPercent: 55,
       hardGateBlockStreakMin: 1,
-      preflightUnavailableStreakMin: 4
+      preflightUnavailableStreakMin: 4,
+      capabilityExpectedUnknownRateMinPercent: 40,
+      capabilityProvidedUnknownRateMinPercent: 40
     });
   });
 
@@ -39,7 +41,9 @@ describe('release drift signals', () => {
           risk_level: 'high',
           release_gate_preflight_available: false,
           release_gate_preflight_blocked: true,
-          require_release_gate_preflight: true
+          require_release_gate_preflight: true,
+          capability_expected_unknown_count: 1,
+          capability_provided_unknown_count: 2
         },
         {
           tag: 'v1.2.0',
@@ -47,7 +51,9 @@ describe('release drift signals', () => {
           risk_level: 'high',
           release_gate_preflight_available: false,
           release_gate_preflight_blocked: true,
-          require_release_gate_preflight: true
+          require_release_gate_preflight: true,
+          capability_expected_unknown_count: 0,
+          capability_provided_unknown_count: 0
         },
         {
           tag: 'v1.1.0',
@@ -55,7 +61,9 @@ describe('release drift signals', () => {
           risk_level: 'high',
           release_gate_preflight_available: true,
           release_gate_preflight_blocked: false,
-          require_release_gate_preflight: false
+          require_release_gate_preflight: false,
+          capability_expected_unknown_count: 1,
+          capability_provided_unknown_count: 0
         }
       ]
     };
@@ -67,7 +75,9 @@ describe('release drift signals', () => {
         highRiskShareDeltaMinPercent: 0,
         preflightBlockRateMinPercent: 50,
         hardGateBlockStreakMin: 2,
-        preflightUnavailableStreakMin: 2
+        preflightUnavailableStreakMin: 2,
+        capabilityExpectedUnknownRateMinPercent: 50,
+        capabilityProvidedUnknownRateMinPercent: 50
       }
     });
 
@@ -76,13 +86,17 @@ describe('release drift signals', () => {
     expect(signals.recentPreflightBlockedRate).toBe(66.67);
     expect(signals.hardGateBlockedStreak).toBe(2);
     expect(signals.preflightUnavailableStreak).toBe(2);
+    expect(signals.recentCapabilityExpectedUnknownRate).toBe(66.67);
+    expect(signals.recentCapabilityProvidedUnknownRate).toBe(33.33);
     expect(signals.alerts).toEqual(expect.arrayContaining([
       expect.stringContaining('consecutive gate failures'),
       expect.stringContaining('high-risk share in latest 5'),
       expect.stringContaining('release preflight blocked rate'),
       expect.stringContaining('hard-gate preflight blocked streak'),
-      expect.stringContaining('release preflight unavailable streak')
+      expect.stringContaining('release preflight unavailable streak'),
+      expect.stringContaining('capability expected unknown positive rate')
     ]));
+    expect(signals.alerts.some(item => item.includes('capability provided unknown positive rate'))).toBe(false);
   });
 
   test('does not emit preflight block-rate alert without known preflight signals', () => {
@@ -98,7 +112,9 @@ describe('release drift signals', () => {
         highRiskShareDeltaMinPercent: 100,
         preflightBlockRateMinPercent: 1,
         hardGateBlockStreakMin: 1,
-        preflightUnavailableStreakMin: 1
+        preflightUnavailableStreakMin: 1,
+        capabilityExpectedUnknownRateMinPercent: 1,
+        capabilityProvidedUnknownRateMinPercent: 1
       }
     });
 
@@ -129,7 +145,9 @@ describe('release drift signals', () => {
         highRiskShareDeltaMinPercent: 10,
         preflightBlockRateMinPercent: 50,
         hardGateBlockStreakMin: 2,
-        preflightUnavailableStreakMin: 2
+        preflightUnavailableStreakMin: 2,
+        capabilityExpectedUnknownRateMinPercent: 100,
+        capabilityProvidedUnknownRateMinPercent: 100
       }
     });
 
@@ -157,7 +175,9 @@ describe('release drift signals', () => {
         highRiskShareDeltaMinPercent: 10,
         preflightBlockRateMinPercent: 50,
         hardGateBlockStreakMin: 2,
-        preflightUnavailableStreakMin: 2
+        preflightUnavailableStreakMin: 2,
+        capabilityExpectedUnknownRateMinPercent: 100,
+        capabilityProvidedUnknownRateMinPercent: 100
       }
     });
 

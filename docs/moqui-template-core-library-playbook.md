@@ -17,8 +17,10 @@ sce defaults already enforce the baseline below:
 - `sce auto handoff run`: requires Moqui baseline portfolio pass by default.
 - `sce auto handoff run`: enforces Moqui matrix regression hard-gate by default (`max_moqui_matrix_regressions=0`).
 - `sce auto handoff run`: evaluates capability coverage matrix by default when manifest `capabilities` is declared (default minimum `100%`).
+- `sce auto handoff run` / `sce auto handoff capability-matrix`: enforces capability lexicon normalization by default (expected/provided unknown aliases are blocked unless explicitly bypassed).
 - `sce auto handoff capability-matrix`: enforces both capability coverage and capability semantic completeness (default minimum `100%` for each).
 - `sce auto governance stats` / `sce auto governance close-loop`: treats Moqui matrix regressions as first-class risk/block signals (including over-gate stop reasons).
+- `sce auto governance stats` / `sce auto governance close-loop`: treats capability lexicon unknown-count signals as first-class risk/block signals.
 - `sce scene package-publish-batch`:
   - ontology validation required by default
   - batch ontology gate defaults:

@@ -21,7 +21,9 @@ function buildThresholdPayload(thresholds) {
     high_risk_share_delta_min_percent: thresholds.highRiskShareDeltaMinPercent,
     preflight_block_rate_min_percent: thresholds.preflightBlockRateMinPercent,
     hard_gate_block_streak_min: thresholds.hardGateBlockStreakMin,
-    preflight_unavailable_streak_min: thresholds.preflightUnavailableStreakMin
+    preflight_unavailable_streak_min: thresholds.preflightUnavailableStreakMin,
+    capability_expected_unknown_rate_min_percent: thresholds.capabilityExpectedUnknownRateMinPercent,
+    capability_provided_unknown_rate_min_percent: thresholds.capabilityProvidedUnknownRateMinPercent
   };
 }
 
@@ -75,6 +77,12 @@ function evaluateReleaseDrift(options = {}) {
     highRiskDeltaPercent,
     highRiskShare,
     preflightUnavailableStreak,
+    recentCapabilityExpectedUnknownKnown,
+    recentCapabilityExpectedUnknownPositive,
+    recentCapabilityExpectedUnknownRate,
+    recentCapabilityProvidedUnknownKnown,
+    recentCapabilityProvidedUnknownPositive,
+    recentCapabilityProvidedUnknownRate,
     recentPreflightBlocked,
     recentPreflightBlockedRate,
     recentPreflightKnown,
@@ -95,6 +103,12 @@ function evaluateReleaseDrift(options = {}) {
       preflight_blocked_rate_latest5_percent: recentPreflightBlockedRate,
       hard_gate_blocked_streak_latest5: hardGateBlockedStreak,
       preflight_unavailable_streak_latest5: preflightUnavailableStreak,
+      capability_expected_unknown_known_latest5: recentCapabilityExpectedUnknownKnown,
+      capability_expected_unknown_positive_latest5: recentCapabilityExpectedUnknownPositive,
+      capability_expected_unknown_positive_rate_latest5_percent: recentCapabilityExpectedUnknownRate,
+      capability_provided_unknown_known_latest5: recentCapabilityProvidedUnknownKnown,
+      capability_provided_unknown_positive_latest5: recentCapabilityProvidedUnknownPositive,
+      capability_provided_unknown_positive_rate_latest5_percent: recentCapabilityProvidedUnknownRate,
       recent_window_size: windows.recent,
       short_window_size: windows.short,
       long_window_size: windows.long
@@ -111,14 +125,18 @@ function evaluateReleaseDrift(options = {}) {
     + `high_delta_threshold=${thresholds.highRiskShareDeltaMinPercent}% `
     + `preflight_block_rate_threshold=${thresholds.preflightBlockRateMinPercent}% `
     + `hard_gate_block_streak_threshold=${thresholds.hardGateBlockStreakMin} `
-    + `preflight_unavailable_streak_threshold=${thresholds.preflightUnavailableStreakMin}`
+    + `preflight_unavailable_streak_threshold=${thresholds.preflightUnavailableStreakMin} `
+    + `cap_expected_unknown_rate_threshold=${thresholds.capabilityExpectedUnknownRateMinPercent}% `
+    + `cap_provided_unknown_rate_threshold=${thresholds.capabilityProvidedUnknownRateMinPercent}%`
   );
   console.log(
     `[release-drift] metrics failed_streak=${failedStreak} high_share=${highRiskShare}% `
     + `high_delta=${highRiskDeltaPercent}% `
     + `preflight_block_rate=${recentPreflightBlockedRate === null ? 'n/a' : `${recentPreflightBlockedRate}%`} `
     + `hard_gate_block_streak=${hardGateBlockedStreak} `
-    + `preflight_unavailable_streak=${preflightUnavailableStreak}`
+    + `preflight_unavailable_streak=${preflightUnavailableStreak} `
+    + `cap_expected_unknown_rate=${recentCapabilityExpectedUnknownRate === null ? 'n/a' : `${recentCapabilityExpectedUnknownRate}%`} `
+    + `cap_provided_unknown_rate=${recentCapabilityProvidedUnknownRate === null ? 'n/a' : `${recentCapabilityProvidedUnknownRate}%`}`
   );
   if (alerts.length > 0) {
     alerts.forEach(item => console.warn(`[release-drift] alert=${item}`));
@@ -151,6 +169,8 @@ function evaluateReleaseDrift(options = {}) {
     `- release preflight blocked rate threshold: ${thresholds.preflightBlockRateMinPercent}%`,
     `- hard-gate blocked streak threshold: ${thresholds.hardGateBlockStreakMin}`,
     `- preflight unavailable streak threshold: ${thresholds.preflightUnavailableStreakMin}`,
+    `- capability expected unknown rate threshold: ${thresholds.capabilityExpectedUnknownRateMinPercent}%`,
+    `- capability provided unknown rate threshold: ${thresholds.capabilityProvidedUnknownRateMinPercent}%`,
     `- failed streak (latest 5): ${failedStreak}`,
     `- high risk share (latest 5): ${highRiskShare}%`,
     `- high risk delta (short-long): ${highRiskDeltaPercent}%`,
@@ -160,7 +180,17 @@ function evaluateReleaseDrift(options = {}) {
         : `${recentPreflightBlocked}/${recentPreflightKnown} (${recentPreflightBlockedRate}%)`
     }`,
     `- hard-gate blocked streak (latest 5): ${hardGateBlockedStreak}`,
-    `- preflight unavailable streak (latest 5): ${preflightUnavailableStreak}`
+    `- preflight unavailable streak (latest 5): ${preflightUnavailableStreak}`,
+    `- capability expected unknown ratio (latest 5): ${
+      recentCapabilityExpectedUnknownKnown === 0
+        ? 'n/a'
+        : `${recentCapabilityExpectedUnknownPositive}/${recentCapabilityExpectedUnknownKnown} (${recentCapabilityExpectedUnknownRate}%)`
+    }`,
+    `- capability provided unknown ratio (latest 5): ${
+      recentCapabilityProvidedUnknownKnown === 0
+        ? 'n/a'
+        : `${recentCapabilityProvidedUnknownPositive}/${recentCapabilityProvidedUnknownKnown} (${recentCapabilityProvidedUnknownRate}%)`
+    }`
   ];
   if (alerts.length === 0) {
     summaryLines.push('', '- no alerts');

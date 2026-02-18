@@ -630,6 +630,12 @@ jobs:
               const sceneBatchFailedCount = payload.aggregates && Number.isFinite(Number(payload.aggregates.scene_package_batch_failed_count))
                 ? Number(payload.aggregates.scene_package_batch_failed_count)
                 : null;
+              const capabilityExpectedUnknownRateHistory = payload.aggregates && Number.isFinite(Number(payload.aggregates.capability_expected_unknown_positive_rate_percent))
+                ? Number(payload.aggregates.capability_expected_unknown_positive_rate_percent)
+                : null;
+              const capabilityProvidedUnknownRateHistory = payload.aggregates && Number.isFinite(Number(payload.aggregates.capability_provided_unknown_positive_rate_percent))
+                ? Number(payload.aggregates.capability_provided_unknown_positive_rate_percent)
+                : null;
               const preflightAvailabilityRateHistory = payload.aggregates && Number.isFinite(Number(payload.aggregates.release_gate_preflight_availability_rate_percent))
                 ? Number(payload.aggregates.release_gate_preflight_availability_rate_percent)
                 : null;
@@ -655,6 +661,12 @@ jobs:
                 recentPreflightBlockedRate,
                 hardGateBlockedStreak,
                 preflightUnavailableStreak,
+                recentCapabilityExpectedUnknownKnown,
+                recentCapabilityExpectedUnknownPositive,
+                recentCapabilityExpectedUnknownRate,
+                recentCapabilityProvidedUnknownKnown,
+                recentCapabilityProvidedUnknownPositive,
+                recentCapabilityProvidedUnknownRate,
                 alerts: driftAlerts
               } = driftSignals;
               const failStreakThreshold = thresholds.failStreakMin;
@@ -663,6 +675,8 @@ jobs:
               const preflightBlockRateThreshold = thresholds.preflightBlockRateMinPercent;
               const hardGateBlockedStreakThreshold = thresholds.hardGateBlockStreakMin;
               const preflightUnavailableStreakThreshold = thresholds.preflightUnavailableStreakMin;
+              const capabilityExpectedUnknownRateThreshold = thresholds.capabilityExpectedUnknownRateMinPercent;
+              const capabilityProvidedUnknownRateThreshold = thresholds.capabilityProvidedUnknownRateMinPercent;
               const releaseTag = process.env.RELEASE_TAG || 'current';
               const releaseRepository = process.env.RELEASE_REPOSITORY || process.env.GITHUB_REPOSITORY || '';
               const historyCardAsset = `release-gate-history-${releaseTag}.md`;
@@ -686,17 +700,21 @@ jobs:
                 `- Gate pass rate (history): ${passRate === null ? 'n/a' : `${passRate}%`}`,
                 `- Scene batch pass rate (history): ${sceneBatchPassRate === null ? 'n/a' : `${sceneBatchPassRate}%`}`,
                 `- Scene batch failed runs (history): ${sceneBatchFailedCount === null ? 'n/a' : sceneBatchFailedCount}`,
+                `- Capability expected unknown-positive rate (history): ${capabilityExpectedUnknownRateHistory === null ? 'n/a' : `${capabilityExpectedUnknownRateHistory}%`}`,
+                `- Capability provided unknown-positive rate (history): ${capabilityProvidedUnknownRateHistory === null ? 'n/a' : `${capabilityProvidedUnknownRateHistory}%`}`,
                 `- Release preflight availability rate (history): ${preflightAvailabilityRateHistory === null ? 'n/a' : `${preflightAvailabilityRateHistory}%`}`,
                 `- Release preflight blocked rate (history): ${preflightBlockedRateHistory === null ? 'n/a' : `${preflightBlockedRateHistory}%`}`,
                 `- Recent pass ratio (latest 5): ${recentKnown === 0 ? 'n/a' : `${recentPass}/${recentKnown}`}`,
                 `- Recent risk mix (latest 5): low=${riskCounts.low}, medium=${riskCounts.medium}, high=${riskCounts.high}, unknown=${riskCounts.unknown}`,
+                `- Recent capability expected unknown ratio (latest 5): ${recentCapabilityExpectedUnknownKnown === 0 ? 'n/a' : `${recentCapabilityExpectedUnknownPositive}/${recentCapabilityExpectedUnknownKnown} (${recentCapabilityExpectedUnknownRate}%)`}`,
+                `- Recent capability provided unknown ratio (latest 5): ${recentCapabilityProvidedUnknownKnown === 0 ? 'n/a' : `${recentCapabilityProvidedUnknownPositive}/${recentCapabilityProvidedUnknownKnown} (${recentCapabilityProvidedUnknownRate}%)`}`,
                 `- Recent preflight blocked ratio (latest 5): ${recentPreflightKnown === 0 ? 'n/a' : `${recentPreflightBlocked}/${recentPreflightKnown} (${recentPreflightBlockedRate}%)`}`,
                 `- Hard-gate preflight blocked streak (latest 5): ${hardGateBlockedStreak}`,
                 `- Preflight unavailable streak (latest 5): ${preflightUnavailableStreak}`,
                 `- Trend card: ${historyCardUrl ? `[${historyCardAsset}](${historyCardUrl})` : historyCardAsset}`,
                 `- History index: ${historyJsonUrl ? `[${historyJsonAsset}](${historyJsonUrl})` : historyJsonAsset}`,
                 `- History summary: ${historySummaryUrl ? `[${historySummaryAsset}](${historySummaryUrl})` : historySummaryAsset}`,
-                `- Drift thresholds: fail_streak>=${failStreakThreshold}, high_share>=${highRiskShareThreshold}%, high_share_delta>=${highRiskDeltaThreshold}%, preflight_block_rate>=${preflightBlockRateThreshold}%, hard_gate_block_streak>=${hardGateBlockedStreakThreshold}, preflight_unavailable_streak>=${preflightUnavailableStreakThreshold}`,
+                `- Drift thresholds: fail_streak>=${failStreakThreshold}, high_share>=${highRiskShareThreshold}%, high_share_delta>=${highRiskDeltaThreshold}%, preflight_block_rate>=${preflightBlockRateThreshold}%, hard_gate_block_streak>=${hardGateBlockedStreakThreshold}, preflight_unavailable_streak>=${preflightUnavailableStreakThreshold}, cap_expected_unknown_rate>=${capabilityExpectedUnknownRateThreshold}%, cap_provided_unknown_rate>=${capabilityProvidedUnknownRateThreshold}%`,
                 '',
                 '### Drift Alerts'
               ];
@@ -732,6 +750,12 @@ jobs:
                   const sceneFailures = Number.isFinite(Number(item && item.scene_package_batch_failure_count))
                     ? `${Number(item.scene_package_batch_failure_count)}`
                     : 'n/a';
+                  const capabilityExpectedUnknown = Number.isFinite(Number(item && item.capability_expected_unknown_count))
+                    ? `${Number(item.capability_expected_unknown_count)}`
+                    : 'n/a';
+                  const capabilityProvidedUnknown = Number.isFinite(Number(item && item.capability_provided_unknown_count))
+                    ? `${Number(item.capability_provided_unknown_count)}`
+                    : 'n/a';
                   const preflightBlocked = item && typeof item.release_gate_preflight_blocked === 'boolean'
                     ? (item.release_gate_preflight_blocked ? 'yes' : 'no')
                     : 'n/a';
@@ -742,7 +766,7 @@ jobs:
                   lines.push(
                     '',
                     `- ${tag} | passed=${passed} | risk=${risk} | scene-batch=${sceneBatch} | ` +
-                    `scene-failures=${sceneFailures} | preflight-blocked=${preflightBlocked} | hard-gate=${hardGateMode} | success=${successRate} | at=${evaluatedAt}`
+                    `scene-failures=${sceneFailures} | capability-unknown=${capabilityExpectedUnknown}/${capabilityProvidedUnknown} | preflight-blocked=${preflightBlocked} | hard-gate=${hardGateMode} | success=${successRate} | at=${evaluatedAt}`
                   );
                 }
               }
@@ -762,6 +786,8 @@ jobs:
           RELEASE_DRIFT_PREFLIGHT_BLOCK_RATE_MIN_PERCENT: ${{ vars.KSE_RELEASE_DRIFT_PREFLIGHT_BLOCK_RATE_MIN_PERCENT }}
           RELEASE_DRIFT_HARD_GATE_BLOCK_STREAK_MIN: ${{ vars.KSE_RELEASE_DRIFT_HARD_GATE_BLOCK_STREAK_MIN }}
           RELEASE_DRIFT_PREFLIGHT_UNAVAILABLE_STREAK_MIN: ${{ vars.KSE_RELEASE_DRIFT_PREFLIGHT_UNAVAILABLE_STREAK_MIN }}
+          RELEASE_DRIFT_CAPABILITY_EXPECTED_UNKNOWN_RATE_MIN_PERCENT: ${{ vars.KSE_RELEASE_DRIFT_CAPABILITY_EXPECTED_UNKNOWN_RATE_MIN_PERCENT }}
+          RELEASE_DRIFT_CAPABILITY_PROVIDED_UNKNOWN_RATE_MIN_PERCENT: ${{ vars.KSE_RELEASE_DRIFT_CAPABILITY_PROVIDED_UNKNOWN_RATE_MIN_PERCENT }}
           RELEASE_GATE_REPORT_FILE: ${{ steps.release_notes.outputs.gate_file }}
         run: |
           set -euo pipefail

@@ -10476,6 +10476,8 @@ if (process.argv.includes('--json')) {
         'gate_passed=true',
         'scene_package_batch_passed=true',
         'scene_package_batch_failure_count=0',
+        'capability_expected_unknown_count=0',
+        'capability_provided_unknown_count=0',
         'release_gate_preflight_available=true',
         'release_gate_preflight_blocked=false',
         'require_release_gate_preflight=false'
@@ -10508,6 +10510,8 @@ if (process.argv.includes('--json')) {
         'gate_passed=false',
         'scene_package_batch_passed=false',
         'scene_package_batch_failure_count=2',
+        'capability_expected_unknown_count=1',
+        'capability_provided_unknown_count=2',
         'release_gate_preflight_available=true',
         'release_gate_preflight_blocked=true',
         'require_release_gate_preflight=true'
@@ -10538,6 +10542,8 @@ if (process.argv.includes('--json')) {
           risk_level: 'unknown',
           scene_package_batch_passed: true,
           scene_package_batch_failure_count: 0,
+          capability_expected_unknown_count: 0,
+          capability_provided_unknown_count: 0,
           violations_count: 0,
           config_warning_count: 0,
           thresholds: {}
@@ -10567,6 +10573,8 @@ if (process.argv.includes('--json')) {
       gate_passed: false,
       scene_package_batch_passed: false,
       scene_package_batch_failure_count: 2,
+      capability_expected_unknown_count: 1,
+      capability_provided_unknown_count: 2,
       release_gate_preflight_available: true,
       release_gate_preflight_blocked: true,
       require_release_gate_preflight: true,
@@ -10581,6 +10589,16 @@ if (process.argv.includes('--json')) {
       scene_package_batch_pass_rate_percent: 66.67,
       scene_package_batch_failed_count: 1,
       avg_scene_package_batch_failure_count: 0.67,
+      capability_expected_unknown_known_runs: 3,
+      capability_expected_unknown_positive_runs: 1,
+      capability_expected_unknown_positive_rate_percent: 33.33,
+      avg_capability_expected_unknown_count: 0.33,
+      max_capability_expected_unknown_count: 1,
+      capability_provided_unknown_known_runs: 3,
+      capability_provided_unknown_positive_runs: 1,
+      capability_provided_unknown_positive_rate_percent: 33.33,
+      avg_capability_provided_unknown_count: 0.67,
+      max_capability_provided_unknown_count: 2,
       drift_alert_runs: 1,
       drift_blocked_runs: 1,
       drift_alert_rate_percent: 50,
@@ -10597,6 +10615,8 @@ if (process.argv.includes('--json')) {
       risk_level: 'high',
       scene_package_batch_passed: false,
       scene_package_batch_failure_count: 2,
+      capability_expected_unknown_count: 1,
+      capability_provided_unknown_count: 2,
       release_gate_preflight_available: true,
       release_gate_preflight_blocked: true,
       require_release_gate_preflight: true,
@@ -10662,6 +10682,7 @@ if (process.argv.includes('--json')) {
     expect(markdown).toContain('Drift alert runs');
     expect(markdown).toContain('Release preflight blocked runs');
     expect(markdown).toContain('drift-alerts=');
+    expect(markdown).toContain('capability-unknown=');
     expect(markdown).toContain('preflight-blocked=');
     expect(markdown).toContain('hard-gate=');
     expect(markdown).toContain('v1.0.0');

@@ -66,6 +66,14 @@ function resolveReleaseDriftThresholds(env = process.env) {
     preflightUnavailableStreakMin: Math.max(
       1,
       Math.floor(parseNumber(env.RELEASE_DRIFT_PREFLIGHT_UNAVAILABLE_STREAK_MIN, 2))
+    ),
+    capabilityExpectedUnknownRateMinPercent: Math.max(
+      0,
+      Math.min(100, parseNumber(env.RELEASE_DRIFT_CAPABILITY_EXPECTED_UNKNOWN_RATE_MIN_PERCENT, 40))
+    ),
+    capabilityProvidedUnknownRateMinPercent: Math.max(
+      0,
+      Math.min(100, parseNumber(env.RELEASE_DRIFT_CAPABILITY_PROVIDED_UNKNOWN_RATE_MIN_PERCENT, 40))
     )
   };
 }
@@ -75,7 +83,13 @@ function buildReleaseDriftSignals(payload = {}, options = {}) {
   const windowSize = Math.max(1, Math.floor(parseNumber(options.windowSize, 5)));
   const shortWindowSize = Math.max(1, Math.floor(parseNumber(options.shortWindowSize, 3)));
   const longWindowSize = Math.max(shortWindowSize, Math.floor(parseNumber(options.longWindowSize, 5)));
-  const thresholds = options.thresholds || resolveReleaseDriftThresholds(options.env || process.env);
+  const defaultThresholds = resolveReleaseDriftThresholds(options.env || process.env);
+  const thresholds = options.thresholds && typeof options.thresholds === 'object'
+    ? {
+      ...defaultThresholds,
+      ...options.thresholds
+    }
+    : defaultThresholds;
 
   const recent = entries.slice(0, Math.min(entries.length, windowSize));
   const shortWindow = entries.slice(0, Math.min(entries.length, shortWindowSize));
@@ -118,6 +132,30 @@ function buildReleaseDriftSignals(payload = {}, options = {}) {
     recent,
     item => item && item.release_gate_preflight_available === false
   );
+  const recentCapabilityExpectedUnknownKnown = recent.filter(item => (
+    item &&
+    Number.isFinite(Number(item.capability_expected_unknown_count))
+  )).length;
+  const recentCapabilityExpectedUnknownPositive = recent.filter(item => (
+    item &&
+    Number.isFinite(Number(item.capability_expected_unknown_count)) &&
+    Number(item.capability_expected_unknown_count) > 0
+  )).length;
+  const recentCapabilityExpectedUnknownRate = recentCapabilityExpectedUnknownKnown > 0
+    ? Number(((recentCapabilityExpectedUnknownPositive / recentCapabilityExpectedUnknownKnown) * 100).toFixed(2))
+    : null;
+  const recentCapabilityProvidedUnknownKnown = recent.filter(item => (
+    item &&
+    Number.isFinite(Number(item.capability_provided_unknown_count))
+  )).length;
+  const recentCapabilityProvidedUnknownPositive = recent.filter(item => (
+    item &&
+    Number.isFinite(Number(item.capability_provided_unknown_count)) &&
+    Number(item.capability_provided_unknown_count) > 0
+  )).length;
+  const recentCapabilityProvidedUnknownRate = recentCapabilityProvidedUnknownKnown > 0
+    ? Number(((recentCapabilityProvidedUnknownPositive / recentCapabilityProvidedUnknownKnown) * 100).toFixed(2))
+    : null;
 
   const alerts = [];
   if (failedStreak >= thresholds.failStreakMin) {
@@ -160,6 +198,24 @@ function buildReleaseDriftSignals(payload = {}, options = {}) {
       + `(threshold=${thresholds.preflightUnavailableStreakMin})`
     );
   }
+  if (
+    recentCapabilityExpectedUnknownRate !== null &&
+    recentCapabilityExpectedUnknownRate >= thresholds.capabilityExpectedUnknownRateMinPercent
+  ) {
+    alerts.push(
+      `capability expected unknown positive rate in latest ${windowSize} is ${recentCapabilityExpectedUnknownRate}% `
+      + `(threshold=${thresholds.capabilityExpectedUnknownRateMinPercent}%, known=${recentCapabilityExpectedUnknownKnown})`
+    );
+  }
+  if (
+    recentCapabilityProvidedUnknownRate !== null &&
+    recentCapabilityProvidedUnknownRate >= thresholds.capabilityProvidedUnknownRateMinPercent
+  ) {
+    alerts.push(
+      `capability provided unknown positive rate in latest ${windowSize} is ${recentCapabilityProvidedUnknownRate}% `
+      + `(threshold=${thresholds.capabilityProvidedUnknownRateMinPercent}%, known=${recentCapabilityProvidedUnknownKnown})`
+    );
+  }
 
   return {
     entries,
@@ -175,6 +231,12 @@ function buildReleaseDriftSignals(payload = {}, options = {}) {
     recentPreflightBlockedRate,
     hardGateBlockedStreak,
     preflightUnavailableStreak,
+    recentCapabilityExpectedUnknownKnown,
+    recentCapabilityExpectedUnknownPositive,
+    recentCapabilityExpectedUnknownRate,
+    recentCapabilityProvidedUnknownKnown,
+    recentCapabilityProvidedUnknownPositive,
+    recentCapabilityProvidedUnknownRate,
     alerts,
     thresholds,
     windows: {
@@ -191,4 +253,3 @@ module.exports = {
   parseNumber,
   resolveReleaseDriftThresholds
 };
-

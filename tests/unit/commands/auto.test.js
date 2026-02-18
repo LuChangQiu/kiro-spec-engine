@@ -4785,12 +4785,31 @@ if (process.argv.includes('--json')) {
 
   test('runs governance close-loop in plan-only mode', async () => {
     const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
     await fs.ensureDir(closeLoopSessionDir);
+    await fs.ensureDir(releaseEvidenceDir);
     const failedSession = path.join(closeLoopSessionDir, 'governance-close-loop-plan-failed.json');
     await fs.writeJson(failedSession, {
       session_id: 'governance-close-loop-plan-failed',
       status: 'failed',
       portfolio: { master_spec: '121-00-close-loop', sub_specs: [] }
+    }, { spaces: 2 });
+    await fs.writeJson(path.join(releaseEvidenceDir, 'release-gate-history.json'), {
+      mode: 'auto-handoff-release-gate-history',
+      total_entries: 4,
+      latest: {
+        tag: 'v1.47.35',
+        gate_passed: false,
+        risk_level: 'high'
+      },
+      aggregates: {
+        pass_rate_percent: 75,
+        scene_package_batch_pass_rate_percent: 70,
+        drift_alert_rate_percent: 50,
+        drift_alert_runs: 2,
+        drift_blocked_runs: 1
+      },
+      entries: []
     }, { spaces: 2 });
 
     const program = buildProgram();
@@ -4817,6 +4836,16 @@ if (process.argv.includes('--json')) {
     expect(parsed.stop_reason).toBe('non-mutating-mode');
     expect(Array.isArray(parsed.rounds)).toBe(true);
     expect(parsed.rounds).toHaveLength(1);
+    expect(parsed.rounds[0].release_gate_before).toEqual(expect.objectContaining({
+      available: true,
+      latest_gate_passed: false,
+      drift_alert_rate_percent: 50
+    }));
+    expect(parsed.rounds[0].release_gate_after).toEqual(expect.objectContaining({
+      available: true,
+      latest_gate_passed: false,
+      drift_alert_rate_percent: 50
+    }));
   });
 
   test('runs governance close-loop with apply and converges to target risk', async () => {

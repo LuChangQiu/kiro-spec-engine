@@ -101,10 +101,13 @@
 35. 治理默认评估接入 handoff 发布信号：
    - `kse auto governance stats` 默认读取 `release-gate-history.json`，将 gate/drift/scene-batch 信号纳入风险评估。
    - 治理健康输出新增 `health.release_gate` 快照，concerns/recommendations 自动给出 release 质量回归处置建议。
+36. 治理 close-loop 轮次遥测接入发布信号：
+   - `kse auto governance close-loop` 每轮输出 `release_gate_before/release_gate_after`，与 `risk_before/risk_after` 对齐。
+   - 轮次级审计可直接追踪 release gate/drift/scene-batch 信号在治理动作前后的变化。
 
 ## 下一阶段（P2）
 
-1. 将 release gate 历史信号进一步接入 `kse auto governance close-loop` 轮次级 telemetry（round before/after）。
+1. 将 governance close-loop 的 release gate 轮次 telemetry 聚合进 `kse auto governance session stats`，形成会话级趋势统计。
 
 ## 长期目标（P3）
 

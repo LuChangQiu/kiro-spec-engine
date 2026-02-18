@@ -9027,7 +9027,10 @@ if (process.argv.includes('--json')) {
         'spec_success_rate=88',
         'gate_passed=true',
         'scene_package_batch_passed=true',
-        'scene_package_batch_failure_count=0'
+        'scene_package_batch_failure_count=0',
+        'release_gate_preflight_available=true',
+        'release_gate_preflight_blocked=false',
+        'require_release_gate_preflight=false'
       ],
       violations: [],
       config_warnings: [],
@@ -9056,7 +9059,10 @@ if (process.argv.includes('--json')) {
         'spec_success_rate=70',
         'gate_passed=false',
         'scene_package_batch_passed=false',
-        'scene_package_batch_failure_count=2'
+        'scene_package_batch_failure_count=2',
+        'release_gate_preflight_available=true',
+        'release_gate_preflight_blocked=true',
+        'require_release_gate_preflight=true'
       ],
       violations: [
         'risk level high exceeds max medium'
@@ -9113,6 +9119,9 @@ if (process.argv.includes('--json')) {
       gate_passed: false,
       scene_package_batch_passed: false,
       scene_package_batch_failure_count: 2,
+      release_gate_preflight_available: true,
+      release_gate_preflight_blocked: true,
+      require_release_gate_preflight: true,
       drift_alert_count: 2,
       drift_blocked: true
     }));
@@ -9127,13 +9136,22 @@ if (process.argv.includes('--json')) {
       drift_alert_runs: 1,
       drift_blocked_runs: 1,
       drift_alert_rate_percent: 50,
-      drift_block_rate_percent: 50
+      drift_block_rate_percent: 50,
+      release_gate_preflight_known_runs: 2,
+      release_gate_preflight_available_runs: 2,
+      release_gate_preflight_blocked_runs: 1,
+      release_gate_preflight_hard_gate_runs: 1,
+      release_gate_preflight_availability_rate_percent: 100,
+      release_gate_preflight_block_rate_percent: 50
     }));
     expect(payload.entries[0]).toEqual(expect.objectContaining({
       tag: 'v1.3.0',
       risk_level: 'high',
       scene_package_batch_passed: false,
       scene_package_batch_failure_count: 2,
+      release_gate_preflight_available: true,
+      release_gate_preflight_blocked: true,
+      require_release_gate_preflight: true,
       drift_alert_count: 2,
       drift_blocked: true
     }));
@@ -9158,7 +9176,10 @@ if (process.argv.includes('--json')) {
         'risk_level=low',
         'spec_success_rate=98',
         'scene_package_batch_passed=true',
-        'scene_package_batch_failure_count=0'
+        'scene_package_batch_failure_count=0',
+        'release_gate_preflight_available=true',
+        'release_gate_preflight_blocked=false',
+        'require_release_gate_preflight=true'
       ],
       evaluated_at: '2026-02-17T03:00:00.000Z'
     }, { spaces: 2 });
@@ -9191,7 +9212,10 @@ if (process.argv.includes('--json')) {
     expect(markdown).toContain('Scene package batch pass rate');
     expect(markdown).toContain('scene-batch=');
     expect(markdown).toContain('Drift alert runs');
+    expect(markdown).toContain('Release preflight blocked runs');
     expect(markdown).toContain('drift-alerts=');
+    expect(markdown).toContain('preflight-blocked=');
+    expect(markdown).toContain('hard-gate=');
     expect(markdown).toContain('v1.0.0');
   });
 

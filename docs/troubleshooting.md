@@ -1035,11 +1035,11 @@ ls -la .kiro/
 - [Command Reference](command-reference.md)
 
 **2. GitHub Issues:**
-- Search existing issues: https://github.com/heguangyong/kiro-spec-engine/issues
-- Create new issue: https://github.com/heguangyong/kiro-spec-engine/issues/new
+- Search existing issues: https://github.com/heguangyong/scene-capability-engine/issues
+- Create new issue: https://github.com/heguangyong/scene-capability-engine/issues/new
 
 **3. GitHub Discussions:**
-- Ask questions: https://github.com/heguangyong/kiro-spec-engine/discussions
+- Ask questions: https://github.com/heguangyong/scene-capability-engine/discussions
 - Share tips and tricks
 - Connect with other users
 
@@ -1126,7 +1126,7 @@ kse docs diagnose
 kse docs cleanup --dry-run
 ```
 
-**Still stuck?** → [Create an issue](https://github.com/heguangyong/kiro-spec-engine/issues/new)
+**Still stuck?** → [Create an issue](https://github.com/heguangyong/scene-capability-engine/issues/new)
 
 ---
 

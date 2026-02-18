@@ -1334,8 +1334,8 @@ fi
 If you encounter issues or have questions:
 
 - 📖 Check the [Troubleshooting Guide](troubleshooting.md)
-- 🐛 Report bugs on [GitHub Issues](https://github.com/heguangyong/kiro-spec-engine/issues)
-- 💬 Ask questions in [GitHub Discussions](https://github.com/heguangyong/kiro-spec-engine/discussions)
+- 🐛 Report bugs on [GitHub Issues](https://github.com/heguangyong/scene-capability-engine/issues)
+- 💬 Ask questions in [GitHub Discussions](https://github.com/heguangyong/scene-capability-engine/discussions)
 
 ---
 

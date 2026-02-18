@@ -1,11 +1,11 @@
-# SCO - Scene Capability Orchestrator
+# SCE - Scene Capability Engine
 
-[![npm version](https://badge.fury.io/js/sco-engine.svg)](https://badge.fury.io/js/sco-engine)
+[![npm version](https://badge.fury.io/js/scene-capability-engine.svg)](https://badge.fury.io/js/scene-capability-engine)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **⚠️ 重要说明**: `sco-engine`（`sco`）是一个 **npm 包和 CLI 工具**，用于 Spec 驱动开发。  
+> **⚠️ 重要说明**: `scene-capability-engine`（`sce`）是一个 **npm 包和 CLI 工具**，用于 Spec 驱动开发。  
 > 它**不是** Kiro IDE 桌面应用程序。如果你在寻找 Kiro IDE，请访问 https://kiro.dev
-> 兼容保留旧命令：`kse` 与 `kiro-spec-engine`。
+> 兼容保留命令：`sco`、`kse` 与 `kiro-spec-engine`。
 
 **AI 编码工具的上下文提供者** - 结构化你的项目需求、设计和任务，让 AI 助手帮你构建更好的软件。
 
@@ -13,43 +13,43 @@
 
 ---
 
-## 什么是 sco？
+## 什么是 sce？
 
-**SCO（场景能力编排引擎）是一个 AI 辅助开发的上下文管理系统。** 它帮助你将项目信息组织成结构化的 "Spec"（需求 → 设计 → 任务），让 AI 工具能够理解和有效使用。
+**SCE（场景能力引擎）是一个 AI 辅助开发的上下文管理系统。** 它帮助你将项目信息组织成结构化的 "Spec"（需求 → 设计 → 任务），让 AI 工具能够理解和有效使用。
 
-把 sco 想象成 **AI 助手的图书管理员** - 它组织和呈现项目上下文，让你的 AI 工具准确知道你在构建什么、为什么构建以及如何构建。
+把 sce 想象成 **AI 助手的图书管理员** - 它组织和呈现项目上下文，让你的 AI 工具准确知道你在构建什么、为什么构建以及如何构建。
 
 ### 工作原理
 
 ```mermaid
 graph LR
-    A[你创建 Spec] --> B[sco 组织上下文]
+    A[你创建 Spec] --> B[sce 组织上下文]
     B --> C[AI 工具读取上下文]
     C --> D[AI 生成更好的代码]
 ```
 
 1. **你创建 Spec** - 在结构化的 markdown 文件中编写需求、设计和任务
-2. **sco 组织上下文** - 导出为 AI 工具优化的格式
+2. **sce 组织上下文** - 导出为 AI 工具优化的格式
 3. **AI 工具读取上下文** - 你的 AI 助手理解项目结构
 4. **AI 生成更好的代码** - 符合你设计和需求的代码
 
-### sco 不是什么
+### sce 不是什么
 
-- ❌ **不是代码生成器** - sco 不写代码；你的 AI 工具写代码
-- ❌ **不是 IDE** - sco 与你现有的开发工具配合使用
+- ❌ **不是代码生成器** - sce 不写代码；你的 AI 工具写代码
+- ❌ **不是 IDE** - sce 与你现有的开发工具配合使用
 - ❌ **不是特定 AI 工具** - 适用于 Claude、Cursor、Windsurf、Copilot 等任何 AI 工具
 - ❌ **不是文档的替代品** - 它是组织项目上下文的结构化方式
 
-### 谁应该使用 sco？
+### 谁应该使用 sce？
 
 - ✅ 使用 AI 编码助手的开发者（Claude、Cursor、Copilot 等）
 - ✅ 需要结构化项目文档的团队
 - ✅ 构建需要清晰需求和设计的功能的任何人
 - ✅ 受益于 Spec 驱动开发的项目
 
-## 为什么 sco 更有优势
+## 为什么 sce 更有优势
 
-| 优势点 | sco 能力 | 实际收益 |
+| 优势点 | sce 能力 | 实际收益 |
 | --- | --- | --- |
 | 结构化先行 | 需求 → 设计 → 任务 + gate 检查 | 降低返工和需求漂移 |
 | 自动闭环交付 | 单命令闭环（`auto close-loop`） | 不再分步骤等待人工确认 |
@@ -65,17 +65,17 @@ graph LR
 ### 90 秒价值验证
 
 ```bash
-# 1) 在当前仓库启用 sco
-sco adopt
+# 1) 在当前仓库启用 sce
+sce adopt
 
 # 2) 生成 Spec 工作流草稿
-sco spec bootstrap --name 01-00-demo-feature --non-interactive
+sce spec bootstrap --name 01-00-demo-feature --non-interactive
 
 # 3) 生成 KPI 输入样例
-sco value metrics sample --out ./kpi-input.json --json
+sce value metrics sample --out ./kpi-input.json --json
 
 # 4) 产出机器可读 KPI 快照
-sco value metrics snapshot --input ./kpi-input.json --json
+sce value metrics snapshot --input ./kpi-input.json --json
 ```
 
 ---
@@ -87,12 +87,12 @@ sco value metrics snapshot --input ./kpi-input.json --json
 **只需告诉你的 AI：**
 
 ```
-安装 sco 并用它以 Spec 驱动开发的方式管理这个项目。
+安装 sce 并用它以 Spec 驱动开发的方式管理这个项目。
 ```
 
 **你的 AI 会：**
-1. 全局安装 sco（`npm install -g sco-engine`）
-2. 在项目中采用它（`sco adopt`）
+1. 全局安装 sce（`npm install -g scene-capability-engine`）
+2. 在项目中采用它（`sce adopt`）
 3. 阅读方法论指南（`.kiro/README.md`）
 4. 按照 Spec 驱动方式开始工作
 
@@ -105,24 +105,24 @@ sco value metrics snapshot --input ./kpi-input.json --json
 <details>
 <summary><b>点击展开详细步骤</b></summary>
 
-#### 步骤 1：安装 sco（30 秒）
+#### 步骤 1：安装 sce（30 秒）
 
 ```bash
-npm install -g sco-engine
+npm install -g scene-capability-engine
 ```
 
 验证安装：
 ```bash
-sco --version
+sce --version
 ```
 
-#### 步骤 2：在项目中采用 sco（30 秒）
+#### 步骤 2：在项目中采用 sce（30 秒）
 
 导航到项目目录并运行：
 
 ```bash
 cd your-project
-sco adopt
+sce adopt
 ```
 
 这会创建一个 `.kiro/` 目录，包含：
@@ -142,7 +142,7 @@ sco adopt
 - 这个项目遵循 Spec 驱动开发
 - 每个功能都从 Spec 开始（需求 + 设计 + 任务）
 - 如何按照这个方法论工作
-- 何时使用 sco 命令
+- 何时使用 sce 命令
 
 #### 步骤 4：开始构建功能
 
@@ -156,7 +156,7 @@ sco adopt
 1. 创建包含需求、设计和任务的 Spec
 2. 按照 Spec 实现
 3. 随着工作进展更新任务状态
-4. 内部使用 sco 命令（你不需要运行它们）
+4. 内部使用 sce 命令（你不需要运行它们）
 
 **示例对话：**
 - **你**："我需要用邮箱和密码登录的功能"
@@ -168,7 +168,7 @@ sco adopt
 
 ---
 
-**关键洞察：** 你不是"使用 sco" - 你的项目"遵循 Spec 驱动方法论"，sco 帮助执行它。AI 为你处理所有 sco 命令。
+**关键洞察：** 你不是"使用 sce" - 你的项目"遵循 Spec 驱动方法论"，sce 帮助执行它。AI 为你处理所有 sce 命令。
 
 ### 步骤 5：下一步（30 秒）
 
@@ -197,9 +197,9 @@ sco adopt
 
 ### 集成模式
 
-sco 支持三种与 AI 工具协作的方式：
+sce 支持三种与 AI 工具协作的方式：
 
-1. **原生集成** - AI 工具直接访问 sco（Kiro IDE）
+1. **原生集成** - AI 工具直接访问 sce（Kiro IDE）
 2. **手动导出** - 你导出并粘贴上下文（Claude、ChatGPT、Cursor）
 3. **Watch 模式** - 文件更改时自动更新上下文（所有工具）
 
@@ -209,7 +209,7 @@ sco 支持三种与 AI 工具协作的方式：
 
 ## 与 AI 工具集成
 
-sco 适用于任何 AI 编码助手。选择你的工具获取具体指导：
+sce 适用于任何 AI 编码助手。选择你的工具获取具体指导：
 
 ### 流行的 AI 工具
 
@@ -226,13 +226,13 @@ sco 适用于任何 AI 编码助手。选择你的工具获取具体指导：
 sequenceDiagram
     participant 你
     participant AI工具
-    participant sco
+    participant sce
     你->>AI工具: "我有一个 user-login 的 Spec，实现任务 1.1"
-    AI工具->>sco: sco context export user-login
-    kse->>AI工具: Spec 内容（需求、设计、任务）
+    AI工具->>sce: sce context export user-login
+    sce->>AI工具: Spec 内容（需求、设计、任务）
     AI工具->>AI工具: 根据 Spec 生成代码
     AI工具->>你: 这是实现
-    AI工具->>sco: 更新 tasks.md（标记任务完成）
+    AI工具->>sce: 更新 tasks.md（标记任务完成）
 ```
 
 **关键洞察：** 你留在 AI 工具中。AI 读取 Spec 并生成符合你设计的代码。
@@ -253,8 +253,8 @@ sequenceDiagram
 - 🎭 **[场景运行时指南](docs/scene-runtime-guide.md)** - 模板引擎、质量流水线、Ontology、Moqui ERP
 - 🤖 **[多 Agent 协调指南](docs/multi-agent-coordination-guide.md)** - 多 Agent 并行协调
 - 📈 **[Value 可观测指南](docs/zh/value-observability-guide.md)** - KPI 快照、基线、趋势与门禁证据
-- 🔌 **[集成模式](docs/integration-modes.md)** - 三种集成 sco 的方式
-- 📝 **[命令参考](docs/command-reference.md)** - 所有 sco 命令
+- 🔌 **[集成模式](docs/integration-modes.md)** - 三种集成 sce 的方式
+- 📝 **[命令参考](docs/command-reference.md)** - 所有 sce 命令
 
 ### 工具特定指南
 - [Cursor 集成](docs/zh/tools/cursor-guide.md)
@@ -270,14 +270,14 @@ sequenceDiagram
 - [CLI 功能示例](docs/examples/add-export-command/) - CLI 命令 Spec
 
 ### 高级主题
-- [采用指南](docs/adoption-guide.md) - 在现有项目中采用 sco
+- [采用指南](docs/adoption-guide.md) - 在现有项目中采用 sce
 - [升级指南](docs/upgrade-guide.md) - 版本升级说明
 - [发布归档](docs/zh/releases/README.md) - 版本化发布说明与验证报告入口
 - [发布说明 v1.46.2](docs/zh/releases/v1.46.2.md) - 当前版本更新亮点
 - [验证报告 v1.46.2](docs/zh/releases/v1.46.2-validation.md) - 发布就绪验证与证据结果
 - [发布检查清单](docs/zh/release-checklist.md) - 可重复执行的发版前核验流程
 - [手动工作流](docs/manual-workflows-guide.md) - 分步工作流
-- [开发者指南](docs/developer-guide.md) - 贡献和扩展 sco
+- [开发者指南](docs/developer-guide.md) - 贡献和扩展 sce
 
 ### 完整文档
 - 📚 **[文档索引](docs/zh/README.md)** - 所有文档集中在一处
@@ -287,10 +287,10 @@ sequenceDiagram
 ## 主要功能
 
 ### Autonomous Control（自动闭环）🚀
-- **自动闭环推进**：`sco auto close-loop "<目标>"` 从目标拆分到编排完成全程自动推进
+- **自动闭环推进**：`sce auto close-loop "<目标>"` 从目标拆分到编排完成全程自动推进
 - **自动主从拆分**：自动生成 Master/Sub Spec 组合、依赖关系与 Agent 分配
 - **语义分解 + 实时状态流**：按目标语义自动归类拆分，并实时输出编排进度（可用 `--no-stream` 关闭）
-- **会话恢复与归档治理**：支持 `--resume interrupted`（或 `--resume latest`）续跑，并可用 `sco auto session list/prune`、`sco auto batch-session list/prune`、`sco auto controller-session list/prune` 管理会话归档
+- **会话恢复与归档治理**：支持 `--resume interrupted`（或 `--resume latest`）续跑，并可用 `sce auto session list/prune`、`sce auto batch-session list/prune`、`sce auto controller-session list/prune` 管理会话归档
 - **终态收敛**：输出统一执行结果（completed/failed/stopped），避免中途等待人工逐步确认
 
 ### Spec 驱动开发
@@ -304,7 +304,7 @@ sequenceDiagram
 - **CLI 命令**：`value metrics sample`、`value metrics snapshot`、`value metrics baseline`、`value metrics trend`，支持 `--json`
 
 ### 多工作区管理 🚀 v1.11.0 新功能
-- **工作区注册表**：从单一位置管理多个 sco 项目
+- **工作区注册表**：从单一位置管理多个 sce 项目
 - **快速切换**：无需目录导航即可在项目间切换
 - **数据原子性**：单一数据源（`~/.kse/workspace-state.json`）
 - **跨平台**：Windows/Linux/macOS 一致的路径处理
@@ -352,13 +352,13 @@ sequenceDiagram
 **快速开始**:
 ```bash
 # 并行运行 3 个 Spec
-sco orchestrate run --specs "spec-a,spec-b,spec-c" --max-parallel 3
+sce orchestrate run --specs "spec-a,spec-b,spec-c" --max-parallel 3
 
 # 查看编排进度
-sco orchestrate status
+sce orchestrate status
 
 # 停止所有子 Agent
-sco orchestrate stop
+sce orchestrate stop
 ```
 
 **推荐 Codex 编排配置（`.kiro/config/orchestrator.json`）**:
@@ -451,121 +451,121 @@ sco orchestrate stop
 
 ```bash
 # 项目设置
-sco adopt                          # 在现有项目中采用 sco
-sco create-spec <name>             # 兼容旧版：仅创建空 Spec 目录
+sce adopt                          # 在现有项目中采用 sce
+sce create-spec <name>             # 兼容旧版：仅创建空 Spec 目录
 
 # 自动闭环主从编排（单命令）
-sco auto close-loop "<目标>"        # 自动拆分 Master/Sub Spec 并推进到完成态
-sco auto close-loop --resume interrupted # 从最近一个未完成 close-loop 会话续跑
-sco auto close-loop 继续           # 简写：续跑最近一个未完成 close-loop 会话
-sco auto continue                  # 快捷命令：续跑最近一个未完成 close-loop 会话
-sco auto close-loop "<目标>" --dry-run --json  # 仅预览拆分与依赖计划
-sco auto close-loop-program "<目标>" --program-govern-until-stable --program-govern-use-action 1 --json # 程序级自动恢复 + 治理循环（含 remediation action 执行）直到稳定
-sco auto close-loop-controller .kiro/auto/program-queue.lines --wait-on-empty --dequeue-limit 2 --json # 队列驱动自治控制器，持续处理广义目标积压
-sco auto close-loop-controller --controller-resume latest --json # 从最近一次 controller 检查点恢复自治推进
-sco auto controller-session list --limit 50 --json # 查看持久化 close-loop-controller 摘要会话
-sco auto controller-session prune --keep 20 --older-than-days 14 --dry-run --json # 按保留策略清理旧 controller 摘要
-sco auto observability snapshot --days 14 --json # 统一自治可观测快照（会话 + 治理 + 趋势）
-sco auto spec status 121-00-master --json # 面向 Agent 的结构化 Spec 状态接口
-sco auto spec instructions 121-02-sub-track --json # 面向 Agent 的 Spec 执行指令接口
-sco auto schema check --json # 检查自治归档 schema 兼容性
-sco auto schema migrate --apply --json # 回填/迁移自治归档 schema_version
+sce auto close-loop "<目标>"        # 自动拆分 Master/Sub Spec 并推进到完成态
+sce auto close-loop --resume interrupted # 从最近一个未完成 close-loop 会话续跑
+sce auto close-loop 继续           # 简写：续跑最近一个未完成 close-loop 会话
+sce auto continue                  # 快捷命令：续跑最近一个未完成 close-loop 会话
+sce auto close-loop "<目标>" --dry-run --json  # 仅预览拆分与依赖计划
+sce auto close-loop-program "<目标>" --program-govern-until-stable --program-govern-use-action 1 --json # 程序级自动恢复 + 治理循环（含 remediation action 执行）直到稳定
+sce auto close-loop-controller .kiro/auto/program-queue.lines --wait-on-empty --dequeue-limit 2 --json # 队列驱动自治控制器，持续处理广义目标积压
+sce auto close-loop-controller --controller-resume latest --json # 从最近一次 controller 检查点恢复自治推进
+sce auto controller-session list --limit 50 --json # 查看持久化 close-loop-controller 摘要会话
+sce auto controller-session prune --keep 20 --older-than-days 14 --dry-run --json # 按保留策略清理旧 controller 摘要
+sce auto observability snapshot --days 14 --json # 统一自治可观测快照（会话 + 治理 + 趋势）
+sce auto spec status 121-00-master --json # 面向 Agent 的结构化 Spec 状态接口
+sce auto spec instructions 121-02-sub-track --json # 面向 Agent 的 Spec 执行指令接口
+sce auto schema check --json # 检查自治归档 schema 兼容性
+sce auto schema migrate --apply --json # 回填/迁移自治归档 schema_version
 
 # Spec 工作流（推荐）
-sco spec bootstrap --name <spec> --non-interactive          # 生成 requirements/design/tasks 初稿
-sco spec pipeline run --spec <spec>                         # 对单个 Spec 执行分阶段流程
-sco spec gate run --spec <spec> --json                      # 执行标准化 Spec 闸口检查
-sco spec bootstrap --specs "<spec-a,spec-b>" --max-parallel <N>  # 多 Spec 默认转 orchestrate
-sco spec pipeline run --specs "<spec-a,spec-b>" --max-parallel <N> # 多 Spec 默认转 orchestrate
-sco spec gate run --specs "<spec-a,spec-b>" --max-parallel <N>     # 多 Spec 默认转 orchestrate
+sce spec bootstrap --name <spec> --non-interactive          # 生成 requirements/design/tasks 初稿
+sce spec pipeline run --spec <spec>                         # 对单个 Spec 执行分阶段流程
+sce spec gate run --spec <spec> --json                      # 执行标准化 Spec 闸口检查
+sce spec bootstrap --specs "<spec-a,spec-b>" --max-parallel <N>  # 多 Spec 默认转 orchestrate
+sce spec pipeline run --specs "<spec-a,spec-b>" --max-parallel <N> # 多 Spec 默认转 orchestrate
+sce spec gate run --specs "<spec-a,spec-b>" --max-parallel <N>     # 多 Spec 默认转 orchestrate
 
 # 上下文管理
-sco context export <spec-name>     # 为 AI 工具导出上下文
-sco prompt generate <spec> <task>  # 生成任务特定提示
+sce context export <spec-name>     # 为 AI 工具导出上下文
+sce prompt generate <spec> <task>  # 生成任务特定提示
 
 # KPI 自动化与可观测（v1.46.2 新增）
-sco value metrics sample --out <path> --json               # 生成 KPI 输入样例 JSON
-sco value metrics snapshot --input <path> --json          # 生成周度 KPI 快照 + gate 摘要
-sco value metrics baseline --from-history <N> --json      # 从最早 N 个快照生成 baseline
-sco value metrics trend --window <N> --json               # 基于最近 N 个快照分析趋势与风险
-sco auto kpi trend --weeks 8 --period week --json         # 聚合自动交付 KPI 趋势（支持周/日桶 + 异常信号）
-sco auto kpi trend --weeks 8 --period day --csv --out <path> # 以 CSV 导出自动 KPI 趋势
-sco auto kpi trend --weeks 8 --mode controller --json     # 仅查看 close-loop-controller 会话趋势
+sce value metrics sample --out <path> --json               # 生成 KPI 输入样例 JSON
+sce value metrics snapshot --input <path> --json          # 生成周度 KPI 快照 + gate 摘要
+sce value metrics baseline --from-history <N> --json      # 从最早 N 个快照生成 baseline
+sce value metrics trend --window <N> --json               # 基于最近 N 个快照分析趋势与风险
+sce auto kpi trend --weeks 8 --period week --json         # 聚合自动交付 KPI 趋势（支持周/日桶 + 异常信号）
+sce auto kpi trend --weeks 8 --period day --csv --out <path> # 以 CSV 导出自动 KPI 趋势
+sce auto kpi trend --weeks 8 --mode controller --json     # 仅查看 close-loop-controller 会话趋势
 
 # 工作区管理（v1.11.0 新增）
-sco workspace create <name> [path] # 注册新工作区
-sco workspace list                 # 列出所有工作区
-sco workspace switch <name>        # 切换活动工作区
-sco workspace info [name]          # 显示工作区详情
-sco workspace remove <name>        # 删除工作区
+sce workspace create <name> [path] # 注册新工作区
+sce workspace list                 # 列出所有工作区
+sce workspace switch <name>        # 切换活动工作区
+sce workspace info [name]          # 显示工作区详情
+sce workspace remove <name>        # 删除工作区
 
 # 环境管理（v1.14.0 新增）
-sco env list                       # 列出所有环境
-sco env switch <name>              # 切换到环境（自动备份）
-sco env info                       # 显示活动环境详情
-sco env register <config-file>     # 注册新环境
-sco env unregister <name>          # 删除环境
-sco env rollback                   # 回滚到上一个环境
-sco env verify                     # 验证当前环境
-sco env run "<command>"            # 在环境上下文中运行命令
+sce env list                       # 列出所有环境
+sce env switch <name>              # 切换到环境（自动备份）
+sce env info                       # 显示活动环境详情
+sce env register <config-file>     # 注册新环境
+sce env unregister <name>          # 删除环境
+sce env rollback                   # 回滚到上一个环境
+sce env verify                     # 验证当前环境
+sce env run "<command>"            # 在环境上下文中运行命令
 
 # 场景模板引擎 (v1.25.0 新增)
-sco scene template-validate --package <path>   # 验证模板变量 schema
-sco scene template-resolve --package <name>    # 解析继承链和合并 schema
-sco scene template-render --package <name> --values <json> --out <dir>  # 渲染模板文件
+sce scene template-validate --package <path>   # 验证模板变量 schema
+sce scene template-resolve --package <name>    # 解析继承链和合并 schema
+sce scene template-render --package <name> --values <json> --out <dir>  # 渲染模板文件
 
 # Moqui ERP 集成 (v1.39.0 新增)
-sco scene connect --config <path>              # 测试 Moqui ERP 实例连接
-sco scene discover --config <path>             # 发现 Moqui 实体、服务、屏幕
-sco scene extract --config <path> --out <dir>  # 从 Moqui 提取场景模板 (v1.40.0)
+sce scene connect --config <path>              # 测试 Moqui ERP 实例连接
+sce scene discover --config <path>             # 发现 Moqui 实体、服务、屏幕
+sce scene extract --config <path> --out <dir>  # 从 Moqui 提取场景模板 (v1.40.0)
 
 # 场景模板质量流水线 (v1.41.0 新增)
-sco scene lint --package <path>                # Lint 场景包质量检查
-sco scene score --package <path>               # 计算质量评分 (0-100)
-sco scene contribute --package <path>          # 一站式验证 → lint → 评分 → 发布
+sce scene lint --package <path>                # Lint 场景包质量检查
+sce scene score --package <path>               # 计算质量评分 (0-100)
+sce scene contribute --package <path>          # 一站式验证 → lint → 评分 → 发布
 
 # 场景 Ontology (v1.42.0 新增)
-sco scene ontology show --package <path>       # 显示 Ontology 图
-sco scene ontology deps --ref <ref>            # 查询依赖链
-sco scene ontology impact --ref <ref>          # 分析反向影响面
-sco scene ontology path --from <ref> --to <ref> # 查询最短关系路径
-sco scene ontology validate --package <path>   # 验证图一致性
-sco scene ontology actions --ref <ref>         # 显示 Action Abstraction
-sco scene ontology lineage --ref <ref>         # 显示数据血缘
-sco scene ontology agent-info --package <path> # 显示 Agent Hints
+sce scene ontology show --package <path>       # 显示 Ontology 图
+sce scene ontology deps --ref <ref>            # 查询依赖链
+sce scene ontology impact --ref <ref>          # 分析反向影响面
+sce scene ontology path --from <ref> --to <ref> # 查询最短关系路径
+sce scene ontology validate --package <path>   # 验证图一致性
+sce scene ontology actions --ref <ref>         # 显示 Action Abstraction
+sce scene ontology lineage --ref <ref>         # 显示数据血缘
+sce scene ontology agent-info --package <path> # 显示 Agent Hints
 
 # Agent 编排 (v1.45.0 新增)
-sco orchestrate run --specs "<spec列表>" --max-parallel <N>  # 启动多 Agent 编排
-sco orchestrate status                         # 查看编排进度
-sco orchestrate stop                           # 停止所有子 Agent
+sce orchestrate run --specs "<spec列表>" --max-parallel <N>  # 启动多 Agent 编排
+sce orchestrate status                         # 查看编排进度
+sce orchestrate stop                           # 停止所有子 Agent
 
-# 说明：当使用 --specs 调用 sco spec bootstrap/pipeline run/gate run 时，会默认转到 orchestrate 模式
+# 说明：当使用 --specs 调用 sce spec bootstrap/pipeline run/gate run 时，会默认转到 orchestrate 模式
 
 # DevOps 运维
-sco ops init <project-name>        # 初始化运维 specs
-sco ops validate [<project>]       # 验证运维完整性
-sco ops audit [options]            # 查询审计日志
-sco ops takeover <action>          # 管理 AI 接管级别
-sco ops feedback <action>          # 管理用户反馈
+sce ops init <project-name>        # 初始化运维 specs
+sce ops validate [<project>]       # 验证运维完整性
+sce ops audit [options]            # 查询审计日志
+sce ops takeover <action>          # 管理 AI 接管级别
+sce ops feedback <action>          # 管理用户反馈
 
 # 任务管理
-sco task claim <spec> <task-id>    # 认领任务
-sco task list <spec>               # 列出已认领任务
+sce task claim <spec> <task-id>    # 认领任务
+sce task list <spec>               # 列出已认领任务
 
 # 文档治理
-sco docs diagnose                  # 检查文档合规性
-sco docs cleanup                   # 删除临时文件
-sco docs validate                  # 验证文档结构
-sco docs archive --spec <name>     # 组织 Spec 产物
-sco docs hooks install             # 安装 Git pre-commit hooks
+sce docs diagnose                  # 检查文档合规性
+sce docs cleanup                   # 删除临时文件
+sce docs validate                  # 验证文档结构
+sce docs archive --spec <name>     # 组织 Spec 产物
+sce docs hooks install             # 安装 Git pre-commit hooks
 
 # 自动化
-sco watch start                    # 启动 watch 模式
-sco watch status                   # 检查 watch 状态
+sce watch start                    # 启动 watch 模式
+sce watch status                   # 检查 watch 状态
 
 # 项目信息
-sco status                         # 项目状态
-sco workflows                      # 列出可用工作流
+sce status                         # 项目状态
+sce workflows                      # 列出可用工作流
 ```
 
 查看[命令参考](docs/command-reference.md)获取完整文档。
@@ -577,8 +577,8 @@ sco workflows                      # 列出可用工作流
 ### 获取帮助
 
 - 📖 **文档**：从[快速开始指南](docs/zh/quick-start.md)开始
-- 🐛 **Bug 报告**：[GitHub Issues](https://github.com/heguangyong/kiro-spec-engine/issues)
-- 💬 **讨论**：[GitHub Discussions](https://github.com/heguangyong/kiro-spec-engine/discussions)
+- 🐛 **Bug 报告**：[GitHub Issues](https://github.com/heguangyong/scene-capability-engine/issues)
+- 💬 **讨论**：[GitHub Discussions](https://github.com/heguangyong/scene-capability-engine/discussions)
 
 ### 贡献
 
@@ -591,7 +591,7 @@ sco workflows                      # 列出可用工作流
 ### 开发设置
 
 ```bash
-git clone https://github.com/heguangyong/kiro-spec-engine.git
+git clone https://github.com/heguangyong/scene-capability-engine.git
 cd kiro-spec-engine
 npm install
 npm link  # 用于本地开发
@@ -617,9 +617,9 @@ MIT 许可证 - 详见 [LICENSE](LICENSE) 文件。
 **准备好增强你的 AI 辅助开发了吗？** 🚀
 
 ```bash
-npm install -g sco-engine
-sco adopt
-sco spec bootstrap --name 01-00-my-first-feature --non-interactive
+npm install -g scene-capability-engine
+sce adopt
+sce spec bootstrap --name 01-00-my-first-feature --non-interactive
 ```
 
 ---

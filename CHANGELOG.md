@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **SCO major rebrand + compatibility bridge**: Rebranded package/CLI to `sco-engine` + `sco` (v2.0.0 baseline), while preserving legacy command aliases `kse` and `kiro-spec-engine` for migration continuity.
+- **SCE naming consolidation + compatibility bridge**: Rebranded product naming to `Scene Capability Engine`, moved package to `scene-capability-engine`, promoted `sce` as the primary CLI command, and preserved `sco` / `kse` / `kiro-spec-engine` aliases for migration continuity.
 - **Rate-limit launch budget safety guard**: Hardened orchestration launch-budget bookkeeping to safely handle partially initialized engine instances in property/instrumentation scenarios.
 - **Property test CI stability (`orchestration-engine.property`)**: Disabled launch-budget waiting in parallel invariant property harness to avoid artificial 60s hold windows and intermittent Jest worker crashes under high-concurrency CI runs.
 - **Moqui runtime binding config overrides**: Added `--moqui-config <path>` to `kse scene run` and `kse scene doctor`, allowing runtime binding resolution to use an explicit `moqui-adapter.json` path per execution context.
@@ -130,7 +130,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Top-level release navigation**: Updated EN/ZH root READMEs to expose release archive and validation report links directly from Advanced Topics for faster proof-of-value discovery.
 - **Observability guide usability**: Added EN/ZH expected JSON output examples for `snapshot --json` and `trend --json` to speed up first-run verification and integration scripting.
 - **Watch log operator flow**: Implemented `kse watch logs --follow` streaming behavior and documented follow examples in command reference.
-- **Canonical documentation links**: Standardized mixed repository links to `https://github.com/heguangyong/kiro-spec-engine` and wired canonical-link scan commands into EN/ZH release checklists.
+- **Canonical documentation links**: Standardized mixed repository links to `https://github.com/heguangyong/scene-capability-engine` and wired canonical-link scan commands into EN/ZH release checklists.
 - **Autonomy positioning clarity**: Strengthened EN/ZH docs and command reference to emphasize closed-loop delivery and automatic master/sub spec decomposition as kse core strengths.
 - **Autonomous operator UX**: Expanded docs with semantic decomposition and live stream behavior for close-loop command usage.
 
@@ -161,7 +161,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **NPM publish metadata normalization**: Updated `package.json` `bin` entries to use `bin/kiro-spec-engine.js` (without `./`) so npm no longer strips CLI bin mappings during publish.
-- **Repository metadata format**: Normalized `repository.url` to `git+https://github.com/heguangyong/kiro-spec-engine.git` to remove npm publish auto-correction warnings.
+- **Repository metadata format**: Normalized `repository.url` to `git+https://github.com/heguangyong/scene-capability-engine.git` to remove npm publish auto-correction warnings.
 
 ## [1.46.0] - 2026-02-13
 
@@ -1214,7 +1214,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Notes
 - All existing tests pass (1491 tests)
 - Optional property-based tests skipped for faster MVP delivery
-- Template repository creation (official kse-spec-templates) to be done separately
+- Template repository creation (official scene-capability-engine-templates) to be done separately
 - Documentation and final integration testing to follow in subsequent iterations
 
 ## [1.15.0] - 2026-01-30

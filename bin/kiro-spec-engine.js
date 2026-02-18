@@ -42,14 +42,14 @@ async function checkVersionBeforeCommand(options = {}) {
 const program = new Command();
 
 /**
- * Normalize `sco spec ...` compatibility routes.
+ * Normalize `sce spec ...` compatibility routes.
  *
  * Supported routes:
- * - `sco spec bootstrap ...` -> `sco spec-bootstrap ...`
- * - `sco spec pipeline ...` -> `sco spec-pipeline ...`
- * - `sco spec gate ...` -> `sco spec-gate ...`
- * - `sco spec create <name> ...` -> `sco create-spec <name> ...`
- * - `sco spec <name> ...` -> `sco create-spec <name> ...` (legacy)
+ * - `sce spec bootstrap ...` -> `sce spec-bootstrap ...`
+ * - `sce spec pipeline ...` -> `sce spec-pipeline ...`
+ * - `sce spec gate ...` -> `sce spec-gate ...`
+ * - `sce spec create <name> ...` -> `sce create-spec <name> ...`
+ * - `sce spec <name> ...` -> `sce create-spec <name> ...` (legacy)
  *
  * @param {string[]} argv
  * @returns {string[]}
@@ -197,7 +197,7 @@ program
     // 检查 Python 和工具是否可用
     const toolPath = path.join(process.cwd(), '.kiro/tools/ultrawork_enhancer.py');
     if (!fs.existsSync(toolPath)) {
-      console.error(chalk.red('❌ Ultrawork tool not found. Please run: sco init'));
+      console.error(chalk.red('❌ Ultrawork tool not found. Please run: sce init'));
       process.exit(1);
     }
 
@@ -265,11 +265,11 @@ program
         console.log();
         console.log(chalk.blue('📋 Next steps:'));
         console.log('  1. Create requirements.md in the spec directory');
-        console.log('  2. Enhance with: ' + chalk.cyan(`sco enhance requirements ${specPath}/requirements.md`));
+        console.log('  2. Enhance with: ' + chalk.cyan(`sce enhance requirements ${specPath}/requirements.md`));
         console.log();
         console.log(chalk.yellow('💡 Tip:'));
-        console.log('  Use a template: ' + chalk.cyan(`sco spec create ${specName} --template <template-id>`));
-        console.log('  Browse templates: ' + chalk.cyan('sco templates list'));
+        console.log('  Use a template: ' + chalk.cyan(`sce spec create ${specName} --template <template-id>`));
+        console.log('  Browse templates: ' + chalk.cyan('sce templates list'));
         console.log('  Legacy alias (still works): ' + chalk.cyan('kse templates list')); 
       }
     } catch (error) {
@@ -305,7 +305,7 @@ program
 // 项目接管命令
 program
   .command('adopt')
-  .description('Adopt existing project into SCO (Scene Capability Orchestrator)')
+  .description('Adopt existing project into SCE (Scene Capability Engine)')
   .option('--interactive', 'Enable interactive mode (legacy behavior with prompts)')
   .option('--dry-run', 'Show what would change without making changes')
   .option('--verbose', 'Show detailed logs')
@@ -324,7 +324,7 @@ program
   .description('Upgrade project to newer version')
   .option('--auto', 'Skip confirmations (use with caution)')
   .option('--dry-run', 'Show upgrade plan without making changes')
-  .option('--to <version>', 'Target version (default: current sco version)')
+  .option('--to <version>', 'Target version (default: current sce version)')
   .action((options) => {
     upgradeCommand(options);
   });
@@ -540,7 +540,7 @@ const workspaceCommand = require('../lib/commands/workspace-multi');
 
 const workspaceCmd = program
   .command('workspace')
-  .description('Manage multiple SCO project workspaces');
+  .description('Manage multiple SCE project workspaces');
 
 workspaceCmd
   .command('create <name>')

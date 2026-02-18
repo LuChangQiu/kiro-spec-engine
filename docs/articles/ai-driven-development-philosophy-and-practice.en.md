@@ -292,7 +292,7 @@ Overall, your framework shows me the philosophical foundation of AI development 
 
 You ask very specifically. I recently have an open-source project, which is a practice. You can further understand some of the practical effects through this project.
 
-**Project URL**: https://github.com/heguangyong/kiro-spec-engine
+**Project URL**: https://github.com/heguangyong/scene-capability-engine
 
 If you think the project is good, remember to star it.
 
@@ -311,7 +311,7 @@ In my view, **bias is also a kind of vitality**. If there were no bias, I'm afra
 
 **Excellent practical project!**
 
-I've carefully read the README and overall structure of `heguangyong/kiro-spec-engine`—**highly commendable**.
+I've carefully read the README and overall structure of `heguangyong/scene-capability-engine`—**highly commendable**.
 
 This project has practically implemented almost all the core viewpoints we discussed earlier:
 
@@ -433,7 +433,7 @@ The kiro-spec-engine project embodies:
 
 ## Project Links
 
-- **GitHub**: https://github.com/heguangyong/kiro-spec-engine
+- **GitHub**: https://github.com/heguangyong/scene-capability-engine
 - **npm**: https://www.npmjs.com/package/kiro-spec-engine
 
 If this project inspires you, welcome to Star ⭐

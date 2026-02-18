@@ -420,7 +420,7 @@ kse rollback
 ```
 
 **Step 3**: Report the issue
-- Go to: https://github.com/heguangyong/kiro-spec-engine/issues
+- Go to: https://github.com/heguangyong/scene-capability-engine/issues
 - Include:
   - Error message
   - Current version
@@ -629,7 +629,7 @@ After successful upgrade:
 ## Getting Help
 
 - **Documentation**: Check README.md
-- **Issues**: https://github.com/heguangyong/kiro-spec-engine/issues
+- **Issues**: https://github.com/heguangyong/scene-capability-engine/issues
 - **Version Info**: `kse version-info`
 - **System Check**: `kse doctor`
 - **Rollback**: `kse rollback`

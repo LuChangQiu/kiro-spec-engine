@@ -454,7 +454,7 @@ done
 **A**: 
 1. Run with verbose mode: `kse adopt --verbose`
 2. Check the logs
-3. Report at: https://github.com/heguangyong/kiro-spec-engine/issues
+3. Report at: https://github.com/heguangyong/scene-capability-engine/issues
 
 ---
 
@@ -592,7 +592,7 @@ kse adopt --interactive
 - **Documentation**: [Adoption Guide](adoption-guide.md)
 - **System Check**: `kse doctor`
 - **Version Info**: `kse version-info`
-- **Issues**: https://github.com/heguangyong/kiro-spec-engine/issues
+- **Issues**: https://github.com/heguangyong/scene-capability-engine/issues
 
 ---
 

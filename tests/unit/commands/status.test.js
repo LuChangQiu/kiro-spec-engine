@@ -145,7 +145,7 @@ describe('Status Command - Document Compliance Integration', () => {
             }
           ],
           summary: { totalViolations: 2 },
-          recommendations: ['Run sco cleanup', 'Run sco archive']
+          recommendations: ['Run sce cleanup', 'Run sce archive']
         })
       }));
       
@@ -194,10 +194,10 @@ describe('Status Command - Document Compliance Integration', () => {
       // Verify quick fix commands are displayed
       const output = logOutput.join('\n');
       expect(output).toContain('Quick Fix Commands:');
-      expect(output).toContain('sco doctor --docs');
-      expect(output).toContain('sco cleanup');
-      expect(output).toContain('sco validate --all');
-      expect(output).toContain('sco docs archive --spec <name>');
+      expect(output).toContain('sce doctor --docs');
+      expect(output).toContain('sce cleanup');
+      expect(output).toContain('sce validate --all');
+      expect(output).toContain('sce docs archive --spec <name>');
     });
     
     test('should handle multiple violation types correctly', async () => {
@@ -278,7 +278,7 @@ describe('Status Command - Document Compliance Integration', () => {
       
       // Verify status command still works
       const output = logOutput.join('\n');
-      expect(output).toContain('SCO Project Status');
+      expect(output).toContain('SCE Project Status');
     });
     
     test('should skip compliance check if governance not available', async () => {
@@ -304,7 +304,7 @@ describe('Status Command - Document Compliance Integration', () => {
       
       // Verify status command still works
       const output = logOutput.join('\n');
-      expect(output).toContain('SCO Project Status');
+      expect(output).toContain('SCE Project Status');
       // Should not show compliance section
       expect(output).not.toContain('📄 Document Compliance');
     });
@@ -371,7 +371,7 @@ describe('Status Command - Document Compliance Integration', () => {
       
       // Verify command completes successfully
       const output = logOutput.join('\n');
-      expect(output).toContain('SCO Project Status');
+      expect(output).toContain('SCE Project Status');
       expect(output).toContain('📄 Document Compliance');
     });
     
@@ -389,7 +389,7 @@ describe('Status Command - Document Compliance Integration', () => {
       
       // Verify command completes successfully
       const output = logOutput.join('\n');
-      expect(output).toContain('SCO Project Status');
+      expect(output).toContain('SCE Project Status');
       expect(output).toContain('📄 Document Compliance');
     });
   });

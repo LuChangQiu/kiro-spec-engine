@@ -42,4 +42,4 @@ kse value metrics snapshot --input ./kpi-input.json --json
 
 📧 支持
 -------
-GitHub: https://github.com/heguangyong/kiro-spec-engine
+GitHub: https://github.com/heguangyong/scene-capability-engine

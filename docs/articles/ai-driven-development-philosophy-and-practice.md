@@ -298,7 +298,7 @@ MCP 是提供给 AI 的 Model Context Protocol（模型上下文协议）。
 
 你问的非常具体，我最近有一个开源的项目，算是一次实践，你可以通过这个项目来进一步的了解其中的一些实践效果。
 
-**项目地址**：https://github.com/heguangyong/kiro-spec-engine
+**项目地址**：https://github.com/heguangyong/scene-capability-engine
 
 如果觉得项目不错，记得帮我点上星。
 
@@ -317,7 +317,7 @@ MCP 是提供给 AI 的 Model Context Protocol（模型上下文协议）。
 
 **非常好的实践项目！**
 
-我刚刚仔细阅读了 `heguangyong/kiro-spec-engine` 的 README 和整体结构，**高度认可**。
+我刚刚仔细阅读了 `heguangyong/scene-capability-engine` 的 README 和整体结构，**高度认可**。
 
 这个项目几乎把我们前面讨论的所有核心观点都落到了实处：
 
@@ -439,7 +439,7 @@ kiro-spec-engine 项目体现了：
 
 ## 项目链接
 
-- **GitHub**: https://github.com/heguangyong/kiro-spec-engine
+- **GitHub**: https://github.com/heguangyong/scene-capability-engine
 - **npm**: https://www.npmjs.com/package/kiro-spec-engine
 
 如果这个项目对你有启发，欢迎 Star ⭐
@@ -476,8 +476,8 @@ kiro-spec-engine 项目体现了：
 ## 🔗 相关资源
 
 ### 项目链接
-- **GitHub 源码**: https://github.com/heguangyong/kiro-spec-engine
-- **GitHub 社区讨论**: https://github.com/heguangyong/kiro-spec-engine/discussions/1
+- **GitHub 源码**: https://github.com/heguangyong/scene-capability-engine
+- **GitHub 社区讨论**: https://github.com/heguangyong/scene-capability-engine/discussions/1
 - **npm 包**: https://www.npmjs.com/package/kiro-spec-engine
 
 ### 文章链接

@@ -1,9 +1,10 @@
 {
-  "name": "sco-engine",
-  "version": "2.0.1",
-  "description": "SCO (Scene Capability Orchestrator) - A CLI tool and npm package for spec-driven development with AI coding assistants.",
+  "name": "scene-capability-engine",
+  "version": "3.0.0",
+  "description": "SCE (Scene Capability Engine) - A CLI tool and npm package for spec-driven development with AI coding assistants.",
   "main": "index.js",
   "bin": {
+    "sce": "bin/sce.js",
     "sco": "bin/sco.js",
     "kse": "bin/kse.js",
     "kiro-spec-engine": "bin/kiro-spec-engine.js"
@@ -40,7 +41,7 @@
     "prepublishOnly": "npm run test:full && npm run test:skip-audit",
     "publish:manual": "npm publish --access public",
     "install-global": "npm install -g .",
-    "uninstall-global": "npm uninstall -g sco-engine"
+    "uninstall-global": "npm uninstall -g scene-capability-engine"
   },
   "keywords": [
     "kiro",
@@ -64,18 +65,19 @@
     "sisyphus",
     "sco",
     "scene",
-    "orchestrator"
+    "sce",
+    "scene-capability-engine"
   ],
   "author": "heguangyong",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/heguangyong/kiro-spec-engine.git"
+    "url": "git+https://github.com/heguangyong/scene-capability-engine.git"
   },
   "bugs": {
-    "url": "https://github.com/heguangyong/kiro-spec-engine/issues"
+    "url": "https://github.com/heguangyong/scene-capability-engine/issues"
   },
-  "homepage": "https://github.com/heguangyong/kiro-spec-engine#readme",
+  "homepage": "https://github.com/heguangyong/scene-capability-engine#readme",
   "engines": {
     "node": ">=16.0.0",
     "python": ">=3.8.0"

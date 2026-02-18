@@ -558,7 +558,7 @@ npm run test:integration
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/heguangyong/kiro-spec-engine.git
+git clone https://github.com/heguangyong/scene-capability-engine.git
 cd kiro-spec-engine
 ```
 
@@ -610,8 +610,8 @@ test: add property tests for backup system
 - [User Adoption Guide](./adoption-guide.md)
 - [User Upgrade Guide](./upgrade-guide.md)
 - [Spec Workflow Guide](../.kiro/specs/SPEC_WORKFLOW_GUIDE.md)
-- [GitHub Repository](https://github.com/heguangyong/kiro-spec-engine)
-- [Issue Tracker](https://github.com/heguangyong/kiro-spec-engine/issues)
+- [GitHub Repository](https://github.com/heguangyong/scene-capability-engine)
+- [Issue Tracker](https://github.com/heguangyong/scene-capability-engine/issues)
 
 ---
 

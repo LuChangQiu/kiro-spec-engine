@@ -45,7 +45,7 @@
 ## 🌐 其他交流渠道
 
 ### GitHub Discussions
-https://github.com/heguangyong/kiro-spec-engine/discussions
+https://github.com/heguangyong/scene-capability-engine/discussions
 
 适合：
 - 深度技术讨论
@@ -54,7 +54,7 @@ https://github.com/heguangyong/kiro-spec-engine/discussions
 - 英文交流
 
 ### GitHub Issues
-https://github.com/heguangyong/kiro-spec-engine/issues
+https://github.com/heguangyong/scene-capability-engine/issues
 
 适合：
 - Bug 报告
@@ -105,7 +105,7 @@ https://mp.weixin.qq.com/s/GRo0XQ6GvQ03T4_FTvAsKA
 
 ## 📬 联系方式
 
-- **GitHub**: https://github.com/heguangyong/kiro-spec-engine
+- **GitHub**: https://github.com/heguangyong/scene-capability-engine
 - **X/Twitter**: https://x.com/heguangyong
 - **掘金**: https://juejin.cn/user/heguangyong
 - **知乎**: https://www.zhihu.com/people/heguangyong

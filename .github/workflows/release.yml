@@ -183,7 +183,7 @@ jobs:
           mkdir -p "${NOTES_DIR}"
 
           if [[ -f "${EVIDENCE_FILE}" ]]; then
-            if node bin/kiro-spec-engine.js auto handoff evidence \
+            if node bin/sce.js auto handoff evidence \
               --file "${EVIDENCE_FILE}" \
               --review-out "${REVIEW_FILE}" \
               --release-draft "${DRAFT_FILE}" \
@@ -555,7 +555,7 @@ jobs:
           fi
           rm -f "${LATEST_RELEASE_FILE}"
 
-          if ! node bin/kiro-spec-engine.js auto handoff gate-index \
+          if ! node bin/sce.js auto handoff gate-index \
             --dir "${NOTES_DIR}" \
             --history-file "${HISTORY_FILE}" \
             --out "${HISTORY_FILE}" \
@@ -782,7 +782,7 @@ jobs:
           HISTORY_CARD_FILE="${NOTES_DIR}/release-gate-history-${TAG}.md"
 
           if [[ -f "${GATE_FILE}" ]]; then
-            if ! node bin/kiro-spec-engine.js auto handoff gate-index \
+            if ! node bin/sce.js auto handoff gate-index \
               --dir "${NOTES_DIR}" \
               --history-file "${HISTORY_FILE}" \
               --out "${HISTORY_FILE}" \

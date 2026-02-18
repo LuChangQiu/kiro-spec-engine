@@ -407,7 +407,7 @@ done
 
 3. **Get Help:**
    - Run `kse --help` for command reference
-   - Check [GitHub Issues](https://github.com/heguangyong/kiro-spec-engine/issues)
+   - Check [GitHub Issues](https://github.com/heguangyong/scene-capability-engine/issues)
    - Review [Contributing Guide](../CONTRIBUTING.md)
 
 ---

@@ -1,6 +1,6 @@
 # Command Reference
 
-> Quick reference for all `sco` commands
+> Quick reference for all `sce` commands
 
 **Version**: 2.0.0
 **Last Updated**: 2026-02-18
@@ -10,21 +10,21 @@
 ## Command Naming
 
 The CLI provides three command aliases:
-- `sco` - **Recommended primary command** (use this in all documentation)
+- `sce` - **Recommended primary command** (use this in all documentation)
 - `kse` - Legacy short alias (compatible)
 - `kiro-spec-engine` - Legacy full alias (compatible)
 
-**Always use `sco` in new examples and documentation.**
+**Always use `sce` in new examples and documentation.**
 
 ---
 
 ## Installation
 
 ```bash
-npm install -g sco-engine
+npm install -g scene-capability-engine
 ```
 
-This creates the `sco` command globally. Legacy aliases `kse` and `kiro-spec-engine` are still available.
+This creates the `sce` command globally. Legacy aliases `kse` and `kiro-spec-engine` are still available.
 
 ---
 
@@ -34,64 +34,64 @@ This creates the `sco` command globally. Legacy aliases `kse` and `kiro-spec-eng
 
 ```bash
 # Initialize new project
-sco init [project-name]
+sce init [project-name]
 
 # Adopt existing project
-sco adopt
+sce adopt
 
 # Check project status
-sco status
+sce status
 
 # Run system diagnostics
-sco doctor
+sce doctor
 ```
 
 ### Spec Management
 
 ```bash
 # Legacy low-level: create spec directory only
-sco create-spec 01-00-feature-name
+sce create-spec 01-00-feature-name
 
 # Bootstrap full Spec draft (requirements/design/tasks)
-sco spec bootstrap --name 01-00-feature-name --non-interactive
+sce spec bootstrap --name 01-00-feature-name --non-interactive
 
 # Run pipeline for one Spec
-sco spec pipeline run --spec 01-00-feature-name
+sce spec pipeline run --spec 01-00-feature-name
 
 # Run gate for one Spec
-sco spec gate run --spec 01-00-feature-name --json
+sce spec gate run --spec 01-00-feature-name --json
 
 # Multi-Spec mode defaults to orchestrate routing
-sco spec bootstrap --specs "spec-a,spec-b" --max-parallel 3
-sco spec pipeline run --specs "spec-a,spec-b" --max-parallel 3
-sco spec gate run --specs "spec-a,spec-b" --max-parallel 3
+sce spec bootstrap --specs "spec-a,spec-b" --max-parallel 3
+sce spec pipeline run --specs "spec-a,spec-b" --max-parallel 3
+sce spec gate run --specs "spec-a,spec-b" --max-parallel 3
 
 # Show Spec progress
-sco status --verbose
+sce status --verbose
 ```
 
 ### Value Metrics
 
 ```bash
 # Generate sample KPI input JSON
-sco value metrics sample --out ./kpi-input.json --period 2026-W10 --json
+sce value metrics sample --out ./kpi-input.json --period 2026-W10 --json
 
 # Generate weekly KPI snapshot + gate summary
-sco value metrics snapshot \
+sce value metrics snapshot \
   --input .kiro/specs/112-00-spec-value-realization-program/custom/weekly-metrics/2026-W09.sample.json \
   --period 2026-W09 \
   --checkpoint day-60 \
   --json
 
 # Use custom metric contract and output paths
-sco value metrics snapshot \
+sce value metrics snapshot \
   --input ./metrics-input.json \
   --definitions .kiro/specs/112-00-spec-value-realization-program/custom/metric-definition.yaml \
   --history-dir .kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics \
   --out .kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/2026-W10.json
 
 # Generate baseline from earliest 3 history snapshots
-sco value metrics baseline \
+sce value metrics baseline \
   --definitions .kiro/specs/112-00-spec-value-realization-program/custom/metric-definition.yaml \
   --history-dir .kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics \
   --from-history 3 \
@@ -99,7 +99,7 @@ sco value metrics baseline \
   --json
 
 # Generate trend report from latest 6 snapshots
-sco value metrics trend \
+sce value metrics trend \
   --definitions .kiro/specs/112-00-spec-value-realization-program/custom/metric-definition.yaml \
   --history-dir .kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics \
   --window 6 \
@@ -110,232 +110,232 @@ sco value metrics trend \
 
 ```bash
 # Claim a task
-sco task claim <spec-name> <task-id>
+sce task claim <spec-name> <task-id>
 
 # Unclaim a task
-sco task unclaim <spec-name> <task-id>
+sce task unclaim <spec-name> <task-id>
 
 # Show task status
-sco task status <spec-name>
+sce task status <spec-name>
 ```
 
 ### Context & Prompts
 
 ```bash
 # Export spec context
-sco context export <spec-name>
+sce context export <spec-name>
 
 # Export with steering rules
-sco context export <spec-name> --steering
+sce context export <spec-name> --steering
 
 # Generate task prompt
-sco prompt generate <spec-name> <task-id>
+sce prompt generate <spec-name> <task-id>
 
 # Generate for specific tool
-sco prompt generate <spec-name> <task-id> --tool=claude-code
+sce prompt generate <spec-name> <task-id> --tool=claude-code
 ```
 
 ### Watch Mode
 
 ```bash
 # Initialize watch configuration
-sco watch init
+sce watch init
 
 # Start watch mode
-sco watch start
+sce watch start
 
 # Stop watch mode
-sco watch stop
+sce watch stop
 
 # Check watch status
-sco watch status
+sce watch status
 
 # View watch logs
-sco watch logs
+sce watch logs
 
 # Follow log stream in real time (tail -f behavior)
-sco watch logs --follow
+sce watch logs --follow
 
 # Show last 100 entries, then continue following
-sco watch logs --tail 100 --follow
+sce watch logs --tail 100 --follow
 
 # Show automation metrics
-sco watch metrics
+sce watch metrics
 
 # List available presets
-sco watch presets
+sce watch presets
 
 # Install a preset
-sco watch install <preset-name>
+sce watch install <preset-name>
 ```
 
 ### Workflows
 
 ```bash
 # List available workflows
-sco workflows
+sce workflows
 
 # Show workflow details
-sco workflows show <workflow-name>
+sce workflows show <workflow-name>
 
 # Open workflow guide
-sco workflows guide
+sce workflows guide
 
 # Mark workflow as complete
-sco workflows complete <workflow-name>
+sce workflows complete <workflow-name>
 ```
 
 ### Workspace Management
 
 ```bash
 # Create a new workspace
-sco workspace create <name> [path]
+sce workspace create <name> [path]
 
 # List all workspaces
-sco workspace list
+sce workspace list
 
 # Switch active workspace
-sco workspace switch <name>
+sce workspace switch <name>
 
 # Show workspace info
-sco workspace info [name]
+sce workspace info [name]
 
 # Remove a workspace
-sco workspace remove <name> [--force]
+sce workspace remove <name> [--force]
 
 # Legacy commands (still supported)
-sco workspace sync
-sco workspace team
+sce workspace sync
+sce workspace team
 ```
 
 ### Environment Management
 
 ```bash
 # List all environments
-sco env list
+sce env list
 
 # Switch to environment (with automatic backup)
-sco env switch <name>
+sce env switch <name>
 
 # Show active environment details
-sco env info
+sce env info
 
 # Register new environment from config file
-sco env register <config-file>
+sce env register <config-file>
 
 # Remove environment (requires --force)
-sco env unregister <name> --force
+sce env unregister <name> --force
 
 # Rollback to previous environment
-sco env rollback
+sce env rollback
 
 # Verify current environment (optional)
-sco env verify
+sce env verify
 
 # Run command in environment context (optional)
-sco env run "<command>"
+sce env run "<command>"
 ```
 
 ### Multi-Repository Management
 
 ```bash
 # Initialize repository configuration
-sco repo init [--force] [--depth <n>]
+sce repo init [--force] [--depth <n>]
 
 # Show status of all repositories
-sco repo status [--verbose] [--json]
+sce repo status [--verbose] [--json]
 
 # Execute command in all repositories
-sco repo exec "<command>" [--dry-run]
+sce repo exec "<command>" [--dry-run]
 
 # Check repository health
-sco repo health [--json]
+sce repo health [--json]
 ```
 
 ### Agent Orchestration (Codex)
 
 ```bash
 # Start orchestration for multiple specs
-sco orchestrate run --specs "spec-a,spec-b,spec-c" --max-parallel 3
+sce orchestrate run --specs "spec-a,spec-b,spec-c" --max-parallel 3
 
 # Show orchestration status
-sco orchestrate status [--json]
+sce orchestrate status [--json]
 
 # Stop all running sub-agents
-sco orchestrate stop
+sce orchestrate stop
 ```
 
-When you pass `--specs` to `sco spec bootstrap|pipeline run|gate run`, sco now defaults to this orchestrate mode automatically.
+When you pass `--specs` to `sce spec bootstrap|pipeline run|gate run`, sce now defaults to this orchestrate mode automatically.
 
 ### Autonomous Close-Loop Program
 
 ```bash
 # One-command close-loop execution:
 # goal -> auto master/sub decomposition -> collab metadata -> orchestration -> terminal result
-sco auto close-loop "build autonomous close-loop and master/sub orchestration"
+sce auto close-loop "build autonomous close-loop and master/sub orchestration"
 # default sub-spec count is auto-selected by goal complexity (typically 3-5)
 
 # Preview decomposition only
-sco auto close-loop "build autonomous close-loop and master/sub orchestration" --dry-run --json
+sce auto close-loop "build autonomous close-loop and master/sub orchestration" --dry-run --json
 
 # Generate plan but skip orchestration run
-sco auto close-loop "build autonomous close-loop and master/sub orchestration" --no-run
+sce auto close-loop "build autonomous close-loop and master/sub orchestration" --no-run
 
 # Run without live status stream output
-sco auto close-loop "build autonomous close-loop and master/sub orchestration" --no-stream
+sce auto close-loop "build autonomous close-loop and master/sub orchestration" --no-stream
 
 # Add Definition-of-Done (DoD) test gate
-sco auto close-loop "build autonomous close-loop and master/sub orchestration" \
+sce auto close-loop "build autonomous close-loop and master/sub orchestration" \
   --dod-tests "npm run test:smoke"
 
 # Strict DoD: require all tasks.md checklists are closed
-sco auto close-loop "build autonomous close-loop and master/sub orchestration" \
+sce auto close-loop "build autonomous close-loop and master/sub orchestration" \
   --dod-tasks-closed
 
 # Write DoD evidence to custom report path
-sco auto close-loop "build autonomous close-loop and master/sub orchestration" \
+sce auto close-loop "build autonomous close-loop and master/sub orchestration" \
   --dod-report ".kiro/reports/close-loop-dod.json"
 
 # Resume from the latest close-loop session snapshot
-sco auto close-loop --resume latest
+sce auto close-loop --resume latest
 
 # Resume from the latest interrupted close-loop session snapshot
-sco auto close-loop --resume interrupted
+sce auto close-loop --resume interrupted
 
 # Quick continue shorthand (maps to --resume interrupted)
-sco auto close-loop continue
-sco auto close-loop 继续
-sco auto continue
+sce auto close-loop continue
+sce auto close-loop 继续
+sce auto continue
 
 # Resume from a specific session id
-sco auto close-loop --resume 117-20260214230000
+sce auto close-loop --resume 117-20260214230000
 
 # Apply session retention automatically after close-loop execution
-sco auto close-loop "build autonomous close-loop and master/sub orchestration" \
+sce auto close-loop "build autonomous close-loop and master/sub orchestration" \
   --session-keep 50 \
   --session-older-than-days 14
 
 # Allow up to 2 automatic replan cycles on orchestration failures
-sco auto close-loop "build autonomous close-loop and master/sub orchestration" \
+sce auto close-loop "build autonomous close-loop and master/sub orchestration" \
   --replan-attempts 2
 
 # Use adaptive replan budget strategy (default) or fixed
-sco auto close-loop "build autonomous close-loop and master/sub orchestration" \
+sce auto close-loop "build autonomous close-loop and master/sub orchestration" \
   --replan-strategy adaptive
 
 # Run multiple goals in one autonomous batch (one master/sub portfolio per goal)
-sco auto close-loop-batch .kiro/goals.txt
-sco auto close-loop-batch .kiro/goals.json --dry-run --json
+sce auto close-loop-batch .kiro/goals.txt
+sce auto close-loop-batch .kiro/goals.json --dry-run --json
 
 # Generate batch goals from one broad program goal (no goals file needed)
-sco auto close-loop-batch \
+sce auto close-loop-batch \
   --decompose-goal "build autonomous close-loop, master/sub decomposition, orchestration and quality rollout" \
   --program-goals 4 \
   --program-min-quality-score 85 \
   --json
 
 # Program command: broad goal -> auto split -> autonomous batch closed-loop execution
-sco auto close-loop-program \
+sce auto close-loop-program \
   "build autonomous close-loop, master/sub decomposition, orchestration and quality rollout" \
   --program-goals 4 \
   --program-quality-gate \
@@ -354,7 +354,7 @@ sco auto close-loop-program \
   --json
 
 # Controller command: drain queued broad goals with close-loop-program runtime
-sco auto close-loop-controller .kiro/auto/program-queue.lines \
+sce auto close-loop-controller .kiro/auto/program-queue.lines \
   --dequeue-limit 2 \
   --max-cycles 20 \
   --controller-done-file .kiro/auto/program-done.lines \
@@ -362,18 +362,18 @@ sco auto close-loop-controller .kiro/auto/program-queue.lines \
   --json
 
 # Persistent controller mode: keep polling queue and execute new goals automatically
-sco auto close-loop-controller .kiro/auto/program-queue.lines \
+sce auto close-loop-controller .kiro/auto/program-queue.lines \
   --wait-on-empty \
   --poll-seconds 30 \
   --max-cycles 1000 \
   --max-minutes 240
 
 # Resume from latest persisted controller session
-sco auto close-loop-controller --controller-resume latest --json
+sce auto close-loop-controller --controller-resume latest --json
 
 # Recovery command: replay unresolved goals from summary using remediation action strategy
-sco auto close-loop-recover latest --json
-sco auto close-loop-recover .kiro/auto/close-loop-batch-summaries/batch-20260215090000.json \
+sce auto close-loop-recover latest --json
+sce auto close-loop-recover .kiro/auto/close-loop-batch-summaries/batch-20260215090000.json \
   --use-action 2 \
   --recover-until-complete \
   --recover-max-rounds 3 \
@@ -384,154 +384,154 @@ sco auto close-loop-recover .kiro/auto/close-loop-batch-summaries/batch-20260215
   --dry-run --json
 
 # Default autonomous batch run (continue-on-error + adaptive scheduling + retry-until-complete)
-sco auto close-loop-batch .kiro/goals.json --json
+sce auto close-loop-batch .kiro/goals.json --json
 
 # Run batch goals with concurrent close-loop workers
-sco auto close-loop-batch .kiro/goals.json --batch-parallel 3 --json
+sce auto close-loop-batch .kiro/goals.json --batch-parallel 3 --json
 
 # Apply global agent budget across all concurrent goals
-sco auto close-loop-batch .kiro/goals.json \
+sce auto close-loop-batch .kiro/goals.json \
   --batch-parallel 3 \
   --batch-agent-budget 6 \
   --json
 
 # Prioritize complex goals first and enable anti-starvation aging
-sco auto close-loop-batch .kiro/goals.json \
+sce auto close-loop-batch .kiro/goals.json \
   --batch-priority critical-first \
   --batch-aging-factor 3 \
   --json
 
 # Automatically retry failed/stopped goals for one extra round
-sco auto close-loop-batch .kiro/goals.json \
+sce auto close-loop-batch .kiro/goals.json \
   --batch-retry-rounds 1 \
   --batch-retry-strategy adaptive \
   --json
 
 # Retry until all goals complete (bounded by max rounds)
-sco auto close-loop-batch .kiro/goals.json \
+sce auto close-loop-batch .kiro/goals.json \
   --batch-retry-until-complete \
   --batch-retry-max-rounds 10 \
   --json
 
 # Disable autonomous batch policy explicitly (only when you need legacy/manual tuning)
-sco auto close-loop-batch .kiro/goals.json \
+sce auto close-loop-batch .kiro/goals.json \
   --no-batch-autonomous \
   --json
 
 # Resume only pending goals from a previous batch summary
-sco auto close-loop-batch --resume-from-summary .kiro/reports/close-loop-batch.json --json
+sce auto close-loop-batch --resume-from-summary .kiro/reports/close-loop-batch.json --json
 
 # Resume pending goals from latest persisted batch session summary
-sco auto close-loop-batch --resume-from-summary latest --json
+sce auto close-loop-batch --resume-from-summary latest --json
 
 # Resume only failed/error goals from summary (ignore unprocessed goals)
-sco auto close-loop-batch --resume-from-summary .kiro/reports/close-loop-batch.json \
+sce auto close-loop-batch --resume-from-summary .kiro/reports/close-loop-batch.json \
   --resume-strategy failed-only --json
 
 # List persisted close-loop sessions
-sco auto session list
-sco auto session list --status completed,partial-failed
-sco auto session list --limit 50 --json
+sce auto session list
+sce auto session list --status completed,partial-failed
+sce auto session list --limit 50 --json
 
 # Aggregate close-loop session telemetry
-sco auto session stats
-sco auto session stats --days 14 --status completed --json
+sce auto session stats
+sce auto session stats --days 14 --status completed --json
 
 # Prune old close-loop sessions
-sco auto session prune --keep 50
-sco auto session prune --keep 20 --older-than-days 14 --dry-run
+sce auto session prune --keep 50
+sce auto session prune --keep 20 --older-than-days 14 --dry-run
 
 # List persisted spec directories
-sco auto spec-session list
-sco auto spec-session list --limit 100 --json
+sce auto spec-session list
+sce auto spec-session list --limit 100 --json
 
 # Prune old spec directories
-sco auto spec-session prune --keep 200
-sco auto spec-session prune --keep 100 --older-than-days 30 --dry-run --json
-sco auto spec-session prune --keep 100 --older-than-days 30 --show-protection-reasons --json
+sce auto spec-session prune --keep 200
+sce auto spec-session prune --keep 100 --older-than-days 30 --dry-run --json
+sce auto spec-session prune --keep 100 --older-than-days 30 --show-protection-reasons --json
 
 # List persisted close-loop-batch summary sessions
-sco auto batch-session list
-sco auto batch-session list --status failed
-sco auto batch-session list --limit 50 --json
+sce auto batch-session list
+sce auto batch-session list --status failed
+sce auto batch-session list --limit 50 --json
 
 # Aggregate close-loop-batch summary telemetry
-sco auto batch-session stats
-sco auto batch-session stats --days 14 --status failed --json
+sce auto batch-session stats
+sce auto batch-session stats --days 14 --status failed --json
 
 # Prune old close-loop-batch summary sessions
-sco auto batch-session prune --keep 50
-sco auto batch-session prune --keep 20 --older-than-days 14 --dry-run
+sce auto batch-session prune --keep 50
+sce auto batch-session prune --keep 20 --older-than-days 14 --dry-run
 
 # List persisted close-loop-controller summary sessions
-sco auto controller-session list
-sco auto controller-session list --status partial-failed
-sco auto controller-session list --limit 50 --json
+sce auto controller-session list
+sce auto controller-session list --status partial-failed
+sce auto controller-session list --limit 50 --json
 
 # Aggregate close-loop-controller summary session telemetry
-sco auto controller-session stats
-sco auto controller-session stats --days 14 --status partial-failed --json
+sce auto controller-session stats
+sce auto controller-session stats --days 14 --status partial-failed --json
 
 # Prune old close-loop-controller summary sessions
-sco auto controller-session prune --keep 50
-sco auto controller-session prune --keep 20 --older-than-days 14 --dry-run
+sce auto controller-session prune --keep 50
+sce auto controller-session prune --keep 20 --older-than-days 14 --dry-run
 
 # Aggregate cross-archive autonomous governance telemetry
-sco auto governance stats
-sco auto governance stats --days 14 --status completed,partial-failed --json
-sco auto governance maintain --session-keep 50 --batch-session-keep 50 --controller-session-keep 50 --json
-sco auto governance maintain --apply --session-keep 20 --batch-session-keep 20 --controller-session-keep 20 --recovery-memory-older-than-days 90 --json
-sco auto governance close-loop --plan-only --max-rounds 3 --target-risk low --json
-sco auto governance close-loop --max-rounds 3 --target-risk low --session-keep 20 --batch-session-keep 20 --controller-session-keep 20 --json
-sco auto governance close-loop --max-rounds 3 --governance-session-keep 50 --governance-session-older-than-days 30 --json
-sco auto governance close-loop --max-rounds 3 --target-risk low --execute-advisory --advisory-recover-max-rounds 3 --advisory-controller-max-cycles 20 --dry-run --json
-sco auto governance close-loop --governance-resume latest --max-rounds 5 --json
-sco auto governance close-loop --governance-resume latest --target-risk high --governance-resume-allow-drift --json
-sco auto governance session list --limit 20 --status completed,failed --json
-sco auto governance session list --resume-only --json
-sco auto governance session stats --days 30 --json
-sco auto governance session stats --resume-only --json
-sco auto governance session prune --keep 50 --older-than-days 30 --dry-run --json
+sce auto governance stats
+sce auto governance stats --days 14 --status completed,partial-failed --json
+sce auto governance maintain --session-keep 50 --batch-session-keep 50 --controller-session-keep 50 --json
+sce auto governance maintain --apply --session-keep 20 --batch-session-keep 20 --controller-session-keep 20 --recovery-memory-older-than-days 90 --json
+sce auto governance close-loop --plan-only --max-rounds 3 --target-risk low --json
+sce auto governance close-loop --max-rounds 3 --target-risk low --session-keep 20 --batch-session-keep 20 --controller-session-keep 20 --json
+sce auto governance close-loop --max-rounds 3 --governance-session-keep 50 --governance-session-older-than-days 30 --json
+sce auto governance close-loop --max-rounds 3 --target-risk low --execute-advisory --advisory-recover-max-rounds 3 --advisory-controller-max-cycles 20 --dry-run --json
+sce auto governance close-loop --governance-resume latest --max-rounds 5 --json
+sce auto governance close-loop --governance-resume latest --target-risk high --governance-resume-allow-drift --json
+sce auto governance session list --limit 20 --status completed,failed --json
+sce auto governance session list --resume-only --json
+sce auto governance session stats --days 30 --json
+sce auto governance session stats --resume-only --json
+sce auto governance session prune --keep 50 --older-than-days 30 --dry-run --json
 
 # Recovery memory maintenance
-sco auto recovery-memory show --json
-sco auto recovery-memory scopes --json
-sco auto recovery-memory prune --older-than-days 30 --dry-run --json
-sco auto recovery-memory clear --json
+sce auto recovery-memory show --json
+sce auto recovery-memory scopes --json
+sce auto recovery-memory prune --older-than-days 30 --dry-run --json
+sce auto recovery-memory clear --json
 
 # Autonomous KPI trend (weekly/daily buckets + CSV export)
-sco auto kpi trend --weeks 12 --period week --mode all --json
-sco auto kpi trend --weeks 8 --period day --mode program --csv --out ./auto-kpi-trend.csv
+sce auto kpi trend --weeks 12 --period week --mode all --json
+sce auto kpi trend --weeks 8 --period day --mode program --csv --out ./auto-kpi-trend.csv
 
 # Unified observability snapshot (sessions + governance + KPI trend)
-sco auto observability snapshot --days 14 --status completed,failed --json
-sco auto observability snapshot --out .kiro/reports/auto-observability.json --json
+sce auto observability snapshot --days 14 --status completed,failed --json
+sce auto observability snapshot --out .kiro/reports/auto-observability.json --json
 
 # Agent-facing spec interfaces
-sco auto spec status 121-00-master --json
-sco auto spec instructions 121-02-sub-track --json
+sce auto spec status 121-00-master --json
+sce auto spec instructions 121-02-sub-track --json
 
 # Autonomous archive schema compatibility
-sco auto schema check --json
-sco auto schema migrate --json                           # dry-run by default
-sco auto schema migrate --apply --json                  # apply schema_version migration
-sco auto schema migrate --only close-loop-session,batch-session --apply --json
+sce auto schema check --json
+sce auto schema migrate --json                           # dry-run by default
+sce auto schema migrate --apply --json                  # apply schema_version migration
+sce auto schema migrate --only close-loop-session,batch-session --apply --json
 
-# Dual-track handoff integration (generic external project -> sco)
-sco auto handoff plan --manifest docs/handoffs/handoff-manifest.json --json
-sco auto handoff plan --manifest docs/handoffs/handoff-manifest.json --strict --out .kiro/reports/handoff-plan.json --json
-sco auto handoff queue --manifest docs/handoffs/handoff-manifest.json --out .kiro/auto/handoff-goals.lines --json
-sco auto handoff template-diff --manifest docs/handoffs/handoff-manifest.json --json
-sco auto handoff capability-matrix --manifest docs/handoffs/handoff-manifest.json --json
-sco auto handoff capability-matrix --manifest docs/handoffs/handoff-manifest.json --format markdown --out .kiro/reports/handoff-capability-matrix.md --fail-on-gap --json
-sco auto handoff run --manifest docs/handoffs/handoff-manifest.json --json
-sco auto handoff run --manifest docs/handoffs/handoff-manifest.json --min-spec-success-rate 95 --max-risk-level medium --json
-sco auto handoff run --manifest docs/handoffs/handoff-manifest.json --continue-from latest --continue-strategy auto --json
-sco auto handoff regression --session-id latest --json
-sco auto handoff regression --session-id latest --window 5 --json
-sco auto handoff regression --session-id latest --format markdown --out .kiro/reports/handoff-regression.md --json
-sco auto handoff regression --session-id latest --window 5 --out .kiro/reports/handoff-regression.json --json
-sco auto close-loop-batch .kiro/auto/handoff-goals.lines --format lines --json
+# Dual-track handoff integration (generic external project -> sce)
+sce auto handoff plan --manifest docs/handoffs/handoff-manifest.json --json
+sce auto handoff plan --manifest docs/handoffs/handoff-manifest.json --strict --out .kiro/reports/handoff-plan.json --json
+sce auto handoff queue --manifest docs/handoffs/handoff-manifest.json --out .kiro/auto/handoff-goals.lines --json
+sce auto handoff template-diff --manifest docs/handoffs/handoff-manifest.json --json
+sce auto handoff capability-matrix --manifest docs/handoffs/handoff-manifest.json --json
+sce auto handoff capability-matrix --manifest docs/handoffs/handoff-manifest.json --format markdown --out .kiro/reports/handoff-capability-matrix.md --fail-on-gap --json
+sce auto handoff run --manifest docs/handoffs/handoff-manifest.json --json
+sce auto handoff run --manifest docs/handoffs/handoff-manifest.json --min-spec-success-rate 95 --max-risk-level medium --json
+sce auto handoff run --manifest docs/handoffs/handoff-manifest.json --continue-from latest --continue-strategy auto --json
+sce auto handoff regression --session-id latest --json
+sce auto handoff regression --session-id latest --window 5 --json
+sce auto handoff regression --session-id latest --format markdown --out .kiro/reports/handoff-regression.md --json
+sce auto handoff regression --session-id latest --window 5 --out .kiro/reports/handoff-regression.json --json
+sce auto close-loop-batch .kiro/auto/handoff-goals.lines --format lines --json
 ``` 
 
 DoD-related options:
@@ -548,8 +548,8 @@ DoD-related options:
 - `--dod-report <path>`: write DoD evidence report JSON to custom path
 - `--no-dod-report`: disable automatic DoD report archive
 - `--resume <session-or-file>`: resume from prior session id, `latest`, `interrupted` (latest non-completed session), or JSON path
-  - Shorthand: `sco auto close-loop continue` / `sco auto close-loop 继续` equals `--resume interrupted`.
-- `sco auto continue`: shortcut command that resumes latest interrupted close-loop session.
+  - Shorthand: `sce auto close-loop continue` / `sce auto close-loop 继续` equals `--resume interrupted`.
+- `sce auto continue`: shortcut command that resumes latest interrupted close-loop session.
 - `--session-id <id>`: set explicit session id for persistence
 - `--no-session`: disable close-loop session persistence
 - `--session-keep <n>`: prune sessions after run and keep newest `n` snapshots
@@ -562,7 +562,7 @@ DoD-related options:
 - `--no-conflict-governance`: disable lease-conflict prediction and scheduling guard
 - `--no-ontology-guidance`: disable scene ontology `agent_hints` scheduling guidance
 
-Close-loop batch (`sco auto close-loop-batch <goals-file>`) options:
+Close-loop batch (`sce auto close-loop-batch <goals-file>`) options:
 - supports shared close-loop execution options (for example: `--subs`, `--max-parallel`, `--dod*`, `--replan*`, `--dry-run`, `--json`)
 - `--format <format>`: parse goals file as `auto`, `json`, or `lines` (default `auto`)
 - `--decompose-goal <goal>`: auto-split one broad goal into multiple batch goals using semantic clauses/categories
@@ -606,7 +606,7 @@ Close-loop batch (`sco auto close-loop-batch <goals-file>`) options:
   - Batch summary includes `batch_session` metadata when persisted (session id + file path).
   - When using `--decompose-goal`, summary includes `generated_from_goal` metadata (strategy, target count, produced count, clause/category diagnostics, decomposition `quality`, and refinement telemetry).
 
-Close-loop program (`sco auto close-loop-program "<goal>"`) options:
+Close-loop program (`sce auto close-loop-program "<goal>"`) options:
 - Automatically enables autonomous batch policy (hands-off closed-loop defaults) and uses semantic decomposition from one broad goal.
 - `--program-goals <n>`: target generated-goal count (`2-12`, default adaptive)
 - Supports batch execution controls (`--batch-parallel`, `--batch-agent-budget`, `--batch-priority`, `--batch-aging-factor`, `--batch-retry*`)
@@ -652,7 +652,7 @@ Close-loop program (`sco auto close-loop-program "<goal>"`) options:
 - Program summary includes `program_diagnostics` with `failure_clusters` and `remediation_actions` (prioritized follow-up commands for convergence).
 - Program summary includes `program_coordination` (master/sub topology, unresolved goal indexes, scheduler snapshot) and `auto_recovery` metadata.
 
-Close-loop controller (`sco auto close-loop-controller [queue-file]`) options:
+Close-loop controller (`sce auto close-loop-controller [queue-file]`) options:
 - `queue-file`: optional queue file path (default `.kiro/auto/close-loop-controller-goals.lines`)
 - `--controller-resume <session-or-file>`: resume from persisted controller session (`latest`, session id, or file path)
 - `--queue-format <auto|json|lines>`: queue parser mode (default `auto`)
@@ -675,7 +675,7 @@ Close-loop controller (`sco auto close-loop-controller [queue-file]`) options:
 - Supports program execution controls (`--program-*`, `--batch-*`, `--continue-on-error`, `--recovery-memory-scope`, `--dry-run`, `--json`) and runs each dequeued queue goal through full autonomous program flow.
 - Summary includes controller telemetry (`history`, `results`, final `pending_goals`, `stop_reason`, `exhausted`, dedupe/lock/session metadata) plus optional done/failed archive file paths.
 
-Close-loop recovery (`sco auto close-loop-recover [summary]`) options:
+Close-loop recovery (`sce auto close-loop-recover [summary]`) options:
 - `summary`: optional summary file path; defaults to `latest` persisted batch summary
 - `--use-action <n>`: choose remediation action index from diagnostics (`1` by default)
 - `--resume-strategy <pending|failed-only>`: control recovery goal scope from source summary
@@ -695,82 +695,82 @@ Close-loop recovery (`sco auto close-loop-recover [summary]`) options:
 - Output includes `recovered_from_summary`, `recovery_plan` (`applied_patch`, available remediation actions, `selection_source`, `selection_explain`), `recovery_cycle` (round history, convergence/exhausted state, elapsed/budget metadata), and `recovery_memory` (signature, scope, action stats, selection explanation).
 
 Close-loop session maintenance:
-- `sco auto session list [--limit <n>] [--status <csv>] [--json]`: list persisted close-loop sessions (`--status` supports comma-separated, case-insensitive filters)
-- `sco auto session stats [--days <n>] [--status <csv>] [--json]`: aggregate persisted close-loop session telemetry within an optional recent-day window
-- `sco auto session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune old session snapshots
+- `sce auto session list [--limit <n>] [--status <csv>] [--json]`: list persisted close-loop sessions (`--status` supports comma-separated, case-insensitive filters)
+- `sce auto session stats [--days <n>] [--status <csv>] [--json]`: aggregate persisted close-loop session telemetry within an optional recent-day window
+- `sce auto session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune old session snapshots
   - List JSON output includes `status_filter` and `status_counts` over filtered sessions.
   - Stats JSON output includes `criteria`, completion/failure rates, `sub_spec_count_sum`, `master_spec_counts`, and `latest_sessions`.
 
 Spec directory maintenance:
-- `sco auto spec-session list [--limit <n>] [--json]`: list persisted spec directories under `.kiro/specs`
-- `sco auto spec-session prune [--keep <n>] [--older-than-days <n>] [--no-protect-active] [--protect-window-days <n>] [--show-protection-reasons] [--dry-run] [--json]`: prune old spec directories by retention policy (default protects active/recent specs)
+- `sce auto spec-session list [--limit <n>] [--json]`: list persisted spec directories under `.kiro/specs`
+- `sce auto spec-session prune [--keep <n>] [--older-than-days <n>] [--no-protect-active] [--protect-window-days <n>] [--show-protection-reasons] [--dry-run] [--json]`: prune old spec directories by retention policy (default protects active/recent specs)
   - Protection sources include collaboration state, close-loop sessions, batch summaries, and controller sessions (via nested batch summary references).
   - JSON output always includes `protection_ranking_top` (top protected specs by reason count); `--show-protection-reasons` additionally includes per-spec `reasons` and full `protection_ranking`.
 - Batch/program/recover summaries can include `spec_session_budget` telemetry when `--spec-session-max-total` is configured.
 
 Close-loop batch session maintenance:
-- `sco auto batch-session list [--limit <n>] [--status <csv>] [--json]`: list persisted close-loop-batch summary sessions (`--status` supports comma-separated, case-insensitive filters)
-- `sco auto batch-session stats [--days <n>] [--status <csv>] [--json]`: aggregate persisted close-loop-batch summary telemetry within an optional recent-day window
-- `sco auto batch-session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune old persisted batch summaries
+- `sce auto batch-session list [--limit <n>] [--status <csv>] [--json]`: list persisted close-loop-batch summary sessions (`--status` supports comma-separated, case-insensitive filters)
+- `sce auto batch-session stats [--days <n>] [--status <csv>] [--json]`: aggregate persisted close-loop-batch summary telemetry within an optional recent-day window
+- `sce auto batch-session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune old persisted batch summaries
   - List JSON output includes `status_filter` and `status_counts` over filtered sessions.
   - Stats JSON output includes `criteria`, completion/failure rates, goal-volume sums, processed ratio, and `latest_sessions`.
 
 Close-loop controller session maintenance:
-- `sco auto controller-session list [--limit <n>] [--status <csv>] [--json]`: list persisted close-loop-controller summary sessions (`--status` supports comma-separated, case-insensitive filters)
-- `sco auto controller-session stats [--days <n>] [--status <csv>] [--json]`: aggregate persisted close-loop-controller status/throughput telemetry within an optional recent-day window
-- `sco auto controller-session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune old persisted controller summaries
+- `sce auto controller-session list [--limit <n>] [--status <csv>] [--json]`: list persisted close-loop-controller summary sessions (`--status` supports comma-separated, case-insensitive filters)
+- `sce auto controller-session stats [--days <n>] [--status <csv>] [--json]`: aggregate persisted close-loop-controller status/throughput telemetry within an optional recent-day window
+- `sce auto controller-session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune old persisted controller summaries
   - List JSON output includes `status_filter` and `status_counts` over filtered sessions.
   - Stats JSON output includes `criteria`, `status_counts`, `queue_format_counts`, completion/failure rates, goal-volume sums, and `latest_sessions`.
 
 Cross-archive autonomous governance maintenance:
-- `sco auto governance stats [--days <n>] [--status <csv>] [--json]`: aggregate a unified governance snapshot from session/batch-session/controller-session archives plus recovery memory state.
+- `sce auto governance stats [--days <n>] [--status <csv>] [--json]`: aggregate a unified governance snapshot from session/batch-session/controller-session archives plus recovery memory state.
   - JSON output includes `totals`, `throughput`, `health` (`risk_level`, `concerns`, `recommendations`, `release_gate`), `top_master_specs`, `recovery_memory`, and full per-archive stats under `archives`.
-- `sco auto governance maintain [--days <n>] [--status <csv>] [--session-keep <n>] [--batch-session-keep <n>] [--controller-session-keep <n>] [--recovery-memory-older-than-days <n>] [--apply] [--dry-run] [--json]`: run governance-maintenance planning and optional execution in one command.
+- `sce auto governance maintain [--days <n>] [--status <csv>] [--session-keep <n>] [--batch-session-keep <n>] [--controller-session-keep <n>] [--recovery-memory-older-than-days <n>] [--apply] [--dry-run] [--json]`: run governance-maintenance planning and optional execution in one command.
   - Plan-only mode is default; add `--apply` to execute maintenance actions (`session prune`, `batch-session prune`, `controller-session prune`, `recovery-memory prune`).
   - When release gate is blocked, plan output prioritizes release remediation advisories (`release-gate-evidence-review`, `release-gate-scene-batch-remediate`) before routine cleanup actions.
   - JSON output includes `assessment` (pre-maintenance governance snapshot), `plan`, `executed_actions`, `summary`, and `after_assessment` (only when `--apply` without `--dry-run`).
-- `sco auto governance close-loop [--days <n>] [--status <csv>] [--session-keep <n>] [--batch-session-keep <n>] [--controller-session-keep <n>] [--recovery-memory-older-than-days <n>] [--max-rounds <n>] [--target-risk <low|medium|high>] [--governance-resume <session|latest|file>] [--governance-resume-allow-drift] [--governance-session-id <id>] [--no-governance-session] [--governance-session-keep <n>] [--governance-session-older-than-days <n>] [--execute-advisory] [--advisory-recover-max-rounds <n>] [--advisory-controller-max-cycles <n>] [--plan-only] [--dry-run] [--json]`: run governance rounds until stop condition (target risk reached, release gate blocked, no actionable maintenance/advisory, non-mutating mode, maintenance/advisory failures, or max rounds).
+- `sce auto governance close-loop [--days <n>] [--status <csv>] [--session-keep <n>] [--batch-session-keep <n>] [--controller-session-keep <n>] [--recovery-memory-older-than-days <n>] [--max-rounds <n>] [--target-risk <low|medium|high>] [--governance-resume <session|latest|file>] [--governance-resume-allow-drift] [--governance-session-id <id>] [--no-governance-session] [--governance-session-keep <n>] [--governance-session-older-than-days <n>] [--execute-advisory] [--advisory-recover-max-rounds <n>] [--advisory-controller-max-cycles <n>] [--plan-only] [--dry-run] [--json]`: run governance rounds until stop condition (target risk reached, release gate blocked, no actionable maintenance/advisory, non-mutating mode, maintenance/advisory failures, or max rounds).
   - `--plan-only` runs a single non-mutating planning round.
   - Governance close-loop sessions are persisted by default at `.kiro/auto/governance-close-loop-sessions/*.json`; use `--governance-resume` to continue interrupted governance loops.
   - On resume, KSE reuses persisted policy defaults (`target_risk`, `execute_advisory`, `advisory_policy`) unless explicitly overridden. Explicit policy drift is blocked by default; add `--governance-resume-allow-drift` to force override.
   - `--governance-session-keep` (with optional `--governance-session-older-than-days`) enables post-run governance session retention pruning while protecting the current session snapshot.
   - `--execute-advisory` enables automatic advisory action execution (`recover-latest`, `controller-resume-latest`) when governance assessment detects failed sessions or controller pending goals; KSE auto-selects the latest actionable advisory source and reports `skipped` (not `failed`) when no actionable source exists.
   - JSON output includes round-by-round risk/action telemetry (`rounds`, with `risk_before/risk_after` and `release_gate_before/release_gate_after`), advisory telemetry (`execute_advisory`, `advisory_policy`, `advisory_summary`, `rounds[*].advisory_actions`), `stop_detail` + `recommendations` for explicit blocking reasons, plus `initial_assessment`, `final_assessment`, and convergence metadata.
-- `sco auto governance session list [--limit <n>] [--status <csv>] [--resume-only] [--json]`: list persisted governance close-loop sessions (`--resume-only` filters to resumed-chain sessions only).
-- `sco auto governance session stats [--days <n>] [--status <csv>] [--resume-only] [--json]`: aggregate governance close-loop session telemetry (completion/failure/convergence, rounds, risk/stop composition, resumed-chain ratios/source counts, and aggregated `release_gate` round telemetry trends).
-- `sco auto governance session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune governance close-loop session archive by retention policy.
+- `sce auto governance session list [--limit <n>] [--status <csv>] [--resume-only] [--json]`: list persisted governance close-loop sessions (`--resume-only` filters to resumed-chain sessions only).
+- `sce auto governance session stats [--days <n>] [--status <csv>] [--resume-only] [--json]`: aggregate governance close-loop session telemetry (completion/failure/convergence, rounds, risk/stop composition, resumed-chain ratios/source counts, and aggregated `release_gate` round telemetry trends).
+- `sce auto governance session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune governance close-loop session archive by retention policy.
 
 Close-loop recovery memory maintenance:
-- `sco auto recovery-memory show [--scope <scope>] [--json]`: inspect persisted recovery signatures/actions and aggregate stats (optionally scoped)
-- `sco auto recovery-memory scopes [--json]`: inspect aggregated recovery-memory statistics grouped by scope
-- `sco auto recovery-memory prune [--older-than-days <n>] [--scope <scope>] [--dry-run] [--json]`: prune stale recovery memory entries (optionally scoped)
-- `sco auto recovery-memory clear [--json]`: clear persisted recovery memory state
+- `sce auto recovery-memory show [--scope <scope>] [--json]`: inspect persisted recovery signatures/actions and aggregate stats (optionally scoped)
+- `sce auto recovery-memory scopes [--json]`: inspect aggregated recovery-memory statistics grouped by scope
+- `sce auto recovery-memory prune [--older-than-days <n>] [--scope <scope>] [--dry-run] [--json]`: prune stale recovery memory entries (optionally scoped)
+- `sce auto recovery-memory clear [--json]`: clear persisted recovery memory state
 
 Autonomous KPI trend:
-- `sco auto kpi trend [--weeks <n>] [--mode <all|batch|program|recover|controller>] [--period <week|day>] [--csv] [--out <path>] [--json]`: aggregate periodic KPI trend from persisted autonomous summary sessions.
+- `sce auto kpi trend [--weeks <n>] [--mode <all|batch|program|recover|controller>] [--period <week|day>] [--csv] [--out <path>] [--json]`: aggregate periodic KPI trend from persisted autonomous summary sessions.
   - `--period <week|day>` selects weekly (default) or daily buckets.
   - `--csv` prints CSV rows to stdout and writes CSV when used with `--out` (JSON remains default).
   - JSON output includes `mode_breakdown` (batch/program/recover/controller/other run distribution), `anomaly_detection`, and flattened `anomalies` (latest-period regression checks against historical baseline, including rate-limit pressure via `average_rate_limit_signals` / `average_rate_limit_backoff_ms`).
 
 Unified observability snapshot:
-- `sco auto observability snapshot [--days <n>] [--status <csv>] [--weeks <n>] [--trend-mode <mode>] [--trend-period <period>] [--out <path>] [--json]`: generate one unified observability snapshot that combines close-loop session stats, batch stats, controller stats, governance session stats, governance health, and KPI trend.
+- `sce auto observability snapshot [--days <n>] [--status <csv>] [--weeks <n>] [--trend-mode <mode>] [--trend-period <period>] [--out <path>] [--json]`: generate one unified observability snapshot that combines close-loop session stats, batch stats, controller stats, governance session stats, governance health, and KPI trend.
 - JSON output includes top-level `highlights` plus detailed archive/trend payloads under `snapshots`.
 
 Agent-facing spec interfaces:
-- `sco auto spec status <spec-name> [--json]`: structured status for one spec (`docs`, `task_progress`, `collaboration`, `health`).
-- `sco auto spec instructions <spec-name> [--json]`: machine-readable execution instructions for one spec (`next_actions`, `priority_open_tasks`, recommended commands, document excerpts).
+- `sce auto spec status <spec-name> [--json]`: structured status for one spec (`docs`, `task_progress`, `collaboration`, `health`).
+- `sce auto spec instructions <spec-name> [--json]`: machine-readable execution instructions for one spec (`next_actions`, `priority_open_tasks`, recommended commands, document excerpts).
 
 Autonomous archive schema compatibility:
-- `sco auto schema check [--only <scopes>] [--json]`: scan archive schema compatibility (`schema_version`) for `close-loop-session`, `batch-session`, `controller-session`, and `governance-session`.
-- `sco auto schema migrate [--only <scopes>] [--target-version <version>] [--apply] [--json]`: migrate/backfill `schema_version` across autonomous archives.
+- `sce auto schema check [--only <scopes>] [--json]`: scan archive schema compatibility (`schema_version`) for `close-loop-session`, `batch-session`, `controller-session`, and `governance-session`.
+- `sce auto schema migrate [--only <scopes>] [--target-version <version>] [--apply] [--json]`: migrate/backfill `schema_version` across autonomous archives.
   - Default mode is dry-run; use `--apply` to persist changes.
 
 Dual-track handoff integration:
-- `sco auto handoff plan --manifest <path> [--out <path>] [--strict] [--strict-warnings] [--json]`: parse handoff manifest (source project, specs, templates, known gaps) and generate an executable KSE integration phase plan.
-- `sco auto handoff queue --manifest <path> [--out <path>] [--append] [--no-include-known-gaps] [--dry-run] [--json]`: generate close-loop batch goal queue from handoff manifest and optionally persist line-based queue file (default `.kiro/auto/handoff-goals.lines`).
-- `sco auto handoff template-diff --manifest <path> [--json]`: compare manifest templates against local template exports/registry and report `missing_in_local` and `extra_in_local`.
-- `sco auto handoff capability-matrix --manifest <path> [--strict] [--strict-warnings] [--min-capability-coverage <n>] [--min-capability-semantic <n>] [--no-require-capability-semantic] [--format <json|markdown>] [--out <path>] [--remediation-queue-out <path>] [--fail-on-gap] [--json]`: generate a fast Moqui capability matrix (`template-diff + baseline + capability coverage + semantic completeness`) and optionally fail fast on gaps.
-- `sco auto handoff run --manifest <path> [--out <path>] [--queue-out <path>] [--append] [--no-include-known-gaps] [--continue-from <session|latest|file>] [--continue-strategy <auto|pending|failed-only>] [--dry-run] [--strict] [--strict-warnings] [--no-dependency-batching] [--min-spec-success-rate <n>] [--max-risk-level <level>] [--no-require-ontology-validation] [--no-require-moqui-baseline] [--min-capability-coverage <n>] [--no-require-capability-coverage] [--require-release-gate-preflight] [--release-evidence-window <n>] [--json]`: execute handoff end-to-end (`plan -> queue -> close-loop-batch -> observability`) with automatic report archive to `.kiro/reports/handoff-runs/<session>.json`.
+- `sce auto handoff plan --manifest <path> [--out <path>] [--strict] [--strict-warnings] [--json]`: parse handoff manifest (source project, specs, templates, known gaps) and generate an executable KSE integration phase plan.
+- `sce auto handoff queue --manifest <path> [--out <path>] [--append] [--no-include-known-gaps] [--dry-run] [--json]`: generate close-loop batch goal queue from handoff manifest and optionally persist line-based queue file (default `.kiro/auto/handoff-goals.lines`).
+- `sce auto handoff template-diff --manifest <path> [--json]`: compare manifest templates against local template exports/registry and report `missing_in_local` and `extra_in_local`.
+- `sce auto handoff capability-matrix --manifest <path> [--strict] [--strict-warnings] [--min-capability-coverage <n>] [--min-capability-semantic <n>] [--no-require-capability-semantic] [--format <json|markdown>] [--out <path>] [--remediation-queue-out <path>] [--fail-on-gap] [--json]`: generate a fast Moqui capability matrix (`template-diff + baseline + capability coverage + semantic completeness`) and optionally fail fast on gaps.
+- `sce auto handoff run --manifest <path> [--out <path>] [--queue-out <path>] [--append] [--no-include-known-gaps] [--continue-from <session|latest|file>] [--continue-strategy <auto|pending|failed-only>] [--dry-run] [--strict] [--strict-warnings] [--no-dependency-batching] [--min-spec-success-rate <n>] [--max-risk-level <level>] [--no-require-ontology-validation] [--no-require-moqui-baseline] [--min-capability-coverage <n>] [--no-require-capability-coverage] [--require-release-gate-preflight] [--release-evidence-window <n>] [--json]`: execute handoff end-to-end (`plan -> queue -> close-loop-batch -> observability`) with automatic report archive to `.kiro/reports/handoff-runs/<session>.json`.
   - Default mode is dependency-aware: spec integration goals are grouped into dependency batches and executed in topological order.
   - `--continue-from` resumes pending goals from an existing handoff run report (`latest`, session id, or JSON file path). For safety, KSE enforces manifest-path consistency between the previous report and current run.
   - `--continue-strategy auto|pending|failed-only` controls resumed scope. `auto` (default) derives the best strategy from prior run state (`pending` when unprocessed/planned goals exist, otherwise `failed-only` for pure failure replay).
@@ -784,14 +784,14 @@ Dual-track handoff integration:
   - Run result includes `failure_summary` (failed phase/gate/release-gate preflight highlights) and `recommendations` with executable follow-up commands (for example, auto-generated `--continue-from <session>` on failed/incomplete batches).
   - Gate defaults: `--min-spec-success-rate` defaults to `100`, `--max-risk-level` defaults to `high`, ontology validation requirement is enabled by default, Moqui baseline requirement is enabled by default, and capability coverage minimum defaults to `100` when manifest `capabilities` is declared.
   - Use `--no-require-ontology-validation`, `--no-require-moqui-baseline`, or `--no-require-capability-coverage` only for emergency bypass.
-- `sco auto handoff regression [--session-id <id|latest>] [--window <n>] [--format <json|markdown>] [--out <path>] [--json]`: compare one handoff run report with its previous run and output trend deltas (success-rate/risk/failed-goals/elapsed time).
+- `sce auto handoff regression [--session-id <id|latest>] [--window <n>] [--format <json|markdown>] [--out <path>] [--json]`: compare one handoff run report with its previous run and output trend deltas (success-rate/risk/failed-goals/elapsed time).
   - `--window` (2-50, default `2`) returns multi-run `series`, `window_trend`, and `aggregates` for broader regression visibility.
   - Regression JSON now includes `risk_layers` (low/medium/high/unknown buckets with per-layer session list and quality aggregates).
   - `--format` supports `json` (default) and `markdown` for human-readable report rendering.
   - Markdown report includes `Trend Series` (ASCII success/ontology bars per session) and `Risk Layer View`.
   - `--out` writes the generated regression report using the selected format.
   - Output includes `recommendations` to guide next action when trend degrades or risk escalates.
-- `sco auto handoff evidence [--file <path>] [--session-id <id|latest>] [--window <n>] [--format <json|markdown>] [--out <path>] [--json]`: quick-review merged release evidence and render current-batch gate/ontology/regression/moqui-baseline/capability-coverage/risk-layer overview.
+- `sce auto handoff evidence [--file <path>] [--session-id <id|latest>] [--window <n>] [--format <json|markdown>] [--out <path>] [--json]`: quick-review merged release evidence and render current-batch gate/ontology/regression/moqui-baseline/capability-coverage/risk-layer overview.
   - Default evidence file is `.kiro/reports/release-evidence/handoff-runs.json`.
   - `--window` (1-50, default `5`) controls how many recent sessions are aggregated in review.
   - JSON output includes `current_overview` (with `release_gate_preflight`, `failure_summary`, and preflight policy flags), `aggregates.status_counts`, `aggregates.gate_pass_rate_percent`, and `risk_layers`.
@@ -799,7 +799,7 @@ Dual-track handoff integration:
   - Add `--release-draft <path>` to auto-generate a release notes draft and evidence review markdown in one run.
   - `--release-version` sets draft version tag (defaults to `v<package.json version>`), and `--release-date` accepts `YYYY-MM-DD` (default: current UTC date).
   - Use `--review-out <path>` to override the generated evidence review markdown path (default `.kiro/reports/release-evidence/handoff-evidence-review.md`).
-- `sco auto handoff gate-index [--dir <path>] [--history-file <path>] [--keep <n>] [--out <path>] [--json]`: aggregate `release-gate-*.json` audits into a cross-version history index.
+- `sce auto handoff gate-index [--dir <path>] [--history-file <path>] [--keep <n>] [--out <path>] [--json]`: aggregate `release-gate-*.json` audits into a cross-version history index.
   - Default scan dir is `.kiro/reports/release-evidence`, default output file is `.kiro/reports/release-evidence/release-gate-history.json`.
   - `--history-file` merges an existing index (for example, previous release asset) before dedup/refresh.
   - `--keep` retains latest N entries (`1-5000`, default `200`).
@@ -832,16 +832,16 @@ Recommended `.kiro/config/orchestrator.json`:
 
 ```bash
 # Validate template variable schema in a scene package
-sco scene template-validate --package <path>
-sco scene template-validate --package ./my-package --json
+sce scene template-validate --package <path>
+sce scene template-validate --package ./my-package --json
 
 # Resolve inheritance chain and display merged variable schema
-sco scene template-resolve --package <name>
-sco scene template-resolve --package scene-erp-inventory --json
+sce scene template-resolve --package <name>
+sce scene template-resolve --package scene-erp-inventory --json
 
 # Render template package with variable substitution
-sco scene template-render --package <name> --values <json-or-path> --out <dir>
-sco scene template-render --package scene-erp --values '{"entity_name":"Order"}' --out ./output --json
+sce scene template-render --package <name> --values <json-or-path> --out <dir>
+sce scene template-render --package scene-erp --values '{"entity_name":"Order"}' --out ./output --json
 ```
 
 ### Scene Package Batch Publish
@@ -849,72 +849,72 @@ sco scene template-render --package scene-erp --values '{"entity_name":"Order"}'
 ```bash
 # Publish scene package templates from a handoff manifest
 # Defaults: completed specs only + ontology validation required + ontology batch gate (avg>=70, valid-rate>=100%)
-sco scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --json
+sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --json
 
 # Optional convenience preset for 331-style path conventions (manifest/docs fallback paths)
-sco scene package-publish-batch --from-331 --json
+sce scene package-publish-batch --from-331 --json
 
 # Preview batch publish plan without writing template files
-sco scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --json
+sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --json
 
 # Publish selected specs only
-sco scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --include 62-00-moqui-full-capability-closure-program,62-01-moqui-capability-itemized-parity-matrix --json
+sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --include 62-00-moqui-full-capability-closure-program,62-01-moqui-capability-itemized-parity-matrix --json
 
 # Disable status filter and use docs/* fallback paths for manifest entries missing scene paths
-sco scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --status all --fallback-spec-package docs/scene-package.json --fallback-scene-manifest docs/scene.yaml --force --json
+sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --status all --fallback-spec-package docs/scene-package.json --fallback-scene-manifest docs/scene.yaml --force --json
 
 # Read specs from non-standard manifest path
-sco scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --manifest-spec-path handoff.spec_items --json
+sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --manifest-spec-path handoff.spec_items --json
 
 # Tighten per-spec ontology semantic quality threshold before publish
-sco scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --ontology-min-score 70 --json
+sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --ontology-min-score 70 --json
 
 # Persist ontology/publish batch report for governance tracking
-sco scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-report-out .kiro/reports/scene-package-ontology-batch.json --json
+sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-report-out .kiro/reports/scene-package-ontology-batch.json --json
 
 # Enforce batch-level ontology portfolio gate (average score + valid-rate)
-sco scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-min-average-score 60 --ontology-min-valid-rate 90 --json
+sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-min-average-score 60 --ontology-min-valid-rate 90 --json
 
 # Emergency bypass (not recommended): disable ontology validation requirement
-sco scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --no-require-ontology-validation --json
+sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --no-require-ontology-validation --json
 
 # Export ontology remediation task draft markdown
-sco scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-task-out .kiro/reports/scene-package-ontology-task-draft.md --json
+sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-task-out .kiro/reports/scene-package-ontology-task-draft.md --json
 
 # Export ontology remediation queue lines (directly consumable by close-loop-batch)
-sco scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-task-queue-out .kiro/auto/ontology-remediation.lines --json
+sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-task-queue-out .kiro/auto/ontology-remediation.lines --json
 ```
 
 ### Scene Package Ontology Backfill Batch
 
 ```bash
 # Backfill ontology_model from a handoff manifest (commit mode)
-sco scene package-ontology-backfill-batch --manifest docs/handoffs/handoff-manifest.json --spec-package-path docs/scene-package.json --json
+sce scene package-ontology-backfill-batch --manifest docs/handoffs/handoff-manifest.json --spec-package-path docs/scene-package.json --json
 
 # Use 331-poc preset defaults in dry-run mode
-sco scene package-ontology-backfill-batch --from-331 --dry-run --json
+sce scene package-ontology-backfill-batch --from-331 --dry-run --json
 
 # Backfill selected specs only
-sco scene package-ontology-backfill-batch --from-331 --include 62-00-moqui-full-capability-closure-program,62-01-moqui-capability-itemized-parity-matrix --dry-run --json
+sce scene package-ontology-backfill-batch --from-331 --include 62-00-moqui-full-capability-closure-program,62-01-moqui-capability-itemized-parity-matrix --dry-run --json
 
 # Export detailed backfill report for governance review
-sco scene package-ontology-backfill-batch --from-331 --dry-run --out-report .kiro/reports/scene-package-ontology-backfill-report.json --json
+sce scene package-ontology-backfill-batch --from-331 --dry-run --out-report .kiro/reports/scene-package-ontology-backfill-report.json --json
 ```
 
 ### Moqui Template Baseline Scorecard
 
 ```bash
 # Preferred CLI entry: score Moqui/ERP templates in the local template library (default filter: moqui|erp)
-sco scene moqui-baseline --json
+sce scene moqui-baseline --json
 
 # Script alias (same behavior)
 npm run report:moqui-baseline
 
 # Score all scene templates instead of Moqui/ERP subset
-sco scene moqui-baseline --include-all --json
+sce scene moqui-baseline --include-all --json
 
 # Customize score thresholds and output paths
-sco scene moqui-baseline \
+sce scene moqui-baseline \
   --min-score 75 \
   --min-valid-rate 100 \
   --out .kiro/reports/moqui-template-baseline.json \
@@ -922,7 +922,7 @@ sco scene moqui-baseline \
   --json
 
 # Compare with a previous baseline and fail CI on portfolio gate fail
-sco scene moqui-baseline \
+sce scene moqui-baseline \
   --compare-with .kiro/reports/release-evidence/moqui-template-baseline-prev.json \
   --fail-on-portfolio-fail \
   --json
@@ -936,86 +936,86 @@ Release workflow default:
 
 ```bash
 # Test connectivity and authentication to Moqui ERP instance
-sco scene connect --config <path>
-sco scene connect --config ./moqui-config.json --json
+sce scene connect --config <path>
+sce scene connect --config ./moqui-config.json --json
 
 # Discover available entities, services, and screens from Moqui ERP
-sco scene discover --config <path>
-sco scene discover --config ./moqui-config.json --type entities --json
+sce scene discover --config <path>
+sce scene discover --config ./moqui-config.json --type entities --json
 
 # Extract scene templates from Moqui ERP instance
-sco scene extract --config <path> --out <dir>
-sco scene extract --config ./moqui-config.json --type entities --pattern crud --out ./templates --json
-sco scene extract --config ./moqui-config.json --dry-run --json
+sce scene extract --config <path> --out <dir>
+sce scene extract --config ./moqui-config.json --type entities --pattern crud --out ./templates --json
+sce scene extract --config ./moqui-config.json --dry-run --json
 ```
 
 ### Scene Template Quality Pipeline
 
 ```bash
 # Lint scene package for quality issues (10-category checks)
-sco scene lint --package <path>
-sco scene lint --package ./my-scene-package --json
-sco scene lint --package ./my-scene-package --strict
+sce scene lint --package <path>
+sce scene lint --package ./my-scene-package --json
+sce scene lint --package ./my-scene-package --strict
 
 # Calculate quality score (0-100, 5-dimension scoring with agent_readiness)
-sco scene score --package <path>
-sco scene score --package ./my-scene-package --json
-sco scene score --package ./my-scene-package --strict
+sce scene score --package <path>
+sce scene score --package ./my-scene-package --json
+sce scene score --package ./my-scene-package --strict
 
 # One-stop contribute pipeline: validate → lint → score → preview → publish
-sco scene contribute --package <path>
-sco scene contribute --package ./my-scene-package --registry ./registry --json
-sco scene contribute --package ./my-scene-package --dry-run
-sco scene contribute --package ./my-scene-package --skip-lint --json
+sce scene contribute --package <path>
+sce scene contribute --package ./my-scene-package --registry ./registry --json
+sce scene contribute --package ./my-scene-package --dry-run
+sce scene contribute --package ./my-scene-package --skip-lint --json
 ```
 
 ### Scene Ontology Enhancement
 
 ```bash
 # Show ontology graph (nodes and edges) from scene manifest
-sco scene ontology show --package <path>
-sco scene ontology show --package ./my-scene-package --json
+sce scene ontology show --package <path>
+sce scene ontology show --package ./my-scene-package --json
 
 # Query dependency chain for a specific node reference
-sco scene ontology deps --package <path> --ref <node-ref>
-sco scene ontology deps --package ./my-scene-package --ref entity:Order --json
+sce scene ontology deps --package <path> --ref <node-ref>
+sce scene ontology deps --package ./my-scene-package --ref entity:Order --json
 
 # Analyze reverse dependency impact radius (what will be affected)
-sco scene ontology impact --package <path> --ref <node-ref>
-sco scene ontology impact --package ./my-scene-package --ref service:createOrder --relation depends_on,composes --max-depth 2 --json
+sce scene ontology impact --package <path> --ref <node-ref>
+sce scene ontology impact --package ./my-scene-package --ref service:createOrder --relation depends_on,composes --max-depth 2 --json
 
 # Find shortest ontology relation path between two refs
-sco scene ontology path --package <path> --from <source-ref> --to <target-ref>
-sco scene ontology path --package ./my-scene-package --from service:createOrder --to entity:Order --undirected --json
+sce scene ontology path --package <path> --from <source-ref> --to <target-ref>
+sce scene ontology path --package ./my-scene-package --from service:createOrder --to entity:Order --undirected --json
 
 # Validate ontology graph (detect dangling edges, cycles)
-sco scene ontology validate --package <path>
-sco scene ontology validate --package ./my-scene-package --json
+sce scene ontology validate --package <path>
+sce scene ontology validate --package ./my-scene-package --json
 
 # Show action abstraction info (inputs, outputs, side-effects)
-sco scene ontology actions --package <path>
-sco scene ontology actions --package ./my-scene-package --ref service:createOrder --json
+sce scene ontology actions --package <path>
+sce scene ontology actions --package ./my-scene-package --ref service:createOrder --json
 
 # Parse and display data lineage (source → transform → sink)
-sco scene ontology lineage --package <path>
-sco scene ontology lineage --package ./my-scene-package --ref entity:Order --json
+sce scene ontology lineage --package <path>
+sce scene ontology lineage --package ./my-scene-package --ref entity:Order --json
 
 # Show agent hints (autonomous operation guidance)
-sco scene ontology agent-info --package <path>
-sco scene ontology agent-info --package ./my-scene-package --json
+sce scene ontology agent-info --package <path>
+sce scene ontology agent-info --package ./my-scene-package --json
 ```
 
 ### Version & Upgrade
 
 ```bash
 # Show version info
-sco version-info
+sce version-info
 
 # Check for upgrades
-sco upgrade check
+sce upgrade check
 
 # Perform upgrade
-sco upgrade
+sce upgrade
 ```
 
 ---
@@ -1024,15 +1024,15 @@ sco upgrade
 
 ```bash
 # Set language
-sco --lang zh <command>
-sco --lang en <command>
+sce --lang zh <command>
+sce --lang en <command>
 
 # Show help
-sco --help
-sco <command> --help
+sce --help
+sce <command> --help
 
 # Show version
-sco --version
+sce --version
 ```
 
 ---
@@ -1043,114 +1043,114 @@ sco --version
 
 ```bash
 # 1. Bootstrap spec draft
-sco spec bootstrap --name 01-00-my-feature --non-interactive
+sce spec bootstrap --name 01-00-my-feature --non-interactive
 
 # 2. Run spec pipeline
-sco spec pipeline run --spec 01-00-my-feature
+sce spec pipeline run --spec 01-00-my-feature
 
 # 3. Export context
-sco context export 01-00-my-feature
+sce context export 01-00-my-feature
 
 # 4. Work on tasks...
 
 # 5. Sync progress
-sco workspace sync
+sce workspace sync
 ```
 
 ### Managing Multiple Projects
 
 ```bash
 # 1. Register your projects as workspaces
-sco workspace create project-a ~/projects/project-a
-sco workspace create project-b ~/projects/project-b
+sce workspace create project-a ~/projects/project-a
+sce workspace create project-b ~/projects/project-b
 
 # 2. List all workspaces
-sco workspace list
+sce workspace list
 
 # 3. Switch between projects
-sco workspace switch project-a
+sce workspace switch project-a
 
 # 4. Check current workspace
-sco workspace info
+sce workspace info
 
 # 5. Work on the active project...
 
 # 6. Switch to another project
-sco workspace switch project-b
+sce workspace switch project-b
 ```
 
 ### Setting Up Automation
 
 ```bash
 # 1. Initialize watch mode
-sco watch init
+sce watch init
 
 # 2. Install presets
-sco watch install auto-sync
-sco watch install test-runner
+sce watch install auto-sync
+sce watch install test-runner
 
 # 3. Start watching
-sco watch start
+sce watch start
 
 # 4. Check status
-sco watch status
+sce watch status
 ```
 
 ### Working with Team
 
 ```bash
 # 1. Check team status
-sco workspace team
+sce workspace team
 
 # 2. Claim a task
-sco task claim 01-00-feature 1.1
+sce task claim 01-00-feature 1.1
 
 # 3. Work on task...
 
 # 4. Sync when done
-sco workspace sync
+sce workspace sync
 ```
 
 ### Managing Multiple Environments
 
 ```bash
 # 1. Register your environments
-sco env register config/dev.json
-sco env register config/staging.json
-sco env register config/prod.json
+sce env register config/dev.json
+sce env register config/staging.json
+sce env register config/prod.json
 
 # 2. List all environments
-sco env list
+sce env list
 
 # 3. Switch to development environment
-sco env switch development
+sce env switch development
 
 # 4. Check current environment
-sco env info
+sce env info
 
 # 5. Verify environment is configured correctly
-sco env verify
+sce env verify
 
 # 6. Run commands in environment context
-sco env run "npm test"
+sce env run "npm test"
 
 # 7. Switch to staging for testing
-sco env switch staging
+sce env switch staging
 
 # 8. Rollback if something goes wrong
-sco env rollback
+sce env rollback
 ```
 
 ---
 
 ## Tips
 
-1. **Use `sco` not legacy aliases** (`kse` / `kiro-spec-engine`) - Shorter and easier to type
+1. **Use `sce` not compatibility aliases** (`sco` / `kse` / `kiro-spec-engine`) - Shorter and easier to type
 2. **Add `--help` to any command** - Get detailed usage information
 3. **Use tab completion** - Most shells support command completion
-4. **Check `sco doctor`** - Diagnose issues quickly
+4. **Check `sce doctor`** - Diagnose issues quickly
 5. **Use watch mode** - Automate repetitive tasks
-6. **Use workspace management** - Easily switch between multiple sco projects
+6. **Use workspace management** - Easily switch between multiple sce projects
 7. **Use environment management** - Manage dev, test, staging, prod configurations with automatic backup
 8. **Use multi-repo management** - Coordinate operations across multiple Git repositories
 
@@ -1160,13 +1160,13 @@ sco env rollback
 
 ### Multi-Repository Management Commands
 
-#### `sco repo init`
+#### `sce repo init`
 
 Initialize repository configuration by scanning the project directory for Git repositories.
 
 **Usage:**
 ```bash
-sco repo init [options]
+sce repo init [options]
 ```
 
 **Options:**
@@ -1184,13 +1184,13 @@ sco repo init [options]
 **Example:**
 ```bash
 # Initialize with default settings
-sco repo init
+sce repo init
 
 # Force overwrite without confirmation
-sco repo init --force
+sce repo init --force
 
 # Scan deeper directory structure
-sco repo init --depth 5
+sce repo init --depth 5
 ```
 
 **Output:**
@@ -1206,13 +1206,13 @@ Configuration saved to .kiro/project-repos.json
 
 ---
 
-#### `sco repo status`
+#### `sce repo status`
 
 Display the Git status of all configured repositories.
 
 **Usage:**
 ```bash
-sco repo status [options]
+sce repo status [options]
 ```
 
 **Options:**
@@ -1229,13 +1229,13 @@ sco repo status [options]
 **Example:**
 ```bash
 # Basic status
-sco repo status
+sce repo status
 
 # Detailed status with file changes
-sco repo status --verbose
+sce repo status --verbose
 
 # JSON output for automation
-sco repo status --json
+sce repo status --json
 ```
 
 **Output:**
@@ -1251,13 +1251,13 @@ sco repo status --json
 
 ---
 
-#### `sco repo exec`
+#### `sce repo exec`
 
 Execute a Git command in all configured repositories.
 
 **Usage:**
 ```bash
-sco repo exec "<command>" [options]
+sce repo exec "<command>" [options]
 ```
 
 **Options:**
@@ -1273,19 +1273,19 @@ sco repo exec "<command>" [options]
 **Example:**
 ```bash
 # Pull latest changes
-sco repo exec "git pull"
+sce repo exec "git pull"
 
 # Create and checkout new branch
-sco repo exec "git checkout -b feature/new-feature"
+sce repo exec "git checkout -b feature/new-feature"
 
 # Preview without executing
-sco repo exec "git push" --dry-run
+sce repo exec "git push" --dry-run
 
 # Fetch all remotes
-sco repo exec "git fetch --all"
+sce repo exec "git fetch --all"
 
 # Show commit history
-sco repo exec "git log --oneline -5"
+sce repo exec "git log --oneline -5"
 ```
 
 **Output:**
@@ -1307,13 +1307,13 @@ Summary: 3 succeeded, 0 failed
 
 ---
 
-#### `sco repo health`
+#### `sce repo health`
 
 Perform health checks on all configured repositories.
 
 **Usage:**
 ```bash
-sco repo health [options]
+sce repo health [options]
 ```
 
 **Options:**
@@ -1328,10 +1328,10 @@ sco repo health [options]
 **Example:**
 ```bash
 # Run health check
-sco repo health
+sce repo health
 
 # JSON output for CI/CD
-sco repo health --json
+sce repo health --json
 ```
 
 **Output:**
@@ -1361,8 +1361,8 @@ Overall Health: 2 healthy, 1 unhealthy
 ---
 
 **Need Help?**
-- Run `sco --help` for command reference
-- Check [GitHub Issues](https://github.com/heguangyong/kiro-spec-engine/issues)
+- Run `sce --help` for command reference
+- Check [GitHub Issues](https://github.com/heguangyong/scene-capability-engine/issues)
 - Review [Documentation](../README.md)
 
 

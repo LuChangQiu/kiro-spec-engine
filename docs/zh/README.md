@@ -306,8 +306,8 @@
 - 🔧 查阅[故障排除](troubleshooting.md)
 
 ### 社区
-- 💬 [GitHub Discussions](https://github.com/heguangyong/kiro-spec-engine/discussions)
-- 🐛 [GitHub Issues](https://github.com/heguangyong/kiro-spec-engine/issues)
+- 💬 [GitHub Discussions](https://github.com/heguangyong/scene-capability-engine/discussions)
+- 🐛 [GitHub Issues](https://github.com/heguangyong/scene-capability-engine/issues)
 
 ---
 

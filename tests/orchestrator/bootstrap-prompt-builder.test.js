@@ -106,7 +106,7 @@ describe('BootstrapPromptBuilder', () => {
     test('falls back to default summary when README is missing', async () => {
       const prompt = await builder.buildPrompt('any-spec');
 
-      expect(prompt).toContain('SCO (Scene Capability Orchestrator)');
+      expect(prompt).toContain('SCE (Scene Capability Engine)');
     });
   });
 

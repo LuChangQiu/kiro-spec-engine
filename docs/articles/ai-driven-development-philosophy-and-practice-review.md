@@ -199,7 +199,7 @@
 - **文章链接（英文）**：[ai-driven-development-philosophy-and-practice.en.md](./ai-driven-development-philosophy-and-practice.en.md)
 - **阅读指南（中文）**：[ai-driven-development-philosophy-and-practice-guide.md](./ai-driven-development-philosophy-and-practice-guide.md)
 - **阅读指南（英文）**：[ai-driven-development-philosophy-and-practice-guide.en.md](./ai-driven-development-philosophy-and-practice-guide.en.md)
-- **项目地址**：https://github.com/heguangyong/kiro-spec-engine
+- **项目地址**：https://github.com/heguangyong/scene-capability-engine
 
 ---
 

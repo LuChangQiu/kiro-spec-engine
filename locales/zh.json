@@ -1,27 +1,27 @@
 {
   "cli": {
-    "name": "sco",
-    "description": "🔥 SCO（场景能力编排引擎）- 以 Spec、编排与 KPI 可观测驱动 AI 交付",
+    "name": "sce",
+    "description": "🔥 SCE（场景能力引擎）- 以 Spec、编排与 KPI 可观测驱动 AI 交付",
     "commands": {
       "init": {
-        "description": "初始化新的 SCO（场景能力编排引擎）项目",
+        "description": "初始化新的 SCE（场景能力引擎）项目",
         "projectNamePrompt": "请输入项目名称:",
         "forceOption": "强制初始化，即使 .kiro 目录已存在",
         "alreadyExists": "⚠️  .kiro 目录已存在",
         "overwritePrompt": "是否要覆盖它？",
         "cancelled": "初始化已取消。",
-        "success": "🎉 SCO 项目初始化成功！",
+        "success": "🎉 SCE 项目初始化成功！",
         "nextSteps": "📋 下一步操作:",
         "step1": "创建第一个 Spec: mkdir .kiro/specs/01-00-your-feature",
         "step2": "编写基础 requirements.md",
-        "step3": "使用 Ultrawork 增强: sco enhance requirements .kiro/specs/01-00-your-feature/requirements.md",
+        "step3": "使用 Ultrawork 增强: sce enhance requirements .kiro/specs/01-00-your-feature/requirements.md",
         "startJourney": "🔥 开始你的 Ultrawork 之旅！",
         "error": "❌ 初始化项目时出错:"
       },
       "enhance": {
         "description": "使用 Ultrawork 精神增强文档质量",
         "starting": "🔥 启动 {stage} 阶段 Ultrawork 增强...",
-        "toolNotFound": "❌ 找不到 Ultrawork 工具。请运行: sco init",
+        "toolNotFound": "❌ 找不到 Ultrawork 工具。请运行: sce init",
         "completed": "✅ Ultrawork 增强完成！",
         "failed": "❌ 增强失败，错误代码:",
         "pythonError": "❌ 运行 Python 工具时出错:",
@@ -32,14 +32,14 @@
         "success": "✅ 已创建 Spec 目录:",
         "nextSteps": "📋 下一步操作:",
         "step1": "在 Spec 目录中创建 requirements.md",
-        "step2": "使用以下命令增强: sco enhance requirements {specPath}/requirements.md",
+        "step2": "使用以下命令增强: sce enhance requirements {specPath}/requirements.md",
         "error": "❌ 创建 Spec 时出错:"
       },
       "status": {
         "description": "检查项目状态和可用的 Specs",
-        "noProject": "⚠️  当前目录中未找到 SCO 项目",
-        "initTip": "运行: sco init 来初始化",
-        "title": "🔥 SCO 项目状态",
+        "noProject": "⚠️  当前目录中未找到 SCE 项目",
+        "initTip": "运行: sce init 来初始化",
+        "title": "🔥 SCE 项目状态",
         "toolStatus": "Ultrawork 工具:",
         "available": "✅ 可用",
         "missing": "❌ 缺失",
@@ -57,7 +57,7 @@
         "python": "Python",
         "python_note": "注意: Ultrawork 质量增强功能需要 Python。",
         "all_good": "所有系统要求均已满足！",
-        "ready": "您已准备好使用 SCO 的所有功能，包括 Ultrawork 增强。",
+        "ready": "您已准备好使用 SCE 的所有功能，包括 Ultrawork 增强。",
         "python_missing": "Python 不可用",
         "basic_features": "基本 CLI 功能（init、status、create-spec）可以正常工作。",
         "ultrawork_unavailable": "Ultrawork 增强功能需要 Python 3.8 或更高版本。"

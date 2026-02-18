@@ -608,7 +608,7 @@ After successful adoption:
 - **Documentation**: Check README.md in your `.kiro/` directory
 - **System Check**: `kse doctor`
 - **Version Info**: `kse version-info`
-- **Issues**: https://github.com/heguangyong/kiro-spec-engine/issues
+- **Issues**: https://github.com/heguangyong/scene-capability-engine/issues
 
 ---
 

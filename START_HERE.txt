@@ -75,6 +75,6 @@ to orchestrate mode.
 7) Support
 ---------------------------------------------------------------
 
-GitHub: https://github.com/heguangyong/kiro-spec-engine
+GitHub: https://github.com/heguangyong/scene-capability-engine
 
 ===============================================================

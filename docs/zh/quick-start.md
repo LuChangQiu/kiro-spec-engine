@@ -733,7 +733,7 @@ ls .kiro/specs/
 
 - 📖 **[故障排除指南](../troubleshooting.md)** - 常见问题和解决方案
 - 🤔 **[常见问题](../faq.md)** - 常见问题解答
-- 💬 **[GitHub Discussions](https://github.com/heguangyong/kiro-spec-engine/discussions)** - 社区帮助
+- 💬 **[GitHub Discussions](https://github.com/heguangyong/scene-capability-engine/discussions)** - 社区帮助
 
 ---
 

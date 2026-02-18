@@ -165,7 +165,7 @@ Detailed technical documentation:
 ### Troubleshooting
 - [Troubleshooting](troubleshooting.md) - Common issues
 - [FAQ](faq.md) - Quick answers
-- [GitHub Issues](https://github.com/heguangyong/kiro-spec-engine/issues) - Report bugs
+- [GitHub Issues](https://github.com/heguangyong/scene-capability-engine/issues) - Report bugs
 
 ---
 
@@ -234,8 +234,8 @@ Detailed technical documentation:
 **Getting Help:**
 - **Quick answers:** [FAQ](faq.md)
 - **Problems:** [Troubleshooting](troubleshooting.md)
-- **Community:** [GitHub Discussions](https://github.com/heguangyong/kiro-spec-engine/discussions)
-- **Bugs:** [GitHub Issues](https://github.com/heguangyong/kiro-spec-engine/issues)
+- **Community:** [GitHub Discussions](https://github.com/heguangyong/scene-capability-engine/discussions)
+- **Bugs:** [GitHub Issues](https://github.com/heguangyong/scene-capability-engine/issues)
 
 ---
 
@@ -263,8 +263,8 @@ Detailed technical documentation:
 
 Found an error? Want to improve the docs?
 
-1. **Report issues:** [GitHub Issues](https://github.com/heguangyong/kiro-spec-engine/issues)
-2. **Suggest improvements:** [GitHub Discussions](https://github.com/heguangyong/kiro-spec-engine/discussions)
+1. **Report issues:** [GitHub Issues](https://github.com/heguangyong/scene-capability-engine/issues)
+2. **Suggest improvements:** [GitHub Discussions](https://github.com/heguangyong/scene-capability-engine/discussions)
 3. **Submit changes:** [Contributing Guide](../CONTRIBUTING.md)
 
 ---

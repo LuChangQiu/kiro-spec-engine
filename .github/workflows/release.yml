@@ -341,6 +341,12 @@ jobs:
               const ontologyMetrics = ontology.metrics && typeof ontology.metrics === 'object'
                 ? ontology.metrics
                 : {};
+              const scenePackageBatch = currentOverview.scene_package_batch && typeof currentOverview.scene_package_batch === 'object'
+                ? currentOverview.scene_package_batch
+                : {};
+              const scenePackageBatchSummary = scenePackageBatch.summary && typeof scenePackageBatch.summary === 'object'
+                ? scenePackageBatch.summary
+                : {};
 
               const gatePassed = gate.passed === true;
               const specSuccessRate = Number(gateActual.spec_success_rate_percent);
@@ -351,6 +357,23 @@ jobs:
               const undecidedDecisions = Number.isFinite(Number(gateActual.ontology_decision_undecided))
                 ? Number(gateActual.ontology_decision_undecided)
                 : Number(ontologyMetrics.decision_undecided);
+              const sceneBatchStatusRaw = `${scenePackageBatch.status || gateActual.scene_package_batch_status || ''}`.trim().toLowerCase();
+              const sceneBatchStatus = sceneBatchStatusRaw || 'unknown';
+              let sceneBatchPassed = null;
+              if (typeof gateActual.scene_package_batch_passed === 'boolean') {
+                sceneBatchPassed = gateActual.scene_package_batch_passed;
+              } else if (sceneBatchStatus === 'passed') {
+                sceneBatchPassed = true;
+              } else if (sceneBatchStatus === 'failed') {
+                sceneBatchPassed = false;
+              }
+              const sceneBatchFailureCount = Number.isFinite(Number(scenePackageBatchSummary.batch_gate_failure_count))
+                ? Number(scenePackageBatchSummary.batch_gate_failure_count)
+                : (
+                  Number.isFinite(Number(scenePackageBatchSummary.failed))
+                    ? Number(scenePackageBatchSummary.failed)
+                    : null
+                );
 
               signals.push(`summary=${summaryFile}`);
               signals.push(`gate_passed=${gatePassed}`);
@@ -358,6 +381,9 @@ jobs:
               signals.push(`risk_level=${riskLevel || 'unknown'}`);
               signals.push(`unmapped_rules=${Number.isFinite(unmappedRules) ? unmappedRules : 'n/a'}`);
               signals.push(`undecided_decisions=${Number.isFinite(undecidedDecisions) ? undecidedDecisions : 'n/a'}`);
+              signals.push(`scene_package_batch_status=${sceneBatchStatus}`);
+              signals.push(`scene_package_batch_passed=${sceneBatchPassed === null ? 'n/a' : sceneBatchPassed}`);
+              signals.push(`scene_package_batch_failure_count=${sceneBatchFailureCount === null ? 'n/a' : sceneBatchFailureCount}`);
 
               if (requireGatePass && !gatePassed) {
                 violations.push('handoff gate is not passed');
@@ -400,12 +426,35 @@ jobs:
                 max_undecided_decisions: Number.isFinite(maxUndecidedDecisions) ? maxUndecidedDecisions : null
               },
               summary_file: summaryFile || null,
+              scene_package_batch_status: null,
+              scene_package_batch_passed: null,
+              scene_package_batch_failure_count: null,
               config_warnings: configWarnings,
               signals,
               violations,
               gate_passed: violations.length === 0,
               evaluated_at: new Date().toISOString()
             };
+            const sceneStatusSignal = signals.find((item) => item.startsWith('scene_package_batch_status='));
+            const scenePassedSignal = signals.find((item) => item.startsWith('scene_package_batch_passed='));
+            const sceneFailureSignal = signals.find((item) => item.startsWith('scene_package_batch_failure_count='));
+            if (sceneStatusSignal) {
+              reportPayload.scene_package_batch_status = sceneStatusSignal.replace('scene_package_batch_status=', '') || null;
+            }
+            if (scenePassedSignal) {
+              const raw = scenePassedSignal.replace('scene_package_batch_passed=', '').trim().toLowerCase();
+              if (raw === 'true') {
+                reportPayload.scene_package_batch_passed = true;
+              } else if (raw === 'false') {
+                reportPayload.scene_package_batch_passed = false;
+              }
+            }
+            if (sceneFailureSignal) {
+              const parsed = Number(sceneFailureSignal.replace('scene_package_batch_failure_count=', '').trim());
+              if (Number.isFinite(parsed)) {
+                reportPayload.scene_package_batch_failure_count = parsed;
+              }
+            }
             fs.mkdirSync(path.dirname(gateReportFile), { recursive: true });
             fs.writeFileSync(gateReportFile, `${JSON.stringify(reportPayload, null, 2)}\n`, 'utf8');
             console.log(`[release-gate] report_file=${gateReportFile}`);
@@ -560,6 +609,12 @@ jobs:
               const passRate = payload.aggregates && Number.isFinite(Number(payload.aggregates.pass_rate_percent))
                 ? Number(payload.aggregates.pass_rate_percent)
                 : null;
+              const sceneBatchPassRate = payload.aggregates && Number.isFinite(Number(payload.aggregates.scene_package_batch_pass_rate_percent))
+                ? Number(payload.aggregates.scene_package_batch_pass_rate_percent)
+                : null;
+              const sceneBatchFailedCount = payload.aggregates && Number.isFinite(Number(payload.aggregates.scene_package_batch_failed_count))
+                ? Number(payload.aggregates.scene_package_batch_failed_count)
+                : null;
               const parseNumber = (value, fallback) => {
                 const parsed = Number(value);
                 return Number.isFinite(parsed) ? parsed : fallback;
@@ -643,6 +698,8 @@ jobs:
                 '',
                 `- Indexed entries: ${Number(payload.total_entries) || 0}`,
                 `- Gate pass rate (history): ${passRate === null ? 'n/a' : `${passRate}%`}`,
+                `- Scene batch pass rate (history): ${sceneBatchPassRate === null ? 'n/a' : `${sceneBatchPassRate}%`}`,
+                `- Scene batch failed runs (history): ${sceneBatchFailedCount === null ? 'n/a' : sceneBatchFailedCount}`,
                 `- Recent pass ratio (latest 5): ${recentKnown === 0 ? 'n/a' : `${recentPass}/${recentKnown}`}`,
                 `- Recent risk mix (latest 5): low=${riskCounts.low}, medium=${riskCounts.medium}, high=${riskCounts.high}, unknown=${riskCounts.unknown}`,
                 `- Trend card: ${historyCardUrl ? `[${historyCardAsset}](${historyCardUrl})` : historyCardAsset}`,
@@ -678,8 +735,18 @@ jobs:
                   const successRate = Number.isFinite(Number(item && item.spec_success_rate_percent))
                     ? `${Number(item.spec_success_rate_percent)}`
                     : 'n/a';
+                  const sceneBatch = item && typeof item.scene_package_batch_passed === 'boolean'
+                    ? (item.scene_package_batch_passed ? 'pass' : 'fail')
+                    : 'n/a';
+                  const sceneFailures = Number.isFinite(Number(item && item.scene_package_batch_failure_count))
+                    ? `${Number(item.scene_package_batch_failure_count)}`
+                    : 'n/a';
                   const evaluatedAt = item && item.evaluated_at ? item.evaluated_at : 'n/a';
-                  lines.push('', `- ${tag} | passed=${passed} | risk=${risk} | success=${successRate} | at=${evaluatedAt}`);
+                  lines.push(
+                    '',
+                    `- ${tag} | passed=${passed} | risk=${risk} | scene-batch=${sceneBatch} | ` +
+                    `scene-failures=${sceneFailures} | success=${successRate} | at=${evaluatedAt}`
+                  );
                 }
               }
 

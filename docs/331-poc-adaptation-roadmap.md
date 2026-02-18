@@ -110,10 +110,13 @@
 38. 治理 close-loop 接入 release gate 阻断语义：
    - `kse auto governance close-loop` 在 release gate/drift 信号异常时输出 `stop_reason=release-gate-blocked`。
    - 结果新增 `stop_detail` 与 `recommendations`，显式给出阻断原因与处置命令。
+39. 治理 maintain 计划默认优先 release gate 修复：
+   - `kse auto governance maintain` 在 release gate 阻断时优先产出 `release-gate-evidence-review` / `release-gate-scene-batch-remediate`。
+   - 发布质量阻断先处理，再执行常规会话/内存清理动作。
 
 ## 下一阶段（P2）
 
-1. 将 release gate 阻断语义接入 `kse auto governance maintain` 的 action plan 优先级，先处理发布质量阻断再做常规清理。
+1. 将 release gate 阻断信号接入 `kse auto handoff run` 的 preflight 提示与失败摘要，形成闭环入口。
 
 ## 长期目标（P3）
 

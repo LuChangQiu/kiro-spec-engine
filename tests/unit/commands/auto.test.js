@@ -4646,6 +4646,54 @@ if (process.argv.includes('--json')) {
     ]));
   });
 
+  test('prioritizes release gate remediation actions in governance maintain plan', async () => {
+    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    await fs.ensureDir(releaseEvidenceDir);
+    await fs.writeJson(path.join(releaseEvidenceDir, 'release-gate-history.json'), {
+      mode: 'auto-handoff-release-gate-history',
+      total_entries: 5,
+      latest: {
+        tag: 'v1.47.35',
+        gate_passed: false,
+        risk_level: 'high'
+      },
+      aggregates: {
+        pass_rate_percent: 50,
+        scene_package_batch_pass_rate_percent: 55,
+        drift_alert_rate_percent: 100,
+        drift_alert_runs: 3,
+        drift_blocked_runs: 1
+      },
+      entries: []
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'kse',
+      'auto',
+      'governance',
+      'maintain',
+      '--json'
+    ]);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-governance-maintain');
+    expect(parsed.plan[0]).toEqual(expect.objectContaining({
+      id: 'release-gate-evidence-review',
+      enabled: true,
+      apply_supported: false
+    }));
+    expect(parsed.plan).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: 'release-gate-scene-batch-remediate',
+        enabled: true,
+        apply_supported: false
+      })
+    ]));
+  });
+
   test('applies governance maintenance actions and returns after assessment', async () => {
     const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
     const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');

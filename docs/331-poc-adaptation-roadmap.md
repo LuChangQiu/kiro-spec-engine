@@ -104,10 +104,13 @@
 36. 治理 close-loop 轮次遥测接入发布信号：
    - `kse auto governance close-loop` 每轮输出 `release_gate_before/release_gate_after`，与 `risk_before/risk_after` 对齐。
    - 轮次级审计可直接追踪 release gate/drift/scene-batch 信号在治理动作前后的变化。
+37. 治理会话统计聚合 release gate 轮次趋势：
+   - `kse auto governance session stats` 新增 `release_gate` 聚合区块，覆盖 gate fail/drift alert/blocked 与通过率均值。
+   - 会话统计输出同时汇总 `round_telemetry_observed/changed`，可量化治理轮次对发布质量信号的影响。
 
 ## 下一阶段（P2）
 
-1. 将 governance close-loop 的 release gate 轮次 telemetry 聚合进 `kse auto governance session stats`，形成会话级趋势统计。
+1. 将 release gate 聚合趋势进一步接入 `kse auto governance close-loop` 的 stop reason/recommendations，给出显式治理阻断原因。
 
 ## 长期目标（P3）
 

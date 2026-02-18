@@ -5347,7 +5347,40 @@ if (process.argv.includes('--json')) {
         failed_actions: 1,
         skipped_actions: 0
       },
-      final_assessment: { health: { risk_level: 'high' } },
+      final_assessment: {
+        health: {
+          risk_level: 'high',
+          release_gate: {
+            available: true,
+            latest_gate_passed: false,
+            pass_rate_percent: 40,
+            scene_package_batch_pass_rate_percent: 50,
+            drift_alert_rate_percent: 100,
+            drift_blocked_runs: 1
+          }
+        }
+      },
+      rounds: [
+        {
+          round: 1,
+          release_gate_before: {
+            available: true,
+            latest_gate_passed: false,
+            pass_rate_percent: 40,
+            scene_package_batch_pass_rate_percent: 50,
+            drift_alert_rate_percent: 100,
+            drift_blocked_runs: 1
+          },
+          release_gate_after: {
+            available: true,
+            latest_gate_passed: false,
+            pass_rate_percent: 45,
+            scene_package_batch_pass_rate_percent: 55,
+            drift_alert_rate_percent: 80,
+            drift_blocked_runs: 1
+          }
+        }
+      ],
       governance_session: {
         id: 'governance-session-old',
         file: oldSession
@@ -5368,7 +5401,40 @@ if (process.argv.includes('--json')) {
         failed_actions: 0,
         skipped_actions: 0
       },
-      final_assessment: { health: { risk_level: 'low' } },
+      final_assessment: {
+        health: {
+          risk_level: 'low',
+          release_gate: {
+            available: true,
+            latest_gate_passed: true,
+            pass_rate_percent: 100,
+            scene_package_batch_pass_rate_percent: 100,
+            drift_alert_rate_percent: 0,
+            drift_blocked_runs: 0
+          }
+        }
+      },
+      rounds: [
+        {
+          round: 1,
+          release_gate_before: {
+            available: true,
+            latest_gate_passed: true,
+            pass_rate_percent: 100,
+            scene_package_batch_pass_rate_percent: 100,
+            drift_alert_rate_percent: 0,
+            drift_blocked_runs: 0
+          },
+          release_gate_after: {
+            available: true,
+            latest_gate_passed: true,
+            pass_rate_percent: 100,
+            scene_package_batch_pass_rate_percent: 100,
+            drift_alert_rate_percent: 0,
+            drift_blocked_runs: 0
+          }
+        }
+      ],
       governance_session: {
         id: 'governance-session-new',
         file: newSession
@@ -5406,6 +5472,8 @@ if (process.argv.includes('--json')) {
     }));
     expect(listPayload.sessions).toHaveLength(1);
     expect(listPayload.sessions[0].id).toBe('governance-session-old');
+    expect(listPayload.sessions[0].release_gate_latest_gate_passed).toBe(false);
+    expect(listPayload.sessions[0].round_release_gate_changed).toBe(1);
 
     logSpy.mockClear();
     const resumedListProgram = buildProgram();
@@ -5456,6 +5524,19 @@ if (process.argv.includes('--json')) {
     expect(statsPayload.final_risk_counts).toEqual(expect.objectContaining({
       high: 1,
       low: 1
+    }));
+    expect(statsPayload.release_gate).toEqual(expect.objectContaining({
+      observed_sessions: 2,
+      failed_sessions: 1,
+      failed_rate_percent: 50,
+      drift_alert_sessions: 1,
+      blocked_sessions: 1,
+      average_pass_rate_percent: 70,
+      average_scene_package_batch_pass_rate_percent: 75,
+      average_drift_alert_rate_percent: 50,
+      round_telemetry_observed: 2,
+      round_telemetry_changed: 1,
+      round_telemetry_change_rate_percent: 50
     }));
 
     logSpy.mockClear();

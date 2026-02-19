@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entities>
+  <entity entity-name="OrderHeader" package-name="mantle.order">
+    <relationship related-entity-name="mantle.order.OrderItem" type="one-nofk"/>
+  </entity>
+  <entity entity-name="OrderItem" package-name="mantle.order">
+    <field name="orderId" type="id"/>
+  </entity>
+</entities>

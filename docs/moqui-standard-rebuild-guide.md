@@ -29,7 +29,17 @@ Optional:
 - `business_rules`
 - `decisions`
 
-## Run
+## Step 1: Extract Metadata (from Moqui project)
+
+```bash
+node scripts/moqui-metadata-extract.js \
+  --project-dir E:/workspace/your-moqui-project \
+  --out docs/moqui/metadata-catalog.json \
+  --markdown-out docs/moqui/metadata-catalog.md \
+  --json
+```
+
+## Step 2: Build Rebuild Bundle
 
 ```bash
 node scripts/moqui-standard-rebuild.js \

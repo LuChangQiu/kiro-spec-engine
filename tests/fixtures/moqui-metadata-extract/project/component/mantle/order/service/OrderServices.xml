@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services>
+  <service verb="create" noun="OrderHeader" service-name="mantle.order.OrderServices.create#OrderHeader">
+    <in-parameters>
+      <parameter name="orderId" entity-name="mantle.order.OrderHeader"/>
+    </in-parameters>
+  </service>
+  <service verb="get" noun="OrderHeader" service-name="mantle.order.OrderServices.get#OrderHeader">
+    <in-parameters>
+      <parameter name="orderId" entity-name="mantle.order.OrderHeader"/>
+    </in-parameters>
+  </service>
+</services>

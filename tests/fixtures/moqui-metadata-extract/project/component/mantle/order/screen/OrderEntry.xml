@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen name="OrderEntry">
+  <transition name="createOrder" service-name="mantle.order.OrderServices.create#OrderHeader"/>
+  <actions>
+    <entity-find entity-name="mantle.order.OrderHeader" list="orderHeaderList"/>
+  </actions>
+  <widgets>
+    <form-single name="OrderEntryForm">
+      <field name="orderId"/>
+      <field name="customerPartyId"/>
+      <field name="statusId"/>
+    </form-single>
+  </widgets>
+</screen>

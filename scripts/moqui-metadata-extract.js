@@ -420,6 +420,8 @@ function collectModelsFromScenePackage(payload, sourceFile) {
   const forms = [];
   const businessRules = [];
   const decisions = [];
+  const bindingRefs = [];
+  const ontologyEntityRefs = [];
 
   const ontologyEntities = toArray(ontologyModel.entities);
   for (const item of ontologyEntities) {
@@ -432,8 +434,10 @@ function collectModelsFromScenePackage(payload, sourceFile) {
     }
     const type = normalizeIdentifier(pickField(item, ['type'])) || '';
     if (type === 'entity' || /^entity:/i.test(id)) {
+      const entityRef = id.replace(/^entity:/i, '');
+      ontologyEntityRefs.push(entityRef);
       entities.push({
-        name: id.replace(/^entity:/i, ''),
+        name: entityRef,
         package: null,
         relations: [],
         source_file: sourceFile
@@ -463,17 +467,23 @@ function collectModelsFromScenePackage(payload, sourceFile) {
       name: ref,
       verb: pickField(binding, ['verb']),
       noun: pickField(binding, ['noun']),
-      entities: [],
+      entities: toArray(binding.entities || binding.entity_refs)
+        .map(item => (typeof item === 'string' ? normalizeText(item) : pickField(item, ['name', 'id', 'entity'])))
+        .filter(Boolean),
       source_file: sourceFile
     });
+    bindingRefs.push(ref);
   }
 
   const entryScene = pickField(artifacts, ['entry_scene', 'entryScene', 'scene']);
+  const resolvedScenePath = entryScene
+    ? `${sourceFile}#${entryScene}`
+    : null;
   if (entryScene) {
     screens.push({
-      path: entryScene,
-      services: [],
-      entities: [],
+      path: resolvedScenePath,
+      services: bindingRefs.slice(0, MAX_HINT_ITEMS),
+      entities: deduplicateBy(ontologyEntityRefs.map(name => ({ name })), item => item.name).map(item => item.name),
       source_file: sourceFile
     });
   } else {
@@ -481,19 +491,22 @@ function collectModelsFromScenePackage(payload, sourceFile) {
     if (sceneName) {
       screens.push({
         path: `scene/${normalizeIdentifier(sceneName)}`,
-        services: [],
-        entities: [],
+        services: bindingRefs.slice(0, MAX_HINT_ITEMS),
+        entities: deduplicateBy(ontologyEntityRefs.map(name => ({ name })), item => item.name).map(item => item.name),
         source_file: sourceFile
       });
     }
   }
 
-  const parameterCount = toArray(payload.parameters).length;
+  const parameterCount = Math.max(
+    toArray(payload.parameters).length,
+    Math.min(toArray(capabilityContract.bindings).length, 6)
+  );
   if (parameterCount > 0) {
     const formName = pickField(metadata, ['name']) || normalizeIdentifier(sourceFile) || 'scene-form';
     forms.push({
       name: `${formName}-input-form`,
-      screen: entryScene || sourceFile,
+      screen: resolvedScenePath || sourceFile,
       field_count: parameterCount,
       source_file: sourceFile
     });

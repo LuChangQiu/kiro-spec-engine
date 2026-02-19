@@ -163,7 +163,8 @@ function collectEntityModels(payload) {
     models.push({
       name,
       package: pickField(entry, ['package', 'package_name', 'group', 'module']),
-      relations
+      relations,
+      source_file: pickField(entry, ['source_file', 'source', 'file'])
     });
   }
   return models;
@@ -198,7 +199,8 @@ function collectServiceModels(payload) {
       name,
       verb: pickField(entry, ['verb']),
       noun: pickField(entry, ['noun']),
-      entities: entityRefs
+      entities: entityRefs,
+      source_file: pickField(entry, ['source_file', 'source', 'file'])
     });
   }
   return models;
@@ -235,7 +237,8 @@ function collectScreenModels(payload) {
     models.push({
       path: screenPath,
       services,
-      entities
+      entities,
+      source_file: pickField(entry, ['source_file', 'source', 'file'])
     });
   }
   return models;
@@ -267,7 +270,8 @@ function collectFormModels(payload) {
     models.push({
       name,
       screen: pickField(entry, ['screen', 'screen_path', 'screen_ref']),
-      field_count: fieldCount
+      field_count: fieldCount,
+      source_file: pickField(entry, ['source_file', 'source', 'file'])
     });
   }
   return models;
@@ -333,6 +337,20 @@ function clampScore(value) {
   return Number(numeric.toFixed(2));
 }
 
+function isInferredSource(sourceFile) {
+  const source = normalizeText(sourceFile);
+  if (!source) {
+    return false;
+  }
+  return /#inferred$/i.test(source) || /[\\/]inferred([\\/]?)/i.test(source);
+}
+
+function preferNonInferred(items) {
+  const list = Array.isArray(items) ? items : [];
+  const filtered = list.filter(item => !isInferredSource(item && item.source_file));
+  return filtered.length > 0 ? filtered : list;
+}
+
 function scoreStatus(score) {
   if (score >= 70) {
     return 'ready';
@@ -344,30 +362,35 @@ function scoreStatus(score) {
 }
 
 function buildReadinessMatrix(context) {
-  const entityCount = context.entities.length;
-  const serviceCount = context.services.length;
-  const screenCount = context.screens.length;
-  const formCount = context.forms.length;
+  const scoringEntities = preferNonInferred(context.entities);
+  const scoringServices = preferNonInferred(context.services);
+  const scoringScreens = preferNonInferred(context.screens);
+  const scoringForms = preferNonInferred(context.forms);
+
+  const entityCount = scoringEntities.length;
+  const serviceCount = scoringServices.length;
+  const screenCount = scoringScreens.length;
+  const formCount = scoringForms.length;
   const ruleCount = context.businessRules.length;
   const decisionCount = context.decisions.length;
 
-  const entityRelationCount = context.entities.reduce(
+  const entityRelationCount = scoringEntities.reduce(
     (sum, item) => sum + toArray(item && item.relations).length,
     0
   );
   const entityPackageCount = new Set(
-    context.entities.map(item => normalizeText(item && item.package)).filter(Boolean)
+    scoringEntities.map(item => normalizeText(item && item.package)).filter(Boolean)
   ).size;
 
-  const servicesBoundToEntityCount = context.services.filter(item => toArray(item && item.entities).length > 0).length;
-  const serviceVerbNounCount = context.services.filter(item => normalizeText(item && item.verb) || normalizeText(item && item.noun)).length;
+  const servicesBoundToEntityCount = scoringServices.filter(item => toArray(item && item.entities).length > 0).length;
+  const serviceVerbNounCount = scoringServices.filter(item => normalizeText(item && item.verb) || normalizeText(item && item.noun)).length;
 
-  const screensWithServiceCount = context.screens.filter(item => toArray(item && item.services).length > 0).length;
-  const screensWithEntityCount = context.screens.filter(item => toArray(item && item.entities).length > 0).length;
+  const screensWithServiceCount = scoringScreens.filter(item => toArray(item && item.services).length > 0).length;
+  const screensWithEntityCount = scoringScreens.filter(item => toArray(item && item.entities).length > 0).length;
 
-  const formsWithFieldsCount = context.forms.filter(item => Number(item && item.field_count) > 0).length;
-  const formsLinkedScreenCount = context.forms.filter(item => normalizeText(item && item.screen)).length;
-  const totalFormFields = context.forms.reduce((sum, item) => sum + (Number(item && item.field_count) || 0), 0);
+  const formsWithFieldsCount = scoringForms.filter(item => Number(item && item.field_count) > 0).length;
+  const formsLinkedScreenCount = scoringForms.filter(item => normalizeText(item && item.screen)).length;
+  const totalFormFields = scoringForms.reduce((sum, item) => sum + (Number(item && item.field_count) || 0), 0);
   const averageFormFields = formCount > 0 ? Number((totalFormFields / formCount).toFixed(2)) : 0;
 
   const matrix = [];

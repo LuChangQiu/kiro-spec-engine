@@ -3129,9 +3129,11 @@ if (process.argv.includes('--json')) {
       applied_batch_parallel: 3,
       applied_batch_agent_budget: 3,
       rate_limit_signals: 2,
+      rate_limit_signals_per_goal: 1,
       rate_limit_backoff_ms: 1800,
       rate_limit_launch_hold_ms: 900,
       adaptive_backpressure_applied: true,
+      backpressure_level: 'mild',
       next_batch_parallel: 2,
       next_batch_agent_budget: 2
     }));
@@ -3139,6 +3141,76 @@ if (process.argv.includes('--json')) {
       round: 2,
       applied_batch_parallel: 2,
       applied_batch_agent_budget: 2
+    }));
+  });
+
+  test('adaptive retry applies severe backpressure under sustained rate-limit pressure', async () => {
+    const goalsFile = path.join(tempDir, 'goals.json');
+    await fs.writeJson(goalsFile, ['high pressure goal', 'stable goal'], { spaces: 2 });
+
+    runAutoCloseLoop
+      .mockResolvedValueOnce({
+        status: 'failed',
+        portfolio: { master_spec: '121-00-high-pressure-r1', sub_specs: [] },
+        orchestration: {
+          rateLimit: {
+            signalCount: 6,
+            totalBackoffMs: 12000,
+            lastLaunchHoldMs: 6000
+          }
+        }
+      })
+      .mockResolvedValueOnce({
+        status: 'completed',
+        portfolio: { master_spec: '121-00-stable-r1', sub_specs: [] }
+      })
+      .mockResolvedValueOnce({
+        status: 'completed',
+        portfolio: { master_spec: '121-00-high-pressure-r2-fixed', sub_specs: [] }
+      });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'sce',
+      'auto',
+      'close-loop-batch',
+      goalsFile,
+      '--continue-on-error',
+      '--batch-parallel',
+      '4',
+      '--batch-agent-budget',
+      '8',
+      '--batch-retry-rounds',
+      '1',
+      '--batch-retry-strategy',
+      'adaptive',
+      '--json'
+    ]);
+
+    expect(runAutoCloseLoop).toHaveBeenCalledTimes(3);
+    const summary = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(summary.batch_retry).toEqual(expect.objectContaining({
+      strategy: 'adaptive',
+      performed_rounds: 1
+    }));
+    expect(summary.batch_retry.history[0]).toEqual(expect.objectContaining({
+      round: 1,
+      applied_batch_parallel: 4,
+      applied_batch_agent_budget: 8,
+      rate_limit_signals: 6,
+      rate_limit_signals_per_goal: 3,
+      rate_limit_backoff_ms: 12000,
+      rate_limit_launch_hold_ms: 6000,
+      adaptive_backpressure_applied: true,
+      backpressure_level: 'severe',
+      next_batch_parallel: 2,
+      next_batch_agent_budget: 4
+    }));
+    expect(summary.batch_retry.history[1]).toEqual(expect.objectContaining({
+      round: 2,
+      applied_batch_parallel: 2,
+      applied_batch_agent_budget: 4
     }));
   });
 

@@ -602,7 +602,7 @@ Close-loop batch (`sce auto close-loop-batch <goals-file>`) options:
 - Batch summary includes `resource_plan` (budget/effective parallel/per-goal maxParallel/scheduling strategy/aging/starvation wait metrics/criticality summary) and `metrics` (`success_rate_percent`, `status_breakdown`, `average_sub_specs_per_goal`, `average_replan_cycles_per_goal`, `total_rate_limit_signals`, `average_rate_limit_signals_per_goal`, `total_rate_limit_backoff_ms`)
   - Under budget mode, scheduler is complexity-weighted (`goal_weight`/`scheduling_weight`) so higher-complexity goals consume more shared slots and can reduce same-batch concurrency.
   - Batch summary includes `batch_retry` telemetry (strategy, until-complete mode, configured/max/performed rounds, exhausted flag, per-round history).
-  - Under `--batch-retry-strategy adaptive`, retry history includes rate-limit pressure and next-round backpressure decisions (`applied_batch_parallel`, `next_batch_parallel`, `adaptive_backpressure_applied`).
+  - Under `--batch-retry-strategy adaptive`, retry history includes rate-limit pressure and next-round backpressure decisions (`applied_batch_parallel`, `next_batch_parallel`, `adaptive_backpressure_applied`, `backpressure_level`). Severe pressure automatically halves `batch_parallel` / `batch_agent_budget` for the next retry round.
   - Batch summary includes `batch_session` metadata when persisted (session id + file path).
   - When using `--decompose-goal`, summary includes `generated_from_goal` metadata (strategy, target count, produced count, clause/category diagnostics, decomposition `quality`, and refinement telemetry).
 

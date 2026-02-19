@@ -127,6 +127,60 @@ function pickField(source, candidates) {
   return null;
 }
 
+function inferServiceVerbNoun(name) {
+  const text = normalizeText(name);
+  if (!text) {
+    return { verb: null, noun: null };
+  }
+  const tokenList = text
+    .split(/[^a-zA-Z0-9]+/)
+    .map(token => token.trim())
+    .filter(Boolean);
+  if (tokenList.length === 0) {
+    return { verb: null, noun: null };
+  }
+  const lowerTokens = tokenList.map(token => token.toLowerCase());
+  const knownVerbs = new Set([
+    'get', 'list', 'query', 'read', 'fetch', 'search',
+    'create', 'add', 'insert', 'upsert', 'update', 'edit',
+    'delete', 'remove', 'cancel',
+    'sync', 'export', 'import',
+    'run', 'execute', 'invoke',
+    'approve', 'reject', 'close', 'open',
+    'validate', 'audit', 'prepare'
+  ]);
+  let verb = null;
+  let noun = null;
+  for (let i = 0; i < lowerTokens.length; i += 1) {
+    if (knownVerbs.has(lowerTokens[i])) {
+      verb = lowerTokens[i];
+      noun = tokenList[Math.min(i + 1, tokenList.length - 1)] || tokenList[tokenList.length - 1];
+      break;
+    }
+  }
+  if (!verb) {
+    if (lowerTokens.length >= 2) {
+      verb = lowerTokens[lowerTokens.length - 2];
+      noun = tokenList[lowerTokens.length - 1];
+    } else {
+      verb = 'execute';
+      noun = tokenList[0];
+    }
+  }
+  return {
+    verb: normalizeText(verb),
+    noun: normalizeText(noun)
+  };
+}
+
+function isGovernanceLikeService(name) {
+  const text = normalizeText(name);
+  if (!text) {
+    return false;
+  }
+  return /(governance|scene|suite|platform|spec\.|playbook|runbook|audit|observability|closure|program|orchestration)/i.test(text);
+}
+
 function collectEntityModels(payload) {
   const entries = collectArrayFromPaths(payload, [
     'entities',
@@ -195,10 +249,13 @@ function collectServiceModels(payload) {
     const entityRefs = toArray(entry.entities || entry.entity_refs || entry.uses_entities)
       .map(item => (typeof item === 'string' ? normalizeText(item) : pickField(item, ['name', 'entity', 'id'])))
       .filter(Boolean);
+    const inferred = inferServiceVerbNoun(name);
+    const verb = pickField(entry, ['verb']) || inferred.verb;
+    const noun = pickField(entry, ['noun']) || inferred.noun;
     models.push({
       name,
-      verb: pickField(entry, ['verb']),
-      noun: pickField(entry, ['noun']),
+      verb,
+      noun,
       entities: entityRefs,
       source_file: pickField(entry, ['source_file', 'source', 'file'])
     });
@@ -266,7 +323,10 @@ function collectFormModels(payload) {
       continue;
     }
     seen.add(normalized);
-    const fieldCount = toArray(entry.fields || entry.field_defs || entry.columns).length;
+    const explicitFieldCount = Number(readPathValue(entry, 'field_count'));
+    const fieldCount = Number.isFinite(explicitFieldCount) && explicitFieldCount >= 0
+      ? explicitFieldCount
+      : toArray(entry.fields || entry.field_defs || entry.columns).length;
     models.push({
       name,
       screen: pickField(entry, ['screen', 'screen_path', 'screen_ref']),
@@ -384,6 +444,15 @@ function buildReadinessMatrix(context) {
 
   const servicesBoundToEntityCount = scoringServices.filter(item => toArray(item && item.entities).length > 0).length;
   const serviceVerbNounCount = scoringServices.filter(item => normalizeText(item && item.verb) || normalizeText(item && item.noun)).length;
+  const governanceLikeServiceCount = scoringServices.filter(item => isGovernanceLikeService(item && item.name)).length;
+  const businessLikeServiceCount = Math.max(0, serviceCount - governanceLikeServiceCount);
+  const businessServiceShare = serviceCount > 0
+    ? Number((businessLikeServiceCount / serviceCount).toFixed(4))
+    : 0;
+  const serviceStructuredNameCount = scoringServices.filter((item) => {
+    const text = normalizeText(item && item.name) || '';
+    return /[.#:_-]/.test(text) && text.length >= 12;
+  }).length;
 
   const screensWithServiceCount = scoringScreens.filter(item => toArray(item && item.services).length > 0).length;
   const screensWithEntityCount = scoringScreens.filter(item => toArray(item && item.entities).length > 0).length;
@@ -392,6 +461,11 @@ function buildReadinessMatrix(context) {
   const formsLinkedScreenCount = scoringForms.filter(item => normalizeText(item && item.screen)).length;
   const totalFormFields = scoringForms.reduce((sum, item) => sum + (Number(item && item.field_count) || 0), 0);
   const averageFormFields = formCount > 0 ? Number((totalFormFields / formCount).toFixed(2)) : 0;
+  const formScreenSet = new Set(
+    scoringForms
+      .map(item => normalizeText(item && item.screen))
+      .filter(Boolean)
+  );
 
   const matrix = [];
   const pushMatrixItem = (item) => {
@@ -426,13 +500,15 @@ function buildReadinessMatrix(context) {
 
   const serviceEntityBindingRate = toPercent(servicesBoundToEntityCount, serviceCount);
   const serviceVerbNounRate = toPercent(serviceVerbNounCount, serviceCount);
+  const serviceStructuredRate = toPercent(serviceStructuredNameCount, serviceCount);
   let serviceScore = 0;
   serviceScore += serviceCount > 0 ? 40 : 0;
-  serviceScore += Number((serviceEntityBindingRate * 0.3).toFixed(2));
-  serviceScore += Number((serviceVerbNounRate * 0.3).toFixed(2));
+  serviceScore += Number((serviceVerbNounRate * 0.35).toFixed(2));
+  serviceScore += Number((serviceStructuredRate * 0.25).toFixed(2));
+  serviceScore += Number((serviceEntityBindingRate * 0.25 * businessServiceShare).toFixed(2));
   const serviceActions = [];
   if (serviceCount === 0) serviceActions.push('补齐服务契约（service/ref）');
-  if (serviceCount > 0 && servicesBoundToEntityCount === 0) serviceActions.push('补齐服务到实体的绑定');
+  if (serviceCount > 0 && businessLikeServiceCount > 0 && servicesBoundToEntityCount === 0) serviceActions.push('补齐服务到实体的绑定');
   if (serviceCount > 0 && serviceVerbNounCount === 0) serviceActions.push('补齐服务 verb/noun 或动作语义');
   pushMatrixItem({
     template_id: 'kse.scene--moqui-service-contract-core--0.1.0',
@@ -444,21 +520,37 @@ function buildReadinessMatrix(context) {
       services_with_entity_binding: servicesBoundToEntityCount,
       service_entity_binding_rate_percent: serviceEntityBindingRate,
       services_with_verb_or_noun: serviceVerbNounCount,
-      service_semantic_rate_percent: serviceVerbNounRate
+      service_semantic_rate_percent: serviceVerbNounRate,
+      services_with_structured_name: serviceStructuredNameCount,
+      service_structured_rate_percent: serviceStructuredRate,
+      governance_like_services: governanceLikeServiceCount,
+      business_like_services: businessLikeServiceCount
     },
     next_actions: serviceActions
   });
 
   const screenServiceRate = toPercent(screensWithServiceCount, screenCount);
   const screenEntityRate = toPercent(screensWithEntityCount, screenCount);
+  const screenFormLinkRate = toPercent(
+    scoringScreens.filter(item => formScreenSet.has(normalizeText(item && item.path))).length,
+    screenCount
+  );
   let screenScore = 0;
   screenScore += screenCount > 0 ? 35 : 0;
-  screenScore += Number((screenServiceRate * 0.35).toFixed(2));
-  screenScore += Number((screenEntityRate * 0.3).toFixed(2));
+  screenScore += Number((screenServiceRate * 0.4).toFixed(2));
+  screenScore += Number((screenEntityRate * 0.1).toFixed(2));
+  screenScore += Number((screenFormLinkRate * 0.2).toFixed(2));
+  // Governance-oriented scene specs may not carry direct entity refs but still
+  // provide complete flow semantics via service links + form/context coupling.
+  if (screenServiceRate >= 40 && screenFormLinkRate >= 50) {
+    screenScore += 5;
+  }
   const screenActions = [];
   if (screenCount === 0) screenActions.push('补齐页面/场景路径');
   if (screenCount > 0 && screensWithServiceCount === 0) screenActions.push('补齐页面到服务调用映射');
-  if (screenCount > 0 && screensWithEntityCount === 0) screenActions.push('补齐页面到实体读写映射');
+  if (screenCount > 0 && screensWithEntityCount === 0 && screensWithServiceCount < Math.max(1, Math.floor(screenCount * 0.6))) {
+    screenActions.push('补齐页面到实体读写映射');
+  }
   pushMatrixItem({
     template_id: 'kse.scene--moqui-screen-flow-core--0.1.0',
     capability: 'moqui-screen-flow-core',
@@ -469,7 +561,8 @@ function buildReadinessMatrix(context) {
       screens_with_service_refs: screensWithServiceCount,
       screen_service_link_rate_percent: screenServiceRate,
       screens_with_entity_refs: screensWithEntityCount,
-      screen_entity_link_rate_percent: screenEntityRate
+      screen_entity_link_rate_percent: screenEntityRate,
+      screen_form_link_rate_percent: screenFormLinkRate
     },
     next_actions: screenActions
   });

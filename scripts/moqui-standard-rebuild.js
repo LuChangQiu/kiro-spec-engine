@@ -837,6 +837,7 @@ function buildMarkdownReport(report) {
   lines.push(`- Copilot contract: ${report.output.copilot_contract}`);
   lines.push(`- Copilot playbook: ${report.output.copilot_playbook}`);
   lines.push(`- Remediation queue: ${report.output.remediation_queue}`);
+  lines.push(`- Remediation plan: ${report.output.remediation_plan_json}`);
   return `${lines.join('\n')}\n`;
 }
 
@@ -854,6 +855,224 @@ function buildRemediationQueueLines(prioritizedGaps) {
   return lines;
 }
 
+function buildRemediationPlanMarkdown(plan) {
+  const lines = [];
+  lines.push('# Matrix Remediation Plan');
+  lines.push('');
+  lines.push(`- Generated at: ${plan.generated_at}`);
+  lines.push(`- Coverage summary: ${plan.summary.total_gaps} gap items`);
+  lines.push('');
+  lines.push('## Items');
+  lines.push('');
+  if (!Array.isArray(plan.items) || plan.items.length === 0) {
+    lines.push('- none');
+    return `${lines.join('\n')}\n`;
+  }
+  for (const item of plan.items) {
+    lines.push(`### ${item.template_id}`);
+    lines.push('');
+    lines.push(`- Status: ${item.status}`);
+    lines.push(`- Score: ${item.score}`);
+    lines.push(`- Summary: ${item.summary}`);
+    lines.push(`- Suggested fields: ${(item.suggested_fields || []).join(', ') || 'none'}`);
+    lines.push(`- Source files: ${(item.source_files || []).length}`);
+    const files = Array.isArray(item.source_files) ? item.source_files.slice(0, 10) : [];
+    for (const file of files) {
+      lines.push(
+        `  - ${file.source_file}: ${file.missing_count} issue(s), missing=${(file.missing_types || []).join('|') || 'unknown'}`
+      );
+    }
+    lines.push('');
+  }
+  return `${lines.join('\n')}\n`;
+}
+
+function buildSourceIssueSummary(issues, limit = 20) {
+  const preferredSourcePattern = /^\.kiro\/specs\/[^/]+\/docs\/scene-package\.json$/i;
+  const allIssues = Array.isArray(issues) ? issues : [];
+  const preferredIssues = allIssues.filter((issue) => {
+    const sourceFile = normalizeText(issue && issue.source_file);
+    return Boolean(sourceFile && preferredSourcePattern.test(sourceFile.replace(/\\/g, '/')));
+  });
+  const selectedIssues = preferredIssues.length > 0 ? preferredIssues : allIssues;
+
+  const bucket = new Map();
+  for (const issue of selectedIssues) {
+    const sourceFile = normalizeText(issue && issue.source_file) || '(unknown-source)';
+    const key = sourceFile;
+    const current = bucket.get(key) || {
+      source_file: sourceFile,
+      missing_count: 0,
+      missing_types: new Set(),
+      sample_items: []
+    };
+    current.missing_count += 1;
+    for (const missingType of toArray(issue && issue.missing_types)) {
+      const text = normalizeText(missingType);
+      if (text) {
+        current.missing_types.add(text);
+      }
+    }
+    const sampleName = normalizeText(issue && issue.name);
+    if (sampleName && current.sample_items.length < 5) {
+      current.sample_items.push(sampleName);
+    }
+    bucket.set(key, current);
+  }
+
+  return Array.from(bucket.values())
+    .map(item => ({
+      source_file: item.source_file,
+      missing_count: item.missing_count,
+      missing_types: Array.from(item.missing_types).sort(),
+      sample_items: item.sample_items
+    }))
+    .sort((a, b) => {
+      if (b.missing_count !== a.missing_count) {
+        return b.missing_count - a.missing_count;
+      }
+      return a.source_file.localeCompare(b.source_file);
+    })
+    .slice(0, limit);
+}
+
+function buildMatrixRemediationPlan(context, prioritizedGaps) {
+  const items = [];
+  const addItem = (item) => {
+    if (!item) {
+      return;
+    }
+    items.push(item);
+  };
+
+  for (const gap of prioritizedGaps) {
+    const templateId = normalizeText(gap && gap.template_id);
+    if (!templateId) {
+      continue;
+    }
+
+    if (templateId === 'kse.scene--moqui-service-contract-core--0.1.0') {
+      const issues = [];
+      for (const service of context.services) {
+        const missingTypes = [];
+        if (toArray(service && service.entities).length === 0) {
+          missingTypes.push('service.entities');
+        }
+        if (!normalizeText(service && service.verb) && !normalizeText(service && service.noun)) {
+          missingTypes.push('service.verb_noun');
+        }
+        if (missingTypes.length > 0) {
+          issues.push({
+            source_file: service.source_file,
+            name: service.name,
+            missing_types: missingTypes
+          });
+        }
+      }
+      addItem({
+        template_id: templateId,
+        status: gap.status,
+        score: gap.score,
+        summary: '补齐服务契约语义与实体绑定。',
+        suggested_fields: ['services[].entities', 'services[].verb', 'services[].noun'],
+        source_files: buildSourceIssueSummary(issues)
+      });
+      continue;
+    }
+
+    if (templateId === 'kse.scene--moqui-screen-flow-core--0.1.0') {
+      const issues = [];
+      for (const screen of context.screens) {
+        const missingTypes = [];
+        if (toArray(screen && screen.services).length === 0) {
+          missingTypes.push('screens[].services');
+        }
+        if (toArray(screen && screen.entities).length === 0) {
+          missingTypes.push('screens[].entities');
+        }
+        if (missingTypes.length > 0) {
+          issues.push({
+            source_file: screen.source_file,
+            name: screen.path,
+            missing_types: missingTypes
+          });
+        }
+      }
+      addItem({
+        template_id: templateId,
+        status: gap.status,
+        score: gap.score,
+        summary: '补齐页面流转中的服务与实体映射。',
+        suggested_fields: ['screens[].services', 'screens[].entities'],
+        source_files: buildSourceIssueSummary(issues)
+      });
+      continue;
+    }
+
+    if (templateId === 'kse.scene--moqui-form-interaction-core--0.1.0') {
+      const issues = [];
+      for (const form of context.forms) {
+        const missingTypes = [];
+        if ((Number(form && form.field_count) || 0) <= 0) {
+          missingTypes.push('forms[].fields');
+        }
+        if (!normalizeText(form && form.screen)) {
+          missingTypes.push('forms[].screen');
+        }
+        if (missingTypes.length > 0) {
+          issues.push({
+            source_file: form.source_file,
+            name: form.name,
+            missing_types: missingTypes
+          });
+        }
+      }
+      addItem({
+        template_id: templateId,
+        status: gap.status,
+        score: gap.score,
+        summary: '补齐表单字段与页面交互上下文。',
+        suggested_fields: ['forms[].fields', 'forms[].field_count', 'forms[].screen'],
+        source_files: buildSourceIssueSummary(issues)
+      });
+      continue;
+    }
+
+    if (templateId === 'kse.scene--moqui-rule-decision-core--0.1.0') {
+      addItem({
+        template_id: templateId,
+        status: gap.status,
+        score: gap.score,
+        summary: '补齐业务规则与决策策略语义映射。',
+        suggested_fields: ['business_rules[]', 'decisions[]', 'governance_contract.business_rules', 'governance_contract.decision_logic'],
+        source_files: []
+      });
+      continue;
+    }
+
+    if (templateId === 'kse.scene--moqui-page-copilot-dialog--0.1.0') {
+      addItem({
+        template_id: templateId,
+        status: gap.status,
+        score: gap.score,
+        summary: '补齐页面级 copilot 所需上下文。',
+        suggested_fields: ['screens[].services', 'screens[].entities', 'forms[].field_count', 'decisions[]'],
+        source_files: []
+      });
+      continue;
+    }
+  }
+
+  return {
+    mode: 'moqui-matrix-remediation-plan',
+    generated_at: new Date().toISOString(),
+    summary: {
+      total_gaps: items.length
+    },
+    items
+  };
+}
+
 async function writeBundle(bundleDir, payload) {
   const handoffDir = path.join(bundleDir, 'handoff');
   const ontologyDir = path.join(bundleDir, 'ontology');
@@ -866,6 +1085,8 @@ async function writeBundle(bundleDir, payload) {
   const copilotPlaybookPath = path.join(copilotDir, 'conversation-playbook.md');
   const recoverySpecPath = path.join(rebuildDir, 'recovery-spec-plan.json');
   const remediationQueuePath = path.join(rebuildDir, 'matrix-remediation.lines');
+  const remediationPlanJsonPath = path.join(rebuildDir, 'matrix-remediation-plan.json');
+  const remediationPlanMarkdownPath = path.join(rebuildDir, 'matrix-remediation-plan.md');
 
   await fs.ensureDir(handoffDir);
   await fs.ensureDir(ontologyDir);
@@ -876,6 +1097,12 @@ async function writeBundle(bundleDir, payload) {
   await fs.writeJson(ontologySeedPath, payload.ontology_seed, { spaces: 2 });
   await fs.writeJson(copilotContractPath, payload.copilot_contract, { spaces: 2 });
   await fs.writeJson(recoverySpecPath, payload.recovery_spec_plan, { spaces: 2 });
+  await fs.writeJson(remediationPlanJsonPath, payload.remediation_plan, { spaces: 2 });
+  await fs.writeFile(
+    remediationPlanMarkdownPath,
+    buildRemediationPlanMarkdown(payload.remediation_plan),
+    'utf8'
+  );
   await fs.writeFile(
     remediationQueuePath,
     buildRemediationQueueLines(payload.prioritized_gaps).join('\n') + '\n',
@@ -902,7 +1129,9 @@ async function writeBundle(bundleDir, payload) {
     copilotContractPath,
     copilotPlaybookPath,
     recoverySpecPath,
-    remediationQueuePath
+    remediationQueuePath,
+    remediationPlanJsonPath,
+    remediationPlanMarkdownPath
   };
 }
 
@@ -940,6 +1169,7 @@ async function main() {
   const prioritizedGaps = readinessMatrix
     .filter(item => item.status !== 'ready')
     .sort((a, b) => a.score - b.score);
+  const remediationPlan = buildMatrixRemediationPlan(context, prioritizedGaps);
   const readinessSummary = {
     average_score: Number((
       readinessMatrix.reduce((sum, item) => sum + Number(item.score || 0), 0) / Math.max(1, readinessMatrix.length)
@@ -979,7 +1209,8 @@ async function main() {
     ontology_seed: ontologySeed,
     copilot_contract: copilotContract,
     recovery_spec_plan: specPlan,
-    prioritized_gaps: prioritizedGaps
+    prioritized_gaps: prioritizedGaps,
+    remediation_plan: remediationPlan
   });
 
   const report = {
@@ -999,6 +1230,7 @@ async function main() {
       readiness_summary: readinessSummary,
       readiness_matrix: readinessMatrix,
       prioritized_gaps: prioritizedGaps,
+      remediation_plan: remediationPlan,
       recommended_templates: recommendedTemplates,
       capabilities,
       spec_plan: specPlan
@@ -1010,7 +1242,9 @@ async function main() {
       copilot_contract: path.relative(process.cwd(), bundleFiles.copilotContractPath),
       copilot_playbook: path.relative(process.cwd(), bundleFiles.copilotPlaybookPath),
       recovery_spec_plan: path.relative(process.cwd(), bundleFiles.recoverySpecPath),
-      remediation_queue: path.relative(process.cwd(), bundleFiles.remediationQueuePath)
+      remediation_queue: path.relative(process.cwd(), bundleFiles.remediationQueuePath),
+      remediation_plan_json: path.relative(process.cwd(), bundleFiles.remediationPlanJsonPath),
+      remediation_plan_markdown: path.relative(process.cwd(), bundleFiles.remediationPlanMarkdownPath)
     }
   };
 

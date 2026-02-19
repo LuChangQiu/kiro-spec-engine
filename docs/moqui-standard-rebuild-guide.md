@@ -64,6 +64,8 @@ node scripts/moqui-standard-rebuild.js \
 - `ontology/moqui-ontology-seed.json`: initial ontology graph seed.
 - `rebuild/recovery-spec-plan.json`: ordered recovery spec list.
 - `rebuild/matrix-remediation.lines`: prioritized remediation queue lines derived from template readiness gaps.
+- `rebuild/matrix-remediation-plan.json`: gap-to-source-file remediation plan for quick 331 execution.
+- `rebuild/matrix-remediation-plan.md`: markdown view of remediation plan.
 - `copilot/page-context-contract.json`: page-context contract for copilot dialog.
 - `copilot/conversation-playbook.md`: operational playbook for human/AI page fixes.
 - rebuild report includes template readiness scoring (`recovery.readiness_matrix`) and prioritized remediation items (`recovery.prioritized_gaps`).

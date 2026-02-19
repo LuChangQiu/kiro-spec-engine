@@ -93,7 +93,11 @@ describe('moqui-standard-rebuild script', () => {
     expect(await fs.pathExists(path.join(bundleDir, 'copilot', 'page-context-contract.json'))).toBe(true);
     expect(await fs.pathExists(path.join(bundleDir, 'copilot', 'conversation-playbook.md'))).toBe(true);
     expect(await fs.pathExists(path.join(bundleDir, 'rebuild', 'matrix-remediation.lines'))).toBe(true);
+    expect(await fs.pathExists(path.join(bundleDir, 'rebuild', 'matrix-remediation-plan.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(bundleDir, 'rebuild', 'matrix-remediation-plan.md'))).toBe(true);
     expect(payload.output.remediation_queue).toContain('matrix-remediation.lines');
+    expect(payload.output.remediation_plan_json).toContain('matrix-remediation-plan.json');
+    expect(payload.output.remediation_plan_markdown).toContain('matrix-remediation-plan.md');
 
     const handoffPayload = await fs.readJson(path.join(bundleDir, 'handoff', 'handoff-manifest.json'));
     expect(handoffPayload.templates).toEqual(expect.arrayContaining([
@@ -107,5 +111,11 @@ describe('moqui-standard-rebuild script', () => {
 
     const remediationLines = await fs.readFile(path.join(bundleDir, 'rebuild', 'matrix-remediation.lines'), 'utf8');
     expect(remediationLines.length).toBeGreaterThan(0);
+
+    const remediationPlan = await fs.readJson(path.join(bundleDir, 'rebuild', 'matrix-remediation-plan.json'));
+    expect(remediationPlan.mode).toBe('moqui-matrix-remediation-plan');
+    expect(remediationPlan.summary).toEqual(expect.objectContaining({
+      total_gaps: expect.any(Number)
+    }));
   });
 });

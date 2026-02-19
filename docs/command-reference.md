@@ -839,7 +839,7 @@ Moqui standard rebuild helper (script-level recovery bootstrap):
   - Recommended usage for rebuild target path: `E:/workspace/331-poc-rebuild` (keep `331-poc` repair stream isolated).
 
 Moqui metadata extractor helper (script-level catalog bootstrap):
-- `node scripts/moqui-metadata-extract.js [--project-dir <path>] [--out <path>] [--markdown-out <path>] [--json]`: scan Moqui XML resources (`entity/service/screen/form/rule/decision`) and emit a normalized metadata catalog for rebuild automation.
+- `node scripts/moqui-metadata-extract.js [--project-dir <path>] [--out <path>] [--markdown-out <path>] [--json]`: build a normalized metadata catalog from multiple sources for rebuild automation. Default sources include Moqui XML resources (`entity/service/screen/form/rule/decision`), scene package contracts (`.kiro/specs/**/docs/scene-package.json`), handoff manifest/capability matrix, and handoff evidence JSON.
   - Recommended first step before `moqui-standard-rebuild`.
   - Keep extraction source read-only and run rebuild generation against SCE output directories.
 

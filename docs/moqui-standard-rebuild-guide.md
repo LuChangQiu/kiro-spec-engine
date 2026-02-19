@@ -39,6 +39,14 @@ node scripts/moqui-metadata-extract.js \
   --json
 ```
 
+`moqui-metadata-extract` now performs multi-source catalog extraction by default:
+- Moqui XML (`entity/service/screen/form/rule/decision`)
+- `scene-package.json` contracts in `.kiro/specs/**/docs/`
+- `docs/handoffs/handoff-manifest.json`
+- `docs/handoffs/capability-matrix.md`
+- `docs/handoffs/evidence/**/*.json`
+- `.kiro/recovery/salvage/**/*.json` (if present)
+
 ## Step 2: Build Rebuild Bundle
 
 ```bash

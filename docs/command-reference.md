@@ -870,6 +870,13 @@ Interactive change-plan generator helper (script-level stage-B planning bridge):
     - `.kiro/reports/interactive-change-plan.generated.md`
   - Generated plans can be evaluated directly by `interactive-change-plan-gate`.
 
+Interactive approval workflow helper (script-level stage-B approval state machine):
+- `node scripts/interactive-approval-workflow.js --action <init|submit|approve|reject|execute|verify|archive|status> [--plan <path>] [--state-file <path>] [--audit-file <path>] [--actor <id>] [--comment <text>] [--force] [--json]`: maintain approval lifecycle state for interactive change plans and append approval events to JSONL audit logs.
+  - Default state file: `.kiro/reports/interactive-approval-state.json`
+  - Default audit file: `.kiro/reports/interactive-approval-events.jsonl`
+  - `init` requires `--plan`; high-risk plans are marked as `approval_required=true`.
+  - `execute` is blocked (exit code `2`) when approval is required but current status is not `approved`.
+
 Moqui standard rebuild helper (script-level recovery bootstrap):
 - `node scripts/moqui-standard-rebuild.js [--metadata <path>] [--out <path>] [--markdown-out <path>] [--bundle-out <path>] [--json]`: build a standard Moqui recovery bundle from metadata, including recommended SCE template matrix, recovery spec plan, handoff manifest seed, ontology seed, and page-copilot context contract.
   - Output now includes `recovery.readiness_matrix`, `recovery.readiness_summary`, and `recovery.prioritized_gaps` for template capability matrix scoring and remediation planning.

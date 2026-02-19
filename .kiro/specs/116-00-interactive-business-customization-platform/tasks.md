@@ -40,12 +40,14 @@
   - 已落地：`scripts/interactive-plan-build.js`（输出 `interactive-change-plan.generated.json|.md`）
   - **验证**: Requirement 2
 
-- [ ] 3.2 建立审批状态机与审批接口
+- [x] 3.2 建立审批状态机与审批接口
   - 支持 draft/submitted/approved/rejected/executed/verified
+  - 已落地：`scripts/interactive-approval-workflow.js` + `tests/unit/scripts/interactive-approval-workflow.test.js`
   - **验证**: Requirement 4
 
-- [ ] 3.3 实现高风险强制审批策略
+- [x] 3.3 实现高风险强制审批策略
   - high 风险不得跳过审批
+  - 已落地：`interactive-change-plan-gate` 与 `interactive-approval-workflow execute` 双重拦截
   - **验证**: Requirement 2, Requirement 3, Requirement 4
 
 ## 任务 4：受控执行与回滚（阶段 C）

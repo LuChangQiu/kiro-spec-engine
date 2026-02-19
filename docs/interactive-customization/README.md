@@ -50,3 +50,20 @@ node scripts/interactive-plan-build.js \
   --context docs/interactive-customization/page-context.sample.json \
   --json
 ```
+
+Run approval workflow state machine:
+
+```bash
+# init from generated plan
+node scripts/interactive-approval-workflow.js \
+  --action init \
+  --plan .kiro/reports/interactive-change-plan.generated.json \
+  --actor product-owner \
+  --json
+
+# submit -> approve -> execute -> verify
+node scripts/interactive-approval-workflow.js --action submit --actor product-owner --json
+node scripts/interactive-approval-workflow.js --action approve --actor security-admin --json
+node scripts/interactive-approval-workflow.js --action execute --actor release-operator --json
+node scripts/interactive-approval-workflow.js --action verify --actor qa-owner --json
+```

@@ -841,6 +841,10 @@ Moqui standard rebuild helper (script-level recovery bootstrap):
   - This workflow is scoped to SCE outputs and does not mutate business project code directly.
   - Recommended usage for rebuild target path: `E:/workspace/331-poc-rebuild` (keep `331-poc` repair stream isolated).
 
+Moqui rebuild gate helper (CI/pre-release readiness gate):
+- `node scripts/moqui-rebuild-gate.js [--metadata <path>] [--out <path>] [--markdown-out <path>] [--bundle-out <path>] [--min-ready <n>] [--max-partial <n>] [--max-gap <n>]`: run rebuild and fail when readiness gate is not met (default: ready>=6, partial<=0, gap<=0).
+- npm alias: `npm run gate:moqui-rebuild`
+
 Moqui metadata extractor helper (script-level catalog bootstrap):
 - `node scripts/moqui-metadata-extract.js [--project-dir <path>] [--out <path>] [--markdown-out <path>] [--json]`: build a normalized metadata catalog from multiple sources for rebuild automation. Default sources include Moqui XML resources (`entity/service/screen/form/rule/decision`), scene package contracts (`.kiro/specs/**/docs/scene-package.json`), handoff manifest/capability matrix, and handoff evidence JSON.
   - Recommended first step before `moqui-standard-rebuild`.

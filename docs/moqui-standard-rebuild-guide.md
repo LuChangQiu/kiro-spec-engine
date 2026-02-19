@@ -58,6 +58,18 @@ node scripts/moqui-standard-rebuild.js \
   --json
 ```
 
+## Step 3: Run Rebuild Readiness Gate (recommended for CI/release)
+
+```bash
+node scripts/moqui-rebuild-gate.js \
+  --metadata docs/moqui/metadata-catalog.json \
+  --out .kiro/reports/recovery/moqui-standard-rebuild.json \
+  --markdown-out .kiro/reports/recovery/moqui-standard-rebuild.md \
+  --bundle-out .kiro/reports/recovery/moqui-standard-bundle
+```
+
+Defaults: `ready>=6`, `partial<=0`, `gap<=0`.
+
 ## Generated Bundle
 
 - `handoff/handoff-manifest.json`: seed manifest for SCE handoff gates.

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Capability lexicon hard gate end-to-end defaultization**: `sce auto handoff run` and `sce auto handoff capability-matrix` now enforce unknown Moqui capability alias blocking by default (expected/provided), emit lexicon gate telemetry into release evidence, and promote those signals into governance risk/concern/recommendation/close-loop block decisions.
+- **Moqui release summary report helper**: Added `node scripts/moqui-release-summary.js` (and npm alias `npm run report:moqui-summary`) to consolidate handoff evidence + baseline + lexicon + capability-matrix into a single release-gate verdict (`passed|failed|incomplete`) with remediation commands.
 - **SCE naming consolidation + compatibility bridge**: Rebranded product naming to `Scene Capability Engine`, moved package to `scene-capability-engine`, promoted `sce` as the primary CLI command, and preserved `sco` / `sce` / `scene-capability-engine` aliases for migration continuity.
 - **Official template library v1.5.0 alignment**: Synced with `scene-capability-engine-templates` `v1.5.0`, adding scene orchestration template coverage for canvas visualization, interaction hardening, execution playbook, dependency drilldown, decision cockpit, runbook export, action queue orchestration, action pack export, and unified scene governance closure.
 - **Branding consistency release guard**: Added `test:brand-consistency` to block publish when legacy repository/package/product naming reappears in tracked source files.
@@ -138,6 +139,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Autonomous operator UX**: Expanded docs with semantic decomposition and live stream behavior for close-loop command usage.
 
 ### Fixed
+- **Orchestrator 429 backoff stall behavior**: `orchestration-engine` now clamps `Retry-After` retry waits by `rateLimitBackoffMaxMs` and interrupts pending retry sleeps immediately on `stop()`, preventing long backoff waits from appearing as deadlocks.
 - **Scene runtime 429 failure behavior under high request pressure**: Moqui HTTP client now retries on `429` with `Retry-After` support and bounded exponential backoff, reducing multi-agent stalls caused by transient service-side request limits.
 - **Moqui adapter matching fallback safety**: `spec.erp.*` bindings no longer get captured by Moqui handler when no adapter config exists, preventing false hard-fail paths and restoring expected simulator fallback behavior.
 - **Controller summary semantics**: `close-loop-controller` now reports final `pending_goals` from the persisted queue snapshot and only marks `cycle-limit-reached` as exhausted when pending work remains (or empty-polling mode explicitly consumes cycle budget).

@@ -33,6 +33,42 @@ Emergency bypass exists but is not recommended:
 - `--no-require-moqui-baseline`
 - `--no-require-capability-coverage`
 
+## Template Capability Matrix Contract
+
+Use the baseline report as the canonical matrix contract (`.kiro/reports/moqui-template-baseline.json`):
+
+| Matrix Dimension | Meaning | Default Gate Target |
+| --- | --- | --- |
+| `graph_valid.rate_percent` | Ontology graph structural validity | `100%` |
+| `score_passed.rate_percent` | Semantic score above baseline threshold | `100%` |
+| `entity_coverage.rate_percent` | Entity model coverage | `100%` |
+| `relation_coverage.rate_percent` | Entity relation coverage | `100%` |
+| `business_rule_coverage.rate_percent` | Business-rule presence coverage | `100%` |
+| `business_rule_closed.among_covered_rate_percent` | No unmapped rules among covered templates | `100%` |
+| `decision_coverage.rate_percent` | Decision logic presence coverage | `100%` |
+| `decision_closed.among_covered_rate_percent` | No undecided decisions among covered templates | `100%` |
+| `baseline_passed.rate_percent` | Full matrix closure rate | `100%` |
+
+Trend regression should stay hard-gated by default:
+
+- `compare.coverage_matrix_regressions.length` must be `0`
+- `sce auto handoff run` default `--max-moqui-matrix-regressions 0`
+
+## External POC Handoff Requirements
+
+When an upstream business project (e.g. a POC) feeds templates into sce, require the following by default:
+
+- Every handoff spec contains:
+  - `custom/scene.yaml` with entity/service/screen binding refs
+  - `custom/scene-package.json` with explicit `capabilities.expected/provided`
+  - ontology semantics for entity, relation, business-rule, and decision dimensions
+- Handoff evidence includes:
+  - latest `moqui-template-baseline.json|.md`
+  - latest `handoff-capability-matrix` report
+  - latest `moqui-lexicon-audit` report
+  - ontology batch report from `scene package-publish-batch --dry-run`
+- New/updated templates must provide deterministic IDs and version bumps so baseline comparisons are stable across releases.
+
 ## One-Shot Intake Flow
 
 ```bash
@@ -58,6 +94,11 @@ node scripts/moqui-lexicon-audit.js \
   --manifest docs/handoffs/handoff-manifest.json \
   --template-dir .kiro/templates/scene-packages \
   --fail-on-gap \
+  --json
+
+# 0.4) Consolidated release gate summary (single-file pass/fail/incomplete verdict)
+node scripts/moqui-release-summary.js \
+  --fail-on-gate-fail \
   --json
 
 # 1) Handoff close-loop
@@ -99,6 +140,8 @@ Required artifacts for each intake batch:
 - `.kiro/reports/release-evidence/moqui-capability-coverage.md`
 - `.kiro/reports/release-evidence/moqui-lexicon-audit.json`
 - `.kiro/reports/release-evidence/moqui-lexicon-audit.md`
+- `.kiro/reports/release-evidence/moqui-release-summary.json`
+- `.kiro/reports/release-evidence/moqui-release-summary.md`
 - `.kiro/reports/handoff-capability-matrix.md` (or JSON equivalent from `sce auto handoff capability-matrix`)
 - `.kiro/reports/handoff-runs/<session>.json`
 - `.kiro/reports/scene-package-ontology-batch.json`

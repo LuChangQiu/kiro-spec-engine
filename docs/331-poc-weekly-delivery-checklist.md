@@ -23,6 +23,12 @@ Use this checklist before each integration batch.
 - `ontology_validation` exists and is recent.
 - Dependency relations (`depends_on`) are present for multi-spec batches.
 - High-risk gaps have mitigation notes.
+- Moqui baseline matrix has no hard-gate regressions:
+  - `compare.coverage_matrix_regressions.length == 0`
+  - `summary.coverage_matrix.baseline_passed.rate_percent == 100`
+- Capability lexicon has no unknown aliases:
+  - `summary.expected_unknown_count == 0`
+  - `summary.provided_unknown_count == 0`
 
 ## sce Acceptance Commands
 
@@ -34,6 +40,10 @@ npx sce auto handoff run --manifest ../331-poc/docs/handoffs/handoff-manifest.js
 
 npx sce auto handoff template-diff --manifest ../331-poc/docs/handoffs/handoff-manifest.json --json
 npx sce auto handoff regression --session-id latest --json
+npx sce auto handoff capability-matrix --manifest ../331-poc/docs/handoffs/handoff-manifest.json --fail-on-gap --json
+npx sce scene moqui-baseline --compare-with .kiro/reports/release-evidence/moqui-template-baseline-prev.json --fail-on-portfolio-fail --json
+node scripts/moqui-lexicon-audit.js --manifest ../331-poc/docs/handoffs/handoff-manifest.json --fail-on-gap --json
+node scripts/moqui-release-summary.js --fail-on-gate-fail --json
 ```
 
 ## Scene Package Gate Commands

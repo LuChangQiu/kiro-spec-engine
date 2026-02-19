@@ -833,6 +833,18 @@ Moqui template library lexicon audit (script-level governance helper):
   - By default, template capability auditing is scoped to `manifest.templates` (when matched), reducing noise from unrelated templates.
   - Template scope matching normalizes `sce.scene--*` / `kse.scene--*` prefixes, so renamed template namespaces still map correctly.
 
+Moqui release summary helper (script-level consolidated gate view):
+- `node scripts/moqui-release-summary.js [--evidence <path>] [--baseline <path>] [--lexicon <path>] [--capability-matrix <path>] [--out <path>] [--markdown-out <path>] [--fail-on-gate-fail] [--json]`: merge handoff release-evidence + baseline + lexicon + capability-matrix into one Moqui release gate summary (`passed | failed | incomplete`) with executable remediation recommendations.
+  - Default inputs:
+    - `.kiro/reports/release-evidence/handoff-runs.json`
+    - `.kiro/reports/release-evidence/moqui-template-baseline.json`
+    - `.kiro/reports/release-evidence/moqui-lexicon-audit.json`
+    - `.kiro/reports/handoff-capability-matrix.json`
+  - Default outputs:
+    - `.kiro/reports/release-evidence/moqui-release-summary.json`
+    - `.kiro/reports/release-evidence/moqui-release-summary.md`
+  - `--fail-on-gate-fail` exits with code `2` when summary gate is `failed`.
+
 Moqui standard rebuild helper (script-level recovery bootstrap):
 - `node scripts/moqui-standard-rebuild.js [--metadata <path>] [--out <path>] [--markdown-out <path>] [--bundle-out <path>] [--json]`: build a standard Moqui recovery bundle from metadata, including recommended SCE template matrix, recovery spec plan, handoff manifest seed, ontology seed, and page-copilot context contract.
   - Output now includes `recovery.readiness_matrix`, `recovery.readiness_summary`, and `recovery.prioritized_gaps` for template capability matrix scoring and remediation planning.
@@ -872,7 +884,7 @@ Recommended `.kiro/config/orchestrator.json`:
 }
 ```
 
-`rateLimit*` settings provide dedicated retry/backoff and adaptive parallel throttling when providers return 429 / too-many-requests errors. Engine retry now also honors `Retry-After` / `try again in ...` hints from provider error messages when present, and pauses launching new pending specs during the active backoff window to reduce request bursts (launch hold remains active even if adaptive parallel throttling is disabled).
+`rateLimit*` settings provide dedicated retry/backoff and adaptive parallel throttling when providers return 429 / too-many-requests errors. Engine retry honors `Retry-After` / `try again in ...` hints from provider error messages and clamps final retry waits by `rateLimitBackoffMaxMs` to avoid unbounded pause windows. During active backoff windows, new pending spec launches are paused to reduce request bursts (launch hold remains active even if adaptive parallel throttling is disabled). `orchestrate stop` now interrupts pending retry waits immediately so long backoff does not look like a deadlock.
 
 ### Scene Template Engine
 
@@ -957,6 +969,9 @@ sce scene moqui-baseline --json
 # Script alias (same behavior)
 npm run report:moqui-baseline
 
+# Consolidated Moqui release gate summary (recommended before tag/publish)
+npm run report:moqui-summary
+
 # Score all scene templates instead of the default Moqui + orchestration subset
 sce scene moqui-baseline --include-all --json
 
@@ -977,6 +992,7 @@ sce scene moqui-baseline \
 
 Release workflow default:
 - Publishes `moqui-template-baseline.json` + `moqui-template-baseline.md` as release assets.
+- Publishes `moqui-release-summary.json` + `moqui-release-summary.md` as release review assets.
 - Enforces baseline portfolio gate by default (`KSE_MOQUI_BASELINE_ENFORCE` defaults to `true` when unset).
 
 ### Moqui ERP Integration

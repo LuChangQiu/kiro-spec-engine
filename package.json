@@ -42,6 +42,7 @@
     "report:moqui-summary": "node scripts/moqui-release-summary.js --json",
     "gate:interactive-plan": "node scripts/interactive-change-plan-gate.js --plan docs/interactive-customization/change-plan.sample.json --json",
     "report:interactive-intent": "node scripts/interactive-intent-build.js --context docs/interactive-customization/page-context.sample.json --goal \"Must improve order approval speed without changing payment authorization policy\" --user-id demo-user --json",
+    "report:interactive-plan": "node scripts/interactive-plan-build.js --intent .kiro/reports/interactive-change-intent.json --context docs/interactive-customization/page-context.sample.json --json",
     "report:moqui-core-regression": "node scripts/moqui-core-regression-suite.js --json",
     "prepublishOnly": "npm run test:full && npm run test:skip-audit && npm run test:brand-consistency",
     "publish:manual": "npm publish --access public",

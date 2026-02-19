@@ -41,3 +41,12 @@ node scripts/interactive-intent-build.js \
   --user-id demo-user \
   --json
 ```
+
+Generate a change plan from intent (suggestion stage):
+
+```bash
+node scripts/interactive-plan-build.js \
+  --intent .kiro/reports/interactive-change-intent.json \
+  --context docs/interactive-customization/page-context.sample.json \
+  --json
+```

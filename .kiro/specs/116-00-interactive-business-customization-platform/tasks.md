@@ -35,8 +35,9 @@
 
 ## 任务 3：建议模式与审批流（阶段 B）
 
-- [ ] 3.1 实现 Change_Plan 生成与影响分析
+- [x] 3.1 实现 Change_Plan 生成与影响分析
   - 输出范围、风险、验证、回滚四类信息
+  - 已落地：`scripts/interactive-plan-build.js`（输出 `interactive-change-plan.generated.json|.md`）
   - **验证**: Requirement 2
 
 - [ ] 3.2 建立审批状态机与审批接口

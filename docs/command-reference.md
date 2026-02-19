@@ -863,6 +863,13 @@ Interactive read-only intent helper (script-level stage-A copilot bridge):
     - `.kiro/reports/interactive-copilot-audit.jsonl`
   - This helper never executes write actions; it only produces suggestion-stage artifacts.
 
+Interactive change-plan generator helper (script-level stage-B planning bridge):
+- `node scripts/interactive-plan-build.js --intent <path> [--context <path>] [--execution-mode <suggestion|apply>] [--out-plan <path>] [--out-markdown <path>] [--json]`: generate structured `Change_Plan` from `Change_Intent`, including action candidates, risk level, verification checks, rollback plan, approval status, and gate hint command.
+  - Default outputs:
+    - `.kiro/reports/interactive-change-plan.generated.json`
+    - `.kiro/reports/interactive-change-plan.generated.md`
+  - Generated plans can be evaluated directly by `interactive-change-plan-gate`.
+
 Moqui standard rebuild helper (script-level recovery bootstrap):
 - `node scripts/moqui-standard-rebuild.js [--metadata <path>] [--out <path>] [--markdown-out <path>] [--bundle-out <path>] [--json]`: build a standard Moqui recovery bundle from metadata, including recommended SCE template matrix, recovery spec plan, handoff manifest seed, ontology seed, and page-copilot context contract.
   - Output now includes `recovery.readiness_matrix`, `recovery.readiness_summary`, and `recovery.prioritized_gaps` for template capability matrix scoring and remediation planning.

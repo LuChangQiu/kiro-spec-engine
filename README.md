@@ -253,6 +253,7 @@ sequenceDiagram
 - 🌍 **[Environment Management](docs/environment-management-guide.md)** - Multi-environment configuration
 - 📦 **[Multi-Repository Management](docs/multi-repo-management-guide.md)** - Manage multiple Git repositories
 - 🎭 **[Scene Runtime](docs/scene-runtime-guide.md)** - Template engine, quality pipeline, ontology, Moqui ERP
+- ♻️ **[Moqui Standard Rebuild](docs/moqui-standard-rebuild-guide.md)** - Rebuild bootstrap bundle + page-copilot contract from metadata
 - 🤖 **[Multi-Agent Coordination](docs/multi-agent-coordination-guide.md)** - Parallel agent coordination
 - 📈 **[Value Observability](docs/value-observability-guide.md)** - KPI snapshot, baseline, trend, gate-ready evidence
 - 🔌 **[Integration Modes](docs/integration-modes.md)** - Three ways to integrate sce

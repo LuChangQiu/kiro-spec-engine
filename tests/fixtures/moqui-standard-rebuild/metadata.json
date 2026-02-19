@@ -1,0 +1,53 @@
+{
+  "source_project": "E:/workspace/331-poc-rebuild",
+  "entities": [
+    {
+      "name": "mantle.order.OrderHeader",
+      "package": "mantle.order",
+      "relations": ["mantle.order.OrderItem"]
+    },
+    {
+      "name": "mantle.order.OrderItem",
+      "package": "mantle.order",
+      "relations": []
+    }
+  ],
+  "services": [
+    {
+      "name": "mantle.order.OrderServices.create#OrderHeader",
+      "verb": "create",
+      "noun": "OrderHeader",
+      "entities": ["mantle.order.OrderHeader", "mantle.order.OrderItem"]
+    },
+    {
+      "name": "mantle.order.OrderServices.get#OrderHeader",
+      "verb": "get",
+      "noun": "OrderHeader",
+      "entities": ["mantle.order.OrderHeader"]
+    }
+  ],
+  "screens": [
+    {
+      "path": "component://mantle/screen/Order/OrderEntry.xml",
+      "services": ["mantle.order.OrderServices.create#OrderHeader"],
+      "entities": ["mantle.order.OrderHeader"]
+    }
+  ],
+  "forms": [
+    {
+      "name": "OrderEntryForm",
+      "screen": "component://mantle/screen/Order/OrderEntry.xml",
+      "fields": ["orderId", "customerPartyId", "statusId"]
+    }
+  ],
+  "business_rules": [
+    {
+      "name": "order-must-have-customer"
+    }
+  ],
+  "decisions": [
+    {
+      "name": "order-priority-routing"
+    }
+  ]
+}

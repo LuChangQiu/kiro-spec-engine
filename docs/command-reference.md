@@ -833,6 +833,11 @@ Moqui template library lexicon audit (script-level governance helper):
   - By default, template capability auditing is scoped to `manifest.templates` (when matched), reducing noise from unrelated templates.
   - Template scope matching normalizes `sce.scene--*` / `kse.scene--*` prefixes, so renamed template namespaces still map correctly.
 
+Moqui standard rebuild helper (script-level recovery bootstrap):
+- `node scripts/moqui-standard-rebuild.js [--metadata <path>] [--out <path>] [--markdown-out <path>] [--bundle-out <path>] [--json]`: build a standard Moqui recovery bundle from metadata, including recommended SCE template matrix, recovery spec plan, handoff manifest seed, ontology seed, and page-copilot context contract.
+  - This workflow is scoped to SCE outputs and does not mutate business project code directly.
+  - Recommended usage for rebuild target path: `E:/workspace/331-poc-rebuild` (keep `331-poc` repair stream isolated).
+
 Recommended `.kiro/config/orchestrator.json`:
 
 ```json

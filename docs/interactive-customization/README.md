@@ -15,6 +15,11 @@ This directory contains baseline contracts and safety policy artifacts for the i
 - `moqui-copilot-context-contract.json`: Moqui page context contract + security boundary baseline.
 - `moqui-copilot-integration-guide.md`: stage-A Moqui integration guide for page-level copilot embedding.
 - `moqui-adapter-interface.md`: stage-C Moqui adapter contract (`capabilities/plan/validate/apply/rollback`).
+- `moqui-interactive-template-playbook.md`: stage-D template sedimentation playbook for Moqui interactive loop.
+- `adapter-extension-contract.schema.json`: cross-stack adapter extension contract schema.
+- `adapter-extension-contract.sample.json`: adapter extension contract sample payload.
+- `adapter-extension-contract.md`: adapter extension contract guide and conformance checklist.
+- `domain-pack-extension-flow.md`: Domain_Pack extension flow for cross-industry replication.
 
 ## Usage
 

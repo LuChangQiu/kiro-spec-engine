@@ -1,5 +1,5 @@
 {
-  "version": "2026.02.18.1",
+  "version": "2026.02.19.2",
   "source": "sce-moqui-core",
   "capabilities": [
     {
@@ -242,6 +242,19 @@
       ],
       "deprecated_aliases": [
         "workflow-approval-center"
+      ]
+    },
+    {
+      "canonical": "platform-interactive-customization-loop",
+      "aliases": [
+        "interactive-customization-loop",
+        "interactive-change-loop",
+        "moqui-interactive-customization-loop",
+        "scene.moqui.interactive.customization.loop",
+        "scene-moqui-interactive-customization-loop"
+      ],
+      "deprecated_aliases": [
+        "interactive-customization-pipeline"
       ]
     },
     {

@@ -180,3 +180,15 @@ sce scene package-publish-batch \
 
 sce auto close-loop-batch .kiro/auto/ontology-remediation.lines --format lines --json
 ```
+
+## Interactive Customization Template Baseline
+
+Stage-D baseline package for the interactive business customization loop:
+
+- `kse.scene--moqui-interactive-customization-loop--0.1.0`
+
+This package captures:
+
+- intent -> plan -> gate -> approval -> low-risk apply -> rollback flow
+- ontology entities/relations for plan/decision/execution trace
+- governance rules and decision strategy for approval and rollback constraints

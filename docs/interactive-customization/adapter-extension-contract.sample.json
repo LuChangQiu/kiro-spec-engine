@@ -1,0 +1,59 @@
+{
+  "adapter_id": "moqui-interactive-adapter",
+  "adapter_version": "1.0.0",
+  "runtime": "moqui",
+  "capability_declaration": {
+    "supported_change_types": [
+      "analysis_only",
+      "update_rule_threshold",
+      "ui_form_field_adjust",
+      "workflow_approval_chain_change",
+      "inventory_adjustment_bulk",
+      "payment_rule_change"
+    ],
+    "requires": [
+      "profile:moqui",
+      "policy:interactive-guardrail"
+    ],
+    "notes": "High-risk destructive actions remain blocked unless explicitly approved."
+  },
+  "risk_declaration": {
+    "default_execution_mode": "suggestion",
+    "auto_apply_risk_levels": [
+      "low"
+    ],
+    "blocked_action_types": [
+      "credential_export",
+      "permission_grant_super_admin",
+      "bulk_delete_without_filter"
+    ]
+  },
+  "interfaces": {
+    "capabilities": {
+      "implemented": true,
+      "entrypoint": "capabilities()"
+    },
+    "plan": {
+      "implemented": true,
+      "entrypoint": "plan(changeIntent, context)"
+    },
+    "validate": {
+      "implemented": true,
+      "entrypoint": "validate(changePlan)"
+    },
+    "apply": {
+      "implemented": true,
+      "entrypoint": "apply(changePlan)"
+    },
+    "rollback": {
+      "implemented": true,
+      "entrypoint": "rollback(executionId)"
+    }
+  },
+  "compliance": {
+    "guardrail_compatible": true,
+    "approval_workflow_compatible": true,
+    "rollback_supported": true,
+    "audit_record_schema": "docs/interactive-customization/execution-record.schema.json"
+  }
+}

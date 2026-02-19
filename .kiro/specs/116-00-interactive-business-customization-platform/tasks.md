@@ -73,16 +73,21 @@
 
 ## 任务 5：模板沉淀与跨栈扩展准备（阶段 D）
 
-- [ ] 5.1 将 Moqui 实验中稳定变更沉淀为 SCE 模板资产
+- [x] 5.1 将 Moqui 实验中稳定变更沉淀为 SCE 模板资产
   - scene-package / ontology / governance contract / playbook
+  - 已落地模板：`.kiro/templates/scene-packages/kse.scene--moqui-interactive-customization-loop--0.1.0/*`
+  - 已落地 playbook：`docs/interactive-customization/moqui-interactive-template-playbook.md`
   - **验证**: Requirement 5
 
-- [ ] 5.2 定义通用 Adapter 扩展规范文档
+- [x] 5.2 定义通用 Adapter 扩展规范文档
   - 约束能力声明、风险声明、验证回滚接口
+  - 已落地：`docs/interactive-customization/adapter-extension-contract.md`
+  - 机器可读契约：`docs/interactive-customization/adapter-extension-contract.schema.json` + `adapter-extension-contract.sample.json`
   - **验证**: Requirement 6
 
-- [ ] 5.3 设计 Domain_Pack 扩展流程
+- [x] 5.3 设计 Domain_Pack 扩展流程
   - 新行业接入时复用核心门禁，不改安全主流程
+  - 已落地：`docs/interactive-customization/domain-pack-extension-flow.md`
   - **验证**: Requirement 6
 
 ## 任务 6：持续改进观测与治理

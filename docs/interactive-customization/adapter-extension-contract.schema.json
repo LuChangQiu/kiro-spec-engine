@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scene-capability-engine.dev/schemas/interactive/adapter-extension-contract.schema.json",
+  "title": "Interactive Adapter Extension Contract",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "adapter_id",
+    "adapter_version",
+    "runtime",
+    "capability_declaration",
+    "risk_declaration",
+    "interfaces",
+    "compliance"
+  ],
+  "properties": {
+    "adapter_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "adapter_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runtime": {
+      "type": "string",
+      "minLength": 1
+    },
+    "capability_declaration": {
+      "type": "object",
+      "required": [
+        "supported_change_types"
+      ],
+      "properties": {
+        "supported_change_types": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "requires": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "risk_declaration": {
+      "type": "object",
+      "required": [
+        "default_execution_mode",
+        "auto_apply_risk_levels"
+      ],
+      "properties": {
+        "default_execution_mode": {
+          "type": "string",
+          "enum": [
+            "suggestion",
+            "apply"
+          ]
+        },
+        "auto_apply_risk_levels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          }
+        },
+        "blocked_action_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "interfaces": {
+      "type": "object",
+      "required": [
+        "capabilities",
+        "plan",
+        "validate",
+        "apply",
+        "rollback"
+      ],
+      "properties": {
+        "capabilities": {
+          "type": "object",
+          "required": [
+            "implemented"
+          ],
+          "properties": {
+            "implemented": {
+              "type": "boolean"
+            },
+            "entrypoint": {
+              "type": "string"
+            }
+          }
+        },
+        "plan": {
+          "type": "object",
+          "required": [
+            "implemented"
+          ],
+          "properties": {
+            "implemented": {
+              "type": "boolean"
+            },
+            "entrypoint": {
+              "type": "string"
+            }
+          }
+        },
+        "validate": {
+          "type": "object",
+          "required": [
+            "implemented"
+          ],
+          "properties": {
+            "implemented": {
+              "type": "boolean"
+            },
+            "entrypoint": {
+              "type": "string"
+            }
+          }
+        },
+        "apply": {
+          "type": "object",
+          "required": [
+            "implemented"
+          ],
+          "properties": {
+            "implemented": {
+              "type": "boolean"
+            },
+            "entrypoint": {
+              "type": "string"
+            }
+          }
+        },
+        "rollback": {
+          "type": "object",
+          "required": [
+            "implemented"
+          ],
+          "properties": {
+            "implemented": {
+              "type": "boolean"
+            },
+            "entrypoint": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "compliance": {
+      "type": "object",
+      "required": [
+        "guardrail_compatible",
+        "approval_workflow_compatible",
+        "rollback_supported"
+      ],
+      "properties": {
+        "guardrail_compatible": {
+          "type": "boolean"
+        },
+        "approval_workflow_compatible": {
+          "type": "boolean"
+        },
+        "rollback_supported": {
+          "type": "boolean"
+        },
+        "audit_record_schema": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -845,6 +845,16 @@ Moqui release summary helper (script-level consolidated gate view):
     - `.kiro/reports/release-evidence/moqui-release-summary.md`
   - `--fail-on-gate-fail` exits with code `2` when summary gate is `failed`.
 
+Interactive customization plan gate helper (script-level secure-by-default check):
+- `node scripts/interactive-change-plan-gate.js --plan <path> [--policy <path>] [--catalog <path>] [--out <path>] [--markdown-out <path>] [--fail-on-block] [--fail-on-non-allow] [--json]`: evaluate interactive change plans against default guardrails (approval, sensitive-data masking, secrets, irreversible backup, high-risk action catalog) and output `allow | review-required | deny`.
+  - Default policy: `docs/interactive-customization/guardrail-policy-baseline.json`
+  - Default catalog: `docs/interactive-customization/high-risk-action-catalog.json` (or `policy.catalog_policy.catalog_file`)
+  - Default outputs:
+    - `.kiro/reports/interactive-change-plan-gate.json`
+    - `.kiro/reports/interactive-change-plan-gate.md`
+  - `--fail-on-block` exits with code `2` on `deny`
+  - `--fail-on-non-allow` exits with code `2` on `deny` or `review-required`
+
 Moqui standard rebuild helper (script-level recovery bootstrap):
 - `node scripts/moqui-standard-rebuild.js [--metadata <path>] [--out <path>] [--markdown-out <path>] [--bundle-out <path>] [--json]`: build a standard Moqui recovery bundle from metadata, including recommended SCE template matrix, recovery spec plan, handoff manifest seed, ontology seed, and page-copilot context contract.
   - Output now includes `recovery.readiness_matrix`, `recovery.readiness_summary`, and `recovery.prioritized_gaps` for template capability matrix scoring and remediation planning.

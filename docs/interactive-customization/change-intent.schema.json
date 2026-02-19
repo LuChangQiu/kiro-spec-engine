@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scene-capability-engine.dev/schemas/interactive/change-intent.schema.json",
+  "title": "Interactive Change Intent",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "intent_id",
+    "user_id",
+    "context_ref",
+    "business_goal",
+    "created_at"
+  ],
+  "properties": {
+    "intent_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "user_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "context_ref": {
+      "type": "object",
+      "required": [
+        "product",
+        "module"
+      ],
+      "properties": {
+        "product": {
+          "type": "string",
+          "minLength": 1
+        },
+        "module": {
+          "type": "string",
+          "minLength": 1
+        },
+        "page": {
+          "type": "string"
+        },
+        "entity": {
+          "type": "string"
+        },
+        "scene_id": {
+          "type": "string"
+        }
+      }
+    },
+    "business_goal": {
+      "type": "string",
+      "minLength": 1
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

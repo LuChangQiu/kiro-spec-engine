@@ -1,0 +1,41 @@
+{
+  "plan_id": "plan-demo-001",
+  "intent_id": "intent-demo-001",
+  "risk_level": "low",
+  "execution_mode": "suggestion",
+  "scope": {
+    "product": "moqui-experiment",
+    "module": "order",
+    "scene_id": "sce.scene--erp-order-fulfillment-workflow--0.1.0"
+  },
+  "actions": [
+    {
+      "action_id": "act-001",
+      "type": "update_rule_threshold",
+      "touches_sensitive_data": false,
+      "requires_privilege_escalation": false,
+      "irreversible": false
+    }
+  ],
+  "impact_assessment": {
+    "business": "improve order auto-release precision",
+    "technical": "rule parameter update only"
+  },
+  "verification_checks": [
+    "order fulfillment regression smoke",
+    "rule threshold snapshot compare"
+  ],
+  "rollback_plan": {
+    "type": "parameter-revert",
+    "reference": "baseline-rule-set-2026-02-19"
+  },
+  "approval": {
+    "status": "not-required",
+    "dual_approved": false
+  },
+  "security": {
+    "masking_applied": false,
+    "plaintext_secrets_in_payload": false
+  },
+  "created_at": "2026-02-19T00:00:00.000Z"
+}

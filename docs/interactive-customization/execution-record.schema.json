@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scene-capability-engine.dev/schemas/interactive/execution-record.schema.json",
+  "title": "Interactive Execution Record",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "execution_id",
+    "plan_id",
+    "adapter_type",
+    "policy_decision",
+    "result",
+    "executed_at"
+  ],
+  "properties": {
+    "execution_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "plan_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "adapter_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policy_decision": {
+      "type": "string",
+      "enum": [
+        "allow",
+        "review-required",
+        "deny"
+      ]
+    },
+    "approval_snapshot": {
+      "type": "object"
+    },
+    "diff_summary": {
+      "type": "object"
+    },
+    "result": {
+      "type": "string",
+      "enum": [
+        "success",
+        "failed",
+        "rolled-back",
+        "skipped"
+      ]
+    },
+    "rollback_ref": {
+      "type": "string"
+    },
+    "audit_trace_id": {
+      "type": "string"
+    },
+    "executed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

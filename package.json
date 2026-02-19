@@ -40,6 +40,7 @@
     "gate:moqui-rebuild": "node scripts/moqui-rebuild-gate.js",
     "report:moqui-baseline": "node scripts/moqui-template-baseline-report.js --json",
     "report:moqui-summary": "node scripts/moqui-release-summary.js --json",
+    "gate:interactive-plan": "node scripts/interactive-change-plan-gate.js --plan docs/interactive-customization/change-plan.sample.json --json",
     "report:moqui-core-regression": "node scripts/moqui-core-regression-suite.js --json",
     "prepublishOnly": "npm run test:full && npm run test:skip-audit && npm run test:brand-consistency",
     "publish:manual": "npm publish --access public",

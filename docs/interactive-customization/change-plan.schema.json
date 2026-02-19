@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scene-capability-engine.dev/schemas/interactive/change-plan.schema.json",
+  "title": "Interactive Change Plan",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "plan_id",
+    "intent_id",
+    "risk_level",
+    "actions",
+    "created_at"
+  ],
+  "properties": {
+    "plan_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "intent_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "execution_mode": {
+      "type": "string",
+      "enum": [
+        "suggestion",
+        "apply"
+      ]
+    },
+    "scope": {
+      "type": "object"
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "action_id",
+          "type"
+        ],
+        "properties": {
+          "action_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "touches_sensitive_data": {
+            "type": "boolean"
+          },
+          "requires_privilege_escalation": {
+            "type": "boolean"
+          },
+          "irreversible": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "impact_assessment": {
+      "type": "object"
+    },
+    "verification_checks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "rollback_plan": {
+      "type": "object"
+    },
+    "security": {
+      "type": "object",
+      "properties": {
+        "masking_applied": {
+          "type": "boolean"
+        },
+        "plaintext_secrets_in_payload": {
+          "type": "boolean"
+        },
+        "backup_reference": {
+          "type": "string"
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "approved",
+            "pending",
+            "rejected",
+            "not-required"
+          ]
+        },
+        "approvers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dual_approved": {
+          "type": "boolean"
+        }
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

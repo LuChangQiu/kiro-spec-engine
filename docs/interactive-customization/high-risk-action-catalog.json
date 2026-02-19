@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-02-19T00:00:00.000Z",
+  "catalog": {
+    "deny_action_types": [
+      "credential_export",
+      "raw_sql_destructive",
+      "permission_grant_super_admin",
+      "bulk_delete_without_filter"
+    ],
+    "review_required_action_types": [
+      "schema_migration",
+      "workflow_approval_chain_change",
+      "payment_rule_change",
+      "inventory_adjustment_bulk"
+    ],
+    "notes": {
+      "deny": "Actions in deny_action_types are blocked by default.",
+      "review_required": "Actions in review_required_action_types require explicit human approval."
+    }
+  }
+}

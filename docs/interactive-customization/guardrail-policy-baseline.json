@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0",
+  "mode": "advice-first",
+  "approval_policy": {
+    "require_approval_for_risk_levels": [
+      "high"
+    ],
+    "max_actions_without_approval": 5,
+    "require_dual_approval_for_privilege_escalation": true
+  },
+  "security_policy": {
+    "require_masking_when_sensitive_data": true,
+    "forbid_plaintext_secrets": true,
+    "require_backup_for_irreversible_actions": true
+  },
+  "catalog_policy": {
+    "catalog_file": "docs/interactive-customization/high-risk-action-catalog.json"
+  }
+}

@@ -203,4 +203,42 @@ describe('interactive-governance-report script', () => {
     expect(payload.summary.breaches).toBe(0);
     expect(payload.summary.warnings).toBeGreaterThanOrEqual(1);
   });
+
+  test('treats low intent sample as warning instead of breach', async () => {
+    const workspace = path.join(tempDir, 'workspace-low-intent-sample');
+    await fs.ensureDir(workspace);
+
+    const intentAudit = path.join(workspace, 'intent.jsonl');
+    const thresholdsFile = path.join(workspace, 'thresholds.json');
+    const now = new Date().toISOString();
+
+    await writeJsonl(intentAudit, [
+      { event_type: 'interactive.intent.generated', intent_id: 'i-1', timestamp: now },
+      { event_type: 'interactive.intent.generated', intent_id: 'i-2', timestamp: now }
+    ]);
+
+    await fs.writeJson(thresholdsFile, {
+      min_intent_samples: 5,
+      adoption_rate_min_percent: 50,
+      execution_success_rate_min_percent: 90,
+      rollback_rate_max_percent: 20,
+      security_intercept_rate_max_percent: 60,
+      satisfaction_min_score: 4,
+      min_feedback_samples: 3
+    }, { spaces: 2 });
+
+    const result = runScript(workspace, [
+      '--intent-audit', intentAudit,
+      '--thresholds', thresholdsFile,
+      '--period', 'all',
+      '--fail-on-alert',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.summary.breaches).toBe(0);
+    expect(payload.alerts.map(item => item.id)).toContain('adoption-sample-insufficient');
+    expect(payload.alerts.map(item => item.id)).not.toContain('adoption-rate-low');
+  });
 });

@@ -220,6 +220,9 @@ function toAverage(values) {
 function loadThresholds(raw = {}) {
   const thresholds = raw && typeof raw === 'object' ? raw : {};
   return {
+    min_intent_samples: Number.isFinite(Number(thresholds.min_intent_samples))
+      ? Number(thresholds.min_intent_samples)
+      : 5,
     adoption_rate_min_percent: Number.isFinite(Number(thresholds.adoption_rate_min_percent))
       ? Number(thresholds.adoption_rate_min_percent)
       : 30,
@@ -267,7 +270,19 @@ function buildAlert({
 function evaluateAlerts(metrics, thresholds) {
   const alerts = [];
 
-  if (
+  if (metrics.intent_total < thresholds.min_intent_samples) {
+    alerts.push({
+      id: 'adoption-sample-insufficient',
+      severity: 'low',
+      status: 'warning',
+      metric: 'intent_total',
+      actual: metrics.intent_total,
+      threshold: thresholds.min_intent_samples,
+      direction: 'min',
+      message: 'Intent sample size is below minimum; adoption trend is not statistically stable.',
+      recommendation: 'Collect more interactive intent/apply runs before enforcing adoption policy.'
+    });
+  } else if (
     metrics.adoption_rate_percent != null &&
     metrics.adoption_rate_percent < thresholds.adoption_rate_min_percent
   ) {

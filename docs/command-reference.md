@@ -887,9 +887,17 @@ Interactive Moqui adapter helper (script-level stage-C controlled execution cont
   - `apply` exits with code `2` when result is non-success (`failed` or `skipped`), ensuring CI-safe gating.
 - npm alias: `npm run report:interactive-adapter-capabilities`
 
+Interactive user feedback helper (script-level stage-D feedback ingestion):
+- `node scripts/interactive-feedback-log.js --score <0..5> [--comment <text>] [--user-id <id>] [--session-id <id>] [--intent-id <id>] [--plan-id <id>] [--execution-id <id>] [--channel <ui|cli|api|other>] [--tags <csv>] [--product <name>] [--module <name>] [--page <name>] [--scene-id <name>] [--feedback-file <path>] [--json]`: append structured business-user feedback records into the interactive feedback JSONL stream for governance metrics.
+  - Default feedback file: `.kiro/reports/interactive-user-feedback.jsonl`
+  - Score range: `0..5`
+- npm alias: `npm run log:interactive-feedback -- --score 5 --comment "clear and safe"`
+
 Interactive governance report helper (script-level stage-D/6 observability + alerting):
 - `node scripts/interactive-governance-report.js [--intent-audit <path>] [--approval-audit <path>] [--execution-ledger <path>] [--feedback-file <path>] [--thresholds <path>] [--period <weekly|monthly|all|custom>] [--from <iso>] [--to <iso>] [--out <path>] [--markdown-out <path>] [--fail-on-alert] [--json]`: compute interactive governance KPIs (adoption/success/rollback/security-intercept/satisfaction), evaluate threshold breaches, and emit machine/human-readable governance report.
   - Default thresholds: `docs/interactive-customization/governance-threshold-baseline.json`
+  - Default minimum intent sample threshold: `min_intent_samples=5` (below this becomes warning, not breach)
+  - Default feedback input: `.kiro/reports/interactive-user-feedback.jsonl`
   - Default outputs:
     - `.kiro/reports/interactive-governance-report.json`
     - `.kiro/reports/interactive-governance-report.md`
@@ -1042,8 +1050,10 @@ sce scene moqui-baseline \
 ```
 
 Release workflow default:
+- Runs interactive governance gate by default (`interactive-governance-report --period weekly --fail-on-alert`) in test and release pipelines.
 - Publishes `moqui-template-baseline.json` + `moqui-template-baseline.md` as release assets.
 - Publishes `moqui-release-summary.json` + `moqui-release-summary.md` as release review assets.
+- Publishes `interactive-governance-<tag>.json` + `interactive-governance-<tag>.md` as release evidence assets.
 - Enforces baseline portfolio gate by default (`KSE_MOQUI_BASELINE_ENFORCE` defaults to `true` when unset).
 
 ### Moqui ERP Integration

@@ -126,6 +126,25 @@ Execution artifacts:
 - Append-only execution ledger: `.kiro/reports/interactive-execution-ledger.jsonl`
 - Execution records include diff summary, gate decision, validation snapshot, and rollback reference.
 
+Append business-user feedback for governance scoring:
+
+```bash
+node scripts/interactive-feedback-log.js \
+  --score 5 \
+  --comment "Approval flow is clearer and faster." \
+  --user-id demo-user \
+  --session-id session-20260219 \
+  --intent-id intent-xxxx \
+  --plan-id plan-xxxx \
+  --execution-id exec-xxxx \
+  --tags moqui,approval \
+  --product moqui-suite \
+  --module order \
+  --page approval \
+  --scene-id scene-moqui-interactive \
+  --json
+```
+
 Generate governance KPI report and threshold alerts:
 
 ```bash
@@ -133,3 +152,6 @@ node scripts/interactive-governance-report.js \
   --period weekly \
   --json
 ```
+
+The governance report consumes feedback events from `.kiro/reports/interactive-user-feedback.jsonl` by default.
+When `intent_total` is below `min_intent_samples` (default `5`), adoption emits a low-severity sample warning instead of a breach.

@@ -15,8 +15,9 @@ Use this template for weekly/monthly interactive customization governance review
 2. Execution success rate (%)
 3. Rollback rate (%)
 4. Security intercept rate (%)
-5. Satisfaction average score (1-5)
-6. Satisfaction sample count
+5. Intent sample count
+6. Satisfaction average score (1-5)
+7. Satisfaction sample count
 
 ## Alert Summary
 

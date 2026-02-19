@@ -27,6 +27,9 @@ jobs:
 
       - name: Run Moqui rebuild gate
         run: npm run gate:moqui-rebuild
+
+      - name: Run interactive governance gate
+        run: node scripts/interactive-governance-report.js --period weekly --fail-on-alert --json
       
       - name: Check coverage
         run: npm run coverage -- --runInBand
@@ -51,6 +54,29 @@ jobs:
       
       - name: Install dependencies
         run: npm ci
+
+      - name: Build interactive governance report
+        id: interactive_governance
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          NOTES_DIR=".kiro/reports/release-evidence"
+          GOVERNANCE_JSON="${NOTES_DIR}/interactive-governance-${TAG}.json"
+          GOVERNANCE_MD="${NOTES_DIR}/interactive-governance-${TAG}.md"
+          GOVERNANCE_STDOUT="${NOTES_DIR}/interactive-governance-${TAG}.stdout.json"
+
+          mkdir -p "${NOTES_DIR}"
+          node scripts/interactive-governance-report.js \
+            --period weekly \
+            --out "${GOVERNANCE_JSON}" \
+            --markdown-out "${GOVERNANCE_MD}" \
+            --fail-on-alert \
+            --json > "${GOVERNANCE_STDOUT}"
+          cat "${GOVERNANCE_STDOUT}"
+          rm -f "${GOVERNANCE_STDOUT}"
+          echo "json_file=${GOVERNANCE_JSON}" >> "$GITHUB_OUTPUT"
+          echo "markdown_file=${GOVERNANCE_MD}" >> "$GITHUB_OUTPUT"
 
       - name: Resolve previous Moqui baseline asset
         id: moqui_baseline_prev
@@ -820,6 +846,8 @@ jobs:
           body_path: ${{ steps.release_notes.outputs.release_body_file }}
           files: |
             ${{ steps.release_notes.outputs.asset_files }}
+            ${{ steps.interactive_governance.outputs.json_file }}
+            ${{ steps.interactive_governance.outputs.markdown_file }}
             ${{ steps.moqui_baseline.outputs.json_file }}
             ${{ steps.moqui_baseline.outputs.markdown_file }}
             ${{ steps.moqui_core_regression.outputs.json_file }}

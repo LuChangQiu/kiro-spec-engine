@@ -32,6 +32,9 @@ jobs:
 
       - name: Run Moqui rebuild gate
         run: npm run gate:moqui-rebuild
+
+      - name: Run interactive governance gate
+        run: node scripts/interactive-governance-report.js --period weekly --fail-on-alert --json
       
       - name: Check coverage
         run: npm run coverage -- --runInBand

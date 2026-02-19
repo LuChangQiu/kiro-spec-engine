@@ -16,7 +16,7 @@ Any medium/high breach from `interactive-governance-report`:
 
 - `high`: execution quality/safety risk. Start containment immediately.
 - `medium`: quality/friction drift. Start corrective tuning in current cycle.
-- `low`: data quality warning (e.g., insufficient feedback samples).
+- `low`: data quality warning (e.g., insufficient intent/feedback samples).
 
 ## Response Workflow
 

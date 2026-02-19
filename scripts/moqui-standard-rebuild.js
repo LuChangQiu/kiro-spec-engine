@@ -813,7 +813,22 @@ function buildMarkdownReport(report) {
   lines.push(`- Ontology seed: ${report.output.ontology_seed}`);
   lines.push(`- Copilot contract: ${report.output.copilot_contract}`);
   lines.push(`- Copilot playbook: ${report.output.copilot_playbook}`);
+  lines.push(`- Remediation queue: ${report.output.remediation_queue}`);
   return `${lines.join('\n')}\n`;
+}
+
+function buildRemediationQueueLines(prioritizedGaps) {
+  const lines = [];
+  for (const gap of prioritizedGaps) {
+    const templateId = normalizeText(gap && gap.template_id) || 'unknown-template';
+    const actions = Array.isArray(gap && gap.next_actions) && gap.next_actions.length > 0
+      ? gap.next_actions
+      : ['补齐模板语义输入'];
+    for (const action of actions) {
+      lines.push(`[${templateId}] ${action}`);
+    }
+  }
+  return lines;
 }
 
 async function writeBundle(bundleDir, payload) {
@@ -827,6 +842,7 @@ async function writeBundle(bundleDir, payload) {
   const copilotContractPath = path.join(copilotDir, 'page-context-contract.json');
   const copilotPlaybookPath = path.join(copilotDir, 'conversation-playbook.md');
   const recoverySpecPath = path.join(rebuildDir, 'recovery-spec-plan.json');
+  const remediationQueuePath = path.join(rebuildDir, 'matrix-remediation.lines');
 
   await fs.ensureDir(handoffDir);
   await fs.ensureDir(ontologyDir);
@@ -837,6 +853,11 @@ async function writeBundle(bundleDir, payload) {
   await fs.writeJson(ontologySeedPath, payload.ontology_seed, { spaces: 2 });
   await fs.writeJson(copilotContractPath, payload.copilot_contract, { spaces: 2 });
   await fs.writeJson(recoverySpecPath, payload.recovery_spec_plan, { spaces: 2 });
+  await fs.writeFile(
+    remediationQueuePath,
+    buildRemediationQueueLines(payload.prioritized_gaps).join('\n') + '\n',
+    'utf8'
+  );
   await fs.writeFile(
     copilotPlaybookPath,
     [
@@ -857,7 +878,8 @@ async function writeBundle(bundleDir, payload) {
     ontologySeedPath,
     copilotContractPath,
     copilotPlaybookPath,
-    recoverySpecPath
+    recoverySpecPath,
+    remediationQueuePath
   };
 }
 
@@ -933,7 +955,8 @@ async function main() {
     handoff_manifest: handoffManifest,
     ontology_seed: ontologySeed,
     copilot_contract: copilotContract,
-    recovery_spec_plan: specPlan
+    recovery_spec_plan: specPlan,
+    prioritized_gaps: prioritizedGaps
   });
 
   const report = {
@@ -963,7 +986,8 @@ async function main() {
       ontology_seed: path.relative(process.cwd(), bundleFiles.ontologySeedPath),
       copilot_contract: path.relative(process.cwd(), bundleFiles.copilotContractPath),
       copilot_playbook: path.relative(process.cwd(), bundleFiles.copilotPlaybookPath),
-      recovery_spec_plan: path.relative(process.cwd(), bundleFiles.recoverySpecPath)
+      recovery_spec_plan: path.relative(process.cwd(), bundleFiles.recoverySpecPath),
+      remediation_queue: path.relative(process.cwd(), bundleFiles.remediationQueuePath)
     }
   };
 

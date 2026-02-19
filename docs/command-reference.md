@@ -836,6 +836,7 @@ Moqui template library lexicon audit (script-level governance helper):
 Moqui standard rebuild helper (script-level recovery bootstrap):
 - `node scripts/moqui-standard-rebuild.js [--metadata <path>] [--out <path>] [--markdown-out <path>] [--bundle-out <path>] [--json]`: build a standard Moqui recovery bundle from metadata, including recommended SCE template matrix, recovery spec plan, handoff manifest seed, ontology seed, and page-copilot context contract.
   - Output now includes `recovery.readiness_matrix`, `recovery.readiness_summary`, and `recovery.prioritized_gaps` for template capability matrix scoring and remediation planning.
+  - Bundle now includes `rebuild/matrix-remediation.lines` (gap remediation queue lines).
   - This workflow is scoped to SCE outputs and does not mutate business project code directly.
   - Recommended usage for rebuild target path: `E:/workspace/331-poc-rebuild` (keep `331-poc` repair stream isolated).
 

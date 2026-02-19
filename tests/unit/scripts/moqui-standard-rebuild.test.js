@@ -92,6 +92,8 @@ describe('moqui-standard-rebuild script', () => {
     expect(await fs.pathExists(path.join(bundleDir, 'ontology', 'moqui-ontology-seed.json'))).toBe(true);
     expect(await fs.pathExists(path.join(bundleDir, 'copilot', 'page-context-contract.json'))).toBe(true);
     expect(await fs.pathExists(path.join(bundleDir, 'copilot', 'conversation-playbook.md'))).toBe(true);
+    expect(await fs.pathExists(path.join(bundleDir, 'rebuild', 'matrix-remediation.lines'))).toBe(true);
+    expect(payload.output.remediation_queue).toContain('matrix-remediation.lines');
 
     const handoffPayload = await fs.readJson(path.join(bundleDir, 'handoff', 'handoff-manifest.json'));
     expect(handoffPayload.templates).toEqual(expect.arrayContaining([
@@ -102,5 +104,8 @@ describe('moqui-standard-rebuild script', () => {
       source: 'moqui-standard-rebuild'
     }));
     expect(Array.isArray(handoffPayload.known_gaps)).toBe(true);
+
+    const remediationLines = await fs.readFile(path.join(bundleDir, 'rebuild', 'matrix-remediation.lines'), 'utf8');
+    expect(remediationLines.length).toBeGreaterThan(0);
   });
 });

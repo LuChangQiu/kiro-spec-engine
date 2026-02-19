@@ -63,6 +63,7 @@ node scripts/moqui-standard-rebuild.js \
 - `handoff/handoff-manifest.json`: seed manifest for SCE handoff gates.
 - `ontology/moqui-ontology-seed.json`: initial ontology graph seed.
 - `rebuild/recovery-spec-plan.json`: ordered recovery spec list.
+- `rebuild/matrix-remediation.lines`: prioritized remediation queue lines derived from template readiness gaps.
 - `copilot/page-context-contract.json`: page-context contract for copilot dialog.
 - `copilot/conversation-playbook.md`: operational playbook for human/AI page fixes.
 - rebuild report includes template readiness scoring (`recovery.readiness_matrix`) and prioritized remediation items (`recovery.prioritized_gaps`).

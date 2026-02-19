@@ -12,6 +12,8 @@ This directory contains baseline contracts and safety policy artifacts for the i
 - `high-risk-action-catalog.json`: baseline high-risk action classification for deny/review decisions.
 - `change-plan.sample.json`: runnable sample plan for gate checks.
 - `page-context.sample.json`: runnable page context sample for read-only intent generation.
+- `moqui-copilot-context-contract.json`: Moqui page context contract + security boundary baseline.
+- `moqui-copilot-integration-guide.md`: stage-A Moqui integration guide for page-level copilot embedding.
 
 ## Usage
 

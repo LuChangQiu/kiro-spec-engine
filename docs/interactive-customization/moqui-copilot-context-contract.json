@@ -1,0 +1,46 @@
+{
+  "version": "1.0.0",
+  "product": "moqui-experiment",
+  "context_contract": {
+    "required_fields": [
+      "product",
+      "module",
+      "page",
+      "entity"
+    ],
+    "optional_fields": [
+      "scene_id",
+      "workflow_node",
+      "fields",
+      "current_state"
+    ],
+    "max_field_count": 200,
+    "max_payload_kb": 256
+  },
+  "security_contract": {
+    "mode": "read-only",
+    "masking_required": true,
+    "sensitive_key_patterns": [
+      "password",
+      "secret",
+      "token",
+      "api_key",
+      "credential",
+      "email",
+      "phone",
+      "bank",
+      "card"
+    ],
+    "forbidden_keys": [
+      "raw_password",
+      "private_key",
+      "access_token_plaintext"
+    ]
+  },
+  "runtime_contract": {
+    "provider": "ui-context-provider",
+    "transport": "json",
+    "schema": "docs/interactive-customization/page-context.schema.json",
+    "consumer": "scripts/interactive-intent-build.js"
+  }
+}

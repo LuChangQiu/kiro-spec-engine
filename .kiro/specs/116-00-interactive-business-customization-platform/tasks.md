@@ -19,8 +19,9 @@
 
 ## 任务 2：Moqui 实验产品对话入口（阶段 A）
 
-- [ ] 2.1 在 Moqui 实验产品设计页面级 Copilot 接入方案
+- [x] 2.1 在 Moqui 实验产品设计页面级 Copilot 接入方案
   - 明确上下文注入边界与脱敏策略
+  - 已落地：`docs/interactive-customization/moqui-copilot-context-contract.json` 与 `docs/interactive-customization/moqui-copilot-integration-guide.md`
   - **验证**: Requirement 1, Requirement 3
 
 - [x] 2.2 实现只读解释能力（页面、实体、流程、规则）

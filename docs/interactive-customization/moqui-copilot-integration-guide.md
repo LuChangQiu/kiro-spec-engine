@@ -1,0 +1,73 @@
+# Moqui Copilot Integration Guide (Stage A)
+
+This guide defines the page-level integration pattern for embedding the SCE Business Copilot into a customized Moqui product.
+
+## Goal
+
+Provide a deterministic and secure context bridge so non-technical users can describe business goals in UI, while backend automation remains read-only at this stage.
+
+## Integration Model
+
+```text
+Moqui Page -> Context Provider -> Masking Filter -> Copilot Panel -> interactive-intent-build
+```
+
+At stage A:
+
+- Copilot is read-only.
+- No write action is executed from the panel.
+- Output artifacts are `Change_Intent`, explain markdown, and audit JSONL.
+
+## Context Provider Contract
+
+Reference file:
+
+- `docs/interactive-customization/moqui-copilot-context-contract.json`
+
+Minimum payload fields:
+
+1. `product`
+2. `module`
+3. `page`
+4. `entity`
+
+Optional but recommended:
+
+1. `scene_id`
+2. `workflow_node`
+3. `fields[]`
+4. `current_state`
+
+Schema:
+
+- `docs/interactive-customization/page-context.schema.json`
+
+## Security Boundary
+
+1. Provider must apply key-based masking for sensitive fields before sending context to Copilot.
+2. Forbidden keys must be removed completely, not masked.
+3. Copilot requests must run under read-only runtime identity.
+4. Generated outputs are stored in report paths only, never direct code/runtime mutation.
+
+## Suggested Moqui Hook Points
+
+1. Build a page context object from screen/form state in controller/render pipeline.
+2. Pass sanitized context to frontend Copilot panel via JSON endpoint or embedded script tag payload.
+3. Trigger `interactive-intent-build` with user goal + sanitized context.
+
+## Example Command
+
+```bash
+node scripts/interactive-intent-build.js \
+  --context docs/interactive-customization/page-context.sample.json \
+  --goal "Must improve approval speed without changing payment authorization policy" \
+  --user-id product-owner \
+  --json
+```
+
+## Acceptance Checklist
+
+1. Context payload validates against schema.
+2. Sensitive keys are masked or removed.
+3. Copilot outputs contain `readonly=true`.
+4. Audit event is appended to `.kiro/reports/interactive-copilot-audit.jsonl`.

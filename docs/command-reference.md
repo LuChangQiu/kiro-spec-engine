@@ -878,11 +878,12 @@ Interactive approval workflow helper (script-level stage-B approval state machin
   - `execute` is blocked (exit code `2`) when approval is required but current status is not `approved`.
 
 Interactive Moqui adapter helper (script-level stage-C controlled execution contract):
-- `node scripts/interactive-moqui-adapter.js --action <capabilities|plan|validate|apply|rollback> [--intent <path>] [--context <path>] [--plan <path>] [--execution-id <id>] [--execution-mode <suggestion|apply>] [--policy <path>] [--catalog <path>] [--moqui-config <path>] [--live-apply] [--no-dry-run] [--allow-suggestion-apply] [--json]`: run unified Moqui adapter interface (`capabilities/plan/validate/apply/rollback`) for interactive customization stage-C.
+- `node scripts/interactive-moqui-adapter.js --action <capabilities|plan|validate|apply|low-risk-apply|rollback> [--intent <path>] [--context <path>] [--plan <path>] [--execution-id <id>] [--execution-mode <suggestion|apply>] [--policy <path>] [--catalog <path>] [--moqui-config <path>] [--live-apply] [--no-dry-run] [--allow-suggestion-apply] [--json]`: run unified Moqui adapter interface (`capabilities/plan/validate/apply/low-risk-apply/rollback`) for interactive customization stage-C.
   - Default plan output (`--action plan`): `.kiro/reports/interactive-change-plan.adapter.json`
   - Default command output: `.kiro/reports/interactive-moqui-adapter.json`
   - Default execution record (for `apply`/`rollback`): `.kiro/reports/interactive-execution-record.latest.json`
   - Default append-only execution ledger: `.kiro/reports/interactive-execution-ledger.jsonl`
+  - `low-risk-apply` is one-click mode: only `risk_level=low` and gate decision `allow` can execute.
   - `apply` exits with code `2` when result is non-success (`failed` or `skipped`), ensuring CI-safe gating.
 - npm alias: `npm run report:interactive-adapter-capabilities`
 

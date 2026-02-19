@@ -20,6 +20,10 @@ This document defines the minimal adapter contract used by interactive customiza
 - Default behavior is safe simulation; live apply is opt-in.
 - Produces `ExecutionRecord` and appends execution ledger.
 
+`applyLowRisk(changePlan)`
+- One-click execution entry for stage-C.
+- Requires `risk_level=low` and policy decision `allow`, otherwise blocks with `ExecutionRecord(result=skipped)`.
+
 `rollback(executionId)`
 - Generates rollback execution record for a previous execution.
 - Keeps append-only audit behavior.

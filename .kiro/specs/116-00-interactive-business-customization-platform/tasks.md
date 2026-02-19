@@ -59,12 +59,16 @@
   - 覆盖测试：`tests/unit/scripts/interactive-moqui-adapter.test.js`
   - **验证**: Requirement 5, Requirement 6
 
-- [ ] 4.2 打通低风险一键执行路径
+- [x] 4.2 打通低风险一键执行路径
   - 只允许通过策略引擎判定的低风险变更
+  - 已落地：`scripts/interactive-moqui-adapter.js --action low-risk-apply`（仅允许 `risk_level=low` 且 gate=`allow`）
+  - 覆盖测试：`tests/unit/scripts/interactive-moqui-adapter.test.js`（`low-risk-apply` 阻断中风险样例）
   - **验证**: Requirement 2, Requirement 4, Requirement 5
 
-- [ ] 4.3 打通回滚与执行报告
+- [x] 4.3 打通回滚与执行报告
   - 输出 diff、执行结果、验证结果、回滚引用
+  - 已落地：`lib/interactive-customization/moqui-interactive-adapter.js`（`ExecutionRecord` 输出 `diff_summary/result/validation_snapshot/rollback_ref`）与 `rollback(executionId)` 账本回滚
+  - 覆盖测试：`tests/unit/scripts/interactive-moqui-adapter.test.js`（apply + rollback 端到端）
   - **验证**: Requirement 4
 
 ## 任务 5：模板沉淀与跨栈扩展准备（阶段 D）

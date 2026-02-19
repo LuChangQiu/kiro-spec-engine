@@ -157,6 +157,48 @@ describe('interactive-moqui-adapter script', () => {
     expect(payload.payload.execution_record.policy_decision).toBe('deny');
   });
 
+  test('low-risk-apply blocks medium-risk plan even when gate is allow', async () => {
+    const workspace = path.join(tempDir, 'workspace-low-risk-apply-blocked');
+    await writePolicyBundle(workspace);
+
+    const planFile = path.join(workspace, 'plan-medium.json');
+    await fs.writeJson(planFile, {
+      plan_id: 'plan-medium-001',
+      intent_id: 'intent-medium-001',
+      risk_level: 'medium',
+      execution_mode: 'apply',
+      actions: [
+        {
+          action_id: 'act-001',
+          type: 'update_rule_threshold',
+          touches_sensitive_data: false,
+          requires_privilege_escalation: false,
+          irreversible: false
+        }
+      ],
+      approval: {
+        status: 'not-required',
+        dual_approved: false
+      },
+      security: {
+        masking_applied: false,
+        plaintext_secrets_in_payload: false
+      },
+      created_at: '2026-02-19T00:00:00.000Z'
+    }, { spaces: 2 });
+
+    const result = runScript(workspace, [
+      '--action', 'low-risk-apply',
+      '--plan', planFile,
+      '--json'
+    ]);
+
+    expect(result.status).toBe(2);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.payload.execution_record.result).toBe('skipped');
+    expect(payload.payload.reason).toContain('low-risk apply');
+  });
+
   test('applies low risk plan and supports rollback by execution id', async () => {
     const workspace = path.join(tempDir, 'workspace-apply-rollback');
     await writePolicyBundle(workspace);

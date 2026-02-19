@@ -96,6 +96,12 @@ node scripts/interactive-moqui-adapter.js \
   --plan .kiro/reports/interactive-change-plan.adapter.json \
   --json
 
+# one-click path: only accepts low-risk + allow decision
+node scripts/interactive-moqui-adapter.js \
+  --action low-risk-apply \
+  --plan .kiro/reports/interactive-change-plan.adapter.json \
+  --json
+
 # rollback by execution id from execution ledger
 node scripts/interactive-moqui-adapter.js \
   --action rollback \
@@ -107,3 +113,4 @@ Execution artifacts:
 
 - Latest execution record: `.kiro/reports/interactive-execution-record.latest.json`
 - Append-only execution ledger: `.kiro/reports/interactive-execution-ledger.jsonl`
+- Execution records include diff summary, gate decision, validation snapshot, and rollback reference.

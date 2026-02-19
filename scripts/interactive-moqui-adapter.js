@@ -88,9 +88,9 @@ function parseArgs(argv) {
   }
 
   const action = `${options.action || ''}`.trim().toLowerCase();
-  const allowed = new Set(['capabilities', 'plan', 'validate', 'apply', 'rollback']);
+  const allowed = new Set(['capabilities', 'plan', 'validate', 'apply', 'low-risk-apply', 'rollback']);
   if (!allowed.has(action)) {
-    throw new Error('--action must be one of: capabilities, plan, validate, apply, rollback');
+    throw new Error('--action must be one of: capabilities, plan, validate, apply, low-risk-apply, rollback');
   }
 
   options.action = action;
@@ -98,8 +98,8 @@ function parseArgs(argv) {
   if (action === 'plan' && !options.intent) {
     throw new Error('--intent is required for --action plan');
   }
-  if (['validate', 'apply'].includes(action) && !options.plan) {
-    throw new Error('--plan is required for --action validate/apply');
+  if (['validate', 'apply', 'low-risk-apply'].includes(action) && !options.plan) {
+    throw new Error('--plan is required for --action validate/apply/low-risk-apply');
   }
   if (action === 'rollback' && !options.executionId) {
     throw new Error('--execution-id is required for --action rollback');
@@ -120,6 +120,7 @@ function printHelpAndExit(code) {
     '  plan                 Build Change_Plan from Change_Intent',
     '  validate             Validate Change_Plan against policy gate',
     '  apply                Run controlled apply pipeline and emit ExecutionRecord',
+    '  low-risk-apply       One-click apply path (requires low-risk + allow)',
     '  rollback             Emit rollback ExecutionRecord for a previous execution',
     '',
     'Options:',
@@ -225,6 +226,24 @@ async function main() {
     const planPath = resolvePath(cwd, options.plan);
     const plan = await readJsonFile(planPath, 'plan');
     const result = await adapter.apply(plan, {
+      liveApply: options.liveApply,
+      dryRun: options.dryRun,
+      allowSuggestionApply: options.allowSuggestionApply
+    });
+    payload = {
+      decision: result.record.result === 'success' ? 'applied' : 'blocked',
+      blocked: result.blocked,
+      reason: result.reason,
+      validation: result.validation,
+      execution_record: result.record
+    };
+    if (result.record.result !== 'success') {
+      process.exitCode = 2;
+    }
+  } else if (options.action === 'low-risk-apply') {
+    const planPath = resolvePath(cwd, options.plan);
+    const plan = await readJsonFile(planPath, 'plan');
+    const result = await adapter.applyLowRisk(plan, {
       liveApply: options.liveApply,
       dryRun: options.dryRun,
       allowSuggestionApply: options.allowSuggestionApply

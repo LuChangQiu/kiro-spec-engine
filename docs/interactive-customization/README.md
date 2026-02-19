@@ -14,6 +14,7 @@ This directory contains baseline contracts and safety policy artifacts for the i
 - `page-context.sample.json`: runnable page context sample for read-only intent generation.
 - `moqui-copilot-context-contract.json`: Moqui page context contract + security boundary baseline.
 - `moqui-copilot-integration-guide.md`: stage-A Moqui integration guide for page-level copilot embedding.
+- `moqui-adapter-interface.md`: stage-C Moqui adapter contract (`capabilities/plan/validate/apply/rollback`).
 
 ## Usage
 
@@ -69,3 +70,40 @@ node scripts/interactive-approval-workflow.js --action approve --actor security-
 node scripts/interactive-approval-workflow.js --action execute --actor release-operator --json
 node scripts/interactive-approval-workflow.js --action verify --actor qa-owner --json
 ```
+
+Run the Moqui adapter interface (`capabilities/plan/validate/apply/rollback`):
+
+```bash
+# show adapter capability + risk declaration
+node scripts/interactive-moqui-adapter.js \
+  --action capabilities \
+  --json
+
+# build plan from intent through adapter contract
+node scripts/interactive-moqui-adapter.js \
+  --action plan \
+  --intent .kiro/reports/interactive-change-intent.json \
+  --execution-mode suggestion \
+  --json
+
+# validate/apply with policy gate and execution record output
+node scripts/interactive-moqui-adapter.js \
+  --action validate \
+  --plan .kiro/reports/interactive-change-plan.adapter.json \
+  --json
+node scripts/interactive-moqui-adapter.js \
+  --action apply \
+  --plan .kiro/reports/interactive-change-plan.adapter.json \
+  --json
+
+# rollback by execution id from execution ledger
+node scripts/interactive-moqui-adapter.js \
+  --action rollback \
+  --execution-id exec-xxxx \
+  --json
+```
+
+Execution artifacts:
+
+- Latest execution record: `.kiro/reports/interactive-execution-record.latest.json`
+- Append-only execution ledger: `.kiro/reports/interactive-execution-ledger.jsonl`

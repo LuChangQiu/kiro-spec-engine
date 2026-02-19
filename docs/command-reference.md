@@ -877,6 +877,15 @@ Interactive approval workflow helper (script-level stage-B approval state machin
   - `init` requires `--plan`; high-risk plans are marked as `approval_required=true`.
   - `execute` is blocked (exit code `2`) when approval is required but current status is not `approved`.
 
+Interactive Moqui adapter helper (script-level stage-C controlled execution contract):
+- `node scripts/interactive-moqui-adapter.js --action <capabilities|plan|validate|apply|rollback> [--intent <path>] [--context <path>] [--plan <path>] [--execution-id <id>] [--execution-mode <suggestion|apply>] [--policy <path>] [--catalog <path>] [--moqui-config <path>] [--live-apply] [--no-dry-run] [--allow-suggestion-apply] [--json]`: run unified Moqui adapter interface (`capabilities/plan/validate/apply/rollback`) for interactive customization stage-C.
+  - Default plan output (`--action plan`): `.kiro/reports/interactive-change-plan.adapter.json`
+  - Default command output: `.kiro/reports/interactive-moqui-adapter.json`
+  - Default execution record (for `apply`/`rollback`): `.kiro/reports/interactive-execution-record.latest.json`
+  - Default append-only execution ledger: `.kiro/reports/interactive-execution-ledger.jsonl`
+  - `apply` exits with code `2` when result is non-success (`failed` or `skipped`), ensuring CI-safe gating.
+- npm alias: `npm run report:interactive-adapter-capabilities`
+
 Moqui standard rebuild helper (script-level recovery bootstrap):
 - `node scripts/moqui-standard-rebuild.js [--metadata <path>] [--out <path>] [--markdown-out <path>] [--bundle-out <path>] [--json]`: build a standard Moqui recovery bundle from metadata, including recommended SCE template matrix, recovery spec plan, handoff manifest seed, ontology seed, and page-copilot context contract.
   - Output now includes `recovery.readiness_matrix`, `recovery.readiness_summary`, and `recovery.prioritized_gaps` for template capability matrix scoring and remediation planning.

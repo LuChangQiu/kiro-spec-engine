@@ -7,3 +7,4 @@
 ---
 
 v50.0 | 2026-02-19 | 启动 Spec 116，确立非技术用户可用的交互式业务定制平台路线（Moqui 实验优先，跨行业可扩展）
+v51.0 | 2026-02-19 | 完成 Spec 116 阶段 C 的 4.1：落地 Moqui Adapter 最小接口（`capabilities/plan/validate/apply/rollback`）与执行审计账本基线

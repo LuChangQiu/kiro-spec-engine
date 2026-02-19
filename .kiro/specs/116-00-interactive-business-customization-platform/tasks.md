@@ -53,8 +53,10 @@
 
 ## 任务 4：受控执行与回滚（阶段 C）
 
-- [ ] 4.1 定义并实现 Moqui Adapter 最小执行接口
+- [x] 4.1 定义并实现 Moqui Adapter 最小执行接口
   - `capabilities/plan/validate/apply/rollback`
+  - 已落地：`lib/interactive-customization/moqui-interactive-adapter.js` 与 `scripts/interactive-moqui-adapter.js`
+  - 覆盖测试：`tests/unit/scripts/interactive-moqui-adapter.test.js`
   - **验证**: Requirement 5, Requirement 6
 
 - [ ] 4.2 打通低风险一键执行路径

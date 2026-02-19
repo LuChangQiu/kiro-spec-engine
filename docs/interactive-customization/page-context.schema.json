@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scene-capability-engine.dev/schemas/interactive/page-context.schema.json",
+  "title": "Interactive Page Context",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "product",
+    "module",
+    "page"
+  ],
+  "properties": {
+    "product": {
+      "type": "string",
+      "minLength": 1
+    },
+    "module": {
+      "type": "string",
+      "minLength": 1
+    },
+    "page": {
+      "type": "string",
+      "minLength": 1
+    },
+    "entity": {
+      "type": "string"
+    },
+    "scene_id": {
+      "type": "string"
+    },
+    "workflow_node": {
+      "type": "string"
+    },
+    "fields": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "type": {
+            "type": "string"
+          },
+          "sensitive": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "current_state": {
+      "type": "object"
+    }
+  }
+}

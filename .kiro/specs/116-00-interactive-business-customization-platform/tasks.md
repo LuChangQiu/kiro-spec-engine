@@ -2,16 +2,19 @@
 
 ## 任务 1：契约与门禁基线定义
 
-- [ ] 1.1 定义 Change_Intent / Change_Plan / ExecutionRecord 的结构化契约
+- [x] 1.1 定义 Change_Intent / Change_Plan / ExecutionRecord 的结构化契约
   - 输出字段规范、状态流转与版本策略
+  - 已落地：`docs/interactive-customization/change-intent.schema.json`、`docs/interactive-customization/change-plan.schema.json`、`docs/interactive-customization/execution-record.schema.json`
   - **验证**: Requirement 1, Requirement 2, Requirement 4
 
-- [ ] 1.2 定义默认 Guardrail 策略基线
+- [x] 1.2 定义默认 Guardrail 策略基线
   - 包含权限、敏感数据、凭证、不可逆操作、审批门槛
+  - 已落地：`docs/interactive-customization/guardrail-policy-baseline.json` + `scripts/interactive-change-plan-gate.js`
   - **验证**: Requirement 3
 
-- [ ] 1.3 定义高风险操作分类清单
+- [x] 1.3 定义高风险操作分类清单
   - 形成 low/medium/high 分类与阻断规则
+  - 已落地：`docs/interactive-customization/high-risk-action-catalog.json`
   - **验证**: Requirement 2, Requirement 3
 
 ## 任务 2：Moqui 实验产品对话入口（阶段 A）
@@ -20,12 +23,14 @@
   - 明确上下文注入边界与脱敏策略
   - **验证**: Requirement 1, Requirement 3
 
-- [ ] 2.2 实现只读解释能力（页面、实体、流程、规则）
+- [x] 2.2 实现只读解释能力（页面、实体、流程、规则）
   - 输出业务可读解释，不触发执行
+  - 已落地：`scripts/interactive-intent-build.js`（输出 `.kiro/reports/interactive-page-explain.md`）
   - **验证**: Requirement 1
 
-- [ ] 2.3 记录对话与意图审计事件
+- [x] 2.3 记录对话与意图审计事件
   - 对话会话、用户、上下文、意图哈希可追溯
+  - 已落地：`scripts/interactive-intent-build.js`（追加 `.kiro/reports/interactive-copilot-audit.jsonl`）
   - **验证**: Requirement 3, Requirement 7
 
 ## 任务 3：建议模式与审批流（阶段 B）

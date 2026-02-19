@@ -855,6 +855,14 @@ Interactive customization plan gate helper (script-level secure-by-default check
   - `--fail-on-block` exits with code `2` on `deny`
   - `--fail-on-non-allow` exits with code `2` on `deny` or `review-required`
 
+Interactive read-only intent helper (script-level stage-A copilot bridge):
+- `node scripts/interactive-intent-build.js --context <path> (--goal <text> | --goal-file <path>) [--user-id <id>] [--session-id <id>] [--out-intent <path>] [--out-explain <path>] [--audit-file <path>] [--mask-keys <csv>] [--json]`: build a read-only `Change_Intent` from page context + business goal, emit masked context preview, append audit event JSONL, and generate explain markdown.
+  - Default outputs:
+    - `.kiro/reports/interactive-change-intent.json`
+    - `.kiro/reports/interactive-page-explain.md`
+    - `.kiro/reports/interactive-copilot-audit.jsonl`
+  - This helper never executes write actions; it only produces suggestion-stage artifacts.
+
 Moqui standard rebuild helper (script-level recovery bootstrap):
 - `node scripts/moqui-standard-rebuild.js [--metadata <path>] [--out <path>] [--markdown-out <path>] [--bundle-out <path>] [--json]`: build a standard Moqui recovery bundle from metadata, including recommended SCE template matrix, recovery spec plan, handoff manifest seed, ontology seed, and page-copilot context contract.
   - Output now includes `recovery.readiness_matrix`, `recovery.readiness_summary`, and `recovery.prioritized_gaps` for template capability matrix scoring and remediation planning.

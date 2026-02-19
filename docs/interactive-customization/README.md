@@ -7,9 +7,11 @@ This directory contains baseline contracts and safety policy artifacts for the i
 - `change-intent.schema.json`: schema for business-level change intents generated from UI copilot conversations.
 - `change-plan.schema.json`: schema for structured change plans (scope, risk, checks, rollback).
 - `execution-record.schema.json`: schema for execution/audit records.
+- `page-context.schema.json`: schema for page-level read-only context payloads.
 - `guardrail-policy-baseline.json`: default secure-by-default guardrail policy.
 - `high-risk-action-catalog.json`: baseline high-risk action classification for deny/review decisions.
 - `change-plan.sample.json`: runnable sample plan for gate checks.
+- `page-context.sample.json`: runnable page context sample for read-only intent generation.
 
 ## Usage
 
@@ -27,5 +29,15 @@ Use strict CI gating:
 node scripts/interactive-change-plan-gate.js \
   --plan path/to/change-plan.json \
   --fail-on-non-allow \
+  --json
+```
+
+Build read-only change intent from page context:
+
+```bash
+node scripts/interactive-intent-build.js \
+  --context docs/interactive-customization/page-context.sample.json \
+  --goal "Must improve order approval speed without changing payment authorization policy" \
+  --user-id demo-user \
   --json
 ```

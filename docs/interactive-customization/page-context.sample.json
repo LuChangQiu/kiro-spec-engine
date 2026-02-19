@@ -1,0 +1,37 @@
+{
+  "product": "moqui-experiment",
+  "module": "order-management",
+  "page": "order-approval-dashboard",
+  "entity": "OrderHeader",
+  "scene_id": "sce.scene--erp-order-fulfillment-workflow--0.1.0",
+  "workflow_node": "approval-review",
+  "fields": [
+    {
+      "name": "order_id",
+      "type": "string",
+      "sensitive": false
+    },
+    {
+      "name": "customer_email",
+      "type": "string",
+      "sensitive": true
+    },
+    {
+      "name": "total_amount",
+      "type": "number",
+      "sensitive": false
+    },
+    {
+      "name": "payment_token",
+      "type": "string",
+      "sensitive": true
+    }
+  ],
+  "current_state": {
+    "order_id": "OH10001",
+    "customer_email": "customer@example.com",
+    "total_amount": 1850.5,
+    "payment_token": "tok_live_example_abc",
+    "approver": "ops_manager"
+  }
+}

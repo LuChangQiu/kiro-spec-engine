@@ -68,7 +68,7 @@ describe('moqui-standard-rebuild script', () => {
       'moqui-page-copilot-context-fix'
     ]));
     expect(payload.recovery.recommended_templates).toEqual(expect.arrayContaining([
-      expect.objectContaining({ id: 'sce.scene--moqui-page-copilot-dialog--0.1.0' })
+      expect.objectContaining({ id: 'kse.scene--moqui-page-copilot-dialog--0.1.0' })
     ]));
     expect(payload.recovery.spec_plan).toEqual(expect.arrayContaining([
       expect.objectContaining({ spec_id: 'moqui-06-page-copilot-integration' })
@@ -83,7 +83,7 @@ describe('moqui-standard-rebuild script', () => {
 
     const handoffPayload = await fs.readJson(path.join(bundleDir, 'handoff', 'handoff-manifest.json'));
     expect(handoffPayload.templates).toEqual(expect.arrayContaining([
-      'sce.scene--moqui-page-copilot-dialog--0.1.0'
+      'kse.scene--moqui-page-copilot-dialog--0.1.0'
     ]));
     expect(handoffPayload.ontology_validation).toEqual(expect.objectContaining({
       status: 'pending',

@@ -320,32 +320,32 @@ function buildRecommendedTemplates(context) {
   };
 
   pushTemplate(
-    'sce.scene--moqui-entity-model-core--0.1.0',
+    'kse.scene--moqui-entity-model-core--0.1.0',
     'Recover entity catalog and relationship baseline.',
     context.entities.length > 0
   );
   pushTemplate(
-    'sce.scene--moqui-service-contract-core--0.1.0',
+    'kse.scene--moqui-service-contract-core--0.1.0',
     'Recover service contracts and entity/service bindings.',
     context.services.length > 0
   );
   pushTemplate(
-    'sce.scene--moqui-screen-flow-core--0.1.0',
+    'kse.scene--moqui-screen-flow-core--0.1.0',
     'Recover screen flow and screen/service references.',
     context.screens.length > 0
   );
   pushTemplate(
-    'sce.scene--moqui-form-interaction-core--0.1.0',
+    'kse.scene--moqui-form-interaction-core--0.1.0',
     'Recover form schema and page interaction fields.',
     context.forms.length > 0
   );
   pushTemplate(
-    'sce.scene--moqui-rule-decision-core--0.1.0',
+    'kse.scene--moqui-rule-decision-core--0.1.0',
     'Recover business rules and decision policies.',
     context.businessRules.length > 0 || context.decisions.length > 0
   );
   pushTemplate(
-    'sce.scene--moqui-page-copilot-dialog--0.1.0',
+    'kse.scene--moqui-page-copilot-dialog--0.1.0',
     'Inject page-level human/AI copilot dialog for in-context fix guidance.',
     context.screens.length > 0
   );

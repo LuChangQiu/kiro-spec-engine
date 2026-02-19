@@ -58,6 +58,15 @@ node scripts/moqui-standard-rebuild.js \
 - `copilot/page-context-contract.json`: page-context contract for copilot dialog.
 - `copilot/conversation-playbook.md`: operational playbook for human/AI page fixes.
 
+## Default Moqui Template Matrix
+
+- `kse.scene--moqui-entity-model-core--0.1.0`
+- `kse.scene--moqui-service-contract-core--0.1.0`
+- `kse.scene--moqui-screen-flow-core--0.1.0`
+- `kse.scene--moqui-form-interaction-core--0.1.0`
+- `kse.scene--moqui-rule-decision-core--0.1.0`
+- `kse.scene--moqui-page-copilot-dialog--0.1.0`
+
 ## Next Step for Business Project
 
 Use generated assets as input to a dedicated rebuild project (for example `331-poc-rebuild`) and execute normal SCE handoff + gate flows there.

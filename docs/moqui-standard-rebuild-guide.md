@@ -65,6 +65,7 @@ node scripts/moqui-standard-rebuild.js \
 - `rebuild/recovery-spec-plan.json`: ordered recovery spec list.
 - `copilot/page-context-contract.json`: page-context contract for copilot dialog.
 - `copilot/conversation-playbook.md`: operational playbook for human/AI page fixes.
+- rebuild report includes template readiness scoring (`recovery.readiness_matrix`) and prioritized remediation items (`recovery.prioritized_gaps`).
 
 ## Default Moqui Template Matrix
 

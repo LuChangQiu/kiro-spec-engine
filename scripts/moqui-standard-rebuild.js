@@ -310,70 +310,256 @@ function detectDomains(entities) {
   return Array.from(domainSet).sort();
 }
 
-function buildRecommendedTemplates(context) {
-  const templates = [];
-  const pushTemplate = (id, reason, enabled) => {
-    if (!enabled) {
-      return;
-    }
-    templates.push({ id, reason });
+function toPercent(numerator, denominator) {
+  const num = Number(numerator);
+  const den = Number(denominator);
+  if (!Number.isFinite(num) || !Number.isFinite(den) || den <= 0) {
+    return 0;
+  }
+  return Number(((num / den) * 100).toFixed(2));
+}
+
+function clampScore(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) {
+    return 0;
+  }
+  if (numeric < 0) {
+    return 0;
+  }
+  if (numeric > 100) {
+    return 100;
+  }
+  return Number(numeric.toFixed(2));
+}
+
+function scoreStatus(score) {
+  if (score >= 70) {
+    return 'ready';
+  }
+  if (score >= 40) {
+    return 'partial';
+  }
+  return 'gap';
+}
+
+function buildReadinessMatrix(context) {
+  const entityCount = context.entities.length;
+  const serviceCount = context.services.length;
+  const screenCount = context.screens.length;
+  const formCount = context.forms.length;
+  const ruleCount = context.businessRules.length;
+  const decisionCount = context.decisions.length;
+
+  const entityRelationCount = context.entities.reduce(
+    (sum, item) => sum + toArray(item && item.relations).length,
+    0
+  );
+  const entityPackageCount = new Set(
+    context.entities.map(item => normalizeText(item && item.package)).filter(Boolean)
+  ).size;
+
+  const servicesBoundToEntityCount = context.services.filter(item => toArray(item && item.entities).length > 0).length;
+  const serviceVerbNounCount = context.services.filter(item => normalizeText(item && item.verb) || normalizeText(item && item.noun)).length;
+
+  const screensWithServiceCount = context.screens.filter(item => toArray(item && item.services).length > 0).length;
+  const screensWithEntityCount = context.screens.filter(item => toArray(item && item.entities).length > 0).length;
+
+  const formsWithFieldsCount = context.forms.filter(item => Number(item && item.field_count) > 0).length;
+  const formsLinkedScreenCount = context.forms.filter(item => normalizeText(item && item.screen)).length;
+  const totalFormFields = context.forms.reduce((sum, item) => sum + (Number(item && item.field_count) || 0), 0);
+  const averageFormFields = formCount > 0 ? Number((totalFormFields / formCount).toFixed(2)) : 0;
+
+  const matrix = [];
+  const pushMatrixItem = (item) => {
+    const status = scoreStatus(item.score);
+    matrix.push({
+      ...item,
+      score: clampScore(item.score),
+      status
+    });
   };
 
-  pushTemplate(
-    'kse.scene--moqui-entity-model-core--0.1.0',
-    'Recover entity catalog and relationship baseline.',
-    context.entities.length > 0
+  let entityScore = 0;
+  entityScore += entityCount > 0 ? 50 : 0;
+  entityScore += entityRelationCount > 0 ? 25 : 0;
+  entityScore += entityPackageCount > 0 ? 25 : 0;
+  const entityActions = [];
+  if (entityCount === 0) entityActions.push('补齐实体清单（name/package）');
+  if (entityRelationCount === 0) entityActions.push('补齐实体关系（relationship/relations）');
+  if (entityPackageCount === 0) entityActions.push('补齐实体 package/domain 标注');
+  pushMatrixItem({
+    template_id: 'kse.scene--moqui-entity-model-core--0.1.0',
+    capability: 'moqui-entity-model-core',
+    reason: 'Recover entity catalog and relationship baseline.',
+    score: entityScore,
+    evidence: {
+      entities: entityCount,
+      relation_edges: entityRelationCount,
+      package_count: entityPackageCount
+    },
+    next_actions: entityActions
+  });
+
+  const serviceEntityBindingRate = toPercent(servicesBoundToEntityCount, serviceCount);
+  const serviceVerbNounRate = toPercent(serviceVerbNounCount, serviceCount);
+  let serviceScore = 0;
+  serviceScore += serviceCount > 0 ? 40 : 0;
+  serviceScore += Number((serviceEntityBindingRate * 0.3).toFixed(2));
+  serviceScore += Number((serviceVerbNounRate * 0.3).toFixed(2));
+  const serviceActions = [];
+  if (serviceCount === 0) serviceActions.push('补齐服务契约（service/ref）');
+  if (serviceCount > 0 && servicesBoundToEntityCount === 0) serviceActions.push('补齐服务到实体的绑定');
+  if (serviceCount > 0 && serviceVerbNounCount === 0) serviceActions.push('补齐服务 verb/noun 或动作语义');
+  pushMatrixItem({
+    template_id: 'kse.scene--moqui-service-contract-core--0.1.0',
+    capability: 'moqui-service-contract-core',
+    reason: 'Recover service contracts and entity/service bindings.',
+    score: serviceScore,
+    evidence: {
+      services: serviceCount,
+      services_with_entity_binding: servicesBoundToEntityCount,
+      service_entity_binding_rate_percent: serviceEntityBindingRate,
+      services_with_verb_or_noun: serviceVerbNounCount,
+      service_semantic_rate_percent: serviceVerbNounRate
+    },
+    next_actions: serviceActions
+  });
+
+  const screenServiceRate = toPercent(screensWithServiceCount, screenCount);
+  const screenEntityRate = toPercent(screensWithEntityCount, screenCount);
+  let screenScore = 0;
+  screenScore += screenCount > 0 ? 35 : 0;
+  screenScore += Number((screenServiceRate * 0.35).toFixed(2));
+  screenScore += Number((screenEntityRate * 0.3).toFixed(2));
+  const screenActions = [];
+  if (screenCount === 0) screenActions.push('补齐页面/场景路径');
+  if (screenCount > 0 && screensWithServiceCount === 0) screenActions.push('补齐页面到服务调用映射');
+  if (screenCount > 0 && screensWithEntityCount === 0) screenActions.push('补齐页面到实体读写映射');
+  pushMatrixItem({
+    template_id: 'kse.scene--moqui-screen-flow-core--0.1.0',
+    capability: 'moqui-screen-flow-core',
+    reason: 'Recover screen flow and screen/service references.',
+    score: screenScore,
+    evidence: {
+      screens: screenCount,
+      screens_with_service_refs: screensWithServiceCount,
+      screen_service_link_rate_percent: screenServiceRate,
+      screens_with_entity_refs: screensWithEntityCount,
+      screen_entity_link_rate_percent: screenEntityRate
+    },
+    next_actions: screenActions
+  });
+
+  const formFieldRate = toPercent(formsWithFieldsCount, formCount);
+  const formScreenLinkRate = toPercent(formsLinkedScreenCount, formCount);
+  let formScore = 0;
+  formScore += formCount > 0 ? 35 : 0;
+  formScore += Number((formFieldRate * 0.35).toFixed(2));
+  formScore += Number((formScreenLinkRate * 0.2).toFixed(2));
+  formScore += averageFormFields >= 3 ? 10 : 0;
+  const formActions = [];
+  if (formCount === 0) formActions.push('补齐表单定义');
+  if (formCount > 0 && formsWithFieldsCount === 0) formActions.push('补齐表单字段定义');
+  if (formCount > 0 && formsLinkedScreenCount === 0) formActions.push('补齐表单到页面映射');
+  if (formCount > 0 && averageFormFields < 3) formActions.push('提升表单字段完备度（平均字段数>=3）');
+  pushMatrixItem({
+    template_id: 'kse.scene--moqui-form-interaction-core--0.1.0',
+    capability: 'moqui-form-interaction-core',
+    reason: 'Recover form schema and page interaction fields.',
+    score: formScore,
+    evidence: {
+      forms: formCount,
+      forms_with_fields: formsWithFieldsCount,
+      form_field_rate_percent: formFieldRate,
+      forms_with_screen_link: formsLinkedScreenCount,
+      form_screen_link_rate_percent: formScreenLinkRate,
+      average_form_fields: averageFormFields
+    },
+    next_actions: formActions
+  });
+
+  const decisionBalanceRate = (ruleCount > 0 && decisionCount > 0)
+    ? toPercent(Math.min(ruleCount, decisionCount), Math.max(ruleCount, decisionCount))
+    : 0;
+  let ruleDecisionScore = 0;
+  ruleDecisionScore += ruleCount > 0 ? 30 : 0;
+  ruleDecisionScore += decisionCount > 0 ? 30 : 0;
+  ruleDecisionScore += Number((decisionBalanceRate * 0.4).toFixed(2));
+  const ruleDecisionActions = [];
+  if (ruleCount === 0) ruleDecisionActions.push('补齐业务规则清单');
+  if (decisionCount === 0) ruleDecisionActions.push('补齐决策策略/decision_logic');
+  if (ruleCount > 0 && decisionCount > 0 && decisionBalanceRate < 60) {
+    ruleDecisionActions.push('提升规则与决策配平度（rule/decision 数量比）');
+  }
+  pushMatrixItem({
+    template_id: 'kse.scene--moqui-rule-decision-core--0.1.0',
+    capability: 'moqui-rule-decision-core',
+    reason: 'Recover business rules and decision policies.',
+    score: ruleDecisionScore,
+    evidence: {
+      business_rules: ruleCount,
+      decisions: decisionCount,
+      rule_decision_balance_rate_percent: decisionBalanceRate
+    },
+    next_actions: ruleDecisionActions
+  });
+
+  const copilotReadinessRate = toPercent(
+    Number(screenCount > 0) + Number(serviceCount > 0) + Number(formCount > 0) + Number(ruleCount + decisionCount > 0),
+    4
   );
-  pushTemplate(
-    'kse.scene--moqui-service-contract-core--0.1.0',
-    'Recover service contracts and entity/service bindings.',
-    context.services.length > 0
-  );
-  pushTemplate(
-    'kse.scene--moqui-screen-flow-core--0.1.0',
-    'Recover screen flow and screen/service references.',
-    context.screens.length > 0
-  );
-  pushTemplate(
-    'kse.scene--moqui-form-interaction-core--0.1.0',
-    'Recover form schema and page interaction fields.',
-    context.forms.length > 0
-  );
-  pushTemplate(
-    'kse.scene--moqui-rule-decision-core--0.1.0',
-    'Recover business rules and decision policies.',
-    context.businessRules.length > 0 || context.decisions.length > 0
-  );
-  pushTemplate(
-    'kse.scene--moqui-page-copilot-dialog--0.1.0',
-    'Inject page-level human/AI copilot dialog for in-context fix guidance.',
-    context.screens.length > 0
-  );
-  return templates;
+  let copilotScore = 0;
+  copilotScore += screenCount > 0 ? 35 : 0;
+  copilotScore += serviceCount > 0 ? 20 : 0;
+  copilotScore += formCount > 0 ? 20 : 0;
+  copilotScore += (ruleCount + decisionCount) > 0 ? 15 : 0;
+  copilotScore += Number((screenServiceRate * 0.1).toFixed(2));
+  const copilotActions = [];
+  if (screenCount === 0) copilotActions.push('补齐页面上下文（screen_path/route/module）');
+  if (serviceCount === 0) copilotActions.push('补齐页面服务引用，支持诊断链路');
+  if (formCount === 0) copilotActions.push('补齐表单交互上下文，支持页面修复建议');
+  if ((ruleCount + decisionCount) === 0) copilotActions.push('补齐规则与决策语义，提升 AI 建议可靠性');
+  pushMatrixItem({
+    template_id: 'kse.scene--moqui-page-copilot-dialog--0.1.0',
+    capability: 'moqui-page-copilot-context-fix',
+    reason: 'Inject page-level human/AI copilot dialog for in-context fix guidance.',
+    score: copilotScore,
+    evidence: {
+      screens: screenCount,
+      services: serviceCount,
+      forms: formCount,
+      semantics: ruleCount + decisionCount,
+      readiness_rate_percent: copilotReadinessRate
+    },
+    next_actions: copilotActions
+  });
+
+  matrix.sort((a, b) => {
+    if (a.score !== b.score) {
+      return b.score - a.score;
+    }
+    return a.template_id.localeCompare(b.template_id);
+  });
+  return matrix;
 }
 
-function buildCapabilities(context) {
-  const capabilities = [];
-  if (context.entities.length > 0) {
-    capabilities.push('moqui-entity-model-core');
-  }
-  if (context.services.length > 0) {
-    capabilities.push('moqui-service-contract-core');
-  }
-  if (context.screens.length > 0) {
-    capabilities.push('moqui-screen-flow-core');
-    capabilities.push('moqui-page-copilot-context-fix');
-  }
-  if (context.forms.length > 0) {
-    capabilities.push('moqui-form-interaction-core');
-  }
-  if (context.businessRules.length > 0 || context.decisions.length > 0) {
-    capabilities.push('moqui-rule-decision-core');
-  }
-  return capabilities;
+function buildRecommendedTemplates(readinessMatrix) {
+  return readinessMatrix
+    .filter(item => item.status !== 'gap')
+    .map(item => ({
+      id: item.template_id,
+      reason: item.reason
+    }));
 }
 
-function buildSpecPlan(context) {
+function buildCapabilities(readinessMatrix) {
+  return readinessMatrix
+    .filter(item => item.status !== 'gap')
+    .map(item => item.capability);
+}
+
+function buildSpecPlan(readinessMatrix) {
   const specs = [];
   const pushSpec = (specId, goal, dependencies = []) => {
     specs.push({
@@ -383,42 +569,48 @@ function buildSpecPlan(context) {
     });
   };
 
-  if (context.entities.length > 0) {
+  const statusByCapability = {};
+  for (const item of readinessMatrix) {
+    statusByCapability[item.capability] = item.status;
+  }
+  const hasCapability = (capability) => statusByCapability[capability] && statusByCapability[capability] !== 'gap';
+
+  if (hasCapability('moqui-entity-model-core')) {
     pushSpec('moqui-01-entity-model-recovery', 'Recover entity model and relations.');
   }
-  if (context.services.length > 0) {
+  if (hasCapability('moqui-service-contract-core')) {
     pushSpec(
       'moqui-02-service-contract-recovery',
       'Recover service contracts and entity bindings.',
-      context.entities.length > 0 ? ['moqui-01-entity-model-recovery'] : []
+      hasCapability('moqui-entity-model-core') ? ['moqui-01-entity-model-recovery'] : []
     );
   }
-  if (context.screens.length > 0) {
+  if (hasCapability('moqui-screen-flow-core')) {
     pushSpec(
       'moqui-03-screen-flow-recovery',
       'Recover screens and navigation/service linkage.',
-      context.services.length > 0 ? ['moqui-02-service-contract-recovery'] : []
+      hasCapability('moqui-service-contract-core') ? ['moqui-02-service-contract-recovery'] : []
     );
   }
-  if (context.forms.length > 0) {
+  if (hasCapability('moqui-form-interaction-core')) {
     pushSpec(
       'moqui-04-form-interaction-recovery',
       'Recover form schema and page actions.',
-      context.screens.length > 0 ? ['moqui-03-screen-flow-recovery'] : []
+      hasCapability('moqui-screen-flow-core') ? ['moqui-03-screen-flow-recovery'] : []
     );
   }
-  if (context.businessRules.length > 0 || context.decisions.length > 0) {
+  if (hasCapability('moqui-rule-decision-core')) {
     pushSpec(
       'moqui-05-rule-decision-recovery',
       'Recover business rules and decision strategy mapping.',
-      context.services.length > 0 ? ['moqui-02-service-contract-recovery'] : []
+      hasCapability('moqui-service-contract-core') ? ['moqui-02-service-contract-recovery'] : []
     );
   }
-  if (context.screens.length > 0) {
+  if (hasCapability('moqui-page-copilot-context-fix')) {
     pushSpec(
       'moqui-06-page-copilot-integration',
       'Integrate page-level copilot dialog for contextual fix guidance.',
-      ['moqui-03-screen-flow-recovery']
+      hasCapability('moqui-screen-flow-core') ? ['moqui-03-screen-flow-recovery'] : []
     );
   }
   return specs;
@@ -570,6 +762,28 @@ function buildMarkdownReport(report) {
   lines.push(`- Decisions: ${report.inventory.decisions}`);
   lines.push(`- Domains: ${report.inventory.domains.length > 0 ? report.inventory.domains.join(', ') : 'none'}`);
   lines.push('');
+  lines.push('## Template Readiness Matrix');
+  lines.push('');
+  lines.push('| Template | Capability | Score | Status |');
+  lines.push('| --- | --- | ---: | --- |');
+  for (const item of report.recovery.readiness_matrix || []) {
+    lines.push(`| ${item.template_id} | ${item.capability} | ${item.score} | ${item.status} |`);
+  }
+  lines.push('');
+  lines.push('## Prioritized Gaps');
+  lines.push('');
+  const prioritizedGaps = report.recovery.prioritized_gaps || [];
+  if (prioritizedGaps.length === 0) {
+    lines.push('- none');
+  } else {
+    for (const gap of prioritizedGaps) {
+      const actions = Array.isArray(gap.next_actions) && gap.next_actions.length > 0
+        ? gap.next_actions.join(' | ')
+        : 'none';
+      lines.push(`- ${gap.template_id} (${gap.score}, ${gap.status}): ${actions}`);
+    }
+  }
+  lines.push('');
   lines.push('## Recommended Templates');
   lines.push('');
   if (report.recovery.recommended_templates.length === 0) {
@@ -677,9 +891,22 @@ async function main() {
     decisions
   };
 
-  const recommendedTemplates = buildRecommendedTemplates(context);
-  const capabilities = buildCapabilities(context);
-  const specPlan = buildSpecPlan(context);
+  const readinessMatrix = buildReadinessMatrix(context);
+  const prioritizedGaps = readinessMatrix
+    .filter(item => item.status !== 'ready')
+    .sort((a, b) => a.score - b.score);
+  const readinessSummary = {
+    average_score: Number((
+      readinessMatrix.reduce((sum, item) => sum + Number(item.score || 0), 0) / Math.max(1, readinessMatrix.length)
+    ).toFixed(2)),
+    ready: readinessMatrix.filter(item => item.status === 'ready').length,
+    partial: readinessMatrix.filter(item => item.status === 'partial').length,
+    gap: readinessMatrix.filter(item => item.status === 'gap').length
+  };
+
+  const recommendedTemplates = buildRecommendedTemplates(readinessMatrix);
+  const capabilities = buildCapabilities(readinessMatrix);
+  const specPlan = buildSpecPlan(readinessMatrix);
   const ontologySeed = buildOntologySeed(context);
   const copilotContract = buildCopilotContract(context);
 
@@ -694,7 +921,12 @@ async function main() {
       source: 'moqui-standard-rebuild',
       generated_at: new Date().toISOString()
     },
-    known_gaps: []
+    known_gaps: prioritizedGaps.map(item => ({
+      template: item.template_id,
+      score: item.score,
+      status: item.status,
+      next_actions: item.next_actions
+    }))
   };
 
   const bundleFiles = await writeBundle(bundleDir, {
@@ -718,6 +950,9 @@ async function main() {
       domains
     },
     recovery: {
+      readiness_summary: readinessSummary,
+      readiness_matrix: readinessMatrix,
+      prioritized_gaps: prioritizedGaps,
       recommended_templates: recommendedTemplates,
       capabilities,
       spec_plan: specPlan

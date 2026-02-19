@@ -73,6 +73,18 @@ describe('moqui-standard-rebuild script', () => {
     expect(payload.recovery.spec_plan).toEqual(expect.arrayContaining([
       expect.objectContaining({ spec_id: 'moqui-06-page-copilot-integration' })
     ]));
+    expect(payload.recovery.readiness_summary).toEqual(expect.objectContaining({
+      average_score: expect.any(Number),
+      ready: expect.any(Number),
+      partial: expect.any(Number),
+      gap: expect.any(Number)
+    }));
+    expect(payload.recovery.readiness_matrix).toEqual(expect.arrayContaining([
+      expect.objectContaining({ template_id: 'kse.scene--moqui-entity-model-core--0.1.0' }),
+      expect.objectContaining({ template_id: 'kse.scene--moqui-page-copilot-dialog--0.1.0' })
+    ]));
+    expect(payload.recovery.readiness_matrix.length).toBe(6);
+    expect(payload.recovery.prioritized_gaps).toEqual(expect.any(Array));
 
     expect(await fs.pathExists(outFile)).toBe(true);
     expect(await fs.pathExists(markdownFile)).toBe(true);
@@ -89,5 +101,6 @@ describe('moqui-standard-rebuild script', () => {
       status: 'pending',
       source: 'moqui-standard-rebuild'
     }));
+    expect(Array.isArray(handoffPayload.known_gaps)).toBe(true);
   });
 });

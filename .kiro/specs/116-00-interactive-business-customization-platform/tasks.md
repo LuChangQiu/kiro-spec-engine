@@ -92,28 +92,36 @@
 
 ## 任务 6：持续改进观测与治理
 
-- [ ] 6.1 定义并采集关键治理指标
+- [x] 6.1 定义并采集关键治理指标
   - 采纳率、成功率、回滚率、安全拦截率、满意度
+  - 已落地：`scripts/interactive-governance-report.js`（从 intent/approval/execution/feedback 证据计算核心 KPI）
+  - 覆盖测试：`tests/unit/scripts/interactive-governance-report.test.js`
   - **验证**: Requirement 7
 
-- [ ] 6.2 输出周期治理报告模板
+- [x] 6.2 输出周期治理报告模板
   - 支持发布评审与策略调优
+  - 已落地：`docs/interactive-customization/governance-report-template.md` 与 `interactive-governance-report` Markdown 输出
   - **验证**: Requirement 7
 
-- [ ] 6.3 定义风险阈值告警与处置流程
+- [x] 6.3 定义风险阈值告警与处置流程
   - 指标越线自动输出告警与修复建议
+  - 已落地：`docs/interactive-customization/governance-threshold-baseline.json` + `docs/interactive-customization/governance-alert-playbook.md`
+  - 自动告警：`scripts/interactive-governance-report.js --fail-on-alert`
   - **验证**: Requirement 7
 
 ## 任务 7：发布与验收
 
-- [ ] 7.1 完成 Moqui 实验阶段性验收（A/B/C/D）
+- [x] 7.1 完成 Moqui 实验阶段性验收（A/B/C/D）
   - 每阶段形成可复核证据
+  - 已落地：`docs/interactive-customization/phase-acceptance-evidence.md`
   - **验证**: Requirement 5, Requirement 7
 
-- [ ] 7.2 形成“非技术用户可用性”验收报告
+- [x] 7.2 形成“非技术用户可用性”验收报告
   - 包含成功案例、失败案例、改进清单
+  - 已落地：`docs/interactive-customization/non-technical-usability-report.md`
   - **验证**: Requirement 1, Requirement 7
 
-- [ ] 7.3 形成跨行业复制建议清单
+- [x] 7.3 形成跨行业复制建议清单
   - 明确通用能力与行业特化边界
+  - 已落地：`docs/interactive-customization/cross-industry-replication-guide.md`
   - **验证**: Requirement 6, Requirement 7

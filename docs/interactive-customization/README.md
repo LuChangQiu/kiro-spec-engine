@@ -20,6 +20,12 @@ This directory contains baseline contracts and safety policy artifacts for the i
 - `adapter-extension-contract.sample.json`: adapter extension contract sample payload.
 - `adapter-extension-contract.md`: adapter extension contract guide and conformance checklist.
 - `domain-pack-extension-flow.md`: Domain_Pack extension flow for cross-industry replication.
+- `governance-threshold-baseline.json`: governance KPI threshold baseline for alerting.
+- `governance-report-template.md`: periodic governance report template.
+- `governance-alert-playbook.md`: threshold breach response workflow.
+- `phase-acceptance-evidence.md`: stage A/B/C/D acceptance evidence checklist.
+- `non-technical-usability-report.md`: business-user usability assessment and improvement backlog.
+- `cross-industry-replication-guide.md`: replication boundary and rollout sequence beyond Moqui.
 
 ## Usage
 
@@ -119,3 +125,11 @@ Execution artifacts:
 - Latest execution record: `.kiro/reports/interactive-execution-record.latest.json`
 - Append-only execution ledger: `.kiro/reports/interactive-execution-ledger.jsonl`
 - Execution records include diff summary, gate decision, validation snapshot, and rollback reference.
+
+Generate governance KPI report and threshold alerts:
+
+```bash
+node scripts/interactive-governance-report.js \
+  --period weekly \
+  --json
+```

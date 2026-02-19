@@ -887,6 +887,15 @@ Interactive Moqui adapter helper (script-level stage-C controlled execution cont
   - `apply` exits with code `2` when result is non-success (`failed` or `skipped`), ensuring CI-safe gating.
 - npm alias: `npm run report:interactive-adapter-capabilities`
 
+Interactive governance report helper (script-level stage-D/6 observability + alerting):
+- `node scripts/interactive-governance-report.js [--intent-audit <path>] [--approval-audit <path>] [--execution-ledger <path>] [--feedback-file <path>] [--thresholds <path>] [--period <weekly|monthly|all|custom>] [--from <iso>] [--to <iso>] [--out <path>] [--markdown-out <path>] [--fail-on-alert] [--json]`: compute interactive governance KPIs (adoption/success/rollback/security-intercept/satisfaction), evaluate threshold breaches, and emit machine/human-readable governance report.
+  - Default thresholds: `docs/interactive-customization/governance-threshold-baseline.json`
+  - Default outputs:
+    - `.kiro/reports/interactive-governance-report.json`
+    - `.kiro/reports/interactive-governance-report.md`
+  - `--fail-on-alert` exits with code `2` when medium/high breaches exist.
+- npm alias: `npm run report:interactive-governance`
+
 Moqui standard rebuild helper (script-level recovery bootstrap):
 - `node scripts/moqui-standard-rebuild.js [--metadata <path>] [--out <path>] [--markdown-out <path>] [--bundle-out <path>] [--json]`: build a standard Moqui recovery bundle from metadata, including recommended SCE template matrix, recovery spec plan, handoff manifest seed, ontology seed, and page-copilot context contract.
   - Output now includes `recovery.readiness_matrix`, `recovery.readiness_summary`, and `recovery.prioritized_gaps` for template capability matrix scoring and remediation planning.

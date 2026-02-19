@@ -1,0 +1,9 @@
+{
+  "version": "1.0.0",
+  "adoption_rate_min_percent": 30,
+  "execution_success_rate_min_percent": 90,
+  "rollback_rate_max_percent": 20,
+  "security_intercept_rate_max_percent": 60,
+  "satisfaction_min_score": 4,
+  "min_feedback_samples": 3
+}

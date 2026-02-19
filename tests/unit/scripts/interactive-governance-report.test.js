@@ -1,0 +1,206 @@
+const fs = require('fs-extra');
+const os = require('os');
+const path = require('path');
+const { spawnSync } = require('child_process');
+
+describe('interactive-governance-report script', () => {
+  let tempDir;
+  let projectRoot;
+  let scriptPath;
+
+  beforeEach(async () => {
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-interactive-governance-'));
+    projectRoot = path.resolve(__dirname, '..', '..', '..');
+    scriptPath = path.join(projectRoot, 'scripts', 'interactive-governance-report.js');
+  });
+
+  afterEach(async () => {
+    if (tempDir) {
+      await fs.remove(tempDir);
+    }
+  });
+
+  function runScript(workspace, args) {
+    return spawnSync(process.execPath, [scriptPath, ...args], {
+      cwd: workspace,
+      encoding: 'utf8'
+    });
+  }
+
+  async function writeJsonl(filePath, items) {
+    await fs.ensureDir(path.dirname(filePath));
+    const text = items.map(item => JSON.stringify(item)).join('\n');
+    await fs.writeFile(filePath, `${text}\n`, 'utf8');
+  }
+
+  test('computes governance metrics with healthy profile and no breach', async () => {
+    const workspace = path.join(tempDir, 'workspace-healthy');
+    await fs.ensureDir(workspace);
+
+    const intentAudit = path.join(workspace, 'intent.jsonl');
+    const approvalAudit = path.join(workspace, 'approval.jsonl');
+    const executionLedger = path.join(workspace, 'execution.jsonl');
+    const feedbackFile = path.join(workspace, 'feedback.jsonl');
+    const thresholdsFile = path.join(workspace, 'thresholds.json');
+
+    const now = new Date().toISOString();
+
+    await writeJsonl(intentAudit, [
+      { event_type: 'interactive.intent.generated', intent_id: 'i-1', timestamp: now },
+      { event_type: 'interactive.intent.generated', intent_id: 'i-2', timestamp: now },
+      { event_type: 'interactive.intent.generated', intent_id: 'i-3', timestamp: now },
+      { event_type: 'interactive.intent.generated', intent_id: 'i-4', timestamp: now },
+      { event_type: 'interactive.intent.generated', intent_id: 'i-5', timestamp: now }
+    ]);
+
+    await writeJsonl(approvalAudit, [
+      { action: 'submit', blocked: false, timestamp: now },
+      { action: 'approve', blocked: false, timestamp: now }
+    ]);
+
+    await writeJsonl(executionLedger, [
+      { execution_id: 'e-1', result: 'success', policy_decision: 'allow', executed_at: now },
+      { execution_id: 'e-2', result: 'success', policy_decision: 'allow', executed_at: now },
+      { execution_id: 'e-3', result: 'success', policy_decision: 'allow', executed_at: now },
+      { execution_id: 'e-4', result: 'success', policy_decision: 'allow', executed_at: now }
+    ]);
+
+    await writeJsonl(feedbackFile, [
+      { satisfaction_score: 5, timestamp: now },
+      { satisfaction_score: 4, timestamp: now },
+      { satisfaction_score: 5, timestamp: now }
+    ]);
+
+    await fs.writeJson(thresholdsFile, {
+      adoption_rate_min_percent: 50,
+      execution_success_rate_min_percent: 80,
+      rollback_rate_max_percent: 30,
+      security_intercept_rate_max_percent: 30,
+      satisfaction_min_score: 4,
+      min_feedback_samples: 2
+    }, { spaces: 2 });
+
+    const result = runScript(workspace, [
+      '--intent-audit', intentAudit,
+      '--approval-audit', approvalAudit,
+      '--execution-ledger', executionLedger,
+      '--feedback-file', feedbackFile,
+      '--thresholds', thresholdsFile,
+      '--period', 'all',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.mode).toBe('interactive-governance-report');
+    expect(payload.metrics.adoption_rate_percent).toBe(80);
+    expect(payload.metrics.execution_success_rate_percent).toBe(100);
+    expect(payload.metrics.rollback_rate_percent).toBe(0);
+    expect(payload.metrics.security_intercept_rate_percent).toBe(0);
+    expect(payload.metrics.satisfaction_avg_score).toBe(4.67);
+    expect(payload.summary.breaches).toBe(0);
+  });
+
+  test('emits breaches and exits 2 with --fail-on-alert', async () => {
+    const workspace = path.join(tempDir, 'workspace-alert');
+    await fs.ensureDir(workspace);
+
+    const intentAudit = path.join(workspace, 'intent.jsonl');
+    const approvalAudit = path.join(workspace, 'approval.jsonl');
+    const executionLedger = path.join(workspace, 'execution.jsonl');
+    const feedbackFile = path.join(workspace, 'feedback.jsonl');
+    const thresholdsFile = path.join(workspace, 'thresholds.json');
+
+    const now = new Date().toISOString();
+
+    await writeJsonl(intentAudit, Array.from({ length: 10 }, (_, index) => ({
+      event_type: 'interactive.intent.generated',
+      intent_id: `i-${index + 1}`,
+      timestamp: now
+    })));
+
+    await writeJsonl(approvalAudit, [
+      { action: 'submit', blocked: false, timestamp: now },
+      { action: 'approve', blocked: false, timestamp: now },
+      { action: 'reject', blocked: false, timestamp: now }
+    ]);
+
+    await writeJsonl(executionLedger, [
+      { execution_id: 'e-1', result: 'success', policy_decision: 'allow', executed_at: now },
+      { execution_id: 'e-2', result: 'success', policy_decision: 'allow', executed_at: now },
+      { execution_id: 'e-3', result: 'failed', policy_decision: 'allow', executed_at: now },
+      { execution_id: 'e-4', result: 'failed', policy_decision: 'allow', executed_at: now },
+      { execution_id: 'e-5', result: 'skipped', policy_decision: 'deny', executed_at: now },
+      { execution_id: 'e-6', result: 'skipped', policy_decision: 'review-required', executed_at: now },
+      { execution_id: 'e-7', result: 'skipped', policy_decision: 'deny', executed_at: now },
+      { execution_id: 'e-8', result: 'skipped', policy_decision: 'deny', executed_at: now },
+      { execution_id: 'e-9', result: 'rolled-back', policy_decision: 'allow', executed_at: now }
+    ]);
+
+    await writeJsonl(feedbackFile, [
+      { satisfaction_score: 2, timestamp: now },
+      { satisfaction_score: 3, timestamp: now }
+    ]);
+
+    await fs.writeJson(thresholdsFile, {
+      adoption_rate_min_percent: 50,
+      execution_success_rate_min_percent: 80,
+      rollback_rate_max_percent: 20,
+      security_intercept_rate_max_percent: 30,
+      satisfaction_min_score: 4,
+      min_feedback_samples: 2
+    }, { spaces: 2 });
+
+    const result = runScript(workspace, [
+      '--intent-audit', intentAudit,
+      '--approval-audit', approvalAudit,
+      '--execution-ledger', executionLedger,
+      '--feedback-file', feedbackFile,
+      '--thresholds', thresholdsFile,
+      '--period', 'all',
+      '--fail-on-alert',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(2);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.summary.status).toBe('alert');
+    expect(payload.summary.breaches).toBeGreaterThanOrEqual(4);
+    expect(payload.alerts.map(item => item.id)).toEqual(expect.arrayContaining([
+      'adoption-rate-low',
+      'execution-success-low',
+      'rollback-rate-high',
+      'security-intercept-high',
+      'satisfaction-low'
+    ]));
+  });
+
+  test('handles missing evidence files without crashing', async () => {
+    const workspace = path.join(tempDir, 'workspace-empty');
+    await fs.ensureDir(workspace);
+
+    const thresholdsFile = path.join(workspace, 'thresholds.json');
+    await fs.writeJson(thresholdsFile, {
+      adoption_rate_min_percent: 30,
+      execution_success_rate_min_percent: 90,
+      rollback_rate_max_percent: 20,
+      security_intercept_rate_max_percent: 60,
+      satisfaction_min_score: 4,
+      min_feedback_samples: 3
+    }, { spaces: 2 });
+
+    const result = runScript(workspace, [
+      '--thresholds', thresholdsFile,
+      '--period', 'all',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.metrics.intent_total).toBe(0);
+    expect(payload.metrics.apply_total).toBe(0);
+    expect(payload.metrics.adoption_rate_percent).toBe(null);
+    expect(payload.summary.breaches).toBe(0);
+    expect(payload.summary.warnings).toBeGreaterThanOrEqual(1);
+  });
+});

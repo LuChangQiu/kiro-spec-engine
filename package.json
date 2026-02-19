@@ -45,6 +45,7 @@
     "report:interactive-plan": "node scripts/interactive-plan-build.js --intent .kiro/reports/interactive-change-intent.json --context docs/interactive-customization/page-context.sample.json --json",
     "report:interactive-approval-status": "node scripts/interactive-approval-workflow.js --action status --json",
     "report:interactive-adapter-capabilities": "node scripts/interactive-moqui-adapter.js --action capabilities --json",
+    "report:interactive-governance": "node scripts/interactive-governance-report.js --period weekly --json",
     "report:moqui-core-regression": "node scripts/moqui-core-regression-suite.js --json",
     "prepublishOnly": "npm run test:full && npm run test:skip-audit && npm run test:brand-consistency",
     "publish:manual": "npm publish --access public",

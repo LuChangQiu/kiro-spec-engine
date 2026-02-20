@@ -8,6 +8,7 @@ const DEFAULT_EVIDENCE = '.kiro/reports/release-evidence/handoff-runs.json';
 const DEFAULT_BASELINE = '.kiro/reports/release-evidence/moqui-template-baseline.json';
 const DEFAULT_LEXICON = '.kiro/reports/release-evidence/moqui-lexicon-audit.json';
 const DEFAULT_CAPABILITY_MATRIX = '.kiro/reports/handoff-capability-matrix.json';
+const DEFAULT_INTERACTIVE_GOVERNANCE = '.kiro/reports/interactive-governance-report.json';
 const DEFAULT_OUT = '.kiro/reports/release-evidence/moqui-release-summary.json';
 const DEFAULT_MARKDOWN_OUT = '.kiro/reports/release-evidence/moqui-release-summary.md';
 
@@ -17,6 +18,7 @@ function parseArgs(argv) {
     baseline: DEFAULT_BASELINE,
     lexicon: DEFAULT_LEXICON,
     capabilityMatrix: DEFAULT_CAPABILITY_MATRIX,
+    interactiveGovernance: DEFAULT_INTERACTIVE_GOVERNANCE,
     out: DEFAULT_OUT,
     markdownOut: DEFAULT_MARKDOWN_OUT,
     failOnGateFail: false,
@@ -37,6 +39,9 @@ function parseArgs(argv) {
       i += 1;
     } else if (token === '--capability-matrix' && next) {
       options.capabilityMatrix = next;
+      i += 1;
+    } else if (token === '--interactive-governance' && next) {
+      options.interactiveGovernance = next;
       i += 1;
     } else if (token === '--out' && next) {
       options.out = next;
@@ -65,6 +70,7 @@ function printHelpAndExit(code) {
     `  --baseline <path>          Moqui baseline JSON (default: ${DEFAULT_BASELINE})`,
     `  --lexicon <path>           Moqui lexicon audit JSON (default: ${DEFAULT_LEXICON})`,
     `  --capability-matrix <path> Capability matrix JSON (default: ${DEFAULT_CAPABILITY_MATRIX})`,
+    `  --interactive-governance <path> Interactive governance report JSON (default: ${DEFAULT_INTERACTIVE_GOVERNANCE})`,
     `  --out <path>               Summary JSON output path (default: ${DEFAULT_OUT})`,
     `  --markdown-out <path>      Summary markdown output path (default: ${DEFAULT_MARKDOWN_OUT})`,
     '  --fail-on-gate-fail        Exit non-zero when summary gate status is failed',
@@ -264,6 +270,24 @@ function extractCapabilityMatrix(payload) {
   };
 }
 
+function extractInteractiveGovernance(payload) {
+  const summary = payload && payload.summary && typeof payload.summary === 'object'
+    ? payload.summary
+    : {};
+  const metrics = payload && payload.metrics && typeof payload.metrics === 'object'
+    ? payload.metrics
+    : {};
+  return {
+    status: typeof summary.status === 'string' ? summary.status : null,
+    breaches: normalizeNumber(summary.breaches),
+    warnings: normalizeNumber(summary.warnings),
+    matrix_signal_total: normalizeNumber(metrics.matrix_signal_total),
+    matrix_portfolio_pass_rate_percent: normalizeNumber(metrics.matrix_portfolio_pass_rate_percent),
+    matrix_regression_positive_rate_percent: normalizeNumber(metrics.matrix_regression_positive_rate_percent),
+    matrix_stage_error_rate_percent: normalizeNumber(metrics.matrix_stage_error_rate_percent)
+  };
+}
+
 function normalizeGateStatus(checks, matrixRegressionCheck) {
   const requiredChecks = checks.filter(item => item.required);
   const hasFailed = requiredChecks.some(item => item.value === false) || matrixRegressionCheck === false;
@@ -332,6 +356,11 @@ function buildRecommendations(summary) {
       'Recover matrix regressions to policy limit before release: `npx sce auto handoff run --manifest docs/handoffs/handoff-manifest.json --dry-run --json`.'
     );
   }
+  if (map.get('interactive_governance') === false) {
+    push(
+      'Resolve interactive governance alerts and rerun: `npm run report:interactive-governance -- --period weekly --fail-on-alert --json`.'
+    );
+  }
 
   if (recommendations.length === 0) {
     push('No blocking issue detected in the available evidence.');
@@ -377,6 +406,11 @@ function buildMarkdownReport(report) {
   lines.push(`- Capability coverage: ${report.capability_coverage.coverage_percent === null ? 'n/a' : `${report.capability_coverage.coverage_percent}%`}`);
   lines.push(`- Capability semantic completeness: ${report.capability_coverage.semantic_complete_percent === null ? 'n/a' : `${report.capability_coverage.semantic_complete_percent}%`}`);
   lines.push(`- Scene package batch gate passed: ${report.scene_package_batch.batch_gate_passed === null ? 'n/a' : (report.scene_package_batch.batch_gate_passed ? 'yes' : 'no')}`);
+  lines.push(`- Interactive governance status: ${report.interactive_governance.status || 'n/a'}`);
+  lines.push(`- Interactive governance breaches: ${report.interactive_governance.breaches === null ? 'n/a' : report.interactive_governance.breaches}`);
+  lines.push(`- Interactive governance warnings: ${report.interactive_governance.warnings === null ? 'n/a' : report.interactive_governance.warnings}`);
+  lines.push(`- Interactive matrix pass-rate: ${report.interactive_governance.matrix_portfolio_pass_rate_percent === null ? 'n/a' : `${report.interactive_governance.matrix_portfolio_pass_rate_percent}%`}`);
+  lines.push(`- Interactive matrix regression-positive rate: ${report.interactive_governance.matrix_regression_positive_rate_percent === null ? 'n/a' : `${report.interactive_governance.matrix_regression_positive_rate_percent}%`}`);
   lines.push(
     `- Matrix regressions: ${report.summary.matrix_regressions === null ? 'n/a' : report.summary.matrix_regressions}` +
     ` (max=${report.summary.max_matrix_regressions === null ? 'n/a' : report.summary.max_matrix_regressions})`
@@ -404,11 +438,12 @@ async function main() {
   const options = parseArgs(process.argv.slice(2));
   const cwd = process.cwd();
 
-  const [evidenceInput, baselineInput, lexiconInput, capabilityMatrixInput] = await Promise.all([
+  const [evidenceInput, baselineInput, lexiconInput, capabilityMatrixInput, interactiveGovernanceInput] = await Promise.all([
     safeReadJson(cwd, options.evidence),
     safeReadJson(cwd, options.baseline),
     safeReadJson(cwd, options.lexicon),
-    safeReadJson(cwd, options.capabilityMatrix)
+    safeReadJson(cwd, options.capabilityMatrix),
+    safeReadJson(cwd, options.interactiveGovernance)
   ]);
 
   const latestSession = pickLatestSession(evidenceInput.payload);
@@ -442,6 +477,11 @@ async function main() {
   const capabilityMatrix = extractCapabilityMatrix(
     capabilityMatrixInput.payload && typeof capabilityMatrixInput.payload === 'object'
       ? capabilityMatrixInput.payload
+      : {}
+  );
+  const interactiveGovernance = extractInteractiveGovernance(
+    interactiveGovernanceInput.payload && typeof interactiveGovernanceInput.payload === 'object'
+      ? interactiveGovernanceInput.payload
       : {}
   );
 
@@ -498,6 +538,13 @@ async function main() {
       value: lexicon.passed !== null ? lexicon.passed : capabilityMatrix.lexicon_passed,
       required: true
     },
+    {
+      key: 'interactive_governance',
+      value: interactiveGovernance.status === 'ok'
+        ? true
+        : (interactiveGovernance.status === 'alert' ? false : null),
+      required: false
+    },
     { key: 'release_preflight', value: handoff.release_preflight_unblocked, required: false }
   ];
 
@@ -521,13 +568,15 @@ async function main() {
       evidence: { key: 'evidence', ...evidenceInput },
       baseline: { key: 'baseline', ...baselineInput },
       lexicon: { key: 'lexicon', ...lexiconInput },
-      capability_matrix: { key: 'capability_matrix', ...capabilityMatrixInput }
+      capability_matrix: { key: 'capability_matrix', ...capabilityMatrixInput },
+      interactive_governance: { key: 'interactive_governance', ...interactiveGovernanceInput }
     },
     handoff,
     baseline,
     lexicon,
     capability_coverage: capabilityCoverage,
     capability_matrix: capabilityMatrix,
+    interactive_governance: interactiveGovernance,
     scene_package_batch: scenePackageBatch,
     summary
   };

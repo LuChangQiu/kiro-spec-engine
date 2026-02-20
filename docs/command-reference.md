@@ -834,7 +834,7 @@ Moqui template library lexicon audit (script-level governance helper):
   - Template scope matching normalizes `sce.scene--*` / `kse.scene--*` prefixes, so renamed template namespaces still map correctly.
 
 Moqui release summary helper (script-level consolidated gate view):
-- `node scripts/moqui-release-summary.js [--evidence <path>] [--baseline <path>] [--lexicon <path>] [--capability-matrix <path>] [--out <path>] [--markdown-out <path>] [--fail-on-gate-fail] [--json]`: merge handoff release-evidence + baseline + lexicon + capability-matrix into one Moqui release gate summary (`passed | failed | incomplete`) with executable remediation recommendations.
+- `node scripts/moqui-release-summary.js [--evidence <path>] [--baseline <path>] [--lexicon <path>] [--capability-matrix <path>] [--interactive-governance <path>] [--out <path>] [--markdown-out <path>] [--fail-on-gate-fail] [--json]`: merge handoff release-evidence + baseline + lexicon + capability-matrix + interactive-governance into one Moqui release gate summary (`passed | failed | incomplete`) with executable remediation recommendations.
   - Default inputs:
     - `.kiro/reports/release-evidence/handoff-runs.json`
     - `.kiro/reports/release-evidence/moqui-template-baseline.json`

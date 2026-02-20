@@ -274,4 +274,68 @@ describe('moqui-release-summary script', () => {
     expect(payload.summary.gate_passed).toBe(false);
     expect(payload.recommendations.some(item => item.includes('moqui-lexicon-audit.js'))).toBe(true);
   });
+
+  test('includes interactive governance signal and remediation recommendation', async () => {
+    const projectRoot = path.resolve(__dirname, '..', '..', '..');
+    const scriptPath = path.join(projectRoot, 'scripts', 'moqui-release-summary.js');
+    const workspace = path.join(tempDir, 'workspace');
+    const evidenceFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+    const baselineFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'moqui-template-baseline.json');
+    const lexiconFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'moqui-lexicon-audit.json');
+    const capabilityMatrixFile = path.join(workspace, '.kiro', 'reports', 'handoff-capability-matrix.json');
+    const governanceFile = path.join(workspace, '.kiro', 'reports', 'interactive-governance-report.json');
+
+    await fs.ensureDir(path.dirname(evidenceFile));
+    await fs.ensureDir(path.dirname(capabilityMatrixFile));
+    await fs.ensureDir(path.dirname(governanceFile));
+
+    await fs.writeJson(evidenceFile, {
+      mode: 'auto-handoff-release-evidence',
+      latest_session_id: 'handoff-pass',
+      sessions: [
+        {
+          session_id: 'handoff-pass',
+          merged_at: '2026-02-18T01:00:00.000Z',
+          status: 'completed',
+          policy: { max_moqui_matrix_regressions: 0 },
+          gate: { passed: true, actual: { spec_success_rate_percent: 100, risk_level: 'low' } },
+          release_gate_preflight: { blocked: false },
+          moqui_baseline: { summary: { portfolio_passed: true, avg_score: 90, valid_rate_percent: 100, baseline_failed: 0 }, compare: { regressions: [] } },
+          moqui_capability_coverage: { summary: { passed: true, semantic_passed: true, coverage_percent: 100, semantic_complete_percent: 100 } },
+          scene_package_batch: { summary: { batch_gate_passed: true, failed: 0, selected: 1 } }
+        }
+      ]
+    }, { spaces: 2 });
+    await fs.writeJson(baselineFile, { summary: { portfolio_passed: true, avg_score: 90, valid_rate_percent: 100, baseline_failed: 0 }, compare: { regressions: [] } }, { spaces: 2 });
+    await fs.writeJson(lexiconFile, { summary: { passed: true, coverage_percent: 100 } }, { spaces: 2 });
+    await fs.writeJson(capabilityMatrixFile, {
+      gates: { passed: true, capability_coverage: { passed: true }, capability_semantic: { passed: true }, capability_lexicon: { passed: true } },
+      capability_coverage: { summary: { coverage_percent: 100, semantic_complete_percent: 100 } }
+    }, { spaces: 2 });
+    await fs.writeJson(governanceFile, {
+      mode: 'interactive-governance-report',
+      summary: { status: 'alert', breaches: 2, warnings: 1 },
+      metrics: {
+        matrix_signal_total: 5,
+        matrix_portfolio_pass_rate_percent: 60,
+        matrix_regression_positive_rate_percent: 40,
+        matrix_stage_error_rate_percent: 20
+      }
+    }, { spaces: 2 });
+
+    const result = spawnSync(process.execPath, [scriptPath, '--json'], {
+      cwd: workspace,
+      encoding: 'utf8'
+    });
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    const governanceCheck = payload.summary.checks.find(item => item.key === 'interactive_governance');
+    expect(governanceCheck).toEqual(expect.objectContaining({
+      value: false,
+      required: false
+    }));
+    expect(payload.interactive_governance.status).toBe('alert');
+    expect(payload.recommendations.some(item => item.includes('report:interactive-governance'))).toBe(true);
+  });
 });

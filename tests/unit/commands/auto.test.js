@@ -8613,11 +8613,18 @@ if (process.argv.includes('--json')) {
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-clusters-phased'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('matrix-remediation.capability-clusters.json'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-clusters'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('Step 1 (Cluster phased):'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('Step 2 (Baseline phased):'))).toBe(true);
     const clusterPhasedIndex = payload.recommendations.findIndex(item => item.includes('run:matrix-remediation-clusters-phased'));
     const baselinePhasedIndex = payload.recommendations.findIndex(item => item.includes('run:matrix-remediation-from-baseline'));
+    const step1Index = payload.recommendations.findIndex(item => item.includes('Step 1 (Cluster phased):'));
+    const step2Index = payload.recommendations.findIndex(item => item.includes('Step 2 (Baseline phased):'));
     expect(clusterPhasedIndex).toBeGreaterThanOrEqual(0);
     expect(baselinePhasedIndex).toBeGreaterThanOrEqual(0);
     expect(clusterPhasedIndex).toBeLessThan(baselinePhasedIndex);
+    expect(step1Index).toBeGreaterThanOrEqual(0);
+    expect(step2Index).toBeGreaterThanOrEqual(0);
+    expect(step1Index).toBeLessThan(step2Index);
     expect(payload.failure_summary).toEqual(expect.objectContaining({
       moqui_matrix_regressions: expect.arrayContaining([
         expect.objectContaining({

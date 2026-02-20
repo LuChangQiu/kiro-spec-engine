@@ -32,6 +32,7 @@ node bin/scene-capability-engine.js value metrics --help
 sce value metrics sample --out ./kpi-input.json --json
 sce value metrics snapshot --input ./kpi-input.json --json
 node scripts/release-ops-weekly-summary.js --json
+node scripts/release-risk-remediation-bundle.js --gate-report .kiro/reports/release-evidence/release-gate.json --json
 ```
 
 Expected:
@@ -39,6 +40,7 @@ Expected:
 - `sample` writes a valid JSON scaffold.
 - `snapshot` returns machine-readable result with `snapshot_path` and risk metadata.
 - `release-ops-weekly-summary` emits weekly governance risk card (`json` + `markdown`) under release-evidence.
+- `release-risk-remediation-bundle` outputs unified weekly/drift remediation commands (`json` + `markdown` + `lines`).
 
 ---
 

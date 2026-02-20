@@ -47,6 +47,7 @@ node scripts/moqui-lexicon-audit.js --manifest ../331-poc/docs/handoffs/handoff-
 node scripts/moqui-release-summary.js --fail-on-gate-fail --json
 node scripts/release-ops-weekly-summary.js --json
 node scripts/release-weekly-ops-gate.js
+node scripts/release-risk-remediation-bundle.js --gate-report .kiro/reports/release-evidence/release-gate.json --json
 ```
 
 ## Scene Package Gate Commands

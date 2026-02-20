@@ -892,6 +892,15 @@ Release weekly ops gate helper (release hard-gate):
   - merges result into `RELEASE_GATE_REPORT_FILE` when provided.
 - npm alias: `npm run gate:release-ops-weekly`
 
+Release risk remediation bundle helper (weekly + drift unified command pack):
+- `node scripts/release-risk-remediation-bundle.js [--gate-report <path>] [--out <path>] [--markdown-out <path>] [--lines-out <path>] [--json]`: derive deduplicated remediation commands from `release-gate` report signals (`weekly_ops`, `drift`) and export JSON/Markdown/lines artifacts.
+  - Default input: `.kiro/reports/release-evidence/release-gate.json`
+  - Default outputs:
+    - `.kiro/reports/release-evidence/release-risk-remediation-bundle.json`
+    - `.kiro/reports/release-evidence/release-risk-remediation-bundle.md`
+    - `.kiro/reports/release-evidence/release-risk-remediation.commands.lines`
+- npm alias: `npm run report:release-risk-remediation`
+
 Matrix regression gate helper (script-level configurable hard gate):
 - `node scripts/matrix-regression-gate.js [--baseline <path>] [--max-regressions <n>] [--enforce] [--out <path>] [--json]`: evaluate matrix regression count from baseline compare payload (`coverage_matrix_regressions` preferred, fallback `regressions`) and enforce hard gate when enabled.
   - Default baseline input: `.kiro/reports/release-evidence/moqui-template-baseline.json`
@@ -1193,6 +1202,7 @@ Release workflow default:
 - Publishes `interactive-matrix-signals-<tag>.jsonl`, `matrix-regression-gate-<tag>.json`, and `matrix-remediation-plan-<tag>.{json,md}` + `matrix-remediation-<tag>.lines` + `matrix-remediation-goals-<tag>.json` + `matrix-remediation-commands-<tag>.md` + `matrix-remediation-{high,medium}-<tag>.lines` + `matrix-remediation-goals-{high,medium}-<tag>.json` + `matrix-remediation-phased-plan-<tag>.json` as release evidence assets.
 - Publishes `weekly-ops-summary-<tag>.json` + `weekly-ops-summary-<tag>.md` as release operational closed-loop assets.
 - Evaluates weekly ops risk gate by default (`release-weekly-ops-gate`; default block when `risk > medium` or summary missing).
+- Publishes `release-risk-remediation-<tag>.json|.md|.lines` derived from unified weekly+drift gate signals.
 - Enforces baseline portfolio gate by default (`KSE_MOQUI_BASELINE_ENFORCE` defaults to `true` when unset).
 
 ### Moqui ERP Integration

@@ -288,3 +288,13 @@ One-shot equivalent:
 ```bash
 npm run run:matrix-remediation-phased -- --json
 ```
+
+Zero-prep one-shot (prepare from baseline + run phased):
+
+```bash
+node scripts/moqui-matrix-remediation-phased-runner.js \
+  --baseline .kiro/reports/release-evidence/moqui-template-baseline.json \
+  --json
+
+npm run run:matrix-remediation-from-baseline -- --json
+```

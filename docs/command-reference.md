@@ -872,7 +872,7 @@ Moqui matrix remediation queue helper (script-level automatic queue export):
 - npm alias: `npm run report:matrix-remediation-queue`
 
 Moqui matrix remediation phased runner helper (script-level one-shot execution):
-- `node scripts/moqui-matrix-remediation-phased-runner.js [--high-goals <path>] [--medium-goals <path>] [--high-lines <path>] [--medium-lines <path>] [--phase-high-parallel <n>] [--phase-high-agent-budget <n>] [--phase-medium-parallel <n>] [--phase-medium-agent-budget <n>] [--phase-cooldown-seconds <n>] [--high-retry-max-rounds <n>] [--medium-retry-max-rounds <n>] [--no-fallback-lines] [--continue-on-error] [--dry-run] [--json]`: execute matrix remediation in anti-429 phased order (`high -> cooldown -> medium`) using `sce auto close-loop-batch`.
+- `node scripts/moqui-matrix-remediation-phased-runner.js [--baseline <path>] [--queue-out <path>] [--queue-lines-out <path>] [--queue-markdown-out <path>] [--queue-batch-json-out <path>] [--queue-commands-out <path>] [--min-delta-abs <n>] [--top-templates <n>] [--high-goals <path>] [--medium-goals <path>] [--high-lines <path>] [--medium-lines <path>] [--phase-high-parallel <n>] [--phase-high-agent-budget <n>] [--phase-medium-parallel <n>] [--phase-medium-agent-budget <n>] [--phase-cooldown-seconds <n>] [--high-retry-max-rounds <n>] [--medium-retry-max-rounds <n>] [--no-fallback-lines] [--continue-on-error] [--dry-run] [--json]`: execute matrix remediation in anti-429 phased order (`high -> cooldown -> medium`) using `sce auto close-loop-batch`; when `--baseline` is provided, it auto-generates the queue package first (`prepare + run` in one command).
   - Default inputs:
     - High goals JSON: `.kiro/auto/matrix-remediation.goals.high.json`
     - Medium goals JSON: `.kiro/auto/matrix-remediation.goals.medium.json`
@@ -882,7 +882,10 @@ Moqui matrix remediation phased runner helper (script-level one-shot execution):
     - High: `--batch-parallel 1 --batch-agent-budget 2 --batch-retry-max-rounds 3`
     - Medium: `--batch-parallel 2 --batch-agent-budget 4 --batch-retry-max-rounds 2`
     - Cooldown: `20` seconds
+  - Zero-prep mode:
+    - `node scripts/moqui-matrix-remediation-phased-runner.js --baseline .kiro/reports/release-evidence/moqui-template-baseline.json --json`
 - npm alias: `npm run run:matrix-remediation-phased`
+- npm alias (baseline zero-prep): `npm run run:matrix-remediation-from-baseline -- --json`
 
 Interactive customization plan gate helper (script-level secure-by-default check):
 - `node scripts/interactive-change-plan-gate.js --plan <path> [--policy <path>] [--catalog <path>] [--out <path>] [--markdown-out <path>] [--fail-on-block] [--fail-on-non-allow] [--json]`: evaluate interactive change plans against default guardrails (approval, sensitive-data masking, secrets, irreversible backup, high-risk action catalog) and output `allow | review-required | deny`.

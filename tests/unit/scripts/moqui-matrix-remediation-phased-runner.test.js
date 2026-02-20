@@ -89,4 +89,46 @@ describe('moqui-matrix-remediation-phased-runner script', () => {
     expect(payload.phases[0].status).toBe('skipped');
     expect(payload.phases[1].status).toBe('skipped');
   });
+
+  test('supports baseline preparation mode and generates phased inputs before planning', async () => {
+    const workspace = path.join(tempDir, 'workspace-baseline-prepare');
+    await fs.ensureDir(workspace);
+    const baseline = path.join(workspace, 'baseline.json');
+    await fs.writeJson(baseline, {
+      compare: {
+        coverage_matrix_regressions: [
+          { metric: 'business_rule_closed', delta_rate_percent: -30.5 },
+          { metric: 'decision_closed', delta_rate_percent: -8.2 }
+        ]
+      },
+      templates: [
+        {
+          template_id: 'sce.scene--moqui-order-approval--0.1.0',
+          capabilities_provides: ['approval-routing'],
+          semantic: { score: 68 },
+          baseline: {
+            flags: {
+              business_rule_closed: false,
+              decision_closed: false,
+              baseline_passed: false
+            },
+            gaps: ['g1']
+          }
+        }
+      ]
+    }, { spaces: 2 });
+
+    const result = runScript(workspace, ['--baseline', baseline, '--dry-run', '--json']);
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.prepare.status).toBe('completed');
+    expect(payload.prepare.command).toContain('moqui-matrix-remediation-queue.js');
+    expect(payload.prepare.queue_summary.selected_regressions).toBe(2);
+    expect(payload.summary.runnable_phases).toBe(2);
+    expect(payload.phases[0].status).toBe('planned');
+    expect(payload.phases[0].selected_input.source).toBe('goals-json');
+    expect(payload.phases[1].status).toBe('planned');
+    expect(await fs.pathExists(path.join(workspace, '.kiro', 'auto', 'matrix-remediation.goals.high.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(workspace, '.kiro', 'auto', 'matrix-remediation.goals.medium.json'))).toBe(true);
+  });
 });

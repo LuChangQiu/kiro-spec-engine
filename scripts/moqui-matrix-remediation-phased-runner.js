@@ -3,8 +3,15 @@
 
 const path = require('path');
 const fs = require('fs-extra');
-const { spawn } = require('child_process');
+const { spawn, spawnSync } = require('child_process');
 const {
+  DEFAULT_BASELINE,
+  DEFAULT_OUT,
+  DEFAULT_LINES_OUT,
+  DEFAULT_MARKDOWN_OUT,
+  DEFAULT_BATCH_JSON_OUT,
+  DEFAULT_COMMANDS_OUT,
+  DEFAULT_TOP_TEMPLATES,
   DEFAULT_PHASE_HIGH_PARALLEL,
   DEFAULT_PHASE_HIGH_AGENT_BUDGET,
   DEFAULT_PHASE_MEDIUM_PARALLEL,
@@ -32,6 +39,14 @@ function parseArgs(argv) {
     phaseCooldownSeconds: DEFAULT_PHASE_COOLDOWN_SECONDS,
     highRetryMaxRounds: DEFAULT_HIGH_RETRY_MAX_ROUNDS,
     mediumRetryMaxRounds: DEFAULT_MEDIUM_RETRY_MAX_ROUNDS,
+    baseline: null,
+    queueOut: DEFAULT_OUT,
+    queueLinesOut: DEFAULT_LINES_OUT,
+    queueMarkdownOut: DEFAULT_MARKDOWN_OUT,
+    queueBatchJsonOut: DEFAULT_BATCH_JSON_OUT,
+    queueCommandsOut: DEFAULT_COMMANDS_OUT,
+    minDeltaAbs: 0,
+    topTemplates: DEFAULT_TOP_TEMPLATES,
     noFallbackLines: false,
     continueOnError: false,
     dryRun: false,
@@ -75,6 +90,30 @@ function parseArgs(argv) {
     } else if (token === '--medium-retry-max-rounds' && next) {
       options.mediumRetryMaxRounds = Number(next);
       index += 1;
+    } else if (token === '--baseline' && next) {
+      options.baseline = next;
+      index += 1;
+    } else if (token === '--queue-out' && next) {
+      options.queueOut = next;
+      index += 1;
+    } else if (token === '--queue-lines-out' && next) {
+      options.queueLinesOut = next;
+      index += 1;
+    } else if (token === '--queue-markdown-out' && next) {
+      options.queueMarkdownOut = next;
+      index += 1;
+    } else if (token === '--queue-batch-json-out' && next) {
+      options.queueBatchJsonOut = next;
+      index += 1;
+    } else if (token === '--queue-commands-out' && next) {
+      options.queueCommandsOut = next;
+      index += 1;
+    } else if (token === '--min-delta-abs' && next) {
+      options.minDeltaAbs = Number(next);
+      index += 1;
+    } else if (token === '--top-templates' && next) {
+      options.topTemplates = Number(next);
+      index += 1;
     } else if (token === '--sce-bin' && next) {
       options.sceBin = next;
       index += 1;
@@ -98,6 +137,10 @@ function parseArgs(argv) {
   validateNonNegativeInt(options.phaseCooldownSeconds, '--phase-cooldown-seconds');
   validatePositiveInt(options.highRetryMaxRounds, '--high-retry-max-rounds');
   validatePositiveInt(options.mediumRetryMaxRounds, '--medium-retry-max-rounds');
+  if (!Number.isFinite(options.minDeltaAbs) || options.minDeltaAbs < 0) {
+    throw new Error('--min-delta-abs must be a non-negative number.');
+  }
+  validatePositiveInt(options.topTemplates, '--top-templates');
 
   return options;
 }
@@ -130,6 +173,14 @@ function printHelpAndExit(code) {
     `  --phase-cooldown-seconds <n>   Cooldown between phases (default: ${DEFAULT_PHASE_COOLDOWN_SECONDS})`,
     `  --high-retry-max-rounds <n>    Retry max rounds for high phase (default: ${DEFAULT_HIGH_RETRY_MAX_ROUNDS})`,
     `  --medium-retry-max-rounds <n>  Retry max rounds for medium phase (default: ${DEFAULT_MEDIUM_RETRY_MAX_ROUNDS})`,
+    `  --baseline <path>              Optional: generate queue package from baseline first (default baseline path: ${DEFAULT_BASELINE})`,
+    `  --queue-out <path>             Queue plan JSON output when --baseline is used (default: ${DEFAULT_OUT})`,
+    `  --queue-lines-out <path>       Queue lines output when --baseline is used (default: ${DEFAULT_LINES_OUT})`,
+    `  --queue-markdown-out <path>    Queue markdown output when --baseline is used (default: ${DEFAULT_MARKDOWN_OUT})`,
+    `  --queue-batch-json-out <path>  Queue aggregate goals JSON output when --baseline is used (default: ${DEFAULT_BATCH_JSON_OUT})`,
+    `  --queue-commands-out <path>    Queue commands markdown output when --baseline is used (default: ${DEFAULT_COMMANDS_OUT})`,
+    '  --min-delta-abs <n>            Pass-through to queue generation when --baseline is used',
+    `  --top-templates <n>            Pass-through top template candidates (default: ${DEFAULT_TOP_TEMPLATES})`,
     '  --no-fallback-lines            Disable fallback to .lines files when goals JSON is empty/missing',
     '  --continue-on-error            Continue medium phase even if high phase fails',
     '  --sce-bin <path>               Override executable (default: current Node + local bin/sce.js)',
@@ -227,6 +278,99 @@ function quoteCliArg(value = '') {
 
 function toCommandPreview(bin, args) {
   return `${quoteCliArg(bin)} ${args.map(arg => quoteCliArg(arg)).join(' ')}`.trim();
+}
+
+function buildQueueGenerationArgs(options, paths) {
+  return [
+    path.resolve(__dirname, 'moqui-matrix-remediation-queue.js'),
+    '--baseline',
+    paths.baselinePath,
+    '--out',
+    paths.queueOutPath,
+    '--lines-out',
+    paths.queueLinesOutPath,
+    '--markdown-out',
+    paths.queueMarkdownOutPath,
+    '--batch-json-out',
+    paths.queueBatchJsonOutPath,
+    '--commands-out',
+    paths.queueCommandsOutPath,
+    '--phase-high-lines-out',
+    paths.highLinesPath,
+    '--phase-medium-lines-out',
+    paths.mediumLinesPath,
+    '--phase-high-goals-out',
+    paths.highGoalsPath,
+    '--phase-medium-goals-out',
+    paths.mediumGoalsPath,
+    '--phase-high-parallel',
+    `${options.phaseHighParallel}`,
+    '--phase-high-agent-budget',
+    `${options.phaseHighAgentBudget}`,
+    '--phase-medium-parallel',
+    `${options.phaseMediumParallel}`,
+    '--phase-medium-agent-budget',
+    `${options.phaseMediumAgentBudget}`,
+    '--phase-cooldown-seconds',
+    `${options.phaseCooldownSeconds}`,
+    '--min-delta-abs',
+    `${options.minDeltaAbs}`,
+    '--top-templates',
+    `${options.topTemplates}`,
+    '--json'
+  ];
+}
+
+function runQueueGeneration(options, runtime, paths) {
+  if (!paths.baselinePath) {
+    return {
+      status: 'skipped',
+      exit_code: null,
+      command: null,
+      queue_summary: null,
+      stderr: null
+    };
+  }
+
+  const commandArgs = buildQueueGenerationArgs(options, paths);
+  const command = toCommandPreview(process.execPath, commandArgs);
+  const result = spawnSync(process.execPath, commandArgs, {
+    cwd: runtime.cwd,
+    encoding: 'utf8'
+  });
+  const code = Number.isFinite(result.status) ? result.status : 1;
+  let queueSummary = null;
+  if (code === 0) {
+    const stdoutText = `${result.stdout || ''}`.trim();
+    if (stdoutText) {
+      try {
+        const parsed = JSON.parse(stdoutText);
+        if (parsed && typeof parsed === 'object') {
+          queueSummary = {
+            selected_regressions: parsed.summary && Number.isFinite(Number(parsed.summary.selected_regressions))
+              ? Number(parsed.summary.selected_regressions)
+              : null,
+            phase_high_count: parsed.summary && Number.isFinite(Number(parsed.summary.phase_high_count))
+              ? Number(parsed.summary.phase_high_count)
+              : null,
+            phase_medium_count: parsed.summary && Number.isFinite(Number(parsed.summary.phase_medium_count))
+              ? Number(parsed.summary.phase_medium_count)
+              : null
+          };
+        }
+      } catch (_error) {
+        queueSummary = null;
+      }
+    }
+  }
+
+  return {
+    status: code === 0 ? 'completed' : 'failed',
+    exit_code: code,
+    command,
+    queue_summary: queueSummary,
+    stderr: `${result.stderr || ''}`.trim() || null
+  };
 }
 
 function executeCommand(bin, args, cwd) {
@@ -343,21 +487,46 @@ async function runPhases(options, runtime) {
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const cwd = process.cwd();
+  const baselinePath = options.baseline
+    ? resolvePath(cwd, options.baseline)
+    : null;
   const highGoalsPath = resolvePath(cwd, options.highGoals);
   const mediumGoalsPath = resolvePath(cwd, options.mediumGoals);
   const highLinesPath = resolvePath(cwd, options.highLines);
   const mediumLinesPath = resolvePath(cwd, options.mediumLines);
+  const queueOutPath = resolvePath(cwd, options.queueOut);
+  const queueLinesOutPath = resolvePath(cwd, options.queueLinesOut);
+  const queueMarkdownOutPath = resolvePath(cwd, options.queueMarkdownOut);
+  const queueBatchJsonOutPath = resolvePath(cwd, options.queueBatchJsonOut);
+  const queueCommandsOutPath = resolvePath(cwd, options.queueCommandsOut);
   const allowLinesFallback = options.noFallbackLines !== true;
+  const runtime = {
+    cwd,
+    toRelative: (filePath) => path.relative(cwd, filePath) || '.'
+  };
+  const paths = {
+    baselinePath,
+    highGoalsPath,
+    mediumGoalsPath,
+    highLinesPath,
+    mediumLinesPath,
+    queueOutPath,
+    queueLinesOutPath,
+    queueMarkdownOutPath,
+    queueBatchJsonOutPath,
+    queueCommandsOutPath
+  };
+
+  const prepare = runQueueGeneration(options, runtime, paths);
+  if (prepare.status === 'failed') {
+    throw new Error(`queue generation failed before phased execution${prepare.stderr ? `: ${prepare.stderr}` : '.'}`);
+  }
 
   const highInput = await selectPhaseInput('high', highGoalsPath, highLinesPath, allowLinesFallback);
   const mediumInput = await selectPhaseInput('medium', mediumGoalsPath, mediumLinesPath, allowLinesFallback);
   const shouldCooldown = Boolean(highInput && mediumInput && options.phaseCooldownSeconds > 0);
-  const runtime = {
-    cwd,
-    highInput,
-    mediumInput,
-    toRelative: (filePath) => path.relative(cwd, filePath) || '.'
-  };
+  runtime.highInput = highInput;
+  runtime.mediumInput = mediumInput;
   const phases = await runPhases(options, runtime);
   const completedCount = phases.filter(item => item.status === 'completed').length;
   const plannedCount = phases.filter(item => item.status === 'planned').length;
@@ -392,10 +561,22 @@ async function main() {
       phase_cooldown_seconds: options.phaseCooldownSeconds
     },
     inputs: {
+      baseline: baselinePath ? runtime.toRelative(baselinePath) : null,
       high_goals: runtime.toRelative(highGoalsPath),
       medium_goals: runtime.toRelative(mediumGoalsPath),
       high_lines: runtime.toRelative(highLinesPath),
-      medium_lines: runtime.toRelative(mediumLinesPath)
+      medium_lines: runtime.toRelative(mediumLinesPath),
+      queue_out: runtime.toRelative(queueOutPath),
+      queue_lines_out: runtime.toRelative(queueLinesOutPath),
+      queue_markdown_out: runtime.toRelative(queueMarkdownOutPath),
+      queue_batch_json_out: runtime.toRelative(queueBatchJsonOutPath),
+      queue_commands_out: runtime.toRelative(queueCommandsOutPath)
+    },
+    prepare: {
+      status: prepare.status,
+      command: prepare.command,
+      exit_code: prepare.exit_code,
+      queue_summary: prepare.queue_summary
     },
     cooldown: {
       seconds: options.phaseCooldownSeconds,
@@ -443,6 +624,8 @@ module.exports = {
   resolvePath,
   readGoalsPayload,
   readLinesPayload,
+  buildQueueGenerationArgs,
+  runQueueGeneration,
   selectPhaseInput,
   buildCloseLoopArgs,
   quoteCliArg,

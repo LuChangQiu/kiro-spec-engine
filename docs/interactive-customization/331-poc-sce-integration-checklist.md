@@ -129,6 +129,12 @@ sce auto close-loop-batch .kiro/auto/matrix-remediation.goals.medium.json \
 # one-shot equivalent
 npm run run:matrix-remediation-phased -- --json
 
+# zero-prep one-shot (prepare from baseline + run phased)
+node scripts/moqui-matrix-remediation-phased-runner.js \
+  --baseline .kiro/reports/release-evidence/moqui-template-baseline.json \
+  --json
+npm run run:matrix-remediation-from-baseline -- --json
+
 # fallback
 sce auto close-loop-batch .kiro/auto/matrix-remediation.lines --json
 sce auto close-loop-batch .kiro/auto/matrix-remediation.goals.json --format json --json

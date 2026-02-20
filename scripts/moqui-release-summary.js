@@ -359,7 +359,10 @@ function buildRecommendations(summary) {
       'Generate phased matrix remediation package: `node scripts/moqui-matrix-remediation-queue.js --baseline .kiro/reports/release-evidence/moqui-template-baseline.json --json`.'
     );
     push(
-      'Run phased anti-429 remediation directly: `npm run run:matrix-remediation-phased -- --json`.'
+      'Run prepare+execute in one step: `node scripts/moqui-matrix-remediation-phased-runner.js --baseline .kiro/reports/release-evidence/moqui-template-baseline.json --json`.'
+    );
+    push(
+      'Or execute phased runner from pre-generated artifacts: `npm run run:matrix-remediation-phased -- --json`.'
     );
   }
   if (map.get('interactive_governance') === false) {

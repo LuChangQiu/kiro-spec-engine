@@ -343,6 +343,9 @@ function buildCommandsMarkdown(payload = {}) {
   const lines = [];
   const artifacts = payload && payload.artifacts ? payload.artifacts : {};
   const executionPolicy = payload && payload.execution_policy ? payload.execution_policy : {};
+  const baselinePath = payload && payload.baseline && payload.baseline.path
+    ? payload.baseline.path
+    : DEFAULT_BASELINE;
   const linesOut = artifacts.lines_out || DEFAULT_LINES_OUT;
   const batchJsonOut = artifacts.batch_json_out || DEFAULT_BATCH_JSON_OUT;
   const highLinesOut = artifacts.phase_high_lines_out || null;
@@ -385,6 +388,8 @@ function buildCommandsMarkdown(payload = {}) {
     lines.push(`   - medium: \`sce auto close-loop-batch ${quoteCliArg(mediumLinesOut)} --format lines --json\``);
     lines.push('5. One-shot phased runner:');
     lines.push(`   - \`node scripts/moqui-matrix-remediation-phased-runner.js --high-goals ${quoteCliArg(highGoalsOut)} --medium-goals ${quoteCliArg(mediumGoalsOut)} --high-lines ${quoteCliArg(highLinesOut)} --medium-lines ${quoteCliArg(mediumLinesOut)} --phase-high-parallel ${highParallel} --phase-high-agent-budget ${highAgentBudget} --phase-medium-parallel ${mediumParallel} --phase-medium-agent-budget ${mediumAgentBudget} --phase-cooldown-seconds ${cooldownSeconds} --json\``);
+    lines.push('6. One-shot from baseline (prepare + run):');
+    lines.push(`   - \`node scripts/moqui-matrix-remediation-phased-runner.js --baseline ${quoteCliArg(baselinePath)} --high-goals ${quoteCliArg(highGoalsOut)} --medium-goals ${quoteCliArg(mediumGoalsOut)} --high-lines ${quoteCliArg(highLinesOut)} --medium-lines ${quoteCliArg(mediumLinesOut)} --phase-high-parallel ${highParallel} --phase-high-agent-budget ${highAgentBudget} --phase-medium-parallel ${mediumParallel} --phase-medium-agent-budget ${mediumAgentBudget} --phase-cooldown-seconds ${cooldownSeconds} --json\``);
   }
   lines.push('');
   lines.push('## Per Goal');

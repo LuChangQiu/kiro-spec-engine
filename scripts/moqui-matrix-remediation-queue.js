@@ -657,6 +657,8 @@ function buildCommandsMarkdown(payload = {}) {
   lines.push('');
   lines.push(`- Generate/refresh cluster plan: \`node scripts/moqui-matrix-remediation-queue.js --baseline ${quoteCliArg(baselinePath)} --capability-cluster-goals-out ${quoteCliArg(capabilityClusterGoalsOut)} --json\``);
   lines.push(`- Execute by cluster-prioritized goals: \`sce auto close-loop-batch ${quoteCliArg(capabilityClusterGoalsOut)} --format json --batch-parallel 1 --batch-agent-budget 2 --batch-retry-until-complete --json\``);
+  lines.push(`- Execute by phased cluster mode: \`node scripts/moqui-matrix-remediation-phased-runner.js --cluster-goals ${quoteCliArg(capabilityClusterGoalsOut)} --json\``);
+  lines.push('- npm alias (cluster phased): `npm run run:matrix-remediation-clusters-phased -- --json`');
   if (highLinesOut && mediumLinesOut && highGoalsOut && mediumGoalsOut) {
     lines.push('');
     lines.push('## Rate-Limit Safe Phased Mode');

@@ -146,6 +146,8 @@ describe('moqui-matrix-remediation-queue script', () => {
     expect(commandsText).toContain('Rate-Limit Safe Phased Mode');
     expect(commandsText).toContain('Capability Cluster Mode');
     expect(commandsText).toContain('capability-clusters.json');
+    expect(commandsText).toContain('moqui-matrix-remediation-phased-runner.js --cluster-goals');
+    expect(commandsText).toContain('run:matrix-remediation-clusters-phased');
     expect(commandsText).toContain('sleep 30');
     expect(commandsText).toContain('moqui-matrix-remediation-phased-runner.js');
     expect(commandsText).toContain('--baseline');

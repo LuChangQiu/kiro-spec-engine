@@ -323,6 +323,7 @@ describe('moqui-release-summary script', () => {
     expect(payload.recommendations.some(item => item.includes('moqui-lexicon-audit.js'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('moqui-matrix-remediation-queue.js'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('matrix-remediation.capability-clusters.json'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-clusters'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('moqui-matrix-remediation-phased-runner.js'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-phased'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('Prioritize template recovery order'))).toBe(true);

@@ -4934,7 +4934,9 @@ if (process.argv.includes('--json')) {
     ]));
     expect(parsed.health.recommendations).toEqual(expect.arrayContaining([
       expect.stringContaining('moqui-matrix-remediation-phased-runner.js'),
-      expect.stringContaining('run:matrix-remediation-from-baseline')
+      expect.stringContaining('run:matrix-remediation-from-baseline'),
+      expect.stringContaining('matrix-remediation.capability-clusters.json'),
+      expect.stringContaining('run:matrix-remediation-clusters')
     ]));
   });
 
@@ -5757,7 +5759,9 @@ if (process.argv.includes('--json')) {
     ]));
     expect(parsed.recommendations).toEqual(expect.arrayContaining([
       expect.stringContaining('moqui-matrix-remediation-phased-runner.js'),
-      expect.stringContaining('run:matrix-remediation-from-baseline')
+      expect.stringContaining('run:matrix-remediation-from-baseline'),
+      expect.stringContaining('matrix-remediation.capability-clusters.json'),
+      expect.stringContaining('run:matrix-remediation-clusters')
     ]));
   });
 
@@ -7550,6 +7554,8 @@ if (process.argv.includes('--json')) {
     expect(payload.recommendations.some(item => item.includes('Recover Moqui matrix regressions'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('moqui-matrix-remediation-phased-runner.js'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-from-baseline'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('matrix-remediation.capability-clusters.json'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-clusters'))).toBe(true);
   });
 
   test('infers manifest capabilities from templates when capabilities are not declared', async () => {
@@ -8601,6 +8607,8 @@ if (process.argv.includes('--json')) {
     expect(payload.recommendations.some(item => item.includes('Recover Moqui matrix regressions'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('moqui-matrix-remediation-phased-runner.js'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-from-baseline'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('matrix-remediation.capability-clusters.json'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-clusters'))).toBe(true);
     expect(payload.failure_summary).toEqual(expect.objectContaining({
       moqui_matrix_regressions: expect.arrayContaining([
         expect.objectContaining({
@@ -10017,6 +10025,8 @@ if (process.argv.includes('--json')) {
     expect(payload.recommendations).toContain('sce auto governance stats --days 14 --json');
     expect(payload.recommendations.some(item => item.includes('moqui-matrix-remediation-phased-runner.js'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-from-baseline'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('matrix-remediation.capability-clusters.json'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-clusters'))).toBe(true);
   });
 
   test('supports handoff regression out file option', async () => {

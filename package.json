@@ -46,6 +46,7 @@
     "report:matrix-remediation-queue": "node scripts/moqui-matrix-remediation-queue.js --json",
     "run:matrix-remediation-phased": "node scripts/moqui-matrix-remediation-phased-runner.js",
     "run:matrix-remediation-from-baseline": "node scripts/moqui-matrix-remediation-phased-runner.js --baseline .kiro/reports/release-evidence/moqui-template-baseline.json",
+    "run:matrix-remediation-clusters": "node bin/sce.js auto close-loop-batch .kiro/auto/matrix-remediation.capability-clusters.json --format json --batch-parallel 1 --batch-agent-budget 2 --batch-retry-until-complete --json",
     "gate:interactive-plan": "node scripts/interactive-change-plan-gate.js --plan docs/interactive-customization/change-plan.sample.json --json",
     "report:interactive-context-bridge": "node scripts/interactive-context-bridge.js --input docs/interactive-customization/moqui-context-provider.sample.json --json",
     "report:interactive-intent": "node scripts/interactive-intent-build.js --context docs/interactive-customization/page-context.sample.json --goal \"Must improve order approval speed without changing payment authorization policy\" --user-id demo-user --json",

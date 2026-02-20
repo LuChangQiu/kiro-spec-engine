@@ -295,6 +295,187 @@ function buildQueueItem(regression = {}, index = 0, baselinePayload = {}, topTem
   };
 }
 
+function collectTemplatePriorityMatrix(items = []) {
+  const bucket = new Map();
+  for (const item of Array.isArray(items) ? items : []) {
+    if (!item || !Array.isArray(item.template_candidates)) {
+      continue;
+    }
+    const deltaAbs = Number(item.delta_rate_percent);
+    const pressure = Number.isFinite(deltaAbs) ? Math.abs(deltaAbs) : 0;
+    const high = item.priority === 'high';
+    for (const template of item.template_candidates) {
+      const templateId = template && template.template_id ? String(template.template_id).trim() : '';
+      if (!templateId) {
+        continue;
+      }
+      if (!bucket.has(templateId)) {
+        bucket.set(templateId, {
+          template_id: templateId,
+          impacted_metrics: new Set(),
+          focus_areas: new Set(),
+          capabilities: new Set(),
+          regression_pressure: 0,
+          high_priority_hits: 0,
+          medium_priority_hits: 0,
+          gap_count: 0,
+          semantic_scores: []
+        });
+      }
+      const row = bucket.get(templateId);
+      row.impacted_metrics.add(item.metric || 'unknown_metric');
+      row.focus_areas.add(item.focus || 'template quality closure');
+      for (const cap of Array.isArray(template.capabilities) ? template.capabilities : []) {
+        const key = `${cap || ''}`.trim();
+        if (key) {
+          row.capabilities.add(key);
+        }
+      }
+      row.regression_pressure += pressure;
+      if (high) {
+        row.high_priority_hits += 1;
+      } else {
+        row.medium_priority_hits += 1;
+      }
+      const gapsCount = Array.isArray(template.gaps) ? template.gaps.length : 0;
+      row.gap_count = Math.max(row.gap_count, gapsCount);
+      const score = Number(template.score);
+      if (Number.isFinite(score)) {
+        row.semantic_scores.push(score);
+      }
+    }
+  }
+
+  const output = Array.from(bucket.values()).map((row) => {
+    const semanticScore = row.semantic_scores.length > 0
+      ? Math.min(...row.semantic_scores)
+      : null;
+    const semanticPenalty = Number.isFinite(semanticScore)
+      ? Math.max(0, 80 - semanticScore)
+      : 0;
+    const priorityScore = Number(
+      (
+        row.regression_pressure +
+        (row.high_priority_hits * 25) +
+        (row.medium_priority_hits * 10) +
+        (row.gap_count * 2) +
+        semanticPenalty
+      ).toFixed(2)
+    );
+    return {
+      template_id: row.template_id,
+      priority_score: priorityScore,
+      recommended_phase: row.high_priority_hits > 0 ? 'high' : 'medium',
+      regression_pressure: Number(row.regression_pressure.toFixed(2)),
+      high_priority_hits: row.high_priority_hits,
+      medium_priority_hits: row.medium_priority_hits,
+      impacted_metric_count: row.impacted_metrics.size,
+      impacted_metrics: Array.from(row.impacted_metrics).sort(),
+      focus_areas: Array.from(row.focus_areas).sort(),
+      capabilities: Array.from(row.capabilities).sort(),
+      gap_count: row.gap_count,
+      semantic_score: Number.isFinite(semanticScore) ? semanticScore : null
+    };
+  });
+
+  output.sort((a, b) => {
+    if (b.priority_score !== a.priority_score) {
+      return b.priority_score - a.priority_score;
+    }
+    if (b.high_priority_hits !== a.high_priority_hits) {
+      return b.high_priority_hits - a.high_priority_hits;
+    }
+    return a.template_id.localeCompare(b.template_id);
+  });
+  return output;
+}
+
+function collectCapabilityClusters(items = [], templatePriorityMatrix = []) {
+  const bucket = new Map();
+  for (const item of Array.isArray(items) ? items : []) {
+    const capabilities = Array.isArray(item && item.capability_focus)
+      ? item.capability_focus.map(cap => `${cap || ''}`.trim()).filter(Boolean)
+      : [];
+    if (capabilities.length === 0) {
+      continue;
+    }
+    const deltaAbs = Number(item.delta_rate_percent);
+    const pressure = Number.isFinite(deltaAbs) ? Math.abs(deltaAbs) : 0;
+    const templateIds = Array.isArray(item.template_candidates)
+      ? item.template_candidates.map(candidate => candidate && candidate.template_id ? `${candidate.template_id}`.trim() : '').filter(Boolean)
+      : [];
+    for (const capability of capabilities) {
+      if (!bucket.has(capability)) {
+        bucket.set(capability, {
+          capability,
+          impacted_metrics: new Set(),
+          focus_areas: new Set(),
+          templates: new Set(),
+          total_regression_pressure: 0,
+          high_priority_hits: 0,
+          medium_priority_hits: 0
+        });
+      }
+      const row = bucket.get(capability);
+      row.impacted_metrics.add(item.metric || 'unknown_metric');
+      row.focus_areas.add(item.focus || 'template quality closure');
+      for (const templateId of templateIds) {
+        row.templates.add(templateId);
+      }
+      row.total_regression_pressure += pressure;
+      if (item.priority === 'high') {
+        row.high_priority_hits += 1;
+      } else {
+        row.medium_priority_hits += 1;
+      }
+    }
+  }
+
+  const output = Array.from(bucket.values()).map((row) => {
+    const suggestedTemplates = (Array.isArray(templatePriorityMatrix) ? templatePriorityMatrix : [])
+      .filter(item => Array.isArray(item.capabilities) && item.capabilities.includes(row.capability))
+      .slice(0, 5)
+      .map(item => ({
+        template_id: item.template_id,
+        recommended_phase: item.recommended_phase,
+        priority_score: item.priority_score
+      }));
+    const priorityScore = Number(
+      (
+        row.total_regression_pressure +
+        (row.high_priority_hits * 20) +
+        (row.medium_priority_hits * 8) +
+        (row.impacted_metrics.size * 5) +
+        (row.templates.size * 2)
+      ).toFixed(2)
+    );
+    return {
+      capability: row.capability,
+      priority_score: priorityScore,
+      regression_pressure: Number(row.total_regression_pressure.toFixed(2)),
+      impacted_metric_count: row.impacted_metrics.size,
+      impacted_metrics: Array.from(row.impacted_metrics).sort(),
+      high_priority_hits: row.high_priority_hits,
+      medium_priority_hits: row.medium_priority_hits,
+      template_count: row.templates.size,
+      templates: Array.from(row.templates).sort(),
+      focus_areas: Array.from(row.focus_areas).sort(),
+      suggested_templates: suggestedTemplates
+    };
+  });
+
+  output.sort((a, b) => {
+    if (b.priority_score !== a.priority_score) {
+      return b.priority_score - a.priority_score;
+    }
+    if (b.high_priority_hits !== a.high_priority_hits) {
+      return b.high_priority_hits - a.high_priority_hits;
+    }
+    return a.capability.localeCompare(b.capability);
+  });
+  return output;
+}
+
 function buildMarkdown(payload) {
   const lines = [];
   lines.push('# Matrix Remediation Plan');
@@ -316,6 +497,28 @@ function buildMarkdown(payload) {
       : 'n/a';
     lines.push(`- [${item.priority}] ${item.goal}`);
     lines.push(`  - capability focus: ${capabilities}`);
+  }
+  if (Array.isArray(payload.template_priority_matrix) && payload.template_priority_matrix.length > 0) {
+    lines.push('');
+    lines.push('## Template Priority Matrix');
+    lines.push('');
+    for (const item of payload.template_priority_matrix.slice(0, 10)) {
+      lines.push(
+        `- [${item.recommended_phase}] ${item.template_id} ` +
+        `(priority=${item.priority_score}, pressure=${item.regression_pressure}, metrics=${item.impacted_metric_count})`
+      );
+    }
+  }
+  if (Array.isArray(payload.capability_clusters) && payload.capability_clusters.length > 0) {
+    lines.push('');
+    lines.push('## Capability Clusters');
+    lines.push('');
+    for (const item of payload.capability_clusters.slice(0, 10)) {
+      lines.push(
+        `- ${item.capability} ` +
+        `(priority=${item.priority_score}, metrics=${item.impacted_metric_count}, templates=${item.template_count})`
+      );
+    }
   }
   return `${lines.join('\n')}\n`;
 }
@@ -441,6 +644,8 @@ async function main() {
   const items = filtered.map((item, index) => buildQueueItem(item, index, baselinePayload, options.topTemplates));
   const highItems = items.filter(item => item && item.priority === 'high');
   const mediumItems = items.filter(item => !item || item.priority !== 'high');
+  const templatePriorityMatrix = collectTemplatePriorityMatrix(items);
+  const capabilityClusters = collectCapabilityClusters(items, templatePriorityMatrix);
   const queueLines = items.map(item => item.goal);
   const highQueueLines = highItems.map(item => item.goal);
   const mediumQueueLines = mediumItems.map(item => item.goal);
@@ -467,9 +672,13 @@ async function main() {
       regressions_total: regressions.length,
       selected_regressions: items.length,
       phase_high_count: highItems.length,
-      phase_medium_count: mediumItems.length
+      phase_medium_count: mediumItems.length,
+      template_priority_count: templatePriorityMatrix.length,
+      capability_cluster_count: capabilityClusters.length
     },
     items,
+    template_priority_matrix: templatePriorityMatrix,
+    capability_clusters: capabilityClusters,
     artifacts: {
       out: path.relative(cwd, outPath) || '.',
       lines_out: path.relative(cwd, linesOutPath) || '.',
@@ -541,6 +750,8 @@ module.exports = {
   metricToFlag,
   deriveCapabilitiesFromTemplateId,
   collectTemplateCandidates,
+  collectTemplatePriorityMatrix,
+  collectCapabilityClusters,
   buildQueueItem,
   buildMarkdown,
   quoteCliArg,

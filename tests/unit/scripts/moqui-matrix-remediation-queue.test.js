@@ -75,9 +75,23 @@ describe('moqui-matrix-remediation-queue script', () => {
     expect(payload.summary.selected_regressions).toBe(2);
     expect(payload.summary.phase_high_count).toBe(1);
     expect(payload.summary.phase_medium_count).toBe(1);
+    expect(payload.summary.template_priority_count).toBeGreaterThanOrEqual(1);
+    expect(payload.summary.capability_cluster_count).toBeGreaterThanOrEqual(1);
     expect(payload.execution_policy.phase_split).toBe(true);
     expect(payload.items[0].template_candidates[0].template_id).toBe('sce.scene--moqui-order-approval--0.1.0');
     expect(payload.items[0].capability_focus).toEqual(expect.arrayContaining(['approval-routing']));
+    expect(Array.isArray(payload.template_priority_matrix)).toBe(true);
+    expect(payload.template_priority_matrix[0]).toEqual(expect.objectContaining({
+      template_id: 'sce.scene--moqui-order-approval--0.1.0',
+      recommended_phase: 'high'
+    }));
+    expect(Array.isArray(payload.capability_clusters)).toBe(true);
+    expect(payload.capability_clusters).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        capability: 'approval-routing',
+        template_count: 1
+      })
+    ]));
 
     const lines = (await fs.readFile(linesOut, 'utf8'))
       .split(/\r?\n/)
@@ -120,6 +134,10 @@ describe('moqui-matrix-remediation-queue script', () => {
     expect(commandsText).toContain('moqui-matrix-remediation-phased-runner.js');
     expect(commandsText).toContain('--baseline');
     expect(commandsText).toContain('sce auto close-loop');
+
+    const markdownText = await fs.readFile(markdownOut, 'utf8');
+    expect(markdownText).toContain('## Template Priority Matrix');
+    expect(markdownText).toContain('## Capability Clusters');
   });
 
   test('limits template candidates by top-templates', async () => {

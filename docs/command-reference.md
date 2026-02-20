@@ -857,6 +857,7 @@ Matrix regression gate helper (script-level configurable hard gate):
 
 Moqui matrix remediation queue helper (script-level automatic queue export):
 - `node scripts/moqui-matrix-remediation-queue.js [--baseline <path>] [--out <path>] [--lines-out <path>] [--markdown-out <path>] [--batch-json-out <path>] [--commands-out <path>] [--phase-high-lines-out <path>] [--phase-medium-lines-out <path>] [--phase-high-goals-out <path>] [--phase-medium-goals-out <path>] [--phase-high-parallel <n>] [--phase-high-agent-budget <n>] [--phase-medium-parallel <n>] [--phase-medium-agent-budget <n>] [--phase-cooldown-seconds <n>] [--no-phase-split] [--min-delta-abs <n>] [--top-templates <n>] [--json]`: convert matrix regressions into remediation goals consumable by `sce auto close-loop-batch`, with per-metric template candidates/capability focus, phase-split anti-429 outputs (`high` then `medium`), and direct command templates.
+  - JSON output includes `template_priority_matrix` (cross-regression template priority ranking) and `capability_clusters` (capability-level remediation clusters with suggested templates).
   - Default inputs/outputs:
     - Baseline: `.kiro/reports/release-evidence/moqui-template-baseline.json`
     - Plan JSON: `.kiro/reports/release-evidence/matrix-remediation-plan.json`

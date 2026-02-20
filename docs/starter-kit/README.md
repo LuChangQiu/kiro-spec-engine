@@ -6,6 +6,7 @@ This starter kit is the default baseline for onboarding an external project (inc
 
 - `handoff-manifest.starter.json`: minimal manifest contract that works with `sce auto handoff` and `sce scene package-publish-batch`.
 - `release.workflow.sample.yml`: GitHub Actions sample for release-gate + weekly ops evidence publication.
+- `handoff-profile-ci.sample.yml`: profile-based intake pipeline sample (`default|moqui|enterprise`).
 
 ## Quick Start
 
@@ -22,6 +23,7 @@ node scripts/release-ops-weekly-summary.js --json
    - release-gate history index
    - governance snapshot export
    - weekly ops summary export
+4. Optional: use `handoff-profile-ci.sample.yml` to run profile-based intake against external projects.
 
 ## Default Acceptance
 
@@ -30,10 +32,15 @@ node scripts/release-ops-weekly-summary.js --json
 - release preflight is not blocked for hard-gate profiles.
 - weekly ops summary risk is not `high` unless explicitly approved.
 
+## Profile Recommendation
+
+- `default`: generic strict baseline intake.
+- `moqui`: preferred profile for Moqui template sedimentation.
+- `enterprise`: production rollout profile (release preflight hard-gate enabled).
+
 ## Default Evidence Set
 
 - `.kiro/reports/release-evidence/handoff-runs.json`
 - `.kiro/reports/release-evidence/release-gate-history.json`
 - `.kiro/reports/release-evidence/governance-snapshot-<tag>.json`
 - `.kiro/reports/release-evidence/weekly-ops-summary-<tag>.json`
-

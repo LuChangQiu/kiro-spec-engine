@@ -158,4 +158,14 @@
 
 ## 下一阶段（新）
 
-1. 主线目标已收口，转入增强项：按 profile 维度补充外部项目样例与 CI 模板（可选）。
+主线目标已收口，当前剩余增强任务（共 4 项）：
+
+1. profile 化外部接入样例收敛（进行中）：
+   - 已补充 `docs/starter-kit/handoff-profile-ci.sample.yml`。
+   - 待补：增加 profile 场景的最小验收样本（manifest + evidence fixture）并写入测试。
+2. weekly ops gate 与 drift gate 的协同策略：
+   - 待补：当 weekly-risk 为高且 drift 同时告警时，输出统一 remediation 指令包（减少重复建议）。
+3. 双轨协同手册收敛：
+   - 待补：将 `docs/331-poc-dual-track-integration-guide.md` 的“持续适配点”更新为当前真实增量目标，避免与已完成项重复。
+4. 发布资产审计一致性：
+   - 待补：新增 release 资产完整性检查脚本，确保每次 tag 发布都包含治理快照/周报/历史趋势核心资产。

@@ -1,0 +1,53 @@
+name: Handoff Intake (Profile)
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: "handoff profile: default|moqui|enterprise"
+        required: true
+        default: "moqui"
+      manifest:
+        description: "handoff manifest path"
+        required: true
+        default: "docs/handoffs/handoff-manifest.json"
+
+jobs:
+  handoff-intake:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "20.x"
+          cache: "npm"
+
+      - run: npm ci
+
+      - name: Validate capability matrix (profile scoped)
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROFILE="${{ github.event.inputs.profile }}"
+          MANIFEST="${{ github.event.inputs.manifest }}"
+          npx sce auto handoff capability-matrix \
+            --manifest "${MANIFEST}" \
+            --profile "${PROFILE}" \
+            --fail-on-gap \
+            --json
+
+      - name: Execute handoff run (profile scoped)
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROFILE="${{ github.event.inputs.profile }}"
+          MANIFEST="${{ github.event.inputs.manifest }}"
+          npx sce auto handoff run \
+            --manifest "${MANIFEST}" \
+            --profile "${PROFILE}" \
+            --json
+
+      - name: Build weekly ops summary
+        run: node scripts/release-ops-weekly-summary.js --json
+

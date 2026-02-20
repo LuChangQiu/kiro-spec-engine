@@ -89,12 +89,16 @@ npx sce auto observability snapshot --json
 2. 不出现高风险未处置项。
 3. observability 快照可追踪到本轮变更。
 
-## 3. sce 侧当前需持续适配的点
+## 3. sce 侧当前持续增强点（主线收口后）
 
-1. 对接自动化：把 331 handoff manifest 解析为可执行批次计划。
-2. ontology 深化：将“业务规则/决策逻辑”映射为可量化 gate 指标。
-3. 多 spec 主从调度：按依赖图自动分批并控制并行度。
-4. 发布治理：把 handoff 批次结果写入统一 release evidence。
+1. profile 维度外部接入样本补齐：
+   - default/moqui/enterprise 的最小 manifest + evidence 示例与 CI 验收样例保持同步。
+2. 周报与漂移协同门禁：
+   - weekly ops gate 与 drift gate 在阻断场景输出统一 remediation 指令包。
+3. 发布资产完整性审计：
+   - 对治理快照、weekly ops summary、release-gate-history 进行发布前自动完整性校验。
+4. ontology 语义矩阵持续加深：
+   - 对“业务规则/决策策略/实体关系”闭环指标保持 100% 合规，持续吸收 Moqui 新增能力模板。
 
 ## 4. 角色划分
 

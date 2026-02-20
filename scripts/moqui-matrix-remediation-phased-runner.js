@@ -25,6 +25,8 @@ const DEFAULT_HIGH_LINES = '.kiro/auto/matrix-remediation.high.lines';
 const DEFAULT_MEDIUM_LINES = '.kiro/auto/matrix-remediation.medium.lines';
 const DEFAULT_HIGH_RETRY_MAX_ROUNDS = 3;
 const DEFAULT_MEDIUM_RETRY_MAX_ROUNDS = 2;
+const DEFAULT_PHASE_RECOVERY_ATTEMPTS = 2;
+const DEFAULT_PHASE_RECOVERY_COOLDOWN_SECONDS = 30;
 
 function parseArgs(argv) {
   const options = {
@@ -39,6 +41,8 @@ function parseArgs(argv) {
     phaseCooldownSeconds: DEFAULT_PHASE_COOLDOWN_SECONDS,
     highRetryMaxRounds: DEFAULT_HIGH_RETRY_MAX_ROUNDS,
     mediumRetryMaxRounds: DEFAULT_MEDIUM_RETRY_MAX_ROUNDS,
+    phaseRecoveryAttempts: DEFAULT_PHASE_RECOVERY_ATTEMPTS,
+    phaseRecoveryCooldownSeconds: DEFAULT_PHASE_RECOVERY_COOLDOWN_SECONDS,
     baseline: null,
     queueOut: DEFAULT_OUT,
     queueLinesOut: DEFAULT_LINES_OUT,
@@ -90,6 +94,12 @@ function parseArgs(argv) {
     } else if (token === '--medium-retry-max-rounds' && next) {
       options.mediumRetryMaxRounds = Number(next);
       index += 1;
+    } else if (token === '--phase-recovery-attempts' && next) {
+      options.phaseRecoveryAttempts = Number(next);
+      index += 1;
+    } else if (token === '--phase-recovery-cooldown-seconds' && next) {
+      options.phaseRecoveryCooldownSeconds = Number(next);
+      index += 1;
     } else if (token === '--baseline' && next) {
       options.baseline = next;
       index += 1;
@@ -137,6 +147,8 @@ function parseArgs(argv) {
   validateNonNegativeInt(options.phaseCooldownSeconds, '--phase-cooldown-seconds');
   validatePositiveInt(options.highRetryMaxRounds, '--high-retry-max-rounds');
   validatePositiveInt(options.mediumRetryMaxRounds, '--medium-retry-max-rounds');
+  validatePositiveInt(options.phaseRecoveryAttempts, '--phase-recovery-attempts');
+  validateNonNegativeInt(options.phaseRecoveryCooldownSeconds, '--phase-recovery-cooldown-seconds');
   if (!Number.isFinite(options.minDeltaAbs) || options.minDeltaAbs < 0) {
     throw new Error('--min-delta-abs must be a non-negative number.');
   }
@@ -173,6 +185,8 @@ function printHelpAndExit(code) {
     `  --phase-cooldown-seconds <n>   Cooldown between phases (default: ${DEFAULT_PHASE_COOLDOWN_SECONDS})`,
     `  --high-retry-max-rounds <n>    Retry max rounds for high phase (default: ${DEFAULT_HIGH_RETRY_MAX_ROUNDS})`,
     `  --medium-retry-max-rounds <n>  Retry max rounds for medium phase (default: ${DEFAULT_MEDIUM_RETRY_MAX_ROUNDS})`,
+    `  --phase-recovery-attempts <n>  Max process-level attempts per phase on failure (default: ${DEFAULT_PHASE_RECOVERY_ATTEMPTS})`,
+    `  --phase-recovery-cooldown-seconds <n> Cooldown between retry attempts of the same phase (default: ${DEFAULT_PHASE_RECOVERY_COOLDOWN_SECONDS})`,
     `  --baseline <path>              Optional: generate queue package from baseline first (default baseline path: ${DEFAULT_BASELINE})`,
     `  --queue-out <path>             Queue plan JSON output when --baseline is used (default: ${DEFAULT_OUT})`,
     `  --queue-lines-out <path>       Queue lines output when --baseline is used (default: ${DEFAULT_LINES_OUT})`,
@@ -396,9 +410,19 @@ async function sleep(seconds) {
   await new Promise(resolve => setTimeout(resolve, seconds * 1000));
 }
 
-async function runPhases(options, runtime) {
+function halveWithFloor(value) {
+  return Math.max(1, Math.floor(Number(value) / 2));
+}
+
+async function runPhases(options, runtime, hooks = {}) {
   const phases = [];
   let failed = false;
+  const executeFn = typeof hooks.executeCommand === 'function'
+    ? hooks.executeCommand
+    : executeCommand;
+  const sleepFn = typeof hooks.sleep === 'function'
+    ? hooks.sleep
+    : sleep;
   const phaseEntries = [
     {
       name: 'high',
@@ -433,7 +457,8 @@ async function runPhases(options, runtime) {
         }
         : null,
       command: null,
-      exit_code: null
+      exit_code: null,
+      attempts: []
     };
 
     if (!entry.input) {
@@ -447,24 +472,69 @@ async function runPhases(options, runtime) {
       continue;
     }
 
-    const args = [...runnerPrefixArgs, ...buildCloseLoopArgs(entry.input, entry)];
-    record.command = toCommandPreview(runnerBin, args);
-
     if (options.dryRun) {
+      const args = [...runnerPrefixArgs, ...buildCloseLoopArgs(entry.input, entry)];
+      record.command = toCommandPreview(runnerBin, args);
+      record.attempts.push({
+        attempt: 1,
+        status: 'planned',
+        command: record.command,
+        parallel: entry.parallel,
+        agent_budget: entry.agentBudget,
+        exit_code: null,
+        reason: null
+      });
       record.status = 'planned';
       phases.push(record);
       continue;
     }
 
-    const execution = await executeCommand(runnerBin, args, runtime.cwd);
-    record.exit_code = execution.code;
-    if (execution.code === 0) {
-      record.status = 'completed';
-    } else {
-      record.status = 'failed';
-      record.reason = execution.error || `exit code ${execution.code}`;
-      failed = true;
+    let attemptParallel = entry.parallel;
+    let attemptAgentBudget = entry.agentBudget;
+    for (let attempt = 1; attempt <= options.phaseRecoveryAttempts; attempt += 1) {
+      const phaseOptions = {
+        parallel: attemptParallel,
+        agentBudget: attemptAgentBudget,
+        retryMaxRounds: entry.retryMaxRounds
+      };
+      const args = [...runnerPrefixArgs, ...buildCloseLoopArgs(entry.input, phaseOptions)];
+      const command = toCommandPreview(runnerBin, args);
+      if (!record.command) {
+        record.command = command;
+      }
+      const execution = await executeFn(runnerBin, args, runtime.cwd);
+      const attemptReason = execution.code === 0 ? null : (execution.error || `exit code ${execution.code}`);
+      record.attempts.push({
+        attempt,
+        status: execution.code === 0 ? 'completed' : 'failed',
+        command,
+        parallel: attemptParallel,
+        agent_budget: attemptAgentBudget,
+        exit_code: execution.code,
+        reason: attemptReason
+      });
+      record.exit_code = execution.code;
+
+      if (execution.code === 0) {
+        record.status = 'completed';
+        record.reason = null;
+        break;
+      }
+
+      if (attempt >= options.phaseRecoveryAttempts) {
+        record.status = 'failed';
+        record.reason = attemptReason;
+        failed = true;
+        break;
+      }
+
+      if (options.phaseRecoveryCooldownSeconds > 0) {
+        await sleepFn(options.phaseRecoveryCooldownSeconds);
+      }
+      attemptParallel = halveWithFloor(attemptParallel);
+      attemptAgentBudget = halveWithFloor(attemptAgentBudget);
     }
+
     phases.push(record);
 
     const isHighPhase = entry.name === 'high';
@@ -475,9 +545,9 @@ async function runPhases(options, runtime) {
       mediumPlanned &&
       !options.dryRun &&
       options.phaseCooldownSeconds > 0 &&
-      (execution.code === 0 || options.continueOnError)
+      (record.status === 'completed' || options.continueOnError)
     ) {
-      await sleep(options.phaseCooldownSeconds);
+      await sleepFn(options.phaseCooldownSeconds);
     }
   }
 
@@ -549,7 +619,8 @@ async function main() {
     policy: {
       continue_on_error: options.continueOnError === true,
       fallback_lines_enabled: allowLinesFallback,
-      dry_run: options.dryRun === true
+      dry_run: options.dryRun === true,
+      auto_phase_recovery_enabled: options.phaseRecoveryAttempts > 1
     },
     execution_policy: {
       phase_high_parallel: options.phaseHighParallel,
@@ -558,7 +629,9 @@ async function main() {
       phase_medium_parallel: options.phaseMediumParallel,
       phase_medium_agent_budget: options.phaseMediumAgentBudget,
       phase_medium_retry_max_rounds: options.mediumRetryMaxRounds,
-      phase_cooldown_seconds: options.phaseCooldownSeconds
+      phase_cooldown_seconds: options.phaseCooldownSeconds,
+      phase_recovery_attempts: options.phaseRecoveryAttempts,
+      phase_recovery_cooldown_seconds: options.phaseRecoveryCooldownSeconds
     },
     inputs: {
       baseline: baselinePath ? runtime.toRelative(baselinePath) : null,
@@ -620,6 +693,8 @@ module.exports = {
   DEFAULT_MEDIUM_LINES,
   DEFAULT_HIGH_RETRY_MAX_ROUNDS,
   DEFAULT_MEDIUM_RETRY_MAX_ROUNDS,
+  DEFAULT_PHASE_RECOVERY_ATTEMPTS,
+  DEFAULT_PHASE_RECOVERY_COOLDOWN_SECONDS,
   parseArgs,
   resolvePath,
   readGoalsPayload,
@@ -631,5 +706,6 @@ module.exports = {
   quoteCliArg,
   toCommandPreview,
   runPhases,
+  halveWithFloor,
   main
 };

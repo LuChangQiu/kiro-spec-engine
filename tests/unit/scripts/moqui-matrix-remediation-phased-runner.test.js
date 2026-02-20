@@ -2,6 +2,10 @@ const fs = require('fs-extra');
 const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const {
+  parseArgs,
+  runPhases
+} = require('../../../scripts/moqui-matrix-remediation-phased-runner');
 
 describe('moqui-matrix-remediation-phased-runner script', () => {
   let tempDir;
@@ -130,5 +134,70 @@ describe('moqui-matrix-remediation-phased-runner script', () => {
     expect(payload.phases[1].status).toBe('planned');
     expect(await fs.pathExists(path.join(workspace, '.kiro', 'auto', 'matrix-remediation.goals.high.json'))).toBe(true);
     expect(await fs.pathExists(path.join(workspace, '.kiro', 'auto', 'matrix-remediation.goals.medium.json'))).toBe(true);
+  });
+
+  test('parses phase recovery options', () => {
+    const options = parseArgs([
+      '--phase-recovery-attempts', '3',
+      '--phase-recovery-cooldown-seconds', '12'
+    ]);
+    expect(options.phaseRecoveryAttempts).toBe(3);
+    expect(options.phaseRecoveryCooldownSeconds).toBe(12);
+  });
+
+  test('retries failed phase and reduces parallel/agent budget on recovery attempts', async () => {
+    const options = {
+      phaseHighParallel: 4,
+      phaseHighAgentBudget: 6,
+      phaseMediumParallel: 2,
+      phaseMediumAgentBudget: 4,
+      phaseCooldownSeconds: 0,
+      highRetryMaxRounds: 3,
+      mediumRetryMaxRounds: 2,
+      phaseRecoveryAttempts: 2,
+      phaseRecoveryCooldownSeconds: 0,
+      continueOnError: false,
+      dryRun: false,
+      sceBin: null
+    };
+    const runtime = {
+      cwd: tempDir,
+      toRelative: value => value,
+      highInput: {
+        phase: 'high',
+        source: 'goals-json',
+        format: 'json',
+        path: 'mock-high.goals.json',
+        count: 1
+      },
+      mediumInput: null
+    };
+    let attemptCount = 0;
+    const phases = await runPhases(options, runtime, {
+      executeCommand: async () => {
+        attemptCount += 1;
+        return { code: attemptCount === 1 ? 1 : 0 };
+      },
+      sleep: async () => {}
+    });
+
+    expect(phases).toHaveLength(2);
+    expect(phases[0].status).toBe('completed');
+    expect(phases[0].attempts).toHaveLength(2);
+    expect(phases[0].attempts[0]).toEqual(expect.objectContaining({
+      attempt: 1,
+      status: 'failed',
+      parallel: 4,
+      agent_budget: 6,
+      exit_code: 1
+    }));
+    expect(phases[0].attempts[1]).toEqual(expect.objectContaining({
+      attempt: 2,
+      status: 'completed',
+      parallel: 2,
+      agent_budget: 3,
+      exit_code: 0
+    }));
+    expect(phases[1].status).toBe('skipped');
   });
 });

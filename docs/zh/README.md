@@ -190,6 +190,12 @@
 - 主从编排与门禁增强
 - 跨轮次回归与发布治理集成
 
+### [Handoff Profile Integration Guide](../handoff-profile-integration-guide.md)
+**外部项目接入规范（英文）** - `default|moqui|enterprise` 三档 handoff profile 契约
+- profile 默认策略与显式参数覆盖规则
+- 外部项目 manifest/evidence 最小要求
+- 从 `moqui` 到 `enterprise` 的分阶段上线建议
+
 ### [Value 可观测指南](value-observability-guide.md)
 **KPI 量化交付指南** - 快照、基线、趋势、门禁证据
 - 周度 KPI 快照生成

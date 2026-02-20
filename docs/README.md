@@ -94,6 +94,7 @@ Detailed technical documentation:
 - **[Moqui Template Core Library Playbook](moqui-template-core-library-playbook.md)** - Default-gated intake flow for absorbing Moqui capabilities into sce templates
 - **[331-poc Dual-Track Integration Guide](331-poc-dual-track-integration-guide.md)** - Handoff contract and integration playbook between 331-poc and sce
 - **[331-poc Adaptation Roadmap](331-poc-adaptation-roadmap.md)** - Ongoing sce-side adaptation backlog and rollout phases
+- **[Handoff Profile Integration Guide](handoff-profile-integration-guide.md)** - External project intake contract for `default|moqui|enterprise` handoff profiles
 - **[Multi-Agent Coordination Guide](multi-agent-coordination-guide.md)** - Multi-agent parallel coordination for concurrent development
 - **[Troubleshooting](troubleshooting.md)** - Solutions to common problems
 - **[FAQ](faq.md)** - Answers to frequently asked questions
@@ -191,6 +192,7 @@ Detailed technical documentation:
 - [Moqui Template Core Library Playbook](moqui-template-core-library-playbook.md)
 - [331-poc Dual-Track Integration Guide](331-poc-dual-track-integration-guide.md)
 - [331-poc Adaptation Roadmap](331-poc-adaptation-roadmap.md)
+- [Handoff Profile Integration Guide](handoff-profile-integration-guide.md)
 - [Scene Template Engine](command-reference.md#scene-template-engine)
 - [Scene Quality Pipeline](command-reference.md#scene-template-quality-pipeline)
 - [Scene Ontology](command-reference.md#scene-ontology-enhancement)

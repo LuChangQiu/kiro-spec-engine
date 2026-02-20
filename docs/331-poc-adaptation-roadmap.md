@@ -152,7 +152,10 @@
 4. release workflow 独立治理快照资产化：
    - 新增 `scripts/release-governance-snapshot-export.js`，从 release evidence summary 提取 `governance_snapshot` 并导出独立 JSON/Markdown 资产。
    - `release.yml` 发布流程新增治理快照导出步骤，统一上传 `governance-snapshot-<tag>.json|.md` 供外部审计直接消费（无 summary 时也会生成占位资产，避免资产缺口）。
+5. handoff 模板 profile 化与外部接入规范：
+   - `sce auto handoff run` / `sce auto handoff capability-matrix` 新增 `--profile <default|moqui|enterprise>`，将策略默认值抽象为稳定 profile 契约，并允许显式参数覆盖。
+   - 新增 `docs/handoff-profile-integration-guide.md`，对外发布 profile 默认策略、覆盖规则、manifest/evidence 要求及分阶段上线建议。
 
 ## 下一阶段（新）
 
-1. 将 handoff 模板适配抽象为 profile（moqui/default/enterprise），对外发布通用外部项目接入规范。
+1. 主线目标已收口，转入增强项：按 profile 维度补充外部项目样例与 CI 模板（可选）。

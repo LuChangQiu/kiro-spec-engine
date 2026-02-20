@@ -7480,6 +7480,65 @@ if (process.argv.includes('--json')) {
     expect(payload.recommendations.some(item => item.includes('sce auto close-loop-batch'))).toBe(true);
   });
 
+  test('supports handoff capability matrix profile selection', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-23-capability-matrix-profile'],
+      templates: ['tpl-matrix-profile'],
+      capabilities: ['erp-order-query-read'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-matrix-profile');
+    await fs.ensureDir(templateDir);
+    await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
+      capabilities: {
+        provides: ['erp-order-query-read']
+      },
+      governance_contract: {
+        business_rules: [
+          { id: 'rule.order.query' }
+        ],
+        decision_logic: [
+          { id: 'decision.order.query-path' }
+        ]
+      },
+      ontology_model: {
+        entities: [
+          { id: 'order_header' }
+        ],
+        relations: [
+          { source: 'order_header', target: 'order_projection', type: 'produces' }
+        ]
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'sce',
+      'auto',
+      'handoff',
+      'capability-matrix',
+      '--manifest',
+      manifestFile,
+      '--profile',
+      'moqui',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-capability-matrix');
+    expect(payload.policy).toEqual(expect.objectContaining({
+      profile: 'moqui'
+    }));
+    expect(payload.gates.passed).toBe(true);
+  });
+
   test('adds phased remediation one-shot recommendations when capability matrix sees Moqui regressions', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
     await fs.writeJson(manifestFile, {
@@ -7753,6 +7812,39 @@ if (process.argv.includes('--json')) {
     expect(payload.gates.reasons.some(item => item.includes('capability-coverage:capability_coverage_percent'))).toBe(true);
   });
 
+  test('validates handoff capability matrix profile option', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-25b-capability-matrix-profile-invalid'],
+      templates: ['tpl-matrix-fail'],
+      capabilities: ['order-fulfillment'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'sce',
+        'auto',
+        'handoff',
+        'capability-matrix',
+        '--manifest',
+        manifestFile,
+        '--profile',
+        'unknown-profile',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.error).toContain('--profile must be one of: default, moqui, enterprise.');
+  });
+
   test('fails capability matrix semantic gate by default when semantic dimensions are missing', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
     await fs.writeJson(manifestFile, {
@@ -7956,6 +8048,119 @@ if (process.argv.includes('--json')) {
         requested: 5
       })
     }));
+  });
+
+  test('applies enterprise handoff run profile defaults', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    const releaseGateHistoryFile = path.join(
+      tempDir,
+      '.kiro',
+      'reports',
+      'release-evidence',
+      'release-gate-history.json'
+    );
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-08-enterprise-profile'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+    await fs.ensureDir(path.dirname(releaseGateHistoryFile));
+    await fs.writeJson(releaseGateHistoryFile, {
+      mode: 'auto-handoff-release-gate-history',
+      total_entries: 1,
+      latest: {
+        tag: 'v3.0.8',
+        gate_passed: true,
+        risk_level: 'low'
+      },
+      aggregates: {
+        pass_rate_percent: 100,
+        scene_package_batch_pass_rate_percent: 100,
+        scene_package_batch_failed_count: 0,
+        drift_alert_rate_percent: 0,
+        drift_alert_runs: 0,
+        drift_blocked_runs: 0
+      },
+      entries: [
+        {
+          tag: 'v3.0.8',
+          gate_passed: true,
+          risk_level: 'low'
+        }
+      ]
+    }, { spaces: 2 });
+
+    runAutoCloseLoop.mockResolvedValue({
+      status: 'completed',
+      portfolio: {
+        master_spec: '160-00-handoff-enterprise-profile',
+        sub_specs: ['160-01-sub']
+      }
+    });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'sce',
+      'auto',
+      'handoff',
+      'run',
+      '--manifest',
+      manifestFile,
+      '--profile',
+      'enterprise',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-run');
+    expect(payload.status).toBe('completed');
+    expect(payload.policy).toEqual(expect.objectContaining({
+      profile: 'enterprise',
+      max_risk_level: 'medium',
+      require_release_gate_preflight: true,
+      release_evidence_window: 10
+    }));
+    expect(payload.release_gate_preflight).toEqual(expect.objectContaining({
+      available: true,
+      blocked: false
+    }));
+  });
+
+  test('validates handoff run profile option', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-08-run-profile-invalid'],
+      templates: ['moqui-domain-extension'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'sce',
+        'auto',
+        'handoff',
+        'run',
+        '--manifest',
+        manifestFile,
+        '--profile',
+        'invalid-profile',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.error).toContain('--profile must be one of: default, moqui, enterprise.');
   });
 
   test('runs handoff by dependency batches before post-spec goals', async () => {

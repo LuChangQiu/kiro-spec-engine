@@ -33,6 +33,12 @@ Emergency bypass exists but is not recommended:
 - `--no-require-moqui-baseline`
 - `--no-require-capability-coverage`
 
+Profile presets are available for external intake standardization:
+
+- `--profile default`: baseline strict intake defaults.
+- `--profile moqui`: explicit Moqui baseline alias (same strict defaults).
+- `--profile enterprise`: stricter release control baseline (`max-risk-level=medium`, `require-release-gate-preflight=true`, `release-evidence-window=10`).
+
 ## Template Capability Matrix Contract
 
 Use the baseline report as the canonical matrix contract (`.kiro/reports/moqui-template-baseline.json`):

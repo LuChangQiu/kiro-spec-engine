@@ -383,6 +383,8 @@ function buildCommandsMarkdown(payload = {}) {
     lines.push('4. Optional lines fallback:');
     lines.push(`   - high: \`sce auto close-loop-batch ${quoteCliArg(highLinesOut)} --format lines --json\``);
     lines.push(`   - medium: \`sce auto close-loop-batch ${quoteCliArg(mediumLinesOut)} --format lines --json\``);
+    lines.push('5. One-shot phased runner:');
+    lines.push(`   - \`node scripts/moqui-matrix-remediation-phased-runner.js --high-goals ${quoteCliArg(highGoalsOut)} --medium-goals ${quoteCliArg(mediumGoalsOut)} --high-lines ${quoteCliArg(highLinesOut)} --medium-lines ${quoteCliArg(mediumLinesOut)} --phase-high-parallel ${highParallel} --phase-high-agent-budget ${highAgentBudget} --phase-medium-parallel ${mediumParallel} --phase-medium-agent-budget ${mediumAgentBudget} --phase-cooldown-seconds ${cooldownSeconds} --json\``);
   }
   lines.push('');
   lines.push('## Per Goal');

@@ -125,6 +125,9 @@ sce auto close-loop-batch .kiro/auto/matrix-remediation.goals.medium.json \
   --batch-retry-max-rounds 2 \
   --json
 
+# one-shot equivalent
+npm run run:matrix-remediation-phased -- --json
+
 # fallback
 sce auto close-loop-batch .kiro/auto/matrix-remediation.lines --json
 sce auto close-loop-batch .kiro/auto/matrix-remediation.goals.json --format json --json

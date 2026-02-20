@@ -117,6 +117,7 @@ describe('moqui-matrix-remediation-queue script', () => {
     expect(commandsText).toContain('--format json');
     expect(commandsText).toContain('Rate-Limit Safe Phased Mode');
     expect(commandsText).toContain('sleep 20');
+    expect(commandsText).toContain('moqui-matrix-remediation-phased-runner.js');
     expect(commandsText).toContain('sce auto close-loop');
   });
 

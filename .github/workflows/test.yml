@@ -68,7 +68,16 @@ jobs:
 
       - name: Run interactive governance gate
         run: node scripts/interactive-governance-report.js --period weekly --fail-on-alert --json
-      
+
+      - name: Build Moqui release summary (CI advisory)
+        run: |
+          node scripts/moqui-release-summary.js \
+            --baseline .kiro/reports/moqui-template-baseline-ci.json \
+            --interactive-governance .kiro/reports/interactive-governance-report.json \
+            --out .kiro/reports/release-evidence/moqui-release-summary-ci.json \
+            --markdown-out .kiro/reports/release-evidence/moqui-release-summary-ci.md \
+            --json
+
       - name: Check coverage
         run: npm run coverage -- --runInBand
       
@@ -92,4 +101,6 @@ jobs:
             .kiro/reports/interactive-flow-smoke/interactive-flow-smoke.summary.json
             .kiro/reports/moqui-template-baseline-ci.json
             .kiro/reports/moqui-template-baseline-ci.md
+            .kiro/reports/release-evidence/moqui-release-summary-ci.json
+            .kiro/reports/release-evidence/moqui-release-summary-ci.md
             .kiro/reports/release-evidence/matrix-regression-gate-ci.json

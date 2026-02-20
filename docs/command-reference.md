@@ -1106,6 +1106,8 @@ Release workflow default:
 - Evaluates matrix regression gate in CI/release with configurable policy:
   - `KSE_MATRIX_REGRESSION_GATE_ENFORCE` (`true|false`, default advisory/disabled)
   - `KSE_MATRIX_REGRESSION_GATE_MAX` (default `0`)
+- Optional release summary hard-gate:
+  - `KSE_MOQUI_RELEASE_SUMMARY_ENFORCE` (`true|false`, default advisory/disabled)
 - Publishes `moqui-template-baseline.json` + `moqui-template-baseline.md` as release assets.
 - Publishes `moqui-release-summary.json` + `moqui-release-summary.md` as release review assets.
 - Publishes `interactive-governance-<tag>.json` + `interactive-governance-<tag>.md` as release evidence assets.

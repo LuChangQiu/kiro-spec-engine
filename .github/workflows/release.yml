@@ -236,6 +236,44 @@ jobs:
           echo "markdown_file=${REMEDIATION_MD}" >> "$GITHUB_OUTPUT"
           echo "lines_file=${REMEDIATION_LINES}" >> "$GITHUB_OUTPUT"
 
+      - name: Build Moqui release summary
+        id: moqui_release_summary
+        shell: bash
+        env:
+          MOQUI_RELEASE_SUMMARY_ENFORCE: ${{ vars.KSE_MOQUI_RELEASE_SUMMARY_ENFORCE }}
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          NOTES_DIR=".kiro/reports/release-evidence"
+          SUMMARY_JSON="${NOTES_DIR}/moqui-release-summary.json"
+          SUMMARY_MD="${NOTES_DIR}/moqui-release-summary.md"
+          SUMMARY_STDOUT="${NOTES_DIR}/moqui-release-summary-${TAG}.stdout.json"
+          FAIL_FLAG=""
+
+          ENFORCE_RAW="${MOQUI_RELEASE_SUMMARY_ENFORCE:-false}"
+          ENFORCE_NORMALIZED="$(printf '%s' "${ENFORCE_RAW}" | tr '[:upper:]' '[:lower:]')"
+          if [[ "${ENFORCE_NORMALIZED}" == "1" || "${ENFORCE_NORMALIZED}" == "true" || "${ENFORCE_NORMALIZED}" == "yes" || "${ENFORCE_NORMALIZED}" == "y" || "${ENFORCE_NORMALIZED}" == "on" ]]; then
+            FAIL_FLAG="--fail-on-gate-fail"
+            echo "[moqui-release-summary] mode=enforce"
+          else
+            echo "[moqui-release-summary] mode=advisory"
+          fi
+
+          node scripts/moqui-release-summary.js \
+            --evidence "${NOTES_DIR}/handoff-runs.json" \
+            --baseline "${{ steps.moqui_baseline.outputs.json_file }}" \
+            --capability-matrix .kiro/reports/handoff-capability-matrix.json \
+            --interactive-governance "${{ steps.interactive_governance.outputs.json_file }}" \
+            --out "${SUMMARY_JSON}" \
+            --markdown-out "${SUMMARY_MD}" \
+            ${FAIL_FLAG} \
+            --json > "${SUMMARY_STDOUT}"
+
+          cat "${SUMMARY_STDOUT}"
+          rm -f "${SUMMARY_STDOUT}"
+          echo "json_file=${SUMMARY_JSON}" >> "$GITHUB_OUTPUT"
+          echo "markdown_file=${SUMMARY_MD}" >> "$GITHUB_OUTPUT"
+
       - name: Run Moqui core regression suite
         id: moqui_core_regression
         shell: bash
@@ -929,6 +967,8 @@ jobs:
             ${{ steps.interactive_matrix_signals.outputs.signal_file }}
             ${{ steps.moqui_baseline.outputs.json_file }}
             ${{ steps.moqui_baseline.outputs.markdown_file }}
+            ${{ steps.moqui_release_summary.outputs.json_file }}
+            ${{ steps.moqui_release_summary.outputs.markdown_file }}
             ${{ steps.matrix_regression_gate.outputs.json_file }}
             ${{ steps.matrix_remediation.outputs.json_file }}
             ${{ steps.matrix_remediation.outputs.markdown_file }}

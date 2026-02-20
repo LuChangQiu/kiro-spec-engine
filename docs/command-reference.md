@@ -845,6 +845,22 @@ Moqui release summary helper (script-level consolidated gate view):
     - `.kiro/reports/release-evidence/moqui-release-summary.md`
   - `--fail-on-gate-fail` exits with code `2` when summary gate is `failed`.
 
+Matrix regression gate helper (script-level configurable hard gate):
+- `node scripts/matrix-regression-gate.js [--baseline <path>] [--max-regressions <n>] [--enforce] [--out <path>] [--json]`: evaluate matrix regression count from baseline compare payload (`coverage_matrix_regressions` preferred, fallback `regressions`) and enforce hard gate when enabled.
+  - Default baseline input: `.kiro/reports/release-evidence/moqui-template-baseline.json`
+  - Default output: `.kiro/reports/release-evidence/matrix-regression-gate.json`
+  - `--enforce` exits with code `2` when regressions exceed `--max-regressions`.
+- npm alias: `npm run gate:matrix-regression`
+
+Moqui matrix remediation queue helper (script-level automatic queue export):
+- `node scripts/moqui-matrix-remediation-queue.js [--baseline <path>] [--out <path>] [--lines-out <path>] [--markdown-out <path>] [--min-delta-abs <n>] [--json]`: convert matrix regressions into remediation goals consumable by `sce auto close-loop-batch`.
+  - Default inputs/outputs:
+    - Baseline: `.kiro/reports/release-evidence/moqui-template-baseline.json`
+    - Plan JSON: `.kiro/reports/release-evidence/matrix-remediation-plan.json`
+    - Queue lines: `.kiro/auto/matrix-remediation.lines`
+    - Plan Markdown: `.kiro/reports/release-evidence/matrix-remediation-plan.md`
+- npm alias: `npm run report:matrix-remediation-queue`
+
 Interactive customization plan gate helper (script-level secure-by-default check):
 - `node scripts/interactive-change-plan-gate.js --plan <path> [--policy <path>] [--catalog <path>] [--out <path>] [--markdown-out <path>] [--fail-on-block] [--fail-on-non-allow] [--json]`: evaluate interactive change plans against default guardrails (approval, sensitive-data masking, secrets, irreversible backup, high-risk action catalog) and output `allow | review-required | deny`.
   - Default policy: `docs/interactive-customization/guardrail-policy-baseline.json`
@@ -1087,9 +1103,13 @@ Release workflow default:
 - Runs interactive loop smoke (`npm run test:interactive-loop-smoke`) in test/release test jobs.
 - Runs interactive flow smoke (`npm run test:interactive-flow-smoke`) in test/release test jobs.
 - Runs interactive governance gate by default (`interactive-governance-report --period weekly --fail-on-alert`) in test and release pipelines.
+- Evaluates matrix regression gate in CI/release with configurable policy:
+  - `KSE_MATRIX_REGRESSION_GATE_ENFORCE` (`true|false`, default advisory/disabled)
+  - `KSE_MATRIX_REGRESSION_GATE_MAX` (default `0`)
 - Publishes `moqui-template-baseline.json` + `moqui-template-baseline.md` as release assets.
 - Publishes `moqui-release-summary.json` + `moqui-release-summary.md` as release review assets.
 - Publishes `interactive-governance-<tag>.json` + `interactive-governance-<tag>.md` as release evidence assets.
+- Publishes `interactive-matrix-signals-<tag>.jsonl`, `matrix-regression-gate-<tag>.json`, and `matrix-remediation-plan-<tag>.{json,md}` + `matrix-remediation-<tag>.lines` as release evidence assets.
 - Enforces baseline portfolio gate by default (`KSE_MOQUI_BASELINE_ENFORCE` defaults to `true` when unset).
 
 ### Moqui ERP Integration

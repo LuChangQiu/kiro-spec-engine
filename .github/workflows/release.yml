@@ -84,6 +84,24 @@ jobs:
           echo "json_file=${GOVERNANCE_JSON}" >> "$GITHUB_OUTPUT"
           echo "markdown_file=${GOVERNANCE_MD}" >> "$GITHUB_OUTPUT"
 
+      - name: Snapshot interactive matrix signals
+        id: interactive_matrix_signals
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          NOTES_DIR=".kiro/reports/release-evidence"
+          SIGNAL_SOURCE=".kiro/reports/interactive-matrix-signals.jsonl"
+          SIGNAL_RELEASE_FILE="${NOTES_DIR}/interactive-matrix-signals-${TAG}.jsonl"
+
+          mkdir -p "${NOTES_DIR}"
+          if [[ -f "${SIGNAL_SOURCE}" ]]; then
+            cp "${SIGNAL_SOURCE}" "${SIGNAL_RELEASE_FILE}"
+          else
+            : > "${SIGNAL_RELEASE_FILE}"
+          fi
+          echo "signal_file=${SIGNAL_RELEASE_FILE}" >> "$GITHUB_OUTPUT"
+
       - name: Resolve previous Moqui baseline asset
         id: moqui_baseline_prev
         shell: bash
@@ -163,6 +181,60 @@ jobs:
           rm -f "${BASELINE_STDOUT}"
           echo "json_file=${BASELINE_JSON}" >> "$GITHUB_OUTPUT"
           echo "markdown_file=${BASELINE_MD}" >> "$GITHUB_OUTPUT"
+
+      - name: Evaluate matrix regression hard gate
+        id: matrix_regression_gate
+        shell: bash
+        env:
+          MATRIX_REGRESSION_GATE_ENFORCE: ${{ vars.KSE_MATRIX_REGRESSION_GATE_ENFORCE }}
+          MATRIX_REGRESSION_GATE_MAX: ${{ vars.KSE_MATRIX_REGRESSION_GATE_MAX }}
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          NOTES_DIR=".kiro/reports/release-evidence"
+          GATE_JSON="${NOTES_DIR}/matrix-regression-gate-${TAG}.json"
+
+          ENFORCE_RAW="${MATRIX_REGRESSION_GATE_ENFORCE:-false}"
+          ENFORCE_NORMALIZED="$(printf '%s' "${ENFORCE_RAW}" | tr '[:upper:]' '[:lower:]')"
+          ENFORCE_FLAG=""
+          if [[ "${ENFORCE_NORMALIZED}" == "1" || "${ENFORCE_NORMALIZED}" == "true" || "${ENFORCE_NORMALIZED}" == "yes" || "${ENFORCE_NORMALIZED}" == "y" || "${ENFORCE_NORMALIZED}" == "on" ]]; then
+            ENFORCE_FLAG="--enforce"
+            echo "[matrix-regression-gate] mode=enforce"
+          else
+            echo "[matrix-regression-gate] mode=advisory"
+          fi
+
+          MAX_REGRESSIONS="${MATRIX_REGRESSION_GATE_MAX:-0}"
+          node scripts/matrix-regression-gate.js \
+            --baseline "${{ steps.moqui_baseline.outputs.json_file }}" \
+            --max-regressions "${MAX_REGRESSIONS}" \
+            --out "${GATE_JSON}" \
+            ${ENFORCE_FLAG} \
+            --json
+
+          echo "json_file=${GATE_JSON}" >> "$GITHUB_OUTPUT"
+
+      - name: Build matrix remediation queue
+        id: matrix_remediation
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          NOTES_DIR=".kiro/reports/release-evidence"
+          REMEDIATION_JSON="${NOTES_DIR}/matrix-remediation-plan-${TAG}.json"
+          REMEDIATION_MD="${NOTES_DIR}/matrix-remediation-plan-${TAG}.md"
+          REMEDIATION_LINES="${NOTES_DIR}/matrix-remediation-${TAG}.lines"
+
+          node scripts/moqui-matrix-remediation-queue.js \
+            --baseline "${{ steps.moqui_baseline.outputs.json_file }}" \
+            --out "${REMEDIATION_JSON}" \
+            --markdown-out "${REMEDIATION_MD}" \
+            --lines-out "${REMEDIATION_LINES}" \
+            --json
+
+          echo "json_file=${REMEDIATION_JSON}" >> "$GITHUB_OUTPUT"
+          echo "markdown_file=${REMEDIATION_MD}" >> "$GITHUB_OUTPUT"
+          echo "lines_file=${REMEDIATION_LINES}" >> "$GITHUB_OUTPUT"
 
       - name: Run Moqui core regression suite
         id: moqui_core_regression
@@ -854,8 +926,13 @@ jobs:
             ${{ steps.release_notes.outputs.asset_files }}
             ${{ steps.interactive_governance.outputs.json_file }}
             ${{ steps.interactive_governance.outputs.markdown_file }}
+            ${{ steps.interactive_matrix_signals.outputs.signal_file }}
             ${{ steps.moqui_baseline.outputs.json_file }}
             ${{ steps.moqui_baseline.outputs.markdown_file }}
+            ${{ steps.matrix_regression_gate.outputs.json_file }}
+            ${{ steps.matrix_remediation.outputs.json_file }}
+            ${{ steps.matrix_remediation.outputs.markdown_file }}
+            ${{ steps.matrix_remediation.outputs.lines_file }}
             ${{ steps.moqui_core_regression.outputs.json_file }}
             ${{ steps.moqui_core_regression.outputs.markdown_file }}
           draft: false

@@ -27,6 +27,7 @@ This directory contains baseline contracts and safety policy artifacts for the i
 - `phase-acceptance-evidence.md`: stage A/B/C/D acceptance evidence checklist.
 - `non-technical-usability-report.md`: business-user usability assessment and improvement backlog.
 - `cross-industry-replication-guide.md`: replication boundary and rollout sequence beyond Moqui.
+- `331-poc-sce-integration-checklist.md`: minimal production checklist for embedding SCE interactive flow in 331-poc.
 
 ## Usage
 
@@ -247,3 +248,12 @@ node scripts/interactive-governance-report.js \
 The governance report consumes feedback events from `.kiro/reports/interactive-user-feedback.jsonl` by default.
 The governance report also consumes matrix signals from `.kiro/reports/interactive-matrix-signals.jsonl` by default.
 When `intent_total` is below `min_intent_samples` (default `5`), adoption emits a low-severity sample warning instead of a breach.
+
+Export matrix regression remediation queue lines (for close-loop-batch):
+
+```bash
+node scripts/moqui-matrix-remediation-queue.js \
+  --baseline .kiro/reports/release-evidence/moqui-template-baseline.json \
+  --lines-out .kiro/auto/matrix-remediation.lines \
+  --json
+```

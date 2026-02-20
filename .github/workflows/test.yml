@@ -39,6 +39,33 @@ jobs:
       - name: Run Moqui rebuild gate
         run: npm run gate:moqui-rebuild
 
+      - name: Build Moqui baseline (CI)
+        run: |
+          node scripts/moqui-template-baseline-report.js \
+            --out .kiro/reports/moqui-template-baseline-ci.json \
+            --markdown-out .kiro/reports/moqui-template-baseline-ci.md \
+            --json
+
+      - name: Evaluate matrix regression gate (CI)
+        env:
+          MATRIX_REGRESSION_GATE_ENFORCE: ${{ vars.KSE_MATRIX_REGRESSION_GATE_ENFORCE }}
+          MATRIX_REGRESSION_GATE_MAX: ${{ vars.KSE_MATRIX_REGRESSION_GATE_MAX }}
+        run: |
+          set -euo pipefail
+          ENFORCE_RAW="${MATRIX_REGRESSION_GATE_ENFORCE:-false}"
+          ENFORCE_NORMALIZED="$(printf '%s' "${ENFORCE_RAW}" | tr '[:upper:]' '[:lower:]')"
+          ENFORCE_FLAG=""
+          if [[ "${ENFORCE_NORMALIZED}" == "1" || "${ENFORCE_NORMALIZED}" == "true" || "${ENFORCE_NORMALIZED}" == "yes" || "${ENFORCE_NORMALIZED}" == "y" || "${ENFORCE_NORMALIZED}" == "on" ]]; then
+            ENFORCE_FLAG="--enforce"
+          fi
+          MAX_REGRESSIONS="${MATRIX_REGRESSION_GATE_MAX:-0}"
+          node scripts/matrix-regression-gate.js \
+            --baseline .kiro/reports/moqui-template-baseline-ci.json \
+            --max-regressions "${MAX_REGRESSIONS}" \
+            --out .kiro/reports/release-evidence/matrix-regression-gate-ci.json \
+            ${ENFORCE_FLAG} \
+            --json
+
       - name: Run interactive governance gate
         run: node scripts/interactive-governance-report.js --period weekly --fail-on-alert --json
       
@@ -51,3 +78,18 @@ jobs:
           files: ./coverage/lcov.info
           flags: unittests
           name: codecov-umbrella
+
+      - name: Upload interactive governance and matrix artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: interactive-governance-matrix-${{ github.run_id }}
+          if-no-files-found: warn
+          path: |
+            .kiro/reports/interactive-governance-report.json
+            .kiro/reports/interactive-governance-report.md
+            .kiro/reports/interactive-matrix-signals.jsonl
+            .kiro/reports/interactive-flow-smoke/interactive-flow-smoke.summary.json
+            .kiro/reports/moqui-template-baseline-ci.json
+            .kiro/reports/moqui-template-baseline-ci.md
+            .kiro/reports/release-evidence/matrix-regression-gate-ci.json

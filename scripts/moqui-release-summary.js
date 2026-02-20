@@ -342,6 +342,17 @@ function normalizeGateStatus(checks, matrixRegressionCheck) {
   return 'passed';
 }
 
+function buildMoquiRegressionRecoverySequenceLines() {
+  return [
+    'Moqui regression recovery sequence (recommended):',
+    'Step 1 (Cluster phased): `npm run run:matrix-remediation-clusters-phased -- --json`.',
+    'Step 1 fallback (cluster batch): `sce auto close-loop-batch .kiro/auto/matrix-remediation.capability-clusters.json --format json --batch-parallel 1 --batch-agent-budget 2 --batch-retry-until-complete --json`.',
+    'Step 1 fallback alias: `npm run run:matrix-remediation-clusters`.',
+    'Step 2 (Baseline phased): `node scripts/moqui-matrix-remediation-phased-runner.js --baseline .kiro/reports/release-evidence/moqui-template-baseline.json --json`.',
+    'Step 2 alias: `npm run run:matrix-remediation-phased -- --json`.'
+  ];
+}
+
 function buildRecommendations(summary, matrixRemediation = {}) {
   const recommendations = [];
   const push = (value) => {
@@ -399,24 +410,9 @@ function buildRecommendations(summary, matrixRemediation = {}) {
     push(
       'Generate phased matrix remediation package: `node scripts/moqui-matrix-remediation-queue.js --baseline .kiro/reports/release-evidence/moqui-template-baseline.json --json`.'
     );
-    push(
-      'Moqui regression recovery sequence (recommended):'
-    );
-    push(
-      'Step 1 (Cluster phased): `npm run run:matrix-remediation-clusters-phased -- --json`.'
-    );
-    push(
-      'Step 1 fallback (cluster batch): `sce auto close-loop-batch .kiro/auto/matrix-remediation.capability-clusters.json --format json --batch-parallel 1 --batch-agent-budget 2 --batch-retry-until-complete --json`.'
-    );
-    push(
-      'Step 1 fallback alias: `npm run run:matrix-remediation-clusters`.'
-    );
-    push(
-      'Step 2 (Baseline phased): `node scripts/moqui-matrix-remediation-phased-runner.js --baseline .kiro/reports/release-evidence/moqui-template-baseline.json --json`.'
-    );
-    push(
-      'Step 2 alias: `npm run run:matrix-remediation-phased -- --json`.'
-    );
+    for (const line of buildMoquiRegressionRecoverySequenceLines()) {
+      push(line);
+    }
     if (Array.isArray(matrixRemediation.template_priority_top) && matrixRemediation.template_priority_top.length > 0) {
       push(
         `Prioritize template recovery order: ${matrixRemediation.template_priority_top

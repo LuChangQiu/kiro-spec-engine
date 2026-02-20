@@ -61,6 +61,25 @@ Bridge output defaults:
 - Normalized page-context: `.kiro/reports/interactive-page-context.normalized.json`
 - Bridge report: `.kiro/reports/interactive-context-bridge.json`
 
+Run one-command full flow (bridge -> loop):
+
+```bash
+node scripts/interactive-flow.js \
+  --input docs/interactive-customization/moqui-context-provider.sample.json \
+  --goal "Adjust order screen field layout for clearer input flow" \
+  --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
+  --execution-mode apply \
+  --auto-execute-low-risk \
+  --feedback-score 5 \
+  --json
+```
+
+Flow output defaults:
+
+- Flow summary: `.kiro/reports/interactive-flow/<session-id>/interactive-flow.summary.json`
+- Bridge context: `.kiro/reports/interactive-flow/<session-id>/interactive-page-context.normalized.json`
+- Loop summary: `.kiro/reports/interactive-flow/<session-id>/interactive-customization-loop.summary.json`
+
 Build read-only change intent from page context:
 
 ```bash

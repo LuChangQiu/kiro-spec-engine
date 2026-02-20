@@ -14,18 +14,21 @@ Evidence:
 
 - `scripts/interactive-context-bridge.js`
 - `scripts/interactive-intent-build.js`
+- `scripts/interactive-flow.js`
 - `docs/interactive-customization/page-context.schema.json`
 - `docs/interactive-customization/moqui-copilot-context-contract.json`
 - `docs/interactive-customization/moqui-context-provider.sample.json`
 - `docs/interactive-customization/moqui-copilot-integration-guide.md`
 - `tests/unit/scripts/interactive-context-bridge.test.js`
 - `tests/unit/scripts/interactive-intent-build.test.js`
+- `tests/unit/scripts/interactive-flow.test.js`
 
 Verification:
 
 ```bash
 npx jest tests/unit/scripts/interactive-intent-build.test.js --runInBand
 npx jest tests/unit/scripts/interactive-context-bridge.test.js --runInBand
+npx jest tests/unit/scripts/interactive-flow.test.js --runInBand
 npm run report:interactive-context-bridge
 npm run report:interactive-intent
 ```

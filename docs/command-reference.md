@@ -865,6 +865,13 @@ Interactive context bridge helper (script-level provider normalization):
   - CLI equivalent: `sce scene context-bridge --input <path> --json`
   - npm alias: `npm run report:interactive-context-bridge`
 
+Interactive full flow helper (script-level one-command entry):
+- `node scripts/interactive-flow.js --input <path> (--goal <text> | --goal-file <path>) [--provider <moqui|generic>] [--execution-mode <suggestion|apply>] [--policy <path>] [--catalog <path>] [--context-contract <path>] [--auto-execute-low-risk] [--feedback-score <0..5>] [--json]`: run `context-bridge -> interactive-loop` in one command for Moqui workbench integration.
+  - Default flow artifact root: `.kiro/reports/interactive-flow/<session-id>/`
+  - Default flow summary output: `.kiro/reports/interactive-flow/<session-id>/interactive-flow.summary.json`
+  - CLI equivalent: `sce scene interactive-flow --input <path> --goal "<goal>" --json`
+  - npm alias: `npm run run:interactive-flow -- --input docs/interactive-customization/moqui-context-provider.sample.json --goal "Adjust order screen field layout for clearer input flow" --json`
+
 Interactive read-only intent helper (script-level stage-A copilot bridge):
 - `node scripts/interactive-intent-build.js --context <path> (--goal <text> | --goal-file <path>) [--user-id <id>] [--session-id <id>] [--out-intent <path>] [--out-explain <path>] [--audit-file <path>] [--context-contract <path>] [--no-strict-contract] [--mask-keys <csv>] [--json]`: build a read-only `Change_Intent` from page context + business goal, emit masked context preview, append audit event JSONL, and generate explain markdown.
   - Default outputs:

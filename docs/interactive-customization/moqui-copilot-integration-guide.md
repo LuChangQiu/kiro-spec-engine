@@ -67,6 +67,19 @@ node scripts/interactive-context-bridge.js \
   --json
 ```
 
+## One-Command Flow
+
+```bash
+node scripts/interactive-flow.js \
+  --input docs/interactive-customization/moqui-context-provider.sample.json \
+  --goal "Adjust order screen field layout for clearer input flow" \
+  --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
+  --execution-mode apply \
+  --auto-execute-low-risk \
+  --feedback-score 5 \
+  --json
+```
+
 ## Example Command
 
 ```bash

@@ -48,6 +48,7 @@
     "report:interactive-approval-status": "node scripts/interactive-approval-workflow.js --action status --json",
     "report:interactive-adapter-capabilities": "node scripts/interactive-moqui-adapter.js --action capabilities --json",
     "run:interactive-loop": "node scripts/interactive-customization-loop.js",
+    "run:interactive-flow": "node scripts/interactive-flow.js",
     "log:interactive-feedback": "node scripts/interactive-feedback-log.js",
     "report:interactive-governance": "node scripts/interactive-governance-report.js --period weekly --json",
     "report:moqui-core-regression": "node scripts/moqui-core-regression-suite.js --json",

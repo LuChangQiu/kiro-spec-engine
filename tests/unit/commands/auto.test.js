@@ -8503,6 +8503,8 @@ if (process.argv.includes('--json')) {
     expect(payload.status).toBe('dry-run');
     expect(payload.policy.max_moqui_matrix_regressions).toBe(5);
     expect(payload.recommendations.some(item => item.includes('Recover Moqui matrix regressions'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('moqui-matrix-remediation-phased-runner.js'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-from-baseline'))).toBe(true);
     expect(payload.failure_summary).toEqual(expect.objectContaining({
       moqui_matrix_regressions: expect.arrayContaining([
         expect.objectContaining({

@@ -803,6 +803,7 @@ Dual-track handoff integration:
   - `release_gate_preflight` is advisory by default; use `--require-release-gate-preflight` to hard-fail when preflight is unavailable/blocked.
   - When Moqui baseline/capability gates fail, sce auto-generates remediation queue lines at `.kiro/auto/moqui-remediation.lines`.
   - Run result includes `failure_summary` (failed phase/gate/release-gate preflight highlights) and `recommendations` with executable follow-up commands (for example, auto-generated `--continue-from <session>` on failed/incomplete batches).
+  - When matrix regressions are detected, recommendations now include phased anti-429 one-shot remediation from baseline (`node scripts/moqui-matrix-remediation-phased-runner.js --baseline ... --json`).
   - Gate defaults: `--min-spec-success-rate` defaults to `100`, `--max-risk-level` defaults to `high`, `--max-moqui-matrix-regressions` defaults to `0`, ontology validation requirement is enabled by default, Moqui baseline requirement is enabled by default, and capability coverage minimum defaults to `100` when manifest `capabilities` is declared.
   - Use `--no-require-ontology-validation`, `--no-require-moqui-baseline`, or `--no-require-capability-coverage` only for emergency bypass.
 - `sce auto handoff regression [--session-id <id|latest>] [--window <n>] [--format <json|markdown>] [--out <path>] [--json]`: compare one handoff run report with its previous run and output trend deltas (success-rate/risk/failed-goals/elapsed time).

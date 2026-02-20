@@ -872,10 +872,11 @@ Interactive change-plan generator helper (script-level stage-B planning bridge):
 
 Interactive one-click loop helper (script-level orchestration entry):
 - `node scripts/interactive-customization-loop.js --context <path> (--goal <text> | --goal-file <path>) [--execution-mode <suggestion|apply>] [--policy <path>] [--catalog <path>] [--auto-approve-low-risk] [--auto-execute-low-risk] [--feedback-score <0..5>] [--feedback-comment <text>] [--feedback-tags <csv>] [--allow-suggestion-apply] [--fail-on-gate-non-allow] [--json]`: run intent->plan->gate->approval pipeline in one command and optionally trigger low-risk one-click apply via Moqui adapter.
+  - CLI equivalent: `sce scene interactive-loop --context <path> --goal "<goal>" --execution-mode apply --auto-execute-low-risk --feedback-score 5 --json`
   - Default loop artifact root: `.kiro/reports/interactive-loop/<session-id>/`
   - Default summary output: `.kiro/reports/interactive-loop/<session-id>/interactive-customization-loop.summary.json`
   - `--auto-execute-low-risk` executes `interactive-moqui-adapter --action low-risk-apply` only when `risk_level=low` and gate decision=`allow`.
-  - `--feedback-score` logs a feedback JSONL event into the same session artifact directory.
+  - `--feedback-score` logs feedback to both session artifact and global governance file (`.kiro/reports/interactive-user-feedback.jsonl`).
 - npm alias: `npm run run:interactive-loop -- --context docs/interactive-customization/page-context.sample.json --goal "Improve order entry clarity" --json`
 
 Interactive approval workflow helper (script-level stage-B approval state machine):
@@ -1058,6 +1059,7 @@ sce scene moqui-baseline \
 ```
 
 Release workflow default:
+- Runs interactive loop smoke (`npm run test:interactive-loop-smoke`) in test/release test jobs.
 - Runs interactive governance gate by default (`interactive-governance-report --period weekly --fail-on-alert`) in test and release pipelines.
 - Publishes `moqui-template-baseline.json` + `moqui-template-baseline.md` as release assets.
 - Publishes `moqui-release-summary.json` + `moqui-release-summary.md` as release review assets.

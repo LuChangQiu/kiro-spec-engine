@@ -184,15 +184,24 @@ describe('interactive-customization-loop script', () => {
     expect(payload.feedback.feedback_id).toMatch(/^feedback-/);
 
     const feedbackFile = path.join(workspace, payload.artifacts.feedback_jsonl);
+    const globalFeedbackFile = path.join(workspace, payload.artifacts.feedback_global_jsonl);
     expect(await fs.pathExists(feedbackFile)).toBe(true);
+    expect(await fs.pathExists(globalFeedbackFile)).toBe(true);
     const lines = (await fs.readFile(feedbackFile, 'utf8'))
       .trim()
       .split(/\r?\n/)
       .filter(Boolean);
+    const globalLines = (await fs.readFile(globalFeedbackFile, 'utf8'))
+      .trim()
+      .split(/\r?\n/)
+      .filter(Boolean);
     expect(lines.length).toBeGreaterThanOrEqual(1);
+    expect(globalLines.length).toBeGreaterThanOrEqual(1);
     const feedbackRecord = JSON.parse(lines[0]);
+    const globalFeedbackRecord = JSON.parse(globalLines[globalLines.length - 1]);
     expect(feedbackRecord.score).toBe(4.5);
     expect(feedbackRecord.user_id).toBe('biz-user');
     expect(feedbackRecord.tags).toEqual(expect.arrayContaining(['moqui', 'ux']));
+    expect(globalFeedbackRecord.feedback_id).toBe(feedbackRecord.feedback_id);
   });
 });

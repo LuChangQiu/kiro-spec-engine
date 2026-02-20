@@ -84,7 +84,20 @@ node scripts/interactive-customization-loop.js \
   --feedback-comment "Flow is clearer and faster." \
   --feedback-tags moqui,approval \
   --json
+
+# CLI equivalent
+sce scene interactive-loop \
+  --context docs/interactive-customization/page-context.sample.json \
+  --goal "Adjust order screen field layout for clearer input flow" \
+  --execution-mode apply \
+  --auto-execute-low-risk \
+  --feedback-score 5 \
+  --json
 ```
+
+`--feedback-score` writes feedback into both:
+- Session artifact: `.kiro/reports/interactive-loop/<session-id>/interactive-user-feedback.jsonl`
+- Governance global stream: `.kiro/reports/interactive-user-feedback.jsonl`
 
 Run approval workflow state machine:
 

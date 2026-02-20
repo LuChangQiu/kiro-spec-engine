@@ -330,6 +330,7 @@ async function main() {
   const sessionId = normalizeSessionId(options.sessionId);
 
   const contextPath = resolvePath(cwd, options.context);
+  const globalFeedbackPath = resolvePath(cwd, '.kiro/reports/interactive-user-feedback.jsonl');
   const outRoot = resolvePath(cwd, options.outDir);
   const sessionDir = path.join(outRoot, sessionId);
   const summaryOutPath = options.out
@@ -348,6 +349,7 @@ async function main() {
     approval_state_json: toRelative(cwd, path.join(sessionDir, 'interactive-approval-state.json')),
     approval_audit_jsonl: toRelative(cwd, path.join(sessionDir, 'interactive-approval-events.jsonl')),
     adapter_json: toRelative(cwd, path.join(sessionDir, 'interactive-moqui-adapter.json')),
+    feedback_global_jsonl: toRelative(cwd, globalFeedbackPath),
     feedback_jsonl: toRelative(cwd, path.join(sessionDir, 'interactive-user-feedback.jsonl')),
     summary_json: toRelative(cwd, summaryOutPath)
   };
@@ -584,6 +586,8 @@ async function main() {
     logged: false,
     score: options.feedbackScore,
     feedback_id: null,
+    global_file: artifacts.feedback_global_jsonl,
+    session_file: artifacts.feedback_jsonl,
     payload: null,
     exit_code: null
   };
@@ -593,7 +597,7 @@ async function main() {
       '--score', String(options.feedbackScore),
       '--user-id', options.userId,
       '--session-id', sessionId,
-      '--feedback-file', resolvePath(cwd, artifacts.feedback_jsonl),
+      '--feedback-file', globalFeedbackPath,
       '--channel', options.feedbackChannel,
       '--json'
     ];
@@ -632,12 +636,23 @@ async function main() {
       allowedExitCodes: [0]
     });
     const feedbackPayload = parseJsonOutput(feedbackResult.stdout, 'interactive-feedback-log');
+    const feedbackRecord = feedbackPayload && feedbackPayload.record && typeof feedbackPayload.record === 'object'
+      ? feedbackPayload.record
+      : null;
+    if (feedbackRecord) {
+      await fs.ensureDir(path.dirname(resolvePath(cwd, artifacts.feedback_jsonl)));
+      await fs.appendFile(
+        resolvePath(cwd, artifacts.feedback_jsonl),
+        `${JSON.stringify(feedbackRecord)}\n`,
+        'utf8'
+      );
+    }
     steps.push(buildStep('feedback_log', feedbackPayload, [process.execPath, SCRIPT_FEEDBACK, ...feedbackArgs].join(' '), feedbackResult.exit_code));
     feedback.logged = true;
     feedback.payload = feedbackPayload;
     feedback.exit_code = feedbackResult.exit_code;
-    feedback.feedback_id = feedbackPayload && feedbackPayload.record
-      ? feedbackPayload.record.feedback_id || null
+    feedback.feedback_id = feedbackRecord
+      ? feedbackRecord.feedback_id || null
       : null;
   }
 

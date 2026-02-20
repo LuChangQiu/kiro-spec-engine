@@ -30,6 +30,9 @@ jobs:
       - name: Run tests
         run: npm test -- --runInBand
 
+      - name: Run interactive loop smoke
+        run: npm run test:interactive-loop-smoke
+
       - name: Run Moqui rebuild gate
         run: npm run gate:moqui-rebuild
 

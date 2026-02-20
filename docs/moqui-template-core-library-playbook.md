@@ -39,6 +39,11 @@ Profile presets are available for external intake standardization:
 - `--profile moqui`: explicit Moqui baseline alias (same strict defaults).
 - `--profile enterprise`: stricter release control baseline (`max-risk-level=medium`, `require-release-gate-preflight=true`, `release-evidence-window=10`).
 
+Default onboarding and safety baselines:
+
+- Starter intake assets: `docs/starter-kit/README.md`
+- Default security/governance controls: `docs/security-governance-default-baseline.md`
+
 ## Template Capability Matrix Contract
 
 Use the baseline report as the canonical matrix contract (`.kiro/reports/moqui-template-baseline.json`):
@@ -107,6 +112,9 @@ node scripts/moqui-release-summary.js \
   --fail-on-gate-fail \
   --json
 
+# 0.5) Weekly ops closed-loop card (handoff + gate history + governance + matrix)
+node scripts/release-ops-weekly-summary.js --json
+
 # 1) Handoff close-loop
 sce auto handoff run --manifest docs/handoffs/handoff-manifest.json --json
 
@@ -148,6 +156,8 @@ Required artifacts for each intake batch:
 - `.kiro/reports/release-evidence/moqui-lexicon-audit.md`
 - `.kiro/reports/release-evidence/moqui-release-summary.json`
 - `.kiro/reports/release-evidence/moqui-release-summary.md`
+- `.kiro/reports/release-evidence/weekly-ops-summary.json`
+- `.kiro/reports/release-evidence/weekly-ops-summary.md`
 - `.kiro/reports/handoff-capability-matrix.md` (or JSON equivalent from `sce auto handoff capability-matrix`)
 - `.kiro/reports/handoff-runs/<session>.json`
 - `.kiro/reports/scene-package-ontology-batch.json`

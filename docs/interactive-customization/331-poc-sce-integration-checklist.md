@@ -75,6 +75,11 @@ Recommended GitHub Variables:
 - `KSE_MATRIX_REGRESSION_GATE_MAX=0`
 - `KSE_MOQUI_RELEASE_SUMMARY_ENFORCE=true` (optional hard gate for release summary `failed` state)
 
+Security baseline:
+
+- Apply default controls in `docs/security-governance-default-baseline.md`.
+- Keep context contract strict mode enabled in production integration.
+
 ## 5. Evidence Artifacts (Must Keep)
 
 - `.kiro/reports/interactive-governance-report.json`
@@ -89,6 +94,8 @@ Recommended GitHub Variables:
 - `.kiro/reports/release-evidence/matrix-remediation-goals-high-<tag>.json`
 - `.kiro/reports/release-evidence/matrix-remediation-goals-medium-<tag>.json`
 - `.kiro/reports/release-evidence/matrix-remediation-phased-plan-<tag>.json`
+- `.kiro/reports/release-evidence/weekly-ops-summary-<tag>.json`
+- `.kiro/reports/release-evidence/weekly-ops-summary-<tag>.md`
 
 ## 6. Pass Criteria
 

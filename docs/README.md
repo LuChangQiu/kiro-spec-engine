@@ -106,6 +106,8 @@ Detailed technical documentation:
 - **[Adoption Guide](adoption-guide.md)** - Adopting sce in existing projects
 - **[Upgrade Guide](upgrade-guide.md)** - Upgrading sce to newer versions
 - **[Release Checklist](release-checklist.md)** - Repeatable pre-release verification flow
+- **[Security Governance Default Baseline](security-governance-default-baseline.md)** - Default safety, approval, and audit controls for SCE delivery
+- **[Release-Ready Starter Kit](starter-kit/README.md)** - Starter manifest + workflow sample for external project onboarding
 - **[Release Archive](releases/README.md)** - Index of release notes and validation reports
 - **[Release Notes v1.46.2](releases/v1.46.2.md)** - Summary of value observability and onboarding improvements
 - **[Validation Report v1.46.2](releases/v1.46.2-validation.md)** - Test and package verification evidence
@@ -193,6 +195,8 @@ Detailed technical documentation:
 - [331-poc Dual-Track Integration Guide](331-poc-dual-track-integration-guide.md)
 - [331-poc Adaptation Roadmap](331-poc-adaptation-roadmap.md)
 - [Handoff Profile Integration Guide](handoff-profile-integration-guide.md)
+- [Release-Ready Starter Kit](starter-kit/README.md)
+- [Security Governance Default Baseline](security-governance-default-baseline.md)
 - [Scene Template Engine](command-reference.md#scene-template-engine)
 - [Scene Quality Pipeline](command-reference.md#scene-template-quality-pipeline)
 - [Scene Ontology](command-reference.md#scene-ontology-enhancement)

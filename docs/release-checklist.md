@@ -31,16 +31,29 @@ node bin/scene-capability-engine.js value metrics --help
 ```bash
 sce value metrics sample --out ./kpi-input.json --json
 sce value metrics snapshot --input ./kpi-input.json --json
+node scripts/release-ops-weekly-summary.js --json
 ```
 
 Expected:
 
 - `sample` writes a valid JSON scaffold.
 - `snapshot` returns machine-readable result with `snapshot_path` and risk metadata.
+- `release-ops-weekly-summary` emits weekly governance risk card (`json` + `markdown`) under release-evidence.
 
 ---
 
-## 3. Packaging Hygiene
+## 3. Security Governance Baseline
+
+Confirm default baseline controls are still active:
+
+- `docs/security-governance-default-baseline.md` is aligned with current release policy.
+- interactive governance gate uses `--fail-on-alert` in CI/release.
+- approval/execution ledgers are retained for audit (`interactive-approval-events.jsonl`, `interactive-execution-ledger.jsonl`).
+- release evidence includes weekly ops summary and governance snapshot assets.
+
+---
+
+## 4. Packaging Hygiene
 
 ```bash
 npm pack --dry-run
@@ -53,7 +66,7 @@ Verify:
 
 ---
 
-## 4. Documentation Consistency
+## 5. Documentation Consistency
 
 Check that key docs are aligned with current version and capabilities:
 
@@ -75,7 +88,7 @@ rg -n "github.com/scene-capability-engine/sce" README.md README.zh.md docs START
 
 ---
 
-## 5. Git Readiness
+## 6. Git Readiness
 
 ```bash
 git status -sb
@@ -89,7 +102,7 @@ Verify:
 
 ---
 
-## 6. Publish Readiness
+## 7. Publish Readiness
 
 Ensure:
 

@@ -1,0 +1,39 @@
+# SCE Release-Ready Starter Kit
+
+This starter kit is the default baseline for onboarding an external project (including Moqui-based solutions) into SCE without project-specific flags.
+
+## Included Assets
+
+- `handoff-manifest.starter.json`: minimal manifest contract that works with `sce auto handoff` and `sce scene package-publish-batch`.
+- `release.workflow.sample.yml`: GitHub Actions sample for release-gate + weekly ops evidence publication.
+
+## Quick Start
+
+1. Prepare your manifest using `handoff-manifest.starter.json` as baseline.
+2. Run default intake pipeline:
+
+```bash
+npx sce auto handoff capability-matrix --manifest docs/handoffs/handoff-manifest.json --profile moqui --fail-on-gap --json
+npx sce auto handoff run --manifest docs/handoffs/handoff-manifest.json --profile moqui --json
+node scripts/release-ops-weekly-summary.js --json
+```
+
+3. Wire release workflow using `release.workflow.sample.yml` sections:
+   - release-gate history index
+   - governance snapshot export
+   - weekly ops summary export
+
+## Default Acceptance
+
+- `scene package publish-batch` gate passes.
+- capability lexicon unknown count is zero.
+- release preflight is not blocked for hard-gate profiles.
+- weekly ops summary risk is not `high` unless explicitly approved.
+
+## Default Evidence Set
+
+- `.kiro/reports/release-evidence/handoff-runs.json`
+- `.kiro/reports/release-evidence/release-gate-history.json`
+- `.kiro/reports/release-evidence/governance-snapshot-<tag>.json`
+- `.kiro/reports/release-evidence/weekly-ops-summary-<tag>.json`
+

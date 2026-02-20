@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-02-20T00:00:00.000Z",
+  "source_project": "E:/workspace/your-project",
+  "specs": [
+    {
+      "id": "60-10-example-capability-spec",
+      "status": "completed",
+      "scene_package": ".kiro/specs/60-10-example-capability-spec/custom/scene-package.json",
+      "scene_manifest": ".kiro/specs/60-10-example-capability-spec/custom/scene.yaml"
+    }
+  ],
+  "templates": [
+    "sce.scene--example-capability-template--0.1.0"
+  ],
+  "capabilities": [
+    "example-capability-a",
+    "example-capability-b"
+  ],
+  "known_gaps": [],
+  "ontology_validation": {
+    "status": "passed",
+    "quality_score": 90,
+    "business_rules": {
+      "total": 1,
+      "mapped": 1
+    },
+    "decision_logic": {
+      "total": 1,
+      "resolved": 1
+    }
+  }
+}

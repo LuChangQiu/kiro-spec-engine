@@ -1,0 +1,41 @@
+name: Release Starter (SCE)
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "20.x"
+          cache: "npm"
+
+      - run: npm ci
+      - run: npm test -- --runInBand
+      - run: node scripts/interactive-governance-report.js --period weekly --fail-on-alert --json
+
+      - name: Build release evidence cards
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          NOTES_DIR=".kiro/reports/release-evidence"
+          mkdir -p "${NOTES_DIR}"
+
+          node scripts/release-ops-weekly-summary.js \
+            --out "${NOTES_DIR}/weekly-ops-summary-${TAG}.json" \
+            --markdown-out "${NOTES_DIR}/weekly-ops-summary-${TAG}.md" \
+            --json
+
+          RELEASE_TAG="${TAG}" \
+          RELEASE_EVIDENCE_SUMMARY_FILE="${NOTES_DIR}/release-evidence-summary-${TAG}.json" \
+          RELEASE_GOVERNANCE_SNAPSHOT_JSON="${NOTES_DIR}/governance-snapshot-${TAG}.json" \
+          RELEASE_GOVERNANCE_SNAPSHOT_MD="${NOTES_DIR}/governance-snapshot-${TAG}.md" \
+            node scripts/release-governance-snapshot-export.js
+

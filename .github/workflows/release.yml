@@ -705,6 +705,24 @@ jobs:
           echo "json_file=${SNAPSHOT_JSON}" >> "$GITHUB_OUTPUT"
           echo "markdown_file=${SNAPSHOT_MD}" >> "$GITHUB_OUTPUT"
 
+      - name: Export weekly ops summary assets
+        id: weekly_ops_summary_assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          NOTES_DIR=".kiro/reports/release-evidence"
+          SUMMARY_JSON="${NOTES_DIR}/weekly-ops-summary-${TAG}.json"
+          SUMMARY_MD="${NOTES_DIR}/weekly-ops-summary-${TAG}.md"
+
+          node scripts/release-ops-weekly-summary.js \
+            --out "${SUMMARY_JSON}" \
+            --markdown-out "${SUMMARY_MD}" \
+            --json
+
+          echo "json_file=${SUMMARY_JSON}" >> "$GITHUB_OUTPUT"
+          echo "markdown_file=${SUMMARY_MD}" >> "$GITHUB_OUTPUT"
+
       - name: Build release gate history index
         shell: bash
         env:
@@ -1030,6 +1048,8 @@ jobs:
             ${{ steps.matrix_remediation.outputs.phased_plan_json_file }}
             ${{ steps.governance_snapshot_assets.outputs.json_file }}
             ${{ steps.governance_snapshot_assets.outputs.markdown_file }}
+            ${{ steps.weekly_ops_summary_assets.outputs.json_file }}
+            ${{ steps.weekly_ops_summary_assets.outputs.markdown_file }}
             ${{ steps.moqui_core_regression.outputs.json_file }}
             ${{ steps.moqui_core_regression.outputs.markdown_file }}
           draft: false

@@ -866,6 +866,19 @@ Release governance snapshot export helper (release-asset extraction):
     - `RELEASE_GOVERNANCE_SNAPSHOT_MD` (default `.kiro/reports/release-evidence/governance-snapshot.md`)
   - never hard-fails release flow when summary is missing; writes unavailable placeholder with warning instead.
 
+Release weekly ops summary helper (ops closed-loop evidence):
+- `node scripts/release-ops-weekly-summary.js [--evidence <path>] [--gate-history <path>] [--interactive-governance <path>] [--matrix-signals <path>] [--from <iso>] [--to <iso>] [--window-days <n>] [--out <path>] [--markdown-out <path>] [--json]`: aggregate weekly handoff/gate/governance/matrix telemetry into one operational risk card.
+  - Default inputs:
+    - `.kiro/reports/release-evidence/handoff-runs.json`
+    - `.kiro/reports/release-evidence/release-gate-history.json`
+    - `.kiro/reports/interactive-governance-report.json`
+    - `.kiro/reports/interactive-matrix-signals.jsonl`
+  - Default outputs:
+    - `.kiro/reports/release-evidence/weekly-ops-summary.json`
+    - `.kiro/reports/release-evidence/weekly-ops-summary.md`
+  - Missing inputs are reported as warnings and reflected in `health.risk`/recommendations.
+- npm alias: `npm run report:release-ops-weekly`
+
 Matrix regression gate helper (script-level configurable hard gate):
 - `node scripts/matrix-regression-gate.js [--baseline <path>] [--max-regressions <n>] [--enforce] [--out <path>] [--json]`: evaluate matrix regression count from baseline compare payload (`coverage_matrix_regressions` preferred, fallback `regressions`) and enforce hard gate when enabled.
   - Default baseline input: `.kiro/reports/release-evidence/moqui-template-baseline.json`
@@ -1165,6 +1178,7 @@ Release workflow default:
 - Publishes `moqui-release-summary.json` + `moqui-release-summary.md` as release review assets.
 - Publishes `interactive-governance-<tag>.json` + `interactive-governance-<tag>.md` as release evidence assets.
 - Publishes `interactive-matrix-signals-<tag>.jsonl`, `matrix-regression-gate-<tag>.json`, and `matrix-remediation-plan-<tag>.{json,md}` + `matrix-remediation-<tag>.lines` + `matrix-remediation-goals-<tag>.json` + `matrix-remediation-commands-<tag>.md` + `matrix-remediation-{high,medium}-<tag>.lines` + `matrix-remediation-goals-{high,medium}-<tag>.json` + `matrix-remediation-phased-plan-<tag>.json` as release evidence assets.
+- Publishes `weekly-ops-summary-<tag>.json` + `weekly-ops-summary-<tag>.md` as release operational closed-loop assets.
 - Enforces baseline portfolio gate by default (`KSE_MOQUI_BASELINE_ENFORCE` defaults to `true` when unset).
 
 ### Moqui ERP Integration

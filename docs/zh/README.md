@@ -213,6 +213,12 @@
 - 测试、命令冒烟、打包检查
 - 文档一致性和 Git 准备状态
 
+### [安全治理默认基线](../security-governance-default-baseline.md)
+**默认安全控制（英文）** - 上下文脱敏、审批策略、发布审计证据最小集合
+
+### [发布即用 Starter Kit](../starter-kit/README.md)
+**外部项目接入脚手架（英文）** - handoff manifest 样例与 release workflow 样例
+
 ### [发布归档](releases/README.md)
 **历史发布入口** - 集中查看发布说明与验证报告
 - 版本化发布说明

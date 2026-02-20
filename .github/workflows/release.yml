@@ -224,17 +224,23 @@ jobs:
           REMEDIATION_JSON="${NOTES_DIR}/matrix-remediation-plan-${TAG}.json"
           REMEDIATION_MD="${NOTES_DIR}/matrix-remediation-plan-${TAG}.md"
           REMEDIATION_LINES="${NOTES_DIR}/matrix-remediation-${TAG}.lines"
+          REMEDIATION_GOALS_JSON="${NOTES_DIR}/matrix-remediation-goals-${TAG}.json"
+          REMEDIATION_COMMANDS_MD="${NOTES_DIR}/matrix-remediation-commands-${TAG}.md"
 
           node scripts/moqui-matrix-remediation-queue.js \
             --baseline "${{ steps.moqui_baseline.outputs.json_file }}" \
             --out "${REMEDIATION_JSON}" \
             --markdown-out "${REMEDIATION_MD}" \
             --lines-out "${REMEDIATION_LINES}" \
+            --batch-json-out "${REMEDIATION_GOALS_JSON}" \
+            --commands-out "${REMEDIATION_COMMANDS_MD}" \
             --json
 
           echo "json_file=${REMEDIATION_JSON}" >> "$GITHUB_OUTPUT"
           echo "markdown_file=${REMEDIATION_MD}" >> "$GITHUB_OUTPUT"
           echo "lines_file=${REMEDIATION_LINES}" >> "$GITHUB_OUTPUT"
+          echo "goals_json_file=${REMEDIATION_GOALS_JSON}" >> "$GITHUB_OUTPUT"
+          echo "commands_md_file=${REMEDIATION_COMMANDS_MD}" >> "$GITHUB_OUTPUT"
 
       - name: Build Moqui release summary
         id: moqui_release_summary
@@ -973,6 +979,8 @@ jobs:
             ${{ steps.matrix_remediation.outputs.json_file }}
             ${{ steps.matrix_remediation.outputs.markdown_file }}
             ${{ steps.matrix_remediation.outputs.lines_file }}
+            ${{ steps.matrix_remediation.outputs.goals_json_file }}
+            ${{ steps.matrix_remediation.outputs.commands_md_file }}
             ${{ steps.moqui_core_regression.outputs.json_file }}
             ${{ steps.moqui_core_regression.outputs.markdown_file }}
           draft: false

@@ -853,12 +853,14 @@ Matrix regression gate helper (script-level configurable hard gate):
 - npm alias: `npm run gate:matrix-regression`
 
 Moqui matrix remediation queue helper (script-level automatic queue export):
-- `node scripts/moqui-matrix-remediation-queue.js [--baseline <path>] [--out <path>] [--lines-out <path>] [--markdown-out <path>] [--min-delta-abs <n>] [--top-templates <n>] [--json]`: convert matrix regressions into remediation goals consumable by `sce auto close-loop-batch`, with per-metric template candidates and capability focus.
+- `node scripts/moqui-matrix-remediation-queue.js [--baseline <path>] [--out <path>] [--lines-out <path>] [--markdown-out <path>] [--batch-json-out <path>] [--commands-out <path>] [--min-delta-abs <n>] [--top-templates <n>] [--json]`: convert matrix regressions into remediation goals consumable by `sce auto close-loop-batch`, with per-metric template candidates/capability focus and direct command templates.
   - Default inputs/outputs:
     - Baseline: `.kiro/reports/release-evidence/moqui-template-baseline.json`
     - Plan JSON: `.kiro/reports/release-evidence/matrix-remediation-plan.json`
     - Queue lines: `.kiro/auto/matrix-remediation.lines`
     - Plan Markdown: `.kiro/reports/release-evidence/matrix-remediation-plan.md`
+    - Batch goals JSON: `.kiro/auto/matrix-remediation.goals.json`
+    - Commands Markdown: `.kiro/reports/release-evidence/matrix-remediation-commands.md`
 - npm alias: `npm run report:matrix-remediation-queue`
 
 Interactive customization plan gate helper (script-level secure-by-default check):
@@ -1111,7 +1113,7 @@ Release workflow default:
 - Publishes `moqui-template-baseline.json` + `moqui-template-baseline.md` as release assets.
 - Publishes `moqui-release-summary.json` + `moqui-release-summary.md` as release review assets.
 - Publishes `interactive-governance-<tag>.json` + `interactive-governance-<tag>.md` as release evidence assets.
-- Publishes `interactive-matrix-signals-<tag>.jsonl`, `matrix-regression-gate-<tag>.json`, and `matrix-remediation-plan-<tag>.{json,md}` + `matrix-remediation-<tag>.lines` as release evidence assets.
+- Publishes `interactive-matrix-signals-<tag>.jsonl`, `matrix-regression-gate-<tag>.json`, and `matrix-remediation-plan-<tag>.{json,md}` + `matrix-remediation-<tag>.lines` + `matrix-remediation-goals-<tag>.json` + `matrix-remediation-commands-<tag>.md` as release evidence assets.
 - Enforces baseline portfolio gate by default (`KSE_MOQUI_BASELINE_ENFORCE` defaults to `true` when unset).
 
 ### Moqui ERP Integration

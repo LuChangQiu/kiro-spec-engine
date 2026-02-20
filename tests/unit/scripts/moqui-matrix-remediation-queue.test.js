@@ -34,6 +34,8 @@ describe('moqui-matrix-remediation-queue script', () => {
     const linesOut = path.join(workspace, 'queue.lines');
     const out = path.join(workspace, 'plan.json');
     const markdownOut = path.join(workspace, 'plan.md');
+    const batchJsonOut = path.join(workspace, 'goals.json');
+    const commandsOut = path.join(workspace, 'commands.md');
     await fs.writeJson(baseline, {
       compare: {
         coverage_matrix_regressions: [
@@ -63,6 +65,8 @@ describe('moqui-matrix-remediation-queue script', () => {
       '--out', out,
       '--lines-out', linesOut,
       '--markdown-out', markdownOut,
+      '--batch-json-out', batchJsonOut,
+      '--commands-out', commandsOut,
       '--json'
     ]);
 
@@ -80,6 +84,16 @@ describe('moqui-matrix-remediation-queue script', () => {
     expect(lines[0]).toContain('business_rule_closed');
     expect(lines[0]).toContain('sce.scene--moqui-order-approval--0.1.0');
     expect(await fs.pathExists(markdownOut)).toBe(true);
+
+    const goalsPayload = await fs.readJson(batchJsonOut);
+    expect(Array.isArray(goalsPayload.goals)).toBe(true);
+    expect(goalsPayload.goals.length).toBe(2);
+    expect(goalsPayload.goals[0]).toContain('Recover matrix regression');
+
+    const commandsText = await fs.readFile(commandsOut, 'utf8');
+    expect(commandsText).toContain('sce auto close-loop-batch');
+    expect(commandsText).toContain('--format json');
+    expect(commandsText).toContain('sce auto close-loop');
   });
 
   test('limits template candidates by top-templates', async () => {

@@ -100,7 +100,10 @@ When matrix regressions are detected:
 node scripts/moqui-matrix-remediation-queue.js \
   --baseline .kiro/reports/release-evidence/moqui-template-baseline.json \
   --lines-out .kiro/auto/matrix-remediation.lines \
+  --batch-json-out .kiro/auto/matrix-remediation.goals.json \
+  --commands-out .kiro/reports/release-evidence/matrix-remediation-commands.md \
   --json
 
 sce auto close-loop-batch .kiro/auto/matrix-remediation.lines --json
+sce auto close-loop-batch .kiro/auto/matrix-remediation.goals.json --format json --json
 ```

@@ -8,6 +8,8 @@ const DEFAULT_BASELINE = '.kiro/reports/release-evidence/moqui-template-baseline
 const DEFAULT_OUT = '.kiro/reports/release-evidence/matrix-remediation-plan.json';
 const DEFAULT_LINES_OUT = '.kiro/auto/matrix-remediation.lines';
 const DEFAULT_MARKDOWN_OUT = '.kiro/reports/release-evidence/matrix-remediation-plan.md';
+const DEFAULT_BATCH_JSON_OUT = '.kiro/auto/matrix-remediation.goals.json';
+const DEFAULT_COMMANDS_OUT = '.kiro/reports/release-evidence/matrix-remediation-commands.md';
 const DEFAULT_TOP_TEMPLATES = 5;
 
 function parseArgs(argv) {
@@ -16,6 +18,8 @@ function parseArgs(argv) {
     out: DEFAULT_OUT,
     linesOut: DEFAULT_LINES_OUT,
     markdownOut: DEFAULT_MARKDOWN_OUT,
+    batchJsonOut: DEFAULT_BATCH_JSON_OUT,
+    commandsOut: DEFAULT_COMMANDS_OUT,
     minDeltaAbs: 0,
     topTemplates: DEFAULT_TOP_TEMPLATES,
     json: false
@@ -35,6 +39,12 @@ function parseArgs(argv) {
       index += 1;
     } else if (token === '--markdown-out' && next) {
       options.markdownOut = next;
+      index += 1;
+    } else if (token === '--batch-json-out' && next) {
+      options.batchJsonOut = next;
+      index += 1;
+    } else if (token === '--commands-out' && next) {
+      options.commandsOut = next;
       index += 1;
     } else if (token === '--min-delta-abs' && next) {
       options.minDeltaAbs = Number(next);
@@ -68,6 +78,8 @@ function printHelpAndExit(code) {
     `  --out <path>           Remediation plan JSON output (default: ${DEFAULT_OUT})`,
     `  --lines-out <path>     Queue lines output for close-loop-batch (default: ${DEFAULT_LINES_OUT})`,
     `  --markdown-out <path>  Remediation markdown output (default: ${DEFAULT_MARKDOWN_OUT})`,
+    `  --batch-json-out <path> Batch goals JSON output for close-loop-batch (default: ${DEFAULT_BATCH_JSON_OUT})`,
+    `  --commands-out <path>  Suggested command list markdown (default: ${DEFAULT_COMMANDS_OUT})`,
     '  --min-delta-abs <n>    Skip regressions with absolute delta < n (default: 0)',
     `  --top-templates <n>    Max affected templates listed per remediation (default: ${DEFAULT_TOP_TEMPLATES})`,
     '  --json                 Print payload as JSON',
@@ -234,6 +246,50 @@ function buildMarkdown(payload) {
   return `${lines.join('\n')}\n`;
 }
 
+function quoteCliArg(value = '') {
+  const text = `${value || ''}`;
+  if (!text) {
+    return '""';
+  }
+  if (/^[\w./\\:-]+$/.test(text)) {
+    return text;
+  }
+  return `"${text.replace(/"/g, '\\"')}"`;
+}
+
+function buildBatchGoalsPayload(items = []) {
+  return {
+    goals: (Array.isArray(items) ? items : [])
+      .map(item => item && item.goal ? String(item.goal).trim() : '')
+      .filter(Boolean)
+  };
+}
+
+function buildCommandsMarkdown(payload = {}) {
+  const lines = [];
+  const artifacts = payload && payload.artifacts ? payload.artifacts : {};
+  const linesOut = artifacts.lines_out || DEFAULT_LINES_OUT;
+  const batchJsonOut = artifacts.batch_json_out || DEFAULT_BATCH_JSON_OUT;
+  lines.push('# Matrix Remediation Commands');
+  lines.push('');
+  lines.push('## Batch Mode');
+  lines.push('');
+  lines.push(`- JSON goals: \`sce auto close-loop-batch ${quoteCliArg(batchJsonOut)} --format json --json\``);
+  lines.push(`- Lines goals: \`sce auto close-loop-batch ${quoteCliArg(linesOut)} --format lines --json\``);
+  lines.push('');
+  lines.push('## Per Goal');
+  lines.push('');
+  if (!Array.isArray(payload.items) || payload.items.length === 0) {
+    lines.push('- none');
+    return `${lines.join('\n')}\n`;
+  }
+  for (const item of payload.items) {
+    const goal = item && item.goal ? String(item.goal) : '';
+    lines.push(`- \`sce auto close-loop ${quoteCliArg(goal)} --json\``);
+  }
+  return `${lines.join('\n')}\n`;
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const cwd = process.cwd();
@@ -241,6 +297,8 @@ async function main() {
   const outPath = resolvePath(cwd, options.out);
   const linesOutPath = resolvePath(cwd, options.linesOut);
   const markdownOutPath = resolvePath(cwd, options.markdownOut);
+  const batchJsonOutPath = resolvePath(cwd, options.batchJsonOut);
+  const commandsOutPath = resolvePath(cwd, options.commandsOut);
   const baselineExists = await fs.pathExists(baselinePath);
   if (!baselineExists) {
     throw new Error(`baseline file not found: ${path.relative(cwd, baselinePath) || baselinePath}`);
@@ -274,16 +332,22 @@ async function main() {
     artifacts: {
       out: path.relative(cwd, outPath) || '.',
       lines_out: path.relative(cwd, linesOutPath) || '.',
-      markdown_out: path.relative(cwd, markdownOutPath) || '.'
+      markdown_out: path.relative(cwd, markdownOutPath) || '.',
+      batch_json_out: path.relative(cwd, batchJsonOutPath) || '.',
+      commands_out: path.relative(cwd, commandsOutPath) || '.'
     }
   };
 
   await fs.ensureDir(path.dirname(linesOutPath));
   await fs.writeFile(linesOutPath, queueLines.join('\n') + (queueLines.length > 0 ? '\n' : ''), 'utf8');
+  await fs.ensureDir(path.dirname(batchJsonOutPath));
+  await fs.writeJson(batchJsonOutPath, buildBatchGoalsPayload(items), { spaces: 2 });
   await fs.ensureDir(path.dirname(outPath));
   await fs.writeJson(outPath, payload, { spaces: 2 });
   await fs.ensureDir(path.dirname(markdownOutPath));
   await fs.writeFile(markdownOutPath, buildMarkdown(payload), 'utf8');
+  await fs.ensureDir(path.dirname(commandsOutPath));
+  await fs.writeFile(commandsOutPath, buildCommandsMarkdown(payload), 'utf8');
 
   if (options.json) {
     process.stdout.write(`${JSON.stringify(payload, null, 2)}\n`);
@@ -306,6 +370,8 @@ module.exports = {
   DEFAULT_OUT,
   DEFAULT_LINES_OUT,
   DEFAULT_MARKDOWN_OUT,
+  DEFAULT_BATCH_JSON_OUT,
+  DEFAULT_COMMANDS_OUT,
   DEFAULT_TOP_TEMPLATES,
   parseArgs,
   resolvePath,
@@ -316,5 +382,8 @@ module.exports = {
   collectTemplateCandidates,
   buildQueueItem,
   buildMarkdown,
+  quoteCliArg,
+  buildBatchGoalsPayload,
+  buildCommandsMarkdown,
   main
 };

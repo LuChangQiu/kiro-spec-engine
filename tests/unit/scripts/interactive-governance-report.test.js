@@ -204,6 +204,116 @@ describe('interactive-governance-report script', () => {
     expect(payload.summary.warnings).toBeGreaterThanOrEqual(1);
   });
 
+  test('consumes matrix signals and emits matrix regression alerts', async () => {
+    const workspace = path.join(tempDir, 'workspace-matrix-alert');
+    await fs.ensureDir(workspace);
+
+    const intentAudit = path.join(workspace, 'intent.jsonl');
+    const approvalAudit = path.join(workspace, 'approval.jsonl');
+    const executionLedger = path.join(workspace, 'execution.jsonl');
+    const feedbackFile = path.join(workspace, 'feedback.jsonl');
+    const matrixSignals = path.join(workspace, 'matrix-signals.jsonl');
+    const thresholdsFile = path.join(workspace, 'thresholds.json');
+
+    const now = new Date().toISOString();
+
+    await writeJsonl(intentAudit, [
+      { event_type: 'interactive.intent.generated', intent_id: 'i-1', timestamp: now },
+      { event_type: 'interactive.intent.generated', intent_id: 'i-2', timestamp: now },
+      { event_type: 'interactive.intent.generated', intent_id: 'i-3', timestamp: now },
+      { event_type: 'interactive.intent.generated', intent_id: 'i-4', timestamp: now },
+      { event_type: 'interactive.intent.generated', intent_id: 'i-5', timestamp: now }
+    ]);
+
+    await writeJsonl(approvalAudit, [
+      { action: 'submit', blocked: false, timestamp: now },
+      { action: 'approve', blocked: false, timestamp: now }
+    ]);
+
+    await writeJsonl(executionLedger, [
+      { execution_id: 'e-1', result: 'success', policy_decision: 'allow', executed_at: now },
+      { execution_id: 'e-2', result: 'success', policy_decision: 'allow', executed_at: now },
+      { execution_id: 'e-3', result: 'success', policy_decision: 'allow', executed_at: now },
+      { execution_id: 'e-4', result: 'success', policy_decision: 'allow', executed_at: now }
+    ]);
+
+    await writeJsonl(feedbackFile, [
+      { satisfaction_score: 5, timestamp: now },
+      { satisfaction_score: 4, timestamp: now },
+      { satisfaction_score: 5, timestamp: now }
+    ]);
+
+    await writeJsonl(matrixSignals, [
+      {
+        generated_at: now,
+        matrix: {
+          stage_status: 'completed',
+          portfolio_passed: false,
+          regression_count: 2,
+          avg_score: 69,
+          valid_rate_percent: 90
+        }
+      },
+      {
+        generated_at: now,
+        matrix: {
+          stage_status: 'non-zero-exit',
+          portfolio_passed: false,
+          regression_count: 1,
+          avg_score: 68,
+          valid_rate_percent: 85
+        }
+      },
+      {
+        generated_at: now,
+        matrix: {
+          stage_status: 'completed',
+          portfolio_passed: true,
+          regression_count: 0,
+          avg_score: 75,
+          valid_rate_percent: 100
+        }
+      }
+    ]);
+
+    await fs.writeJson(thresholdsFile, {
+      adoption_rate_min_percent: 50,
+      execution_success_rate_min_percent: 80,
+      rollback_rate_max_percent: 30,
+      security_intercept_rate_max_percent: 30,
+      satisfaction_min_score: 4,
+      min_feedback_samples: 2,
+      min_matrix_samples: 2,
+      matrix_portfolio_pass_rate_min_percent: 80,
+      matrix_regression_positive_rate_max_percent: 10,
+      matrix_stage_error_rate_max_percent: 10
+    }, { spaces: 2 });
+
+    const result = runScript(workspace, [
+      '--intent-audit', intentAudit,
+      '--approval-audit', approvalAudit,
+      '--execution-ledger', executionLedger,
+      '--feedback-file', feedbackFile,
+      '--matrix-signals', matrixSignals,
+      '--thresholds', thresholdsFile,
+      '--period', 'all',
+      '--fail-on-alert',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(2);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.metrics.matrix_signal_total).toBe(3);
+    expect(payload.metrics.matrix_portfolio_pass_rate_percent).toBe(33.33);
+    expect(payload.metrics.matrix_regression_positive_rate_percent).toBe(66.67);
+    expect(payload.metrics.matrix_stage_error_rate_percent).toBe(33.33);
+    expect(payload.alerts.map(item => item.id)).toEqual(expect.arrayContaining([
+      'matrix-portfolio-pass-rate-low',
+      'matrix-regression-rate-high',
+      'matrix-stage-error-rate-high'
+    ]));
+  });
+
   test('treats low intent sample as warning instead of breach', async () => {
     const workspace = path.join(tempDir, 'workspace-low-intent-sample');
     await fs.ensureDir(workspace);

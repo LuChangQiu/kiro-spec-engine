@@ -14,6 +14,10 @@ describe('scene interactive-flow option helpers', () => {
       feedbackScore: '4.5',
       feedbackTags: 'moqui,approval',
       feedbackChannel: 'UI',
+      matrixMinScore: '75',
+      matrixMinValidRate: '95',
+      matrixSignals: ' .kiro/reports/custom-matrix.jsonl ',
+      matrix: false,
       dryRun: false
     });
 
@@ -25,6 +29,10 @@ describe('scene interactive-flow option helpers', () => {
     expect(normalized.feedbackScore).toBe(4.5);
     expect(normalized.feedbackTags).toBe('moqui,approval');
     expect(normalized.feedbackChannel).toBe('ui');
+    expect(normalized.matrixMinScore).toBe(75);
+    expect(normalized.matrixMinValidRate).toBe(95);
+    expect(normalized.matrixSignals).toBe('.kiro/reports/custom-matrix.jsonl');
+    expect(normalized.matrix).toBe(false);
     expect(normalized.dryRun).toBe(false);
   });
 
@@ -85,6 +93,28 @@ describe('scene interactive-flow option helpers', () => {
       feedbackChannel: 'mail',
       feedbackScore: null
     })).toBe('--feedback-channel must be one of: ui, cli, api, other');
+
+    expect(validateSceneInteractiveFlowOptions({
+      input: 'docs/moqui-provider.json',
+      provider: 'moqui',
+      goal: 'x',
+      executionMode: 'apply',
+      feedbackChannel: 'ui',
+      feedbackScore: null,
+      matrixMinScore: 120,
+      matrixMinValidRate: 100
+    })).toBe('--matrix-min-score must be a number between 0 and 100');
+
+    expect(validateSceneInteractiveFlowOptions({
+      input: 'docs/moqui-provider.json',
+      provider: 'moqui',
+      goal: 'x',
+      executionMode: 'apply',
+      feedbackChannel: 'ui',
+      feedbackScore: null,
+      matrixMinScore: 80,
+      matrixMinValidRate: -1
+    })).toBe('--matrix-min-valid-rate must be a number between 0 and 100');
   });
 
   test('validate accepts valid options', () => {

@@ -10,10 +10,14 @@ const DEFAULT_PROVIDER = 'moqui';
 const DEFAULT_OUT_DIR = '.kiro/reports/interactive-flow';
 const DEFAULT_USER_ID = 'anonymous-user';
 const DEFAULT_FEEDBACK_CHANNEL = 'ui';
+const DEFAULT_MATRIX_SIGNALS = '.kiro/reports/interactive-matrix-signals.jsonl';
+const DEFAULT_MATRIX_MIN_SCORE = 70;
+const DEFAULT_MATRIX_MIN_VALID_RATE = 100;
 const FEEDBACK_CHANNELS = new Set(['ui', 'cli', 'api', 'other']);
 
 const SCRIPT_CONTEXT_BRIDGE = path.resolve(__dirname, 'interactive-context-bridge.js');
 const SCRIPT_INTERACTIVE_LOOP = path.resolve(__dirname, 'interactive-customization-loop.js');
+const SCRIPT_MOQUI_BASELINE = path.resolve(__dirname, 'moqui-template-baseline-report.js');
 
 function parseArgs(argv) {
   const options = {
@@ -49,6 +53,19 @@ function parseArgs(argv) {
     failOnGateDeny: false,
     failOnGateNonAllow: false,
     failOnExecuteBlocked: false,
+    matrix: true,
+    matrixTemplateDir: null,
+    matrixMatch: null,
+    matrixIncludeAll: false,
+    matrixMinScore: DEFAULT_MATRIX_MIN_SCORE,
+    matrixMinValidRate: DEFAULT_MATRIX_MIN_VALID_RATE,
+    matrixCompareWith: null,
+    matrixOut: null,
+    matrixMarkdownOut: null,
+    matrixSignals: DEFAULT_MATRIX_SIGNALS,
+    matrixFailOnPortfolioFail: false,
+    matrixFailOnRegression: false,
+    matrixFailOnError: false,
     json: false
   };
 
@@ -142,6 +159,40 @@ function parseArgs(argv) {
       options.failOnGateNonAllow = true;
     } else if (token === '--fail-on-execute-blocked') {
       options.failOnExecuteBlocked = true;
+    } else if (token === '--no-matrix') {
+      options.matrix = false;
+    } else if (token === '--matrix-template-dir' && next) {
+      options.matrixTemplateDir = next;
+      index += 1;
+    } else if (token === '--matrix-match' && next) {
+      options.matrixMatch = next;
+      index += 1;
+    } else if (token === '--matrix-include-all') {
+      options.matrixIncludeAll = true;
+    } else if (token === '--matrix-min-score' && next) {
+      options.matrixMinScore = Number(next);
+      index += 1;
+    } else if (token === '--matrix-min-valid-rate' && next) {
+      options.matrixMinValidRate = Number(next);
+      index += 1;
+    } else if (token === '--matrix-compare-with' && next) {
+      options.matrixCompareWith = next;
+      index += 1;
+    } else if (token === '--matrix-out' && next) {
+      options.matrixOut = next;
+      index += 1;
+    } else if (token === '--matrix-markdown-out' && next) {
+      options.matrixMarkdownOut = next;
+      index += 1;
+    } else if (token === '--matrix-signals' && next) {
+      options.matrixSignals = next;
+      index += 1;
+    } else if (token === '--matrix-fail-on-portfolio-fail') {
+      options.matrixFailOnPortfolioFail = true;
+    } else if (token === '--matrix-fail-on-regression') {
+      options.matrixFailOnRegression = true;
+    } else if (token === '--matrix-fail-on-error') {
+      options.matrixFailOnError = true;
     } else if (token === '--json') {
       options.json = true;
     } else if (token === '--help' || token === '-h') {
@@ -170,6 +221,13 @@ function parseArgs(argv) {
   options.feedbackComment = `${options.feedbackComment || ''}`.trim() || null;
   options.feedbackChannel = `${options.feedbackChannel || ''}`.trim().toLowerCase() || DEFAULT_FEEDBACK_CHANNEL;
   options.feedbackTags = Array.from(new Set(options.feedbackTags.map(item => `${item || ''}`.trim().toLowerCase()).filter(Boolean)));
+  options.matrix = options.matrix !== false;
+  options.matrixTemplateDir = `${options.matrixTemplateDir || ''}`.trim() || null;
+  options.matrixMatch = `${options.matrixMatch || ''}`.trim() || null;
+  options.matrixCompareWith = `${options.matrixCompareWith || ''}`.trim() || null;
+  options.matrixOut = `${options.matrixOut || ''}`.trim() || null;
+  options.matrixMarkdownOut = `${options.matrixMarkdownOut || ''}`.trim() || null;
+  options.matrixSignals = `${options.matrixSignals || ''}`.trim() || DEFAULT_MATRIX_SIGNALS;
 
   if (!options.input) {
     throw new Error('--input is required.');
@@ -190,6 +248,12 @@ function parseArgs(argv) {
   }
   if (!FEEDBACK_CHANNELS.has(options.feedbackChannel)) {
     throw new Error(`--feedback-channel must be one of: ${Array.from(FEEDBACK_CHANNELS).join(', ')}`);
+  }
+  if (!Number.isFinite(options.matrixMinScore) || options.matrixMinScore < 0 || options.matrixMinScore > 100) {
+    throw new Error('--matrix-min-score must be between 0 and 100.');
+  }
+  if (!Number.isFinite(options.matrixMinValidRate) || options.matrixMinValidRate < 0 || options.matrixMinValidRate > 100) {
+    throw new Error('--matrix-min-valid-rate must be between 0 and 100.');
   }
 
   return options;
@@ -235,6 +299,19 @@ function printHelpAndExit(code) {
     '  --fail-on-gate-deny             Exit code 2 if gate decision is deny',
     '  --fail-on-gate-non-allow        Exit code 2 if gate decision is deny/review-required',
     '  --fail-on-execute-blocked       Exit code 2 if auto execute is blocked/non-success',
+    '  --no-matrix                     Disable matrix baseline snapshot stage',
+    '  --matrix-template-dir <path>    Template library path for matrix stage',
+    '  --matrix-match <regex>          Matrix selector regex',
+    '  --matrix-include-all            Score all templates in matrix stage',
+    `  --matrix-min-score <0..100>     Matrix min semantic score (default: ${DEFAULT_MATRIX_MIN_SCORE})`,
+    `  --matrix-min-valid-rate <0..100> Matrix min valid-rate (default: ${DEFAULT_MATRIX_MIN_VALID_RATE})`,
+    '  --matrix-compare-with <path>    Previous matrix baseline report for regression comparison',
+    '  --matrix-out <path>             Matrix JSON report output path',
+    '  --matrix-markdown-out <path>    Matrix markdown report output path',
+    `  --matrix-signals <path>         Matrix signal stream JSONL (default: ${DEFAULT_MATRIX_SIGNALS})`,
+    '  --matrix-fail-on-portfolio-fail Exit non-zero when matrix portfolio gate fails',
+    '  --matrix-fail-on-regression     Exit code 2 when matrix regressions are detected',
+    '  --matrix-fail-on-error          Exit non-zero when matrix stage fails unexpectedly',
     '  --json                          Print flow payload as JSON',
     '  -h, --help                      Show this help'
   ];
@@ -270,6 +347,18 @@ function parseJsonOutput(text, label) {
   }
 }
 
+function tryParseJsonOutput(text) {
+  const raw = `${text || ''}`.trim();
+  if (!raw) {
+    return null;
+  }
+  try {
+    return JSON.parse(raw);
+  } catch (_error) {
+    return null;
+  }
+}
+
 function runScript(label, scriptPath, args, cwd) {
   const result = spawnSync(process.execPath, [scriptPath, ...args], {
     cwd,
@@ -282,6 +371,11 @@ function runScript(label, scriptPath, args, cwd) {
     error: result.error || null,
     command: [process.execPath, scriptPath, ...args].join(' ')
   };
+}
+
+async function appendJsonLine(filePath, payload) {
+  await fs.ensureDir(path.dirname(filePath));
+  await fs.appendFile(filePath, `${JSON.stringify(payload)}\n`, 'utf8');
 }
 
 async function main() {
@@ -303,6 +397,14 @@ async function main() {
   const flowOutPath = options.out
     ? resolvePath(cwd, options.out)
     : path.join(sessionDir, 'interactive-flow.summary.json');
+  const matrixOutPath = options.matrixOut
+    ? resolvePath(cwd, options.matrixOut)
+    : path.join(sessionDir, 'moqui-template-baseline.json');
+  const matrixMarkdownOutPath = options.matrixMarkdownOut
+    ? resolvePath(cwd, options.matrixMarkdownOut)
+    : path.join(sessionDir, 'moqui-template-baseline.md');
+  const matrixSignalsPath = resolvePath(cwd, options.matrixSignals);
+  const matrixSignalPath = path.join(sessionDir, 'interactive-matrix-signal.json');
 
   await fs.ensureDir(sessionDir);
 
@@ -413,6 +515,107 @@ async function main() {
   }
   const loopPayload = parseJsonOutput(loopResult.stdout, 'interactive-customization-loop');
 
+  let matrixResult = null;
+  let matrixPayload = null;
+  let matrixSignal = null;
+  let matrixStageStatus = 'skipped';
+  if (options.matrix) {
+    const matrixArgs = [
+      '--out', matrixOutPath,
+      '--markdown-out', matrixMarkdownOutPath,
+      '--min-score', String(options.matrixMinScore),
+      '--min-valid-rate', String(options.matrixMinValidRate),
+      '--json'
+    ];
+    if (options.matrixTemplateDir) {
+      matrixArgs.push('--template-dir', resolvePath(cwd, options.matrixTemplateDir));
+    }
+    if (options.matrixMatch) {
+      matrixArgs.push('--match', options.matrixMatch);
+    }
+    if (options.matrixIncludeAll) {
+      matrixArgs.push('--include-all');
+    }
+    if (options.matrixCompareWith) {
+      matrixArgs.push('--compare-with', resolvePath(cwd, options.matrixCompareWith));
+    }
+    if (options.matrixFailOnPortfolioFail) {
+      matrixArgs.push('--fail-on-portfolio-fail');
+    }
+
+    matrixResult = runScript('moqui-template-baseline', SCRIPT_MOQUI_BASELINE, matrixArgs, cwd);
+    if (matrixResult.error) {
+      matrixStageStatus = 'error';
+      if (options.matrixFailOnError) {
+        throw new Error(`moqui-template-baseline failed: ${matrixResult.error.message}`);
+      }
+    } else {
+      matrixPayload = tryParseJsonOutput(matrixResult.stdout);
+      matrixStageStatus = matrixResult.exitCode === 0 ? 'completed' : 'non-zero-exit';
+      if (!matrixPayload && options.matrixFailOnError) {
+        throw new Error('moqui-template-baseline returned invalid JSON payload.');
+      }
+      if (matrixPayload) {
+        const summary = matrixPayload && matrixPayload.summary ? matrixPayload.summary : {};
+        const compare = matrixPayload && matrixPayload.compare ? matrixPayload.compare : {};
+        const regressions = Array.isArray(compare.coverage_matrix_regressions)
+          ? compare.coverage_matrix_regressions
+          : [];
+
+        matrixSignal = {
+          mode: 'interactive-matrix-signal',
+          generated_at: new Date().toISOString(),
+          session_id: sessionId,
+          provider: options.provider,
+          matrix: {
+            stage_status: matrixStageStatus,
+            exit_code: matrixResult.exitCode,
+            scoped_templates: Number.isFinite(Number(summary.scoped_templates))
+              ? Number(summary.scoped_templates)
+              : null,
+            portfolio_passed: summary.portfolio_passed === true,
+            avg_score: Number.isFinite(Number(summary.avg_score))
+              ? Number(summary.avg_score)
+              : null,
+            valid_rate_percent: Number.isFinite(Number(summary.valid_rate_percent))
+              ? Number(summary.valid_rate_percent)
+              : null,
+            baseline_failed: Number.isFinite(Number(summary.baseline_failed))
+              ? Number(summary.baseline_failed)
+              : null,
+            regression_count: regressions.length,
+            regressions: regressions.map((item) => ({
+              metric: item && item.metric ? String(item.metric) : null,
+              delta_rate_percent: Number.isFinite(Number(item && item.delta_rate_percent))
+                ? Number(item.delta_rate_percent)
+                : null
+            })),
+            thresholds: {
+              min_score: options.matrixMinScore,
+              min_valid_rate_percent: options.matrixMinValidRate
+            },
+            compare_with: options.matrixCompareWith
+              ? toRelative(cwd, resolvePath(cwd, options.matrixCompareWith))
+              : null,
+            output_json: toRelative(cwd, matrixOutPath),
+            output_markdown: toRelative(cwd, matrixMarkdownOutPath)
+          }
+        };
+
+        await fs.ensureDir(path.dirname(matrixSignalPath));
+        await fs.writeJson(matrixSignalPath, matrixSignal, { spaces: 2 });
+        await appendJsonLine(matrixSignalsPath, matrixSignal);
+      }
+    }
+  }
+
+  const matrixRegressionCount = matrixSignal && matrixSignal.matrix
+    ? Number(matrixSignal.matrix.regression_count || 0)
+    : null;
+  const matrixPortfolioPassed = matrixSignal && matrixSignal.matrix
+    ? matrixSignal.matrix.portfolio_passed === true
+    : null;
+
   const flowPayload = {
     mode: 'interactive-flow',
     generated_at: new Date().toISOString(),
@@ -428,19 +631,33 @@ async function main() {
         exit_code: loopResult.exitCode,
         command: loopResult.command,
         payload: loopPayload
+      },
+      matrix: {
+        enabled: options.matrix,
+        status: matrixStageStatus,
+        exit_code: matrixResult ? matrixResult.exitCode : null,
+        command: matrixResult ? matrixResult.command : null,
+        payload: matrixPayload
       }
     },
     summary: {
       status: loopPayload && loopPayload.summary ? loopPayload.summary.status : null,
       gate_decision: loopPayload && loopPayload.gate ? loopPayload.gate.decision : null,
-      execution_result: loopPayload && loopPayload.execution ? loopPayload.execution.result : null
+      execution_result: loopPayload && loopPayload.execution ? loopPayload.execution.result : null,
+      matrix_status: matrixStageStatus,
+      matrix_portfolio_passed: matrixPortfolioPassed,
+      matrix_regression_count: matrixRegressionCount
     },
     artifacts: {
       input: toRelative(cwd, inputPath),
       bridge_context_json: toRelative(cwd, bridgeOutContextPath),
       bridge_report_json: toRelative(cwd, bridgeOutReportPath),
       loop_summary_json: toRelative(cwd, loopOutPath),
-      flow_summary_json: toRelative(cwd, flowOutPath)
+      flow_summary_json: toRelative(cwd, flowOutPath),
+      matrix_summary_json: options.matrix ? toRelative(cwd, matrixOutPath) : null,
+      matrix_summary_markdown: options.matrix ? toRelative(cwd, matrixMarkdownOutPath) : null,
+      matrix_signal_json: options.matrix && matrixSignal ? toRelative(cwd, matrixSignalPath) : null,
+      matrix_signals_jsonl: options.matrix && matrixSignal ? toRelative(cwd, matrixSignalsPath) : null
     }
   };
 
@@ -454,12 +671,38 @@ async function main() {
     process.stdout.write(`- Session: ${flowPayload.session_id}\n`);
     process.stdout.write(`- Status: ${flowPayload.summary.status || 'unknown'}\n`);
     process.stdout.write(`- Gate decision: ${flowPayload.summary.gate_decision || 'n/a'}\n`);
+    if (options.matrix) {
+      process.stdout.write(`- Matrix status: ${flowPayload.summary.matrix_status || 'unknown'}\n`);
+      process.stdout.write(`- Matrix portfolio pass: ${flowPayload.summary.matrix_portfolio_passed === true ? 'yes' : 'no'}\n`);
+      process.stdout.write(`- Matrix regressions: ${flowPayload.summary.matrix_regression_count == null ? 'n/a' : flowPayload.summary.matrix_regression_count}\n`);
+    }
     process.stdout.write(`- Bridge context: ${flowPayload.artifacts.bridge_context_json}\n`);
     process.stdout.write(`- Flow summary: ${flowPayload.artifacts.flow_summary_json}\n`);
   }
 
+  let finalExitCode = 0;
   if (loopResult.exitCode !== 0) {
-    process.exitCode = loopResult.exitCode;
+    finalExitCode = loopResult.exitCode;
+  }
+
+  if (options.matrix) {
+    if (matrixResult && matrixResult.error && options.matrixFailOnError && finalExitCode === 0) {
+      finalExitCode = 2;
+    }
+    if (matrixResult && !matrixResult.error && finalExitCode === 0) {
+      if (options.matrixFailOnError && matrixResult.exitCode !== 0) {
+        finalExitCode = matrixResult.exitCode;
+      } else if (options.matrixFailOnPortfolioFail && matrixResult.exitCode !== 0) {
+        finalExitCode = matrixResult.exitCode;
+      }
+      if (options.matrixFailOnRegression && Number(matrixRegressionCount) > 0 && finalExitCode === 0) {
+        finalExitCode = 2;
+      }
+    }
+  }
+
+  if (finalExitCode !== 0) {
+    process.exitCode = finalExitCode;
   }
 }
 
@@ -478,6 +721,8 @@ module.exports = {
   resolvePath,
   normalizeSessionId,
   parseJsonOutput,
+  tryParseJsonOutput,
   runScript,
+  appendJsonLine,
   main
 };

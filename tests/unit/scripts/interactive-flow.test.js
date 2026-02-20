@@ -126,12 +126,31 @@ describe('interactive-flow script', () => {
     expect(payload.mode).toBe('interactive-flow');
     expect(payload.pipeline.bridge.exit_code).toBe(0);
     expect(payload.pipeline.loop.exit_code).toBe(0);
+    expect(payload.pipeline.matrix.enabled).toBe(true);
+    expect(payload.pipeline.matrix.exit_code).toBe(0);
+    expect(payload.pipeline.matrix.status).toBe('completed');
     expect(payload.summary.status).toBe('ready-for-apply');
+    expect(payload.summary.matrix_status).toBe('completed');
 
     const bridgeContextFile = path.join(workspace, payload.artifacts.bridge_context_json);
     const flowSummaryFile = path.join(workspace, payload.artifacts.flow_summary_json);
+    const matrixSummaryFile = path.join(workspace, payload.artifacts.matrix_summary_json);
+    const matrixMarkdownFile = path.join(workspace, payload.artifacts.matrix_summary_markdown);
+    const matrixSignalFile = path.join(workspace, payload.artifacts.matrix_signal_json);
+    const matrixSignalsFile = path.join(workspace, payload.artifacts.matrix_signals_jsonl);
     expect(await fs.pathExists(bridgeContextFile)).toBe(true);
     expect(await fs.pathExists(flowSummaryFile)).toBe(true);
+    expect(await fs.pathExists(matrixSummaryFile)).toBe(true);
+    expect(await fs.pathExists(matrixMarkdownFile)).toBe(true);
+    expect(await fs.pathExists(matrixSignalFile)).toBe(true);
+    expect(await fs.pathExists(matrixSignalsFile)).toBe(true);
+
+    const signals = (await fs.readFile(matrixSignalsFile, 'utf8'))
+      .split(/\r?\n/)
+      .filter(Boolean)
+      .map(line => JSON.parse(line));
+    expect(signals.length).toBeGreaterThanOrEqual(1);
+    expect(signals[signals.length - 1].session_id).toBe(payload.session_id);
   });
 
   test('supports low-risk auto execute in apply mode', async () => {
@@ -157,6 +176,34 @@ describe('interactive-flow script', () => {
     expect(payload.summary.status).toBe('completed');
     expect(payload.summary.execution_result).toBe('success');
     expect(payload.pipeline.loop.payload.feedback.logged).toBe(true);
+  });
+
+  test('allows disabling matrix stage explicitly', async () => {
+    const workspace = path.join(tempDir, 'workspace-no-matrix');
+    await fs.ensureDir(workspace);
+    const { policyPath, catalogPath } = await writePolicyBundle(workspace);
+    const payloadPath = await writeProviderPayload(workspace);
+
+    const result = runScript(workspace, [
+      '--input', payloadPath,
+      '--provider', 'moqui',
+      '--goal', 'Adjust order screen field layout for clearer input flow',
+      '--policy', policyPath,
+      '--catalog', catalogPath,
+      '--no-matrix',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.pipeline.matrix.enabled).toBe(false);
+    expect(payload.pipeline.matrix.status).toBe('skipped');
+    expect(payload.pipeline.matrix.exit_code).toBe(null);
+    expect(payload.artifacts.matrix_summary_json).toBe(null);
+    expect(payload.artifacts.matrix_signal_json).toBe(null);
+
+    const matrixSignalsFile = path.join(workspace, '.kiro', 'reports', 'interactive-matrix-signals.jsonl');
+    expect(await fs.pathExists(matrixSignalsFile)).toBe(false);
   });
 
   test('fails in strict mode when provider payload violates contract', async () => {

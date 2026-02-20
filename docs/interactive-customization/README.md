@@ -74,11 +74,29 @@ node scripts/interactive-flow.js \
   --json
 ```
 
+Matrix stage behavior (enabled by default in `interactive-flow`):
+
+- Runs `moqui-template-baseline-report` after loop stage to snapshot template matrix status.
+- Writes session artifacts and appends a global matrix signal stream.
+- Use `--no-matrix` to disable this stage for diagnostics.
+
+Common matrix flags:
+
+- `--matrix-min-score <0..100>`
+- `--matrix-min-valid-rate <0..100>`
+- `--matrix-compare-with <path>`
+- `--matrix-signals <path>`
+- `--matrix-fail-on-portfolio-fail`
+- `--matrix-fail-on-regression`
+
 Flow output defaults:
 
 - Flow summary: `.kiro/reports/interactive-flow/<session-id>/interactive-flow.summary.json`
 - Bridge context: `.kiro/reports/interactive-flow/<session-id>/interactive-page-context.normalized.json`
 - Loop summary: `.kiro/reports/interactive-flow/<session-id>/interactive-customization-loop.summary.json`
+- Matrix summary JSON: `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.json`
+- Matrix summary Markdown: `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.md`
+- Matrix signal stream: `.kiro/reports/interactive-matrix-signals.jsonl`
 
 Build read-only change intent from page context:
 
@@ -227,4 +245,5 @@ node scripts/interactive-governance-report.js \
 ```
 
 The governance report consumes feedback events from `.kiro/reports/interactive-user-feedback.jsonl` by default.
+The governance report also consumes matrix signals from `.kiro/reports/interactive-matrix-signals.jsonl` by default.
 When `intent_total` is below `min_intent_samples` (default `5`), adoption emits a low-severity sample warning instead of a breach.

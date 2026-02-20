@@ -866,9 +866,14 @@ Interactive context bridge helper (script-level provider normalization):
   - npm alias: `npm run report:interactive-context-bridge`
 
 Interactive full flow helper (script-level one-command entry):
-- `node scripts/interactive-flow.js --input <path> (--goal <text> | --goal-file <path>) [--provider <moqui|generic>] [--execution-mode <suggestion|apply>] [--policy <path>] [--catalog <path>] [--context-contract <path>] [--auto-execute-low-risk] [--feedback-score <0..5>] [--json]`: run `context-bridge -> interactive-loop` in one command for Moqui workbench integration.
+- `node scripts/interactive-flow.js --input <path> (--goal <text> | --goal-file <path>) [--provider <moqui|generic>] [--execution-mode <suggestion|apply>] [--policy <path>] [--catalog <path>] [--context-contract <path>] [--auto-execute-low-risk] [--feedback-score <0..5>] [--no-matrix] [--matrix-min-score <0..100>] [--matrix-min-valid-rate <0..100>] [--matrix-compare-with <path>] [--matrix-signals <path>] [--matrix-fail-on-portfolio-fail] [--matrix-fail-on-regression] [--json]`: run `context-bridge -> interactive-loop -> matrix-baseline-snapshot` in one command for Moqui workbench integration.
   - Default flow artifact root: `.kiro/reports/interactive-flow/<session-id>/`
   - Default flow summary output: `.kiro/reports/interactive-flow/<session-id>/interactive-flow.summary.json`
+  - Default matrix outputs:
+    - `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.json`
+    - `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.md`
+    - `.kiro/reports/interactive-matrix-signals.jsonl` (append-only signal stream)
+  - Matrix stage is enabled by default; use `--no-matrix` only for diagnostics.
   - CLI equivalent: `sce scene interactive-flow --input <path> --goal "<goal>" --json`
   - npm alias: `npm run run:interactive-flow -- --input docs/interactive-customization/moqui-context-provider.sample.json --goal "Adjust order screen field layout for clearer input flow" --json`
 
@@ -922,10 +927,11 @@ Interactive user feedback helper (script-level stage-D feedback ingestion):
 - npm alias: `npm run log:interactive-feedback -- --score 5 --comment "clear and safe"`
 
 Interactive governance report helper (script-level stage-D/6 observability + alerting):
-- `node scripts/interactive-governance-report.js [--intent-audit <path>] [--approval-audit <path>] [--execution-ledger <path>] [--feedback-file <path>] [--thresholds <path>] [--period <weekly|monthly|all|custom>] [--from <iso>] [--to <iso>] [--out <path>] [--markdown-out <path>] [--fail-on-alert] [--json]`: compute interactive governance KPIs (adoption/success/rollback/security-intercept/satisfaction), evaluate threshold breaches, and emit machine/human-readable governance report.
+- `node scripts/interactive-governance-report.js [--intent-audit <path>] [--approval-audit <path>] [--execution-ledger <path>] [--feedback-file <path>] [--matrix-signals <path>] [--thresholds <path>] [--period <weekly|monthly|all|custom>] [--from <iso>] [--to <iso>] [--out <path>] [--markdown-out <path>] [--fail-on-alert] [--json]`: compute interactive governance KPIs (adoption/success/rollback/security-intercept/satisfaction + matrix pass/regression/stage-error), evaluate threshold breaches, and emit machine/human-readable governance report.
   - Default thresholds: `docs/interactive-customization/governance-threshold-baseline.json`
   - Default minimum intent sample threshold: `min_intent_samples=5` (below this becomes warning, not breach)
   - Default feedback input: `.kiro/reports/interactive-user-feedback.jsonl`
+  - Default matrix input: `.kiro/reports/interactive-matrix-signals.jsonl`
   - Default outputs:
     - `.kiro/reports/interactive-governance-report.json`
     - `.kiro/reports/interactive-governance-report.md`

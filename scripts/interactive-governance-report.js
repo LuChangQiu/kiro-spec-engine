@@ -8,6 +8,7 @@ const DEFAULT_INTENT_AUDIT = '.kiro/reports/interactive-copilot-audit.jsonl';
 const DEFAULT_APPROVAL_AUDIT = '.kiro/reports/interactive-approval-events.jsonl';
 const DEFAULT_EXECUTION_LEDGER = '.kiro/reports/interactive-execution-ledger.jsonl';
 const DEFAULT_FEEDBACK_FILE = '.kiro/reports/interactive-user-feedback.jsonl';
+const DEFAULT_MATRIX_SIGNALS = '.kiro/reports/interactive-matrix-signals.jsonl';
 const DEFAULT_THRESHOLDS = 'docs/interactive-customization/governance-threshold-baseline.json';
 const DEFAULT_OUT = '.kiro/reports/interactive-governance-report.json';
 const DEFAULT_MARKDOWN_OUT = '.kiro/reports/interactive-governance-report.md';
@@ -18,6 +19,7 @@ function parseArgs(argv) {
     approvalAudit: DEFAULT_APPROVAL_AUDIT,
     executionLedger: DEFAULT_EXECUTION_LEDGER,
     feedbackFile: DEFAULT_FEEDBACK_FILE,
+    matrixSignals: DEFAULT_MATRIX_SIGNALS,
     thresholds: DEFAULT_THRESHOLDS,
     period: 'weekly',
     from: null,
@@ -42,6 +44,9 @@ function parseArgs(argv) {
       i += 1;
     } else if (token === '--feedback-file' && next) {
       options.feedbackFile = next;
+      i += 1;
+    } else if (token === '--matrix-signals' && next) {
+      options.matrixSignals = next;
       i += 1;
     } else if (token === '--thresholds' && next) {
       options.thresholds = next;
@@ -95,6 +100,7 @@ function printHelpAndExit(code) {
     `  --approval-audit <path>    Approval audit JSONL (default: ${DEFAULT_APPROVAL_AUDIT})`,
     `  --execution-ledger <path>  Execution ledger JSONL (default: ${DEFAULT_EXECUTION_LEDGER})`,
     `  --feedback-file <path>     User feedback JSONL (default: ${DEFAULT_FEEDBACK_FILE})`,
+    `  --matrix-signals <path>    Matrix signal JSONL (default: ${DEFAULT_MATRIX_SIGNALS})`,
     `  --thresholds <path>        Governance threshold JSON (default: ${DEFAULT_THRESHOLDS})`,
     '  --period <type>            weekly|monthly|all|custom (default: weekly)',
     '  --from <ISO datetime>      Start time (required for custom period)',
@@ -240,7 +246,19 @@ function loadThresholds(raw = {}) {
       : 4,
     min_feedback_samples: Number.isFinite(Number(thresholds.min_feedback_samples))
       ? Number(thresholds.min_feedback_samples)
-      : 3
+      : 3,
+    min_matrix_samples: Number.isFinite(Number(thresholds.min_matrix_samples))
+      ? Number(thresholds.min_matrix_samples)
+      : 3,
+    matrix_portfolio_pass_rate_min_percent: Number.isFinite(Number(thresholds.matrix_portfolio_pass_rate_min_percent))
+      ? Number(thresholds.matrix_portfolio_pass_rate_min_percent)
+      : 80,
+    matrix_regression_positive_rate_max_percent: Number.isFinite(Number(thresholds.matrix_regression_positive_rate_max_percent))
+      ? Number(thresholds.matrix_regression_positive_rate_max_percent)
+      : 20,
+    matrix_stage_error_rate_max_percent: Number.isFinite(Number(thresholds.matrix_stage_error_rate_max_percent))
+      ? Number(thresholds.matrix_stage_error_rate_max_percent)
+      : 20
   };
 }
 
@@ -377,6 +395,68 @@ function evaluateAlerts(metrics, thresholds) {
     });
   }
 
+  if (metrics.matrix_signal_total < thresholds.min_matrix_samples) {
+    alerts.push({
+      id: 'matrix-sample-insufficient',
+      severity: 'low',
+      status: 'warning',
+      metric: 'matrix_signal_total',
+      actual: metrics.matrix_signal_total,
+      threshold: thresholds.min_matrix_samples,
+      direction: 'min',
+      message: 'Matrix signal sample size is below minimum; matrix trend is not statistically stable.',
+      recommendation: 'Collect more interactive-flow runs with matrix snapshots before tightening matrix gates.'
+    });
+  } else {
+    if (
+      metrics.matrix_portfolio_pass_rate_percent != null &&
+      metrics.matrix_portfolio_pass_rate_percent < thresholds.matrix_portfolio_pass_rate_min_percent
+    ) {
+      alerts.push(buildAlert({
+        id: 'matrix-portfolio-pass-rate-low',
+        severity: 'medium',
+        metric: 'matrix_portfolio_pass_rate_percent',
+        actual: metrics.matrix_portfolio_pass_rate_percent,
+        threshold: thresholds.matrix_portfolio_pass_rate_min_percent,
+        direction: 'min',
+        message: 'Matrix portfolio pass rate is below minimum threshold.',
+        recommendation: 'Prioritize ontology closure and semantic quality improvements in failing templates.'
+      }));
+    }
+
+    if (
+      metrics.matrix_regression_positive_rate_percent != null &&
+      metrics.matrix_regression_positive_rate_percent > thresholds.matrix_regression_positive_rate_max_percent
+    ) {
+      alerts.push(buildAlert({
+        id: 'matrix-regression-rate-high',
+        severity: 'medium',
+        metric: 'matrix_regression_positive_rate_percent',
+        actual: metrics.matrix_regression_positive_rate_percent,
+        threshold: thresholds.matrix_regression_positive_rate_max_percent,
+        direction: 'max',
+        message: 'Matrix regression-positive rate is above maximum threshold.',
+        recommendation: 'Run matrix remediation queue and block release until regression deltas are closed.'
+      }));
+    }
+
+    if (
+      metrics.matrix_stage_error_rate_percent != null &&
+      metrics.matrix_stage_error_rate_percent > thresholds.matrix_stage_error_rate_max_percent
+    ) {
+      alerts.push(buildAlert({
+        id: 'matrix-stage-error-rate-high',
+        severity: 'medium',
+        metric: 'matrix_stage_error_rate_percent',
+        actual: metrics.matrix_stage_error_rate_percent,
+        threshold: thresholds.matrix_stage_error_rate_max_percent,
+        direction: 'max',
+        message: 'Matrix stage non-zero/error rate is above maximum threshold.',
+        recommendation: 'Stabilize matrix baseline runtime (inputs/template-dir/compare refs) before scale-out.'
+      }));
+    }
+  }
+
   return alerts;
 }
 
@@ -430,6 +510,11 @@ function buildMarkdown(report) {
   lines.push(`| Security intercept rate | ${report.metrics.security_intercept_rate_percent == null ? 'n/a' : `${report.metrics.security_intercept_rate_percent}%`} |`);
   lines.push(`| Satisfaction (avg) | ${report.metrics.satisfaction_avg_score == null ? 'n/a' : report.metrics.satisfaction_avg_score} |`);
   lines.push(`| Satisfaction samples | ${report.metrics.satisfaction_response_count} |`);
+  lines.push(`| Matrix portfolio pass rate | ${report.metrics.matrix_portfolio_pass_rate_percent == null ? 'n/a' : `${report.metrics.matrix_portfolio_pass_rate_percent}%`} |`);
+  lines.push(`| Matrix regression-positive rate | ${report.metrics.matrix_regression_positive_rate_percent == null ? 'n/a' : `${report.metrics.matrix_regression_positive_rate_percent}%`} |`);
+  lines.push(`| Matrix stage error rate | ${report.metrics.matrix_stage_error_rate_percent == null ? 'n/a' : `${report.metrics.matrix_stage_error_rate_percent}%`} |`);
+  lines.push(`| Matrix avg semantic score | ${report.metrics.matrix_avg_score == null ? 'n/a' : report.metrics.matrix_avg_score} |`);
+  lines.push(`| Matrix signal samples | ${report.metrics.matrix_signal_total} |`);
   lines.push('');
   lines.push('## Alerts');
   lines.push('');
@@ -457,6 +542,7 @@ async function main() {
   const approvalAuditPath = resolvePath(cwd, options.approvalAudit);
   const executionLedgerPath = resolvePath(cwd, options.executionLedger);
   const feedbackFilePath = resolvePath(cwd, options.feedbackFile);
+  const matrixSignalsPath = resolvePath(cwd, options.matrixSignals);
   const thresholdsPath = resolvePath(cwd, options.thresholds);
   const outPath = resolvePath(cwd, options.out);
   const markdownOutPath = resolvePath(cwd, options.markdownOut);
@@ -467,12 +553,14 @@ async function main() {
     intentEventsRaw,
     approvalEventsRaw,
     executionRecordsRaw,
-    feedbackRaw
+    feedbackRaw,
+    matrixSignalsRaw
   ] = await Promise.all([
     readJsonLinesFile(intentAuditPath),
     readJsonLinesFile(approvalAuditPath),
     readJsonLinesFile(executionLedgerPath),
-    readJsonLinesFile(feedbackFilePath)
+    readJsonLinesFile(feedbackFilePath),
+    readJsonLinesFile(matrixSignalsPath)
   ]);
 
   const thresholds = loadThresholds(
@@ -503,6 +591,12 @@ async function main() {
     window
   );
 
+  const matrixSignals = filterByWindow(
+    matrixSignalsRaw.filter(item => item && item.matrix && typeof item.matrix === 'object'),
+    ['generated_at', 'timestamp', 'created_at'],
+    window
+  );
+
   const applyRecords = executionRecords.filter(item =>
     ['success', 'failed', 'skipped'].includes(`${item.result || ''}`.trim().toLowerCase())
   );
@@ -529,6 +623,22 @@ async function main() {
   const feedbackScores = feedbackEvents
     .map(parseFeedbackScore)
     .filter(value => Number.isFinite(value) && value >= 0);
+  const matrixScoreValues = matrixSignals
+    .map((item) => Number(item && item.matrix ? item.matrix.avg_score : null))
+    .filter(value => Number.isFinite(value));
+  const matrixValidRateValues = matrixSignals
+    .map((item) => Number(item && item.matrix ? item.matrix.valid_rate_percent : null))
+    .filter(value => Number.isFinite(value));
+  const matrixPortfolioPassedCount = matrixSignals.filter((item) =>
+    item && item.matrix && item.matrix.portfolio_passed === true
+  ).length;
+  const matrixRegressionPositiveCount = matrixSignals.filter((item) =>
+    Number(item && item.matrix ? item.matrix.regression_count : 0) > 0
+  ).length;
+  const matrixStageErrorCount = matrixSignals.filter((item) => {
+    const status = `${item && item.matrix ? item.matrix.stage_status || '' : ''}`.trim().toLowerCase();
+    return status === 'error' || status === 'non-zero-exit';
+  }).length;
 
   const approvalSubmittedCount = approvalEvents.filter(item =>
     `${item.action || ''}`.trim().toLowerCase() === 'submit' && item.blocked !== true
@@ -556,7 +666,16 @@ async function main() {
     rollback_rate_percent: toRatePercent(rollbackRecords.length, successApplyCount),
     security_intercept_rate_percent: toRatePercent(securityInterceptCount, applyRecords.length),
     satisfaction_avg_score: toAverage(feedbackScores),
-    satisfaction_response_count: feedbackScores.length
+    satisfaction_response_count: feedbackScores.length,
+    matrix_signal_total: matrixSignals.length,
+    matrix_portfolio_pass_total: matrixPortfolioPassedCount,
+    matrix_regression_positive_total: matrixRegressionPositiveCount,
+    matrix_stage_error_total: matrixStageErrorCount,
+    matrix_portfolio_pass_rate_percent: toRatePercent(matrixPortfolioPassedCount, matrixSignals.length),
+    matrix_regression_positive_rate_percent: toRatePercent(matrixRegressionPositiveCount, matrixSignals.length),
+    matrix_stage_error_rate_percent: toRatePercent(matrixStageErrorCount, matrixSignals.length),
+    matrix_avg_score: toAverage(matrixScoreValues),
+    matrix_avg_valid_rate_percent: toAverage(matrixValidRateValues)
   };
 
   const alerts = evaluateAlerts(metrics, thresholds);
@@ -577,6 +696,7 @@ async function main() {
       approval_audit: path.relative(cwd, approvalAuditPath) || '.',
       execution_ledger: path.relative(cwd, executionLedgerPath) || '.',
       feedback_file: path.relative(cwd, feedbackFilePath) || '.',
+      matrix_signals: path.relative(cwd, matrixSignalsPath) || '.',
       thresholds: path.relative(cwd, thresholdsPath) || '.'
     },
     thresholds,
@@ -629,6 +749,7 @@ module.exports = {
   DEFAULT_APPROVAL_AUDIT,
   DEFAULT_EXECUTION_LEDGER,
   DEFAULT_FEEDBACK_FILE,
+  DEFAULT_MATRIX_SIGNALS,
   DEFAULT_THRESHOLDS,
   DEFAULT_OUT,
   DEFAULT_MARKDOWN_OUT,

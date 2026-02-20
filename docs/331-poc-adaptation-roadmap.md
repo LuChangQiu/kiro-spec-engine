@@ -149,8 +149,10 @@
 3. release evidence 与治理视图合并：
    - `sce auto handoff evidence` 报告新增 `governance_snapshot`（risk/concerns/recommendations + release/handoff health）。
    - evidence markdown 与 release draft 同步输出 `Governance Snapshot` 区块，形成可发布的一体化治理审阅材料。
+4. release workflow 独立治理快照资产化：
+   - 新增 `scripts/release-governance-snapshot-export.js`，从 release evidence summary 提取 `governance_snapshot` 并导出独立 JSON/Markdown 资产。
+   - `release.yml` 发布流程新增治理快照导出步骤，统一上传 `governance-snapshot-<tag>.json|.md` 供外部审计直接消费（无 summary 时也会生成占位资产，避免资产缺口）。
 
 ## 下一阶段（新）
 
-1. 在 release workflow 中将 `governance_snapshot` 抽出为独立 release asset（JSON/Markdown），便于外部审计直接消费。
-2. 将 handoff 模板适配抽象为 profile（moqui/default/enterprise），对外发布通用外部项目接入规范。
+1. 将 handoff 模板适配抽象为 profile（moqui/default/enterprise），对外发布通用外部项目接入规范。

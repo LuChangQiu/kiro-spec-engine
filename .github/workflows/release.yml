@@ -685,6 +685,26 @@ jobs:
           }
           NODE
 
+      - name: Export release governance snapshot assets
+        id: governance_snapshot_assets
+        shell: bash
+        env:
+          RELEASE_EVIDENCE_SUMMARY_FILE: ${{ steps.release_notes.outputs.summary_file }}
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          NOTES_DIR=".kiro/reports/release-evidence"
+          SNAPSHOT_JSON="${NOTES_DIR}/governance-snapshot-${TAG}.json"
+          SNAPSHOT_MD="${NOTES_DIR}/governance-snapshot-${TAG}.md"
+
+          RELEASE_GOVERNANCE_SNAPSHOT_JSON="${SNAPSHOT_JSON}" \
+          RELEASE_GOVERNANCE_SNAPSHOT_MD="${SNAPSHOT_MD}" \
+          RELEASE_TAG="${TAG}" \
+            node scripts/release-governance-snapshot-export.js
+
+          echo "json_file=${SNAPSHOT_JSON}" >> "$GITHUB_OUTPUT"
+          echo "markdown_file=${SNAPSHOT_MD}" >> "$GITHUB_OUTPUT"
+
       - name: Build release gate history index
         shell: bash
         env:
@@ -1008,6 +1028,8 @@ jobs:
             ${{ steps.matrix_remediation.outputs.high_goals_json_file }}
             ${{ steps.matrix_remediation.outputs.medium_goals_json_file }}
             ${{ steps.matrix_remediation.outputs.phased_plan_json_file }}
+            ${{ steps.governance_snapshot_assets.outputs.json_file }}
+            ${{ steps.governance_snapshot_assets.outputs.markdown_file }}
             ${{ steps.moqui_core_regression.outputs.json_file }}
             ${{ steps.moqui_core_regression.outputs.markdown_file }}
           draft: false

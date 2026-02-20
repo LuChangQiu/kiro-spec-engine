@@ -851,6 +851,15 @@ Moqui release summary helper (script-level consolidated gate view):
     - `.kiro/reports/release-evidence/moqui-release-summary.md`
   - `--fail-on-gate-fail` exits with code `2` when summary gate is `failed`.
 
+Release governance snapshot export helper (release-asset extraction):
+- `node scripts/release-governance-snapshot-export.js`:
+  - reads release evidence summary from `RELEASE_EVIDENCE_SUMMARY_FILE`
+  - extracts `governance_snapshot` into independent audit assets
+  - writes:
+    - `RELEASE_GOVERNANCE_SNAPSHOT_JSON` (default `.kiro/reports/release-evidence/governance-snapshot.json`)
+    - `RELEASE_GOVERNANCE_SNAPSHOT_MD` (default `.kiro/reports/release-evidence/governance-snapshot.md`)
+  - never hard-fails release flow when summary is missing; writes unavailable placeholder with warning instead.
+
 Matrix regression gate helper (script-level configurable hard gate):
 - `node scripts/matrix-regression-gate.js [--baseline <path>] [--max-regressions <n>] [--enforce] [--out <path>] [--json]`: evaluate matrix regression count from baseline compare payload (`coverage_matrix_regressions` preferred, fallback `regressions`) and enforce hard gate when enabled.
   - Default baseline input: `.kiro/reports/release-evidence/moqui-template-baseline.json`

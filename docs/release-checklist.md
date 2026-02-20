@@ -128,6 +128,12 @@ Ensure:
   - `KSE_RELEASE_DRIFT_PREFLIGHT_BLOCK_RATE_MIN_PERCENT`: minimum release preflight blocked rate in latest 5 known runs (default `40`)
   - `KSE_RELEASE_DRIFT_HARD_GATE_BLOCK_STREAK_MIN`: minimum consecutive hard-gate preflight blocked streak (latest window, default `2`)
   - `KSE_RELEASE_DRIFT_PREFLIGHT_UNAVAILABLE_STREAK_MIN`: minimum consecutive release preflight unavailable streak (latest window, default `2`)
+- Optional: tune weekly ops release gate:
+  - `KSE_RELEASE_WEEKLY_OPS_ENFORCE`: `true|false` (default `true`)
+  - `KSE_RELEASE_WEEKLY_OPS_REQUIRE_SUMMARY`: require weekly summary artifact (`true|false`, default `true`)
+  - `KSE_RELEASE_WEEKLY_OPS_MAX_RISK_LEVEL`: `low|medium|high|unknown` (default `medium`)
+  - `KSE_RELEASE_WEEKLY_OPS_MAX_GOVERNANCE_BREACHES`: optional max breach count
+  - `KSE_RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT`: optional max regression-positive rate percent
 - Optional local dry-run for gate history index artifact:
   - `sce auto handoff gate-index --dir .kiro/reports/release-evidence --out .kiro/reports/release-evidence/release-gate-history.json --json`
 

@@ -59,6 +59,7 @@
     "log:interactive-feedback": "node scripts/interactive-feedback-log.js",
     "report:interactive-governance": "node scripts/interactive-governance-report.js --period weekly --json",
     "report:release-ops-weekly": "node scripts/release-ops-weekly-summary.js --json",
+    "gate:release-ops-weekly": "node scripts/release-weekly-ops-gate.js",
     "report:moqui-core-regression": "node scripts/moqui-core-regression-suite.js --json",
     "prepublishOnly": "npm run test:full && npm run test:skip-audit && npm run test:brand-consistency && npm run report:interactive-governance -- --fail-on-alert",
     "publish:manual": "npm publish --access public",

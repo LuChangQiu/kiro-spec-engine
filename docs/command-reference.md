@@ -879,6 +879,19 @@ Release weekly ops summary helper (ops closed-loop evidence):
   - Missing inputs are reported as warnings and reflected in `health.risk`/recommendations.
 - npm alias: `npm run report:release-ops-weekly`
 
+Release weekly ops gate helper (release hard-gate):
+- `node scripts/release-weekly-ops-gate.js`:
+  - reads weekly summary from `RELEASE_WEEKLY_OPS_SUMMARY_FILE`
+  - default policy:
+    - `RELEASE_WEEKLY_OPS_ENFORCE=true`
+    - `RELEASE_WEEKLY_OPS_REQUIRE_SUMMARY=true`
+    - `RELEASE_WEEKLY_OPS_MAX_RISK_LEVEL=medium`
+  - optional thresholds:
+    - `RELEASE_WEEKLY_OPS_MAX_GOVERNANCE_BREACHES=<n>`
+    - `RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT=<n>`
+  - merges result into `RELEASE_GATE_REPORT_FILE` when provided.
+- npm alias: `npm run gate:release-ops-weekly`
+
 Matrix regression gate helper (script-level configurable hard gate):
 - `node scripts/matrix-regression-gate.js [--baseline <path>] [--max-regressions <n>] [--enforce] [--out <path>] [--json]`: evaluate matrix regression count from baseline compare payload (`coverage_matrix_regressions` preferred, fallback `regressions`) and enforce hard gate when enabled.
   - Default baseline input: `.kiro/reports/release-evidence/moqui-template-baseline.json`
@@ -1179,6 +1192,7 @@ Release workflow default:
 - Publishes `interactive-governance-<tag>.json` + `interactive-governance-<tag>.md` as release evidence assets.
 - Publishes `interactive-matrix-signals-<tag>.jsonl`, `matrix-regression-gate-<tag>.json`, and `matrix-remediation-plan-<tag>.{json,md}` + `matrix-remediation-<tag>.lines` + `matrix-remediation-goals-<tag>.json` + `matrix-remediation-commands-<tag>.md` + `matrix-remediation-{high,medium}-<tag>.lines` + `matrix-remediation-goals-{high,medium}-<tag>.json` + `matrix-remediation-phased-plan-<tag>.json` as release evidence assets.
 - Publishes `weekly-ops-summary-<tag>.json` + `weekly-ops-summary-<tag>.md` as release operational closed-loop assets.
+- Evaluates weekly ops risk gate by default (`release-weekly-ops-gate`; default block when `risk > medium` or summary missing).
 - Enforces baseline portfolio gate by default (`KSE_MOQUI_BASELINE_ENFORCE` defaults to `true` when unset).
 
 ### Moqui ERP Integration

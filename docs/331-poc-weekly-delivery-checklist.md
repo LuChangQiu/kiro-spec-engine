@@ -46,6 +46,7 @@ npx sce scene moqui-baseline --compare-with .kiro/reports/release-evidence/moqui
 node scripts/moqui-lexicon-audit.js --manifest ../331-poc/docs/handoffs/handoff-manifest.json --fail-on-gap --json
 node scripts/moqui-release-summary.js --fail-on-gate-fail --json
 node scripts/release-ops-weekly-summary.js --json
+node scripts/release-weekly-ops-gate.js
 ```
 
 ## Scene Package Gate Commands

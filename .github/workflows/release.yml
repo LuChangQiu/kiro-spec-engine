@@ -230,6 +230,7 @@ jobs:
           REMEDIATION_MEDIUM_LINES="${NOTES_DIR}/matrix-remediation-medium-${TAG}.lines"
           REMEDIATION_HIGH_GOALS_JSON="${NOTES_DIR}/matrix-remediation-goals-high-${TAG}.json"
           REMEDIATION_MEDIUM_GOALS_JSON="${NOTES_DIR}/matrix-remediation-goals-medium-${TAG}.json"
+          REMEDIATION_PHASED_PLAN_JSON="${NOTES_DIR}/matrix-remediation-phased-plan-${TAG}.json"
 
           node scripts/moqui-matrix-remediation-queue.js \
             --baseline "${{ steps.moqui_baseline.outputs.json_file }}" \
@@ -244,6 +245,14 @@ jobs:
             --phase-medium-goals-out "${REMEDIATION_MEDIUM_GOALS_JSON}" \
             --json
 
+          node scripts/moqui-matrix-remediation-phased-runner.js \
+            --high-goals "${REMEDIATION_HIGH_GOALS_JSON}" \
+            --medium-goals "${REMEDIATION_MEDIUM_GOALS_JSON}" \
+            --high-lines "${REMEDIATION_HIGH_LINES}" \
+            --medium-lines "${REMEDIATION_MEDIUM_LINES}" \
+            --dry-run \
+            --json > "${REMEDIATION_PHASED_PLAN_JSON}"
+
           echo "json_file=${REMEDIATION_JSON}" >> "$GITHUB_OUTPUT"
           echo "markdown_file=${REMEDIATION_MD}" >> "$GITHUB_OUTPUT"
           echo "lines_file=${REMEDIATION_LINES}" >> "$GITHUB_OUTPUT"
@@ -253,6 +262,7 @@ jobs:
           echo "medium_lines_file=${REMEDIATION_MEDIUM_LINES}" >> "$GITHUB_OUTPUT"
           echo "high_goals_json_file=${REMEDIATION_HIGH_GOALS_JSON}" >> "$GITHUB_OUTPUT"
           echo "medium_goals_json_file=${REMEDIATION_MEDIUM_GOALS_JSON}" >> "$GITHUB_OUTPUT"
+          echo "phased_plan_json_file=${REMEDIATION_PHASED_PLAN_JSON}" >> "$GITHUB_OUTPUT"
 
       - name: Build Moqui release summary
         id: moqui_release_summary
@@ -997,6 +1007,7 @@ jobs:
             ${{ steps.matrix_remediation.outputs.medium_lines_file }}
             ${{ steps.matrix_remediation.outputs.high_goals_json_file }}
             ${{ steps.matrix_remediation.outputs.medium_goals_json_file }}
+            ${{ steps.matrix_remediation.outputs.phased_plan_json_file }}
             ${{ steps.moqui_core_regression.outputs.json_file }}
             ${{ steps.moqui_core_regression.outputs.markdown_file }}
           draft: false

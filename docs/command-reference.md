@@ -1134,7 +1134,7 @@ Release workflow default:
 - Publishes `moqui-template-baseline.json` + `moqui-template-baseline.md` as release assets.
 - Publishes `moqui-release-summary.json` + `moqui-release-summary.md` as release review assets.
 - Publishes `interactive-governance-<tag>.json` + `interactive-governance-<tag>.md` as release evidence assets.
-- Publishes `interactive-matrix-signals-<tag>.jsonl`, `matrix-regression-gate-<tag>.json`, and `matrix-remediation-plan-<tag>.{json,md}` + `matrix-remediation-<tag>.lines` + `matrix-remediation-goals-<tag>.json` + `matrix-remediation-commands-<tag>.md` + `matrix-remediation-{high,medium}-<tag>.lines` + `matrix-remediation-goals-{high,medium}-<tag>.json` as release evidence assets.
+- Publishes `interactive-matrix-signals-<tag>.jsonl`, `matrix-regression-gate-<tag>.json`, and `matrix-remediation-plan-<tag>.{json,md}` + `matrix-remediation-<tag>.lines` + `matrix-remediation-goals-<tag>.json` + `matrix-remediation-commands-<tag>.md` + `matrix-remediation-{high,medium}-<tag>.lines` + `matrix-remediation-goals-{high,medium}-<tag>.json` + `matrix-remediation-phased-plan-<tag>.json` as release evidence assets.
 - Enforces baseline portfolio gate by default (`KSE_MOQUI_BASELINE_ENFORCE` defaults to `true` when unset).
 
 ### Moqui ERP Integration

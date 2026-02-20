@@ -355,6 +355,12 @@ function buildRecommendations(summary) {
     push(
       'Recover matrix regressions to policy limit before release: `npx sce auto handoff run --manifest docs/handoffs/handoff-manifest.json --dry-run --json`.'
     );
+    push(
+      'Generate phased matrix remediation package: `node scripts/moqui-matrix-remediation-queue.js --baseline .kiro/reports/release-evidence/moqui-template-baseline.json --json`.'
+    );
+    push(
+      'Run phased anti-429 remediation directly: `npm run run:matrix-remediation-phased -- --json`.'
+    );
   }
   if (map.get('interactive_governance') === false) {
     push(

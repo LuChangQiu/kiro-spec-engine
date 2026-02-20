@@ -88,6 +88,7 @@ Recommended GitHub Variables:
 - `.kiro/reports/release-evidence/matrix-remediation-medium-<tag>.lines`
 - `.kiro/reports/release-evidence/matrix-remediation-goals-high-<tag>.json`
 - `.kiro/reports/release-evidence/matrix-remediation-goals-medium-<tag>.json`
+- `.kiro/reports/release-evidence/matrix-remediation-phased-plan-<tag>.json`
 
 ## 6. Pass Criteria
 

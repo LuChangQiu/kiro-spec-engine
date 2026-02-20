@@ -273,6 +273,8 @@ describe('moqui-release-summary script', () => {
     expect(payload.summary.gate_status).toBe('failed');
     expect(payload.summary.gate_passed).toBe(false);
     expect(payload.recommendations.some(item => item.includes('moqui-lexicon-audit.js'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('moqui-matrix-remediation-queue.js'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-phased'))).toBe(true);
   });
 
   test('includes interactive governance signal and remediation recommendation', async () => {

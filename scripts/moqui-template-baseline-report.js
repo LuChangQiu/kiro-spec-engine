@@ -565,6 +565,11 @@ async function main() {
       template_id: item.templateId,
       template_path: path.relative(process.cwd(), item.templatePath),
       contract_path: path.relative(process.cwd(), item.contractPath),
+      capabilities_provides: item.contract
+        && item.contract.capabilities
+        && Array.isArray(item.contract.capabilities.provides)
+        ? item.contract.capabilities.provides
+        : [],
       ontology: {
         valid: ontologyValidation.valid,
         error_count: Array.isArray(ontologyValidation.errors) ? ontologyValidation.errors.length : 0

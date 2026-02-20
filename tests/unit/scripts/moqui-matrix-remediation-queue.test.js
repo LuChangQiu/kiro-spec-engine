@@ -27,7 +27,7 @@ describe('moqui-matrix-remediation-queue script', () => {
     });
   }
 
-  test('exports queue lines from matrix regressions', async () => {
+  test('exports queue lines with template and capability mapping', async () => {
     const workspace = path.join(tempDir, 'workspace-export');
     await fs.ensureDir(workspace);
     const baseline = path.join(workspace, 'baseline.json');
@@ -40,7 +40,22 @@ describe('moqui-matrix-remediation-queue script', () => {
           { metric: 'business_rule_closed', delta_rate_percent: -12.5 },
           { metric: 'decision_closed', delta_rate_percent: -8.3 }
         ]
-      }
+      },
+      templates: [
+        {
+          template_id: 'sce.scene--moqui-order-approval--0.1.0',
+          capabilities_provides: ['approval-routing', 'order-governance'],
+          semantic: { score: 68 },
+          baseline: {
+            flags: {
+              business_rule_closed: false,
+              decision_closed: false,
+              baseline_passed: false
+            },
+            gaps: ['unmapped business rules remain', 'undecided decisions remain']
+          }
+        }
+      ]
     }, { spaces: 2 });
 
     const result = runScript(workspace, [
@@ -54,6 +69,8 @@ describe('moqui-matrix-remediation-queue script', () => {
     expect(result.status).toBe(0);
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.summary.selected_regressions).toBe(2);
+    expect(payload.items[0].template_candidates[0].template_id).toBe('sce.scene--moqui-order-approval--0.1.0');
+    expect(payload.items[0].capability_focus).toEqual(expect.arrayContaining(['approval-routing']));
 
     const lines = (await fs.readFile(linesOut, 'utf8'))
       .split(/\r?\n/)
@@ -61,7 +78,55 @@ describe('moqui-matrix-remediation-queue script', () => {
       .filter(Boolean);
     expect(lines.length).toBe(2);
     expect(lines[0]).toContain('business_rule_closed');
+    expect(lines[0]).toContain('sce.scene--moqui-order-approval--0.1.0');
     expect(await fs.pathExists(markdownOut)).toBe(true);
+  });
+
+  test('limits template candidates by top-templates', async () => {
+    const workspace = path.join(tempDir, 'workspace-top-limit');
+    await fs.ensureDir(workspace);
+    const baseline = path.join(workspace, 'baseline.json');
+    await fs.writeJson(baseline, {
+      compare: {
+        coverage_matrix_regressions: [
+          { metric: 'business_rule_closed', delta_rate_percent: -12.5 }
+        ]
+      },
+      templates: [
+        {
+          template_id: 'sce.scene--moqui-order-approval-a--0.1.0',
+          semantic: { score: 61 },
+          baseline: {
+            flags: {
+              business_rule_closed: false
+            },
+            gaps: ['unmapped business rules remain']
+          }
+        },
+        {
+          template_id: 'sce.scene--moqui-order-approval-b--0.1.0',
+          semantic: { score: 72 },
+          baseline: {
+            flags: {
+              business_rule_closed: false
+            },
+            gaps: ['unmapped business rules remain']
+          }
+        }
+      ]
+    }, { spaces: 2 });
+
+    const result = runScript(workspace, [
+      '--baseline', baseline,
+      '--top-templates', '1',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.summary.selected_regressions).toBe(1);
+    expect(payload.items[0].template_candidates.length).toBe(1);
+    expect(payload.items[0].template_candidates[0].template_id).toBe('sce.scene--moqui-order-approval-a--0.1.0');
   });
 
   test('applies min delta filter', async () => {

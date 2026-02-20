@@ -853,7 +853,7 @@ Matrix regression gate helper (script-level configurable hard gate):
 - npm alias: `npm run gate:matrix-regression`
 
 Moqui matrix remediation queue helper (script-level automatic queue export):
-- `node scripts/moqui-matrix-remediation-queue.js [--baseline <path>] [--out <path>] [--lines-out <path>] [--markdown-out <path>] [--min-delta-abs <n>] [--json]`: convert matrix regressions into remediation goals consumable by `sce auto close-loop-batch`.
+- `node scripts/moqui-matrix-remediation-queue.js [--baseline <path>] [--out <path>] [--lines-out <path>] [--markdown-out <path>] [--min-delta-abs <n>] [--top-templates <n>] [--json]`: convert matrix regressions into remediation goals consumable by `sce auto close-loop-batch`, with per-metric template candidates and capability focus.
   - Default inputs/outputs:
     - Baseline: `.kiro/reports/release-evidence/moqui-template-baseline.json`
     - Plan JSON: `.kiro/reports/release-evidence/matrix-remediation-plan.json`

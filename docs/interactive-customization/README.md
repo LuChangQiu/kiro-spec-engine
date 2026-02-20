@@ -254,6 +254,7 @@ Export matrix regression remediation queue lines (for close-loop-batch):
 ```bash
 node scripts/moqui-matrix-remediation-queue.js \
   --baseline .kiro/reports/release-evidence/moqui-template-baseline.json \
+  --top-templates 5 \
   --lines-out .kiro/auto/matrix-remediation.lines \
   --json
 ```

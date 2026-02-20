@@ -8,6 +8,7 @@ const DEFAULT_BASELINE = '.kiro/reports/release-evidence/moqui-template-baseline
 const DEFAULT_OUT = '.kiro/reports/release-evidence/matrix-remediation-plan.json';
 const DEFAULT_LINES_OUT = '.kiro/auto/matrix-remediation.lines';
 const DEFAULT_MARKDOWN_OUT = '.kiro/reports/release-evidence/matrix-remediation-plan.md';
+const DEFAULT_TOP_TEMPLATES = 5;
 
 function parseArgs(argv) {
   const options = {
@@ -16,6 +17,7 @@ function parseArgs(argv) {
     linesOut: DEFAULT_LINES_OUT,
     markdownOut: DEFAULT_MARKDOWN_OUT,
     minDeltaAbs: 0,
+    topTemplates: DEFAULT_TOP_TEMPLATES,
     json: false
   };
 
@@ -37,6 +39,9 @@ function parseArgs(argv) {
     } else if (token === '--min-delta-abs' && next) {
       options.minDeltaAbs = Number(next);
       index += 1;
+    } else if (token === '--top-templates' && next) {
+      options.topTemplates = Number(next);
+      index += 1;
     } else if (token === '--json') {
       options.json = true;
     } else if (token === '--help' || token === '-h') {
@@ -46,6 +51,9 @@ function parseArgs(argv) {
 
   if (!Number.isFinite(options.minDeltaAbs) || options.minDeltaAbs < 0) {
     throw new Error('--min-delta-abs must be a non-negative number.');
+  }
+  if (!Number.isFinite(options.topTemplates) || options.topTemplates < 1) {
+    throw new Error('--top-templates must be a positive number.');
   }
 
   return options;
@@ -61,6 +69,7 @@ function printHelpAndExit(code) {
     `  --lines-out <path>     Queue lines output for close-loop-batch (default: ${DEFAULT_LINES_OUT})`,
     `  --markdown-out <path>  Remediation markdown output (default: ${DEFAULT_MARKDOWN_OUT})`,
     '  --min-delta-abs <n>    Skip regressions with absolute delta < n (default: 0)',
+    `  --top-templates <n>    Max affected templates listed per remediation (default: ${DEFAULT_TOP_TEMPLATES})`,
     '  --json                 Print payload as JSON',
     '  -h, --help             Show this help'
   ];
@@ -101,19 +110,101 @@ function metricToFocus(metric = '') {
   return map[normalized] || 'template quality closure';
 }
 
-function buildQueueItem(regression = {}, index = 0) {
+function metricToFlag(metric = '') {
+  const normalized = `${metric || ''}`.trim().toLowerCase();
+  const map = {
+    graph_valid: 'graph_valid',
+    score_passed: 'score_passed',
+    entity_coverage: 'entity_coverage',
+    relation_coverage: 'relation_coverage',
+    business_rule_coverage: 'business_rule_coverage',
+    business_rule_closed: 'business_rule_closed',
+    decision_coverage: 'decision_coverage',
+    decision_closed: 'decision_closed',
+    baseline_passed: 'baseline_passed'
+  };
+  return map[normalized] || null;
+}
+
+function deriveCapabilitiesFromTemplateId(templateId = '') {
+  const text = `${templateId || ''}`.toLowerCase();
+  const normalized = text
+    .replace(/^sce\.scene--/g, '')
+    .replace(/^kse\.scene--/g, '')
+    .replace(/--\d+\.\d+\.\d+$/g, '')
+    .replace(/[._]/g, '-');
+  const parts = normalized
+    .split('-')
+    .map(item => item.trim())
+    .filter(item => item.length > 2 && !['scene', 'template', 'moqui', 'suite', 'erp'].includes(item));
+  return Array.from(new Set(parts)).slice(0, 6);
+}
+
+function collectTemplateCandidates(baselinePayload = {}, metric = '', topTemplates = DEFAULT_TOP_TEMPLATES) {
+  const templates = Array.isArray(baselinePayload && baselinePayload.templates)
+    ? baselinePayload.templates
+    : [];
+  const flagName = metricToFlag(metric);
+  const filtered = templates.filter((item) => {
+    if (!item || !item.baseline || !item.baseline.flags) {
+      return false;
+    }
+    if (!flagName) {
+      return item.baseline.flags.baseline_passed !== true;
+    }
+    return item.baseline.flags[flagName] !== true;
+  });
+
+  const scored = filtered.map((item) => {
+    const score = Number(item && item.semantic ? item.semantic.score : null);
+    const gaps = Array.isArray(item && item.baseline ? item.baseline.gaps : [])
+      ? item.baseline.gaps
+      : [];
+    const capabilities = Array.isArray(item && item.capabilities_provides)
+      ? item.capabilities_provides
+      : deriveCapabilitiesFromTemplateId(item && item.template_id ? item.template_id : '');
+    return {
+      template_id: item && item.template_id ? item.template_id : null,
+      score: Number.isFinite(score) ? score : null,
+      gaps,
+      capabilities
+    };
+  });
+
+  scored.sort((a, b) => {
+    const scoreA = Number.isFinite(Number(a.score)) ? Number(a.score) : 999;
+    const scoreB = Number.isFinite(Number(b.score)) ? Number(b.score) : 999;
+    if (scoreA !== scoreB) {
+      return scoreA - scoreB;
+    }
+    return (b.gaps.length || 0) - (a.gaps.length || 0);
+  });
+
+  return scored.slice(0, Math.max(1, Number(topTemplates)));
+}
+
+function buildQueueItem(regression = {}, index = 0, baselinePayload = {}, topTemplates = DEFAULT_TOP_TEMPLATES) {
   const metric = regression && regression.metric ? String(regression.metric) : 'unknown_metric';
   const delta = Number(regression && regression.delta_rate_percent);
   const deltaValue = Number.isFinite(delta) ? Number(delta.toFixed(2)) : null;
   const focus = metricToFocus(metric);
   const priority = Number.isFinite(deltaValue) && deltaValue <= -20 ? 'high' : 'medium';
-  const goal = `Recover matrix regression for ${metric} (${deltaValue == null ? 'n/a' : `${deltaValue}%`}) by closing ${focus} in Moqui scene templates.`;
+  const templates = collectTemplateCandidates(baselinePayload, metric, topTemplates);
+  const templateIds = templates
+    .map(item => item.template_id)
+    .filter(Boolean);
+  const capabilityFocus = Array.from(new Set(
+    templates.flatMap(item => Array.isArray(item.capabilities) ? item.capabilities : [])
+  )).slice(0, 10);
+  const goal = `Recover matrix regression for ${metric} (${deltaValue == null ? 'n/a' : `${deltaValue}%`}) by closing ${focus} in templates: ${templateIds.length > 0 ? templateIds.join(', ') : 'TBD'}.`;
   return {
     id: `matrix-remediate-${index + 1}`,
     metric,
     delta_rate_percent: deltaValue,
     focus,
     priority,
+    template_candidates: templates,
+    capability_focus: capabilityFocus,
     goal
   };
 }
@@ -134,7 +225,11 @@ function buildMarkdown(payload) {
     return `${lines.join('\n')}\n`;
   }
   for (const item of payload.items) {
+    const capabilities = Array.isArray(item.capability_focus) && item.capability_focus.length > 0
+      ? item.capability_focus.join(', ')
+      : 'n/a';
     lines.push(`- [${item.priority}] ${item.goal}`);
+    lines.push(`  - capability focus: ${capabilities}`);
   }
   return `${lines.join('\n')}\n`;
 }
@@ -158,7 +253,7 @@ async function main() {
     const delta = Number(item && item.delta_rate_percent);
     return Number.isFinite(delta) && Math.abs(delta) >= minDeltaAbs;
   });
-  const items = filtered.map((item, index) => buildQueueItem(item, index));
+  const items = filtered.map((item, index) => buildQueueItem(item, index, baselinePayload, options.topTemplates));
   const queueLines = items.map(item => item.goal);
 
   const payload = {
@@ -168,7 +263,8 @@ async function main() {
       path: path.relative(cwd, baselinePath) || '.'
     },
     policy: {
-      min_delta_abs: minDeltaAbs
+      min_delta_abs: minDeltaAbs,
+      top_templates: Number(options.topTemplates)
     },
     summary: {
       regressions_total: regressions.length,
@@ -210,10 +306,14 @@ module.exports = {
   DEFAULT_OUT,
   DEFAULT_LINES_OUT,
   DEFAULT_MARKDOWN_OUT,
+  DEFAULT_TOP_TEMPLATES,
   parseArgs,
   resolvePath,
   pickRegressions,
   metricToFocus,
+  metricToFlag,
+  deriveCapabilitiesFromTemplateId,
+  collectTemplateCandidates,
   buildQueueItem,
   buildMarkdown,
   main

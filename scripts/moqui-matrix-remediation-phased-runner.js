@@ -23,6 +23,7 @@ const DEFAULT_HIGH_GOALS = '.kiro/auto/matrix-remediation.goals.high.json';
 const DEFAULT_MEDIUM_GOALS = '.kiro/auto/matrix-remediation.goals.medium.json';
 const DEFAULT_HIGH_LINES = '.kiro/auto/matrix-remediation.high.lines';
 const DEFAULT_MEDIUM_LINES = '.kiro/auto/matrix-remediation.medium.lines';
+const DEFAULT_CLUSTER_GOALS = '.kiro/auto/matrix-remediation.capability-clusters.json';
 const DEFAULT_HIGH_RETRY_MAX_ROUNDS = 3;
 const DEFAULT_MEDIUM_RETRY_MAX_ROUNDS = 2;
 const DEFAULT_PHASE_RECOVERY_ATTEMPTS = 2;
@@ -49,6 +50,9 @@ function parseArgs(argv) {
     queueMarkdownOut: DEFAULT_MARKDOWN_OUT,
     queueBatchJsonOut: DEFAULT_BATCH_JSON_OUT,
     queueCommandsOut: DEFAULT_COMMANDS_OUT,
+    clusterGoals: null,
+    clusterHighGoalsOut: null,
+    clusterMediumGoalsOut: null,
     minDeltaAbs: 0,
     topTemplates: DEFAULT_TOP_TEMPLATES,
     noFallbackLines: false,
@@ -117,6 +121,15 @@ function parseArgs(argv) {
       index += 1;
     } else if (token === '--queue-commands-out' && next) {
       options.queueCommandsOut = next;
+      index += 1;
+    } else if (token === '--cluster-goals' && next) {
+      options.clusterGoals = next;
+      index += 1;
+    } else if (token === '--cluster-high-goals-out' && next) {
+      options.clusterHighGoalsOut = next;
+      index += 1;
+    } else if (token === '--cluster-medium-goals-out' && next) {
+      options.clusterMediumGoalsOut = next;
       index += 1;
     } else if (token === '--min-delta-abs' && next) {
       options.minDeltaAbs = Number(next);
@@ -193,6 +206,9 @@ function printHelpAndExit(code) {
     `  --queue-markdown-out <path>    Queue markdown output when --baseline is used (default: ${DEFAULT_MARKDOWN_OUT})`,
     `  --queue-batch-json-out <path>  Queue aggregate goals JSON output when --baseline is used (default: ${DEFAULT_BATCH_JSON_OUT})`,
     `  --queue-commands-out <path>    Queue commands markdown output when --baseline is used (default: ${DEFAULT_COMMANDS_OUT})`,
+    `  --cluster-goals <path>         Optional: capability-cluster goals JSON input (for example: ${DEFAULT_CLUSTER_GOALS})`,
+    '  --cluster-high-goals-out <path> Derived high-phase goals JSON output from capability clusters',
+    '  --cluster-medium-goals-out <path> Derived medium-phase goals JSON output from capability clusters',
     '  --min-delta-abs <n>            Pass-through to queue generation when --baseline is used',
     `  --top-templates <n>            Pass-through top template candidates (default: ${DEFAULT_TOP_TEMPLATES})`,
     '  --no-fallback-lines            Disable fallback to .lines files when goals JSON is empty/missing',
@@ -208,6 +224,11 @@ function printHelpAndExit(code) {
 
 function resolvePath(cwd, value) {
   return path.isAbsolute(value) ? value : path.resolve(cwd, value);
+}
+
+function derivePhasePath(basePath, phaseName) {
+  const parsed = path.parse(basePath);
+  return path.join(parsed.dir, `${parsed.name}.${phaseName}${parsed.ext}`);
 }
 
 async function readGoalsPayload(filePath) {
@@ -233,6 +254,101 @@ async function readLinesPayload(filePath) {
     .map(item => item.trim())
     .filter(Boolean);
   return { exists: true, lines };
+}
+
+function dedupeGoals(values = []) {
+  const output = [];
+  const seen = new Set();
+  for (const item of values) {
+    const goal = `${item || ''}`.trim();
+    if (!goal || seen.has(goal)) {
+      continue;
+    }
+    seen.add(goal);
+    output.push(goal);
+  }
+  return output;
+}
+
+async function readClusterGoalsPayload(filePath) {
+  const exists = await fs.pathExists(filePath);
+  if (!exists) {
+    return {
+      exists: false,
+      cluster_count: 0,
+      goal_count: 0,
+      high_goals: [],
+      medium_goals: []
+    };
+  }
+  const payload = await fs.readJson(filePath);
+  const clusters = Array.isArray(payload && payload.clusters)
+    ? payload.clusters
+    : [];
+  const highGoals = [];
+  const mediumGoals = [];
+  for (const cluster of clusters) {
+    const goals = Array.isArray(cluster && cluster.goals)
+      ? cluster.goals.map(item => `${item || ''}`.trim()).filter(Boolean)
+      : [];
+    const phase = `${cluster && cluster.recommended_phase ? cluster.recommended_phase : ''}`
+      .trim()
+      .toLowerCase();
+    if (phase === 'high') {
+      highGoals.push(...goals);
+    } else {
+      mediumGoals.push(...goals);
+    }
+  }
+
+  const fallbackGoals = Array.isArray(payload && payload.goals)
+    ? payload.goals.map(item => `${item || ''}`.trim()).filter(Boolean)
+    : [];
+  const dedupHigh = dedupeGoals(highGoals);
+  const dedupMedium = dedupeGoals([...mediumGoals, ...fallbackGoals]);
+  return {
+    exists: true,
+    cluster_count: clusters.length,
+    goal_count: dedupHigh.length + dedupMedium.length,
+    high_goals: dedupHigh,
+    medium_goals: dedupMedium
+  };
+}
+
+async function writeGoalsPayload(filePath, goals = []) {
+  await fs.ensureDir(path.dirname(filePath));
+  await fs.writeJson(filePath, { goals: dedupeGoals(goals) }, { spaces: 2 });
+}
+
+async function prepareClusterGoals(options, runtime, paths) {
+  if (!paths.clusterGoalsPath) {
+    return {
+      status: 'skipped',
+      source: null,
+      high_goals_path: null,
+      medium_goals_path: null,
+      cluster_count: 0,
+      goal_count: 0,
+      high_goal_count: 0,
+      medium_goal_count: 0
+    };
+  }
+  const parsed = await readClusterGoalsPayload(paths.clusterGoalsPath);
+  if (!parsed.exists) {
+    throw new Error(`cluster goals file not found: ${runtime.toRelative(paths.clusterGoalsPath)}`);
+  }
+  await writeGoalsPayload(paths.clusterHighGoalsPath, parsed.high_goals);
+  await writeGoalsPayload(paths.clusterMediumGoalsPath, parsed.medium_goals);
+  return {
+    status: 'completed',
+    source: runtime.toRelative(paths.clusterGoalsPath),
+    high_goals_path: runtime.toRelative(paths.clusterHighGoalsPath),
+    medium_goals_path: runtime.toRelative(paths.clusterMediumGoalsPath),
+    cluster_count: parsed.cluster_count,
+    goal_count: parsed.goal_count,
+    high_goal_count: parsed.high_goals.length,
+    medium_goal_count: parsed.medium_goals.length
+  };
 }
 
 async function selectPhaseInput(phaseName, goalsPath, linesPath, allowLinesFallback) {
@@ -569,6 +685,23 @@ async function main() {
   const queueMarkdownOutPath = resolvePath(cwd, options.queueMarkdownOut);
   const queueBatchJsonOutPath = resolvePath(cwd, options.queueBatchJsonOut);
   const queueCommandsOutPath = resolvePath(cwd, options.queueCommandsOut);
+  const clusterGoalsPath = options.clusterGoals
+    ? resolvePath(cwd, options.clusterGoals)
+    : null;
+  const clusterHighGoalsPath = clusterGoalsPath
+    ? (
+      options.clusterHighGoalsOut
+        ? resolvePath(cwd, options.clusterHighGoalsOut)
+        : derivePhasePath(clusterGoalsPath, 'high')
+    )
+    : null;
+  const clusterMediumGoalsPath = clusterGoalsPath
+    ? (
+      options.clusterMediumGoalsOut
+        ? resolvePath(cwd, options.clusterMediumGoalsOut)
+        : derivePhasePath(clusterGoalsPath, 'medium')
+    )
+    : null;
   const allowLinesFallback = options.noFallbackLines !== true;
   const runtime = {
     cwd,
@@ -584,7 +717,10 @@ async function main() {
     queueLinesOutPath,
     queueMarkdownOutPath,
     queueBatchJsonOutPath,
-    queueCommandsOutPath
+    queueCommandsOutPath,
+    clusterGoalsPath,
+    clusterHighGoalsPath,
+    clusterMediumGoalsPath
   };
 
   const prepare = runQueueGeneration(options, runtime, paths);
@@ -592,8 +728,16 @@ async function main() {
     throw new Error(`queue generation failed before phased execution${prepare.stderr ? `: ${prepare.stderr}` : '.'}`);
   }
 
-  const highInput = await selectPhaseInput('high', highGoalsPath, highLinesPath, allowLinesFallback);
-  const mediumInput = await selectPhaseInput('medium', mediumGoalsPath, mediumLinesPath, allowLinesFallback);
+  const clusterPrepare = await prepareClusterGoals(options, runtime, paths);
+  const effectiveHighGoalsPath = clusterPrepare.status === 'completed'
+    ? clusterHighGoalsPath
+    : highGoalsPath;
+  const effectiveMediumGoalsPath = clusterPrepare.status === 'completed'
+    ? clusterMediumGoalsPath
+    : mediumGoalsPath;
+
+  const highInput = await selectPhaseInput('high', effectiveHighGoalsPath, highLinesPath, allowLinesFallback);
+  const mediumInput = await selectPhaseInput('medium', effectiveMediumGoalsPath, mediumLinesPath, allowLinesFallback);
   const shouldCooldown = Boolean(highInput && mediumInput && options.phaseCooldownSeconds > 0);
   runtime.highInput = highInput;
   runtime.mediumInput = mediumInput;
@@ -620,7 +764,8 @@ async function main() {
       continue_on_error: options.continueOnError === true,
       fallback_lines_enabled: allowLinesFallback,
       dry_run: options.dryRun === true,
-      auto_phase_recovery_enabled: options.phaseRecoveryAttempts > 1
+      auto_phase_recovery_enabled: options.phaseRecoveryAttempts > 1,
+      cluster_mode_enabled: clusterPrepare.status === 'completed'
     },
     execution_policy: {
       phase_high_parallel: options.phaseHighParallel,
@@ -635,15 +780,18 @@ async function main() {
     },
     inputs: {
       baseline: baselinePath ? runtime.toRelative(baselinePath) : null,
-      high_goals: runtime.toRelative(highGoalsPath),
-      medium_goals: runtime.toRelative(mediumGoalsPath),
+      high_goals: runtime.toRelative(effectiveHighGoalsPath),
+      medium_goals: runtime.toRelative(effectiveMediumGoalsPath),
       high_lines: runtime.toRelative(highLinesPath),
       medium_lines: runtime.toRelative(mediumLinesPath),
       queue_out: runtime.toRelative(queueOutPath),
       queue_lines_out: runtime.toRelative(queueLinesOutPath),
       queue_markdown_out: runtime.toRelative(queueMarkdownOutPath),
       queue_batch_json_out: runtime.toRelative(queueBatchJsonOutPath),
-      queue_commands_out: runtime.toRelative(queueCommandsOutPath)
+      queue_commands_out: runtime.toRelative(queueCommandsOutPath),
+      cluster_goals: clusterGoalsPath ? runtime.toRelative(clusterGoalsPath) : null,
+      cluster_high_goals_out: clusterHighGoalsPath ? runtime.toRelative(clusterHighGoalsPath) : null,
+      cluster_medium_goals_out: clusterMediumGoalsPath ? runtime.toRelative(clusterMediumGoalsPath) : null
     },
     prepare: {
       status: prepare.status,
@@ -651,6 +799,7 @@ async function main() {
       exit_code: prepare.exit_code,
       queue_summary: prepare.queue_summary
     },
+    cluster_prepare: clusterPrepare,
     cooldown: {
       seconds: options.phaseCooldownSeconds,
       planned: shouldCooldown,
@@ -691,14 +840,19 @@ module.exports = {
   DEFAULT_MEDIUM_GOALS,
   DEFAULT_HIGH_LINES,
   DEFAULT_MEDIUM_LINES,
+  DEFAULT_CLUSTER_GOALS,
   DEFAULT_HIGH_RETRY_MAX_ROUNDS,
   DEFAULT_MEDIUM_RETRY_MAX_ROUNDS,
   DEFAULT_PHASE_RECOVERY_ATTEMPTS,
   DEFAULT_PHASE_RECOVERY_COOLDOWN_SECONDS,
   parseArgs,
   resolvePath,
+  derivePhasePath,
   readGoalsPayload,
   readLinesPayload,
+  readClusterGoalsPayload,
+  writeGoalsPayload,
+  prepareClusterGoals,
   buildQueueGenerationArgs,
   runQueueGeneration,
   selectPhaseInput,

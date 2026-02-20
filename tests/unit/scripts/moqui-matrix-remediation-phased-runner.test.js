@@ -136,6 +136,53 @@ describe('moqui-matrix-remediation-phased-runner script', () => {
     expect(await fs.pathExists(path.join(workspace, '.kiro', 'auto', 'matrix-remediation.goals.medium.json'))).toBe(true);
   });
 
+  test('supports capability-cluster goals mode and derives phased goals before planning', async () => {
+    const workspace = path.join(tempDir, 'workspace-cluster-goals');
+    await fs.ensureDir(path.join(workspace, '.kiro', 'auto'));
+    const clusterFile = path.join(workspace, '.kiro', 'auto', 'matrix-remediation.capability-clusters.json');
+    await fs.writeJson(clusterFile, {
+      mode: 'moqui-matrix-capability-cluster-goals',
+      clusters: [
+        {
+          capability: 'approval-routing',
+          recommended_phase: 'high',
+          goals: ['Recover approval routing A', 'Recover approval routing A']
+        },
+        {
+          capability: 'decision-governance',
+          recommended_phase: 'medium',
+          goals: ['Recover decision governance B']
+        }
+      ],
+      goals: ['Recover decision governance fallback']
+    }, { spaces: 2 });
+
+    const result = runScript(workspace, ['--cluster-goals', clusterFile, '--dry-run', '--json']);
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.status).toBe('dry-run');
+    expect(payload.policy.cluster_mode_enabled).toBe(true);
+    expect(payload.cluster_prepare).toEqual(expect.objectContaining({
+      status: 'completed',
+      cluster_count: 2,
+      high_goal_count: 1,
+      medium_goal_count: 2
+    }));
+    expect(payload.inputs.high_goals).toContain('matrix-remediation.capability-clusters.high.json');
+    expect(payload.inputs.medium_goals).toContain('matrix-remediation.capability-clusters.medium.json');
+    expect(payload.summary.runnable_phases).toBe(2);
+    expect(payload.phases[0].selected_input.source).toBe('goals-json');
+    expect(payload.phases[1].selected_input.source).toBe('goals-json');
+
+    const highGoals = await fs.readJson(path.join(workspace, '.kiro', 'auto', 'matrix-remediation.capability-clusters.high.json'));
+    const mediumGoals = await fs.readJson(path.join(workspace, '.kiro', 'auto', 'matrix-remediation.capability-clusters.medium.json'));
+    expect(highGoals.goals).toEqual(['Recover approval routing A']);
+    expect(mediumGoals.goals).toEqual(expect.arrayContaining([
+      'Recover decision governance B',
+      'Recover decision governance fallback'
+    ]));
+  });
+
   test('parses phase recovery options', () => {
     const options = parseArgs([
       '--phase-recovery-attempts', '3',

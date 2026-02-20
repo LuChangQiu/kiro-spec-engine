@@ -406,6 +406,9 @@ function buildRecommendations(summary, matrixRemediation = {}) {
       'Or use npm alias: `npm run run:matrix-remediation-clusters`.'
     );
     push(
+      'Or run phased cluster execution: `npm run run:matrix-remediation-clusters-phased -- --json`.'
+    );
+    push(
       'Run prepare+execute in one step: `node scripts/moqui-matrix-remediation-phased-runner.js --baseline .kiro/reports/release-evidence/moqui-template-baseline.json --json`.'
     );
     push(

@@ -879,7 +879,7 @@ Moqui matrix remediation queue helper (script-level automatic queue export):
 - npm alias: `npm run report:matrix-remediation-queue`
 
 Moqui matrix remediation phased runner helper (script-level one-shot execution):
-- `node scripts/moqui-matrix-remediation-phased-runner.js [--baseline <path>] [--queue-out <path>] [--queue-lines-out <path>] [--queue-markdown-out <path>] [--queue-batch-json-out <path>] [--queue-commands-out <path>] [--min-delta-abs <n>] [--top-templates <n>] [--high-goals <path>] [--medium-goals <path>] [--high-lines <path>] [--medium-lines <path>] [--phase-high-parallel <n>] [--phase-high-agent-budget <n>] [--phase-medium-parallel <n>] [--phase-medium-agent-budget <n>] [--phase-cooldown-seconds <n>] [--high-retry-max-rounds <n>] [--medium-retry-max-rounds <n>] [--phase-recovery-attempts <n>] [--phase-recovery-cooldown-seconds <n>] [--no-fallback-lines] [--continue-on-error] [--dry-run] [--json]`: execute matrix remediation in anti-429 phased order (`high -> cooldown -> medium`) using `sce auto close-loop-batch`; when `--baseline` is provided, it auto-generates the queue package first (`prepare + run` in one command).
+- `node scripts/moqui-matrix-remediation-phased-runner.js [--baseline <path>] [--queue-out <path>] [--queue-lines-out <path>] [--queue-markdown-out <path>] [--queue-batch-json-out <path>] [--queue-commands-out <path>] [--cluster-goals <path>] [--cluster-high-goals-out <path>] [--cluster-medium-goals-out <path>] [--min-delta-abs <n>] [--top-templates <n>] [--high-goals <path>] [--medium-goals <path>] [--high-lines <path>] [--medium-lines <path>] [--phase-high-parallel <n>] [--phase-high-agent-budget <n>] [--phase-medium-parallel <n>] [--phase-medium-agent-budget <n>] [--phase-cooldown-seconds <n>] [--high-retry-max-rounds <n>] [--medium-retry-max-rounds <n>] [--phase-recovery-attempts <n>] [--phase-recovery-cooldown-seconds <n>] [--no-fallback-lines] [--continue-on-error] [--dry-run] [--json]`: execute matrix remediation in anti-429 phased order (`high -> cooldown -> medium`) using `sce auto close-loop-batch`; when `--baseline` is provided, it auto-generates the queue package first (`prepare + run` in one command), and when `--cluster-goals` is provided it derives phase goals from capability clusters before execution.
   - Default inputs:
     - High goals JSON: `.kiro/auto/matrix-remediation.goals.high.json`
     - Medium goals JSON: `.kiro/auto/matrix-remediation.goals.medium.json`
@@ -895,6 +895,7 @@ Moqui matrix remediation phased runner helper (script-level one-shot execution):
 - npm alias: `npm run run:matrix-remediation-phased`
 - npm alias (baseline zero-prep): `npm run run:matrix-remediation-from-baseline -- --json`
 - npm alias (capability clusters): `npm run run:matrix-remediation-clusters`
+- npm alias (capability clusters phased): `npm run run:matrix-remediation-clusters-phased -- --json`
 
 Interactive customization plan gate helper (script-level secure-by-default check):
 - `node scripts/interactive-change-plan-gate.js --plan <path> [--policy <path>] [--catalog <path>] [--out <path>] [--markdown-out <path>] [--fail-on-block] [--fail-on-non-allow] [--json]`: evaluate interactive change plans against default guardrails (approval, sensitive-data masking, secrets, irreversible backup, high-risk action catalog) and output `allow | review-required | deny`.

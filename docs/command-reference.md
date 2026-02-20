@@ -725,6 +725,7 @@ Close-loop controller session maintenance:
 Cross-archive autonomous governance maintenance:
 - `sce auto governance stats [--days <n>] [--status <csv>] [--json]`: aggregate a unified governance snapshot from session/batch-session/controller-session archives plus recovery memory state.
   - JSON output includes `totals`, `throughput`, `health` (`risk_level`, `concerns`, `recommendations`, `release_gate`, `handoff_quality`), `top_master_specs`, `recovery_memory`, and full per-archive stats under `archives`.
+  - When handoff Moqui matrix regressions are positive, `health.recommendations` now include phased anti-429 baseline one-shot remediation commands.
   - `health.handoff_quality` carries Moqui matrix + capability lexicon governance signals:
     - `latest_capability_expected_unknown_count`
     - `latest_capability_provided_unknown_count`
@@ -813,7 +814,7 @@ Dual-track handoff integration:
   - `--format` supports `json` (default) and `markdown` for human-readable report rendering.
   - Markdown report includes `Trend Series` (ASCII success/ontology bars per session) and `Risk Layer View`.
   - `--out` writes the generated regression report using the selected format.
-  - Output includes `recommendations` to guide next action when trend degrades or risk escalates.
+  - Output includes `recommendations` to guide next action when trend degrades or risk escalates, including phased anti-429 baseline one-shot remediation when Moqui matrix regressions are detected.
 - `sce auto handoff evidence [--file <path>] [--session-id <id|latest>] [--window <n>] [--format <json|markdown>] [--out <path>] [--json]`: quick-review merged release evidence and render current-batch gate/ontology/regression/moqui-baseline/capability-coverage/risk-layer overview.
   - Default evidence file is `.kiro/reports/release-evidence/handoff-runs.json`.
   - `--window` (1-50, default `5`) controls how many recent sessions are aggregated in review.

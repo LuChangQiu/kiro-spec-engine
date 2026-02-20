@@ -4932,6 +4932,10 @@ if (process.argv.includes('--json')) {
     expect(parsed.health.recommendations).toEqual(expect.arrayContaining([
       expect.stringContaining('--max-moqui-matrix-regressions 0')
     ]));
+    expect(parsed.health.recommendations).toEqual(expect.arrayContaining([
+      expect.stringContaining('moqui-matrix-remediation-phased-runner.js'),
+      expect.stringContaining('run:matrix-remediation-from-baseline')
+    ]));
   });
 
   test('elevates governance risk when handoff lexicon unknown capability counts are positive', async () => {
@@ -5750,6 +5754,10 @@ if (process.argv.includes('--json')) {
     expect(parsed.recommendations).toEqual(expect.arrayContaining([
       expect.stringContaining('--max-moqui-matrix-regressions 0'),
       expect.stringContaining('sce scene moqui-baseline --include-all')
+    ]));
+    expect(parsed.recommendations).toEqual(expect.arrayContaining([
+      expect.stringContaining('moqui-matrix-remediation-phased-runner.js'),
+      expect.stringContaining('run:matrix-remediation-from-baseline')
     ]));
   });
 
@@ -9981,7 +9989,8 @@ if (process.argv.includes('--json')) {
       },
       gates: {
         actual: {
-          risk_level: 'high'
+          risk_level: 'high',
+          moqui_matrix_regression_count: 1
         }
       },
       batch_summary: {
@@ -10006,6 +10015,8 @@ if (process.argv.includes('--json')) {
     expect(payload.trend).toBe('degraded');
     expect(payload.recommendations.some(item => item.includes('--continue-from handoff-bad'))).toBe(true);
     expect(payload.recommendations).toContain('sce auto governance stats --days 14 --json');
+    expect(payload.recommendations.some(item => item.includes('moqui-matrix-remediation-phased-runner.js'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-from-baseline'))).toBe(true);
   });
 
   test('supports handoff regression out file option', async () => {

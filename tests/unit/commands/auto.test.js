@@ -7456,6 +7456,94 @@ if (process.argv.includes('--json')) {
     expect(payload.recommendations.some(item => item.includes('sce auto close-loop-batch'))).toBe(true);
   });
 
+  test('adds phased remediation one-shot recommendations when capability matrix sees Moqui regressions', async () => {
+    const manifestFile = path.join(tempDir, 'handoff-manifest.json');
+    await fs.writeJson(manifestFile, {
+      timestamp: '2026-02-16T00:00:00.000Z',
+      source_project: 'E:/workspace/331-poc',
+      specs: ['60-23-capability-matrix-regression'],
+      templates: ['tpl-matrix-regression'],
+      capabilities: ['order-fulfillment', 'inventory-allocation'],
+      ontology_validation: {
+        status: 'passed'
+      }
+    }, { spaces: 2 });
+
+    const baselineScript = path.join(tempDir, 'scripts', 'moqui-template-baseline-report.js');
+    await fs.writeFile(
+      baselineScript,
+      `'use strict';
+const fs = require('fs');
+const path = require('path');
+const readArg = flag => {
+  const index = process.argv.indexOf(flag);
+  return index >= 0 ? process.argv[index + 1] : null;
+};
+const outFile = readArg('--out');
+const markdownFile = readArg('--markdown-out');
+const payload = {
+  mode: 'moqui-template-baseline',
+  generated_at: '2026-02-17T00:00:00.000Z',
+  summary: {
+    total_templates: 3,
+    scoped_templates: 3,
+    avg_score: 92,
+    valid_rate_percent: 100,
+    baseline_passed: 3,
+    baseline_failed: 0,
+    portfolio_passed: true
+  },
+  compare: {
+    coverage_matrix_regressions: [
+      { metric: 'business_rule_closed', delta_rate_percent: -25 }
+    ],
+    coverage_matrix_deltas: {
+      business_rule_closed: { count: -1, rate_percent: -25 }
+    }
+  }
+};
+if (outFile) {
+  fs.mkdirSync(path.dirname(outFile), { recursive: true });
+  fs.writeFileSync(outFile, JSON.stringify(payload, null, 2), 'utf8');
+}
+if (markdownFile) {
+  fs.mkdirSync(path.dirname(markdownFile), { recursive: true });
+  fs.writeFileSync(markdownFile, '# Mock Moqui Baseline Regression\\n', 'utf8');
+}
+if (process.argv.includes('--json')) {
+  process.stdout.write(JSON.stringify(payload));
+}
+`,
+      'utf8'
+    );
+
+    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-matrix-regression');
+    await fs.ensureDir(templateDir);
+    await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
+      capabilities: {
+        provides: ['inventory-allocation']
+      }
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'sce',
+      'auto',
+      'handoff',
+      'capability-matrix',
+      '--manifest',
+      manifestFile,
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-capability-matrix');
+    expect(payload.recommendations.some(item => item.includes('Recover Moqui matrix regressions'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('moqui-matrix-remediation-phased-runner.js'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-from-baseline'))).toBe(true);
+  });
+
   test('infers manifest capabilities from templates when capabilities are not declared', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
     await fs.writeJson(manifestFile, {

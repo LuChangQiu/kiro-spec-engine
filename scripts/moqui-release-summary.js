@@ -9,6 +9,7 @@ const DEFAULT_BASELINE = '.kiro/reports/release-evidence/moqui-template-baseline
 const DEFAULT_LEXICON = '.kiro/reports/release-evidence/moqui-lexicon-audit.json';
 const DEFAULT_CAPABILITY_MATRIX = '.kiro/reports/handoff-capability-matrix.json';
 const DEFAULT_INTERACTIVE_GOVERNANCE = '.kiro/reports/interactive-governance-report.json';
+const DEFAULT_MATRIX_REMEDIATION_PLAN = '.kiro/reports/release-evidence/matrix-remediation-plan.json';
 const DEFAULT_OUT = '.kiro/reports/release-evidence/moqui-release-summary.json';
 const DEFAULT_MARKDOWN_OUT = '.kiro/reports/release-evidence/moqui-release-summary.md';
 
@@ -19,6 +20,7 @@ function parseArgs(argv) {
     lexicon: DEFAULT_LEXICON,
     capabilityMatrix: DEFAULT_CAPABILITY_MATRIX,
     interactiveGovernance: DEFAULT_INTERACTIVE_GOVERNANCE,
+    matrixRemediationPlan: DEFAULT_MATRIX_REMEDIATION_PLAN,
     out: DEFAULT_OUT,
     markdownOut: DEFAULT_MARKDOWN_OUT,
     failOnGateFail: false,
@@ -42,6 +44,9 @@ function parseArgs(argv) {
       i += 1;
     } else if (token === '--interactive-governance' && next) {
       options.interactiveGovernance = next;
+      i += 1;
+    } else if (token === '--matrix-remediation-plan' && next) {
+      options.matrixRemediationPlan = next;
       i += 1;
     } else if (token === '--out' && next) {
       options.out = next;
@@ -71,6 +76,7 @@ function printHelpAndExit(code) {
     `  --lexicon <path>           Moqui lexicon audit JSON (default: ${DEFAULT_LEXICON})`,
     `  --capability-matrix <path> Capability matrix JSON (default: ${DEFAULT_CAPABILITY_MATRIX})`,
     `  --interactive-governance <path> Interactive governance report JSON (default: ${DEFAULT_INTERACTIVE_GOVERNANCE})`,
+    `  --matrix-remediation-plan <path> Matrix remediation plan JSON (default: ${DEFAULT_MATRIX_REMEDIATION_PLAN})`,
     `  --out <path>               Summary JSON output path (default: ${DEFAULT_OUT})`,
     `  --markdown-out <path>      Summary markdown output path (default: ${DEFAULT_MARKDOWN_OUT})`,
     '  --fail-on-gate-fail        Exit non-zero when summary gate status is failed',
@@ -288,6 +294,40 @@ function extractInteractiveGovernance(payload) {
   };
 }
 
+function extractMatrixRemediation(payload) {
+  const summary = payload && payload.summary && typeof payload.summary === 'object'
+    ? payload.summary
+    : {};
+  const templatePriority = Array.isArray(payload && payload.template_priority_matrix)
+    ? payload.template_priority_matrix
+    : [];
+  const capabilityClusters = Array.isArray(payload && payload.capability_clusters)
+    ? payload.capability_clusters
+    : [];
+  const templatePriorityTop = templatePriority
+    .slice(0, 5)
+    .map(item => ({
+      template_id: item && item.template_id ? item.template_id : null,
+      recommended_phase: item && item.recommended_phase ? item.recommended_phase : null,
+      priority_score: normalizeNumber(item && item.priority_score)
+    }))
+    .filter(item => item.template_id);
+  const capabilityClustersTop = capabilityClusters
+    .slice(0, 5)
+    .map(item => ({
+      capability: item && item.capability ? item.capability : null,
+      priority_score: normalizeNumber(item && item.priority_score),
+      template_count: normalizeNumber(item && item.template_count)
+    }))
+    .filter(item => item.capability);
+  return {
+    template_priority_count: normalizeNumber(summary.template_priority_count),
+    capability_cluster_count: normalizeNumber(summary.capability_cluster_count),
+    template_priority_top: templatePriorityTop,
+    capability_clusters_top: capabilityClustersTop
+  };
+}
+
 function normalizeGateStatus(checks, matrixRegressionCheck) {
   const requiredChecks = checks.filter(item => item.required);
   const hasFailed = requiredChecks.some(item => item.value === false) || matrixRegressionCheck === false;
@@ -301,7 +341,7 @@ function normalizeGateStatus(checks, matrixRegressionCheck) {
   return 'passed';
 }
 
-function buildRecommendations(summary) {
+function buildRecommendations(summary, matrixRemediation = {}) {
   const recommendations = [];
   const push = (value) => {
     const text = `${value || ''}`.trim();
@@ -364,6 +404,22 @@ function buildRecommendations(summary) {
     push(
       'Or execute phased runner from pre-generated artifacts: `npm run run:matrix-remediation-phased -- --json`.'
     );
+    if (Array.isArray(matrixRemediation.template_priority_top) && matrixRemediation.template_priority_top.length > 0) {
+      push(
+        `Prioritize template recovery order: ${matrixRemediation.template_priority_top
+          .slice(0, 3)
+          .map(item => `${item.template_id}(${item.recommended_phase || 'n/a'})`)
+          .join(' -> ')}.`
+      );
+    }
+    if (Array.isArray(matrixRemediation.capability_clusters_top) && matrixRemediation.capability_clusters_top.length > 0) {
+      push(
+        `Prioritize capability closure clusters: ${matrixRemediation.capability_clusters_top
+          .slice(0, 3)
+          .map(item => `${item.capability}${Number.isFinite(item.priority_score) ? `(${item.priority_score})` : ''}`)
+          .join(' -> ')}.`
+      );
+    }
   }
   if (map.get('interactive_governance') === false) {
     push(
@@ -424,6 +480,12 @@ function buildMarkdownReport(report) {
     `- Matrix regressions: ${report.summary.matrix_regressions === null ? 'n/a' : report.summary.matrix_regressions}` +
     ` (max=${report.summary.max_matrix_regressions === null ? 'n/a' : report.summary.max_matrix_regressions})`
   );
+  lines.push(
+    `- Matrix template priority count: ${report.matrix_remediation.template_priority_count === null ? 'n/a' : report.matrix_remediation.template_priority_count}`
+  );
+  lines.push(
+    `- Matrix capability cluster count: ${report.matrix_remediation.capability_cluster_count === null ? 'n/a' : report.matrix_remediation.capability_cluster_count}`
+  );
   lines.push('');
   lines.push('## Inputs');
   lines.push('');
@@ -433,6 +495,34 @@ function buildMarkdownReport(report) {
     lines.push(
       `| ${input.key} | ${input.path} | ${input.exists ? 'yes' : 'no'} | ${input.parse_error || 'none'} |`
     );
+  }
+  if (
+    Array.isArray(report.matrix_remediation.template_priority_top) &&
+    report.matrix_remediation.template_priority_top.length > 0
+  ) {
+    lines.push('');
+    lines.push('## Matrix Template Priorities');
+    lines.push('');
+    for (const item of report.matrix_remediation.template_priority_top.slice(0, 5)) {
+      lines.push(
+        `- ${item.template_id} (${item.recommended_phase || 'n/a'}, ` +
+        `score=${item.priority_score === null ? 'n/a' : item.priority_score})`
+      );
+    }
+  }
+  if (
+    Array.isArray(report.matrix_remediation.capability_clusters_top) &&
+    report.matrix_remediation.capability_clusters_top.length > 0
+  ) {
+    lines.push('');
+    lines.push('## Matrix Capability Clusters');
+    lines.push('');
+    for (const item of report.matrix_remediation.capability_clusters_top.slice(0, 5)) {
+      lines.push(
+        `- ${item.capability} (score=${item.priority_score === null ? 'n/a' : item.priority_score}, ` +
+        `templates=${item.template_count === null ? 'n/a' : item.template_count})`
+      );
+    }
   }
   lines.push('');
   lines.push('## Recommendations');
@@ -447,12 +537,13 @@ async function main() {
   const options = parseArgs(process.argv.slice(2));
   const cwd = process.cwd();
 
-  const [evidenceInput, baselineInput, lexiconInput, capabilityMatrixInput, interactiveGovernanceInput] = await Promise.all([
+  const [evidenceInput, baselineInput, lexiconInput, capabilityMatrixInput, interactiveGovernanceInput, matrixRemediationPlanInput] = await Promise.all([
     safeReadJson(cwd, options.evidence),
     safeReadJson(cwd, options.baseline),
     safeReadJson(cwd, options.lexicon),
     safeReadJson(cwd, options.capabilityMatrix),
-    safeReadJson(cwd, options.interactiveGovernance)
+    safeReadJson(cwd, options.interactiveGovernance),
+    safeReadJson(cwd, options.matrixRemediationPlan)
   ]);
 
   const latestSession = pickLatestSession(evidenceInput.payload);
@@ -491,6 +582,11 @@ async function main() {
   const interactiveGovernance = extractInteractiveGovernance(
     interactiveGovernanceInput.payload && typeof interactiveGovernanceInput.payload === 'object'
       ? interactiveGovernanceInput.payload
+      : {}
+  );
+  const matrixRemediation = extractMatrixRemediation(
+    matrixRemediationPlanInput.payload && typeof matrixRemediationPlanInput.payload === 'object'
+      ? matrixRemediationPlanInput.payload
       : {}
   );
 
@@ -578,7 +674,8 @@ async function main() {
       baseline: { key: 'baseline', ...baselineInput },
       lexicon: { key: 'lexicon', ...lexiconInput },
       capability_matrix: { key: 'capability_matrix', ...capabilityMatrixInput },
-      interactive_governance: { key: 'interactive_governance', ...interactiveGovernanceInput }
+      interactive_governance: { key: 'interactive_governance', ...interactiveGovernanceInput },
+      matrix_remediation_plan: { key: 'matrix_remediation_plan', ...matrixRemediationPlanInput }
     },
     handoff,
     baseline,
@@ -586,10 +683,11 @@ async function main() {
     capability_coverage: capabilityCoverage,
     capability_matrix: capabilityMatrix,
     interactive_governance: interactiveGovernance,
+    matrix_remediation: matrixRemediation,
     scene_package_batch: scenePackageBatch,
     summary
   };
-  report.recommendations = buildRecommendations(report.summary);
+  report.recommendations = buildRecommendations(report.summary, report.matrix_remediation);
 
   const outPath = path.resolve(cwd, options.out);
   const markdownOutPath = path.resolve(cwd, options.markdownOut);

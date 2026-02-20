@@ -24,9 +24,11 @@ describe('moqui-release-summary script', () => {
     const baselineFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'moqui-template-baseline.json');
     const lexiconFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'moqui-lexicon-audit.json');
     const capabilityMatrixFile = path.join(workspace, '.kiro', 'reports', 'handoff-capability-matrix.json');
+    const matrixRemediationPlanFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'matrix-remediation-plan.json');
 
     await fs.ensureDir(path.dirname(evidenceFile));
     await fs.ensureDir(path.dirname(capabilityMatrixFile));
+    await fs.ensureDir(path.dirname(matrixRemediationPlanFile));
 
     await fs.writeJson(evidenceFile, {
       mode: 'auto-handoff-release-evidence',
@@ -125,6 +127,27 @@ describe('moqui-release-summary script', () => {
         }
       }
     }, { spaces: 2 });
+    await fs.writeJson(matrixRemediationPlanFile, {
+      mode: 'moqui-matrix-remediation-queue',
+      summary: {
+        template_priority_count: 1,
+        capability_cluster_count: 1
+      },
+      template_priority_matrix: [
+        {
+          template_id: 'sce.scene--moqui-order-approval--0.1.0',
+          recommended_phase: 'high',
+          priority_score: 88.2
+        }
+      ],
+      capability_clusters: [
+        {
+          capability: 'approval-routing',
+          priority_score: 77.3,
+          template_count: 1
+        }
+      ]
+    }, { spaces: 2 });
 
     const result = spawnSync(process.execPath, [scriptPath, '--json'], {
       cwd: workspace,
@@ -153,9 +176,11 @@ describe('moqui-release-summary script', () => {
     const baselineFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'moqui-template-baseline.json');
     const lexiconFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'moqui-lexicon-audit.json');
     const capabilityMatrixFile = path.join(workspace, '.kiro', 'reports', 'handoff-capability-matrix.json');
+    const matrixRemediationPlanFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'matrix-remediation-plan.json');
 
     await fs.ensureDir(path.dirname(evidenceFile));
     await fs.ensureDir(path.dirname(capabilityMatrixFile));
+    await fs.ensureDir(path.dirname(matrixRemediationPlanFile));
 
     await fs.writeJson(evidenceFile, {
       mode: 'auto-handoff-release-evidence',
@@ -258,6 +283,27 @@ describe('moqui-release-summary script', () => {
         }
       }
     }, { spaces: 2 });
+    await fs.writeJson(matrixRemediationPlanFile, {
+      mode: 'moqui-matrix-remediation-queue',
+      summary: {
+        template_priority_count: 1,
+        capability_cluster_count: 1
+      },
+      template_priority_matrix: [
+        {
+          template_id: 'sce.scene--moqui-order-approval--0.1.0',
+          recommended_phase: 'high',
+          priority_score: 88.2
+        }
+      ],
+      capability_clusters: [
+        {
+          capability: 'approval-routing',
+          priority_score: 77.3,
+          template_count: 1
+        }
+      ]
+    }, { spaces: 2 });
 
     const result = spawnSync(
       process.execPath,
@@ -276,6 +322,12 @@ describe('moqui-release-summary script', () => {
     expect(payload.recommendations.some(item => item.includes('moqui-matrix-remediation-queue.js'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('moqui-matrix-remediation-phased-runner.js'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-phased'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('Prioritize template recovery order'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('Prioritize capability closure clusters'))).toBe(true);
+    expect(payload.matrix_remediation).toEqual(expect.objectContaining({
+      template_priority_count: 1,
+      capability_cluster_count: 1
+    }));
   });
 
   test('includes interactive governance signal and remediation recommendation', async () => {

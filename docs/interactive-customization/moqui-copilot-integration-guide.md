@@ -9,7 +9,7 @@ Provide a deterministic and secure context bridge so non-technical users can des
 ## Integration Model
 
 ```text
-Moqui Page -> Context Provider -> Masking Filter -> Copilot Panel -> interactive-intent-build
+Moqui Page -> Context Provider -> interactive-context-bridge -> Masking Filter -> Copilot Panel -> interactive-intent-build
 ```
 
 At stage A:
@@ -54,8 +54,18 @@ Schema:
 ## Suggested Moqui Hook Points
 
 1. Build a page context object from screen/form state in controller/render pipeline.
-2. Pass sanitized context to frontend Copilot panel via JSON endpoint or embedded script tag payload.
-3. Trigger `interactive-intent-build` with user goal + sanitized context.
+2. Pass provider payload to `interactive-context-bridge` and store normalized page-context artifact.
+3. Pass sanitized context to frontend Copilot panel via JSON endpoint or embedded script tag payload.
+4. Trigger `interactive-intent-build` with user goal + sanitized context.
+
+## Bridge Command
+
+```bash
+node scripts/interactive-context-bridge.js \
+  --input docs/interactive-customization/moqui-context-provider.sample.json \
+  --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
+  --json
+```
 
 ## Example Command
 

@@ -1,0 +1,72 @@
+{
+  "product": "331-moqui-poc",
+  "workspace": {
+    "module": "governance-platform",
+    "page": "screen-explorer-workbench",
+    "scene": {
+      "id": "sce.scene--platform-screen-explorer-assist--0.1.0",
+      "name": "Screen 探索场景",
+      "type": "screen-analysis",
+      "workflow_node": "screen-analysis"
+    },
+    "screen_explorer": {
+      "active_tab": "Overview",
+      "selected_screen": "Screen Explorer",
+      "selected_component": "Entity",
+      "filters": [
+        "AI Components",
+        "Forms",
+        "Widgets"
+      ],
+      "result_total": 0
+    },
+    "ontology": {
+      "entities": [
+        "Screen",
+        "Form",
+        "Widget"
+      ],
+      "relations": [
+        "Screen_has_Form",
+        "Screen_has_Widget"
+      ],
+      "business_rules": [
+        "screen_name_unique",
+        "component_reference_consistency",
+        "change_requires_audit_record"
+      ],
+      "decision_policies": [
+        "publish_requires_risk_review",
+        "fallback_to_read_only_when_gate_non_allow"
+      ]
+    }
+  },
+  "fields": [
+    {
+      "name": "screen_name",
+      "type": "string"
+    },
+    {
+      "name": "component_type",
+      "type": "enum"
+    },
+    {
+      "name": "api_token",
+      "type": "string",
+      "sensitive": true
+    }
+  ],
+  "current_state": {
+    "screen_name": "Screen Explorer",
+    "component_type": "Entity",
+    "api_token": "tok_live_example_abc",
+    "operator": "platform_manager"
+  },
+  "assistant": {
+    "sessionId": "session-1771",
+    "agentId": "codex-gpt4-1",
+    "model": "Spec-Expert",
+    "mode": "read-only",
+    "prompt": "Ask what should be fixed on the current page and propose actionable plan."
+  }
+}

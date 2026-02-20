@@ -42,6 +42,7 @@
     "report:moqui-baseline": "node scripts/moqui-template-baseline-report.js --json",
     "report:moqui-summary": "node scripts/moqui-release-summary.js --json",
     "gate:interactive-plan": "node scripts/interactive-change-plan-gate.js --plan docs/interactive-customization/change-plan.sample.json --json",
+    "report:interactive-context-bridge": "node scripts/interactive-context-bridge.js --input docs/interactive-customization/moqui-context-provider.sample.json --json",
     "report:interactive-intent": "node scripts/interactive-intent-build.js --context docs/interactive-customization/page-context.sample.json --goal \"Must improve order approval speed without changing payment authorization policy\" --user-id demo-user --json",
     "report:interactive-plan": "node scripts/interactive-plan-build.js --intent .kiro/reports/interactive-change-intent.json --context docs/interactive-customization/page-context.sample.json --json",
     "report:interactive-approval-status": "node scripts/interactive-approval-workflow.js --action status --json",

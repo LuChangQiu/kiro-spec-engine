@@ -12,6 +12,7 @@ This directory contains baseline contracts and safety policy artifacts for the i
 - `high-risk-action-catalog.json`: baseline high-risk action classification for deny/review decisions.
 - `change-plan.sample.json`: runnable sample plan for gate checks.
 - `page-context.sample.json`: runnable page context sample for read-only intent generation.
+- `moqui-context-provider.sample.json`: sample raw payload from Moqui workbench context provider (before normalization).
 - `moqui-copilot-context-contract.json`: Moqui page context contract + security boundary baseline.
 - `moqui-copilot-integration-guide.md`: stage-A Moqui integration guide for page-level copilot embedding.
 - `moqui-adapter-interface.md`: stage-C Moqui adapter contract (`capabilities/plan/validate/apply/rollback`).
@@ -45,6 +46,20 @@ node scripts/interactive-change-plan-gate.js \
   --fail-on-non-allow \
   --json
 ```
+
+Normalize Moqui workbench payload into standard page-context:
+
+```bash
+node scripts/interactive-context-bridge.js \
+  --input docs/interactive-customization/moqui-context-provider.sample.json \
+  --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
+  --json
+```
+
+Bridge output defaults:
+
+- Normalized page-context: `.kiro/reports/interactive-page-context.normalized.json`
+- Bridge report: `.kiro/reports/interactive-context-bridge.json`
 
 Build read-only change intent from page context:
 

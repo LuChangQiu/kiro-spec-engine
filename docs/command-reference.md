@@ -855,6 +855,16 @@ Interactive customization plan gate helper (script-level secure-by-default check
   - `--fail-on-block` exits with code `2` on `deny`
   - `--fail-on-non-allow` exits with code `2` on `deny` or `review-required`
 
+Interactive context bridge helper (script-level provider normalization):
+- `node scripts/interactive-context-bridge.js --input <path> [--provider <moqui|generic>] [--out-context <path>] [--out-report <path>] [--context-contract <path>] [--no-strict-contract] [--json]`: normalize raw UI/provider payload into standard interactive `page-context` and validate against context contract before intent generation.
+  - Default input sample: `docs/interactive-customization/moqui-context-provider.sample.json`
+  - Default outputs:
+    - `.kiro/reports/interactive-page-context.normalized.json`
+    - `.kiro/reports/interactive-context-bridge.json`
+  - Strict contract validation is enabled by default; `--no-strict-contract` keeps report generation for diagnostics.
+  - CLI equivalent: `sce scene context-bridge --input <path> --json`
+  - npm alias: `npm run report:interactive-context-bridge`
+
 Interactive read-only intent helper (script-level stage-A copilot bridge):
 - `node scripts/interactive-intent-build.js --context <path> (--goal <text> | --goal-file <path>) [--user-id <id>] [--session-id <id>] [--out-intent <path>] [--out-explain <path>] [--audit-file <path>] [--context-contract <path>] [--no-strict-contract] [--mask-keys <csv>] [--json]`: build a read-only `Change_Intent` from page context + business goal, emit masked context preview, append audit event JSONL, and generate explain markdown.
   - Default outputs:

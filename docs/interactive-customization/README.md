@@ -52,6 +52,7 @@ Build read-only change intent from page context:
 node scripts/interactive-intent-build.js \
   --context docs/interactive-customization/page-context.sample.json \
   --goal "Must improve order approval speed without changing payment authorization policy" \
+  --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
   --user-id demo-user \
   --json
 ```
@@ -71,12 +72,14 @@ Run one-command interactive loop (intent -> plan -> gate -> approval; optional l
 # suggestion-first loop (no apply)
 node scripts/interactive-customization-loop.js \
   --context docs/interactive-customization/page-context.sample.json \
+  --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
   --goal "Improve order entry clarity for business users" \
   --json
 
 # low-risk one-click apply loop
 node scripts/interactive-customization-loop.js \
   --context docs/interactive-customization/page-context.sample.json \
+  --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
   --goal "Adjust order screen field layout for clearer input flow" \
   --execution-mode apply \
   --auto-execute-low-risk \
@@ -88,6 +91,7 @@ node scripts/interactive-customization-loop.js \
 # CLI equivalent
 sce scene interactive-loop \
   --context docs/interactive-customization/page-context.sample.json \
+  --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
   --goal "Adjust order screen field layout for clearer input flow" \
   --execution-mode apply \
   --auto-execute-low-risk \
@@ -98,6 +102,7 @@ sce scene interactive-loop \
 `--feedback-score` writes feedback into both:
 - Session artifact: `.kiro/reports/interactive-loop/<session-id>/interactive-user-feedback.jsonl`
 - Governance global stream: `.kiro/reports/interactive-user-feedback.jsonl`
+- Context contract validation is strict by default (required fields, payload size, forbidden keys). Use `--no-strict-contract` only for temporary diagnostics.
 
 Run approval workflow state machine:
 

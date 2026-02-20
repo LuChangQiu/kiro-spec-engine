@@ -9,6 +9,8 @@ describe('scene interactive-loop option helpers', () => {
       context: ' docs/context.json ',
       goal: ' improve approval speed ',
       executionMode: 'apply',
+      contextContract: ' docs/interactive-customization/moqui-copilot-context-contract.json ',
+      strictContract: false,
       feedbackScore: '4.5',
       feedbackTags: 'moqui,approval',
       feedbackChannel: 'UI',
@@ -18,6 +20,8 @@ describe('scene interactive-loop option helpers', () => {
     expect(normalized.context).toBe('docs/context.json');
     expect(normalized.goal).toBe('improve approval speed');
     expect(normalized.executionMode).toBe('apply');
+    expect(normalized.contextContract).toBe('docs/interactive-customization/moqui-copilot-context-contract.json');
+    expect(normalized.strictContract).toBe(false);
     expect(normalized.feedbackScore).toBe(4.5);
     expect(normalized.feedbackTags).toBe('moqui,approval');
     expect(normalized.feedbackChannel).toBe('ui');
@@ -59,6 +63,15 @@ describe('scene interactive-loop option helpers', () => {
       feedbackChannel: 'ui',
       feedbackScore: 7
     })).toBe('--feedback-score must be a number between 0 and 5');
+
+    expect(validateSceneInteractiveLoopOptions({
+      context: 'docs/context.json',
+      goal: 'x',
+      executionMode: 'apply',
+      contextContract: '',
+      feedbackChannel: 'ui',
+      feedbackScore: null
+    })).toBe('--context-contract cannot be empty');
 
     expect(validateSceneInteractiveLoopOptions({
       context: 'docs/context.json',

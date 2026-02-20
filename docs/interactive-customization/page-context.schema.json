@@ -57,6 +57,94 @@
     },
     "current_state": {
       "type": "object"
+    },
+    "scene_workspace": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "scene_name": {
+          "type": "string"
+        },
+        "scene_type": {
+          "type": "string"
+        },
+        "screen_explorer": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "active_tab": {
+              "type": "string"
+            },
+            "selected_screen": {
+              "type": "string"
+            },
+            "selected_component": {
+              "type": "string"
+            },
+            "filters": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "result_total": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "ontology": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "entities": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "relations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "business_rules": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "decision_policies": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "assistant_panel": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "session_id": {
+          "type": "string"
+        },
+        "agent_id": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "mode": {
+          "type": "string"
+        },
+        "current_page_context": {
+          "type": "string"
+        }
+      }
     }
   }
 }

@@ -1,21 +1,23 @@
 {
-  "version": "1.0.0",
-  "product": "moqui-experiment",
+  "version": "1.1.0",
+  "product": "scene-capability-engine",
   "context_contract": {
     "required_fields": [
       "product",
       "module",
-      "page",
-      "entity"
+      "page"
     ],
     "optional_fields": [
+      "entity",
       "scene_id",
       "workflow_node",
       "fields",
-      "current_state"
+      "current_state",
+      "scene_workspace",
+      "assistant_panel"
     ],
-    "max_field_count": 200,
-    "max_payload_kb": 256
+    "max_field_count": 400,
+    "max_payload_kb": 512
   },
   "security_contract": {
     "mode": "read-only",
@@ -25,6 +27,7 @@
       "secret",
       "token",
       "api_key",
+      "apikey",
       "credential",
       "email",
       "phone",
@@ -41,6 +44,7 @@
     "provider": "ui-context-provider",
     "transport": "json",
     "schema": "docs/interactive-customization/page-context.schema.json",
-    "consumer": "scripts/interactive-intent-build.js"
+    "consumer": "scripts/interactive-intent-build.js",
+    "loop_entry": "scripts/interactive-customization-loop.js"
   }
 }

@@ -856,11 +856,13 @@ Interactive customization plan gate helper (script-level secure-by-default check
   - `--fail-on-non-allow` exits with code `2` on `deny` or `review-required`
 
 Interactive read-only intent helper (script-level stage-A copilot bridge):
-- `node scripts/interactive-intent-build.js --context <path> (--goal <text> | --goal-file <path>) [--user-id <id>] [--session-id <id>] [--out-intent <path>] [--out-explain <path>] [--audit-file <path>] [--mask-keys <csv>] [--json]`: build a read-only `Change_Intent` from page context + business goal, emit masked context preview, append audit event JSONL, and generate explain markdown.
+- `node scripts/interactive-intent-build.js --context <path> (--goal <text> | --goal-file <path>) [--user-id <id>] [--session-id <id>] [--out-intent <path>] [--out-explain <path>] [--audit-file <path>] [--context-contract <path>] [--no-strict-contract] [--mask-keys <csv>] [--json]`: build a read-only `Change_Intent` from page context + business goal, emit masked context preview, append audit event JSONL, and generate explain markdown.
   - Default outputs:
     - `.kiro/reports/interactive-change-intent.json`
     - `.kiro/reports/interactive-page-explain.md`
     - `.kiro/reports/interactive-copilot-audit.jsonl`
+  - Default context contract: `docs/interactive-customization/moqui-copilot-context-contract.json` (fallback built-in baseline when file is absent)
+  - Contract validation is strict by default (required fields, payload size, forbidden keys).
   - This helper never executes write actions; it only produces suggestion-stage artifacts.
 
 Interactive change-plan generator helper (script-level stage-B planning bridge):
@@ -871,8 +873,8 @@ Interactive change-plan generator helper (script-level stage-B planning bridge):
   - Generated plans can be evaluated directly by `interactive-change-plan-gate`.
 
 Interactive one-click loop helper (script-level orchestration entry):
-- `node scripts/interactive-customization-loop.js --context <path> (--goal <text> | --goal-file <path>) [--execution-mode <suggestion|apply>] [--policy <path>] [--catalog <path>] [--auto-approve-low-risk] [--auto-execute-low-risk] [--feedback-score <0..5>] [--feedback-comment <text>] [--feedback-tags <csv>] [--allow-suggestion-apply] [--fail-on-gate-non-allow] [--json]`: run intent->plan->gate->approval pipeline in one command and optionally trigger low-risk one-click apply via Moqui adapter.
-  - CLI equivalent: `sce scene interactive-loop --context <path> --goal "<goal>" --execution-mode apply --auto-execute-low-risk --feedback-score 5 --json`
+- `node scripts/interactive-customization-loop.js --context <path> (--goal <text> | --goal-file <path>) [--execution-mode <suggestion|apply>] [--policy <path>] [--catalog <path>] [--context-contract <path>] [--no-strict-contract] [--auto-approve-low-risk] [--auto-execute-low-risk] [--feedback-score <0..5>] [--feedback-comment <text>] [--feedback-tags <csv>] [--allow-suggestion-apply] [--fail-on-gate-non-allow] [--json]`: run intent->plan->gate->approval pipeline in one command and optionally trigger low-risk one-click apply via Moqui adapter.
+  - CLI equivalent: `sce scene interactive-loop --context <path> --goal "<goal>" --context-contract docs/interactive-customization/moqui-copilot-context-contract.json --execution-mode apply --auto-execute-low-risk --feedback-score 5 --json`
   - Default loop artifact root: `.kiro/reports/interactive-loop/<session-id>/`
   - Default summary output: `.kiro/reports/interactive-loop/<session-id>/interactive-customization-loop.summary.json`
   - `--auto-execute-low-risk` executes `interactive-moqui-adapter --action low-risk-apply` only when `risk_level=low` and gate decision=`allow`.

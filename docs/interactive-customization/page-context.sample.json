@@ -1,37 +1,73 @@
 {
-  "product": "moqui-experiment",
-  "module": "order-management",
-  "page": "order-approval-dashboard",
-  "entity": "OrderHeader",
-  "scene_id": "sce.scene--erp-order-fulfillment-workflow--0.1.0",
-  "workflow_node": "approval-review",
+  "product": "moqui-poc",
+  "module": "governance-platform",
+  "page": "screen-explorer-workbench",
+  "entity": "Screen",
+  "scene_id": "sce.scene--platform-screen-explorer-assist--0.1.0",
+  "workflow_node": "screen-analysis",
   "fields": [
     {
-      "name": "order_id",
+      "name": "screen_name",
       "type": "string",
       "sensitive": false
     },
     {
-      "name": "customer_email",
-      "type": "string",
-      "sensitive": true
-    },
-    {
-      "name": "total_amount",
-      "type": "number",
+      "name": "component_type",
+      "type": "enum",
       "sensitive": false
     },
     {
-      "name": "payment_token",
+      "name": "api_token",
       "type": "string",
       "sensitive": true
     }
   ],
   "current_state": {
-    "order_id": "OH10001",
-    "customer_email": "customer@example.com",
-    "total_amount": 1850.5,
-    "payment_token": "tok_live_example_abc",
-    "approver": "ops_manager"
+    "screen_name": "Screen Explorer",
+    "component_type": "Entity",
+    "api_token": "tok_live_example_abc",
+    "operator": "platform_manager"
+  },
+  "scene_workspace": {
+    "scene_name": "Screen 探索场景",
+    "scene_type": "screen-analysis",
+    "screen_explorer": {
+      "active_tab": "Overview",
+      "selected_screen": "Screen Explorer",
+      "selected_component": "Entity",
+      "filters": [
+        "AI Components",
+        "Forms",
+        "Widgets"
+      ],
+      "result_total": 0
+    },
+    "ontology": {
+      "entities": [
+        "Screen",
+        "Form",
+        "Widget"
+      ],
+      "relations": [
+        "Screen_has_Form",
+        "Screen_has_Widget"
+      ],
+      "business_rules": [
+        "screen_name_unique",
+        "component_reference_consistency",
+        "change_requires_audit_record"
+      ],
+      "decision_policies": [
+        "publish_requires_risk_review",
+        "fallback_to_read_only_when_gate_non_allow"
+      ]
+    }
+  },
+  "assistant_panel": {
+    "session_id": "session-1771",
+    "agent_id": "codex-gpt4-1",
+    "model": "Spec-Expert",
+    "mode": "read-only",
+    "current_page_context": "Ask what should be fixed on the current page and propose actionable plan."
   }
 }

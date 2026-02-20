@@ -29,6 +29,8 @@ function parseArgs(argv) {
     executionMode: 'suggestion',
     policy: null,
     catalog: null,
+    contextContract: null,
+    strictContract: true,
     moquiConfig: null,
     outDir: DEFAULT_OUT_DIR,
     out: null,
@@ -78,6 +80,11 @@ function parseArgs(argv) {
     } else if (token === '--catalog' && next) {
       options.catalog = next;
       index += 1;
+    } else if (token === '--context-contract' && next) {
+      options.contextContract = next;
+      index += 1;
+    } else if (token === '--no-strict-contract') {
+      options.strictContract = false;
     } else if (token === '--moqui-config' && next) {
       options.moquiConfig = next;
       index += 1;
@@ -174,6 +181,8 @@ function printHelpAndExit(code) {
     '  --execution-mode <mode>          suggestion|apply (default: suggestion)',
     '  --policy <path>                  Guardrail policy override',
     '  --catalog <path>                 High-risk catalog override',
+    '  --context-contract <path>        Context contract override for intent build',
+    '  --no-strict-contract             Do not fail when context contract validation has issues',
     '  --moqui-config <path>            Moqui adapter runtime config',
     `  --out-dir <path>                 Loop artifact root (default: ${DEFAULT_OUT_DIR})`,
     '  --out <path>                     Loop summary JSON output path',
@@ -371,6 +380,12 @@ async function main() {
     intentArgs.push('--goal', options.goal);
   } else {
     intentArgs.push('--goal-file', resolvePath(cwd, options.goalFile));
+  }
+  if (options.contextContract) {
+    intentArgs.push('--context-contract', resolvePath(cwd, options.contextContract));
+  }
+  if (!options.strictContract) {
+    intentArgs.push('--no-strict-contract');
   }
   const intentResult = runScript({
     label: 'interactive-intent-build',

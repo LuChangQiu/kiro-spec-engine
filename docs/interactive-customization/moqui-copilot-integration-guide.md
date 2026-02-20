@@ -29,14 +29,16 @@ Minimum payload fields:
 1. `product`
 2. `module`
 3. `page`
-4. `entity`
 
 Optional but recommended:
 
-1. `scene_id`
-2. `workflow_node`
-3. `fields[]`
-4. `current_state`
+1. `entity`
+2. `scene_id`
+3. `workflow_node`
+4. `fields[]`
+5. `current_state`
+6. `scene_workspace` (screen explorer + ontology snapshot)
+7. `assistant_panel` (AI panel session/model metadata)
 
 Schema:
 
@@ -60,6 +62,7 @@ Schema:
 ```bash
 node scripts/interactive-intent-build.js \
   --context docs/interactive-customization/page-context.sample.json \
+  --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
   --goal "Must improve approval speed without changing payment authorization policy" \
   --user-id product-owner \
   --json
@@ -68,6 +71,7 @@ node scripts/interactive-intent-build.js \
 ## Acceptance Checklist
 
 1. Context payload validates against schema.
-2. Sensitive keys are masked or removed.
-3. Copilot outputs contain `readonly=true`.
-4. Audit event is appended to `.kiro/reports/interactive-copilot-audit.jsonl`.
+2. Context contract gate passes (required fields + payload size + forbidden keys).
+3. Sensitive keys are masked or removed.
+4. Copilot outputs contain `readonly=true`.
+5. Audit event is appended to `.kiro/reports/interactive-copilot-audit.jsonl`.

@@ -39,6 +39,21 @@ describe('interactive-intent-build script', () => {
         order_id: 'OH10001',
         customer_email: 'customer@example.com',
         payment_token: 'tok_live_abc'
+      },
+      scene_workspace: {
+        ontology: {
+          entities: ['OrderHeader', 'OrderItem'],
+          relations: ['OrderHeader_has_OrderItem'],
+          business_rules: ['approval_limit_rule'],
+          decision_policies: ['approval_routing_policy']
+        },
+        screen_explorer: {
+          selected_component: 'Form',
+          result_total: 1
+        }
+      },
+      assistant_panel: {
+        session_id: 'session-777'
       }
     }, { spaces: 2 });
 
@@ -71,6 +86,10 @@ describe('interactive-intent-build script', () => {
     expect(payload.intent.constraints.length).toBeGreaterThan(0);
     expect(payload.sanitized_context_preview.current_state.customer_email).toBe('[REDACTED]');
     expect(payload.sanitized_context_preview.current_state.payment_token).toBe('[REDACTED]');
+    expect(payload.context_analysis.ontology_entity_total).toBe(2);
+    expect(payload.context_analysis.assistant_session_id).toBe('session-777');
+    expect(payload.contract_validation.valid).toBe(true);
+    expect(payload.contract_validation.strict).toBe(true);
 
     const intentFile = path.join(workspace, '.kiro', 'reports', 'interactive-change-intent.json');
     const explainFile = path.join(workspace, '.kiro', 'reports', 'interactive-page-explain.md');
@@ -82,6 +101,7 @@ describe('interactive-intent-build script', () => {
     const intentPayload = await fs.readJson(intentFile);
     expect(intentPayload.metadata.mode).toBe('read-only');
     expect(intentPayload.context_ref.product).toBe('moqui-experiment');
+    expect(intentPayload.metadata.contract_validation.valid).toBe(true);
 
     const auditLines = (await fs.readFile(auditFile, 'utf8'))
       .split(/\r?\n/)
@@ -163,5 +183,55 @@ describe('interactive-intent-build script', () => {
 
     expect(result.status).toBe(1);
     expect(`${result.stderr}`.toLowerCase()).toContain('goal');
+  });
+
+  test('fails in strict mode when context violates explicit contract', async () => {
+    const projectRoot = path.resolve(__dirname, '..', '..', '..');
+    const scriptPath = path.join(projectRoot, 'scripts', 'interactive-intent-build.js');
+    const workspace = path.join(tempDir, 'workspace-contract-fail');
+    const contextFile = path.join(workspace, 'page-context.json');
+    const contractFile = path.join(workspace, 'context-contract.json');
+
+    await fs.ensureDir(workspace);
+    await fs.writeJson(contextFile, {
+      product: 'moqui-experiment',
+      module: 'order-management',
+      page: 'order-list',
+      current_state: {
+        private_key: 'secret-value-should-not-pass'
+      }
+    }, { spaces: 2 });
+    await fs.writeJson(contractFile, {
+      version: '1.1.0',
+      context_contract: {
+        required_fields: ['product', 'module', 'page'],
+        max_payload_kb: 64
+      },
+      security_contract: {
+        forbidden_keys: ['private_key']
+      }
+    }, { spaces: 2 });
+
+    const result = spawnSync(
+      process.execPath,
+      [
+        scriptPath,
+        '--context',
+        contextFile,
+        '--goal',
+        'Improve list readability without changing approval policy',
+        '--context-contract',
+        contractFile,
+        '--json'
+      ],
+      {
+        cwd: workspace,
+        encoding: 'utf8'
+      }
+    );
+
+    expect(result.status).toBe(1);
+    expect(`${result.stderr}`.toLowerCase()).toContain('context contract validation failed');
+    expect(`${result.stderr}`.toLowerCase()).toContain('forbidden keys present');
   });
 });

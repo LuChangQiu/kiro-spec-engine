@@ -80,6 +80,21 @@ describe('interactive-customization-loop script', () => {
     return contextPath;
   }
 
+  async function writeContextContract(workspace) {
+    const contractPath = path.join(workspace, 'context-contract.json');
+    await fs.writeJson(contractPath, {
+      version: '1.1.0',
+      context_contract: {
+        required_fields: ['product', 'module', 'page'],
+        max_payload_kb: 128
+      },
+      security_contract: {
+        forbidden_keys: ['private_key']
+      }
+    }, { spaces: 2 });
+    return contractPath;
+  }
+
   test('runs end-to-end loop and returns ready-for-apply summary', async () => {
     const workspace = path.join(tempDir, 'workspace-basic-loop');
     await fs.ensureDir(workspace);
@@ -203,5 +218,38 @@ describe('interactive-customization-loop script', () => {
     expect(feedbackRecord.user_id).toBe('biz-user');
     expect(feedbackRecord.tags).toEqual(expect.arrayContaining(['moqui', 'ux']));
     expect(globalFeedbackRecord.feedback_id).toBe(feedbackRecord.feedback_id);
+  });
+
+  test('allows non-strict contract mode and surfaces intent contract issues', async () => {
+    const workspace = path.join(tempDir, 'workspace-non-strict-contract');
+    await fs.ensureDir(workspace);
+    const { policyPath, catalogPath } = await writePolicyBundle(workspace);
+    const contextPath = await writeContext(workspace);
+    const contractPath = await writeContextContract(workspace);
+
+    const rawContext = await fs.readJson(contextPath);
+    rawContext.current_state = {
+      private_key: 'should-trigger-contract-issue'
+    };
+    await fs.writeJson(contextPath, rawContext, { spaces: 2 });
+
+    const result = runScript(workspace, [
+      '--context', contextPath,
+      '--context-contract', contractPath,
+      '--no-strict-contract',
+      '--goal', 'Adjust order screen field layout for clearer input flow',
+      '--user-id', 'biz-user',
+      '--policy', policyPath,
+      '--catalog', catalogPath,
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.summary.status).toBe('ready-for-apply');
+    expect(Array.isArray(payload.steps)).toBe(true);
+    expect(payload.steps[0].name).toBe('intent');
+    expect(payload.steps[0].payload.contract_validation.valid).toBe(false);
+    expect(payload.steps[0].payload.contract_validation.issues.length).toBeGreaterThan(0);
   });
 });

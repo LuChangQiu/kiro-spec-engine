@@ -327,6 +327,11 @@ describe('moqui-release-summary script', () => {
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-clusters-phased'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('moqui-matrix-remediation-phased-runner.js'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-phased'))).toBe(true);
+    const clusterPhasedIndex = payload.recommendations.findIndex(item => item.includes('run:matrix-remediation-clusters-phased'));
+    const baselinePhasedIndex = payload.recommendations.findIndex(item => item.includes('moqui-matrix-remediation-phased-runner.js'));
+    expect(clusterPhasedIndex).toBeGreaterThanOrEqual(0);
+    expect(baselinePhasedIndex).toBeGreaterThanOrEqual(0);
+    expect(clusterPhasedIndex).toBeLessThan(baselinePhasedIndex);
     expect(payload.recommendations.some(item => item.includes('Prioritize template recovery order'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('Prioritize capability closure clusters'))).toBe(true);
     expect(payload.matrix_remediation).toEqual(expect.objectContaining({

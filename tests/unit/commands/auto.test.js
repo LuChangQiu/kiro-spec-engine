@@ -4935,6 +4935,7 @@ if (process.argv.includes('--json')) {
     expect(parsed.health.recommendations).toEqual(expect.arrayContaining([
       expect.stringContaining('moqui-matrix-remediation-phased-runner.js'),
       expect.stringContaining('run:matrix-remediation-from-baseline'),
+      expect.stringContaining('run:matrix-remediation-clusters-phased'),
       expect.stringContaining('matrix-remediation.capability-clusters.json'),
       expect.stringContaining('run:matrix-remediation-clusters')
     ]));
@@ -5760,6 +5761,7 @@ if (process.argv.includes('--json')) {
     expect(parsed.recommendations).toEqual(expect.arrayContaining([
       expect.stringContaining('moqui-matrix-remediation-phased-runner.js'),
       expect.stringContaining('run:matrix-remediation-from-baseline'),
+      expect.stringContaining('run:matrix-remediation-clusters-phased'),
       expect.stringContaining('matrix-remediation.capability-clusters.json'),
       expect.stringContaining('run:matrix-remediation-clusters')
     ]));
@@ -7554,6 +7556,7 @@ if (process.argv.includes('--json')) {
     expect(payload.recommendations.some(item => item.includes('Recover Moqui matrix regressions'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('moqui-matrix-remediation-phased-runner.js'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-from-baseline'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-clusters-phased'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('matrix-remediation.capability-clusters.json'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-clusters'))).toBe(true);
   });
@@ -8607,8 +8610,14 @@ if (process.argv.includes('--json')) {
     expect(payload.recommendations.some(item => item.includes('Recover Moqui matrix regressions'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('moqui-matrix-remediation-phased-runner.js'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-from-baseline'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-clusters-phased'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('matrix-remediation.capability-clusters.json'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-clusters'))).toBe(true);
+    const clusterPhasedIndex = payload.recommendations.findIndex(item => item.includes('run:matrix-remediation-clusters-phased'));
+    const baselinePhasedIndex = payload.recommendations.findIndex(item => item.includes('run:matrix-remediation-from-baseline'));
+    expect(clusterPhasedIndex).toBeGreaterThanOrEqual(0);
+    expect(baselinePhasedIndex).toBeGreaterThanOrEqual(0);
+    expect(clusterPhasedIndex).toBeLessThan(baselinePhasedIndex);
     expect(payload.failure_summary).toEqual(expect.objectContaining({
       moqui_matrix_regressions: expect.arrayContaining([
         expect.objectContaining({
@@ -10025,6 +10034,7 @@ if (process.argv.includes('--json')) {
     expect(payload.recommendations).toContain('sce auto governance stats --days 14 --json');
     expect(payload.recommendations.some(item => item.includes('moqui-matrix-remediation-phased-runner.js'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-from-baseline'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-clusters-phased'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('matrix-remediation.capability-clusters.json'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-clusters'))).toBe(true);
   });

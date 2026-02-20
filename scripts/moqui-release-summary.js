@@ -400,13 +400,13 @@ function buildRecommendations(summary, matrixRemediation = {}) {
       'Generate phased matrix remediation package: `node scripts/moqui-matrix-remediation-queue.js --baseline .kiro/reports/release-evidence/moqui-template-baseline.json --json`.'
     );
     push(
-      'Execute capability-cluster prioritized goals: `sce auto close-loop-batch .kiro/auto/matrix-remediation.capability-clusters.json --format json --batch-parallel 1 --batch-agent-budget 2 --batch-retry-until-complete --json`.'
+      'Run phased cluster execution first: `npm run run:matrix-remediation-clusters-phased -- --json`.'
+    );
+    push(
+      'Or execute capability-cluster prioritized goals: `sce auto close-loop-batch .kiro/auto/matrix-remediation.capability-clusters.json --format json --batch-parallel 1 --batch-agent-budget 2 --batch-retry-until-complete --json`.'
     );
     push(
       'Or use npm alias: `npm run run:matrix-remediation-clusters`.'
-    );
-    push(
-      'Or run phased cluster execution: `npm run run:matrix-remediation-clusters-phased -- --json`.'
     );
     push(
       'Run prepare+execute in one step: `node scripts/moqui-matrix-remediation-phased-runner.js --baseline .kiro/reports/release-evidence/moqui-template-baseline.json --json`.'

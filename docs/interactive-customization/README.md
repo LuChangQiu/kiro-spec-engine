@@ -65,6 +65,24 @@ node scripts/interactive-plan-build.js \
   --json
 ```
 
+Run one-command interactive loop (intent -> plan -> gate -> approval; optional low-risk apply):
+
+```bash
+# suggestion-first loop (no apply)
+node scripts/interactive-customization-loop.js \
+  --context docs/interactive-customization/page-context.sample.json \
+  --goal "Improve order entry clarity for business users" \
+  --json
+
+# low-risk one-click apply loop
+node scripts/interactive-customization-loop.js \
+  --context docs/interactive-customization/page-context.sample.json \
+  --goal "Adjust order screen field layout for clearer input flow" \
+  --execution-mode apply \
+  --auto-execute-low-risk \
+  --json
+```
+
 Run approval workflow state machine:
 
 ```bash

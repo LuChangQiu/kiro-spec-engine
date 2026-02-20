@@ -870,6 +870,13 @@ Interactive change-plan generator helper (script-level stage-B planning bridge):
     - `.kiro/reports/interactive-change-plan.generated.md`
   - Generated plans can be evaluated directly by `interactive-change-plan-gate`.
 
+Interactive one-click loop helper (script-level orchestration entry):
+- `node scripts/interactive-customization-loop.js --context <path> (--goal <text> | --goal-file <path>) [--execution-mode <suggestion|apply>] [--policy <path>] [--catalog <path>] [--auto-approve-low-risk] [--auto-execute-low-risk] [--allow-suggestion-apply] [--fail-on-gate-non-allow] [--json]`: run intent->plan->gate->approval pipeline in one command and optionally trigger low-risk one-click apply via Moqui adapter.
+  - Default loop artifact root: `.kiro/reports/interactive-loop/<session-id>/`
+  - Default summary output: `.kiro/reports/interactive-loop/<session-id>/interactive-customization-loop.summary.json`
+  - `--auto-execute-low-risk` executes `interactive-moqui-adapter --action low-risk-apply` only when `risk_level=low` and gate decision=`allow`.
+- npm alias: `npm run run:interactive-loop -- --context docs/interactive-customization/page-context.sample.json --goal "Improve order entry clarity" --json`
+
 Interactive approval workflow helper (script-level stage-B approval state machine):
 - `node scripts/interactive-approval-workflow.js --action <init|submit|approve|reject|execute|verify|archive|status> [--plan <path>] [--state-file <path>] [--audit-file <path>] [--actor <id>] [--comment <text>] [--force] [--json]`: maintain approval lifecycle state for interactive change plans and append approval events to JSONL audit logs.
   - Default state file: `.kiro/reports/interactive-approval-state.json`

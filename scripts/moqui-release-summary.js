@@ -323,6 +323,7 @@ function extractMatrixRemediation(payload) {
   return {
     template_priority_count: normalizeNumber(summary.template_priority_count),
     capability_cluster_count: normalizeNumber(summary.capability_cluster_count),
+    capability_cluster_goal_count: normalizeNumber(summary.capability_cluster_goal_count),
     template_priority_top: templatePriorityTop,
     capability_clusters_top: capabilityClustersTop
   };
@@ -397,6 +398,9 @@ function buildRecommendations(summary, matrixRemediation = {}) {
     );
     push(
       'Generate phased matrix remediation package: `node scripts/moqui-matrix-remediation-queue.js --baseline .kiro/reports/release-evidence/moqui-template-baseline.json --json`.'
+    );
+    push(
+      'Execute capability-cluster prioritized goals: `sce auto close-loop-batch .kiro/auto/matrix-remediation.capability-clusters.json --format json --batch-parallel 1 --batch-agent-budget 2 --batch-retry-until-complete --json`.'
     );
     push(
       'Run prepare+execute in one step: `node scripts/moqui-matrix-remediation-phased-runner.js --baseline .kiro/reports/release-evidence/moqui-template-baseline.json --json`.'
@@ -485,6 +489,9 @@ function buildMarkdownReport(report) {
   );
   lines.push(
     `- Matrix capability cluster count: ${report.matrix_remediation.capability_cluster_count === null ? 'n/a' : report.matrix_remediation.capability_cluster_count}`
+  );
+  lines.push(
+    `- Matrix capability-cluster goals: ${report.matrix_remediation.capability_cluster_goal_count === null ? 'n/a' : report.matrix_remediation.capability_cluster_goal_count}`
   );
   lines.push('');
   lines.push('## Inputs');

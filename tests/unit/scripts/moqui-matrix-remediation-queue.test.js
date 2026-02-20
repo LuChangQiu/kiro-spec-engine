@@ -35,6 +35,7 @@ describe('moqui-matrix-remediation-queue script', () => {
     const out = path.join(workspace, 'plan.json');
     const markdownOut = path.join(workspace, 'plan.md');
     const batchJsonOut = path.join(workspace, 'goals.json');
+    const capabilityClusterGoalsOut = path.join(workspace, 'capability-clusters.json');
     const commandsOut = path.join(workspace, 'commands.md');
     await fs.writeJson(baseline, {
       compare: {
@@ -66,6 +67,7 @@ describe('moqui-matrix-remediation-queue script', () => {
       '--lines-out', linesOut,
       '--markdown-out', markdownOut,
       '--batch-json-out', batchJsonOut,
+      '--capability-cluster-goals-out', capabilityClusterGoalsOut,
       '--commands-out', commandsOut,
       '--json'
     ]);
@@ -77,6 +79,7 @@ describe('moqui-matrix-remediation-queue script', () => {
     expect(payload.summary.phase_medium_count).toBe(1);
     expect(payload.summary.template_priority_count).toBeGreaterThanOrEqual(1);
     expect(payload.summary.capability_cluster_count).toBeGreaterThanOrEqual(1);
+    expect(payload.summary.capability_cluster_goal_count).toBeGreaterThanOrEqual(1);
     expect(payload.execution_policy.phase_split).toBe(true);
     expect(payload.items[0].template_candidates[0].template_id).toBe('sce.scene--moqui-order-approval--0.1.0');
     expect(payload.items[0].capability_focus).toEqual(expect.arrayContaining(['approval-routing']));
@@ -106,6 +109,17 @@ describe('moqui-matrix-remediation-queue script', () => {
     expect(Array.isArray(goalsPayload.goals)).toBe(true);
     expect(goalsPayload.goals.length).toBe(2);
     expect(goalsPayload.goals[0]).toContain('Recover matrix regression');
+    const clusterGoalsPayload = await fs.readJson(capabilityClusterGoalsOut);
+    expect(clusterGoalsPayload.mode).toBe('moqui-matrix-capability-cluster-goals');
+    expect(clusterGoalsPayload.summary.cluster_count).toBeGreaterThanOrEqual(1);
+    expect(clusterGoalsPayload.summary.goal_count).toBeGreaterThanOrEqual(1);
+    expect(clusterGoalsPayload.clusters).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        capability: 'approval-routing',
+        goal_count: expect.any(Number)
+      })
+    ]));
+    expect(Array.isArray(clusterGoalsPayload.goals)).toBe(true);
 
     const highLinesOut = path.join(workspace, 'queue.high.lines');
     const mediumLinesOut = path.join(workspace, 'queue.medium.lines');
@@ -130,6 +144,8 @@ describe('moqui-matrix-remediation-queue script', () => {
     expect(commandsText).toContain('sce auto close-loop-batch');
     expect(commandsText).toContain('--format json');
     expect(commandsText).toContain('Rate-Limit Safe Phased Mode');
+    expect(commandsText).toContain('Capability Cluster Mode');
+    expect(commandsText).toContain('capability-clusters.json');
     expect(commandsText).toContain('sleep 30');
     expect(commandsText).toContain('moqui-matrix-remediation-phased-runner.js');
     expect(commandsText).toContain('--baseline');

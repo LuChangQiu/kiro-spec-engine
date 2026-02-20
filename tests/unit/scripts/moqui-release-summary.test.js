@@ -131,7 +131,8 @@ describe('moqui-release-summary script', () => {
       mode: 'moqui-matrix-remediation-queue',
       summary: {
         template_priority_count: 1,
-        capability_cluster_count: 1
+        capability_cluster_count: 1,
+        capability_cluster_goal_count: 2
       },
       template_priority_matrix: [
         {
@@ -287,7 +288,8 @@ describe('moqui-release-summary script', () => {
       mode: 'moqui-matrix-remediation-queue',
       summary: {
         template_priority_count: 1,
-        capability_cluster_count: 1
+        capability_cluster_count: 1,
+        capability_cluster_goal_count: 1
       },
       template_priority_matrix: [
         {
@@ -320,13 +322,15 @@ describe('moqui-release-summary script', () => {
     expect(payload.summary.gate_passed).toBe(false);
     expect(payload.recommendations.some(item => item.includes('moqui-lexicon-audit.js'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('moqui-matrix-remediation-queue.js'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('matrix-remediation.capability-clusters.json'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('moqui-matrix-remediation-phased-runner.js'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-phased'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('Prioritize template recovery order'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('Prioritize capability closure clusters'))).toBe(true);
     expect(payload.matrix_remediation).toEqual(expect.objectContaining({
       template_priority_count: 1,
-      capability_cluster_count: 1
+      capability_cluster_count: 1,
+      capability_cluster_goal_count: 1
     }));
   });
 

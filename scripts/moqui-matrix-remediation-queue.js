@@ -9,6 +9,7 @@ const DEFAULT_OUT = '.kiro/reports/release-evidence/matrix-remediation-plan.json
 const DEFAULT_LINES_OUT = '.kiro/auto/matrix-remediation.lines';
 const DEFAULT_MARKDOWN_OUT = '.kiro/reports/release-evidence/matrix-remediation-plan.md';
 const DEFAULT_BATCH_JSON_OUT = '.kiro/auto/matrix-remediation.goals.json';
+const DEFAULT_CAPABILITY_CLUSTER_GOALS_OUT = '.kiro/auto/matrix-remediation.capability-clusters.json';
 const DEFAULT_COMMANDS_OUT = '.kiro/reports/release-evidence/matrix-remediation-commands.md';
 const DEFAULT_TOP_TEMPLATES = 5;
 const DEFAULT_PHASE_HIGH_PARALLEL = 1;
@@ -24,6 +25,7 @@ function parseArgs(argv) {
     linesOut: DEFAULT_LINES_OUT,
     markdownOut: DEFAULT_MARKDOWN_OUT,
     batchJsonOut: DEFAULT_BATCH_JSON_OUT,
+    capabilityClusterGoalsOut: DEFAULT_CAPABILITY_CLUSTER_GOALS_OUT,
     commandsOut: DEFAULT_COMMANDS_OUT,
     phaseSplit: true,
     phaseHighLinesOut: null,
@@ -57,6 +59,9 @@ function parseArgs(argv) {
       index += 1;
     } else if (token === '--batch-json-out' && next) {
       options.batchJsonOut = next;
+      index += 1;
+    } else if (token === '--capability-cluster-goals-out' && next) {
+      options.capabilityClusterGoalsOut = next;
       index += 1;
     } else if (token === '--commands-out' && next) {
       options.commandsOut = next;
@@ -138,6 +143,7 @@ function printHelpAndExit(code) {
     `  --lines-out <path>     Queue lines output for close-loop-batch (default: ${DEFAULT_LINES_OUT})`,
     `  --markdown-out <path>  Remediation markdown output (default: ${DEFAULT_MARKDOWN_OUT})`,
     `  --batch-json-out <path> Batch goals JSON output for close-loop-batch (default: ${DEFAULT_BATCH_JSON_OUT})`,
+    `  --capability-cluster-goals-out <path> Capability-cluster goals JSON output (default: ${DEFAULT_CAPABILITY_CLUSTER_GOALS_OUT})`,
     `  --commands-out <path>  Suggested command list markdown (default: ${DEFAULT_COMMANDS_OUT})`,
     '  --no-phase-split       Disable priority split outputs (high/medium phase files)',
     '  --phase-high-lines-out <path>  High-priority queue lines output path',
@@ -542,6 +548,74 @@ function buildBatchGoalsPayload(items = []) {
   };
 }
 
+function buildCapabilityClusterGoalsPayload(capabilityClusters = [], items = []) {
+  const normalizedItems = Array.isArray(items) ? items : [];
+  const clusters = [];
+  const allGoals = [];
+  const allSeen = new Set();
+  for (const cluster of Array.isArray(capabilityClusters) ? capabilityClusters : []) {
+    if (!cluster || !cluster.capability) {
+      continue;
+    }
+    const capability = `${cluster.capability}`.trim();
+    if (!capability) {
+      continue;
+    }
+    const matchedItems = normalizedItems.filter((item) => (
+      Array.isArray(item && item.capability_focus) &&
+      item.capability_focus.includes(capability)
+    ));
+    const goals = [];
+    const seen = new Set();
+    for (const item of matchedItems) {
+      const goal = item && item.goal ? `${item.goal}`.trim() : '';
+      if (!goal || seen.has(goal)) {
+        continue;
+      }
+      seen.add(goal);
+      goals.push(goal);
+      if (!allSeen.has(goal)) {
+        allSeen.add(goal);
+        allGoals.push(goal);
+      }
+    }
+    const templates = Array.from(new Set(
+      matchedItems.flatMap(item => (
+        Array.isArray(item && item.template_candidates)
+          ? item.template_candidates.map(candidate => candidate && candidate.template_id ? `${candidate.template_id}`.trim() : '').filter(Boolean)
+          : []
+      ))
+    ));
+    const metrics = Array.from(new Set(
+      matchedItems.map(item => item && item.metric ? `${item.metric}`.trim() : '').filter(Boolean)
+    ));
+    clusters.push({
+      capability,
+      priority_score: Number(cluster.priority_score) || 0,
+      recommended_phase: cluster.recommended_phase || (
+        matchedItems.some(item => item && item.priority === 'high') ? 'high' : 'medium'
+      ),
+      goal_count: goals.length,
+      template_count: templates.length,
+      metric_count: metrics.length,
+      templates,
+      metrics,
+      goals
+    });
+  }
+
+  return {
+    mode: 'moqui-matrix-capability-cluster-goals',
+    generated_at: new Date().toISOString(),
+    summary: {
+      cluster_count: clusters.length,
+      goal_count: allGoals.length
+    },
+    clusters,
+    goals: allGoals
+  };
+}
+
 function buildCommandsMarkdown(payload = {}) {
   const lines = [];
   const artifacts = payload && payload.artifacts ? payload.artifacts : {};
@@ -551,6 +625,7 @@ function buildCommandsMarkdown(payload = {}) {
     : DEFAULT_BASELINE;
   const linesOut = artifacts.lines_out || DEFAULT_LINES_OUT;
   const batchJsonOut = artifacts.batch_json_out || DEFAULT_BATCH_JSON_OUT;
+  const capabilityClusterGoalsOut = artifacts.capability_cluster_goals_out || DEFAULT_CAPABILITY_CLUSTER_GOALS_OUT;
   const highLinesOut = artifacts.phase_high_lines_out || null;
   const mediumLinesOut = artifacts.phase_medium_lines_out || null;
   const highGoalsOut = artifacts.phase_high_goals_out || null;
@@ -576,6 +651,12 @@ function buildCommandsMarkdown(payload = {}) {
   lines.push('');
   lines.push(`- JSON goals: \`sce auto close-loop-batch ${quoteCliArg(batchJsonOut)} --format json --json\``);
   lines.push(`- Lines goals: \`sce auto close-loop-batch ${quoteCliArg(linesOut)} --format lines --json\``);
+  lines.push(`- Capability-cluster goals: \`sce auto close-loop-batch ${quoteCliArg(capabilityClusterGoalsOut)} --format json --batch-parallel 1 --batch-agent-budget 2 --json\``);
+  lines.push('');
+  lines.push('## Capability Cluster Mode');
+  lines.push('');
+  lines.push(`- Generate/refresh cluster plan: \`node scripts/moqui-matrix-remediation-queue.js --baseline ${quoteCliArg(baselinePath)} --capability-cluster-goals-out ${quoteCliArg(capabilityClusterGoalsOut)} --json\``);
+  lines.push(`- Execute by cluster-prioritized goals: \`sce auto close-loop-batch ${quoteCliArg(capabilityClusterGoalsOut)} --format json --batch-parallel 1 --batch-agent-budget 2 --batch-retry-until-complete --json\``);
   if (highLinesOut && mediumLinesOut && highGoalsOut && mediumGoalsOut) {
     lines.push('');
     lines.push('## Rate-Limit Safe Phased Mode');
@@ -616,6 +697,7 @@ async function main() {
   const linesOutPath = resolvePath(cwd, options.linesOut);
   const markdownOutPath = resolvePath(cwd, options.markdownOut);
   const batchJsonOutPath = resolvePath(cwd, options.batchJsonOut);
+  const capabilityClusterGoalsOutPath = resolvePath(cwd, options.capabilityClusterGoalsOut);
   const commandsOutPath = resolvePath(cwd, options.commandsOut);
   const phaseHighLinesOutPath = options.phaseHighLinesOut
     ? resolvePath(cwd, options.phaseHighLinesOut)
@@ -646,6 +728,7 @@ async function main() {
   const mediumItems = items.filter(item => !item || item.priority !== 'high');
   const templatePriorityMatrix = collectTemplatePriorityMatrix(items);
   const capabilityClusters = collectCapabilityClusters(items, templatePriorityMatrix);
+  const capabilityClusterGoals = buildCapabilityClusterGoalsPayload(capabilityClusters, items);
   const queueLines = items.map(item => item.goal);
   const highQueueLines = highItems.map(item => item.goal);
   const mediumQueueLines = mediumItems.map(item => item.goal);
@@ -674,7 +757,8 @@ async function main() {
       phase_high_count: highItems.length,
       phase_medium_count: mediumItems.length,
       template_priority_count: templatePriorityMatrix.length,
-      capability_cluster_count: capabilityClusters.length
+      capability_cluster_count: capabilityClusters.length,
+      capability_cluster_goal_count: capabilityClusterGoals.summary.goal_count
     },
     items,
     template_priority_matrix: templatePriorityMatrix,
@@ -684,6 +768,7 @@ async function main() {
       lines_out: path.relative(cwd, linesOutPath) || '.',
       markdown_out: path.relative(cwd, markdownOutPath) || '.',
       batch_json_out: path.relative(cwd, batchJsonOutPath) || '.',
+      capability_cluster_goals_out: path.relative(cwd, capabilityClusterGoalsOutPath) || '.',
       commands_out: path.relative(cwd, commandsOutPath) || '.',
       phase_high_lines_out: options.phaseSplit ? (path.relative(cwd, phaseHighLinesOutPath) || '.') : null,
       phase_medium_lines_out: options.phaseSplit ? (path.relative(cwd, phaseMediumLinesOutPath) || '.') : null,
@@ -696,6 +781,8 @@ async function main() {
   await fs.writeFile(linesOutPath, queueLines.join('\n') + (queueLines.length > 0 ? '\n' : ''), 'utf8');
   await fs.ensureDir(path.dirname(batchJsonOutPath));
   await fs.writeJson(batchJsonOutPath, buildBatchGoalsPayload(items), { spaces: 2 });
+  await fs.ensureDir(path.dirname(capabilityClusterGoalsOutPath));
+  await fs.writeJson(capabilityClusterGoalsOutPath, capabilityClusterGoals, { spaces: 2 });
   if (options.phaseSplit) {
     await fs.ensureDir(path.dirname(phaseHighLinesOutPath));
     await fs.writeFile(phaseHighLinesOutPath, highQueueLines.join('\n') + (highQueueLines.length > 0 ? '\n' : ''), 'utf8');
@@ -735,6 +822,7 @@ module.exports = {
   DEFAULT_LINES_OUT,
   DEFAULT_MARKDOWN_OUT,
   DEFAULT_BATCH_JSON_OUT,
+  DEFAULT_CAPABILITY_CLUSTER_GOALS_OUT,
   DEFAULT_COMMANDS_OUT,
   DEFAULT_TOP_TEMPLATES,
   DEFAULT_PHASE_HIGH_PARALLEL,
@@ -752,6 +840,7 @@ module.exports = {
   collectTemplateCandidates,
   collectTemplatePriorityMatrix,
   collectCapabilityClusters,
+  buildCapabilityClusterGoalsPayload,
   buildQueueItem,
   buildMarkdown,
   quoteCliArg,

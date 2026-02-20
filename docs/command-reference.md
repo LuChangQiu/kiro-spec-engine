@@ -857,14 +857,16 @@ Matrix regression gate helper (script-level configurable hard gate):
 - npm alias: `npm run gate:matrix-regression`
 
 Moqui matrix remediation queue helper (script-level automatic queue export):
-- `node scripts/moqui-matrix-remediation-queue.js [--baseline <path>] [--out <path>] [--lines-out <path>] [--markdown-out <path>] [--batch-json-out <path>] [--commands-out <path>] [--phase-high-lines-out <path>] [--phase-medium-lines-out <path>] [--phase-high-goals-out <path>] [--phase-medium-goals-out <path>] [--phase-high-parallel <n>] [--phase-high-agent-budget <n>] [--phase-medium-parallel <n>] [--phase-medium-agent-budget <n>] [--phase-cooldown-seconds <n>] [--no-phase-split] [--min-delta-abs <n>] [--top-templates <n>] [--json]`: convert matrix regressions into remediation goals consumable by `sce auto close-loop-batch`, with per-metric template candidates/capability focus, phase-split anti-429 outputs (`high` then `medium`), and direct command templates.
+- `node scripts/moqui-matrix-remediation-queue.js [--baseline <path>] [--out <path>] [--lines-out <path>] [--markdown-out <path>] [--batch-json-out <path>] [--capability-cluster-goals-out <path>] [--commands-out <path>] [--phase-high-lines-out <path>] [--phase-medium-lines-out <path>] [--phase-high-goals-out <path>] [--phase-medium-goals-out <path>] [--phase-high-parallel <n>] [--phase-high-agent-budget <n>] [--phase-medium-parallel <n>] [--phase-medium-agent-budget <n>] [--phase-cooldown-seconds <n>] [--no-phase-split] [--min-delta-abs <n>] [--top-templates <n>] [--json]`: convert matrix regressions into remediation goals consumable by `sce auto close-loop-batch`, with per-metric template candidates/capability focus, phase-split anti-429 outputs (`high` then `medium`), capability-cluster executable goals, and direct command templates.
   - JSON output includes `template_priority_matrix` (cross-regression template priority ranking) and `capability_clusters` (capability-level remediation clusters with suggested templates).
+  - JSON output includes `capability_cluster_goal_count` and writes `mode=moqui-matrix-capability-cluster-goals` payload with cluster-level `goals` for direct batch execution.
   - Default inputs/outputs:
     - Baseline: `.kiro/reports/release-evidence/moqui-template-baseline.json`
     - Plan JSON: `.kiro/reports/release-evidence/matrix-remediation-plan.json`
     - Queue lines: `.kiro/auto/matrix-remediation.lines`
     - Plan Markdown: `.kiro/reports/release-evidence/matrix-remediation-plan.md`
     - Batch goals JSON: `.kiro/auto/matrix-remediation.goals.json`
+    - Capability-cluster goals JSON: `.kiro/auto/matrix-remediation.capability-clusters.json`
     - Commands Markdown: `.kiro/reports/release-evidence/matrix-remediation-commands.md`
     - High queue lines: `.kiro/auto/matrix-remediation.high.lines`
     - Medium queue lines: `.kiro/auto/matrix-remediation.medium.lines`

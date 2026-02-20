@@ -11,6 +11,11 @@ const DEFAULT_MARKDOWN_OUT = '.kiro/reports/release-evidence/matrix-remediation-
 const DEFAULT_BATCH_JSON_OUT = '.kiro/auto/matrix-remediation.goals.json';
 const DEFAULT_COMMANDS_OUT = '.kiro/reports/release-evidence/matrix-remediation-commands.md';
 const DEFAULT_TOP_TEMPLATES = 5;
+const DEFAULT_PHASE_HIGH_PARALLEL = 1;
+const DEFAULT_PHASE_HIGH_AGENT_BUDGET = 2;
+const DEFAULT_PHASE_MEDIUM_PARALLEL = 2;
+const DEFAULT_PHASE_MEDIUM_AGENT_BUDGET = 4;
+const DEFAULT_PHASE_COOLDOWN_SECONDS = 20;
 
 function parseArgs(argv) {
   const options = {
@@ -20,6 +25,16 @@ function parseArgs(argv) {
     markdownOut: DEFAULT_MARKDOWN_OUT,
     batchJsonOut: DEFAULT_BATCH_JSON_OUT,
     commandsOut: DEFAULT_COMMANDS_OUT,
+    phaseSplit: true,
+    phaseHighLinesOut: null,
+    phaseMediumLinesOut: null,
+    phaseHighGoalsOut: null,
+    phaseMediumGoalsOut: null,
+    phaseHighParallel: DEFAULT_PHASE_HIGH_PARALLEL,
+    phaseHighAgentBudget: DEFAULT_PHASE_HIGH_AGENT_BUDGET,
+    phaseMediumParallel: DEFAULT_PHASE_MEDIUM_PARALLEL,
+    phaseMediumAgentBudget: DEFAULT_PHASE_MEDIUM_AGENT_BUDGET,
+    phaseCooldownSeconds: DEFAULT_PHASE_COOLDOWN_SECONDS,
     minDeltaAbs: 0,
     topTemplates: DEFAULT_TOP_TEMPLATES,
     json: false
@@ -46,6 +61,35 @@ function parseArgs(argv) {
     } else if (token === '--commands-out' && next) {
       options.commandsOut = next;
       index += 1;
+    } else if (token === '--no-phase-split') {
+      options.phaseSplit = false;
+    } else if (token === '--phase-high-lines-out' && next) {
+      options.phaseHighLinesOut = next;
+      index += 1;
+    } else if (token === '--phase-medium-lines-out' && next) {
+      options.phaseMediumLinesOut = next;
+      index += 1;
+    } else if (token === '--phase-high-goals-out' && next) {
+      options.phaseHighGoalsOut = next;
+      index += 1;
+    } else if (token === '--phase-medium-goals-out' && next) {
+      options.phaseMediumGoalsOut = next;
+      index += 1;
+    } else if (token === '--phase-high-parallel' && next) {
+      options.phaseHighParallel = Number(next);
+      index += 1;
+    } else if (token === '--phase-high-agent-budget' && next) {
+      options.phaseHighAgentBudget = Number(next);
+      index += 1;
+    } else if (token === '--phase-medium-parallel' && next) {
+      options.phaseMediumParallel = Number(next);
+      index += 1;
+    } else if (token === '--phase-medium-agent-budget' && next) {
+      options.phaseMediumAgentBudget = Number(next);
+      index += 1;
+    } else if (token === '--phase-cooldown-seconds' && next) {
+      options.phaseCooldownSeconds = Number(next);
+      index += 1;
     } else if (token === '--min-delta-abs' && next) {
       options.minDeltaAbs = Number(next);
       index += 1;
@@ -65,6 +109,21 @@ function parseArgs(argv) {
   if (!Number.isFinite(options.topTemplates) || options.topTemplates < 1) {
     throw new Error('--top-templates must be a positive number.');
   }
+  if (!Number.isFinite(options.phaseHighParallel) || options.phaseHighParallel < 1) {
+    throw new Error('--phase-high-parallel must be a positive number.');
+  }
+  if (!Number.isFinite(options.phaseHighAgentBudget) || options.phaseHighAgentBudget < 1) {
+    throw new Error('--phase-high-agent-budget must be a positive number.');
+  }
+  if (!Number.isFinite(options.phaseMediumParallel) || options.phaseMediumParallel < 1) {
+    throw new Error('--phase-medium-parallel must be a positive number.');
+  }
+  if (!Number.isFinite(options.phaseMediumAgentBudget) || options.phaseMediumAgentBudget < 1) {
+    throw new Error('--phase-medium-agent-budget must be a positive number.');
+  }
+  if (!Number.isFinite(options.phaseCooldownSeconds) || options.phaseCooldownSeconds < 0) {
+    throw new Error('--phase-cooldown-seconds must be a non-negative number.');
+  }
 
   return options;
 }
@@ -80,6 +139,16 @@ function printHelpAndExit(code) {
     `  --markdown-out <path>  Remediation markdown output (default: ${DEFAULT_MARKDOWN_OUT})`,
     `  --batch-json-out <path> Batch goals JSON output for close-loop-batch (default: ${DEFAULT_BATCH_JSON_OUT})`,
     `  --commands-out <path>  Suggested command list markdown (default: ${DEFAULT_COMMANDS_OUT})`,
+    '  --no-phase-split       Disable priority split outputs (high/medium phase files)',
+    '  --phase-high-lines-out <path>  High-priority queue lines output path',
+    '  --phase-medium-lines-out <path> Medium-priority queue lines output path',
+    '  --phase-high-goals-out <path>  High-priority goals JSON output path',
+    '  --phase-medium-goals-out <path> Medium-priority goals JSON output path',
+    `  --phase-high-parallel <n>      Suggested close-loop-batch parallel for high phase (default: ${DEFAULT_PHASE_HIGH_PARALLEL})`,
+    `  --phase-high-agent-budget <n>  Suggested agent budget for high phase (default: ${DEFAULT_PHASE_HIGH_AGENT_BUDGET})`,
+    `  --phase-medium-parallel <n>    Suggested close-loop-batch parallel for medium phase (default: ${DEFAULT_PHASE_MEDIUM_PARALLEL})`,
+    `  --phase-medium-agent-budget <n> Suggested agent budget for medium phase (default: ${DEFAULT_PHASE_MEDIUM_AGENT_BUDGET})`,
+    `  --phase-cooldown-seconds <n>   Suggested cooldown seconds between phases (default: ${DEFAULT_PHASE_COOLDOWN_SECONDS})`,
     '  --min-delta-abs <n>    Skip regressions with absolute delta < n (default: 0)',
     `  --top-templates <n>    Max affected templates listed per remediation (default: ${DEFAULT_TOP_TEMPLATES})`,
     '  --json                 Print payload as JSON',
@@ -91,6 +160,11 @@ function printHelpAndExit(code) {
 
 function resolvePath(cwd, value) {
   return path.isAbsolute(value) ? value : path.resolve(cwd, value);
+}
+
+function derivePhasePath(basePath, phaseName) {
+  const parsed = path.parse(basePath);
+  return path.join(parsed.dir, `${parsed.name}.${phaseName}${parsed.ext}`);
 }
 
 function pickRegressions(payload) {
@@ -268,14 +342,48 @@ function buildBatchGoalsPayload(items = []) {
 function buildCommandsMarkdown(payload = {}) {
   const lines = [];
   const artifacts = payload && payload.artifacts ? payload.artifacts : {};
+  const executionPolicy = payload && payload.execution_policy ? payload.execution_policy : {};
   const linesOut = artifacts.lines_out || DEFAULT_LINES_OUT;
   const batchJsonOut = artifacts.batch_json_out || DEFAULT_BATCH_JSON_OUT;
+  const highLinesOut = artifacts.phase_high_lines_out || null;
+  const mediumLinesOut = artifacts.phase_medium_lines_out || null;
+  const highGoalsOut = artifacts.phase_high_goals_out || null;
+  const mediumGoalsOut = artifacts.phase_medium_goals_out || null;
+  const highParallel = Number.isFinite(Number(executionPolicy.phase_high_parallel))
+    ? Number(executionPolicy.phase_high_parallel)
+    : DEFAULT_PHASE_HIGH_PARALLEL;
+  const highAgentBudget = Number.isFinite(Number(executionPolicy.phase_high_agent_budget))
+    ? Number(executionPolicy.phase_high_agent_budget)
+    : DEFAULT_PHASE_HIGH_AGENT_BUDGET;
+  const mediumParallel = Number.isFinite(Number(executionPolicy.phase_medium_parallel))
+    ? Number(executionPolicy.phase_medium_parallel)
+    : DEFAULT_PHASE_MEDIUM_PARALLEL;
+  const mediumAgentBudget = Number.isFinite(Number(executionPolicy.phase_medium_agent_budget))
+    ? Number(executionPolicy.phase_medium_agent_budget)
+    : DEFAULT_PHASE_MEDIUM_AGENT_BUDGET;
+  const cooldownSeconds = Number.isFinite(Number(executionPolicy.phase_cooldown_seconds))
+    ? Number(executionPolicy.phase_cooldown_seconds)
+    : DEFAULT_PHASE_COOLDOWN_SECONDS;
   lines.push('# Matrix Remediation Commands');
   lines.push('');
   lines.push('## Batch Mode');
   lines.push('');
   lines.push(`- JSON goals: \`sce auto close-loop-batch ${quoteCliArg(batchJsonOut)} --format json --json\``);
   lines.push(`- Lines goals: \`sce auto close-loop-batch ${quoteCliArg(linesOut)} --format lines --json\``);
+  if (highLinesOut && mediumLinesOut && highGoalsOut && mediumGoalsOut) {
+    lines.push('');
+    lines.push('## Rate-Limit Safe Phased Mode');
+    lines.push('');
+    lines.push('1. High-priority phase (low parallel):');
+    lines.push(`   - \`sce auto close-loop-batch ${quoteCliArg(highGoalsOut)} --format json --batch-parallel ${highParallel} --batch-agent-budget ${highAgentBudget} --batch-retry-until-complete --batch-retry-max-rounds 3 --json\``);
+    lines.push('2. Cooldown before next phase:');
+    lines.push(`   - \`sleep ${cooldownSeconds}\``);
+    lines.push('3. Medium-priority phase:');
+    lines.push(`   - \`sce auto close-loop-batch ${quoteCliArg(mediumGoalsOut)} --format json --batch-parallel ${mediumParallel} --batch-agent-budget ${mediumAgentBudget} --batch-retry-until-complete --batch-retry-max-rounds 2 --json\``);
+    lines.push('4. Optional lines fallback:');
+    lines.push(`   - high: \`sce auto close-loop-batch ${quoteCliArg(highLinesOut)} --format lines --json\``);
+    lines.push(`   - medium: \`sce auto close-loop-batch ${quoteCliArg(mediumLinesOut)} --format lines --json\``);
+  }
   lines.push('');
   lines.push('## Per Goal');
   lines.push('');
@@ -299,6 +407,18 @@ async function main() {
   const markdownOutPath = resolvePath(cwd, options.markdownOut);
   const batchJsonOutPath = resolvePath(cwd, options.batchJsonOut);
   const commandsOutPath = resolvePath(cwd, options.commandsOut);
+  const phaseHighLinesOutPath = options.phaseHighLinesOut
+    ? resolvePath(cwd, options.phaseHighLinesOut)
+    : derivePhasePath(linesOutPath, 'high');
+  const phaseMediumLinesOutPath = options.phaseMediumLinesOut
+    ? resolvePath(cwd, options.phaseMediumLinesOut)
+    : derivePhasePath(linesOutPath, 'medium');
+  const phaseHighGoalsOutPath = options.phaseHighGoalsOut
+    ? resolvePath(cwd, options.phaseHighGoalsOut)
+    : derivePhasePath(batchJsonOutPath, 'high');
+  const phaseMediumGoalsOutPath = options.phaseMediumGoalsOut
+    ? resolvePath(cwd, options.phaseMediumGoalsOut)
+    : derivePhasePath(batchJsonOutPath, 'medium');
   const baselineExists = await fs.pathExists(baselinePath);
   if (!baselineExists) {
     throw new Error(`baseline file not found: ${path.relative(cwd, baselinePath) || baselinePath}`);
@@ -312,7 +432,11 @@ async function main() {
     return Number.isFinite(delta) && Math.abs(delta) >= minDeltaAbs;
   });
   const items = filtered.map((item, index) => buildQueueItem(item, index, baselinePayload, options.topTemplates));
+  const highItems = items.filter(item => item && item.priority === 'high');
+  const mediumItems = items.filter(item => !item || item.priority !== 'high');
   const queueLines = items.map(item => item.goal);
+  const highQueueLines = highItems.map(item => item.goal);
+  const mediumQueueLines = mediumItems.map(item => item.goal);
 
   const payload = {
     mode: 'moqui-matrix-remediation-queue',
@@ -324,9 +448,19 @@ async function main() {
       min_delta_abs: minDeltaAbs,
       top_templates: Number(options.topTemplates)
     },
+    execution_policy: {
+      phase_split: options.phaseSplit === true,
+      phase_high_parallel: Number(options.phaseHighParallel),
+      phase_high_agent_budget: Number(options.phaseHighAgentBudget),
+      phase_medium_parallel: Number(options.phaseMediumParallel),
+      phase_medium_agent_budget: Number(options.phaseMediumAgentBudget),
+      phase_cooldown_seconds: Number(options.phaseCooldownSeconds)
+    },
     summary: {
       regressions_total: regressions.length,
-      selected_regressions: items.length
+      selected_regressions: items.length,
+      phase_high_count: highItems.length,
+      phase_medium_count: mediumItems.length
     },
     items,
     artifacts: {
@@ -334,7 +468,11 @@ async function main() {
       lines_out: path.relative(cwd, linesOutPath) || '.',
       markdown_out: path.relative(cwd, markdownOutPath) || '.',
       batch_json_out: path.relative(cwd, batchJsonOutPath) || '.',
-      commands_out: path.relative(cwd, commandsOutPath) || '.'
+      commands_out: path.relative(cwd, commandsOutPath) || '.',
+      phase_high_lines_out: options.phaseSplit ? (path.relative(cwd, phaseHighLinesOutPath) || '.') : null,
+      phase_medium_lines_out: options.phaseSplit ? (path.relative(cwd, phaseMediumLinesOutPath) || '.') : null,
+      phase_high_goals_out: options.phaseSplit ? (path.relative(cwd, phaseHighGoalsOutPath) || '.') : null,
+      phase_medium_goals_out: options.phaseSplit ? (path.relative(cwd, phaseMediumGoalsOutPath) || '.') : null
     }
   };
 
@@ -342,6 +480,16 @@ async function main() {
   await fs.writeFile(linesOutPath, queueLines.join('\n') + (queueLines.length > 0 ? '\n' : ''), 'utf8');
   await fs.ensureDir(path.dirname(batchJsonOutPath));
   await fs.writeJson(batchJsonOutPath, buildBatchGoalsPayload(items), { spaces: 2 });
+  if (options.phaseSplit) {
+    await fs.ensureDir(path.dirname(phaseHighLinesOutPath));
+    await fs.writeFile(phaseHighLinesOutPath, highQueueLines.join('\n') + (highQueueLines.length > 0 ? '\n' : ''), 'utf8');
+    await fs.ensureDir(path.dirname(phaseMediumLinesOutPath));
+    await fs.writeFile(phaseMediumLinesOutPath, mediumQueueLines.join('\n') + (mediumQueueLines.length > 0 ? '\n' : ''), 'utf8');
+    await fs.ensureDir(path.dirname(phaseHighGoalsOutPath));
+    await fs.writeJson(phaseHighGoalsOutPath, buildBatchGoalsPayload(highItems), { spaces: 2 });
+    await fs.ensureDir(path.dirname(phaseMediumGoalsOutPath));
+    await fs.writeJson(phaseMediumGoalsOutPath, buildBatchGoalsPayload(mediumItems), { spaces: 2 });
+  }
   await fs.ensureDir(path.dirname(outPath));
   await fs.writeJson(outPath, payload, { spaces: 2 });
   await fs.ensureDir(path.dirname(markdownOutPath));
@@ -373,8 +521,14 @@ module.exports = {
   DEFAULT_BATCH_JSON_OUT,
   DEFAULT_COMMANDS_OUT,
   DEFAULT_TOP_TEMPLATES,
+  DEFAULT_PHASE_HIGH_PARALLEL,
+  DEFAULT_PHASE_HIGH_AGENT_BUDGET,
+  DEFAULT_PHASE_MEDIUM_PARALLEL,
+  DEFAULT_PHASE_MEDIUM_AGENT_BUDGET,
+  DEFAULT_PHASE_COOLDOWN_SECONDS,
   parseArgs,
   resolvePath,
+  derivePhasePath,
   pickRegressions,
   metricToFocus,
   metricToFlag,

@@ -84,6 +84,10 @@ Recommended GitHub Variables:
 - `.kiro/reports/release-evidence/matrix-regression-gate-<tag>.json`
 - `.kiro/reports/release-evidence/matrix-remediation-plan-<tag>.json`
 - `.kiro/reports/release-evidence/matrix-remediation-<tag>.lines`
+- `.kiro/reports/release-evidence/matrix-remediation-high-<tag>.lines`
+- `.kiro/reports/release-evidence/matrix-remediation-medium-<tag>.lines`
+- `.kiro/reports/release-evidence/matrix-remediation-goals-high-<tag>.json`
+- `.kiro/reports/release-evidence/matrix-remediation-goals-medium-<tag>.json`
 
 ## 6. Pass Criteria
 
@@ -104,6 +108,24 @@ node scripts/moqui-matrix-remediation-queue.js \
   --commands-out .kiro/reports/release-evidence/matrix-remediation-commands.md \
   --json
 
+# anti-429 phased mode (recommended default)
+sce auto close-loop-batch .kiro/auto/matrix-remediation.goals.high.json \
+  --format json \
+  --batch-parallel 1 \
+  --batch-agent-budget 2 \
+  --batch-retry-until-complete \
+  --batch-retry-max-rounds 3 \
+  --json
+sleep 20
+sce auto close-loop-batch .kiro/auto/matrix-remediation.goals.medium.json \
+  --format json \
+  --batch-parallel 2 \
+  --batch-agent-budget 4 \
+  --batch-retry-until-complete \
+  --batch-retry-max-rounds 2 \
+  --json
+
+# fallback
 sce auto close-loop-batch .kiro/auto/matrix-remediation.lines --json
 sce auto close-loop-batch .kiro/auto/matrix-remediation.goals.json --format json --json
 ```

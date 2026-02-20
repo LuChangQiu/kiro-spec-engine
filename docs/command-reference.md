@@ -870,8 +870,8 @@ Moqui matrix remediation queue helper (script-level automatic queue export):
     - Medium goals JSON: `.kiro/auto/matrix-remediation.goals.medium.json`
   - Default phased execution policy:
     - High phase: `--batch-parallel 1 --batch-agent-budget 2`
-    - Medium phase: `--batch-parallel 2 --batch-agent-budget 4`
-    - Cooldown: `sleep 20` seconds between phases
+    - Medium phase: `--batch-parallel 1 --batch-agent-budget 2`
+    - Cooldown: `sleep 30` seconds between phases
 - npm alias: `npm run report:matrix-remediation-queue`
 
 Moqui matrix remediation phased runner helper (script-level one-shot execution):
@@ -883,8 +883,8 @@ Moqui matrix remediation phased runner helper (script-level one-shot execution):
     - Medium lines fallback: `.kiro/auto/matrix-remediation.medium.lines`
   - Default execution policy:
     - High: `--batch-parallel 1 --batch-agent-budget 2 --batch-retry-max-rounds 3`
-    - Medium: `--batch-parallel 2 --batch-agent-budget 4 --batch-retry-max-rounds 2`
-    - Cooldown: `20` seconds
+    - Medium: `--batch-parallel 1 --batch-agent-budget 2 --batch-retry-max-rounds 2`
+    - Cooldown: `30` seconds
     - Phase process recovery: `--phase-recovery-attempts 2` with `--phase-recovery-cooldown-seconds 30`; on retry, phase parallel/agent-budget are halved (floor, min=1)
   - Zero-prep mode:
     - `node scripts/moqui-matrix-remediation-phased-runner.js --baseline .kiro/reports/release-evidence/moqui-template-baseline.json --json`

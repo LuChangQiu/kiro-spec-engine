@@ -117,11 +117,11 @@ sce auto close-loop-batch .kiro/auto/matrix-remediation.goals.high.json \
   --batch-retry-until-complete \
   --batch-retry-max-rounds 3 \
   --json
-sleep 20
+sleep 30
 sce auto close-loop-batch .kiro/auto/matrix-remediation.goals.medium.json \
   --format json \
-  --batch-parallel 2 \
-  --batch-agent-budget 4 \
+  --batch-parallel 1 \
+  --batch-agent-budget 2 \
   --batch-retry-until-complete \
   --batch-retry-max-rounds 2 \
   --json

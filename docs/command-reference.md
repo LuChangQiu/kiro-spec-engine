@@ -1079,6 +1079,7 @@ sce scene moqui-baseline \
 
 Release workflow default:
 - Runs interactive loop smoke (`npm run test:interactive-loop-smoke`) in test/release test jobs.
+- Runs interactive flow smoke (`npm run test:interactive-flow-smoke`) in test/release test jobs.
 - Runs interactive governance gate by default (`interactive-governance-report --period weekly --fail-on-alert`) in test and release pipelines.
 - Publishes `moqui-template-baseline.json` + `moqui-template-baseline.md` as release assets.
 - Publishes `moqui-release-summary.json` + `moqui-release-summary.md` as release review assets.

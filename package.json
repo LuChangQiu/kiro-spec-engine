@@ -32,6 +32,7 @@
     "test:properties": "npx jest tests/properties",
     "test:handles": "npx jest --config=jest.config.js --runInBand --detectOpenHandles",
     "test:interactive-loop-smoke": "node scripts/interactive-loop-smoke.js --json",
+    "test:interactive-flow-smoke": "node scripts/interactive-flow-smoke.js --json",
     "test:skip-audit": "node scripts/check-skip-allowlist.js",
     "test:brand-consistency": "node scripts/check-branding-consistency.js",
     "test:watch": "npx jest --watch",

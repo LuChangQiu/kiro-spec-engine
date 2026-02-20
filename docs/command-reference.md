@@ -871,10 +871,11 @@ Interactive change-plan generator helper (script-level stage-B planning bridge):
   - Generated plans can be evaluated directly by `interactive-change-plan-gate`.
 
 Interactive one-click loop helper (script-level orchestration entry):
-- `node scripts/interactive-customization-loop.js --context <path> (--goal <text> | --goal-file <path>) [--execution-mode <suggestion|apply>] [--policy <path>] [--catalog <path>] [--auto-approve-low-risk] [--auto-execute-low-risk] [--allow-suggestion-apply] [--fail-on-gate-non-allow] [--json]`: run intent->plan->gate->approval pipeline in one command and optionally trigger low-risk one-click apply via Moqui adapter.
+- `node scripts/interactive-customization-loop.js --context <path> (--goal <text> | --goal-file <path>) [--execution-mode <suggestion|apply>] [--policy <path>] [--catalog <path>] [--auto-approve-low-risk] [--auto-execute-low-risk] [--feedback-score <0..5>] [--feedback-comment <text>] [--feedback-tags <csv>] [--allow-suggestion-apply] [--fail-on-gate-non-allow] [--json]`: run intent->plan->gate->approval pipeline in one command and optionally trigger low-risk one-click apply via Moqui adapter.
   - Default loop artifact root: `.kiro/reports/interactive-loop/<session-id>/`
   - Default summary output: `.kiro/reports/interactive-loop/<session-id>/interactive-customization-loop.summary.json`
   - `--auto-execute-low-risk` executes `interactive-moqui-adapter --action low-risk-apply` only when `risk_level=low` and gate decision=`allow`.
+  - `--feedback-score` logs a feedback JSONL event into the same session artifact directory.
 - npm alias: `npm run run:interactive-loop -- --context docs/interactive-customization/page-context.sample.json --goal "Improve order entry clarity" --json`
 
 Interactive approval workflow helper (script-level stage-B approval state machine):

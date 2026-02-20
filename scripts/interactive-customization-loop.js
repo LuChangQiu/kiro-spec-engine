@@ -9,12 +9,15 @@ const { spawnSync } = require('child_process');
 const DEFAULT_OUT_DIR = '.kiro/reports/interactive-loop';
 const DEFAULT_USER_ID = 'anonymous-user';
 const DEFAULT_APPROVAL_ACTOR = 'workflow-operator';
+const DEFAULT_FEEDBACK_CHANNEL = 'ui';
+const FEEDBACK_CHANNELS = new Set(['ui', 'cli', 'api', 'other']);
 
 const SCRIPT_INTENT = path.resolve(__dirname, 'interactive-intent-build.js');
 const SCRIPT_PLAN = path.resolve(__dirname, 'interactive-plan-build.js');
 const SCRIPT_GATE = path.resolve(__dirname, 'interactive-change-plan-gate.js');
 const SCRIPT_APPROVAL = path.resolve(__dirname, 'interactive-approval-workflow.js');
 const SCRIPT_ADAPTER = path.resolve(__dirname, 'interactive-moqui-adapter.js');
+const SCRIPT_FEEDBACK = path.resolve(__dirname, 'interactive-feedback-log.js');
 
 function parseArgs(argv) {
   const options = {
@@ -37,6 +40,10 @@ function parseArgs(argv) {
     allowSuggestionApply: false,
     liveApply: false,
     dryRun: true,
+    feedbackScore: null,
+    feedbackComment: null,
+    feedbackTags: [],
+    feedbackChannel: DEFAULT_FEEDBACK_CHANNEL,
     failOnGateDeny: false,
     failOnGateNonAllow: false,
     failOnExecuteBlocked: false,
@@ -98,6 +105,18 @@ function parseArgs(argv) {
       options.liveApply = true;
     } else if (token === '--no-dry-run') {
       options.dryRun = false;
+    } else if (token === '--feedback-score' && next) {
+      options.feedbackScore = Number(next);
+      index += 1;
+    } else if (token === '--feedback-comment' && next) {
+      options.feedbackComment = next;
+      index += 1;
+    } else if (token === '--feedback-tags' && next) {
+      options.feedbackTags = next.split(',').map(item => item.trim()).filter(Boolean);
+      index += 1;
+    } else if (token === '--feedback-channel' && next) {
+      options.feedbackChannel = next;
+      index += 1;
     } else if (token === '--fail-on-gate-deny') {
       options.failOnGateDeny = true;
     } else if (token === '--fail-on-gate-non-allow') {
@@ -120,10 +139,21 @@ function parseArgs(argv) {
   if (!['suggestion', 'apply'].includes(`${options.executionMode || ''}`.trim())) {
     throw new Error('--execution-mode must be one of: suggestion, apply');
   }
+  if (options.feedbackScore != null) {
+    if (!Number.isFinite(options.feedbackScore) || options.feedbackScore < 0 || options.feedbackScore > 5) {
+      throw new Error('--feedback-score must be between 0 and 5.');
+    }
+  }
 
   options.userId = `${options.userId || ''}`.trim() || DEFAULT_USER_ID;
   options.approvalActor = `${options.approvalActor || ''}`.trim() || DEFAULT_APPROVAL_ACTOR;
   options.approverActor = `${options.approverActor || ''}`.trim() || options.approvalActor;
+  options.feedbackComment = `${options.feedbackComment || ''}`.trim() || null;
+  options.feedbackChannel = `${options.feedbackChannel || ''}`.trim().toLowerCase() || DEFAULT_FEEDBACK_CHANNEL;
+  if (!FEEDBACK_CHANNELS.has(options.feedbackChannel)) {
+    throw new Error(`--feedback-channel must be one of: ${Array.from(FEEDBACK_CHANNELS).join(', ')}`);
+  }
+  options.feedbackTags = Array.from(new Set(options.feedbackTags.map(item => item.toLowerCase())));
 
   return options;
 }
@@ -155,6 +185,10 @@ function printHelpAndExit(code) {
     '  --allow-suggestion-apply         Allow applying plans with execution_mode=suggestion',
     '  --live-apply                     Enable live apply mode for adapter',
     '  --no-dry-run                     Disable dry-run simulation when live apply is enabled',
+    '  --feedback-score <0..5>          Optional user feedback score to append into feedback JSONL',
+    '  --feedback-comment <text>        Optional user feedback comment',
+    '  --feedback-tags <csv>            Optional feedback tags (comma-separated)',
+    `  --feedback-channel <name>        ui|cli|api|other (default: ${DEFAULT_FEEDBACK_CHANNEL})`,
     '  --fail-on-gate-deny              Exit code 2 if gate decision is deny',
     '  --fail-on-gate-non-allow         Exit code 2 if gate decision is deny/review-required',
     '  --fail-on-execute-blocked        Exit code 2 if auto execute result is blocked/non-success',
@@ -254,7 +288,7 @@ function buildSummaryStatus({ gateDecision, executionAttempted, executionBlocked
   return 'apply-finished-with-risk';
 }
 
-function buildNextActions({ gateDecision, riskLevel, autoExecuteTriggered, executionPayload, approvalStatus, artifacts }) {
+function buildNextActions({ gateDecision, riskLevel, autoExecuteTriggered, executionPayload, approvalStatus, feedbackLogged, artifacts }) {
   const actions = [];
   const decision = `${gateDecision || ''}`.trim().toLowerCase();
   const risk = `${riskLevel || ''}`.trim().toLowerCase();
@@ -271,8 +305,13 @@ function buildNextActions({ gateDecision, riskLevel, autoExecuteTriggered, execu
   } else if (executionPayload && executionPayload.execution_record) {
     const record = executionPayload.execution_record;
     if (`${record.result || ''}`.trim().toLowerCase() === 'success') {
-      actions.push(`Execution succeeded (execution_id=${record.execution_id || 'n/a'}). Collect user feedback for governance.`);
-      actions.push('node scripts/interactive-feedback-log.js --score 5 --comment "business flow improved" --json');
+      if (feedbackLogged) {
+        actions.push(`Execution succeeded (execution_id=${record.execution_id || 'n/a'}) and feedback was logged.`);
+        actions.push('node scripts/interactive-governance-report.js --period weekly --json');
+      } else {
+        actions.push(`Execution succeeded (execution_id=${record.execution_id || 'n/a'}). Collect user feedback for governance.`);
+        actions.push('node scripts/interactive-feedback-log.js --score 5 --comment "business flow improved" --json');
+      }
     } else {
       actions.push('Execution was blocked or failed. Inspect adapter output and adjust plan/policy.');
       actions.push(`node scripts/interactive-moqui-adapter.js --action validate --plan ${artifacts.plan_json} --json`);
@@ -309,6 +348,7 @@ async function main() {
     approval_state_json: toRelative(cwd, path.join(sessionDir, 'interactive-approval-state.json')),
     approval_audit_jsonl: toRelative(cwd, path.join(sessionDir, 'interactive-approval-events.jsonl')),
     adapter_json: toRelative(cwd, path.join(sessionDir, 'interactive-moqui-adapter.json')),
+    feedback_jsonl: toRelative(cwd, path.join(sessionDir, 'interactive-user-feedback.jsonl')),
     summary_json: toRelative(cwd, summaryOutPath)
   };
 
@@ -529,6 +569,77 @@ async function main() {
 
   const approvalState = approvalStatusPayload && approvalStatusPayload.state ? approvalStatusPayload.state : {};
   const approvalStatus = approvalState && approvalState.status ? approvalState.status : null;
+  const intentRecord = intentPayload && intentPayload.intent && typeof intentPayload.intent === 'object'
+    ? intentPayload.intent
+    : {};
+  const planRecord = planPayload && planPayload.plan && typeof planPayload.plan === 'object'
+    ? planPayload.plan
+    : {};
+  const contextRef = intentRecord.context_ref && typeof intentRecord.context_ref === 'object'
+    ? intentRecord.context_ref
+    : {};
+
+  const feedback = {
+    requested: options.feedbackScore != null,
+    logged: false,
+    score: options.feedbackScore,
+    feedback_id: null,
+    payload: null,
+    exit_code: null
+  };
+
+  if (options.feedbackScore != null) {
+    const feedbackArgs = [
+      '--score', String(options.feedbackScore),
+      '--user-id', options.userId,
+      '--session-id', sessionId,
+      '--feedback-file', resolvePath(cwd, artifacts.feedback_jsonl),
+      '--channel', options.feedbackChannel,
+      '--json'
+    ];
+    if (options.feedbackComment) {
+      feedbackArgs.push('--comment', options.feedbackComment);
+    }
+    if (options.feedbackTags.length > 0) {
+      feedbackArgs.push('--tags', options.feedbackTags.join(','));
+    }
+    if (intentRecord.intent_id) {
+      feedbackArgs.push('--intent-id', intentRecord.intent_id);
+    }
+    if (planRecord.plan_id) {
+      feedbackArgs.push('--plan-id', planRecord.plan_id);
+    }
+    if (execution.execution_id) {
+      feedbackArgs.push('--execution-id', execution.execution_id);
+    }
+    if (contextRef.product) {
+      feedbackArgs.push('--product', `${contextRef.product}`);
+    }
+    if (contextRef.module) {
+      feedbackArgs.push('--module', `${contextRef.module}`);
+    }
+    if (contextRef.page) {
+      feedbackArgs.push('--page', `${contextRef.page}`);
+    }
+    if (contextRef.scene_id) {
+      feedbackArgs.push('--scene-id', `${contextRef.scene_id}`);
+    }
+    const feedbackResult = runScript({
+      label: 'interactive-feedback-log',
+      scriptPath: SCRIPT_FEEDBACK,
+      args: feedbackArgs,
+      cwd,
+      allowedExitCodes: [0]
+    });
+    const feedbackPayload = parseJsonOutput(feedbackResult.stdout, 'interactive-feedback-log');
+    steps.push(buildStep('feedback_log', feedbackPayload, [process.execPath, SCRIPT_FEEDBACK, ...feedbackArgs].join(' '), feedbackResult.exit_code));
+    feedback.logged = true;
+    feedback.payload = feedbackPayload;
+    feedback.exit_code = feedbackResult.exit_code;
+    feedback.feedback_id = feedbackPayload && feedbackPayload.record
+      ? feedbackPayload.record.feedback_id || null
+      : null;
+  }
 
   const summaryStatus = buildSummaryStatus({
     gateDecision,
@@ -559,7 +670,11 @@ async function main() {
       auto_execute_low_risk: options.autoExecuteLowRisk,
       allow_suggestion_apply: options.allowSuggestionApply,
       live_apply: options.liveApply,
-      dry_run: options.dryRun
+      dry_run: options.dryRun,
+      feedback_score: options.feedbackScore,
+      feedback_comment: options.feedbackComment,
+      feedback_tags: options.feedbackTags,
+      feedback_channel: options.feedbackChannel
     },
     gate: {
       decision: gateDecision,
@@ -578,12 +693,14 @@ async function main() {
       next_actions: buildNextActions({
         gateDecision,
         riskLevel,
-        autoExecuteTriggered: execution.auto_triggered === true,
-        executionPayload: execution.payload && execution.payload.payload ? execution.payload.payload : null,
-        approvalStatus,
-        artifacts
-      })
-    },
+      autoExecuteTriggered: execution.auto_triggered === true,
+      executionPayload: execution.payload && execution.payload.payload ? execution.payload.payload : null,
+      approvalStatus,
+      feedbackLogged: feedback.logged,
+      artifacts
+    })
+  },
+    feedback,
     artifacts,
     steps
   };
@@ -620,6 +737,8 @@ module.exports = {
   DEFAULT_OUT_DIR,
   DEFAULT_USER_ID,
   DEFAULT_APPROVAL_ACTOR,
+  DEFAULT_FEEDBACK_CHANNEL,
+  FEEDBACK_CHANNELS,
   parseArgs,
   resolvePath,
   normalizeSessionId,

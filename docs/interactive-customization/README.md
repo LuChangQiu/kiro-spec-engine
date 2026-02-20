@@ -80,6 +80,9 @@ node scripts/interactive-customization-loop.js \
   --goal "Adjust order screen field layout for clearer input flow" \
   --execution-mode apply \
   --auto-execute-low-risk \
+  --feedback-score 5 \
+  --feedback-comment "Flow is clearer and faster." \
+  --feedback-tags moqui,approval \
   --json
 ```
 

@@ -155,4 +155,44 @@ describe('interactive-customization-loop script', () => {
     expect(payload.gate.decision).toBe('deny');
     expect(payload.summary.status).toBe('blocked');
   });
+
+  test('logs feedback into session feedback file when score is provided', async () => {
+    const workspace = path.join(tempDir, 'workspace-feedback');
+    await fs.ensureDir(workspace);
+    const { policyPath, catalogPath } = await writePolicyBundle(workspace);
+    const contextPath = await writeContext(workspace);
+
+    const result = runScript(workspace, [
+      '--context', contextPath,
+      '--goal', 'Adjust order screen field layout for clearer input flow',
+      '--execution-mode', 'apply',
+      '--auto-execute-low-risk',
+      '--user-id', 'biz-user',
+      '--policy', policyPath,
+      '--catalog', catalogPath,
+      '--feedback-score', '4.5',
+      '--feedback-comment', 'Flow is clearer and safer now.',
+      '--feedback-tags', 'moqui,ux',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.feedback.requested).toBe(true);
+    expect(payload.feedback.logged).toBe(true);
+    expect(payload.feedback.score).toBe(4.5);
+    expect(payload.feedback.feedback_id).toMatch(/^feedback-/);
+
+    const feedbackFile = path.join(workspace, payload.artifacts.feedback_jsonl);
+    expect(await fs.pathExists(feedbackFile)).toBe(true);
+    const lines = (await fs.readFile(feedbackFile, 'utf8'))
+      .trim()
+      .split(/\r?\n/)
+      .filter(Boolean);
+    expect(lines.length).toBeGreaterThanOrEqual(1);
+    const feedbackRecord = JSON.parse(lines[0]);
+    expect(feedbackRecord.score).toBe(4.5);
+    expect(feedbackRecord.user_id).toBe('biz-user');
+    expect(feedbackRecord.tags).toEqual(expect.arrayContaining(['moqui', 'ux']));
+  });
 });

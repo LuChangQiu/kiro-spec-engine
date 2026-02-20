@@ -840,6 +840,7 @@ Moqui template library lexicon audit (script-level governance helper):
 Moqui release summary helper (script-level consolidated gate view):
 - `node scripts/moqui-release-summary.js [--evidence <path>] [--baseline <path>] [--lexicon <path>] [--capability-matrix <path>] [--interactive-governance <path>] [--matrix-remediation-plan <path>] [--out <path>] [--markdown-out <path>] [--fail-on-gate-fail] [--json]`: merge handoff release-evidence + baseline + lexicon + capability-matrix + interactive-governance into one Moqui release gate summary (`passed | failed | incomplete`) with executable remediation recommendations.
   - When matrix regressions exist and remediation plan is available, recommendations include concrete template/capability priority order from `template_priority_matrix` and `capability_clusters`.
+  - Matrix-regression recovery recommendations now use explicit labeled sequence steps: `Step 1 (Cluster phased)` then `Step 2 (Baseline phased)`.
   - Default inputs:
     - `.kiro/reports/release-evidence/handoff-runs.json`
     - `.kiro/reports/release-evidence/moqui-template-baseline.json`

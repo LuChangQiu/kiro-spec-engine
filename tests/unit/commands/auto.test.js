@@ -4939,6 +4939,11 @@ if (process.argv.includes('--json')) {
       expect.stringContaining('matrix-remediation.capability-clusters.json'),
       expect.stringContaining('run:matrix-remediation-clusters')
     ]));
+    expect(parsed.health.recommendations).toEqual(expect.arrayContaining([
+      expect.stringContaining('Moqui regression recovery sequence (recommended)'),
+      expect.stringContaining('Step 1 (Cluster phased):'),
+      expect.stringContaining('Step 2 (Baseline phased):')
+    ]));
   });
 
   test('elevates governance risk when handoff lexicon unknown capability counts are positive', async () => {
@@ -5764,6 +5769,11 @@ if (process.argv.includes('--json')) {
       expect.stringContaining('run:matrix-remediation-clusters-phased'),
       expect.stringContaining('matrix-remediation.capability-clusters.json'),
       expect.stringContaining('run:matrix-remediation-clusters')
+    ]));
+    expect(parsed.recommendations).toEqual(expect.arrayContaining([
+      expect.stringContaining('Moqui regression recovery sequence (recommended)'),
+      expect.stringContaining('Step 1 (Cluster phased):'),
+      expect.stringContaining('Step 2 (Baseline phased):')
     ]));
   });
 
@@ -7559,6 +7569,8 @@ if (process.argv.includes('--json')) {
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-clusters-phased'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('matrix-remediation.capability-clusters.json'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-clusters'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('Step 1 (Cluster phased):'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('Step 2 (Baseline phased):'))).toBe(true);
   });
 
   test('infers manifest capabilities from templates when capabilities are not declared', async () => {

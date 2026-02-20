@@ -327,11 +327,19 @@ describe('moqui-release-summary script', () => {
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-clusters-phased'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('moqui-matrix-remediation-phased-runner.js'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('run:matrix-remediation-phased'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('Moqui regression recovery sequence (recommended)'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('Step 1 (Cluster phased):'))).toBe(true);
+    expect(payload.recommendations.some(item => item.includes('Step 2 (Baseline phased):'))).toBe(true);
     const clusterPhasedIndex = payload.recommendations.findIndex(item => item.includes('run:matrix-remediation-clusters-phased'));
     const baselinePhasedIndex = payload.recommendations.findIndex(item => item.includes('moqui-matrix-remediation-phased-runner.js'));
+    const step1Index = payload.recommendations.findIndex(item => item.includes('Step 1 (Cluster phased):'));
+    const step2Index = payload.recommendations.findIndex(item => item.includes('Step 2 (Baseline phased):'));
     expect(clusterPhasedIndex).toBeGreaterThanOrEqual(0);
     expect(baselinePhasedIndex).toBeGreaterThanOrEqual(0);
     expect(clusterPhasedIndex).toBeLessThan(baselinePhasedIndex);
+    expect(step1Index).toBeGreaterThanOrEqual(0);
+    expect(step2Index).toBeGreaterThanOrEqual(0);
+    expect(step1Index).toBeLessThan(step2Index);
     expect(payload.recommendations.some(item => item.includes('Prioritize template recovery order'))).toBe(true);
     expect(payload.recommendations.some(item => item.includes('Prioritize capability closure clusters'))).toBe(true);
     expect(payload.matrix_remediation).toEqual(expect.objectContaining({

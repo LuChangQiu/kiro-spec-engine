@@ -27,11 +27,19 @@ describe('release-risk-remediation-bundle script', () => {
       mode: 'release-gate',
       weekly_ops: {
         blocked: true,
-        violations: ['weekly ops risk high exceeds max medium'],
+        violations: [
+          'weekly ops risk high exceeds max medium',
+          'weekly ops dialogue-authorization block rate 66% exceeds max 40%',
+          'weekly ops authorization-tier block rate 58% exceeds max 40%'
+        ],
         signals: {
           risk: 'high',
-          governance_status: 'alert'
-        }
+          governance_status: 'alert',
+          dialogue_authorization_block_rate_percent: 66,
+          authorization_tier_block_rate_percent: 58
+        },
+        max_dialogue_authorization_block_rate_percent: 40,
+        max_authorization_tier_block_rate_percent: 40
       },
       drift: {
         blocked: true,
@@ -55,9 +63,12 @@ describe('release-risk-remediation-bundle script', () => {
     expect(payload.plan.commands.some(item => item.includes('release-ops-weekly-summary.js'))).toBe(true);
     expect(payload.plan.commands.some(item => item.includes('release-drift-evaluate.js'))).toBe(true);
     expect(payload.plan.commands.some(item => item.includes('interactive-governance-report.js'))).toBe(true);
+    expect(payload.plan.commands.some(item => item.includes('interactive-dialogue-governance.js'))).toBe(true);
+    expect(payload.plan.commands.some(item => item.includes('interactive-authorization-tier-evaluate.js'))).toBe(true);
+    expect(payload.plan.reasons).toContain('dialogue-authorization-block-pressure');
+    expect(payload.plan.reasons).toContain('authorization-tier-block-pressure');
     expect(await fs.pathExists(path.join(workspace, '.kiro', 'reports', 'release-evidence', 'release-risk-remediation-bundle.json'))).toBe(true);
     expect(await fs.pathExists(path.join(workspace, '.kiro', 'reports', 'release-evidence', 'release-risk-remediation-bundle.md'))).toBe(true);
     expect(await fs.pathExists(path.join(workspace, '.kiro', 'reports', 'release-evidence', 'release-risk-remediation.commands.lines'))).toBe(true);
   });
 });
-

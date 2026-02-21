@@ -54,13 +54,17 @@ function riskRank(level) {
   return 4;
 }
 
-function parseOptionalNumber(raw) {
-  const value = `${raw || ''}`.trim();
-  if (!value) {
+function parseOptionalNumberWithWarning(env, name, warnings) {
+  const raw = readValue(env, name, '');
+  if (!raw) {
     return null;
   }
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : null;
+  const parsed = Number(raw);
+  if (Number.isFinite(parsed)) {
+    return parsed;
+  }
+  warnings.push(`invalid number ${name}=${raw}, fallback=default`);
+  return null;
 }
 
 function safeReadJson(file) {
@@ -149,27 +153,38 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
   const enforce = parseBoolean(readValue(env, 'RELEASE_WEEKLY_OPS_ENFORCE', ''), true);
   const requireSummary = parseBoolean(readValue(env, 'RELEASE_WEEKLY_OPS_REQUIRE_SUMMARY', ''), true);
   const maxRiskLevel = normalizeRiskLevel(readValue(env, 'RELEASE_WEEKLY_OPS_MAX_RISK_LEVEL', ''), 'medium');
-  const maxGovernanceBreaches = parseOptionalNumber(readValue(env, 'RELEASE_WEEKLY_OPS_MAX_GOVERNANCE_BREACHES', ''));
-  const maxAuthorizationTierBlockRatePercentRaw = parseOptionalNumber(
-    readValue(env, 'RELEASE_WEEKLY_OPS_MAX_AUTHORIZATION_TIER_BLOCK_RATE_PERCENT', '')
+  const configWarnings = [];
+  const maxGovernanceBreaches = parseOptionalNumberWithWarning(
+    env,
+    'RELEASE_WEEKLY_OPS_MAX_GOVERNANCE_BREACHES',
+    configWarnings
+  );
+  const maxAuthorizationTierBlockRatePercentRaw = parseOptionalNumberWithWarning(
+    env,
+    'RELEASE_WEEKLY_OPS_MAX_AUTHORIZATION_TIER_BLOCK_RATE_PERCENT',
+    configWarnings
   );
   const maxAuthorizationTierBlockRatePercent = Number.isFinite(maxAuthorizationTierBlockRatePercentRaw)
     ? maxAuthorizationTierBlockRatePercentRaw
     : 40;
-  const maxDialogueAuthorizationBlockRatePercentRaw = parseOptionalNumber(
-    readValue(env, 'RELEASE_WEEKLY_OPS_MAX_DIALOGUE_AUTHORIZATION_BLOCK_RATE_PERCENT', '')
+  const maxDialogueAuthorizationBlockRatePercentRaw = parseOptionalNumberWithWarning(
+    env,
+    'RELEASE_WEEKLY_OPS_MAX_DIALOGUE_AUTHORIZATION_BLOCK_RATE_PERCENT',
+    configWarnings
   );
   const maxDialogueAuthorizationBlockRatePercent = Number.isFinite(maxDialogueAuthorizationBlockRatePercentRaw)
     ? maxDialogueAuthorizationBlockRatePercentRaw
     : 40;
-  const maxMatrixRegressionPositiveRatePercent = parseOptionalNumber(
-    readValue(env, 'RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT', '')
+  const maxMatrixRegressionPositiveRatePercent = parseOptionalNumberWithWarning(
+    env,
+    'RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT',
+    configWarnings
   );
   const gateReportFile = readValue(env, 'RELEASE_GATE_REPORT_FILE', '');
   const summaryPath = readValue(env, 'GITHUB_STEP_SUMMARY', '');
 
   const violations = [];
-  const warnings = [];
+  const warnings = configWarnings.slice();
   const summaryResult = safeReadJson(summaryFile);
   let signals = null;
 
@@ -236,6 +251,7 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
     max_authorization_tier_block_rate_percent: maxAuthorizationTierBlockRatePercent,
     max_dialogue_authorization_block_rate_percent: maxDialogueAuthorizationBlockRatePercent,
     max_matrix_regression_positive_rate_percent: maxMatrixRegressionPositiveRatePercent,
+    config_warnings: configWarnings,
     signals,
     warnings,
     violations,

@@ -146,6 +146,40 @@ function buildRemediationPlan(gatePayload) {
     addRecommendation('Clear medium/high governance breaches before next release tag.');
   }
 
+  const weeklyDialogueBlockRate = Number(
+    weeklySignals && weeklySignals.dialogue_authorization_block_rate_percent
+  );
+  const weeklyDialogueBlockRateMax = Number(
+    weeklyOps && weeklyOps.max_dialogue_authorization_block_rate_percent
+  );
+  const dialogueRateExceeded = (
+    Number.isFinite(weeklyDialogueBlockRate)
+    && Number.isFinite(weeklyDialogueBlockRateMax)
+    && weeklyDialogueBlockRate > weeklyDialogueBlockRateMax
+  ) || weeklyViolations.some(item => `${item || ''}`.includes('dialogue-authorization block rate'));
+  if (dialogueRateExceeded) {
+    addReason('dialogue-authorization-block-pressure');
+    addCommand('node scripts/interactive-dialogue-governance.js --policy docs/interactive-customization/dialogue-governance-policy-baseline.json --authorization-dialogue-policy docs/interactive-customization/authorization-dialogue-policy-baseline.json --json');
+    addRecommendation('Reduce dialogue-authorization block pressure by tuning ui-mode specific authorization dialogue rules for user-app vs ops-console.');
+  }
+
+  const weeklyAuthTierBlockRate = Number(
+    weeklySignals && weeklySignals.authorization_tier_block_rate_percent
+  );
+  const weeklyAuthTierBlockRateMax = Number(
+    weeklyOps && weeklyOps.max_authorization_tier_block_rate_percent
+  );
+  const authorizationTierRateExceeded = (
+    Number.isFinite(weeklyAuthTierBlockRate)
+    && Number.isFinite(weeklyAuthTierBlockRateMax)
+    && weeklyAuthTierBlockRate > weeklyAuthTierBlockRateMax
+  ) || weeklyViolations.some(item => `${item || ''}`.includes('authorization-tier block rate'));
+  if (authorizationTierRateExceeded) {
+    addReason('authorization-tier-block-pressure');
+    addCommand('node scripts/interactive-authorization-tier-evaluate.js --policy docs/interactive-customization/authorization-tier-policy-baseline.json --json');
+    addRecommendation('Tune authorization-tier profile/environment step-up policy to reduce deny/review pressure while preserving safety constraints.');
+  }
+
   if (driftAlerts.length > 0 || driftBlocked) {
     addReason('release-drift-alerts');
     driftAlerts.forEach(item => addReason(item));
@@ -279,4 +313,3 @@ module.exports = {
   buildRemediationPlan,
   buildMarkdown
 };
-

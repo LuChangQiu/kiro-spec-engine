@@ -211,4 +211,45 @@ describe('release weekly ops gate script', () => {
     expect(result.blocked).toBe(true);
     expect(result.violations.some(item => item.includes('missing file'))).toBe(true);
   });
+
+  test('records config warnings and falls back to default thresholds when env values are invalid', () => {
+    const tempDir = makeTempDir();
+    const summaryFile = path.join(tempDir, 'weekly-ops-summary.json');
+    fs.writeFileSync(summaryFile, JSON.stringify({
+      mode: 'release-weekly-ops-summary',
+      health: {
+        risk: 'medium'
+      },
+      snapshots: {
+        interactive_governance: {
+          status: 'ok',
+          breaches: 0,
+          authorization_tier_block_rate_percent: 20,
+          dialogue_authorization_block_rate_percent: 15
+        },
+        matrix_signals: {
+          regression_positive_rate_percent: 5
+        }
+      }
+    }, null, 2), 'utf8');
+
+    const result = evaluateReleaseWeeklyOpsGate({
+      env: {
+        RELEASE_WEEKLY_OPS_SUMMARY_FILE: summaryFile,
+        RELEASE_WEEKLY_OPS_MAX_AUTHORIZATION_TIER_BLOCK_RATE_PERCENT: 'abc',
+        RELEASE_WEEKLY_OPS_MAX_DIALOGUE_AUTHORIZATION_BLOCK_RATE_PERCENT: 'xyz',
+        RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT: 'bad-value'
+      }
+    });
+
+    expect(result.exit_code).toBe(0);
+    expect(result.blocked).toBe(false);
+    expect(result.payload.max_authorization_tier_block_rate_percent).toBe(40);
+    expect(result.payload.max_dialogue_authorization_block_rate_percent).toBe(40);
+    expect(result.payload.max_matrix_regression_positive_rate_percent).toBe(null);
+    expect(result.payload.config_warnings.length).toBe(3);
+    expect(result.payload.warnings.some(item => item.includes('RELEASE_WEEKLY_OPS_MAX_AUTHORIZATION_TIER_BLOCK_RATE_PERCENT'))).toBe(true);
+    expect(result.payload.warnings.some(item => item.includes('RELEASE_WEEKLY_OPS_MAX_DIALOGUE_AUTHORIZATION_BLOCK_RATE_PERCENT'))).toBe(true);
+    expect(result.payload.warnings.some(item => item.includes('RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT'))).toBe(true);
+  });
 });

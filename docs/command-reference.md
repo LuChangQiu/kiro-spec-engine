@@ -891,11 +891,13 @@ Release weekly ops gate helper (release hard-gate):
     - `RELEASE_WEEKLY_OPS_MAX_AUTHORIZATION_TIER_BLOCK_RATE_PERCENT=<n>` (default `40`)
     - `RELEASE_WEEKLY_OPS_MAX_DIALOGUE_AUTHORIZATION_BLOCK_RATE_PERCENT=<n>` (default `40`)
     - `RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT=<n>`
+  - invalid numeric threshold values emit `config_warnings` and fall back to defaults.
   - merges result into `RELEASE_GATE_REPORT_FILE` when provided.
 - npm alias: `npm run gate:release-ops-weekly`
 
 Release risk remediation bundle helper (weekly + drift unified command pack):
 - `node scripts/release-risk-remediation-bundle.js [--gate-report <path>] [--out <path>] [--markdown-out <path>] [--lines-out <path>] [--json]`: derive deduplicated remediation commands from `release-gate` report signals (`weekly_ops`, `drift`) and export JSON/Markdown/lines artifacts.
+  - when weekly gate includes `dialogue-authorization`/`authorization-tier` block-rate pressure, plan includes policy-specific diagnostics (`interactive-dialogue-governance`, `interactive-authorization-tier-evaluate`).
   - Default input: `.kiro/reports/release-evidence/release-gate.json`
   - Default outputs:
     - `.kiro/reports/release-evidence/release-risk-remediation-bundle.json`

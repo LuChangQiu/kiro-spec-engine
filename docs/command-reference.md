@@ -750,6 +750,7 @@ Cross-archive autonomous governance maintenance:
   - `--governance-session-keep` (with optional `--governance-session-older-than-days`) enables post-run governance session retention pruning while protecting the current session snapshot.
   - `--execute-advisory` enables automatic advisory action execution (`recover-latest`, `controller-resume-latest`) when governance assessment detects failed sessions or controller pending goals; sce auto-selects the latest actionable advisory source and reports `skipped` (not `failed`) when no actionable source exists.
   - JSON output includes round-by-round risk/action telemetry (`rounds`, with `risk_before/risk_after` and `release_gate_before/release_gate_after`), advisory telemetry (`execute_advisory`, `advisory_policy`, `advisory_summary`, `rounds[*].advisory_actions`), `stop_detail` + `recommendations` for explicit blocking reasons, plus `initial_assessment`, `final_assessment`, and convergence metadata.
+  - When blocked by weekly release pressure, `stop_detail.weekly_ops` provides structured latest/aggregate/pressure fields so downstream agents and UI assistants do not need to parse reason strings.
   - Release-gate block reasons now include handoff matrix regression reasons when present:
     - `handoff-capability-expected-unknown-positive:<n>`
     - `handoff-capability-provided-unknown-positive:<n>`
@@ -757,6 +758,12 @@ Cross-archive autonomous governance maintenance:
     - `handoff-capability-provided-unknown-positive-rate:<percent>`
     - `handoff-moqui-matrix-regressions-positive:<n>`
     - `handoff-moqui-matrix-regressions-over-gate:<n>/<max>`
+  - Release-gate block reasons also include weekly-ops pressure reasons when present (examples):
+    - `weekly-ops-latest-blocked`
+    - `weekly-ops-blocked-runs-positive:<n>`
+    - `weekly-ops-config-warnings-positive:<n>`
+    - `weekly-ops-auth-tier-block-rate-high:<percent>`
+    - `weekly-ops-dialogue-authorization-block-rate-high:<percent>`
 - `sce auto governance session list [--limit <n>] [--status <csv>] [--resume-only] [--json]`: list persisted governance close-loop sessions (`--resume-only` filters to resumed-chain sessions only).
 - `sce auto governance session stats [--days <n>] [--status <csv>] [--resume-only] [--json]`: aggregate governance close-loop session telemetry (completion/failure/convergence, rounds, risk/stop composition, resumed-chain ratios/source counts, and aggregated `release_gate` round telemetry trends).
 - `sce auto governance session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune governance close-loop session archive by retention policy.

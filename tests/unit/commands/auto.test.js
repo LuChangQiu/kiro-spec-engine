@@ -5754,6 +5754,32 @@ if (process.argv.includes('--json')) {
       'weekly-ops-auth-tier-block-rate-high:58',
       'weekly-ops-dialogue-authorization-block-rate-high:66'
     ]));
+    expect(parsed.stop_detail.weekly_ops).toEqual(expect.objectContaining({
+      latest: expect.objectContaining({
+        blocked: true,
+        risk_level: 'high',
+        governance_status: 'alert',
+        authorization_tier_block_rate_percent: 58,
+        dialogue_authorization_block_rate_percent: 66,
+        config_warning_count: 2
+      }),
+      aggregates: expect.objectContaining({
+        blocked_runs: 2,
+        block_rate_percent: 50,
+        violations_total: 3,
+        warnings_total: 5,
+        config_warnings_total: 2,
+        authorization_tier_block_rate_max_percent: 58,
+        dialogue_authorization_block_rate_max_percent: 66
+      }),
+      pressure: expect.objectContaining({
+        blocked: true,
+        high: true,
+        config_warning_positive: true,
+        auth_tier_block_rate_high: true,
+        dialogue_authorization_block_rate_high: true
+      })
+    }));
     expect(parsed.recommendations).toEqual(expect.arrayContaining([
       expect.stringContaining('release-ops-weekly-summary.js'),
       expect.stringContaining('KSE_RELEASE_WEEKLY_OPS_*'),

@@ -888,6 +888,7 @@ Release weekly ops gate helper (release hard-gate):
     - `RELEASE_WEEKLY_OPS_MAX_RISK_LEVEL=medium`
   - optional thresholds:
     - `RELEASE_WEEKLY_OPS_MAX_GOVERNANCE_BREACHES=<n>`
+    - `RELEASE_WEEKLY_OPS_MAX_AUTHORIZATION_TIER_BLOCK_RATE_PERCENT=<n>` (default `40`)
     - `RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT=<n>`
   - merges result into `RELEASE_GATE_REPORT_FILE` when provided.
 - npm alias: `npm run gate:release-ops-weekly`
@@ -1016,6 +1017,7 @@ Interactive read-only intent helper (script-level stage-A copilot bridge):
 
 Interactive dialogue governance helper (script-level communication-rule gate):
 - `node scripts/interactive-dialogue-governance.js (--goal <text> | --goal-file <path>) [--context <path>] [--policy <path>] [--profile <business-user|system-maintainer>] [--out <path>] [--fail-on-deny] [--json]`: evaluate user request text against embedded-assistant communication policy, output `allow|clarify|deny`, and produce clarification questions for non-technical users.
+  - Embedded assistant authorization dialogue baseline: `docs/interactive-customization/embedded-assistant-authorization-dialogue-rules.md`
   - Default output: `.kiro/reports/interactive-dialogue-governance.json`
   - Default policy: `docs/interactive-customization/dialogue-governance-policy-baseline.json` (fallback builtin policy when missing)
   - Default profile: `business-user` (use `system-maintainer` for maintenance/operator conversations)

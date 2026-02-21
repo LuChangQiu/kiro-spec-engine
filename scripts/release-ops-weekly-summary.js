@@ -475,6 +475,18 @@ function buildInteractiveGovernanceSnapshot(payload, window) {
     status: typeof summary.status === 'string' ? summary.status : null,
     breaches: Number.isFinite(Number(summary.breaches)) ? Number(summary.breaches) : null,
     warnings: Number.isFinite(Number(summary.warnings)) ? Number(summary.warnings) : null,
+    authorization_tier_total: Number.isFinite(Number(metrics.authorization_tier_total))
+      ? Number(metrics.authorization_tier_total)
+      : null,
+    authorization_tier_deny_total: Number.isFinite(Number(metrics.authorization_tier_deny_total))
+      ? Number(metrics.authorization_tier_deny_total)
+      : null,
+    authorization_tier_review_required_total: Number.isFinite(Number(metrics.authorization_tier_review_required_total))
+      ? Number(metrics.authorization_tier_review_required_total)
+      : null,
+    authorization_tier_block_rate_percent: Number.isFinite(Number(metrics.authorization_tier_block_rate_percent))
+      ? Number(metrics.authorization_tier_block_rate_percent)
+      : null,
     matrix_signal_total: Number.isFinite(Number(metrics.matrix_signal_total))
       ? Number(metrics.matrix_signal_total)
       : null,
@@ -626,6 +638,14 @@ function buildHealth(snapshots, warnings) {
     pushConcern('interactive governance report is in alert status');
     pushRecommendation('Resolve governance alerts: `node scripts/interactive-governance-report.js --period weekly --fail-on-alert --json`.');
   }
+  if (
+    Number.isFinite(governance.authorization_tier_block_rate_percent)
+    && governance.authorization_tier_block_rate_percent > 40
+  ) {
+    risk = promoteRisk(risk, governance.authorization_tier_block_rate_percent >= 60 ? 'high' : 'medium');
+    pushConcern(`authorization-tier block rate is ${governance.authorization_tier_block_rate_percent}%`);
+    pushRecommendation('Tune dialogue profile + authorization-tier policy to reduce deny/review pressure for actionable requests.');
+  }
 
   const matrix = snapshots.matrix_signals;
   if (matrix.total_signals === 0) {
@@ -680,6 +700,10 @@ function buildMarkdown(report) {
   lines.push(`- Status: ${report.snapshots.interactive_governance.status || 'n/a'}`);
   lines.push(`- Breaches: ${report.snapshots.interactive_governance.breaches == null ? 'n/a' : report.snapshots.interactive_governance.breaches}`);
   lines.push(`- Warnings: ${report.snapshots.interactive_governance.warnings == null ? 'n/a' : report.snapshots.interactive_governance.warnings}`);
+  lines.push(`- Authorization tier signals: ${report.snapshots.interactive_governance.authorization_tier_total == null ? 'n/a' : report.snapshots.interactive_governance.authorization_tier_total}`);
+  lines.push(`- Authorization tier deny total: ${report.snapshots.interactive_governance.authorization_tier_deny_total == null ? 'n/a' : report.snapshots.interactive_governance.authorization_tier_deny_total}`);
+  lines.push(`- Authorization tier review-required total: ${report.snapshots.interactive_governance.authorization_tier_review_required_total == null ? 'n/a' : report.snapshots.interactive_governance.authorization_tier_review_required_total}`);
+  lines.push(`- Authorization tier block rate: ${report.snapshots.interactive_governance.authorization_tier_block_rate_percent == null ? 'n/a' : `${report.snapshots.interactive_governance.authorization_tier_block_rate_percent}%`}`);
   lines.push('');
   lines.push('## Matrix Signals');
   lines.push('');

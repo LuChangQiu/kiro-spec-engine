@@ -24,7 +24,8 @@ describe('release weekly ops gate script', () => {
       snapshots: {
         interactive_governance: {
           status: 'ok',
-          breaches: 0
+          breaches: 0,
+          authorization_tier_block_rate_percent: 10
         },
         matrix_signals: {
           regression_positive_rate_percent: 10
@@ -50,7 +51,8 @@ describe('release weekly ops gate script', () => {
     expect(gatePayload.weekly_ops).toEqual(expect.objectContaining({
       mode: 'release-weekly-ops-gate',
       blocked: false,
-      max_risk_level: 'medium'
+      max_risk_level: 'medium',
+      max_authorization_tier_block_rate_percent: 40
     }));
   });
 
@@ -66,7 +68,8 @@ describe('release weekly ops gate script', () => {
       snapshots: {
         interactive_governance: {
           status: 'alert',
-          breaches: 2
+          breaches: 2,
+          authorization_tier_block_rate_percent: 60
         },
         matrix_signals: {
           regression_positive_rate_percent: 40
@@ -99,7 +102,8 @@ describe('release weekly ops gate script', () => {
       snapshots: {
         interactive_governance: {
           status: 'alert',
-          breaches: 3
+          breaches: 3,
+          authorization_tier_block_rate_percent: 70
         },
         matrix_signals: {
           regression_positive_rate_percent: 45
@@ -121,6 +125,39 @@ describe('release weekly ops gate script', () => {
     expect(result.violations.length).toBeGreaterThan(0);
   });
 
+  test('blocks when authorization-tier block rate exceeds threshold', () => {
+    const tempDir = makeTempDir();
+    const summaryFile = path.join(tempDir, 'weekly-ops-summary.json');
+    fs.writeFileSync(summaryFile, JSON.stringify({
+      mode: 'release-weekly-ops-summary',
+      health: {
+        risk: 'medium'
+      },
+      snapshots: {
+        interactive_governance: {
+          status: 'ok',
+          breaches: 0,
+          authorization_tier_block_rate_percent: 65
+        },
+        matrix_signals: {
+          regression_positive_rate_percent: 5
+        }
+      }
+    }, null, 2), 'utf8');
+
+    const result = evaluateReleaseWeeklyOpsGate({
+      env: {
+        RELEASE_WEEKLY_OPS_SUMMARY_FILE: summaryFile,
+        RELEASE_WEEKLY_OPS_MAX_RISK_LEVEL: 'high',
+        RELEASE_WEEKLY_OPS_MAX_AUTHORIZATION_TIER_BLOCK_RATE_PERCENT: '50'
+      }
+    });
+
+    expect(result.exit_code).toBe(1);
+    expect(result.blocked).toBe(true);
+    expect(result.violations.some(item => item.includes('authorization-tier block rate'))).toBe(true);
+  });
+
   test('blocks when summary is missing and require_summary is enabled', () => {
     const tempDir = makeTempDir();
     const summaryFile = path.join(tempDir, 'missing-summary.json');
@@ -136,4 +173,3 @@ describe('release weekly ops gate script', () => {
     expect(result.violations.some(item => item.includes('missing file'))).toBe(true);
   });
 });
-

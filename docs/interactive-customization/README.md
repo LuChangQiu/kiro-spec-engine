@@ -28,6 +28,7 @@ This directory contains baseline contracts and safety policy artifacts for the i
 - `governance-threshold-baseline.json`: governance KPI threshold baseline for alerting.
 - `governance-report-template.md`: periodic governance report template.
 - `governance-alert-playbook.md`: threshold breach response workflow.
+- `embedded-assistant-authorization-dialogue-rules.md`: required user/maintainer conversation + authorization behavior for embedded AI assistants.
 - `phase-acceptance-evidence.md`: stage A/B/C/D acceptance evidence checklist.
 - `non-technical-usability-report.md`: business-user usability assessment and improvement backlog.
 - `cross-industry-replication-guide.md`: replication boundary and rollout sequence beyond Moqui.

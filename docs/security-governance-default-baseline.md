@@ -15,6 +15,7 @@ This baseline is the default operating policy for SCE-driven delivery, including
 - Low-risk auto-apply is allowed only when gate result is `allow`.
 - Runtime policy gate is mandatory before apply (`runtime_mode=ops-fix`, `runtime_environment=staging` by default).
 - Runtime non-allow (`deny|review-required`) should block unattended apply (`--fail-on-runtime-non-allow`).
+- Authorization-tier gate is mandatory before apply (profile+environment step-up checks).
 - Enable role-based action control when environment requires stronger separation of duties (`approval-role-policy-baseline.json` + `--actor-role`).
 - Apply-mode mutating plans require password authorization (`authorization.password_required=true` by default).
 - Password verifier hash must be supplied via `SCE_INTERACTIVE_AUTH_PASSWORD_SHA256` (or explicit override).
@@ -37,6 +38,7 @@ This baseline is the default operating policy for SCE-driven delivery, including
 - `.kiro/reports/release-evidence/governance-snapshot-<tag>.json`
 - `.kiro/reports/release-evidence/weekly-ops-summary-<tag>.json`
 - `.kiro/reports/interactive-governance-report.json`
+- `.kiro/reports/interactive-authorization-tier-signals.jsonl`
 - `.kiro/reports/interactive-dialogue-governance.json`
 - `.kiro/reports/interactive-execution-ledger.jsonl`
 - `.kiro/reports/interactive-approval-events.jsonl`

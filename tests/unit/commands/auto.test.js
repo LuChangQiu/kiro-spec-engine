@@ -3338,6 +3338,75 @@ if (process.argv.includes('--json')) {
     expect(summary.results[0].batch_attempt).toBe(3);
   });
 
+  test('emits rate-limit recovery recommendation when retry budget is exhausted under 429 pressure', async () => {
+    const goalsFile = path.join(tempDir, 'goals.json');
+    await fs.writeJson(goalsFile, ['always rate-limited goal'], { spaces: 2 });
+
+    runAutoCloseLoop
+      .mockResolvedValueOnce({
+        status: 'failed',
+        portfolio: { master_spec: '121-00-rate-limit-r1', sub_specs: [] },
+        orchestration: {
+          rateLimit: {
+            signalCount: 4,
+            totalBackoffMs: 6000,
+            lastLaunchHoldMs: 3000
+          }
+        }
+      })
+      .mockResolvedValueOnce({
+        status: 'failed',
+        portfolio: { master_spec: '121-00-rate-limit-r2', sub_specs: [] },
+        orchestration: {
+          rateLimit: {
+            signalCount: 3,
+            totalBackoffMs: 4000,
+            lastLaunchHoldMs: 2000
+          }
+        }
+      });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'sce',
+        'auto',
+        'close-loop-batch',
+        goalsFile,
+        '--batch-parallel',
+        '3',
+        '--batch-agent-budget',
+        '4',
+        '--batch-retry-rounds',
+        '1',
+        '--batch-retry-strategy',
+        'adaptive',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const summary = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(summary.status).toBe('failed');
+    expect(summary.batch_retry).toEqual(expect.objectContaining({
+      exhausted: true,
+      rate_limit_pressure_detected: true,
+      total_rate_limit_signals: 7,
+      total_rate_limit_backoff_ms: 10000,
+      total_rate_limit_launch_hold_ms: 5000,
+      recovery_recommended: true
+    }));
+    expect(summary.batch_retry.recovery_patch).toEqual(expect.objectContaining({
+      batch_parallel: 2,
+      batch_agent_budget: 2,
+      batch_retry_until_complete: true,
+      batch_retry_strategy: 'adaptive'
+    }));
+    expect(summary.batch_retry.recovery_suggested_command).toContain('--batch-parallel 2');
+    expect(summary.batch_retry.recovery_suggested_command).toContain('--batch-agent-budget 2');
+    expect(summary.batch_retry.recovery_suggested_command).toContain('--batch-retry-until-complete');
+  });
+
   test('lists close-loop sessions in json mode', async () => {
     const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
     await fs.ensureDir(sessionDir);

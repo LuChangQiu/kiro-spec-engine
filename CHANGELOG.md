@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Batch 429 exhaustion recovery guidance**: `sce auto close-loop-batch` now emits rate-limit pressure telemetry and automatic recovery recommendation metadata (`batch_retry.recovery_*`) when retry budget is exhausted under throttling, plus a ready-to-run `close-loop-recover` suggested command in CLI summary.
 - **Interactive execution-block diagnostics in summaries**: `interactive-customization-loop` now emits normalized block categories and remediation hints (`summary.execution_block_reason_category`, `summary.execution_block_remediation_hint`), with `interactive-flow` passthrough plus `summary.authorization_execute_roles` for role-policy guided UI remediation.
 - **Interactive smoke role-policy coverage**: `interactive-loop-smoke` and `interactive-flow-smoke` now run with approval role-policy + actor-role parameters by default to validate password+role dual-authorization path in CI/release smoke stage.
 - **Interactive approval role-policy step-up**: `interactive-approval-workflow` now supports optional role-based action authorization (`--role-policy`, `--actor-role`) and loop/flow/scene commands can pass role policy and actor roles (`--approval-role-policy`, `--approval-actor-role`, `--approver-actor-role`) for separation-of-duties governance.

@@ -5,9 +5,13 @@ const path = require('path');
 const fs = require('fs-extra');
 
 const DEFAULT_POLICY = 'docs/interactive-customization/dialogue-governance-policy-baseline.json';
+const DEFAULT_AUTHORIZATION_DIALOGUE_POLICY = 'docs/interactive-customization/authorization-dialogue-policy-baseline.json';
 const DEFAULT_OUT = '.kiro/reports/interactive-dialogue-governance.json';
 const DEFAULT_PROFILE = 'business-user';
 const DIALOGUE_PROFILES = new Set(['business-user', 'system-maintainer']);
+const EXECUTION_MODES = new Set(['suggestion', 'apply']);
+const RUNTIME_ENVIRONMENTS = new Set(['dev', 'staging', 'prod']);
+const UI_MODES = new Set(['user-app', 'ops-console']);
 
 const BUILTIN_POLICY = {
   version: '1.0.0',
@@ -86,6 +90,54 @@ const BUILTIN_POLICY = {
   }
 };
 
+const BUILTIN_AUTHORIZATION_DIALOGUE_POLICY = {
+  version: '1.0.0',
+  default_profile: DEFAULT_PROFILE,
+  prompt_templates: {
+    scope_confirmation: 'Confirm target module/page and business boundary before execution.',
+    impact_confirmation: 'Confirm expected business impact and out-of-scope boundaries.',
+    rollback_confirmation: 'Confirm rollback reference is prepared before apply.',
+    ticket_reference: 'Provide approved change ticket id.',
+    password_step_up: 'Complete one-time password authorization before apply.',
+    role_policy: 'Provide actor role and approver role according to role policy.',
+    role_separation: 'Confirm operator role and approver role are different.',
+    manual_review_ack: 'Acknowledge manual review is required before production apply.'
+  },
+  profiles: {
+    'business-user': {
+      allow_execution_modes: ['suggestion'],
+      base_required_steps: ['scope_confirmation']
+    },
+    'system-maintainer': {
+      allow_execution_modes: ['suggestion', 'apply'],
+      base_required_steps: ['scope_confirmation', 'impact_confirmation', 'rollback_confirmation']
+    }
+  },
+  environments: {
+    dev: {
+      require_ticket: false,
+      require_password_for_apply: false,
+      require_role_policy: false,
+      require_distinct_actor_roles: false,
+      require_manual_review_ack: false
+    },
+    staging: {
+      require_ticket: true,
+      require_password_for_apply: true,
+      require_role_policy: false,
+      require_distinct_actor_roles: false,
+      require_manual_review_ack: false
+    },
+    prod: {
+      require_ticket: true,
+      require_password_for_apply: true,
+      require_role_policy: true,
+      require_distinct_actor_roles: true,
+      require_manual_review_ack: true
+    }
+  }
+};
+
 function parseArgs(argv) {
   const options = {
     goal: null,
@@ -93,6 +145,10 @@ function parseArgs(argv) {
     context: null,
     policy: DEFAULT_POLICY,
     profile: DEFAULT_PROFILE,
+    uiMode: null,
+    executionMode: 'suggestion',
+    runtimeEnvironment: 'staging',
+    authorizationDialoguePolicy: DEFAULT_AUTHORIZATION_DIALOGUE_POLICY,
     out: DEFAULT_OUT,
     json: false,
     failOnDeny: false
@@ -116,6 +172,18 @@ function parseArgs(argv) {
     } else if (token === '--profile' && next) {
       options.profile = next;
       index += 1;
+    } else if (token === '--ui-mode' && next) {
+      options.uiMode = next;
+      index += 1;
+    } else if (token === '--execution-mode' && next) {
+      options.executionMode = next;
+      index += 1;
+    } else if (token === '--runtime-environment' && next) {
+      options.runtimeEnvironment = next;
+      index += 1;
+    } else if (token === '--authorization-dialogue-policy' && next) {
+      options.authorizationDialoguePolicy = next;
+      index += 1;
     } else if (token === '--out' && next) {
       options.out = next;
       index += 1;
@@ -135,6 +203,20 @@ function parseArgs(argv) {
   if (!DIALOGUE_PROFILES.has(options.profile)) {
     throw new Error(`--profile must be one of: ${Array.from(DIALOGUE_PROFILES).join(', ')}`);
   }
+  options.uiMode = normalizeText(
+    options.uiMode || (options.profile === 'system-maintainer' ? 'ops-console' : 'user-app')
+  ).toLowerCase();
+  if (!UI_MODES.has(options.uiMode)) {
+    throw new Error(`--ui-mode must be one of: ${Array.from(UI_MODES).join(', ')}`);
+  }
+  options.executionMode = normalizeText(options.executionMode || 'suggestion').toLowerCase() || 'suggestion';
+  if (!EXECUTION_MODES.has(options.executionMode)) {
+    throw new Error(`--execution-mode must be one of: ${Array.from(EXECUTION_MODES).join(', ')}`);
+  }
+  options.runtimeEnvironment = normalizeText(options.runtimeEnvironment || 'staging').toLowerCase() || 'staging';
+  if (!RUNTIME_ENVIRONMENTS.has(options.runtimeEnvironment)) {
+    throw new Error(`--runtime-environment must be one of: ${Array.from(RUNTIME_ENVIRONMENTS).join(', ')}`);
+  }
   return options;
 }
 
@@ -148,6 +230,10 @@ function printHelpAndExit(code) {
     '  --context <path>         Optional page context JSON file',
     `  --policy <path>          Dialogue governance policy JSON (default: ${DEFAULT_POLICY})`,
     `  --profile <name>         Dialogue profile (business-user|system-maintainer, default: ${DEFAULT_PROFILE})`,
+    '  --ui-mode <name>         user-app|ops-console (default by profile)',
+    '  --execution-mode <mode>  suggestion|apply (default: suggestion)',
+    '  --runtime-environment <name> dev|staging|prod (default: staging)',
+    `  --authorization-dialogue-policy <path> Authorization dialogue policy JSON (default: ${DEFAULT_AUTHORIZATION_DIALOGUE_POLICY})`,
     `  --out <path>             Governance report JSON output path (default: ${DEFAULT_OUT})`,
     '  --fail-on-deny           Exit code 2 when dialogue decision is deny',
     '  --json                   Print payload JSON',
@@ -269,6 +355,15 @@ function uniqueStrings(values) {
   return Array.from(new Set(Array.isArray(values) ? values : []));
 }
 
+function normalizeStringTokenList(values, fallback = []) {
+  const normalized = uniqueStrings(
+    (Array.isArray(values) ? values : fallback)
+      .map(item => normalizeText(item).toLowerCase())
+      .filter(Boolean)
+  );
+  return normalized;
+}
+
 function normalizePolicy(rawPolicy) {
   const policy = rawPolicy && typeof rawPolicy === 'object' ? rawPolicy : {};
   const lengthPolicy = policy.length_policy && typeof policy.length_policy === 'object'
@@ -368,6 +463,198 @@ async function loadPolicy(policyPath, cwd) {
     source: path.relative(cwd, resolved) || '.',
     from_file: true,
     policy: normalizePolicy(rawPolicy)
+  };
+}
+
+function normalizePromptTemplateMap(input, fallback) {
+  const raw = input && typeof input === 'object' ? input : {};
+  const result = {};
+  for (const [key, value] of Object.entries(fallback || {})) {
+    result[key] = normalizeText(value);
+  }
+  for (const [key, value] of Object.entries(raw)) {
+    const normalizedKey = normalizeText(key);
+    const normalizedValue = normalizeText(value);
+    if (!normalizedKey || !normalizedValue) {
+      continue;
+    }
+    result[normalizedKey] = normalizedValue;
+  }
+  return result;
+}
+
+function normalizeAuthorizationDialogueProfile(input, fallback) {
+  const profile = input && typeof input === 'object' ? input : {};
+  const base = fallback && typeof fallback === 'object' ? fallback : {};
+  return {
+    allow_execution_modes: normalizeStringTokenList(
+      profile.allow_execution_modes,
+      base.allow_execution_modes || ['suggestion']
+    ),
+    base_required_steps: normalizeStringTokenList(
+      profile.base_required_steps,
+      base.base_required_steps || ['scope_confirmation']
+    )
+  };
+}
+
+function normalizeAuthorizationDialogueEnvironment(input, fallback) {
+  const env = input && typeof input === 'object' ? input : {};
+  const base = fallback && typeof fallback === 'object' ? fallback : {};
+  const pickBool = (field, defaultValue = false) => {
+    if (env[field] === true) {
+      return true;
+    }
+    if (env[field] === false) {
+      return false;
+    }
+    return defaultValue === true;
+  };
+  return {
+    require_ticket: pickBool('require_ticket', base.require_ticket),
+    require_password_for_apply: pickBool('require_password_for_apply', base.require_password_for_apply),
+    require_role_policy: pickBool('require_role_policy', base.require_role_policy),
+    require_distinct_actor_roles: pickBool('require_distinct_actor_roles', base.require_distinct_actor_roles),
+    require_manual_review_ack: pickBool('require_manual_review_ack', base.require_manual_review_ack)
+  };
+}
+
+function normalizeAuthorizationDialoguePolicy(rawPolicy) {
+  const policy = rawPolicy && typeof rawPolicy === 'object' ? rawPolicy : {};
+  const fallback = BUILTIN_AUTHORIZATION_DIALOGUE_POLICY;
+  const profilesInput = policy.profiles && typeof policy.profiles === 'object' ? policy.profiles : {};
+  const environmentsInput = policy.environments && typeof policy.environments === 'object' ? policy.environments : {};
+
+  const profiles = {};
+  for (const [profileName, config] of Object.entries(fallback.profiles)) {
+    profiles[profileName] = normalizeAuthorizationDialogueProfile(config, config);
+  }
+  for (const [profileName, config] of Object.entries(profilesInput)) {
+    const key = normalizeText(profileName).toLowerCase();
+    if (!key) {
+      continue;
+    }
+    profiles[key] = normalizeAuthorizationDialogueProfile(config, profiles[key] || fallback.profiles[DEFAULT_PROFILE]);
+  }
+
+  const environments = {};
+  for (const [envName, config] of Object.entries(fallback.environments)) {
+    environments[envName] = normalizeAuthorizationDialogueEnvironment(config, config);
+  }
+  for (const [envName, config] of Object.entries(environmentsInput)) {
+    const key = normalizeText(envName).toLowerCase();
+    if (!key) {
+      continue;
+    }
+    environments[key] = normalizeAuthorizationDialogueEnvironment(config, environments[key] || fallback.environments.staging);
+  }
+
+  const defaultProfile = normalizeText(policy.default_profile || fallback.default_profile).toLowerCase() || DEFAULT_PROFILE;
+
+  return {
+    version: normalizeText(policy.version || fallback.version),
+    default_profile: profiles[defaultProfile] ? defaultProfile : DEFAULT_PROFILE,
+    prompt_templates: normalizePromptTemplateMap(policy.prompt_templates, fallback.prompt_templates),
+    profiles,
+    environments
+  };
+}
+
+async function loadAuthorizationDialoguePolicy(policyPath, cwd) {
+  const resolved = resolvePath(cwd, policyPath || DEFAULT_AUTHORIZATION_DIALOGUE_POLICY);
+  const exists = await fs.pathExists(resolved);
+  if (!exists) {
+    return {
+      source: 'builtin-default',
+      from_file: false,
+      policy: normalizeAuthorizationDialoguePolicy(BUILTIN_AUTHORIZATION_DIALOGUE_POLICY)
+    };
+  }
+  const rawPolicy = await readJsonFile(resolved, 'authorization dialogue policy');
+  return {
+    source: path.relative(cwd, resolved) || '.',
+    from_file: true,
+    policy: normalizeAuthorizationDialoguePolicy(rawPolicy)
+  };
+}
+
+function evaluateAuthorizationDialogue(options, policyRuntime) {
+  const policy = policyRuntime && policyRuntime.policy && typeof policyRuntime.policy === 'object'
+    ? policyRuntime.policy
+    : normalizeAuthorizationDialoguePolicy(BUILTIN_AUTHORIZATION_DIALOGUE_POLICY);
+  const activeProfile = options.profile || policy.default_profile || DEFAULT_PROFILE;
+  const profile = policy.profiles[activeProfile] || policy.profiles[policy.default_profile] || policy.profiles[DEFAULT_PROFILE];
+  const environment = policy.environments[options.runtimeEnvironment] || policy.environments.staging || {};
+
+  const requiredSteps = Array.isArray(profile.base_required_steps) ? [...profile.base_required_steps] : [];
+  const requiredInputs = [];
+  const reasons = [];
+  let decision = 'allow';
+
+  const allowedModes = Array.isArray(profile.allow_execution_modes)
+    ? profile.allow_execution_modes
+    : ['suggestion'];
+
+  if (!allowedModes.includes(options.executionMode)) {
+    decision = 'deny';
+    reasons.push(`profile "${activeProfile}" does not allow execution mode "${options.executionMode}"`);
+  }
+  if (options.uiMode === 'user-app' && options.executionMode === 'apply') {
+    decision = 'deny';
+    reasons.push('ui mode "user-app" is suggestion-only for embedded business-user surfaces');
+  }
+
+  if (options.executionMode === 'apply') {
+    requiredSteps.push('impact_confirmation', 'rollback_confirmation');
+    if (environment.require_ticket) {
+      requiredSteps.push('ticket_reference');
+      requiredInputs.push('change_ticket_id');
+    }
+    if (environment.require_password_for_apply) {
+      requiredSteps.push('password_step_up');
+      requiredInputs.push('one_time_password');
+    }
+    if (environment.require_role_policy) {
+      requiredSteps.push('role_policy');
+      requiredInputs.push('actor_role', 'approver_role');
+    }
+    if (environment.require_distinct_actor_roles) {
+      requiredSteps.push('role_separation');
+      requiredInputs.push('operator_role', 'approver_role');
+    }
+    if (environment.require_manual_review_ack) {
+      requiredSteps.push('manual_review_ack');
+      if (decision !== 'deny') {
+        decision = 'review-required';
+      }
+      reasons.push(`environment "${options.runtimeEnvironment}" requires manual review acknowledgement before apply`);
+    }
+  }
+
+  const uniqueSteps = normalizeStringTokenList(requiredSteps, []);
+  const uniqueInputs = normalizeStringTokenList(requiredInputs, []);
+  const prompts = uniqueSteps
+    .map(step => policy.prompt_templates[step])
+    .filter(Boolean);
+
+  return {
+    decision,
+    execute_permitted: options.executionMode === 'apply' && decision === 'allow',
+    required_confirmation_steps: uniqueSteps,
+    required_inputs: uniqueInputs,
+    ui_prompts: prompts,
+    reasons: uniqueStrings(reasons),
+    context: {
+      ui_mode: options.uiMode,
+      execution_mode: options.executionMode,
+      runtime_environment: options.runtimeEnvironment,
+      dialogue_profile: activeProfile
+    },
+    policy: {
+      source: policyRuntime.source,
+      from_file: policyRuntime.from_file,
+      version: policy.version
+    }
   };
 }
 
@@ -474,8 +761,13 @@ async function main() {
     ? await readJsonFile(resolvePath(cwd, options.context), 'context')
     : {};
   const policyRuntime = await loadPolicy(options.policy, cwd);
+  const authorizationDialoguePolicyRuntime = await loadAuthorizationDialoguePolicy(
+    options.authorizationDialoguePolicy,
+    cwd
+  );
   const profileRuntime = resolvePolicyProfile(policyRuntime.policy, options.profile);
   const evaluation = evaluateDialogue(goal, context, profileRuntime.policy);
+  const authorizationDialogue = evaluateAuthorizationDialogue(options, authorizationDialoguePolicyRuntime);
   const outPath = resolvePath(cwd, options.out || DEFAULT_OUT);
 
   const payload = {
@@ -488,13 +780,18 @@ async function main() {
       mode: profileRuntime.policy.mode,
       default_profile: policyRuntime.policy.default_profile || DEFAULT_PROFILE,
       requested_profile: profileRuntime.requested_profile,
-      active_profile: profileRuntime.active_profile
+      active_profile: profileRuntime.active_profile,
+      ui_mode: options.uiMode
     },
     input: {
       goal,
+      ui_mode: options.uiMode,
+      execution_mode: options.executionMode,
+      runtime_environment: options.runtimeEnvironment,
       context: options.context ? (path.relative(cwd, resolvePath(cwd, options.context)) || '.') : null,
       context_ref: toContextRef(context)
     },
+    authorization_dialogue: authorizationDialogue,
     ...evaluation,
     output: {
       report: path.relative(cwd, outPath) || '.'
@@ -525,16 +822,21 @@ if (require.main === module) {
 
 module.exports = {
   DEFAULT_POLICY,
+  DEFAULT_AUTHORIZATION_DIALOGUE_POLICY,
   DEFAULT_OUT,
   BUILTIN_POLICY,
+  BUILTIN_AUTHORIZATION_DIALOGUE_POLICY,
   parseArgs,
   resolvePath,
   normalizePolicy,
+  normalizeAuthorizationDialoguePolicy,
   normalizeProfileConfig,
   normalizeProfileMap,
   mergePolicyWithProfile,
   resolvePolicyProfile,
   loadPolicy,
+  loadAuthorizationDialoguePolicy,
+  evaluateAuthorizationDialogue,
   evaluateDialogue,
   main
 };

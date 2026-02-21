@@ -18,6 +18,7 @@ describe('scene interactive-flow option helpers', () => {
       authorizationTierOut: ' .kiro/reports/authorization-tier.json ',
       dialoguePolicy: ' docs/interactive-customization/dialogue-governance-policy-baseline.json ',
       dialogueProfile: ' SYSTEM-MAINTAINER ',
+      uiMode: ' OPS-CONSOLE ',
       contextContract: ' docs/interactive-customization/moqui-copilot-context-contract.json ',
       workOrderOut: ' .kiro/reports/work-order.json ',
       workOrderMarkdownOut: ' .kiro/reports/work-order.md ',
@@ -48,6 +49,7 @@ describe('scene interactive-flow option helpers', () => {
     expect(normalized.authorizationTierOut).toBe('.kiro/reports/authorization-tier.json');
     expect(normalized.dialoguePolicy).toBe('docs/interactive-customization/dialogue-governance-policy-baseline.json');
     expect(normalized.dialogueProfile).toBe('system-maintainer');
+    expect(normalized.uiMode).toBe('ops-console');
     expect(normalized.contextContract).toBe('docs/interactive-customization/moqui-copilot-context-contract.json');
     expect(normalized.workOrderOut).toBe('.kiro/reports/work-order.json');
     expect(normalized.workOrderMarkdownOut).toBe('.kiro/reports/work-order.md');
@@ -119,6 +121,19 @@ describe('scene interactive-flow option helpers', () => {
       feedbackChannel: 'ui',
       feedbackScore: null
     })).toBe('--dialogue-profile must be one of: business-user, system-maintainer');
+
+    expect(validateSceneInteractiveFlowOptions({
+      input: 'docs/moqui-provider.json',
+      provider: 'moqui',
+      goal: 'x',
+      executionMode: 'apply',
+      dialogueProfile: 'system-maintainer',
+      uiMode: 'operator-ui',
+      runtimeMode: 'ops-fix',
+      runtimeEnvironment: 'staging',
+      feedbackChannel: 'ui',
+      feedbackScore: null
+    })).toBe('--ui-mode must be one of: user-app, ops-console');
 
     expect(validateSceneInteractiveFlowOptions({
       input: 'docs/moqui-provider.json',

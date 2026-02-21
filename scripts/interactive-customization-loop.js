@@ -18,6 +18,7 @@ const FEEDBACK_CHANNELS = new Set(['ui', 'cli', 'api', 'other']);
 const RUNTIME_MODES = new Set(['user-assist', 'ops-fix', 'feature-dev']);
 const RUNTIME_ENVIRONMENTS = new Set(['dev', 'staging', 'prod']);
 const DIALOGUE_PROFILES = new Set(['business-user', 'system-maintainer']);
+const UI_MODES = new Set(['user-app', 'ops-console']);
 
 const SCRIPT_DIALOGUE = path.resolve(__dirname, 'interactive-dialogue-governance.js');
 const SCRIPT_INTENT = path.resolve(__dirname, 'interactive-intent-build.js');
@@ -42,6 +43,7 @@ function parseArgs(argv) {
     catalog: null,
     dialoguePolicy: null,
     dialogueProfile: DEFAULT_DIALOGUE_PROFILE,
+    uiMode: null,
     dialogueOut: null,
     runtimeMode: DEFAULT_RUNTIME_MODE,
     runtimeEnvironment: DEFAULT_RUNTIME_ENVIRONMENT,
@@ -115,6 +117,9 @@ function parseArgs(argv) {
       index += 1;
     } else if (token === '--dialogue-profile' && next) {
       options.dialogueProfile = next;
+      index += 1;
+    } else if (token === '--ui-mode' && next) {
+      options.uiMode = next;
       index += 1;
     } else if (token === '--dialogue-out' && next) {
       options.dialogueOut = next;
@@ -261,6 +266,8 @@ function parseArgs(argv) {
   options.feedbackComment = `${options.feedbackComment || ''}`.trim() || null;
   options.dialoguePolicy = `${options.dialoguePolicy || ''}`.trim() || null;
   options.dialogueProfile = `${options.dialogueProfile || ''}`.trim().toLowerCase() || DEFAULT_DIALOGUE_PROFILE;
+  options.uiMode = `${options.uiMode || ''}`.trim().toLowerCase()
+    || (options.dialogueProfile === 'system-maintainer' ? 'ops-console' : 'user-app');
   options.dialogueOut = `${options.dialogueOut || ''}`.trim() || null;
   options.runtimeMode = `${options.runtimeMode || ''}`.trim().toLowerCase() || DEFAULT_RUNTIME_MODE;
   options.runtimeEnvironment = `${options.runtimeEnvironment || ''}`.trim().toLowerCase() || DEFAULT_RUNTIME_ENVIRONMENT;
@@ -282,6 +289,9 @@ function parseArgs(argv) {
   options.feedbackTags = Array.from(new Set(options.feedbackTags.map(item => item.toLowerCase())));
   if (!DIALOGUE_PROFILES.has(options.dialogueProfile)) {
     throw new Error(`--dialogue-profile must be one of: ${Array.from(DIALOGUE_PROFILES).join(', ')}`);
+  }
+  if (!UI_MODES.has(options.uiMode)) {
+    throw new Error(`--ui-mode must be one of: ${Array.from(UI_MODES).join(', ')}`);
   }
 
   return options;
@@ -305,6 +315,7 @@ function printHelpAndExit(code) {
     '  --catalog <path>                 High-risk catalog override',
     '  --dialogue-policy <path>         Dialogue governance policy override',
     `  --dialogue-profile <name>        business-user|system-maintainer (default: ${DEFAULT_DIALOGUE_PROFILE})`,
+    `  --ui-mode <name>                 user-app|ops-console (default by dialogue profile)`,
     '  --dialogue-out <path>            Dialogue governance report output path',
     `  --runtime-mode <name>            user-assist|ops-fix|feature-dev (default: ${DEFAULT_RUNTIME_MODE})`,
     `  --runtime-environment <name>     dev|staging|prod (default: ${DEFAULT_RUNTIME_ENVIRONMENT})`,
@@ -684,6 +695,9 @@ async function main() {
 
   const dialogueArgs = [
     '--context', contextPath,
+    '--ui-mode', options.uiMode,
+    '--execution-mode', options.executionMode,
+    '--runtime-environment', options.runtimeEnvironment,
     '--out', resolvePath(cwd, artifacts.dialogue_json),
     '--json'
   ];
@@ -1370,6 +1384,7 @@ async function main() {
       feedback_channel: options.feedbackChannel,
       dialogue_policy: options.dialoguePolicy ? toRelative(cwd, resolvePath(cwd, options.dialoguePolicy)) : null,
       dialogue_profile: options.dialogueProfile,
+      ui_mode: options.uiMode,
       runtime_mode: options.runtimeMode,
       runtime_environment: options.runtimeEnvironment,
       runtime_policy: options.runtimePolicy ? toRelative(cwd, resolvePath(cwd, options.runtimePolicy)) : null,
@@ -1382,10 +1397,21 @@ async function main() {
     dialogue: {
       decision: dialogueDecision,
       profile: dialoguePayload && dialoguePayload.policy ? dialoguePayload.policy.active_profile || null : null,
+      ui_mode: dialoguePayload &&
+        dialoguePayload.authorization_dialogue &&
+        dialoguePayload.authorization_dialogue.context &&
+        dialoguePayload.authorization_dialogue.context.ui_mode
+        ? dialoguePayload.authorization_dialogue.context.ui_mode
+        : options.uiMode,
       reasons: Array.isArray(dialoguePayload && dialoguePayload.reasons) ? dialoguePayload.reasons : [],
       clarification_questions: Array.isArray(dialoguePayload && dialoguePayload.clarification_questions)
         ? dialoguePayload.clarification_questions
-        : []
+        : [],
+      authorization_dialogue: dialoguePayload &&
+        dialoguePayload.authorization_dialogue &&
+        typeof dialoguePayload.authorization_dialogue === 'object'
+        ? dialoguePayload.authorization_dialogue
+        : null
     },
     gate: {
       decision: gateDecision,
@@ -1428,6 +1454,12 @@ async function main() {
     execution,
     summary: {
       status: summaryStatus,
+      ui_mode: options.uiMode,
+      dialogue_authorization_decision: dialoguePayload &&
+        dialoguePayload.authorization_dialogue &&
+        dialoguePayload.authorization_dialogue.decision
+        ? dialoguePayload.authorization_dialogue.decision
+        : null,
       authorization_tier_decision: authorizationTierDecision,
       execution_block_reason_category: executionBlockReasonCategory,
       execution_block_remediation_hint: executionBlockRemediationHint,

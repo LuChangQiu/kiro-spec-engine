@@ -17,6 +17,7 @@ const DEFAULT_AUTH_PASSWORD_HASH_ENV = 'SCE_INTERACTIVE_AUTH_PASSWORD_SHA256';
 const FEEDBACK_CHANNELS = new Set(['ui', 'cli', 'api', 'other']);
 const DEFAULT_DIALOGUE_PROFILE = 'business-user';
 const DIALOGUE_PROFILES = new Set(['business-user', 'system-maintainer']);
+const UI_MODES = new Set(['user-app', 'ops-console']);
 const DEFAULT_RUNTIME_MODE = 'ops-fix';
 const DEFAULT_RUNTIME_ENVIRONMENT = 'staging';
 const RUNTIME_MODES = new Set(['user-assist', 'ops-fix', 'feature-dev']);
@@ -39,6 +40,7 @@ function parseArgs(argv) {
     catalog: null,
     dialoguePolicy: null,
     dialogueProfile: DEFAULT_DIALOGUE_PROFILE,
+    uiMode: null,
     dialogueOut: null,
     runtimeMode: DEFAULT_RUNTIME_MODE,
     runtimeEnvironment: DEFAULT_RUNTIME_ENVIRONMENT,
@@ -131,6 +133,9 @@ function parseArgs(argv) {
       index += 1;
     } else if (token === '--dialogue-profile' && next) {
       options.dialogueProfile = next;
+      index += 1;
+    } else if (token === '--ui-mode' && next) {
+      options.uiMode = next;
       index += 1;
     } else if (token === '--dialogue-out' && next) {
       options.dialogueOut = next;
@@ -292,6 +297,8 @@ function parseArgs(argv) {
   options.catalog = `${options.catalog || ''}`.trim() || null;
   options.dialoguePolicy = `${options.dialoguePolicy || ''}`.trim() || null;
   options.dialogueProfile = `${options.dialogueProfile || ''}`.trim().toLowerCase() || DEFAULT_DIALOGUE_PROFILE;
+  options.uiMode = `${options.uiMode || ''}`.trim().toLowerCase()
+    || (options.dialogueProfile === 'system-maintainer' ? 'ops-console' : 'user-app');
   options.dialogueOut = `${options.dialogueOut || ''}`.trim() || null;
   options.runtimeMode = `${options.runtimeMode || ''}`.trim().toLowerCase() || DEFAULT_RUNTIME_MODE;
   options.runtimeEnvironment = `${options.runtimeEnvironment || ''}`.trim().toLowerCase() || DEFAULT_RUNTIME_ENVIRONMENT;
@@ -344,6 +351,9 @@ function parseArgs(argv) {
   if (!DIALOGUE_PROFILES.has(options.dialogueProfile)) {
     throw new Error(`--dialogue-profile must be one of: ${Array.from(DIALOGUE_PROFILES).join(', ')}`);
   }
+  if (!UI_MODES.has(options.uiMode)) {
+    throw new Error(`--ui-mode must be one of: ${Array.from(UI_MODES).join(', ')}`);
+  }
   if (!RUNTIME_MODES.has(options.runtimeMode)) {
     throw new Error(`--runtime-mode must be one of: ${Array.from(RUNTIME_MODES).join(', ')}`);
   }
@@ -393,6 +403,7 @@ function printHelpAndExit(code) {
     '  --catalog <path>                High-risk catalog override',
     '  --dialogue-policy <path>        Dialogue governance policy override',
     `  --dialogue-profile <name>       business-user|system-maintainer (default: ${DEFAULT_DIALOGUE_PROFILE})`,
+    `  --ui-mode <name>                user-app|ops-console (default by dialogue profile)`,
     '  --dialogue-out <path>           Dialogue governance report output path',
     `  --runtime-mode <name>           user-assist|ops-fix|feature-dev (default: ${DEFAULT_RUNTIME_MODE})`,
     `  --runtime-environment <name>    dev|staging|prod (default: ${DEFAULT_RUNTIME_ENVIRONMENT})`,
@@ -609,6 +620,9 @@ async function main() {
   }
   if (options.dialogueProfile) {
     loopArgs.push('--dialogue-profile', options.dialogueProfile);
+  }
+  if (options.uiMode) {
+    loopArgs.push('--ui-mode', options.uiMode);
   }
   if (options.dialogueOut) {
     loopArgs.push('--dialogue-out', resolvePath(cwd, options.dialogueOut));
@@ -856,6 +870,10 @@ async function main() {
     summary: {
       status: loopPayload && loopPayload.summary ? loopPayload.summary.status : null,
       dialogue_decision: loopPayload && loopPayload.dialogue ? loopPayload.dialogue.decision : null,
+      dialogue_authorization_decision: loopPayload && loopPayload.summary
+        ? loopPayload.summary.dialogue_authorization_decision || null
+        : null,
+      ui_mode: loopPayload && loopPayload.summary ? loopPayload.summary.ui_mode || null : options.uiMode,
       dialogue_profile: loopPayload && loopPayload.dialogue ? loopPayload.dialogue.profile || null : null,
       gate_decision: loopPayload && loopPayload.gate ? loopPayload.gate.decision : null,
       runtime_decision: loopPayload && loopPayload.runtime ? loopPayload.runtime.decision : null,
@@ -919,6 +937,8 @@ async function main() {
     process.stdout.write(`- Session: ${flowPayload.session_id}\n`);
     process.stdout.write(`- Status: ${flowPayload.summary.status || 'unknown'}\n`);
     process.stdout.write(`- Dialogue decision: ${flowPayload.summary.dialogue_decision || 'n/a'}\n`);
+    process.stdout.write(`- Dialogue authorization: ${flowPayload.summary.dialogue_authorization_decision || 'n/a'}\n`);
+    process.stdout.write(`- UI mode: ${flowPayload.summary.ui_mode || 'n/a'}\n`);
     process.stdout.write(`- Authorization tier: ${flowPayload.summary.authorization_tier_decision || 'n/a'}\n`);
     process.stdout.write(`- Gate decision: ${flowPayload.summary.gate_decision || 'n/a'}\n`);
     process.stdout.write(`- Runtime decision: ${flowPayload.summary.runtime_decision || 'n/a'}\n`);

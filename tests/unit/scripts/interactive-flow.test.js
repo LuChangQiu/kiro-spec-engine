@@ -402,6 +402,7 @@ describe('interactive-flow script', () => {
     expect(result.status).toBe(0);
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.summary.dialogue_profile).toBe('system-maintainer');
+    expect(payload.summary.ui_mode).toBe('ops-console');
   });
 
   test('blocks apply for business-user profile by default authorization tier', async () => {
@@ -423,6 +424,8 @@ describe('interactive-flow script', () => {
 
     expect(result.status).toBe(0);
     const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.summary.ui_mode).toBe('user-app');
+    expect(payload.summary.dialogue_authorization_decision).toBe('deny');
     expect(payload.summary.authorization_tier_decision).toBe('deny');
     expect(payload.summary.status).toBe('blocked');
     expect(payload.summary.execution_result).toBe(null);

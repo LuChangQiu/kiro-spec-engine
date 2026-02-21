@@ -37,8 +37,72 @@ describe('interactive-dialogue-governance script', () => {
     expect(result.status).toBe(0);
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.decision).toBe('allow');
+    expect(payload.authorization_dialogue.decision).toBe('allow');
     expect(Array.isArray(payload.response_rules)).toBe(true);
     expect(payload.response_rules.length).toBeGreaterThan(0);
+  });
+
+  test('returns authorization-dialogue deny for business-user apply mode', async () => {
+    const workspace = path.join(tempDir, 'workspace-authz-deny');
+    await fs.ensureDir(workspace);
+
+    const result = runScript(workspace, [
+      '--goal', 'Reduce order approval lead time by 20% on OrderEntry page',
+      '--execution-mode', 'apply',
+      '--profile', 'business-user',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.decision).toBe('allow');
+    expect(payload.authorization_dialogue.decision).toBe('deny');
+    expect(payload.authorization_dialogue.reasons.join(' ')).toContain('does not allow execution mode');
+  });
+
+  test('returns authorization-dialogue review-required in prod for system-maintainer apply', async () => {
+    const workspace = path.join(tempDir, 'workspace-authz-review');
+    await fs.ensureDir(workspace);
+
+    const result = runScript(workspace, [
+      '--goal', 'Apply order approval workflow fix with rollback plan and ticket',
+      '--execution-mode', 'apply',
+      '--runtime-environment', 'prod',
+      '--profile', 'system-maintainer',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.authorization_dialogue.decision).toBe('review-required');
+    expect(payload.authorization_dialogue.required_inputs).toEqual(expect.arrayContaining([
+      'change_ticket_id',
+      'one_time_password',
+      'actor_role',
+      'approver_role'
+    ]));
+    expect(payload.authorization_dialogue.required_confirmation_steps).toEqual(expect.arrayContaining([
+      'manual_review_ack',
+      'role_separation'
+    ]));
+  });
+
+  test('enforces user-app mode as suggestion-only even with system-maintainer profile', async () => {
+    const workspace = path.join(tempDir, 'workspace-ui-mode-user-app');
+    await fs.ensureDir(workspace);
+
+    const result = runScript(workspace, [
+      '--goal', 'Reduce order approval lead time by 20% on OrderEntry page',
+      '--profile', 'system-maintainer',
+      '--ui-mode', 'user-app',
+      '--execution-mode', 'apply',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.authorization_dialogue.decision).toBe('deny');
+    expect(payload.authorization_dialogue.reasons.join(' ')).toContain('user-app');
   });
 
   test('returns clarify for vague short goal', async () => {

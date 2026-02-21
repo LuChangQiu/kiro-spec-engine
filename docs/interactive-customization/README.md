@@ -10,6 +10,7 @@ This directory contains baseline contracts and safety policy artifacts for the i
 - `page-context.schema.json`: schema for page-level read-only context payloads.
 - `guardrail-policy-baseline.json`: default secure-by-default guardrail policy.
 - `dialogue-governance-policy-baseline.json`: baseline communication rules for embedded assistant dialogue.
+- `authorization-dialogue-policy-baseline.json`: machine-readable authorization dialogue policy (profile/env confirmation + step-up prompts).
 - `authorization-tier-policy-baseline.json`: baseline authorization tier policy for profile/environment step-up requirements.
 - `runtime-mode-policy-baseline.json`: baseline runtime mode/environment policy (`user-assist|ops-fix|feature-dev` x `dev|staging|prod`).
 - `approval-role-policy-baseline.json`: optional approval role policy baseline (`submit/approve/execute/verify/archive` role requirements).
@@ -29,6 +30,7 @@ This directory contains baseline contracts and safety policy artifacts for the i
 - `governance-report-template.md`: periodic governance report template.
 - `governance-alert-playbook.md`: threshold breach response workflow.
 - `embedded-assistant-authorization-dialogue-rules.md`: required user/maintainer conversation + authorization behavior for embedded AI assistants.
+- `dual-ui-mode-integration-guide.md`: integration pattern for user-app and ops-console dual-surface deployments.
 - `phase-acceptance-evidence.md`: stage A/B/C/D acceptance evidence checklist.
 - `non-technical-usability-report.md`: business-user usability assessment and improvement backlog.
 - `cross-industry-replication-guide.md`: replication boundary and rollout sequence beyond Moqui.
@@ -117,6 +119,7 @@ Flow output defaults:
 - Matrix summary Markdown: `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.md`
 - Matrix signal stream: `.kiro/reports/interactive-matrix-signals.jsonl`
 - Loop/flow summaries now include execution block diagnostics:
+  - `summary.dialogue_authorization_decision` (`allow|review-required|deny`)
   - `summary.execution_block_reason_category` (`password-authorization|role-policy|authorization-tier|runtime-policy|approval-policy|unknown`)
   - `summary.execution_block_remediation_hint` (human-readable fix hint)
   - `summary.authorization_execute_roles` (flow-level execute role requirements when role policy is enabled)
@@ -146,9 +149,12 @@ Run dialogue governance (communication-rule check only):
 ```bash
 node scripts/interactive-dialogue-governance.js \
   --goal "Improve order entry speed without changing payment policy" \
+  --execution-mode suggestion \
+  --runtime-environment staging \
   --profile business-user \
   --context docs/interactive-customization/page-context.sample.json \
   --policy docs/interactive-customization/dialogue-governance-policy-baseline.json \
+  --authorization-dialogue-policy docs/interactive-customization/authorization-dialogue-policy-baseline.json \
   --json
 ```
 
@@ -161,6 +167,7 @@ node scripts/interactive-customization-loop.js \
   --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
   --goal "Improve order entry clarity for business users" \
   --dialogue-profile business-user \
+  --ui-mode user-app \
   --json
 
 # low-risk one-click apply loop
@@ -169,6 +176,7 @@ node scripts/interactive-customization-loop.js \
   --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
   --goal "Adjust order screen field layout for clearer input flow" \
   --dialogue-profile system-maintainer \
+  --ui-mode ops-console \
   --runtime-mode ops-fix \
   --runtime-environment staging \
   --authorization-tier-policy docs/interactive-customization/authorization-tier-policy-baseline.json \
@@ -203,6 +211,7 @@ sce scene interactive-loop \
 - Session artifact: `.kiro/reports/interactive-loop/<session-id>/interactive-user-feedback.jsonl`
 - Governance global stream: `.kiro/reports/interactive-user-feedback.jsonl`
 - `--dialogue-profile` defaults to `business-user`; use `system-maintainer` for operations/maintenance sessions that must surface ticket + rollback requirements before execution.
+- `--ui-mode user-app|ops-console` binds interaction surface semantics (user app vs management console) and participates in authorization dialogue decisioning.
 - In default authorization tier, `business-user` only allows `suggestion` mode; apply path requires `system-maintainer` profile plus environment-specific step-up requirements.
 - Context contract validation is strict by default (required fields, payload size, forbidden keys). Use `--no-strict-contract` only for temporary diagnostics.
 - `--execution-mode apply` with mutating actions requires password authorization by default (`plan.authorization.password_required=true`).

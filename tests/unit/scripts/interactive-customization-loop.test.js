@@ -188,6 +188,7 @@ describe('interactive-customization-loop script', () => {
     expect(payload.mode).toBe('interactive-customization-loop');
     expect(payload.dialogue.decision).toBe('allow');
     expect(payload.dialogue.profile).toBe('business-user');
+    expect(payload.options.ui_mode).toBe('user-app');
     expect(payload.gate.decision).toBe('allow');
     expect(payload.runtime.decision).toBe('allow');
     expect(payload.work_order).toBeTruthy();
@@ -468,6 +469,10 @@ describe('interactive-customization-loop script', () => {
     expect(result.status).toBe(0);
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.dialogue.profile).toBe('system-maintainer');
+    expect(payload.options.ui_mode).toBe('ops-console');
+    expect(payload.dialogue.ui_mode).toBe('ops-console');
+    expect(payload.dialogue.authorization_dialogue).toBeTruthy();
+    expect(payload.summary.dialogue_authorization_decision).toBe('allow');
     expect(payload.options.dialogue_profile).toBe('system-maintainer');
   });
 
@@ -489,7 +494,9 @@ describe('interactive-customization-loop script', () => {
 
     expect(result.status).toBe(0);
     const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.dialogue.authorization_dialogue.decision).toBe('deny');
     expect(payload.authorization_tier.decision).toBe('deny');
+    expect(payload.summary.dialogue_authorization_decision).toBe('deny');
     expect(payload.summary.authorization_tier_decision).toBe('deny');
     expect(payload.summary.status).toBe('blocked');
     expect(payload.execution.attempted).toBe(false);

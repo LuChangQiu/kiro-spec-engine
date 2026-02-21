@@ -1,0 +1,47 @@
+{
+  "version": "1.0.0",
+  "default_profile": "business-user",
+  "prompt_templates": {
+    "scope_confirmation": "Confirm target module/page and business boundary before execution.",
+    "impact_confirmation": "Confirm expected business impact and out-of-scope boundaries.",
+    "rollback_confirmation": "Confirm rollback reference is prepared before apply.",
+    "ticket_reference": "Provide approved change ticket id.",
+    "password_step_up": "Complete one-time password authorization before apply.",
+    "role_policy": "Provide actor role and approver role according to role policy.",
+    "role_separation": "Confirm operator role and approver role are different.",
+    "manual_review_ack": "Acknowledge manual review is required before production apply."
+  },
+  "profiles": {
+    "business-user": {
+      "allow_execution_modes": ["suggestion"],
+      "base_required_steps": ["scope_confirmation"]
+    },
+    "system-maintainer": {
+      "allow_execution_modes": ["suggestion", "apply"],
+      "base_required_steps": ["scope_confirmation", "impact_confirmation", "rollback_confirmation"]
+    }
+  },
+  "environments": {
+    "dev": {
+      "require_ticket": false,
+      "require_password_for_apply": false,
+      "require_role_policy": false,
+      "require_distinct_actor_roles": false,
+      "require_manual_review_ack": false
+    },
+    "staging": {
+      "require_ticket": true,
+      "require_password_for_apply": true,
+      "require_role_policy": false,
+      "require_distinct_actor_roles": false,
+      "require_manual_review_ack": false
+    },
+    "prod": {
+      "require_ticket": true,
+      "require_password_for_apply": true,
+      "require_role_policy": true,
+      "require_distinct_actor_roles": true,
+      "require_manual_review_ack": true
+    }
+  }
+}

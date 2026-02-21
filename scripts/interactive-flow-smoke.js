@@ -10,6 +10,9 @@ const DEFAULT_INPUT = 'docs/interactive-customization/moqui-context-provider.sam
 const DEFAULT_GOAL = 'Adjust order screen field layout for clearer input flow';
 const DEFAULT_POLICY = 'docs/interactive-customization/guardrail-policy-baseline.json';
 const DEFAULT_CATALOG = 'docs/interactive-customization/high-risk-action-catalog.json';
+const DEFAULT_APPROVAL_ROLE_POLICY = 'docs/interactive-customization/approval-role-policy-baseline.json';
+const DEFAULT_APPROVAL_ACTOR_ROLE = 'workflow-operator';
+const DEFAULT_APPROVER_ACTOR_ROLE = 'workflow-operator';
 const DEFAULT_OUT = '.kiro/reports/interactive-flow-smoke/interactive-flow-smoke.summary.json';
 
 function parseArgs(argv) {
@@ -18,6 +21,9 @@ function parseArgs(argv) {
     goal: DEFAULT_GOAL,
     policy: DEFAULT_POLICY,
     catalog: DEFAULT_CATALOG,
+    approvalRolePolicy: DEFAULT_APPROVAL_ROLE_POLICY,
+    approvalActorRole: DEFAULT_APPROVAL_ACTOR_ROLE,
+    approverActorRole: DEFAULT_APPROVER_ACTOR_ROLE,
     out: DEFAULT_OUT,
     json: false
   };
@@ -36,6 +42,15 @@ function parseArgs(argv) {
       index += 1;
     } else if (token === '--catalog' && next) {
       options.catalog = next;
+      index += 1;
+    } else if (token === '--approval-role-policy' && next) {
+      options.approvalRolePolicy = next;
+      index += 1;
+    } else if (token === '--approval-actor-role' && next) {
+      options.approvalActorRole = next;
+      index += 1;
+    } else if (token === '--approver-actor-role' && next) {
+      options.approverActorRole = next;
       index += 1;
     } else if (token === '--out' && next) {
       options.out = next;
@@ -59,6 +74,9 @@ function printHelpAndExit(code) {
     `  --goal <text>      Smoke goal text (default: ${DEFAULT_GOAL})`,
     `  --policy <path>    Guardrail policy path (default: ${DEFAULT_POLICY})`,
     `  --catalog <path>   High-risk catalog path (default: ${DEFAULT_CATALOG})`,
+    `  --approval-role-policy <path> Role policy path (default: ${DEFAULT_APPROVAL_ROLE_POLICY})`,
+    `  --approval-actor-role <name>  Approval actor role (default: ${DEFAULT_APPROVAL_ACTOR_ROLE})`,
+    `  --approver-actor-role <name>  Approver actor role (default: ${DEFAULT_APPROVER_ACTOR_ROLE})`,
     `  --out <path>       Flow summary output path (default: ${DEFAULT_OUT})`,
     '  --json             Print smoke payload as JSON',
     '  -h, --help         Show this help'
@@ -96,6 +114,7 @@ async function main() {
   const inputPath = resolvePath(cwd, options.input);
   const policyPath = resolvePath(cwd, options.policy);
   const catalogPath = resolvePath(cwd, options.catalog);
+  const approvalRolePolicyPath = resolvePath(cwd, options.approvalRolePolicy);
   const outPath = resolvePath(cwd, options.out);
 
   if (!(await fs.pathExists(flowScript))) {
@@ -110,6 +129,9 @@ async function main() {
   if (!(await fs.pathExists(catalogPath))) {
     throw new Error(`catalog file not found: ${catalogPath}`);
   }
+  if (!(await fs.pathExists(approvalRolePolicyPath))) {
+    throw new Error(`approval role policy file not found: ${approvalRolePolicyPath}`);
+  }
 
   const args = [
     flowScript,
@@ -117,6 +139,9 @@ async function main() {
     '--goal', options.goal,
     '--policy', policyPath,
     '--catalog', catalogPath,
+    '--approval-role-policy', approvalRolePolicyPath,
+    '--approval-actor-role', options.approvalActorRole,
+    '--approver-actor-role', options.approverActorRole,
     '--execution-mode', 'apply',
     '--auto-execute-low-risk',
     '--auth-password-hash', crypto.createHash('sha256').update('smoke-pass').digest('hex'),
@@ -147,6 +172,12 @@ async function main() {
   assert(payload.summary && payload.summary.execution_result === 'success', 'flow execution result must be success');
   assert(payload.pipeline && payload.pipeline.bridge && payload.pipeline.bridge.exit_code === 0, 'bridge stage must succeed');
   assert(payload.pipeline && payload.pipeline.loop && payload.pipeline.loop.exit_code === 0, 'loop stage must succeed');
+  assert(payload.pipeline && payload.pipeline.loop && payload.pipeline.loop.payload &&
+    payload.pipeline.loop.payload.approval &&
+    payload.pipeline.loop.payload.approval.authorization &&
+    payload.pipeline.loop.payload.approval.authorization.role_requirements &&
+    Array.isArray(payload.pipeline.loop.payload.approval.authorization.role_requirements.execute),
+  'flow loop payload role requirements must be present');
   assert(await fs.pathExists(flowSummary), `flow summary file missing: ${flowSummary}`);
   assert(await fs.pathExists(bridgeContext), `bridge context file missing: ${bridgeContext}`);
 
@@ -188,6 +219,9 @@ module.exports = {
   DEFAULT_GOAL,
   DEFAULT_POLICY,
   DEFAULT_CATALOG,
+  DEFAULT_APPROVAL_ROLE_POLICY,
+  DEFAULT_APPROVAL_ACTOR_ROLE,
+  DEFAULT_APPROVER_ACTOR_ROLE,
   DEFAULT_OUT,
   parseArgs,
   resolvePath,

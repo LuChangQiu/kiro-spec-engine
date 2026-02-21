@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Interactive smoke role-policy coverage**: `interactive-loop-smoke` and `interactive-flow-smoke` now run with approval role-policy + actor-role parameters by default to validate password+role dual-authorization path in CI/release smoke stage.
 - **Interactive approval role-policy step-up**: `interactive-approval-workflow` now supports optional role-based action authorization (`--role-policy`, `--actor-role`) and loop/flow/scene commands can pass role policy and actor roles (`--approval-role-policy`, `--approval-actor-role`, `--approver-actor-role`) for separation-of-duties governance.
 - **Interactive runtime policy + work-order default pipeline**: Added `interactive-runtime-policy-evaluate` and `interactive-work-order-build`, integrated both into `interactive-customization-loop` and `interactive-flow` (including `sce scene interactive-loop/interactive-flow` passthrough), with default `runtime_mode=ops-fix`, `runtime_environment=staging`, runtime non-allow fail gate option, and auditable work-order artifacts.
 - **Release weekly ops closed-loop summary**: Added `node scripts/release-ops-weekly-summary.js` (npm alias `npm run report:release-ops-weekly`) to aggregate handoff evidence, release-gate history, interactive governance, and matrix signals into one weekly risk/recommendation card (`weekly-ops-summary.json|.md`).

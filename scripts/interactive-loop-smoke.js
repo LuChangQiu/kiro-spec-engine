@@ -8,12 +8,18 @@ const { spawnSync } = require('child_process');
 
 const DEFAULT_CONTEXT = 'docs/interactive-customization/page-context.sample.json';
 const DEFAULT_GOAL = 'Adjust order screen field layout for clearer input flow';
+const DEFAULT_APPROVAL_ROLE_POLICY = 'docs/interactive-customization/approval-role-policy-baseline.json';
+const DEFAULT_APPROVAL_ACTOR_ROLE = 'workflow-operator';
+const DEFAULT_APPROVER_ACTOR_ROLE = 'workflow-operator';
 const DEFAULT_OUT = '.kiro/reports/interactive-loop-smoke/interactive-loop-smoke.summary.json';
 
 function parseArgs(argv) {
   const options = {
     context: DEFAULT_CONTEXT,
     goal: DEFAULT_GOAL,
+    approvalRolePolicy: DEFAULT_APPROVAL_ROLE_POLICY,
+    approvalActorRole: DEFAULT_APPROVAL_ACTOR_ROLE,
+    approverActorRole: DEFAULT_APPROVER_ACTOR_ROLE,
     out: DEFAULT_OUT,
     json: false
   };
@@ -26,6 +32,15 @@ function parseArgs(argv) {
       index += 1;
     } else if (token === '--goal' && next) {
       options.goal = next;
+      index += 1;
+    } else if (token === '--approval-role-policy' && next) {
+      options.approvalRolePolicy = next;
+      index += 1;
+    } else if (token === '--approval-actor-role' && next) {
+      options.approvalActorRole = next;
+      index += 1;
+    } else if (token === '--approver-actor-role' && next) {
+      options.approverActorRole = next;
       index += 1;
     } else if (token === '--out' && next) {
       options.out = next;
@@ -47,6 +62,9 @@ function printHelpAndExit(code) {
     'Options:',
     `  --context <path>     Context JSON path (default: ${DEFAULT_CONTEXT})`,
     `  --goal <text>        Smoke goal text (default: ${DEFAULT_GOAL})`,
+    `  --approval-role-policy <path> Role policy path (default: ${DEFAULT_APPROVAL_ROLE_POLICY})`,
+    `  --approval-actor-role <name>  Approval actor role (default: ${DEFAULT_APPROVAL_ACTOR_ROLE})`,
+    `  --approver-actor-role <name>  Approver actor role (default: ${DEFAULT_APPROVER_ACTOR_ROLE})`,
     `  --out <path>         Loop summary output path (default: ${DEFAULT_OUT})`,
     '  --json               Print smoke payload as JSON',
     '  -h, --help           Show this help'
@@ -82,6 +100,7 @@ async function main() {
   const cwd = process.cwd();
   const loopScript = path.resolve(__dirname, 'interactive-customization-loop.js');
   const contextPath = resolvePath(cwd, options.context);
+  const approvalRolePolicyPath = resolvePath(cwd, options.approvalRolePolicy);
   const outPath = resolvePath(cwd, options.out);
 
   if (!(await fs.pathExists(loopScript))) {
@@ -90,12 +109,18 @@ async function main() {
   if (!(await fs.pathExists(contextPath))) {
     throw new Error(`context file not found: ${contextPath}`);
   }
+  if (!(await fs.pathExists(approvalRolePolicyPath))) {
+    throw new Error(`approval role policy file not found: ${approvalRolePolicyPath}`);
+  }
 
   const args = [
     loopScript,
     '--context', contextPath,
     '--goal', options.goal,
     '--execution-mode', 'apply',
+    '--approval-role-policy', approvalRolePolicyPath,
+    '--approval-actor-role', options.approvalActorRole,
+    '--approver-actor-role', options.approverActorRole,
     '--auto-execute-low-risk',
     '--auth-password-hash', crypto.createHash('sha256').update('smoke-pass').digest('hex'),
     '--auth-password', 'smoke-pass',
@@ -126,6 +151,8 @@ async function main() {
   assert(payload.summary && payload.summary.status === 'completed', 'loop summary status must be completed');
   assert(payload.execution && payload.execution.attempted === true, 'loop execution must be attempted');
   assert(payload.execution && payload.execution.blocked === false, 'loop execution must not be blocked');
+  assert(payload.approval && payload.approval.authorization && payload.approval.authorization.role_requirements &&
+    Array.isArray(payload.approval.authorization.role_requirements.execute), 'loop role requirements must be present');
   assert(payload.feedback && payload.feedback.logged === true, 'loop feedback must be logged');
   assert(Array.isArray(payload.steps) && payload.steps.some(step => step && step.name === 'feedback_log'), 'feedback_log step is required');
   assert(await fs.pathExists(artifactFeedback), `session feedback file missing: ${artifactFeedback}`);
@@ -169,6 +196,9 @@ if (require.main === module) {
 module.exports = {
   DEFAULT_CONTEXT,
   DEFAULT_GOAL,
+  DEFAULT_APPROVAL_ROLE_POLICY,
+  DEFAULT_APPROVAL_ACTOR_ROLE,
+  DEFAULT_APPROVER_ACTOR_ROLE,
   DEFAULT_OUT,
   parseArgs,
   resolvePath,

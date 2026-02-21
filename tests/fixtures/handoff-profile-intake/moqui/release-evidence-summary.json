@@ -1,0 +1,29 @@
+{
+  "mode": "auto-handoff-evidence-review",
+  "generated_at": "2026-02-21T00:10:00.000Z",
+  "current_overview": {
+    "gate": {
+      "passed": true,
+      "actual": {
+        "spec_success_rate_percent": 98,
+        "risk_level": "low"
+      }
+    },
+    "scene_package_batch": {
+      "status": "passed",
+      "summary": {
+        "batch_gate_passed": true,
+        "batch_gate_failure_count": 0
+      }
+    }
+  },
+  "governance_snapshot": {
+    "mode": "auto-governance-stats",
+    "health": {
+      "risk": "low",
+      "concerns": [],
+      "recommendations": []
+    }
+  }
+}
+

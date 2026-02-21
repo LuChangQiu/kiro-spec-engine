@@ -1054,6 +1054,30 @@ jobs:
           echo "markdown_file=${BUNDLE_MD}" >> "$GITHUB_OUTPUT"
           echo "lines_file=${BUNDLE_LINES}" >> "$GITHUB_OUTPUT"
 
+      - name: Evaluate release asset integrity
+        id: release_asset_integrity
+        shell: bash
+        env:
+          RELEASE_GATE_REPORT_FILE: ${{ steps.release_notes.outputs.gate_file }}
+          RELEASE_ASSET_INTEGRITY_ENFORCE: ${{ vars.KSE_RELEASE_ASSET_INTEGRITY_ENFORCE }}
+          RELEASE_ASSET_INTEGRITY_REQUIRE_NON_EMPTY: ${{ vars.KSE_RELEASE_ASSET_INTEGRITY_REQUIRE_NON_EMPTY }}
+          RELEASE_ASSET_INTEGRITY_REQUIRED_FILES: ${{ vars.KSE_RELEASE_ASSET_INTEGRITY_REQUIRED_FILES }}
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          NOTES_DIR=".kiro/reports/release-evidence"
+          INTEGRITY_JSON="${NOTES_DIR}/release-asset-integrity-${TAG}.json"
+          INTEGRITY_MD="${NOTES_DIR}/release-asset-integrity-${TAG}.md"
+
+          RELEASE_TAG="${TAG}" \
+          RELEASE_ASSET_INTEGRITY_DIR="${NOTES_DIR}" \
+          RELEASE_ASSET_INTEGRITY_REPORT_JSON="${INTEGRITY_JSON}" \
+          RELEASE_ASSET_INTEGRITY_REPORT_MD="${INTEGRITY_MD}" \
+            node scripts/release-asset-integrity-check.js
+
+          echo "json_file=${INTEGRITY_JSON}" >> "$GITHUB_OUTPUT"
+          echo "markdown_file=${INTEGRITY_MD}" >> "$GITHUB_OUTPUT"
+
       - name: Publish to npm
         run: npm publish --access public
         env:
@@ -1090,6 +1114,8 @@ jobs:
             ${{ steps.release_risk_remediation.outputs.json_file }}
             ${{ steps.release_risk_remediation.outputs.markdown_file }}
             ${{ steps.release_risk_remediation.outputs.lines_file }}
+            ${{ steps.release_asset_integrity.outputs.json_file }}
+            ${{ steps.release_asset_integrity.outputs.markdown_file }}
             ${{ steps.moqui_core_regression.outputs.json_file }}
             ${{ steps.moqui_core_regression.outputs.markdown_file }}
           draft: false

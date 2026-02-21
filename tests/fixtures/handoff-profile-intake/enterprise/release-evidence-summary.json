@@ -1,0 +1,32 @@
+{
+  "mode": "auto-handoff-evidence-review",
+  "generated_at": "2026-02-21T00:10:00.000Z",
+  "current_overview": {
+    "gate": {
+      "passed": true,
+      "actual": {
+        "spec_success_rate_percent": 96,
+        "risk_level": "medium"
+      }
+    },
+    "release_gate_preflight": {
+      "available": true,
+      "blocked": false,
+      "latest_tag": "v3.1.0",
+      "latest_gate_passed": true
+    }
+  },
+  "governance_snapshot": {
+    "mode": "auto-governance-stats",
+    "health": {
+      "risk": "medium",
+      "concerns": [
+        "release preflight hard gate enabled"
+      ],
+      "recommendations": [
+        "keep release preflight evidence up to date"
+      ]
+    }
+  }
+}
+

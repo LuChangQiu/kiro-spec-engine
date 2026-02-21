@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-02-21T00:00:00.000Z",
+  "source_project": "E:/workspace/external-moqui-sample",
+  "specs": [
+    {
+      "id": "62-10-moqui-order-approval",
+      "status": "completed",
+      "scene_package": ".kiro/specs/62-10-moqui-order-approval/custom/scene-package.json",
+      "scene_manifest": ".kiro/specs/62-10-moqui-order-approval/custom/scene.yaml"
+    }
+  ],
+  "templates": [
+    "sce.scene--moqui-order-approval--0.1.0"
+  ],
+  "capabilities": [
+    "order-approval",
+    "order-query-read",
+    "inventory-adjustment"
+  ],
+  "known_gaps": [],
+  "ontology_validation": {
+    "status": "passed",
+    "quality_score": 92,
+    "business_rules": {
+      "total": 2,
+      "mapped": 2
+    },
+    "decision_logic": {
+      "total": 2,
+      "resolved": 2
+    }
+  }
+}
+

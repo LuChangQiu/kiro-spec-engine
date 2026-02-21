@@ -1,0 +1,36 @@
+{
+  "timestamp": "2026-02-21T00:00:00.000Z",
+  "source_project": "E:/workspace/external-enterprise-sample",
+  "specs": [
+    {
+      "id": "70-20-enterprise-release-control",
+      "status": "completed",
+      "depends_on": [
+        "70-10-enterprise-baseline"
+      ],
+      "scene_package": ".kiro/specs/70-20-enterprise-release-control/custom/scene-package.json",
+      "scene_manifest": ".kiro/specs/70-20-enterprise-release-control/custom/scene.yaml"
+    }
+  ],
+  "templates": [
+    "sce.scene--enterprise-release-control--0.1.0"
+  ],
+  "capabilities": [
+    "release-preflight-governance",
+    "approval-routing"
+  ],
+  "known_gaps": [],
+  "ontology_validation": {
+    "status": "passed",
+    "quality_score": 90,
+    "business_rules": {
+      "total": 2,
+      "mapped": 2
+    },
+    "decision_logic": {
+      "total": 1,
+      "resolved": 1
+    }
+  }
+}
+

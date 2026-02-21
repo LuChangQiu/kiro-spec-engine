@@ -41,6 +41,7 @@ node scripts/interactive-governance-report.js --period weekly --fail-on-alert --
 node scripts/release-ops-weekly-summary.js --json
 node scripts/release-weekly-ops-gate.js
 node scripts/release-risk-remediation-bundle.js --gate-report .kiro/reports/release-evidence/release-gate.json --json
+node scripts/release-asset-integrity-check.js
 ```
 
 If weekly ops summary risk is `high`, freeze release and run remediation before next tag.

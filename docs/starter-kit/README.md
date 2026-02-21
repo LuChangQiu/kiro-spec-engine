@@ -7,6 +7,10 @@ This starter kit is the default baseline for onboarding an external project (inc
 - `handoff-manifest.starter.json`: minimal manifest contract that works with `sce auto handoff` and `sce scene package-publish-batch`.
 - `release.workflow.sample.yml`: GitHub Actions sample for release-gate + weekly ops evidence publication.
 - `handoff-profile-ci.sample.yml`: profile-based intake pipeline sample (`default|moqui|enterprise`).
+- profile fixture references (for validation/testing):
+  - `tests/fixtures/handoff-profile-intake/default/*`
+  - `tests/fixtures/handoff-profile-intake/moqui/*`
+  - `tests/fixtures/handoff-profile-intake/enterprise/*`
 
 ## Quick Start
 

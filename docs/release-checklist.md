@@ -136,6 +136,10 @@ Ensure:
   - `KSE_RELEASE_WEEKLY_OPS_MAX_RISK_LEVEL`: `low|medium|high|unknown` (default `medium`)
   - `KSE_RELEASE_WEEKLY_OPS_MAX_GOVERNANCE_BREACHES`: optional max breach count
   - `KSE_RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT`: optional max regression-positive rate percent
+- Optional: tune release asset integrity gate:
+  - `KSE_RELEASE_ASSET_INTEGRITY_ENFORCE`: `true|false` (default `true`)
+  - `KSE_RELEASE_ASSET_INTEGRITY_REQUIRE_NON_EMPTY`: `true|false` (default `true`)
+  - `KSE_RELEASE_ASSET_INTEGRITY_REQUIRED_FILES`: override required asset list (comma-separated, supports `{tag}`)
 - Optional local dry-run for gate history index artifact:
   - `sce auto handoff gate-index --dir .kiro/reports/release-evidence --out .kiro/reports/release-evidence/release-gate-history.json --json`
 

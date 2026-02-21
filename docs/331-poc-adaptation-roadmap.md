@@ -158,10 +158,18 @@
 
 ## 下一阶段（新）
 
-主线目标已收口，当前剩余增强任务（共 2 项）：
+主线增强项已收口（本轮完成）：
 
-1. profile 化外部接入样例收敛（进行中）：
-   - 已补充 `docs/starter-kit/handoff-profile-ci.sample.yml`。
-   - 待补：增加 profile 场景的最小验收样本（manifest + evidence fixture）并写入测试。
+1. profile 化外部接入样例收敛：
+   - 新增 `docs/starter-kit/handoff-profile-ci.sample.yml`。
+   - 新增 profile 最小验收样本（manifest + evidence fixture）：
+     - `tests/fixtures/handoff-profile-intake/default/*`
+     - `tests/fixtures/handoff-profile-intake/moqui/*`
+     - `tests/fixtures/handoff-profile-intake/enterprise/*`
+   - 新增样本自动化校验：
+     - `tests/unit/starter-kit/handoff-profile-intake-fixtures.test.js`
 2. 发布资产审计一致性：
-   - 待补：新增 release 资产完整性检查脚本，确保每次 tag 发布都包含治理快照/周报/历史趋势核心资产。
+   - 新增 `scripts/release-asset-integrity-check.js`，默认阻断缺失/空资产。
+   - `release.yml` 已接入资产完整性审计并发布 `release-asset-integrity-<tag>.json|.md`。
+
+当前剩余增强任务：`0`

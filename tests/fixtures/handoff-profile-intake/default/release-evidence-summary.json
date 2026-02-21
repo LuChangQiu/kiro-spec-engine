@@ -1,0 +1,22 @@
+{
+  "mode": "auto-handoff-evidence-review",
+  "generated_at": "2026-02-21T00:10:00.000Z",
+  "current_overview": {
+    "gate": {
+      "passed": true,
+      "actual": {
+        "spec_success_rate_percent": 100,
+        "risk_level": "low"
+      }
+    }
+  },
+  "governance_snapshot": {
+    "mode": "auto-governance-stats",
+    "health": {
+      "risk": "low",
+      "concerns": [],
+      "recommendations": []
+    }
+  }
+}
+

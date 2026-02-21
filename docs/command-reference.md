@@ -901,6 +901,23 @@ Release risk remediation bundle helper (weekly + drift unified command pack):
     - `.kiro/reports/release-evidence/release-risk-remediation.commands.lines`
 - npm alias: `npm run report:release-risk-remediation`
 
+Release asset integrity check helper (release artifact completeness gate):
+- `node scripts/release-asset-integrity-check.js`:
+  - validates required release evidence assets in `RELEASE_ASSET_INTEGRITY_DIR` (default `.kiro/reports/release-evidence`).
+  - default required files:
+    - `release-gate-{tag}.json`
+    - `release-gate-history-{tag}.json|.md`
+    - `governance-snapshot-{tag}.json|.md`
+    - `weekly-ops-summary-{tag}.json|.md`
+    - `release-risk-remediation-{tag}.json|.md|.lines`
+  - default behavior: enforce blocking when any required asset is missing (`RELEASE_ASSET_INTEGRITY_ENFORCE=true`).
+  - supports override via `RELEASE_ASSET_INTEGRITY_REQUIRED_FILES` (comma-separated, `{tag}` placeholder supported).
+  - writes optional reports:
+    - `RELEASE_ASSET_INTEGRITY_REPORT_JSON`
+    - `RELEASE_ASSET_INTEGRITY_REPORT_MD`
+  - merges result into `RELEASE_GATE_REPORT_FILE` when provided.
+- npm alias: `npm run gate:release-asset-integrity`
+
 Matrix regression gate helper (script-level configurable hard gate):
 - `node scripts/matrix-regression-gate.js [--baseline <path>] [--max-regressions <n>] [--enforce] [--out <path>] [--json]`: evaluate matrix regression count from baseline compare payload (`coverage_matrix_regressions` preferred, fallback `regressions`) and enforce hard gate when enabled.
   - Default baseline input: `.kiro/reports/release-evidence/moqui-template-baseline.json`
@@ -1203,6 +1220,7 @@ Release workflow default:
 - Publishes `weekly-ops-summary-<tag>.json` + `weekly-ops-summary-<tag>.md` as release operational closed-loop assets.
 - Evaluates weekly ops risk gate by default (`release-weekly-ops-gate`; default block when `risk > medium` or summary missing).
 - Publishes `release-risk-remediation-<tag>.json|.md|.lines` derived from unified weekly+drift gate signals.
+- Evaluates and publishes release asset integrity audit (`release-asset-integrity-<tag>.json|.md`) before `npm publish`.
 - Enforces baseline portfolio gate by default (`KSE_MOQUI_BASELINE_ENFORCE` defaults to `true` when unset).
 
 ### Moqui ERP Integration

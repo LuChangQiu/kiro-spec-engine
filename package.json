@@ -60,6 +60,7 @@
     "report:interactive-governance": "node scripts/interactive-governance-report.js --period weekly --json",
     "report:release-ops-weekly": "node scripts/release-ops-weekly-summary.js --json",
     "gate:release-ops-weekly": "node scripts/release-weekly-ops-gate.js",
+    "gate:release-asset-integrity": "node scripts/release-asset-integrity-check.js",
     "report:release-risk-remediation": "node scripts/release-risk-remediation-bundle.js --json",
     "report:moqui-core-regression": "node scripts/moqui-core-regression-suite.js --json",
     "prepublishOnly": "npm run test:full && npm run test:skip-audit && npm run test:brand-consistency && npm run report:interactive-governance -- --fail-on-alert",

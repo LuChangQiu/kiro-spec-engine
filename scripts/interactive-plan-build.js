@@ -7,6 +7,8 @@ const crypto = require('crypto');
 
 const DEFAULT_OUT_PLAN = '.kiro/reports/interactive-change-plan.generated.json';
 const DEFAULT_OUT_MARKDOWN = '.kiro/reports/interactive-change-plan.generated.md';
+const DEFAULT_AUTH_PASSWORD_HASH_ENV = 'SCE_INTERACTIVE_AUTH_PASSWORD_SHA256';
+const DEFAULT_AUTH_PASSWORD_TTL_SECONDS = 600;
 
 function parseArgs(argv) {
   const options = {
@@ -259,6 +261,35 @@ function buildApproval(riskLevel, executionMode, actions) {
   };
 }
 
+function isMutatingAction(actionType) {
+  return `${actionType || ''}`.trim().toLowerCase() !== 'analysis_only';
+}
+
+function buildAuthorization(actions, executionMode, riskLevel) {
+  const mutating = actions.some(action => isMutatingAction(action.type));
+  const requiresPrivilegeEscalation = actions.some(action => action.requires_privilege_escalation === true);
+  const requiresPassword = mutating && `${executionMode || ''}`.trim().toLowerCase() === 'apply';
+  const reasonCodes = [];
+
+  if (requiresPassword) {
+    reasonCodes.push('mutating-action-apply-mode');
+  }
+  if (requiresPrivilegeEscalation) {
+    reasonCodes.push('privilege-escalation-detected');
+  }
+  if (`${riskLevel || ''}`.trim().toLowerCase() === 'high') {
+    reasonCodes.push('high-risk-plan');
+  }
+
+  return {
+    password_required: requiresPassword,
+    password_scope: requiresPassword ? ['execute'] : [],
+    password_hash_env: DEFAULT_AUTH_PASSWORD_HASH_ENV,
+    password_ttl_seconds: DEFAULT_AUTH_PASSWORD_TTL_SECONDS,
+    reason_codes: reasonCodes
+  };
+}
+
 function buildMarkdown(payload) {
   const plan = payload.plan;
   const lines = [];
@@ -270,6 +301,7 @@ function buildMarkdown(payload) {
   lines.push(`- Risk level: ${plan.risk_level}`);
   lines.push(`- Execution mode: ${plan.execution_mode}`);
   lines.push(`- Approval status: ${plan.approval.status}`);
+  lines.push(`- Password authorization required: ${plan.authorization.password_required ? 'yes' : 'no'}`);
   lines.push('');
   lines.push('## Scope');
   lines.push('');
@@ -297,6 +329,16 @@ function buildMarkdown(payload) {
   lines.push(`- Reference: ${plan.rollback_plan.reference}`);
   lines.push(`- Note: ${plan.rollback_plan.note}`);
   lines.push('');
+  lines.push('## Authorization');
+  lines.push('');
+  lines.push(`- Password required: ${plan.authorization.password_required ? 'yes' : 'no'}`);
+  lines.push(`- Password scope: ${Array.isArray(plan.authorization.password_scope) && plan.authorization.password_scope.length > 0 ? plan.authorization.password_scope.join(', ') : 'none'}`);
+  lines.push(`- Password hash env: ${plan.authorization.password_hash_env || 'n/a'}`);
+  lines.push(`- Password TTL (seconds): ${plan.authorization.password_ttl_seconds || 'n/a'}`);
+  if (Array.isArray(plan.authorization.reason_codes) && plan.authorization.reason_codes.length > 0) {
+    lines.push(`- Reason codes: ${plan.authorization.reason_codes.join(', ')}`);
+  }
+  lines.push('');
   lines.push('## Gate Command');
   lines.push('');
   lines.push(`- ${payload.gate_hint_command}`);
@@ -320,6 +362,7 @@ async function main() {
   const verificationChecks = buildVerificationChecks(actions);
   const rollbackPlan = buildRollbackPlan(actions);
   const approval = buildApproval(riskLevel, options.executionMode, actions);
+  const authorization = buildAuthorization(actions, options.executionMode, riskLevel);
   const security = {
     masking_applied: actions.some(item => item.touches_sensitive_data),
     plaintext_secrets_in_payload: false,
@@ -343,6 +386,7 @@ async function main() {
     verification_checks: verificationChecks,
     rollback_plan: rollbackPlan,
     approval,
+    authorization,
     security,
     created_at: new Date().toISOString()
   };

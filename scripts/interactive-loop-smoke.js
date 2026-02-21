@@ -3,6 +3,7 @@
 
 const path = require('path');
 const fs = require('fs-extra');
+const crypto = require('crypto');
 const { spawnSync } = require('child_process');
 
 const DEFAULT_CONTEXT = 'docs/interactive-customization/page-context.sample.json';
@@ -96,6 +97,8 @@ async function main() {
     '--goal', options.goal,
     '--execution-mode', 'apply',
     '--auto-execute-low-risk',
+    '--auth-password-hash', crypto.createHash('sha256').update('smoke-pass').digest('hex'),
+    '--auth-password', 'smoke-pass',
     '--feedback-score', '5',
     '--feedback-comment', 'CI smoke feedback',
     '--feedback-tags', 'ci,smoke',

@@ -9,6 +9,7 @@ This directory contains baseline contracts and safety policy artifacts for the i
 - `execution-record.schema.json`: schema for execution/audit records.
 - `page-context.schema.json`: schema for page-level read-only context payloads.
 - `guardrail-policy-baseline.json`: default secure-by-default guardrail policy.
+- `dialogue-governance-policy-baseline.json`: baseline communication rules for embedded assistant dialogue.
 - `high-risk-action-catalog.json`: baseline high-risk action classification for deny/review decisions.
 - `change-plan.sample.json`: runnable sample plan for gate checks.
 - `page-context.sample.json`: runnable page context sample for read-only intent generation.
@@ -69,8 +70,11 @@ node scripts/interactive-flow.js \
   --input docs/interactive-customization/moqui-context-provider.sample.json \
   --goal "Adjust order screen field layout for clearer input flow" \
   --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
+  --dialogue-policy docs/interactive-customization/dialogue-governance-policy-baseline.json \
   --execution-mode apply \
   --auto-execute-low-risk \
+  --auth-password-hash "<sha256-of-demo-pass>" \
+  --auth-password "demo-pass" \
   --feedback-score 5 \
   --json
 ```
@@ -95,6 +99,7 @@ Flow output defaults:
 - Flow summary: `.kiro/reports/interactive-flow/<session-id>/interactive-flow.summary.json`
 - Bridge context: `.kiro/reports/interactive-flow/<session-id>/interactive-page-context.normalized.json`
 - Loop summary: `.kiro/reports/interactive-flow/<session-id>/interactive-customization-loop.summary.json`
+- Dialogue governance report: `.kiro/reports/interactive-flow/<session-id>/interactive-dialogue-governance.json`
 - Matrix summary JSON: `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.json`
 - Matrix summary Markdown: `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.md`
 - Matrix signal stream: `.kiro/reports/interactive-matrix-signals.jsonl`
@@ -119,6 +124,16 @@ node scripts/interactive-plan-build.js \
   --json
 ```
 
+Run dialogue governance (communication-rule check only):
+
+```bash
+node scripts/interactive-dialogue-governance.js \
+  --goal "Improve order entry speed without changing payment policy" \
+  --context docs/interactive-customization/page-context.sample.json \
+  --policy docs/interactive-customization/dialogue-governance-policy-baseline.json \
+  --json
+```
+
 Run one-command interactive loop (intent -> plan -> gate -> approval; optional low-risk apply):
 
 ```bash
@@ -136,6 +151,8 @@ node scripts/interactive-customization-loop.js \
   --goal "Adjust order screen field layout for clearer input flow" \
   --execution-mode apply \
   --auto-execute-low-risk \
+  --auth-password-hash "<sha256-of-demo-pass>" \
+  --auth-password "demo-pass" \
   --feedback-score 5 \
   --feedback-comment "Flow is clearer and faster." \
   --feedback-tags moqui,approval \
@@ -148,6 +165,8 @@ sce scene interactive-loop \
   --goal "Adjust order screen field layout for clearer input flow" \
   --execution-mode apply \
   --auto-execute-low-risk \
+  --auth-password-hash "<sha256-of-demo-pass>" \
+  --auth-password "demo-pass" \
   --feedback-score 5 \
   --json
 ```
@@ -156,6 +175,7 @@ sce scene interactive-loop \
 - Session artifact: `.kiro/reports/interactive-loop/<session-id>/interactive-user-feedback.jsonl`
 - Governance global stream: `.kiro/reports/interactive-user-feedback.jsonl`
 - Context contract validation is strict by default (required fields, payload size, forbidden keys). Use `--no-strict-contract` only for temporary diagnostics.
+- `--execution-mode apply` with mutating actions requires password authorization by default (`plan.authorization.password_required=true`).
 
 Run approval workflow state machine:
 
@@ -170,7 +190,7 @@ node scripts/interactive-approval-workflow.js \
 # submit -> approve -> execute -> verify
 node scripts/interactive-approval-workflow.js --action submit --actor product-owner --json
 node scripts/interactive-approval-workflow.js --action approve --actor security-admin --json
-node scripts/interactive-approval-workflow.js --action execute --actor release-operator --json
+node scripts/interactive-approval-workflow.js --action execute --actor release-operator --password "demo-pass" --json
 node scripts/interactive-approval-workflow.js --action verify --actor qa-owner --json
 ```
 

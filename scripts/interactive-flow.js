@@ -13,6 +13,7 @@ const DEFAULT_FEEDBACK_CHANNEL = 'ui';
 const DEFAULT_MATRIX_SIGNALS = '.kiro/reports/interactive-matrix-signals.jsonl';
 const DEFAULT_MATRIX_MIN_SCORE = 70;
 const DEFAULT_MATRIX_MIN_VALID_RATE = 100;
+const DEFAULT_AUTH_PASSWORD_HASH_ENV = 'SCE_INTERACTIVE_AUTH_PASSWORD_SHA256';
 const FEEDBACK_CHANNELS = new Set(['ui', 'cli', 'api', 'other']);
 
 const SCRIPT_CONTEXT_BRIDGE = path.resolve(__dirname, 'interactive-context-bridge.js');
@@ -30,6 +31,8 @@ function parseArgs(argv) {
     executionMode: 'suggestion',
     policy: null,
     catalog: null,
+    dialoguePolicy: null,
+    dialogueOut: null,
     contextContract: null,
     strictContract: true,
     moquiConfig: null,
@@ -50,6 +53,10 @@ function parseArgs(argv) {
     feedbackComment: null,
     feedbackTags: [],
     feedbackChannel: DEFAULT_FEEDBACK_CHANNEL,
+    authPassword: null,
+    authPasswordHash: null,
+    authPasswordEnv: null,
+    failOnDialogueDeny: false,
     failOnGateDeny: false,
     failOnGateNonAllow: false,
     failOnExecuteBlocked: false,
@@ -99,6 +106,12 @@ function parseArgs(argv) {
       index += 1;
     } else if (token === '--catalog' && next) {
       options.catalog = next;
+      index += 1;
+    } else if (token === '--dialogue-policy' && next) {
+      options.dialoguePolicy = next;
+      index += 1;
+    } else if (token === '--dialogue-out' && next) {
+      options.dialogueOut = next;
       index += 1;
     } else if (token === '--context-contract' && next) {
       options.contextContract = next;
@@ -153,6 +166,17 @@ function parseArgs(argv) {
     } else if (token === '--feedback-channel' && next) {
       options.feedbackChannel = next;
       index += 1;
+    } else if (token === '--auth-password' && next) {
+      options.authPassword = next;
+      index += 1;
+    } else if (token === '--auth-password-hash' && next) {
+      options.authPasswordHash = next;
+      index += 1;
+    } else if (token === '--auth-password-env' && next) {
+      options.authPasswordEnv = next;
+      index += 1;
+    } else if (token === '--fail-on-dialogue-deny') {
+      options.failOnDialogueDeny = true;
     } else if (token === '--fail-on-gate-deny') {
       options.failOnGateDeny = true;
     } else if (token === '--fail-on-gate-non-allow') {
@@ -209,6 +233,8 @@ function parseArgs(argv) {
   options.executionMode = `${options.executionMode || ''}`.trim() || 'suggestion';
   options.policy = `${options.policy || ''}`.trim() || null;
   options.catalog = `${options.catalog || ''}`.trim() || null;
+  options.dialoguePolicy = `${options.dialoguePolicy || ''}`.trim() || null;
+  options.dialogueOut = `${options.dialogueOut || ''}`.trim() || null;
   options.contextContract = `${options.contextContract || ''}`.trim() || null;
   options.moquiConfig = `${options.moquiConfig || ''}`.trim() || null;
   options.outDir = `${options.outDir || ''}`.trim() || DEFAULT_OUT_DIR;
@@ -221,6 +247,11 @@ function parseArgs(argv) {
   options.feedbackComment = `${options.feedbackComment || ''}`.trim() || null;
   options.feedbackChannel = `${options.feedbackChannel || ''}`.trim().toLowerCase() || DEFAULT_FEEDBACK_CHANNEL;
   options.feedbackTags = Array.from(new Set(options.feedbackTags.map(item => `${item || ''}`.trim().toLowerCase()).filter(Boolean)));
+  options.authPassword = options.authPassword == null ? null : `${options.authPassword}`;
+  options.authPasswordHash = options.authPasswordHash == null
+    ? null
+    : `${options.authPasswordHash}`.trim().toLowerCase();
+  options.authPasswordEnv = `${options.authPasswordEnv || ''}`.trim() || null;
   options.matrix = options.matrix !== false;
   options.matrixTemplateDir = `${options.matrixTemplateDir || ''}`.trim() || null;
   options.matrixMatch = `${options.matrixMatch || ''}`.trim() || null;
@@ -249,6 +280,12 @@ function parseArgs(argv) {
   if (!FEEDBACK_CHANNELS.has(options.feedbackChannel)) {
     throw new Error(`--feedback-channel must be one of: ${Array.from(FEEDBACK_CHANNELS).join(', ')}`);
   }
+  if (options.authPasswordHash != null && !/^[a-fA-F0-9]{64}$/.test(options.authPasswordHash)) {
+    throw new Error('--auth-password-hash must be a sha256 hex string (64 chars).');
+  }
+  if (options.authPasswordEnv != null && `${options.authPasswordEnv || ''}`.trim().length === 0) {
+    throw new Error('--auth-password-env cannot be empty.');
+  }
   if (!Number.isFinite(options.matrixMinScore) || options.matrixMinScore < 0 || options.matrixMinScore > 100) {
     throw new Error('--matrix-min-score must be between 0 and 100.');
   }
@@ -276,6 +313,8 @@ function printHelpAndExit(code) {
     '  --execution-mode <mode>         suggestion|apply (default: suggestion)',
     '  --policy <path>                 Guardrail policy override',
     '  --catalog <path>                High-risk catalog override',
+    '  --dialogue-policy <path>        Dialogue governance policy override',
+    '  --dialogue-out <path>           Dialogue governance report output path',
     '  --context-contract <path>       Context contract override',
     '  --no-strict-contract            Do not fail when context contract validation has issues',
     '  --moqui-config <path>           Moqui adapter runtime config',
@@ -296,6 +335,10 @@ function printHelpAndExit(code) {
     '  --feedback-comment <text>       Optional feedback comment',
     '  --feedback-tags <csv>           Optional feedback tags',
     `  --feedback-channel <name>       ui|cli|api|other (default: ${DEFAULT_FEEDBACK_CHANNEL})`,
+    '  --auth-password <text>          One-time password for protected execute action',
+    '  --auth-password-hash <sha256>   Password verifier hash override',
+    `  --auth-password-env <name>      Password hash env name (default: ${DEFAULT_AUTH_PASSWORD_HASH_ENV})`,
+    '  --fail-on-dialogue-deny         Exit code 2 if dialogue decision is deny',
     '  --fail-on-gate-deny             Exit code 2 if gate decision is deny',
     '  --fail-on-gate-non-allow        Exit code 2 if gate decision is deny/review-required',
     '  --fail-on-execute-blocked       Exit code 2 if auto execute is blocked/non-success',
@@ -359,7 +402,23 @@ function tryParseJsonOutput(text) {
   }
 }
 
-function runScript(label, scriptPath, args, cwd) {
+function buildCommandString(scriptPath, args, redactFlags = []) {
+  const redacted = new Set(redactFlags);
+  const maskedArgs = [];
+  for (let index = 0; index < args.length; index += 1) {
+    const token = args[index];
+    maskedArgs.push(token);
+    if (redacted.has(token)) {
+      if (index + 1 < args.length) {
+        maskedArgs.push('***');
+        index += 1;
+      }
+    }
+  }
+  return [process.execPath, scriptPath, ...maskedArgs].join(' ');
+}
+
+function runScript(label, scriptPath, args, cwd, redactFlags = []) {
   const result = spawnSync(process.execPath, [scriptPath, ...args], {
     cwd,
     encoding: 'utf8'
@@ -369,7 +428,7 @@ function runScript(label, scriptPath, args, cwd) {
     stdout: `${result.stdout || ''}`,
     stderr: `${result.stderr || ''}`,
     error: result.error || null,
-    command: [process.execPath, scriptPath, ...args].join(' ')
+    command: buildCommandString(scriptPath, args, redactFlags)
   };
 }
 
@@ -454,6 +513,12 @@ async function main() {
   if (options.catalog) {
     loopArgs.push('--catalog', resolvePath(cwd, options.catalog));
   }
+  if (options.dialoguePolicy) {
+    loopArgs.push('--dialogue-policy', resolvePath(cwd, options.dialoguePolicy));
+  }
+  if (options.dialogueOut) {
+    loopArgs.push('--dialogue-out', resolvePath(cwd, options.dialogueOut));
+  }
   if (options.contextContract) {
     loopArgs.push('--context-contract', resolvePath(cwd, options.contextContract));
   }
@@ -499,6 +564,18 @@ async function main() {
   if (options.feedbackChannel) {
     loopArgs.push('--feedback-channel', options.feedbackChannel);
   }
+  if (options.authPassword) {
+    loopArgs.push('--auth-password', options.authPassword);
+  }
+  if (options.authPasswordHash) {
+    loopArgs.push('--auth-password-hash', options.authPasswordHash);
+  }
+  if (options.authPasswordEnv) {
+    loopArgs.push('--auth-password-env', options.authPasswordEnv);
+  }
+  if (options.failOnDialogueDeny) {
+    loopArgs.push('--fail-on-dialogue-deny');
+  }
   if (options.failOnGateDeny) {
     loopArgs.push('--fail-on-gate-deny');
   }
@@ -509,7 +586,13 @@ async function main() {
     loopArgs.push('--fail-on-execute-blocked');
   }
 
-  const loopResult = runScript('interactive-customization-loop', SCRIPT_INTERACTIVE_LOOP, loopArgs, cwd);
+  const loopResult = runScript(
+    'interactive-customization-loop',
+    SCRIPT_INTERACTIVE_LOOP,
+    loopArgs,
+    cwd,
+    ['--auth-password', '--auth-password-hash']
+  );
   if (loopResult.error) {
     throw new Error(`interactive-customization-loop failed: ${loopResult.error.message}`);
   }
@@ -642,8 +725,16 @@ async function main() {
     },
     summary: {
       status: loopPayload && loopPayload.summary ? loopPayload.summary.status : null,
+      dialogue_decision: loopPayload && loopPayload.dialogue ? loopPayload.dialogue.decision : null,
       gate_decision: loopPayload && loopPayload.gate ? loopPayload.gate.decision : null,
       execution_result: loopPayload && loopPayload.execution ? loopPayload.execution.result : null,
+      execution_reason: loopPayload && loopPayload.execution ? loopPayload.execution.reason || null : null,
+      authorization_password_required: loopPayload && loopPayload.approval && loopPayload.approval.authorization
+        ? loopPayload.approval.authorization.password_required === true
+        : null,
+      authorization_password_verified: loopPayload && loopPayload.approval && loopPayload.approval.authorization
+        ? loopPayload.approval.authorization.password_verified === true
+        : null,
       matrix_status: matrixStageStatus,
       matrix_portfolio_passed: matrixPortfolioPassed,
       matrix_regression_count: matrixRegressionCount
@@ -652,6 +743,7 @@ async function main() {
       input: toRelative(cwd, inputPath),
       bridge_context_json: toRelative(cwd, bridgeOutContextPath),
       bridge_report_json: toRelative(cwd, bridgeOutReportPath),
+      dialogue_json: loopPayload && loopPayload.artifacts ? loopPayload.artifacts.dialogue_json || null : null,
       loop_summary_json: toRelative(cwd, loopOutPath),
       flow_summary_json: toRelative(cwd, flowOutPath),
       matrix_summary_json: options.matrix ? toRelative(cwd, matrixOutPath) : null,
@@ -670,6 +762,7 @@ async function main() {
     process.stdout.write('Interactive flow completed.\n');
     process.stdout.write(`- Session: ${flowPayload.session_id}\n`);
     process.stdout.write(`- Status: ${flowPayload.summary.status || 'unknown'}\n`);
+    process.stdout.write(`- Dialogue decision: ${flowPayload.summary.dialogue_decision || 'n/a'}\n`);
     process.stdout.write(`- Gate decision: ${flowPayload.summary.gate_decision || 'n/a'}\n`);
     if (options.matrix) {
       process.stdout.write(`- Matrix status: ${flowPayload.summary.matrix_status || 'unknown'}\n`);
@@ -722,6 +815,7 @@ module.exports = {
   normalizeSessionId,
   parseJsonOutput,
   tryParseJsonOutput,
+  buildCommandString,
   runScript,
   appendJsonLine,
   main

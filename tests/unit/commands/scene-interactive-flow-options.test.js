@@ -10,10 +10,13 @@ describe('scene interactive-flow option helpers', () => {
       provider: ' MOQUI ',
       goal: ' improve approval speed ',
       executionMode: 'apply',
+      dialoguePolicy: ' docs/interactive-customization/dialogue-governance-policy-baseline.json ',
       contextContract: ' docs/interactive-customization/moqui-copilot-context-contract.json ',
       feedbackScore: '4.5',
       feedbackTags: 'moqui,approval',
       feedbackChannel: 'UI',
+      authPasswordHash: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      authPasswordEnv: ' SCE_INTERACTIVE_AUTH_PASSWORD_SHA256 ',
       matrixMinScore: '75',
       matrixMinValidRate: '95',
       matrixSignals: ' .kiro/reports/custom-matrix.jsonl ',
@@ -25,10 +28,13 @@ describe('scene interactive-flow option helpers', () => {
     expect(normalized.provider).toBe('moqui');
     expect(normalized.goal).toBe('improve approval speed');
     expect(normalized.executionMode).toBe('apply');
+    expect(normalized.dialoguePolicy).toBe('docs/interactive-customization/dialogue-governance-policy-baseline.json');
     expect(normalized.contextContract).toBe('docs/interactive-customization/moqui-copilot-context-contract.json');
     expect(normalized.feedbackScore).toBe(4.5);
     expect(normalized.feedbackTags).toBe('moqui,approval');
     expect(normalized.feedbackChannel).toBe('ui');
+    expect(normalized.authPasswordHash).toBe('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+    expect(normalized.authPasswordEnv).toBe('SCE_INTERACTIVE_AUTH_PASSWORD_SHA256');
     expect(normalized.matrixMinScore).toBe(75);
     expect(normalized.matrixMinValidRate).toBe(95);
     expect(normalized.matrixSignals).toBe('.kiro/reports/custom-matrix.jsonl');
@@ -115,6 +121,16 @@ describe('scene interactive-flow option helpers', () => {
       matrixMinScore: 80,
       matrixMinValidRate: -1
     })).toBe('--matrix-min-valid-rate must be a number between 0 and 100');
+
+    expect(validateSceneInteractiveFlowOptions({
+      input: 'docs/moqui-provider.json',
+      provider: 'moqui',
+      goal: 'x',
+      executionMode: 'apply',
+      feedbackChannel: 'ui',
+      feedbackScore: null,
+      authPasswordHash: 'bad-hash'
+    })).toBe('--auth-password-hash must be a sha256 hex string (64 chars)');
   });
 
   test('validate accepts valid options', () => {

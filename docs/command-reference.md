@@ -987,9 +987,10 @@ Interactive context bridge helper (script-level provider normalization):
   - npm alias: `npm run report:interactive-context-bridge`
 
 Interactive full flow helper (script-level one-command entry):
-- `node scripts/interactive-flow.js --input <path> (--goal <text> | --goal-file <path>) [--provider <moqui|generic>] [--execution-mode <suggestion|apply>] [--policy <path>] [--catalog <path>] [--context-contract <path>] [--auto-execute-low-risk] [--feedback-score <0..5>] [--no-matrix] [--matrix-min-score <0..100>] [--matrix-min-valid-rate <0..100>] [--matrix-compare-with <path>] [--matrix-signals <path>] [--matrix-fail-on-portfolio-fail] [--matrix-fail-on-regression] [--json]`: run `context-bridge -> interactive-loop -> matrix-baseline-snapshot` in one command for Moqui workbench integration.
+- `node scripts/interactive-flow.js --input <path> (--goal <text> | --goal-file <path>) [--provider <moqui|generic>] [--execution-mode <suggestion|apply>] [--policy <path>] [--catalog <path>] [--dialogue-policy <path>] [--context-contract <path>] [--auto-execute-low-risk] [--auth-password-hash <sha256>] [--auth-password <text>] [--feedback-score <0..5>] [--no-matrix] [--matrix-min-score <0..100>] [--matrix-min-valid-rate <0..100>] [--matrix-compare-with <path>] [--matrix-signals <path>] [--matrix-fail-on-portfolio-fail] [--matrix-fail-on-regression] [--json]`: run `context-bridge -> interactive-loop -> matrix-baseline-snapshot` in one command for Moqui workbench integration.
   - Default flow artifact root: `.kiro/reports/interactive-flow/<session-id>/`
   - Default flow summary output: `.kiro/reports/interactive-flow/<session-id>/interactive-flow.summary.json`
+  - Default dialogue report output: `.kiro/reports/interactive-flow/<session-id>/interactive-dialogue-governance.json`
   - Default matrix outputs:
     - `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.json`
     - `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.md`
@@ -1008,6 +1009,12 @@ Interactive read-only intent helper (script-level stage-A copilot bridge):
   - Contract validation is strict by default (required fields, payload size, forbidden keys).
   - This helper never executes write actions; it only produces suggestion-stage artifacts.
 
+Interactive dialogue governance helper (script-level communication-rule gate):
+- `node scripts/interactive-dialogue-governance.js (--goal <text> | --goal-file <path>) [--context <path>] [--policy <path>] [--out <path>] [--fail-on-deny] [--json]`: evaluate user request text against embedded-assistant communication policy, output `allow|clarify|deny`, and produce clarification questions for non-technical users.
+  - Default output: `.kiro/reports/interactive-dialogue-governance.json`
+  - Default policy: `docs/interactive-customization/dialogue-governance-policy-baseline.json` (fallback builtin policy when missing)
+  - `--fail-on-deny` exits with code `2` to block unsafe requests in CI/automation.
+
 Interactive change-plan generator helper (script-level stage-B planning bridge):
 - `node scripts/interactive-plan-build.js --intent <path> [--context <path>] [--execution-mode <suggestion|apply>] [--out-plan <path>] [--out-markdown <path>] [--json]`: generate structured `Change_Plan` from `Change_Intent`, including action candidates, risk level, verification checks, rollback plan, approval status, and gate hint command.
   - Default outputs:
@@ -1016,19 +1023,21 @@ Interactive change-plan generator helper (script-level stage-B planning bridge):
   - Generated plans can be evaluated directly by `interactive-change-plan-gate`.
 
 Interactive one-click loop helper (script-level orchestration entry):
-- `node scripts/interactive-customization-loop.js --context <path> (--goal <text> | --goal-file <path>) [--execution-mode <suggestion|apply>] [--policy <path>] [--catalog <path>] [--context-contract <path>] [--no-strict-contract] [--auto-approve-low-risk] [--auto-execute-low-risk] [--feedback-score <0..5>] [--feedback-comment <text>] [--feedback-tags <csv>] [--allow-suggestion-apply] [--fail-on-gate-non-allow] [--json]`: run intent->plan->gate->approval pipeline in one command and optionally trigger low-risk one-click apply via Moqui adapter.
-  - CLI equivalent: `sce scene interactive-loop --context <path> --goal "<goal>" --context-contract docs/interactive-customization/moqui-copilot-context-contract.json --execution-mode apply --auto-execute-low-risk --feedback-score 5 --json`
+- `node scripts/interactive-customization-loop.js --context <path> (--goal <text> | --goal-file <path>) [--execution-mode <suggestion|apply>] [--policy <path>] [--catalog <path>] [--dialogue-policy <path>] [--context-contract <path>] [--no-strict-contract] [--auto-approve-low-risk] [--auto-execute-low-risk] [--auth-password-hash <sha256>] [--auth-password <text>] [--feedback-score <0..5>] [--feedback-comment <text>] [--feedback-tags <csv>] [--allow-suggestion-apply] [--fail-on-dialogue-deny] [--fail-on-gate-non-allow] [--json]`: run dialogue->intent->plan->gate->approval pipeline in one command and optionally trigger low-risk one-click apply via Moqui adapter.
+  - CLI equivalent: `sce scene interactive-loop --context <path> --goal "<goal>" --context-contract docs/interactive-customization/moqui-copilot-context-contract.json --execution-mode apply --auto-execute-low-risk --auth-password "<password>" --feedback-score 5 --json`
   - Default loop artifact root: `.kiro/reports/interactive-loop/<session-id>/`
   - Default summary output: `.kiro/reports/interactive-loop/<session-id>/interactive-customization-loop.summary.json`
-  - `--auto-execute-low-risk` executes `interactive-moqui-adapter --action low-risk-apply` only when `risk_level=low` and gate decision=`allow`.
+  - `--auto-execute-low-risk` executes `interactive-moqui-adapter --action low-risk-apply` only when `risk_level=low`, dialogue decision != `deny`, and gate decision=`allow`.
+  - Apply-mode mutating plans require password authorization by default (`plan.authorization.password_required=true`).
   - `--feedback-score` logs feedback to both session artifact and global governance file (`.kiro/reports/interactive-user-feedback.jsonl`).
 - npm alias: `npm run run:interactive-loop -- --context docs/interactive-customization/page-context.sample.json --goal "Improve order entry clarity" --json`
 
 Interactive approval workflow helper (script-level stage-B approval state machine):
-- `node scripts/interactive-approval-workflow.js --action <init|submit|approve|reject|execute|verify|archive|status> [--plan <path>] [--state-file <path>] [--audit-file <path>] [--actor <id>] [--comment <text>] [--force] [--json]`: maintain approval lifecycle state for interactive change plans and append approval events to JSONL audit logs.
+- `node scripts/interactive-approval-workflow.js --action <init|submit|approve|reject|execute|verify|archive|status> [--plan <path>] [--state-file <path>] [--audit-file <path>] [--actor <id>] [--comment <text>] [--password <text>] [--password-hash <sha256>] [--password-hash-env <name>] [--password-required] [--password-scope <csv>] [--json]`: maintain approval lifecycle state for interactive change plans and append approval events to JSONL audit logs.
   - Default state file: `.kiro/reports/interactive-approval-state.json`
   - Default audit file: `.kiro/reports/interactive-approval-events.jsonl`
   - `init` requires `--plan`; high-risk plans are marked as `approval_required=true`.
+  - Password authorization can be required per plan (`plan.authorization.password_required=true`) or overridden in `init`.
   - `execute` is blocked (exit code `2`) when approval is required but current status is not `approved`.
 
 Interactive Moqui adapter helper (script-level stage-C controlled execution contract):

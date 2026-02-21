@@ -13,6 +13,14 @@
     "forbid_plaintext_secrets": true,
     "require_backup_for_irreversible_actions": true
   },
+  "authorization_policy": {
+    "require_password_for_apply_mutations": true,
+    "password_scope": [
+      "execute"
+    ],
+    "password_hash_env": "SCE_INTERACTIVE_AUTH_PASSWORD_SHA256",
+    "password_ttl_seconds": 600
+  },
   "catalog_policy": {
     "catalog_file": "docs/interactive-customization/high-risk-action-catalog.json"
   }

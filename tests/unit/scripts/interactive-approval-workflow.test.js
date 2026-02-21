@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const os = require('os');
 const path = require('path');
+const crypto = require('crypto');
 const { spawnSync } = require('child_process');
 
 describe('interactive-approval-workflow script', () => {
@@ -171,5 +172,79 @@ describe('interactive-approval-workflow script', () => {
     expect(payload.decision).toBe('blocked');
     expect(payload.reason).toContain('cannot approve');
     expect(payload.state.status).toBe('draft');
+  });
+
+  test('requires password authorization for execute when plan marks password_required', async () => {
+    const projectRoot = path.resolve(__dirname, '..', '..', '..');
+    const scriptPath = path.join(projectRoot, 'scripts', 'interactive-approval-workflow.js');
+    const workspace = path.join(tempDir, 'workspace-auth');
+    const passwordHash = crypto.createHash('sha256').update('demo-pass').digest('hex');
+    const planFile = await writePlan(workspace, 'plan-auth.json', {
+      plan_id: 'plan-auth-001',
+      intent_id: 'intent-auth-001',
+      risk_level: 'low',
+      execution_mode: 'apply',
+      actions: [
+        {
+          action_id: 'act-001',
+          type: 'ui_form_field_adjust',
+          requires_privilege_escalation: false
+        }
+      ],
+      approval: {
+        status: 'not-required'
+      },
+      authorization: {
+        password_required: true,
+        password_scope: ['execute'],
+        password_hash: passwordHash,
+        password_ttl_seconds: 600
+      }
+    });
+
+    let result = runScript(scriptPath, workspace, [
+      '--action', 'init',
+      '--plan', planFile,
+      '--actor', 'owner-auth',
+      '--json'
+    ]);
+    expect(result.status).toBe(0);
+
+    result = runScript(scriptPath, workspace, [
+      '--action', 'submit',
+      '--actor', 'owner-auth',
+      '--json'
+    ]);
+    expect(result.status).toBe(0);
+
+    result = runScript(scriptPath, workspace, [
+      '--action', 'execute',
+      '--actor', 'owner-auth',
+      '--json'
+    ]);
+    expect(result.status).toBe(2);
+    let payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.reason).toContain('password authorization required');
+
+    result = runScript(scriptPath, workspace, [
+      '--action', 'execute',
+      '--actor', 'owner-auth',
+      '--password', 'bad-pass',
+      '--json'
+    ]);
+    expect(result.status).toBe(2);
+    payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.reason).toContain('password authorization failed');
+
+    result = runScript(scriptPath, workspace, [
+      '--action', 'execute',
+      '--actor', 'owner-auth',
+      '--password', 'demo-pass',
+      '--json'
+    ]);
+    expect(result.status).toBe(0);
+    payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.state.status).toBe('executed');
+    expect(payload.authorization.password_verified).toBe(true);
   });
 });

@@ -3,6 +3,7 @@
 
 const path = require('path');
 const fs = require('fs-extra');
+const crypto = require('crypto');
 const { spawnSync } = require('child_process');
 
 const DEFAULT_INPUT = 'docs/interactive-customization/moqui-context-provider.sample.json';
@@ -118,6 +119,8 @@ async function main() {
     '--catalog', catalogPath,
     '--execution-mode', 'apply',
     '--auto-execute-low-risk',
+    '--auth-password-hash', crypto.createHash('sha256').update('smoke-pass').digest('hex'),
+    '--auth-password', 'smoke-pass',
     '--feedback-score', '5',
     '--out', outPath,
     '--json'

@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const os = require('os');
 const path = require('path');
+const crypto = require('crypto');
 const { spawnSync } = require('child_process');
 
 describe('interactive-customization-loop script', () => {
@@ -113,6 +114,7 @@ describe('interactive-customization-loop script', () => {
     expect(result.status).toBe(0);
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.mode).toBe('interactive-customization-loop');
+    expect(payload.dialogue.decision).toBe('allow');
     expect(payload.gate.decision).toBe('allow');
     expect(payload.summary.status).toBe('ready-for-apply');
     expect(payload.execution.attempted).toBe(false);
@@ -132,6 +134,8 @@ describe('interactive-customization-loop script', () => {
       '--goal', 'Adjust order screen field layout for clearer input flow',
       '--execution-mode', 'apply',
       '--auto-execute-low-risk',
+      '--auth-password-hash', crypto.createHash('sha256').update('demo-pass').digest('hex'),
+      '--auth-password', 'demo-pass',
       '--user-id', 'biz-user',
       '--policy', policyPath,
       '--catalog', catalogPath,
@@ -144,6 +148,8 @@ describe('interactive-customization-loop script', () => {
     expect(payload.execution.blocked).toBe(false);
     expect(payload.execution.result).toBe('success');
     expect(payload.summary.status).toBe('completed');
+    expect(payload.approval.authorization.password_required).toBe(true);
+    expect(payload.approval.authorization.password_verified).toBe(true);
 
     const adapterOutput = path.join(workspace, payload.artifacts.adapter_json);
     expect(await fs.pathExists(adapterOutput)).toBe(true);
@@ -182,6 +188,8 @@ describe('interactive-customization-loop script', () => {
       '--goal', 'Adjust order screen field layout for clearer input flow',
       '--execution-mode', 'apply',
       '--auto-execute-low-risk',
+      '--auth-password-hash', crypto.createHash('sha256').update('demo-pass').digest('hex'),
+      '--auth-password', 'demo-pass',
       '--user-id', 'biz-user',
       '--policy', policyPath,
       '--catalog', catalogPath,
@@ -248,8 +256,9 @@ describe('interactive-customization-loop script', () => {
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.summary.status).toBe('ready-for-apply');
     expect(Array.isArray(payload.steps)).toBe(true);
-    expect(payload.steps[0].name).toBe('intent');
-    expect(payload.steps[0].payload.contract_validation.valid).toBe(false);
-    expect(payload.steps[0].payload.contract_validation.issues.length).toBeGreaterThan(0);
+    const intentStep = payload.steps.find(step => step && step.name === 'intent');
+    expect(intentStep).toBeTruthy();
+    expect(intentStep.payload.contract_validation.valid).toBe(false);
+    expect(intentStep.payload.contract_validation.issues.length).toBeGreaterThan(0);
   });
 });

@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const os = require('os');
 const path = require('path');
+const crypto = require('crypto');
 const { spawnSync } = require('child_process');
 
 describe('interactive-flow script', () => {
@@ -130,6 +131,7 @@ describe('interactive-flow script', () => {
     expect(payload.pipeline.matrix.exit_code).toBe(0);
     expect(payload.pipeline.matrix.status).toBe('completed');
     expect(payload.summary.status).toBe('ready-for-apply');
+    expect(payload.summary.dialogue_decision).toBe('allow');
     expect(payload.summary.matrix_status).toBe('completed');
 
     const bridgeContextFile = path.join(workspace, payload.artifacts.bridge_context_json);
@@ -165,6 +167,8 @@ describe('interactive-flow script', () => {
       '--goal', 'Adjust order screen field layout for clearer input flow',
       '--execution-mode', 'apply',
       '--auto-execute-low-risk',
+      '--auth-password-hash', crypto.createHash('sha256').update('demo-pass').digest('hex'),
+      '--auth-password', 'demo-pass',
       '--feedback-score', '5',
       '--policy', policyPath,
       '--catalog', catalogPath,
@@ -175,6 +179,7 @@ describe('interactive-flow script', () => {
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.summary.status).toBe('completed');
     expect(payload.summary.execution_result).toBe('success');
+    expect(payload.summary.authorization_password_verified).toBe(true);
     expect(payload.pipeline.loop.payload.feedback.logged).toBe(true);
   });
 

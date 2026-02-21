@@ -10,8 +10,10 @@ const DEFAULT_OUT_DIR = '.kiro/reports/interactive-loop';
 const DEFAULT_USER_ID = 'anonymous-user';
 const DEFAULT_APPROVAL_ACTOR = 'workflow-operator';
 const DEFAULT_FEEDBACK_CHANNEL = 'ui';
+const DEFAULT_AUTH_PASSWORD_HASH_ENV = 'SCE_INTERACTIVE_AUTH_PASSWORD_SHA256';
 const FEEDBACK_CHANNELS = new Set(['ui', 'cli', 'api', 'other']);
 
+const SCRIPT_DIALOGUE = path.resolve(__dirname, 'interactive-dialogue-governance.js');
 const SCRIPT_INTENT = path.resolve(__dirname, 'interactive-intent-build.js');
 const SCRIPT_PLAN = path.resolve(__dirname, 'interactive-plan-build.js');
 const SCRIPT_GATE = path.resolve(__dirname, 'interactive-change-plan-gate.js');
@@ -29,6 +31,8 @@ function parseArgs(argv) {
     executionMode: 'suggestion',
     policy: null,
     catalog: null,
+    dialoguePolicy: null,
+    dialogueOut: null,
     contextContract: null,
     strictContract: true,
     moquiConfig: null,
@@ -46,6 +50,10 @@ function parseArgs(argv) {
     feedbackComment: null,
     feedbackTags: [],
     feedbackChannel: DEFAULT_FEEDBACK_CHANNEL,
+    authPassword: null,
+    authPasswordHash: null,
+    authPasswordEnv: null,
+    failOnDialogueDeny: false,
     failOnGateDeny: false,
     failOnGateNonAllow: false,
     failOnExecuteBlocked: false,
@@ -79,6 +87,12 @@ function parseArgs(argv) {
       index += 1;
     } else if (token === '--catalog' && next) {
       options.catalog = next;
+      index += 1;
+    } else if (token === '--dialogue-policy' && next) {
+      options.dialoguePolicy = next;
+      index += 1;
+    } else if (token === '--dialogue-out' && next) {
+      options.dialogueOut = next;
       index += 1;
     } else if (token === '--context-contract' && next) {
       options.contextContract = next;
@@ -124,6 +138,17 @@ function parseArgs(argv) {
     } else if (token === '--feedback-channel' && next) {
       options.feedbackChannel = next;
       index += 1;
+    } else if (token === '--auth-password' && next) {
+      options.authPassword = next;
+      index += 1;
+    } else if (token === '--auth-password-hash' && next) {
+      options.authPasswordHash = next;
+      index += 1;
+    } else if (token === '--auth-password-env' && next) {
+      options.authPasswordEnv = next;
+      index += 1;
+    } else if (token === '--fail-on-dialogue-deny') {
+      options.failOnDialogueDeny = true;
     } else if (token === '--fail-on-gate-deny') {
       options.failOnGateDeny = true;
     } else if (token === '--fail-on-gate-non-allow') {
@@ -151,12 +176,28 @@ function parseArgs(argv) {
       throw new Error('--feedback-score must be between 0 and 5.');
     }
   }
+  if (options.authPasswordHash != null) {
+    const normalizedHash = `${options.authPasswordHash || ''}`.trim();
+    if (!/^[a-fA-F0-9]{64}$/.test(normalizedHash)) {
+      throw new Error('--auth-password-hash must be a sha256 hex string (64 chars).');
+    }
+  }
+  if (options.authPasswordEnv != null && `${options.authPasswordEnv || ''}`.trim().length === 0) {
+    throw new Error('--auth-password-env cannot be empty.');
+  }
 
   options.userId = `${options.userId || ''}`.trim() || DEFAULT_USER_ID;
   options.approvalActor = `${options.approvalActor || ''}`.trim() || DEFAULT_APPROVAL_ACTOR;
   options.approverActor = `${options.approverActor || ''}`.trim() || options.approvalActor;
   options.feedbackComment = `${options.feedbackComment || ''}`.trim() || null;
+  options.dialoguePolicy = `${options.dialoguePolicy || ''}`.trim() || null;
+  options.dialogueOut = `${options.dialogueOut || ''}`.trim() || null;
   options.feedbackChannel = `${options.feedbackChannel || ''}`.trim().toLowerCase() || DEFAULT_FEEDBACK_CHANNEL;
+  options.authPassword = options.authPassword == null ? null : `${options.authPassword}`;
+  options.authPasswordHash = options.authPasswordHash == null
+    ? null
+    : `${options.authPasswordHash}`.trim().toLowerCase();
+  options.authPasswordEnv = `${options.authPasswordEnv || ''}`.trim() || null;
   if (!FEEDBACK_CHANNELS.has(options.feedbackChannel)) {
     throw new Error(`--feedback-channel must be one of: ${Array.from(FEEDBACK_CHANNELS).join(', ')}`);
   }
@@ -170,7 +211,7 @@ function printHelpAndExit(code) {
     'Usage: node scripts/interactive-customization-loop.js --context <path> (--goal <text> | --goal-file <path>) [options]',
     '',
     'Pipeline:',
-    '  intent -> plan -> gate -> approval(init/submit) -> optional low-risk apply',
+    '  dialogue -> intent -> plan -> gate -> approval(init/submit) -> optional low-risk apply',
     '',
     'Options:',
     '  --context <path>                 Page context JSON file (required)',
@@ -181,6 +222,8 @@ function printHelpAndExit(code) {
     '  --execution-mode <mode>          suggestion|apply (default: suggestion)',
     '  --policy <path>                  Guardrail policy override',
     '  --catalog <path>                 High-risk catalog override',
+    '  --dialogue-policy <path>         Dialogue governance policy override',
+    '  --dialogue-out <path>            Dialogue governance report output path',
     '  --context-contract <path>        Context contract override for intent build',
     '  --no-strict-contract             Do not fail when context contract validation has issues',
     '  --moqui-config <path>            Moqui adapter runtime config',
@@ -198,6 +241,10 @@ function printHelpAndExit(code) {
     '  --feedback-comment <text>        Optional user feedback comment',
     '  --feedback-tags <csv>            Optional feedback tags (comma-separated)',
     `  --feedback-channel <name>        ui|cli|api|other (default: ${DEFAULT_FEEDBACK_CHANNEL})`,
+    '  --auth-password <text>           One-time password for protected execute action',
+    '  --auth-password-hash <sha256>    Password verifier hash override',
+    `  --auth-password-env <name>       Password hash env name (default: ${DEFAULT_AUTH_PASSWORD_HASH_ENV})`,
+    '  --fail-on-dialogue-deny          Exit code 2 if dialogue decision is deny',
     '  --fail-on-gate-deny              Exit code 2 if gate decision is deny',
     '  --fail-on-gate-non-allow         Exit code 2 if gate decision is deny/review-required',
     '  --fail-on-execute-blocked        Exit code 2 if auto execute result is blocked/non-success',
@@ -230,6 +277,22 @@ function parseJsonOutput(text, label) {
   } catch (error) {
     throw new Error(`${label} returned invalid JSON: ${error.message}`);
   }
+}
+
+function buildCommandString(scriptPath, args, redactFlags = []) {
+  const redacted = new Set(redactFlags);
+  const maskedArgs = [];
+  for (let index = 0; index < args.length; index += 1) {
+    const token = args[index];
+    maskedArgs.push(token);
+    if (redacted.has(token)) {
+      if (index + 1 < args.length) {
+        maskedArgs.push('***');
+        index += 1;
+      }
+    }
+  }
+  return [process.execPath, scriptPath, ...maskedArgs].join(' ');
 }
 
 function runScript({
@@ -272,13 +335,21 @@ function buildStep(name, payload, command, exitCode) {
   };
 }
 
-function shouldAutoLowRisk(gateDecision, riskLevel) {
-  return `${gateDecision || ''}`.trim().toLowerCase() === 'allow' &&
+function shouldAutoLowRisk(gateDecision, riskLevel, dialogueDecision) {
+  return `${dialogueDecision || ''}`.trim().toLowerCase() !== 'deny' &&
+    `${gateDecision || ''}`.trim().toLowerCase() === 'allow' &&
     `${riskLevel || ''}`.trim().toLowerCase() === 'low';
 }
 
-function buildSummaryStatus({ gateDecision, executionAttempted, executionBlocked, executionResult }) {
+function buildSummaryStatus({ dialogueDecision, gateDecision, executionAttempted, executionBlocked, executionResult }) {
+  const normalizedDialogueDecision = `${dialogueDecision || ''}`.trim().toLowerCase();
   const decision = `${gateDecision || ''}`.trim().toLowerCase();
+  if (normalizedDialogueDecision === 'deny') {
+    return 'blocked';
+  }
+  if (normalizedDialogueDecision === 'clarify' && decision === 'allow' && !executionAttempted) {
+    return 'requires-clarification';
+  }
   if (decision === 'deny') {
     return 'blocked';
   }
@@ -297,12 +368,26 @@ function buildSummaryStatus({ gateDecision, executionAttempted, executionBlocked
   return 'apply-finished-with-risk';
 }
 
-function buildNextActions({ gateDecision, riskLevel, autoExecuteTriggered, executionPayload, approvalStatus, feedbackLogged, artifacts }) {
+function buildNextActions({
+  dialogueDecision,
+  gateDecision,
+  riskLevel,
+  autoExecuteTriggered,
+  executionPayload,
+  executionReason,
+  approvalStatus,
+  feedbackLogged,
+  artifacts
+}) {
   const actions = [];
+  const dialogue = `${dialogueDecision || ''}`.trim().toLowerCase();
   const decision = `${gateDecision || ''}`.trim().toLowerCase();
   const risk = `${riskLevel || ''}`.trim().toLowerCase();
 
-  if (decision === 'deny') {
+  if (dialogue === 'deny') {
+    actions.push('Rewrite the goal to remove sensitive/forbidden requests and rerun dialogue governance.');
+    actions.push(`node scripts/interactive-dialogue-governance.js --goal "..." --context ${artifacts.context_json} --json`);
+  } else if (decision === 'deny') {
     actions.push('Revise business goal wording and regenerate intent/plan before retrying.');
     actions.push('Review gate failure reasons in the generated gate markdown report.');
   } else if (decision === 'review-required') {
@@ -325,6 +410,9 @@ function buildNextActions({ gateDecision, riskLevel, autoExecuteTriggered, execu
       actions.push('Execution was blocked or failed. Inspect adapter output and adjust plan/policy.');
       actions.push(`node scripts/interactive-moqui-adapter.js --action validate --plan ${artifacts.plan_json} --json`);
     }
+  } else if (`${executionReason || ''}`.toLowerCase().includes('password authorization')) {
+    actions.push('Provide one-time password authorization and rerun low-risk apply.');
+    actions.push(`node scripts/interactive-customization-loop.js --context ${artifacts.context_json} --goal "..." --execution-mode apply --auto-execute-low-risk --auth-password "<password>" --json`);
   }
 
   if (risk === 'low' && approvalStatus === 'submitted') {
@@ -348,6 +436,10 @@ async function main() {
 
   const artifacts = {
     session_dir: toRelative(cwd, sessionDir),
+    context_json: toRelative(cwd, contextPath),
+    dialogue_json: toRelative(cwd, options.dialogueOut
+      ? resolvePath(cwd, options.dialogueOut)
+      : path.join(sessionDir, 'interactive-dialogue-governance.json')),
     intent_json: toRelative(cwd, path.join(sessionDir, 'interactive-change-intent.json')),
     explain_md: toRelative(cwd, path.join(sessionDir, 'interactive-page-explain.md')),
     intent_audit_jsonl: toRelative(cwd, path.join(sessionDir, 'interactive-copilot-audit.jsonl')),
@@ -366,6 +458,35 @@ async function main() {
   await fs.ensureDir(sessionDir);
 
   const steps = [];
+
+  const dialogueArgs = [
+    '--context', contextPath,
+    '--out', resolvePath(cwd, artifacts.dialogue_json),
+    '--json'
+  ];
+  if (options.goal) {
+    dialogueArgs.push('--goal', options.goal);
+  } else {
+    dialogueArgs.push('--goal-file', resolvePath(cwd, options.goalFile));
+  }
+  if (options.dialoguePolicy) {
+    dialogueArgs.push('--policy', resolvePath(cwd, options.dialoguePolicy));
+  }
+  const dialogueResult = runScript({
+    label: 'interactive-dialogue-governance',
+    scriptPath: SCRIPT_DIALOGUE,
+    args: dialogueArgs,
+    cwd,
+    allowedExitCodes: [0]
+  });
+  const dialoguePayload = parseJsonOutput(dialogueResult.stdout, 'interactive-dialogue-governance');
+  const dialogueDecision = dialoguePayload && dialoguePayload.decision ? dialoguePayload.decision : 'allow';
+  steps.push(buildStep(
+    'dialogue',
+    dialoguePayload,
+    buildCommandString(SCRIPT_DIALOGUE, dialogueArgs),
+    dialogueResult.exit_code
+  ));
 
   const intentArgs = [
     '--context', contextPath,
@@ -395,7 +516,7 @@ async function main() {
     allowedExitCodes: [0]
   });
   const intentPayload = parseJsonOutput(intentResult.stdout, 'interactive-intent-build');
-  steps.push(buildStep('intent', intentPayload, [process.execPath, SCRIPT_INTENT, ...intentArgs].join(' '), intentResult.exit_code));
+  steps.push(buildStep('intent', intentPayload, buildCommandString(SCRIPT_INTENT, intentArgs), intentResult.exit_code));
 
   const planArgs = [
     '--intent', resolvePath(cwd, artifacts.intent_json),
@@ -413,7 +534,7 @@ async function main() {
     allowedExitCodes: [0]
   });
   const planPayload = parseJsonOutput(planResult.stdout, 'interactive-plan-build');
-  steps.push(buildStep('plan', planPayload, [process.execPath, SCRIPT_PLAN, ...planArgs].join(' '), planResult.exit_code));
+  steps.push(buildStep('plan', planPayload, buildCommandString(SCRIPT_PLAN, planArgs), planResult.exit_code));
 
   const gateArgs = [
     '--plan', resolvePath(cwd, artifacts.plan_json),
@@ -435,7 +556,7 @@ async function main() {
     allowedExitCodes: [0]
   });
   const gatePayload = parseJsonOutput(gateResult.stdout, 'interactive-change-plan-gate');
-  steps.push(buildStep('gate', gatePayload, [process.execPath, SCRIPT_GATE, ...gateArgs].join(' '), gateResult.exit_code));
+  steps.push(buildStep('gate', gatePayload, buildCommandString(SCRIPT_GATE, gateArgs), gateResult.exit_code));
 
   const approvalInitArgs = [
     '--action', 'init',
@@ -447,6 +568,12 @@ async function main() {
     '--force',
     '--json'
   ];
+  if (options.authPasswordHash) {
+    approvalInitArgs.push('--password-hash', options.authPasswordHash);
+  }
+  if (options.authPasswordEnv) {
+    approvalInitArgs.push('--password-hash-env', options.authPasswordEnv);
+  }
   const approvalInitResult = runScript({
     label: 'interactive-approval-workflow:init',
     scriptPath: SCRIPT_APPROVAL,
@@ -455,9 +582,13 @@ async function main() {
     allowedExitCodes: [0]
   });
   const approvalInitPayload = parseJsonOutput(approvalInitResult.stdout, 'interactive-approval-workflow:init');
-  steps.push(buildStep('approval_init', approvalInitPayload, [process.execPath, SCRIPT_APPROVAL, ...approvalInitArgs].join(' '), approvalInitResult.exit_code));
+  steps.push(buildStep(
+    'approval_init',
+    approvalInitPayload,
+    buildCommandString(SCRIPT_APPROVAL, approvalInitArgs, ['--password-hash']),
+    approvalInitResult.exit_code
+  ));
 
-  let latestApprovalPayload = approvalInitPayload;
   if (!options.skipSubmit) {
     const approvalSubmitArgs = [
       '--action', 'submit',
@@ -474,13 +605,13 @@ async function main() {
       cwd,
       allowedExitCodes: [0]
     });
-    latestApprovalPayload = parseJsonOutput(approvalSubmitResult.stdout, 'interactive-approval-workflow:submit');
-    steps.push(buildStep('approval_submit', latestApprovalPayload, [process.execPath, SCRIPT_APPROVAL, ...approvalSubmitArgs].join(' '), approvalSubmitResult.exit_code));
+    const approvalSubmitPayload = parseJsonOutput(approvalSubmitResult.stdout, 'interactive-approval-workflow:submit');
+    steps.push(buildStep('approval_submit', approvalSubmitPayload, buildCommandString(SCRIPT_APPROVAL, approvalSubmitArgs), approvalSubmitResult.exit_code));
   }
 
   const gateDecision = gatePayload && gatePayload.decision ? gatePayload.decision : 'deny';
   const riskLevel = planPayload && planPayload.plan ? planPayload.plan.risk_level : null;
-  const canAutoLowRisk = shouldAutoLowRisk(gateDecision, riskLevel);
+  const canAutoLowRisk = shouldAutoLowRisk(gateDecision, riskLevel, dialogueDecision);
 
   if (options.autoApproveLowRisk && canAutoLowRisk) {
     const approvalApproveArgs = [
@@ -498,8 +629,8 @@ async function main() {
       cwd,
       allowedExitCodes: [0]
     });
-    latestApprovalPayload = parseJsonOutput(approvalApproveResult.stdout, 'interactive-approval-workflow:approve');
-    steps.push(buildStep('approval_approve_auto', latestApprovalPayload, [process.execPath, SCRIPT_APPROVAL, ...approvalApproveArgs].join(' '), approvalApproveResult.exit_code));
+    const approvalApprovePayload = parseJsonOutput(approvalApproveResult.stdout, 'interactive-approval-workflow:approve');
+    steps.push(buildStep('approval_approve_auto', approvalApprovePayload, buildCommandString(SCRIPT_APPROVAL, approvalApproveArgs), approvalApproveResult.exit_code));
   }
 
   let execution = {
@@ -508,12 +639,52 @@ async function main() {
     blocked: false,
     result: null,
     decision: null,
+    reason: null,
     execution_id: null,
     payload: null,
     exit_code: null
   };
 
   if (options.autoExecuteLowRisk && canAutoLowRisk) {
+    const approvalExecuteArgs = [
+      '--action', 'execute',
+      '--state-file', resolvePath(cwd, artifacts.approval_state_json),
+      '--audit-file', resolvePath(cwd, artifacts.approval_audit_jsonl),
+      '--actor', options.approverActor,
+      '--comment', 'auto execute low-risk allow plan',
+      '--json'
+    ];
+    if (options.authPassword) {
+      approvalExecuteArgs.push('--password', options.authPassword);
+    }
+    const approvalExecuteResult = runScript({
+      label: 'interactive-approval-workflow:execute',
+      scriptPath: SCRIPT_APPROVAL,
+      args: approvalExecuteArgs,
+      cwd,
+      allowedExitCodes: [0, 2]
+    });
+    const approvalExecutePayload = parseJsonOutput(approvalExecuteResult.stdout, 'interactive-approval-workflow:execute');
+    steps.push(buildStep(
+      'approval_execute_auto',
+      approvalExecutePayload,
+      buildCommandString(SCRIPT_APPROVAL, approvalExecuteArgs, ['--password']),
+      approvalExecuteResult.exit_code
+    ));
+
+    if (approvalExecuteResult.exit_code === 2 || approvalExecutePayload.decision === 'blocked') {
+      execution = {
+        attempted: true,
+        auto_triggered: true,
+        blocked: true,
+        result: 'blocked',
+        decision: 'approval-blocked',
+        reason: approvalExecutePayload.reason || 'approval execute blocked',
+        execution_id: null,
+        payload: approvalExecutePayload,
+        exit_code: approvalExecuteResult.exit_code
+      };
+    } else {
     const adapterArgs = [
       '--action', 'low-risk-apply',
       '--plan', resolvePath(cwd, artifacts.plan_json),
@@ -560,11 +731,33 @@ async function main() {
       blocked: adapterResult.exit_code === 2,
       result: record ? record.result : null,
       decision: adapterPayload && adapterPayload.payload ? adapterPayload.payload.decision : null,
+      reason: adapterPayload && adapterPayload.payload ? adapterPayload.payload.reason || null : null,
       execution_id: record ? record.execution_id : null,
       payload: adapterPayload,
       exit_code: adapterResult.exit_code
     };
-    steps.push(buildStep('adapter_low_risk_apply_auto', adapterPayload, [process.execPath, SCRIPT_ADAPTER, ...adapterArgs].join(' '), adapterResult.exit_code));
+    steps.push(buildStep('adapter_low_risk_apply_auto', adapterPayload, buildCommandString(SCRIPT_ADAPTER, adapterArgs), adapterResult.exit_code));
+
+    if (adapterResult.exit_code === 0) {
+      const approvalVerifyArgs = [
+        '--action', 'verify',
+        '--state-file', resolvePath(cwd, artifacts.approval_state_json),
+        '--audit-file', resolvePath(cwd, artifacts.approval_audit_jsonl),
+        '--actor', options.approverActor,
+        '--comment', 'auto verify after successful low-risk apply',
+        '--json'
+      ];
+      const approvalVerifyResult = runScript({
+        label: 'interactive-approval-workflow:verify',
+        scriptPath: SCRIPT_APPROVAL,
+        args: approvalVerifyArgs,
+        cwd,
+        allowedExitCodes: [0, 2]
+      });
+      const approvalVerifyPayload = parseJsonOutput(approvalVerifyResult.stdout, 'interactive-approval-workflow:verify');
+      steps.push(buildStep('approval_verify_auto', approvalVerifyPayload, buildCommandString(SCRIPT_APPROVAL, approvalVerifyArgs), approvalVerifyResult.exit_code));
+    }
+    }
   }
 
   const approvalStatusArgs = [
@@ -581,8 +774,7 @@ async function main() {
     allowedExitCodes: [0]
   });
   const approvalStatusPayload = parseJsonOutput(approvalStatusResult.stdout, 'interactive-approval-workflow:status');
-  latestApprovalPayload = approvalStatusPayload;
-  steps.push(buildStep('approval_status', approvalStatusPayload, [process.execPath, SCRIPT_APPROVAL, ...approvalStatusArgs].join(' '), approvalStatusResult.exit_code));
+  steps.push(buildStep('approval_status', approvalStatusPayload, buildCommandString(SCRIPT_APPROVAL, approvalStatusArgs), approvalStatusResult.exit_code));
 
   const approvalState = approvalStatusPayload && approvalStatusPayload.state ? approvalStatusPayload.state : {};
   const approvalStatus = approvalState && approvalState.status ? approvalState.status : null;
@@ -662,7 +854,7 @@ async function main() {
         'utf8'
       );
     }
-    steps.push(buildStep('feedback_log', feedbackPayload, [process.execPath, SCRIPT_FEEDBACK, ...feedbackArgs].join(' '), feedbackResult.exit_code));
+    steps.push(buildStep('feedback_log', feedbackPayload, buildCommandString(SCRIPT_FEEDBACK, feedbackArgs), feedbackResult.exit_code));
     feedback.logged = true;
     feedback.payload = feedbackPayload;
     feedback.exit_code = feedbackResult.exit_code;
@@ -672,6 +864,7 @@ async function main() {
   }
 
   const summaryStatus = buildSummaryStatus({
+    dialogueDecision,
     gateDecision,
     executionAttempted: execution.attempted,
     executionBlocked: execution.blocked,
@@ -704,7 +897,17 @@ async function main() {
       feedback_score: options.feedbackScore,
       feedback_comment: options.feedbackComment,
       feedback_tags: options.feedbackTags,
-      feedback_channel: options.feedbackChannel
+      feedback_channel: options.feedbackChannel,
+      dialogue_policy: options.dialoguePolicy ? toRelative(cwd, resolvePath(cwd, options.dialoguePolicy)) : null,
+      auth_password_hash: options.authPasswordHash ? '***' : null,
+      auth_password_env: options.authPasswordEnv || DEFAULT_AUTH_PASSWORD_HASH_ENV
+    },
+    dialogue: {
+      decision: dialogueDecision,
+      reasons: Array.isArray(dialoguePayload && dialoguePayload.reasons) ? dialoguePayload.reasons : [],
+      clarification_questions: Array.isArray(dialoguePayload && dialoguePayload.clarification_questions)
+        ? dialoguePayload.clarification_questions
+        : []
     },
     gate: {
       decision: gateDecision,
@@ -715,16 +918,21 @@ async function main() {
       workflow_id: approvalState.workflow_id || null,
       status: approvalStatus,
       approval_required: approvalState.approval_required === true,
-      approvals: approvalState.approvals || {}
+      approvals: approvalState.approvals || {},
+      authorization: approvalStatusPayload && approvalStatusPayload.authorization
+        ? approvalStatusPayload.authorization
+        : {}
     },
     execution,
     summary: {
       status: summaryStatus,
       next_actions: buildNextActions({
+        dialogueDecision,
         gateDecision,
         riskLevel,
       autoExecuteTriggered: execution.auto_triggered === true,
       executionPayload: execution.payload && execution.payload.payload ? execution.payload.payload : null,
+      executionReason: execution.reason,
       approvalStatus,
       feedbackLogged: feedback.logged,
       artifacts
@@ -748,6 +956,8 @@ async function main() {
   }
 
   if (options.failOnGateDeny && `${gateDecision}`.trim().toLowerCase() === 'deny') {
+    process.exitCode = 2;
+  } else if (options.failOnDialogueDeny && `${dialogueDecision}`.trim().toLowerCase() === 'deny') {
     process.exitCode = 2;
   } else if (options.failOnGateNonAllow && `${gateDecision}`.trim().toLowerCase() !== 'allow') {
     process.exitCode = 2;
@@ -773,6 +983,7 @@ module.exports = {
   resolvePath,
   normalizeSessionId,
   parseJsonOutput,
+  buildCommandString,
   runScript,
   toRelative,
   buildStep,

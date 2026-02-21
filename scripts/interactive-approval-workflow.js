@@ -7,6 +7,9 @@ const crypto = require('crypto');
 
 const DEFAULT_STATE_FILE = '.kiro/reports/interactive-approval-state.json';
 const DEFAULT_AUDIT_FILE = '.kiro/reports/interactive-approval-events.jsonl';
+const DEFAULT_PASSWORD_HASH_ENV = 'SCE_INTERACTIVE_AUTH_PASSWORD_SHA256';
+const DEFAULT_PASSWORD_TTL_SECONDS = 600;
+const PASSWORD_SCOPES = new Set(['approve', 'execute']);
 
 function parseArgs(argv) {
   const options = {
@@ -17,6 +20,12 @@ function parseArgs(argv) {
     actor: null,
     comment: null,
     force: false,
+    password: null,
+    passwordHash: null,
+    passwordHashEnv: null,
+    passwordRequired: false,
+    passwordScope: null,
+    passwordTtlSeconds: null,
     json: false
   };
 
@@ -43,6 +52,23 @@ function parseArgs(argv) {
       i += 1;
     } else if (token === '--force') {
       options.force = true;
+    } else if (token === '--password' && next) {
+      options.password = next;
+      i += 1;
+    } else if (token === '--password-hash' && next) {
+      options.passwordHash = next;
+      i += 1;
+    } else if (token === '--password-hash-env' && next) {
+      options.passwordHashEnv = next;
+      i += 1;
+    } else if (token === '--password-required') {
+      options.passwordRequired = true;
+    } else if (token === '--password-scope' && next) {
+      options.passwordScope = next;
+      i += 1;
+    } else if (token === '--password-ttl-seconds' && next) {
+      options.passwordTtlSeconds = Number(next);
+      i += 1;
     } else if (token === '--json') {
       options.json = true;
     } else if (token === '--help' || token === '-h') {
@@ -76,6 +102,23 @@ function parseArgs(argv) {
     throw new Error('--actor is required for mutating actions.');
   }
 
+  if (options.passwordHash && !isSha256Hash(options.passwordHash)) {
+    throw new Error('--password-hash must be a sha256 hex string (64 chars).');
+  }
+  if (options.passwordHashEnv != null && `${options.passwordHashEnv || ''}`.trim().length === 0) {
+    throw new Error('--password-hash-env cannot be empty.');
+  }
+  if (options.passwordScope != null) {
+    options.passwordScope = parsePasswordScope(options.passwordScope, '--password-scope');
+  }
+  if (options.passwordTtlSeconds != null) {
+    if (!Number.isFinite(options.passwordTtlSeconds) || options.passwordTtlSeconds <= 0) {
+      throw new Error('--password-ttl-seconds must be a positive number.');
+    }
+  }
+
+  options.passwordHash = options.passwordHash ? options.passwordHash.trim().toLowerCase() : null;
+  options.passwordHashEnv = options.passwordHashEnv ? options.passwordHashEnv.trim() : null;
   return options;
 }
 
@@ -87,15 +130,21 @@ function printHelpAndExit(code) {
     '  init, submit, approve, reject, execute, verify, archive, status',
     '',
     'Options:',
-    '  --action <name>          Workflow action (required)',
-    '  --plan <path>            Change plan JSON (required for init)',
-    `  --state-file <path>      Workflow state JSON file (default: ${DEFAULT_STATE_FILE})`,
-    `  --audit-file <path>      Workflow events JSONL file (default: ${DEFAULT_AUDIT_FILE})`,
-    '  --actor <id>             Actor identifier (required for mutating actions)',
-    '  --comment <text>         Optional action comment',
-    '  --force                  Allow init to overwrite existing state file',
-    '  --json                   Print JSON payload',
-    '  -h, --help               Show this help'
+    '  --action <name>              Workflow action (required)',
+    '  --plan <path>                Change plan JSON (required for init)',
+    `  --state-file <path>          Workflow state JSON file (default: ${DEFAULT_STATE_FILE})`,
+    `  --audit-file <path>          Workflow events JSONL file (default: ${DEFAULT_AUDIT_FILE})`,
+    '  --actor <id>                 Actor identifier (required for mutating actions)',
+    '  --comment <text>             Optional action comment',
+    '  --force                      Allow init to overwrite existing state file',
+    '  --password <text>            One-time password input (for password-protected actions)',
+    '  --password-hash <sha256>     Password verifier hash override for init',
+    `  --password-hash-env <name>   Environment variable that stores password hash (default: ${DEFAULT_PASSWORD_HASH_ENV})`,
+    '  --password-required          Force password authorization requirement in init',
+    '  --password-scope <csv>       Password scope override: approve,execute',
+    `  --password-ttl-seconds <n>   Password verification TTL seconds (default: ${DEFAULT_PASSWORD_TTL_SECONDS})`,
+    '  --json                       Print JSON payload',
+    '  -h, --help                   Show this help'
   ];
   console.log(lines.join('\n'));
   process.exit(code);
@@ -142,6 +191,60 @@ function toBoolean(value) {
   return value === true;
 }
 
+function isSha256Hash(value) {
+  return /^[a-fA-F0-9]{64}$/.test(`${value || ''}`.trim());
+}
+
+function sha256(value) {
+  return crypto.createHash('sha256').update(String(value)).digest('hex');
+}
+
+function parsePasswordScope(value, label = 'password scope') {
+  const tokens = `${value || ''}`
+    .split(',')
+    .map(item => item.trim().toLowerCase())
+    .filter(Boolean);
+  const unique = Array.from(new Set(tokens));
+  const invalid = unique.filter(item => !PASSWORD_SCOPES.has(item));
+  if (invalid.length > 0) {
+    throw new Error(`${label} supports only: approve, execute`);
+  }
+  return unique;
+}
+
+function normalizePasswordScope(value, fallback = []) {
+  if (Array.isArray(value)) {
+    const normalized = value
+      .map(item => `${item || ''}`.trim().toLowerCase())
+      .filter(item => PASSWORD_SCOPES.has(item));
+    return Array.from(new Set(normalized));
+  }
+  if (typeof value === 'string' && value.trim()) {
+    try {
+      return parsePasswordScope(value);
+    } catch (_error) {
+      return [...fallback];
+    }
+  }
+  return [...fallback];
+}
+
+function resolvePasswordTtlSeconds(optionsTtl, planTtl) {
+  const fromOptions = Number(optionsTtl);
+  if (Number.isFinite(fromOptions) && fromOptions > 0) {
+    return Math.floor(fromOptions);
+  }
+  const fromPlan = Number(planTtl);
+  if (Number.isFinite(fromPlan) && fromPlan > 0) {
+    return Math.floor(fromPlan);
+  }
+  return DEFAULT_PASSWORD_TTL_SECONDS;
+}
+
+function isMutatingPlanAction(item) {
+  return `${item && item.type ? item.type : ''}`.trim().toLowerCase() !== 'analysis_only';
+}
+
 function computeApprovalFlags(plan) {
   const actions = Array.isArray(plan && plan.actions)
     ? plan.actions.filter(item => item && typeof item === 'object')
@@ -164,7 +267,54 @@ function computeApprovalFlags(plan) {
   };
 }
 
-function buildInitialState(plan, actor, comment) {
+function computeAuthorization(plan, options = {}) {
+  const authorization = plan && plan.authorization && typeof plan.authorization === 'object'
+    ? plan.authorization
+    : {};
+  const actions = Array.isArray(plan && plan.actions)
+    ? plan.actions.filter(item => item && typeof item === 'object')
+    : [];
+  const executionMode = `${plan && plan.execution_mode ? plan.execution_mode : ''}`.trim().toLowerCase();
+  const mutating = actions.some(item => isMutatingPlanAction(item));
+
+  const passwordRequired = (
+    options.passwordRequired === true ||
+    authorization.password_required === true ||
+    (executionMode === 'apply' && mutating)
+  );
+  const passwordScope = passwordRequired
+    ? (
+      (Array.isArray(options.passwordScope) && options.passwordScope.length > 0)
+        ? [...options.passwordScope]
+        : normalizePasswordScope(authorization.password_scope, ['execute'])
+    )
+    : [];
+  const passwordHash = options.passwordHash
+    ? options.passwordHash
+    : (isSha256Hash(authorization.password_hash) ? String(authorization.password_hash).trim().toLowerCase() : null);
+  const passwordHashEnv = options.passwordHashEnv
+    ? options.passwordHashEnv
+    : `${authorization.password_hash_env || DEFAULT_PASSWORD_HASH_ENV}`.trim() || DEFAULT_PASSWORD_HASH_ENV;
+  const passwordTtlSeconds = resolvePasswordTtlSeconds(options.passwordTtlSeconds, authorization.password_ttl_seconds);
+  const reasonCodes = Array.isArray(authorization.reason_codes)
+    ? authorization.reason_codes.map(item => `${item || ''}`.trim()).filter(Boolean)
+    : [];
+
+  return {
+    password_required: passwordRequired,
+    password_scope: passwordScope,
+    password_hash: passwordHash,
+    password_hash_env: passwordHashEnv,
+    password_ttl_seconds: passwordTtlSeconds,
+    password_verified: false,
+    password_verified_at: null,
+    password_verified_by: null,
+    password_expires_at: null,
+    reason_codes: reasonCodes
+  };
+}
+
+function buildInitialState(plan, actor, comment, options) {
   const now = new Date().toISOString();
   const flags = computeApprovalFlags(plan);
   const initial = {
@@ -183,6 +333,7 @@ function buildInitialState(plan, actor, comment) {
       approvers: [],
       rejected_by: null
     },
+    authorization: computeAuthorization(plan, options),
     history: [],
     created_at: now,
     updated_at: now
@@ -199,6 +350,86 @@ function assertTransition(state, fromList, action) {
       reason: `cannot ${action} when status is ${state.status}; expected ${fromList.join('|')}`
     };
   }
+  return { ok: true, reason: null };
+}
+
+function resolveVerifierHash(state, env = process.env) {
+  const authorization = state && state.authorization && typeof state.authorization === 'object'
+    ? state.authorization
+    : {};
+  if (authorization.password_hash && isSha256Hash(authorization.password_hash)) {
+    return String(authorization.password_hash).trim().toLowerCase();
+  }
+  const envName = `${authorization.password_hash_env || DEFAULT_PASSWORD_HASH_ENV}`.trim();
+  const fromEnv = env && Object.prototype.hasOwnProperty.call(env, envName)
+    ? `${env[envName] || ''}`.trim().toLowerCase()
+    : '';
+  if (isSha256Hash(fromEnv)) {
+    return fromEnv;
+  }
+  return null;
+}
+
+function isPasswordVerificationActive(authorization, nowMs) {
+  if (!authorization || authorization.password_verified !== true) {
+    return false;
+  }
+  const expires = authorization.password_expires_at
+    ? Date.parse(authorization.password_expires_at)
+    : Number.NaN;
+  if (!Number.isFinite(expires)) {
+    return false;
+  }
+  return nowMs < expires;
+}
+
+function requirePasswordForAction(state, options, action, nowIso) {
+  const authorization = state && state.authorization && typeof state.authorization === 'object'
+    ? state.authorization
+    : {};
+  const scope = normalizePasswordScope(authorization.password_scope, []);
+  if (authorization.password_required !== true || !scope.includes(action)) {
+    return { ok: true, reason: null };
+  }
+
+  const nowMs = Date.parse(nowIso);
+  if (isPasswordVerificationActive(authorization, nowMs)) {
+    return { ok: true, reason: null };
+  }
+
+  const verifierHash = resolveVerifierHash(state, process.env);
+  if (!verifierHash) {
+    return {
+      ok: false,
+      reason: 'password authorization required but verifier hash is not configured'
+    };
+  }
+
+  const candidate = `${options.password || ''}`;
+  if (!candidate.trim()) {
+    return {
+      ok: false,
+      reason: `password authorization required for ${action}`
+    };
+  }
+
+  const candidateHash = sha256(candidate).toLowerCase();
+  if (candidateHash !== verifierHash) {
+    return {
+      ok: false,
+      reason: 'password authorization failed'
+    };
+  }
+
+  const ttlSeconds = resolvePasswordTtlSeconds(
+    authorization.password_ttl_seconds,
+    DEFAULT_PASSWORD_TTL_SECONDS
+  );
+  authorization.password_verified = true;
+  authorization.password_verified_by = `${options.actor || ''}`.trim() || null;
+  authorization.password_verified_at = nowIso;
+  authorization.password_expires_at = new Date(nowMs + (ttlSeconds * 1000)).toISOString();
+  state.authorization = authorization;
   return { ok: true, reason: null };
 }
 
@@ -236,13 +467,18 @@ function mutateStateForAction(state, options) {
     if (!check.ok) {
       fail(check.reason);
     } else {
-      toStatus = 'approved';
-      state.status = toStatus;
-      if (!state.approvals.approvers.includes(actor)) {
-        state.approvals.approvers.push(actor);
+      const auth = requirePasswordForAction(state, options, action, now);
+      if (!auth.ok) {
+        fail(auth.reason);
+      } else {
+        toStatus = 'approved';
+        state.status = toStatus;
+        if (!state.approvals.approvers.includes(actor)) {
+          state.approvals.approvers.push(actor);
+        }
+        state.approvals.status = 'approved';
+        state.approvals.rejected_by = null;
       }
-      state.approvals.status = 'approved';
-      state.approvals.rejected_by = null;
     }
   } else if (action === 'reject') {
     const check = assertTransition(state, ['submitted'], action);
@@ -262,8 +498,13 @@ function mutateStateForAction(state, options) {
     } else if (state.approval_required && state.status !== 'approved') {
       fail('approval required before execute');
     } else {
-      toStatus = 'executed';
-      state.status = toStatus;
+      const auth = requirePasswordForAction(state, options, action, now);
+      if (!auth.ok) {
+        fail(auth.reason);
+      } else {
+        toStatus = 'executed';
+        state.status = toStatus;
+      }
     }
   } else if (action === 'verify') {
     const check = assertTransition(state, ['executed'], action);
@@ -305,7 +546,30 @@ async function appendAuditLine(auditPath, event) {
   await fs.appendFile(auditPath, `${JSON.stringify(event)}\n`, 'utf8');
 }
 
+function buildAuthorizationSummary(state) {
+  const authorization = state && state.authorization && typeof state.authorization === 'object'
+    ? state.authorization
+    : {};
+  return {
+    password_required: authorization.password_required === true,
+    password_scope: Array.isArray(authorization.password_scope) ? authorization.password_scope : [],
+    password_verified: authorization.password_verified === true,
+    password_verified_at: authorization.password_verified_at || null,
+    password_expires_at: authorization.password_expires_at || null,
+    password_hash_env: authorization.password_hash_env || DEFAULT_PASSWORD_HASH_ENV,
+    verifier_configured: Boolean(resolveVerifierHash(state, process.env))
+  };
+}
+
 function buildOutput(state, options, statePath, auditPath, decision, reason) {
+  const publicState = JSON.parse(JSON.stringify(state || {}));
+  if (
+    publicState.authorization &&
+    typeof publicState.authorization === 'object' &&
+    publicState.authorization.password_hash
+  ) {
+    publicState.authorization.password_hash = '***';
+  }
   return {
     mode: 'interactive-approval-workflow',
     generated_at: new Date().toISOString(),
@@ -313,7 +577,8 @@ function buildOutput(state, options, statePath, auditPath, decision, reason) {
     actor: options.actor || null,
     decision,
     reason: reason || null,
-    state,
+    state: publicState,
+    authorization: buildAuthorizationSummary(state),
     output: {
       state: path.relative(process.cwd(), statePath) || '.',
       audit: path.relative(process.cwd(), auditPath) || '.'
@@ -333,7 +598,7 @@ async function main() {
     }
     const planPath = resolvePath(cwd, options.plan);
     const plan = await readJsonFile(planPath, 'plan');
-    const { state, event } = buildInitialState(plan, options.actor, options.comment);
+    const { state, event } = buildInitialState(plan, options.actor, options.comment, options);
     await fs.ensureDir(path.dirname(statePath));
     await fs.writeJson(statePath, state, { spaces: 2 });
     await appendAuditLine(auditPath, event);
@@ -385,6 +650,8 @@ async function main() {
     if (payload.reason) {
       process.stdout.write(`- Reason: ${payload.reason}\n`);
     }
+    process.stdout.write(`- Password required: ${payload.authorization.password_required ? 'yes' : 'no'}\n`);
+    process.stdout.write(`- Password verified: ${payload.authorization.password_verified ? 'yes' : 'no'}\n`);
     process.stdout.write(`- State: ${payload.output.state}\n`);
     process.stdout.write(`- Audit: ${payload.output.audit}\n`);
   }

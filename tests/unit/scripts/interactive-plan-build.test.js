@@ -68,6 +68,7 @@ describe('interactive-plan-build script', () => {
       ])
     );
     expect(payload.plan.approval.status).toBe('not-required');
+    expect(payload.plan.authorization.password_required).toBe(false);
 
     const planFile = path.join(workspace, '.kiro', 'reports', 'interactive-change-plan.generated.json');
     const markdownFile = path.join(workspace, '.kiro', 'reports', 'interactive-change-plan.generated.md');
@@ -111,6 +112,8 @@ describe('interactive-plan-build script', () => {
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.plan.risk_level).toBe('high');
     expect(payload.plan.approval.status).toBe('pending');
+    expect(payload.plan.authorization.password_required).toBe(true);
+    expect(payload.plan.authorization.password_scope).toEqual(['execute']);
     expect(payload.plan.actions.map(item => item.type)).toEqual(
       expect.arrayContaining([
         'bulk_delete_without_filter',

@@ -1,0 +1,49 @@
+{
+  "version": "1.0.0",
+  "mode": "business-safe-assistant",
+  "length_policy": {
+    "min_chars": 12,
+    "max_chars": 1200,
+    "min_significant_tokens": 4
+  },
+  "deny_patterns": [
+    {
+      "id": "credential-exfiltration",
+      "pattern": "\\b(export|dump|reveal|show)\\b[^.\\n]{0,80}\\b(password|secret|token|credential)\\b",
+      "reason": "request attempts to expose credentials or secrets"
+    },
+    {
+      "id": "approval-bypass",
+      "pattern": "\\b(skip|bypass|disable)\\b[^.\\n]{0,80}\\b(approval|review|audit|permission)\\b",
+      "reason": "request attempts to bypass approval or governance flow"
+    },
+    {
+      "id": "destructive-without-guardrail",
+      "pattern": "\\b(delete|truncate|drop)\\b[^.\\n]{0,80}\\b(without backup|without approval|directly)\\b",
+      "reason": "destructive action request lacks required safety guardrails"
+    }
+  ],
+  "clarify_patterns": [
+    {
+      "id": "ambiguous-improve",
+      "pattern": "\\b(improve|optimize|fix)\\b",
+      "reason": "goal is improvement-oriented but missing measurable target"
+    },
+    {
+      "id": "vague-scope",
+      "pattern": "\\b(system|workflow|process)\\b[^.\\n]{0,50}\\b(all|overall|everything)\\b",
+      "reason": "goal scope is too broad and needs narrowing"
+    }
+  ],
+  "response_rules": [
+    "Use concise business language and avoid deep technical jargon.",
+    "Always restate objective, scope, and expected impact before recommendations.",
+    "When risk or permission is involved, explicitly list required approvals and authorization.",
+    "If requirement is ambiguous, ask at most two focused clarification questions.",
+    "Never propose credential export, approval bypass, or secret leakage."
+  ],
+  "clarification_templates": [
+    "What business metric should improve first (speed, accuracy, cost, compliance)?",
+    "Which module/page should be changed first, and what must remain unchanged?"
+  ]
+}

@@ -51,7 +51,10 @@ function parseArgs(argv) {
     workOrderOut: null,
     workOrderMarkdownOut: null,
     approvalActor: DEFAULT_APPROVAL_ACTOR,
+    approvalActorRole: null,
     approverActor: null,
+    approverActorRole: null,
+    approvalRolePolicy: null,
     skipSubmit: false,
     autoApproveLowRisk: false,
     autoExecuteLowRisk: false,
@@ -142,8 +145,17 @@ function parseArgs(argv) {
     } else if (token === '--approval-actor' && next) {
       options.approvalActor = next;
       index += 1;
+    } else if (token === '--approval-actor-role' && next) {
+      options.approvalActorRole = next;
+      index += 1;
     } else if (token === '--approver-actor' && next) {
       options.approverActor = next;
+      index += 1;
+    } else if (token === '--approver-actor-role' && next) {
+      options.approverActorRole = next;
+      index += 1;
+    } else if (token === '--approval-role-policy' && next) {
+      options.approvalRolePolicy = next;
       index += 1;
     } else if (token === '--skip-submit') {
       options.skipSubmit = true;
@@ -227,7 +239,10 @@ function parseArgs(argv) {
 
   options.userId = `${options.userId || ''}`.trim() || DEFAULT_USER_ID;
   options.approvalActor = `${options.approvalActor || ''}`.trim() || DEFAULT_APPROVAL_ACTOR;
+  options.approvalActorRole = `${options.approvalActorRole || ''}`.trim().toLowerCase() || null;
   options.approverActor = `${options.approverActor || ''}`.trim() || options.approvalActor;
+  options.approverActorRole = `${options.approverActorRole || ''}`.trim().toLowerCase() || options.approvalActorRole;
+  options.approvalRolePolicy = `${options.approvalRolePolicy || ''}`.trim() || null;
   options.feedbackComment = `${options.feedbackComment || ''}`.trim() || null;
   options.dialoguePolicy = `${options.dialoguePolicy || ''}`.trim() || null;
   options.dialogueOut = `${options.dialogueOut || ''}`.trim() || null;
@@ -281,7 +296,10 @@ function printHelpAndExit(code) {
     '  --work-order-out <path>          Work-order JSON output path',
     '  --work-order-markdown-out <path> Work-order markdown output path',
     `  --approval-actor <id>            Approval workflow actor (default: ${DEFAULT_APPROVAL_ACTOR})`,
+    '  --approval-actor-role <name>     Approval actor role for role-policy checks',
     '  --approver-actor <id>            Auto-approve actor (default: approval actor)',
+    '  --approver-actor-role <name>     Auto-approve actor role (default: approval actor role)',
+    '  --approval-role-policy <path>    Approval role policy JSON path',
     '  --skip-submit                    Skip approval submit step',
     '  --auto-approve-low-risk          Auto-approve when gate=allow and risk=low',
     '  --auto-execute-low-risk          Auto-run adapter low-risk-apply when gate=allow and risk=low',
@@ -692,6 +710,12 @@ async function main() {
     '--force',
     '--json'
   ];
+  if (options.approvalActorRole) {
+    approvalInitArgs.push('--actor-role', options.approvalActorRole);
+  }
+  if (options.approvalRolePolicy) {
+    approvalInitArgs.push('--role-policy', resolvePath(cwd, options.approvalRolePolicy));
+  }
   if (options.authPasswordHash) {
     approvalInitArgs.push('--password-hash', options.authPasswordHash);
   }
@@ -722,6 +746,9 @@ async function main() {
       '--comment', 'interactive loop submit',
       '--json'
     ];
+    if (options.approvalActorRole) {
+      approvalSubmitArgs.push('--actor-role', options.approvalActorRole);
+    }
     const approvalSubmitResult = runScript({
       label: 'interactive-approval-workflow:submit',
       scriptPath: SCRIPT_APPROVAL,
@@ -750,6 +777,9 @@ async function main() {
       '--comment', 'auto approve low-risk allow plan',
       '--json'
     ];
+    if (options.approverActorRole) {
+      approvalApproveArgs.push('--actor-role', options.approverActorRole);
+    }
     const approvalApproveResult = runScript({
       label: 'interactive-approval-workflow:approve',
       scriptPath: SCRIPT_APPROVAL,
@@ -821,6 +851,9 @@ async function main() {
         '--comment', 'auto execute low-risk allow plan',
         '--json'
       ];
+      if (options.approverActorRole) {
+        approvalExecuteArgs.push('--actor-role', options.approverActorRole);
+      }
       if (options.authPassword) {
         approvalExecuteArgs.push('--password', options.authPassword);
       }
@@ -914,6 +947,9 @@ async function main() {
             '--comment', 'auto verify after successful low-risk apply',
             '--json'
           ];
+          if (options.approverActorRole) {
+            approvalVerifyArgs.push('--actor-role', options.approverActorRole);
+          }
           const approvalVerifyResult = runScript({
             label: 'interactive-approval-workflow:verify',
             scriptPath: SCRIPT_APPROVAL,
@@ -1103,7 +1139,10 @@ async function main() {
       catalog: options.catalog ? toRelative(cwd, resolvePath(cwd, options.catalog)) : null,
       moqui_config: options.moquiConfig ? toRelative(cwd, resolvePath(cwd, options.moquiConfig)) : null,
       approval_actor: options.approvalActor,
+      approval_actor_role: options.approvalActorRole,
       approver_actor: options.approverActor,
+      approver_actor_role: options.approverActorRole,
+      approval_role_policy: options.approvalRolePolicy ? toRelative(cwd, resolvePath(cwd, options.approvalRolePolicy)) : null,
       skip_submit: options.skipSubmit,
       auto_approve_low_risk: options.autoApproveLowRisk,
       auto_execute_low_risk: options.autoExecuteLowRisk,

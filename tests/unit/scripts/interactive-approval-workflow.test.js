@@ -247,4 +247,90 @@ describe('interactive-approval-workflow script', () => {
     expect(payload.state.status).toBe('executed');
     expect(payload.authorization.password_verified).toBe(true);
   });
+
+  test('enforces actor role policy when role-policy is configured', async () => {
+    const projectRoot = path.resolve(__dirname, '..', '..', '..');
+    const scriptPath = path.join(projectRoot, 'scripts', 'interactive-approval-workflow.js');
+    const workspace = path.join(tempDir, 'workspace-role-policy');
+    const passwordHash = crypto.createHash('sha256').update('demo-pass').digest('hex');
+    const planFile = await writePlan(workspace, 'plan-role.json', {
+      plan_id: 'plan-role-001',
+      intent_id: 'intent-role-001',
+      risk_level: 'low',
+      execution_mode: 'apply',
+      actions: [
+        {
+          action_id: 'act-001',
+          type: 'ui_form_field_adjust',
+          requires_privilege_escalation: false
+        }
+      ],
+      approval: {
+        status: 'not-required'
+      },
+      authorization: {
+        password_required: true,
+        password_scope: ['execute'],
+        password_hash: passwordHash,
+        password_ttl_seconds: 600
+      }
+    });
+    const rolePolicyFile = path.join(workspace, 'approval-role-policy.json');
+    await fs.writeJson(rolePolicyFile, {
+      version: '1.0.0',
+      role_requirements: {
+        submit: ['product-owner'],
+        execute: ['release-operator']
+      }
+    }, { spaces: 2 });
+
+    let result = runScript(scriptPath, workspace, [
+      '--action', 'init',
+      '--plan', planFile,
+      '--actor', 'owner-role',
+      '--actor-role', 'product-owner',
+      '--role-policy', rolePolicyFile,
+      '--json'
+    ]);
+    expect(result.status).toBe(0);
+
+    result = runScript(scriptPath, workspace, [
+      '--action', 'submit',
+      '--actor', 'owner-role',
+      '--json'
+    ]);
+    expect(result.status).toBe(2);
+    let payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.reason).toContain('actor role required for submit');
+
+    result = runScript(scriptPath, workspace, [
+      '--action', 'submit',
+      '--actor', 'owner-role',
+      '--actor-role', 'product-owner',
+      '--json'
+    ]);
+    expect(result.status).toBe(0);
+
+    result = runScript(scriptPath, workspace, [
+      '--action', 'execute',
+      '--actor', 'owner-role',
+      '--actor-role', 'product-owner',
+      '--password', 'demo-pass',
+      '--json'
+    ]);
+    expect(result.status).toBe(2);
+    payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.reason).toContain('not allowed for execute');
+
+    result = runScript(scriptPath, workspace, [
+      '--action', 'execute',
+      '--actor', 'owner-role',
+      '--actor-role', 'release-operator',
+      '--password', 'demo-pass',
+      '--json'
+    ]);
+    expect(result.status).toBe(0);
+    payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.state.status).toBe('executed');
+  });
 });

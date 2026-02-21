@@ -11,6 +11,7 @@ This directory contains baseline contracts and safety policy artifacts for the i
 - `guardrail-policy-baseline.json`: default secure-by-default guardrail policy.
 - `dialogue-governance-policy-baseline.json`: baseline communication rules for embedded assistant dialogue.
 - `runtime-mode-policy-baseline.json`: baseline runtime mode/environment policy (`user-assist|ops-fix|feature-dev` x `dev|staging|prod`).
+- `approval-role-policy-baseline.json`: optional approval role policy baseline (`submit/approve/execute/verify/archive` role requirements).
 - `high-risk-action-catalog.json`: baseline high-risk action classification for deny/review decisions.
 - `change-plan.sample.json`: runnable sample plan for gate checks.
 - `page-context.sample.json`: runnable page context sample for read-only intent generation.
@@ -156,6 +157,9 @@ node scripts/interactive-customization-loop.js \
   --runtime-mode ops-fix \
   --runtime-environment staging \
   --runtime-policy docs/interactive-customization/runtime-mode-policy-baseline.json \
+  --approval-role-policy docs/interactive-customization/approval-role-policy-baseline.json \
+  --approval-actor-role product-owner \
+  --approver-actor-role release-operator \
   --execution-mode apply \
   --auto-execute-low-risk \
   --auth-password-hash "<sha256-of-demo-pass>" \
@@ -223,10 +227,14 @@ node scripts/interactive-approval-workflow.js \
 
 # submit -> approve -> execute -> verify
 node scripts/interactive-approval-workflow.js --action submit --actor product-owner --json
-node scripts/interactive-approval-workflow.js --action approve --actor security-admin --json
-node scripts/interactive-approval-workflow.js --action execute --actor release-operator --password "demo-pass" --json
-node scripts/interactive-approval-workflow.js --action verify --actor qa-owner --json
+node scripts/interactive-approval-workflow.js --action approve --actor security-admin --actor-role security-admin --json
+node scripts/interactive-approval-workflow.js --action execute --actor release-operator --actor-role release-operator --password "demo-pass" --json
+node scripts/interactive-approval-workflow.js --action verify --actor qa-owner --actor-role qa-owner --json
 ```
+
+When role control is required, initialize workflow with:
+- `--role-policy docs/interactive-customization/approval-role-policy-baseline.json`
+- and pass `--actor-role <role>` in each mutating action.
 
 Run the Moqui adapter interface (`capabilities/plan/validate/apply/rollback`):
 

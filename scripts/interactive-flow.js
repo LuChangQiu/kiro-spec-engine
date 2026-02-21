@@ -52,7 +52,10 @@ function parseArgs(argv) {
     bridgeOutContext: null,
     bridgeOutReport: null,
     approvalActor: null,
+    approvalActorRole: null,
     approverActor: null,
+    approverActorRole: null,
+    approvalRolePolicy: null,
     skipSubmit: false,
     autoApproveLowRisk: false,
     autoExecuteLowRisk: false,
@@ -168,8 +171,17 @@ function parseArgs(argv) {
     } else if (token === '--approval-actor' && next) {
       options.approvalActor = next;
       index += 1;
+    } else if (token === '--approval-actor-role' && next) {
+      options.approvalActorRole = next;
+      index += 1;
     } else if (token === '--approver-actor' && next) {
       options.approverActor = next;
+      index += 1;
+    } else if (token === '--approver-actor-role' && next) {
+      options.approverActorRole = next;
+      index += 1;
+    } else if (token === '--approval-role-policy' && next) {
+      options.approvalRolePolicy = next;
       index += 1;
     } else if (token === '--skip-submit') {
       options.skipSubmit = true;
@@ -280,7 +292,10 @@ function parseArgs(argv) {
   options.bridgeOutContext = `${options.bridgeOutContext || ''}`.trim() || null;
   options.bridgeOutReport = `${options.bridgeOutReport || ''}`.trim() || null;
   options.approvalActor = `${options.approvalActor || ''}`.trim() || null;
+  options.approvalActorRole = `${options.approvalActorRole || ''}`.trim().toLowerCase() || null;
   options.approverActor = `${options.approverActor || ''}`.trim() || null;
+  options.approverActorRole = `${options.approverActorRole || ''}`.trim().toLowerCase() || null;
+  options.approvalRolePolicy = `${options.approvalRolePolicy || ''}`.trim() || null;
   options.feedbackComment = `${options.feedbackComment || ''}`.trim() || null;
   options.feedbackChannel = `${options.feedbackChannel || ''}`.trim().toLowerCase() || DEFAULT_FEEDBACK_CHANNEL;
   options.feedbackTags = Array.from(new Set(options.feedbackTags.map(item => `${item || ''}`.trim().toLowerCase()).filter(Boolean)));
@@ -373,7 +388,10 @@ function printHelpAndExit(code) {
     '  --work-order-markdown-out <path> Work-order markdown output path',
     '  --out <path>                    Flow summary output path',
     '  --approval-actor <id>           Approval workflow actor',
+    '  --approval-actor-role <name>    Approval workflow actor role',
     '  --approver-actor <id>           Auto-approve actor',
+    '  --approver-actor-role <name>    Auto-approve actor role',
+    '  --approval-role-policy <path>   Approval role policy JSON path',
     '  --skip-submit                   Skip approval submit step',
     '  --auto-approve-low-risk         Auto-approve low-risk allow plans',
     '  --auto-execute-low-risk         Auto-run low-risk apply for allow+low plans',
@@ -599,8 +617,17 @@ async function main() {
   if (options.approvalActor) {
     loopArgs.push('--approval-actor', options.approvalActor);
   }
+  if (options.approvalActorRole) {
+    loopArgs.push('--approval-actor-role', options.approvalActorRole);
+  }
   if (options.approverActor) {
     loopArgs.push('--approver-actor', options.approverActor);
+  }
+  if (options.approverActorRole) {
+    loopArgs.push('--approver-actor-role', options.approverActorRole);
+  }
+  if (options.approvalRolePolicy) {
+    loopArgs.push('--approval-role-policy', resolvePath(cwd, options.approvalRolePolicy));
   }
   if (options.skipSubmit) {
     loopArgs.push('--skip-submit');

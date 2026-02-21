@@ -10,6 +10,17 @@ const DEFAULT_AUDIT_FILE = '.kiro/reports/interactive-approval-events.jsonl';
 const DEFAULT_PASSWORD_HASH_ENV = 'SCE_INTERACTIVE_AUTH_PASSWORD_SHA256';
 const DEFAULT_PASSWORD_TTL_SECONDS = 600;
 const PASSWORD_SCOPES = new Set(['approve', 'execute']);
+const WORKFLOW_ACTIONS = new Set([
+  'init',
+  'submit',
+  'approve',
+  'reject',
+  'execute',
+  'verify',
+  'archive',
+  'status'
+]);
+const ROLE_SCOPED_ACTIONS = new Set(['submit', 'approve', 'reject', 'execute', 'verify', 'archive']);
 
 function parseArgs(argv) {
   const options = {
@@ -20,6 +31,8 @@ function parseArgs(argv) {
     actor: null,
     comment: null,
     force: false,
+    actorRole: null,
+    rolePolicy: null,
     password: null,
     passwordHash: null,
     passwordHashEnv: null,
@@ -49,6 +62,12 @@ function parseArgs(argv) {
       i += 1;
     } else if (token === '--comment' && next) {
       options.comment = next;
+      i += 1;
+    } else if (token === '--actor-role' && next) {
+      options.actorRole = next;
+      i += 1;
+    } else if (token === '--role-policy' && next) {
+      options.rolePolicy = next;
       i += 1;
     } else if (token === '--force') {
       options.force = true;
@@ -80,18 +99,8 @@ function parseArgs(argv) {
     throw new Error('--action is required.');
   }
   const action = `${options.action}`.trim().toLowerCase();
-  const allowedActions = new Set([
-    'init',
-    'submit',
-    'approve',
-    'reject',
-    'execute',
-    'verify',
-    'archive',
-    'status'
-  ]);
-  if (!allowedActions.has(action)) {
-    throw new Error(`--action must be one of: ${Array.from(allowedActions).join(', ')}`);
+  if (!WORKFLOW_ACTIONS.has(action)) {
+    throw new Error(`--action must be one of: ${Array.from(WORKFLOW_ACTIONS).join(', ')}`);
   }
   options.action = action;
 
@@ -108,6 +117,12 @@ function parseArgs(argv) {
   if (options.passwordHashEnv != null && `${options.passwordHashEnv || ''}`.trim().length === 0) {
     throw new Error('--password-hash-env cannot be empty.');
   }
+  if (options.actorRole != null && `${options.actorRole || ''}`.trim().length === 0) {
+    throw new Error('--actor-role cannot be empty.');
+  }
+  if (options.rolePolicy != null && `${options.rolePolicy || ''}`.trim().length === 0) {
+    throw new Error('--role-policy cannot be empty.');
+  }
   if (options.passwordScope != null) {
     options.passwordScope = parsePasswordScope(options.passwordScope, '--password-scope');
   }
@@ -119,6 +134,8 @@ function parseArgs(argv) {
 
   options.passwordHash = options.passwordHash ? options.passwordHash.trim().toLowerCase() : null;
   options.passwordHashEnv = options.passwordHashEnv ? options.passwordHashEnv.trim() : null;
+  options.actorRole = options.actorRole ? options.actorRole.trim().toLowerCase() : null;
+  options.rolePolicy = options.rolePolicy ? options.rolePolicy.trim() : null;
   return options;
 }
 
@@ -135,6 +152,8 @@ function printHelpAndExit(code) {
     `  --state-file <path>          Workflow state JSON file (default: ${DEFAULT_STATE_FILE})`,
     `  --audit-file <path>          Workflow events JSONL file (default: ${DEFAULT_AUDIT_FILE})`,
     '  --actor <id>                 Actor identifier (required for mutating actions)',
+    '  --actor-role <name>          Actor role identifier for role-policy checks',
+    '  --role-policy <path>         Role policy JSON path (optional; enables role checks)',
     '  --comment <text>             Optional action comment',
     '  --force                      Allow init to overwrite existing state file',
     '  --password <text>            One-time password input (for password-protected actions)',
@@ -166,18 +185,37 @@ async function readJsonFile(filePath, label) {
   }
 }
 
+async function resolveRoleRequirements(cwd, options, plan) {
+  let fromPolicy = {};
+  if (options.rolePolicy) {
+    const rolePolicyPath = resolvePath(cwd, options.rolePolicy);
+    const rolePolicy = await readJsonFile(rolePolicyPath, 'role-policy');
+    const policyRoles = rolePolicy && rolePolicy.role_requirements && typeof rolePolicy.role_requirements === 'object'
+      ? rolePolicy.role_requirements
+      : {};
+    fromPolicy = normalizeRoleRequirements(policyRoles);
+  }
+
+  const planAuthorization = plan && plan.authorization && typeof plan.authorization === 'object'
+    ? plan.authorization
+    : {};
+  const fromPlan = normalizeRoleRequirements(planAuthorization.role_requirements || {});
+  return mergeRoleRequirements(fromPolicy, fromPlan);
+}
+
 function normalizeRiskLevel(value) {
   const normalized = `${value || ''}`.trim().toLowerCase();
   return ['low', 'medium', 'high'].includes(normalized) ? normalized : 'medium';
 }
 
-function createEvent(state, action, actor, comment, fromStatus, toStatus, blocked, reason) {
+function createEvent(state, action, actor, actorRole, comment, fromStatus, toStatus, blocked, reason) {
   return {
     event_id: `event-${crypto.randomUUID()}`,
     workflow_id: state && state.workflow_id ? state.workflow_id : null,
     event_type: blocked ? 'interactive.approval.blocked' : `interactive.approval.${action}`,
     action,
     actor,
+    actor_role: actorRole || null,
     comment: comment || null,
     from_status: fromStatus || null,
     to_status: toStatus || null,
@@ -227,6 +265,52 @@ function normalizePasswordScope(value, fallback = []) {
     }
   }
   return [...fallback];
+}
+
+function normalizeRoleName(value) {
+  return `${value || ''}`.trim().toLowerCase();
+}
+
+function normalizeRoleList(value) {
+  if (Array.isArray(value)) {
+    return Array.from(new Set(value.map(item => normalizeRoleName(item)).filter(Boolean)));
+  }
+  if (typeof value === 'string' && value.trim()) {
+    return Array.from(new Set(
+      value
+        .split(',')
+        .map(item => normalizeRoleName(item))
+        .filter(Boolean)
+    ));
+  }
+  return [];
+}
+
+function normalizeRoleRequirements(value = {}) {
+  if (!value || typeof value !== 'object') {
+    return {};
+  }
+  const normalized = {};
+  for (const key of Object.keys(value)) {
+    const action = normalizeRoleName(key);
+    if (!ROLE_SCOPED_ACTIONS.has(action)) {
+      continue;
+    }
+    const roles = normalizeRoleList(value[key]);
+    if (roles.length > 0) {
+      normalized[action] = roles;
+    }
+  }
+  return normalized;
+}
+
+function mergeRoleRequirements(base = {}, override = {}) {
+  const merged = { ...base };
+  const normalizedOverride = normalizeRoleRequirements(override);
+  for (const action of Object.keys(normalizedOverride)) {
+    merged[action] = normalizedOverride[action];
+  }
+  return merged;
 }
 
 function resolvePasswordTtlSeconds(optionsTtl, planTtl) {
@@ -299,6 +383,7 @@ function computeAuthorization(plan, options = {}) {
   const reasonCodes = Array.isArray(authorization.reason_codes)
     ? authorization.reason_codes.map(item => `${item || ''}`.trim()).filter(Boolean)
     : [];
+  const roleRequirements = normalizeRoleRequirements(options.roleRequirements || authorization.role_requirements || {});
 
   return {
     password_required: passwordRequired,
@@ -310,7 +395,8 @@ function computeAuthorization(plan, options = {}) {
     password_verified_at: null,
     password_verified_by: null,
     password_expires_at: null,
-    reason_codes: reasonCodes
+    reason_codes: reasonCodes,
+    role_requirements: roleRequirements
   };
 }
 
@@ -338,7 +424,17 @@ function buildInitialState(plan, actor, comment, options) {
     created_at: now,
     updated_at: now
   };
-  const event = createEvent(initial, 'init', actor, comment, null, 'draft', false, null);
+  const event = createEvent(
+    initial,
+    'init',
+    actor,
+    options && options.actorRole ? options.actorRole : null,
+    comment,
+    null,
+    'draft',
+    false,
+    null
+  );
   initial.history.push(event);
   return { state: initial, event };
 }
@@ -433,6 +529,34 @@ function requirePasswordForAction(state, options, action, nowIso) {
   return { ok: true, reason: null };
 }
 
+function requireRoleForAction(state, options, action) {
+  const authorization = state && state.authorization && typeof state.authorization === 'object'
+    ? state.authorization
+    : {};
+  const roleRequirements = authorization && authorization.role_requirements && typeof authorization.role_requirements === 'object'
+    ? authorization.role_requirements
+    : {};
+  const allowedRoles = normalizeRoleList(roleRequirements[action]);
+  if (allowedRoles.length === 0) {
+    return { ok: true, reason: null };
+  }
+
+  const actorRole = normalizeRoleName(options && options.actorRole);
+  if (!actorRole) {
+    return {
+      ok: false,
+      reason: `actor role required for ${action}; allowed roles: ${allowedRoles.join(', ')}`
+    };
+  }
+  if (!allowedRoles.includes(actorRole)) {
+    return {
+      ok: false,
+      reason: `actor role "${actorRole}" is not allowed for ${action}; allowed roles: ${allowedRoles.join(', ')}`
+    };
+  }
+  return { ok: true, reason: null };
+}
+
 function mutateStateForAction(state, options) {
   const actor = `${options.actor || ''}`.trim();
   const comment = options.comment || null;
@@ -456,10 +580,15 @@ function mutateStateForAction(state, options) {
     if (!check.ok) {
       fail(check.reason);
     } else {
-      toStatus = 'submitted';
-      state.status = toStatus;
-      if (state.approval_required && state.approvals.status === 'not-required') {
-        state.approvals.status = 'pending';
+      const roleCheck = requireRoleForAction(state, options, action);
+      if (!roleCheck.ok) {
+        fail(roleCheck.reason);
+      } else {
+        toStatus = 'submitted';
+        state.status = toStatus;
+        if (state.approval_required && state.approvals.status === 'not-required') {
+          state.approvals.status = 'pending';
+        }
       }
     }
   } else if (action === 'approve') {
@@ -467,17 +596,22 @@ function mutateStateForAction(state, options) {
     if (!check.ok) {
       fail(check.reason);
     } else {
-      const auth = requirePasswordForAction(state, options, action, now);
-      if (!auth.ok) {
-        fail(auth.reason);
+      const roleCheck = requireRoleForAction(state, options, action);
+      if (!roleCheck.ok) {
+        fail(roleCheck.reason);
       } else {
-        toStatus = 'approved';
-        state.status = toStatus;
-        if (!state.approvals.approvers.includes(actor)) {
-          state.approvals.approvers.push(actor);
+        const auth = requirePasswordForAction(state, options, action, now);
+        if (!auth.ok) {
+          fail(auth.reason);
+        } else {
+          toStatus = 'approved';
+          state.status = toStatus;
+          if (!state.approvals.approvers.includes(actor)) {
+            state.approvals.approvers.push(actor);
+          }
+          state.approvals.status = 'approved';
+          state.approvals.rejected_by = null;
         }
-        state.approvals.status = 'approved';
-        state.approvals.rejected_by = null;
       }
     }
   } else if (action === 'reject') {
@@ -485,10 +619,15 @@ function mutateStateForAction(state, options) {
     if (!check.ok) {
       fail(check.reason);
     } else {
-      toStatus = 'rejected';
-      state.status = toStatus;
-      state.approvals.status = 'rejected';
-      state.approvals.rejected_by = actor;
+      const roleCheck = requireRoleForAction(state, options, action);
+      if (!roleCheck.ok) {
+        fail(roleCheck.reason);
+      } else {
+        toStatus = 'rejected';
+        state.status = toStatus;
+        state.approvals.status = 'rejected';
+        state.approvals.rejected_by = actor;
+      }
     }
   } else if (action === 'execute') {
     const validFrom = ['submitted', 'approved'];
@@ -498,12 +637,17 @@ function mutateStateForAction(state, options) {
     } else if (state.approval_required && state.status !== 'approved') {
       fail('approval required before execute');
     } else {
-      const auth = requirePasswordForAction(state, options, action, now);
-      if (!auth.ok) {
-        fail(auth.reason);
+      const roleCheck = requireRoleForAction(state, options, action);
+      if (!roleCheck.ok) {
+        fail(roleCheck.reason);
       } else {
-        toStatus = 'executed';
-        state.status = toStatus;
+        const auth = requirePasswordForAction(state, options, action, now);
+        if (!auth.ok) {
+          fail(auth.reason);
+        } else {
+          toStatus = 'executed';
+          state.status = toStatus;
+        }
       }
     }
   } else if (action === 'verify') {
@@ -511,16 +655,26 @@ function mutateStateForAction(state, options) {
     if (!check.ok) {
       fail(check.reason);
     } else {
-      toStatus = 'verified';
-      state.status = toStatus;
+      const roleCheck = requireRoleForAction(state, options, action);
+      if (!roleCheck.ok) {
+        fail(roleCheck.reason);
+      } else {
+        toStatus = 'verified';
+        state.status = toStatus;
+      }
     }
   } else if (action === 'archive') {
     const check = assertTransition(state, ['verified', 'rejected'], action);
     if (!check.ok) {
       fail(check.reason);
     } else {
-      toStatus = 'archived';
-      state.status = toStatus;
+      const roleCheck = requireRoleForAction(state, options, action);
+      if (!roleCheck.ok) {
+        fail(roleCheck.reason);
+      } else {
+        toStatus = 'archived';
+        state.status = toStatus;
+      }
     }
   } else {
     fail(`unsupported action: ${action}`);
@@ -530,6 +684,7 @@ function mutateStateForAction(state, options) {
     state,
     action,
     actor,
+    options && options.actorRole ? options.actorRole : null,
     comment,
     fromStatus,
     blocked ? fromStatus : toStatus,
@@ -557,7 +712,8 @@ function buildAuthorizationSummary(state) {
     password_verified_at: authorization.password_verified_at || null,
     password_expires_at: authorization.password_expires_at || null,
     password_hash_env: authorization.password_hash_env || DEFAULT_PASSWORD_HASH_ENV,
-    verifier_configured: Boolean(resolveVerifierHash(state, process.env))
+    verifier_configured: Boolean(resolveVerifierHash(state, process.env)),
+    role_requirements: normalizeRoleRequirements(authorization.role_requirements || {})
   };
 }
 
@@ -575,6 +731,7 @@ function buildOutput(state, options, statePath, auditPath, decision, reason) {
     generated_at: new Date().toISOString(),
     action: options.action,
     actor: options.actor || null,
+    actor_role: options.actorRole || null,
     decision,
     reason: reason || null,
     state: publicState,
@@ -598,7 +755,12 @@ async function main() {
     }
     const planPath = resolvePath(cwd, options.plan);
     const plan = await readJsonFile(planPath, 'plan');
-    const { state, event } = buildInitialState(plan, options.actor, options.comment, options);
+    const roleRequirements = await resolveRoleRequirements(cwd, options, plan);
+    const initOptions = {
+      ...options,
+      roleRequirements
+    };
+    const { state, event } = buildInitialState(plan, options.actor, options.comment, initOptions);
     await fs.ensureDir(path.dirname(statePath));
     await fs.writeJson(statePath, state, { spaces: 2 });
     await appendAuditLine(auditPath, event);

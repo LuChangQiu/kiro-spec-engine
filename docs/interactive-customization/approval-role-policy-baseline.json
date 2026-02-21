@@ -1,0 +1,36 @@
+{
+  "version": "1.0.0",
+  "profile": "interactive-approval-role-baseline",
+  "role_requirements": {
+    "submit": [
+      "product-owner",
+      "ops-engineer",
+      "workflow-operator"
+    ],
+    "approve": [
+      "security-admin",
+      "product-owner",
+      "workflow-operator"
+    ],
+    "reject": [
+      "security-admin",
+      "product-owner",
+      "workflow-operator"
+    ],
+    "execute": [
+      "release-operator",
+      "ops-engineer",
+      "workflow-operator"
+    ],
+    "verify": [
+      "qa-owner",
+      "release-operator",
+      "workflow-operator"
+    ],
+    "archive": [
+      "product-owner",
+      "release-operator",
+      "workflow-operator"
+    ]
+  }
+}

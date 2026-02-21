@@ -17,6 +17,9 @@ describe('scene interactive-loop option helpers', () => {
       contextContract: ' docs/interactive-customization/moqui-copilot-context-contract.json ',
       workOrderOut: ' .kiro/reports/work-order.json ',
       workOrderMarkdownOut: ' .kiro/reports/work-order.md ',
+      approvalActorRole: ' Product-Owner ',
+      approverActorRole: ' Security-Admin ',
+      approvalRolePolicy: ' docs/interactive-customization/approval-role-policy-baseline.json ',
       strictContract: false,
       feedbackScore: '4.5',
       feedbackTags: 'moqui,approval',
@@ -37,6 +40,9 @@ describe('scene interactive-loop option helpers', () => {
     expect(normalized.contextContract).toBe('docs/interactive-customization/moqui-copilot-context-contract.json');
     expect(normalized.workOrderOut).toBe('.kiro/reports/work-order.json');
     expect(normalized.workOrderMarkdownOut).toBe('.kiro/reports/work-order.md');
+    expect(normalized.approvalActorRole).toBe('product-owner');
+    expect(normalized.approverActorRole).toBe('security-admin');
+    expect(normalized.approvalRolePolicy).toBe('docs/interactive-customization/approval-role-policy-baseline.json');
     expect(normalized.strictContract).toBe(false);
     expect(normalized.feedbackScore).toBe(4.5);
     expect(normalized.feedbackTags).toBe('moqui,approval');

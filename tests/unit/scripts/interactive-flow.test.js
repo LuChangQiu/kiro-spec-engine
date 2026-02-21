@@ -35,6 +35,7 @@ describe('interactive-flow script', () => {
     const policyPath = path.join(docsDir, 'guardrail-policy-baseline.json');
     const catalogPath = path.join(docsDir, 'high-risk-action-catalog.json');
     const runtimePolicyPath = path.join(docsDir, 'runtime-mode-policy-baseline.json');
+    const approvalRolePolicyPath = path.join(docsDir, 'approval-role-policy-baseline.json');
 
     await fs.writeJson(policyPath, {
       version: '1.0.0',
@@ -122,7 +123,17 @@ describe('interactive-flow script', () => {
       }
     }, { spaces: 2 });
 
-    return { policyPath, catalogPath, runtimePolicyPath };
+    await fs.writeJson(approvalRolePolicyPath, {
+      version: '1.0.0',
+      role_requirements: {
+        submit: ['product-owner'],
+        approve: ['product-owner', 'security-admin'],
+        execute: ['release-operator'],
+        verify: ['qa-owner']
+      }
+    }, { spaces: 2 });
+
+    return { policyPath, catalogPath, runtimePolicyPath, approvalRolePolicyPath };
   }
 
   async function writeProviderPayload(workspace) {
@@ -306,5 +317,36 @@ describe('interactive-flow script', () => {
 
     expect(result.status).toBe(1);
     expect(`${result.stderr}`.toLowerCase()).toContain('context contract validation failed');
+  });
+
+  test('fails with exit code 2 when role policy blocks auto execute', async () => {
+    const workspace = path.join(tempDir, 'workspace-role-block-flow');
+    await fs.ensureDir(workspace);
+    const { policyPath, catalogPath, approvalRolePolicyPath } = await writePolicyBundle(workspace);
+    const payloadPath = await writeProviderPayload(workspace);
+
+    const result = runScript(workspace, [
+      '--input', payloadPath,
+      '--provider', 'moqui',
+      '--goal', 'Adjust order screen field layout for clearer input flow',
+      '--execution-mode', 'apply',
+      '--auto-approve-low-risk',
+      '--auto-execute-low-risk',
+      '--approval-role-policy', approvalRolePolicyPath,
+      '--approval-actor-role', 'product-owner',
+      '--approver-actor-role', 'product-owner',
+      '--auth-password-hash', crypto.createHash('sha256').update('demo-pass').digest('hex'),
+      '--auth-password', 'demo-pass',
+      '--policy', policyPath,
+      '--catalog', catalogPath,
+      '--fail-on-execute-blocked',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(2);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.summary.status).toBe('apply-blocked');
+    expect(payload.summary.execution_result).toBe('blocked');
+    expect(payload.summary.execution_reason).toContain('not allowed for execute');
   });
 });

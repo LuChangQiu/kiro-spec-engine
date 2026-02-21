@@ -857,6 +857,24 @@ jobs:
               const preflightBlockedRateHistory = payload.aggregates && Number.isFinite(Number(payload.aggregates.release_gate_preflight_block_rate_percent))
                 ? Number(payload.aggregates.release_gate_preflight_block_rate_percent)
                 : null;
+              const configWarningsTotalHistory = payload.aggregates && Number.isFinite(Number(payload.aggregates.config_warnings_total))
+                ? Number(payload.aggregates.config_warnings_total)
+                : null;
+              const weeklyOpsKnownRunsHistory = payload.aggregates && Number.isFinite(Number(payload.aggregates.weekly_ops_known_runs))
+                ? Number(payload.aggregates.weekly_ops_known_runs)
+                : null;
+              const weeklyOpsBlockedRunsHistory = payload.aggregates && Number.isFinite(Number(payload.aggregates.weekly_ops_blocked_runs))
+                ? Number(payload.aggregates.weekly_ops_blocked_runs)
+                : null;
+              const weeklyOpsConfigWarningsTotalHistory = payload.aggregates && Number.isFinite(Number(payload.aggregates.weekly_ops_config_warnings_total))
+                ? Number(payload.aggregates.weekly_ops_config_warnings_total)
+                : null;
+              const weeklyOpsDialogueBlockRateMaxHistory = payload.aggregates && Number.isFinite(Number(payload.aggregates.weekly_ops_dialogue_authorization_block_rate_max_percent))
+                ? Number(payload.aggregates.weekly_ops_dialogue_authorization_block_rate_max_percent)
+                : null;
+              const weeklyOpsAuthTierBlockRateMaxHistory = payload.aggregates && Number.isFinite(Number(payload.aggregates.weekly_ops_authorization_tier_block_rate_max_percent))
+                ? Number(payload.aggregates.weekly_ops_authorization_tier_block_rate_max_percent)
+                : null;
               const {
                 buildReleaseDriftSignals,
                 resolveReleaseDriftThresholds
@@ -919,6 +937,11 @@ jobs:
                 `- Capability provided unknown-positive rate (history): ${capabilityProvidedUnknownRateHistory === null ? 'n/a' : `${capabilityProvidedUnknownRateHistory}%`}`,
                 `- Release preflight availability rate (history): ${preflightAvailabilityRateHistory === null ? 'n/a' : `${preflightAvailabilityRateHistory}%`}`,
                 `- Release preflight blocked rate (history): ${preflightBlockedRateHistory === null ? 'n/a' : `${preflightBlockedRateHistory}%`}`,
+                `- Release gate config warnings total (history): ${configWarningsTotalHistory === null ? 'n/a' : configWarningsTotalHistory}`,
+                `- Weekly ops blocked runs (history): ${weeklyOpsBlockedRunsHistory === null ? 'n/a' : weeklyOpsBlockedRunsHistory}/${weeklyOpsKnownRunsHistory === null ? 'n/a' : weeklyOpsKnownRunsHistory}`,
+                `- Weekly ops config warnings total (history): ${weeklyOpsConfigWarningsTotalHistory === null ? 'n/a' : weeklyOpsConfigWarningsTotalHistory}`,
+                `- Weekly ops auth-tier block rate max (history): ${weeklyOpsAuthTierBlockRateMaxHistory === null ? 'n/a' : `${weeklyOpsAuthTierBlockRateMaxHistory}%`}`,
+                `- Weekly ops dialogue-auth block rate max (history): ${weeklyOpsDialogueBlockRateMaxHistory === null ? 'n/a' : `${weeklyOpsDialogueBlockRateMaxHistory}%`}`,
                 `- Recent pass ratio (latest 5): ${recentKnown === 0 ? 'n/a' : `${recentPass}/${recentKnown}`}`,
                 `- Recent risk mix (latest 5): low=${riskCounts.low}, medium=${riskCounts.medium}, high=${riskCounts.high}, unknown=${riskCounts.unknown}`,
                 `- Recent capability expected unknown ratio (latest 5): ${recentCapabilityExpectedUnknownKnown === 0 ? 'n/a' : `${recentCapabilityExpectedUnknownPositive}/${recentCapabilityExpectedUnknownKnown} (${recentCapabilityExpectedUnknownRate}%)`}`,
@@ -977,11 +1000,20 @@ jobs:
                   const hardGateMode = item && item.require_release_gate_preflight === true
                     ? 'enabled'
                     : (item && item.require_release_gate_preflight === false ? 'advisory' : 'n/a');
+                  const weeklyOpsBlocked = item && typeof item.weekly_ops_blocked === 'boolean'
+                    ? (item.weekly_ops_blocked ? 'yes' : 'no')
+                    : 'n/a';
+                  const weeklyOpsConfigWarnings = Number.isFinite(Number(item && item.weekly_ops_config_warning_count))
+                    ? `${Number(item.weekly_ops_config_warning_count)}`
+                    : 'n/a';
+                  const weeklyOpsDialogueRate = Number.isFinite(Number(item && item.weekly_ops_dialogue_authorization_block_rate_percent))
+                    ? `${Number(item.weekly_ops_dialogue_authorization_block_rate_percent)}%`
+                    : 'n/a';
                   const evaluatedAt = item && item.evaluated_at ? item.evaluated_at : 'n/a';
                   lines.push(
                     '',
                     `- ${tag} | passed=${passed} | risk=${risk} | scene-batch=${sceneBatch} | ` +
-                    `scene-failures=${sceneFailures} | capability-unknown=${capabilityExpectedUnknown}/${capabilityProvidedUnknown} | preflight-blocked=${preflightBlocked} | hard-gate=${hardGateMode} | success=${successRate} | at=${evaluatedAt}`
+                    `scene-failures=${sceneFailures} | capability-unknown=${capabilityExpectedUnknown}/${capabilityProvidedUnknown} | preflight-blocked=${preflightBlocked} | hard-gate=${hardGateMode} | weekly-blocked=${weeklyOpsBlocked} | weekly-config-warnings=${weeklyOpsConfigWarnings} | weekly-dialogue-rate=${weeklyOpsDialogueRate} | success=${successRate} | at=${evaluatedAt}`
                   );
                 }
               }

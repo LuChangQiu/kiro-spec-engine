@@ -11042,6 +11042,23 @@ if (process.argv.includes('--json')) {
       violations: [],
       config_warnings: [],
       gate_passed: true,
+      weekly_ops: {
+        blocked: false,
+        violations: [],
+        warnings: [
+          'weekly summary generated in advisory mode'
+        ],
+        config_warnings: [
+          'invalid number RELEASE_WEEKLY_OPS_MAX_DIALOGUE_AUTHORIZATION_BLOCK_RATE_PERCENT=abc, fallback=default'
+        ],
+        signals: {
+          risk: 'medium',
+          governance_status: 'ok',
+          authorization_tier_block_rate_percent: 35,
+          dialogue_authorization_block_rate_percent: 30,
+          matrix_regression_positive_rate_percent: 10
+        }
+      },
       drift: {
         enforce: false,
         alert_count: 0,
@@ -11078,6 +11095,24 @@ if (process.argv.includes('--json')) {
       ],
       config_warnings: [],
       gate_passed: false,
+      weekly_ops: {
+        blocked: true,
+        violations: [
+          'weekly ops dialogue-authorization block rate 66% exceeds max 40%'
+        ],
+        warnings: [],
+        config_warnings: [
+          'invalid number RELEASE_WEEKLY_OPS_MAX_DIALOGUE_AUTHORIZATION_BLOCK_RATE_PERCENT=xyz, fallback=default',
+          'invalid number RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT=bad-value, fallback=default'
+        ],
+        signals: {
+          risk: 'high',
+          governance_status: 'alert',
+          authorization_tier_block_rate_percent: 55,
+          dialogue_authorization_block_rate_percent: 66,
+          matrix_regression_positive_rate_percent: 40
+        }
+      },
       drift: {
         enforce: true,
         alert_count: 2,
@@ -11135,6 +11170,15 @@ if (process.argv.includes('--json')) {
       release_gate_preflight_available: true,
       release_gate_preflight_blocked: true,
       require_release_gate_preflight: true,
+      weekly_ops_blocked: true,
+      weekly_ops_risk_level: 'high',
+      weekly_ops_governance_status: 'alert',
+      weekly_ops_authorization_tier_block_rate_percent: 55,
+      weekly_ops_dialogue_authorization_block_rate_percent: 66,
+      weekly_ops_matrix_regression_positive_rate_percent: 40,
+      weekly_ops_violations_count: 1,
+      weekly_ops_warning_count: 0,
+      weekly_ops_config_warning_count: 2,
       drift_alert_count: 2,
       drift_blocked: true
     }));
@@ -11160,6 +11204,20 @@ if (process.argv.includes('--json')) {
       drift_blocked_runs: 1,
       drift_alert_rate_percent: 50,
       drift_block_rate_percent: 50,
+      weekly_ops_known_runs: 2,
+      weekly_ops_blocked_runs: 1,
+      weekly_ops_block_rate_percent: 50,
+      weekly_ops_violations_total: 1,
+      weekly_ops_warnings_total: 1,
+      weekly_ops_config_warnings_total: 3,
+      weekly_ops_config_warning_runs: 2,
+      weekly_ops_config_warning_run_rate_percent: 100,
+      weekly_ops_authorization_tier_block_rate_avg_percent: 45,
+      weekly_ops_authorization_tier_block_rate_max_percent: 55,
+      weekly_ops_dialogue_authorization_block_rate_avg_percent: 48,
+      weekly_ops_dialogue_authorization_block_rate_max_percent: 66,
+      weekly_ops_matrix_regression_positive_rate_avg_percent: 25,
+      weekly_ops_matrix_regression_positive_rate_max_percent: 40,
       release_gate_preflight_known_runs: 2,
       release_gate_preflight_available_runs: 2,
       release_gate_preflight_blocked_runs: 1,
@@ -11177,6 +11235,9 @@ if (process.argv.includes('--json')) {
       release_gate_preflight_available: true,
       release_gate_preflight_blocked: true,
       require_release_gate_preflight: true,
+      weekly_ops_blocked: true,
+      weekly_ops_dialogue_authorization_block_rate_percent: 66,
+      weekly_ops_config_warning_count: 2,
       drift_alert_count: 2,
       drift_blocked: true
     }));
@@ -11238,7 +11299,11 @@ if (process.argv.includes('--json')) {
     expect(markdown).toContain('scene-batch=');
     expect(markdown).toContain('Drift alert runs');
     expect(markdown).toContain('Release preflight blocked runs');
+    expect(markdown).toContain('Weekly ops known runs');
+    expect(markdown).toContain('Weekly ops config warnings total');
     expect(markdown).toContain('drift-alerts=');
+    expect(markdown).toContain('weekly-blocked=');
+    expect(markdown).toContain('weekly-config-warnings=');
     expect(markdown).toContain('capability-unknown=');
     expect(markdown).toContain('preflight-blocked=');
     expect(markdown).toContain('hard-gate=');

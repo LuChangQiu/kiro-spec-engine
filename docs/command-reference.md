@@ -834,7 +834,7 @@ Dual-track handoff integration:
   - Default scan dir is `.kiro/reports/release-evidence`, default output file is `.kiro/reports/release-evidence/release-gate-history.json`.
   - `--history-file` merges an existing index (for example, previous release asset) before dedup/refresh.
   - `--keep` retains latest N entries (`1-5000`, default `200`).
-  - Aggregates include scene package batch, capability unknown trend, drift, and release-preflight/hard-gate signals (`scene_package_batch_*`, `capability_expected_unknown_*`, `capability_provided_unknown_*`, `drift_alert_*`, `drift_block_*`, `release_gate_preflight_*`) when present in gate reports.
+  - Aggregates include scene package batch, capability unknown trend, drift, weekly ops pressure, config warning pressure, and release-preflight/hard-gate signals (`scene_package_batch_*`, `capability_expected_unknown_*`, `capability_provided_unknown_*`, `drift_alert_*`, `drift_block_*`, `weekly_ops_*`, `config_warnings_total`, `release_gate_preflight_*`) when present in gate reports.
   - `--markdown-out <path>` writes a human-readable trend card markdown for PR/Issue handoff.
 
 Moqui template library lexicon audit (script-level governance helper):

@@ -348,5 +348,34 @@ describe('interactive-flow script', () => {
     expect(payload.summary.status).toBe('apply-blocked');
     expect(payload.summary.execution_result).toBe('blocked');
     expect(payload.summary.execution_reason).toContain('not allowed for execute');
+    expect(payload.summary.execution_block_reason_category).toBe('role-policy');
+    expect(payload.summary.execution_block_remediation_hint).toContain('actor role');
+    expect(payload.summary.authorization_execute_roles).toEqual(['release-operator']);
+  });
+
+  test('propagates password authorization block classification from loop summary', async () => {
+    const workspace = path.join(tempDir, 'workspace-password-block-flow');
+    await fs.ensureDir(workspace);
+    const { policyPath, catalogPath } = await writePolicyBundle(workspace);
+    const payloadPath = await writeProviderPayload(workspace);
+
+    const result = runScript(workspace, [
+      '--input', payloadPath,
+      '--provider', 'moqui',
+      '--goal', 'Adjust order screen field layout for clearer input flow',
+      '--execution-mode', 'apply',
+      '--auto-execute-low-risk',
+      '--auth-password-hash', crypto.createHash('sha256').update('demo-pass').digest('hex'),
+      '--policy', policyPath,
+      '--catalog', catalogPath,
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.summary.status).toBe('apply-blocked');
+    expect(payload.summary.execution_reason).toContain('password authorization required');
+    expect(payload.summary.execution_block_reason_category).toBe('password-authorization');
+    expect(payload.summary.execution_block_remediation_hint).toContain('password authorization');
   });
 });

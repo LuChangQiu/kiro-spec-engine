@@ -391,9 +391,44 @@ describe('interactive-customization-loop script', () => {
     expect(result.status).toBe(2);
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.summary.status).toBe('apply-blocked');
+    expect(payload.summary.execution_block_reason_category).toBe('role-policy');
+    expect(payload.summary.execution_block_remediation_hint).toContain('actor role');
     expect(payload.execution.attempted).toBe(true);
     expect(payload.execution.blocked).toBe(true);
     expect(payload.execution.reason).toContain('not allowed for execute');
     expect(payload.approval.authorization.role_requirements.execute).toEqual(['release-operator']);
+    expect(payload.summary.next_actions).toEqual(expect.arrayContaining([
+      expect.stringContaining('--approval-role-policy'),
+      expect.stringContaining('--approver-actor-role')
+    ]));
+  });
+
+  test('categorizes password authorization block and emits remediation hint', async () => {
+    const workspace = path.join(tempDir, 'workspace-password-block');
+    await fs.ensureDir(workspace);
+    const { policyPath, catalogPath } = await writePolicyBundle(workspace);
+    const contextPath = await writeContext(workspace);
+
+    const result = runScript(workspace, [
+      '--context', contextPath,
+      '--goal', 'Adjust order screen field layout for clearer input flow',
+      '--execution-mode', 'apply',
+      '--auto-execute-low-risk',
+      '--auth-password-hash', crypto.createHash('sha256').update('demo-pass').digest('hex'),
+      '--policy', policyPath,
+      '--catalog', catalogPath,
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.summary.status).toBe('apply-blocked');
+    expect(payload.execution.blocked).toBe(true);
+    expect(payload.execution.reason).toContain('password authorization required');
+    expect(payload.summary.execution_block_reason_category).toBe('password-authorization');
+    expect(payload.summary.execution_block_remediation_hint).toContain('password authorization');
+    expect(payload.summary.next_actions).toEqual(expect.arrayContaining([
+      expect.stringContaining('--auth-password')
+    ]));
   });
 });

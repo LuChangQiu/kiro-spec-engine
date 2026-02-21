@@ -108,6 +108,10 @@ Flow output defaults:
 - Matrix summary JSON: `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.json`
 - Matrix summary Markdown: `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.md`
 - Matrix signal stream: `.kiro/reports/interactive-matrix-signals.jsonl`
+- Loop/flow summaries now include execution block diagnostics:
+  - `summary.execution_block_reason_category` (`password-authorization|role-policy|runtime-policy|approval-policy|unknown`)
+  - `summary.execution_block_remediation_hint` (human-readable fix hint)
+  - `summary.authorization_execute_roles` (flow-level execute role requirements when role policy is enabled)
 
 Build read-only change intent from page context:
 

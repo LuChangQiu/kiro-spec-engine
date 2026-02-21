@@ -460,6 +460,53 @@ function buildSummaryStatus({
   return 'apply-finished-with-risk';
 }
 
+function detectExecutionBlockReasonCategory(execution) {
+  if (!execution || execution.blocked !== true) {
+    return null;
+  }
+  const reason = `${execution.reason || ''}`.trim().toLowerCase();
+  const decision = `${execution.decision || ''}`.trim().toLowerCase();
+
+  if (reason.includes('password authorization')) {
+    return 'password-authorization';
+  }
+  if (reason.includes('actor role') || reason.includes('allowed roles')) {
+    return 'role-policy';
+  }
+  if (decision === 'runtime-blocked' || reason.includes('runtime environment')) {
+    return 'runtime-policy';
+  }
+  if (decision === 'approval-blocked') {
+    return 'approval-policy';
+  }
+  return 'unknown';
+}
+
+function buildExecutionBlockRemediationHint({
+  blockReasonCategory,
+  executionReason
+}) {
+  if (!blockReasonCategory) {
+    return null;
+  }
+  if (blockReasonCategory === 'password-authorization') {
+    return 'Provide one-time password authorization and rerun apply.';
+  }
+  if (blockReasonCategory === 'role-policy') {
+    return 'Use an actor role allowed by approval role policy for this action and rerun apply.';
+  }
+  if (blockReasonCategory === 'runtime-policy') {
+    return 'Adjust runtime mode/environment policy or run under an environment that permits the action.';
+  }
+  if (blockReasonCategory === 'approval-policy') {
+    return 'Complete required approval workflow transitions before execute.';
+  }
+  if (`${executionReason || ''}`.trim().length > 0) {
+    return `Review execution block reason: ${executionReason}`;
+  }
+  return 'Review execution block reason and approval/runtime policies.';
+}
+
 function buildNextActions({
   dialogueDecision,
   gateDecision,
@@ -468,6 +515,7 @@ function buildNextActions({
   runtime,
   autoExecuteTriggered,
   executionPayload,
+  executionBlockReasonCategory,
   executionReason,
   approvalStatus,
   feedbackLogged,
@@ -511,9 +559,13 @@ function buildNextActions({
       actions.push('Execution was blocked or failed. Inspect adapter output and adjust plan/policy.');
       actions.push(`node scripts/interactive-moqui-adapter.js --action validate --plan ${artifacts.plan_json} --json`);
     }
-  } else if (`${executionReason || ''}`.toLowerCase().includes('password authorization')) {
+  } else if (executionBlockReasonCategory === 'password-authorization') {
     actions.push('Provide one-time password authorization and rerun low-risk apply.');
     actions.push(`node scripts/interactive-customization-loop.js --context ${artifacts.context_json} --goal "..." --execution-mode apply --auto-execute-low-risk --auth-password "<password>" --json`);
+  } else if (executionBlockReasonCategory === 'role-policy') {
+    actions.push('Use an approver actor role allowed by approval role policy, then rerun low-risk apply.');
+    actions.push(`node scripts/interactive-approval-workflow.js --action status --state-file ${artifacts.approval_state_json} --json`);
+    actions.push(`node scripts/interactive-customization-loop.js --context ${artifacts.context_json} --goal "..." --execution-mode apply --auto-execute-low-risk --approval-role-policy "<role-policy.json>" --approver-actor-role "<allowed-role>" --json`);
   }
 
   if (risk === 'low' && approvalStatus === 'submitted') {
@@ -1122,6 +1174,11 @@ async function main() {
     executionBlocked: execution.blocked,
     executionResult: execution.result
   });
+  const executionBlockReasonCategory = detectExecutionBlockReasonCategory(execution);
+  const executionBlockRemediationHint = buildExecutionBlockRemediationHint({
+    blockReasonCategory: executionBlockReasonCategory,
+    executionReason: execution.reason
+  });
 
   const payload = {
     mode: 'interactive-customization-loop',
@@ -1191,6 +1248,8 @@ async function main() {
     execution,
     summary: {
       status: summaryStatus,
+      execution_block_reason_category: executionBlockReasonCategory,
+      execution_block_remediation_hint: executionBlockRemediationHint,
       next_actions: buildNextActions({
         dialogueDecision,
         gateDecision,
@@ -1202,6 +1261,7 @@ async function main() {
         },
         autoExecuteTriggered: execution.auto_triggered === true,
         executionPayload: execution.payload && execution.payload.payload ? execution.payload.payload : null,
+        executionBlockReasonCategory,
         executionReason: execution.reason,
         approvalStatus,
         feedbackLogged: feedback.logged,
@@ -1269,6 +1329,8 @@ module.exports = {
   buildStep,
   shouldAutoLowRisk,
   buildSummaryStatus,
+  detectExecutionBlockReasonCategory,
+  buildExecutionBlockRemediationHint,
   buildNextActions,
   main
 };

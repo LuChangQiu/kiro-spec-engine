@@ -830,6 +830,12 @@ async function main() {
       runtime_environment: loopPayload && loopPayload.runtime ? loopPayload.runtime.environment : null,
       execution_result: loopPayload && loopPayload.execution ? loopPayload.execution.result : null,
       execution_reason: loopPayload && loopPayload.execution ? loopPayload.execution.reason || null : null,
+      execution_block_reason_category: loopPayload && loopPayload.summary
+        ? loopPayload.summary.execution_block_reason_category || null
+        : null,
+      execution_block_remediation_hint: loopPayload && loopPayload.summary
+        ? loopPayload.summary.execution_block_remediation_hint || null
+        : null,
       work_order_id: loopPayload && loopPayload.work_order ? loopPayload.work_order.work_order_id || null : null,
       work_order_status: loopPayload && loopPayload.work_order ? loopPayload.work_order.status || null : null,
       authorization_password_required: loopPayload && loopPayload.approval && loopPayload.approval.authorization
@@ -838,6 +844,13 @@ async function main() {
       authorization_password_verified: loopPayload && loopPayload.approval && loopPayload.approval.authorization
         ? loopPayload.approval.authorization.password_verified === true
         : null,
+      authorization_execute_roles: loopPayload &&
+        loopPayload.approval &&
+        loopPayload.approval.authorization &&
+        loopPayload.approval.authorization.role_requirements &&
+        Array.isArray(loopPayload.approval.authorization.role_requirements.execute)
+        ? loopPayload.approval.authorization.role_requirements.execute
+        : [],
       matrix_status: matrixStageStatus,
       matrix_portfolio_passed: matrixPortfolioPassed,
       matrix_regression_count: matrixRegressionCount

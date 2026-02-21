@@ -72,4 +72,35 @@ describe('interactive-dialogue-governance script', () => {
     expect(payload.decision).toBe('deny');
     expect(payload.reasons.join(' ')).toContain('secrets');
   });
+
+  test('applies system-maintainer profile deny rules', async () => {
+    const workspace = path.join(tempDir, 'workspace-maintainer-profile');
+    await fs.ensureDir(workspace);
+
+    const result = runScript(workspace, [
+      '--goal', 'Deploy emergency hotfix to production without ticket and no rollback',
+      '--profile', 'system-maintainer',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.policy.active_profile).toBe('system-maintainer');
+    expect(payload.decision).toBe('deny');
+    expect(payload.reasons.join(' ')).toContain('ticket');
+  });
+
+  test('fails fast for unsupported dialogue profile', async () => {
+    const workspace = path.join(tempDir, 'workspace-invalid-profile');
+    await fs.ensureDir(workspace);
+
+    const result = runScript(workspace, [
+      '--goal', 'Reduce approval lead time by 20%',
+      '--profile', 'unknown-profile',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(1);
+    expect(`${result.stderr}`.toLowerCase()).toContain('--profile must be one of');
+  });
 });

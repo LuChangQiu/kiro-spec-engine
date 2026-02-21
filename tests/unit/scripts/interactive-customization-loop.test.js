@@ -187,6 +187,7 @@ describe('interactive-customization-loop script', () => {
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.mode).toBe('interactive-customization-loop');
     expect(payload.dialogue.decision).toBe('allow');
+    expect(payload.dialogue.profile).toBe('business-user');
     expect(payload.gate.decision).toBe('allow');
     expect(payload.runtime.decision).toBe('allow');
     expect(payload.work_order).toBeTruthy();
@@ -430,5 +431,26 @@ describe('interactive-customization-loop script', () => {
     expect(payload.summary.next_actions).toEqual(expect.arrayContaining([
       expect.stringContaining('--auth-password')
     ]));
+  });
+
+  test('supports dialogue profile override for maintenance conversations', async () => {
+    const workspace = path.join(tempDir, 'workspace-dialogue-profile');
+    await fs.ensureDir(workspace);
+    const { policyPath, catalogPath } = await writePolicyBundle(workspace);
+    const contextPath = await writeContext(workspace);
+
+    const result = runScript(workspace, [
+      '--context', contextPath,
+      '--goal', 'Tune order screen validation copy for operators',
+      '--dialogue-profile', 'system-maintainer',
+      '--policy', policyPath,
+      '--catalog', catalogPath,
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.dialogue.profile).toBe('system-maintainer');
+    expect(payload.options.dialogue_profile).toBe('system-maintainer');
   });
 });

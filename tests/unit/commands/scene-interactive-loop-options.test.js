@@ -14,6 +14,7 @@ describe('scene interactive-loop option helpers', () => {
       runtimePolicy: ' docs/interactive-customization/runtime-mode-policy-baseline.json ',
       runtimeOut: ' .kiro/reports/runtime.json ',
       dialoguePolicy: ' docs/interactive-customization/dialogue-governance-policy-baseline.json ',
+      dialogueProfile: ' SYSTEM-MAINTAINER ',
       contextContract: ' docs/interactive-customization/moqui-copilot-context-contract.json ',
       workOrderOut: ' .kiro/reports/work-order.json ',
       workOrderMarkdownOut: ' .kiro/reports/work-order.md ',
@@ -37,6 +38,7 @@ describe('scene interactive-loop option helpers', () => {
     expect(normalized.runtimePolicy).toBe('docs/interactive-customization/runtime-mode-policy-baseline.json');
     expect(normalized.runtimeOut).toBe('.kiro/reports/runtime.json');
     expect(normalized.dialoguePolicy).toBe('docs/interactive-customization/dialogue-governance-policy-baseline.json');
+    expect(normalized.dialogueProfile).toBe('system-maintainer');
     expect(normalized.contextContract).toBe('docs/interactive-customization/moqui-copilot-context-contract.json');
     expect(normalized.workOrderOut).toBe('.kiro/reports/work-order.json');
     expect(normalized.workOrderMarkdownOut).toBe('.kiro/reports/work-order.md');
@@ -81,6 +83,17 @@ describe('scene interactive-loop option helpers', () => {
       feedbackChannel: 'ui',
       feedbackScore: null
     })).toBe('--execution-mode must be suggestion or apply');
+
+    expect(validateSceneInteractiveLoopOptions({
+      context: 'docs/context.json',
+      goal: 'x',
+      executionMode: 'apply',
+      dialogueProfile: 'ops-user',
+      runtimeMode: 'ops-fix',
+      runtimeEnvironment: 'staging',
+      feedbackChannel: 'ui',
+      feedbackScore: null
+    })).toBe('--dialogue-profile must be one of: business-user, system-maintainer');
 
     expect(validateSceneInteractiveLoopOptions({
       context: 'docs/context.json',

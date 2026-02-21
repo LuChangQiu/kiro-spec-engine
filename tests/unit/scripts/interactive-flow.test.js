@@ -204,6 +204,7 @@ describe('interactive-flow script', () => {
     expect(payload.pipeline.matrix.status).toBe('completed');
     expect(payload.summary.status).toBe('ready-for-apply');
     expect(payload.summary.dialogue_decision).toBe('allow');
+    expect(payload.summary.dialogue_profile).toBe('business-user');
     expect(payload.summary.runtime_decision).toBe('allow');
     expect(payload.summary.work_order_status).toBeTruthy();
     expect(payload.summary.matrix_status).toBe('completed');
@@ -377,5 +378,26 @@ describe('interactive-flow script', () => {
     expect(payload.summary.execution_reason).toContain('password authorization required');
     expect(payload.summary.execution_block_reason_category).toBe('password-authorization');
     expect(payload.summary.execution_block_remediation_hint).toContain('password authorization');
+  });
+
+  test('propagates dialogue profile override into flow summary', async () => {
+    const workspace = path.join(tempDir, 'workspace-dialogue-profile-flow');
+    await fs.ensureDir(workspace);
+    const { policyPath, catalogPath } = await writePolicyBundle(workspace);
+    const payloadPath = await writeProviderPayload(workspace);
+
+    const result = runScript(workspace, [
+      '--input', payloadPath,
+      '--provider', 'moqui',
+      '--goal', 'Tune order screen validation copy for operators',
+      '--dialogue-profile', 'system-maintainer',
+      '--policy', policyPath,
+      '--catalog', catalogPath,
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.summary.dialogue_profile).toBe('system-maintainer');
   });
 });

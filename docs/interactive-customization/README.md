@@ -71,6 +71,7 @@ Run one-command full flow (bridge -> loop):
 node scripts/interactive-flow.js \
   --input docs/interactive-customization/moqui-context-provider.sample.json \
   --goal "Adjust order screen field layout for clearer input flow" \
+  --dialogue-profile business-user \
   --runtime-mode ops-fix \
   --runtime-environment staging \
   --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
@@ -138,6 +139,7 @@ Run dialogue governance (communication-rule check only):
 ```bash
 node scripts/interactive-dialogue-governance.js \
   --goal "Improve order entry speed without changing payment policy" \
+  --profile business-user \
   --context docs/interactive-customization/page-context.sample.json \
   --policy docs/interactive-customization/dialogue-governance-policy-baseline.json \
   --json
@@ -151,6 +153,7 @@ node scripts/interactive-customization-loop.js \
   --context docs/interactive-customization/page-context.sample.json \
   --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
   --goal "Improve order entry clarity for business users" \
+  --dialogue-profile business-user \
   --json
 
 # low-risk one-click apply loop
@@ -158,6 +161,7 @@ node scripts/interactive-customization-loop.js \
   --context docs/interactive-customization/page-context.sample.json \
   --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
   --goal "Adjust order screen field layout for clearer input flow" \
+  --dialogue-profile system-maintainer \
   --runtime-mode ops-fix \
   --runtime-environment staging \
   --runtime-policy docs/interactive-customization/runtime-mode-policy-baseline.json \
@@ -178,6 +182,7 @@ sce scene interactive-loop \
   --context docs/interactive-customization/page-context.sample.json \
   --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
   --goal "Adjust order screen field layout for clearer input flow" \
+  --dialogue-profile business-user \
   --execution-mode apply \
   --auto-execute-low-risk \
   --auth-password-hash "<sha256-of-demo-pass>" \
@@ -189,6 +194,7 @@ sce scene interactive-loop \
 `--feedback-score` writes feedback into both:
 - Session artifact: `.kiro/reports/interactive-loop/<session-id>/interactive-user-feedback.jsonl`
 - Governance global stream: `.kiro/reports/interactive-user-feedback.jsonl`
+- `--dialogue-profile` defaults to `business-user`; use `system-maintainer` for operations/maintenance sessions that must surface ticket + rollback requirements before execution.
 - Context contract validation is strict by default (required fields, payload size, forbidden keys). Use `--no-strict-contract` only for temporary diagnostics.
 - `--execution-mode apply` with mutating actions requires password authorization by default (`plan.authorization.password_required=true`).
 - Runtime policy defaults to `ops-fix@staging`; low-risk auto execute requires runtime decision `allow`.

@@ -13,9 +13,11 @@ const DEFAULT_FEEDBACK_CHANNEL = 'ui';
 const DEFAULT_AUTH_PASSWORD_HASH_ENV = 'SCE_INTERACTIVE_AUTH_PASSWORD_SHA256';
 const DEFAULT_RUNTIME_MODE = 'ops-fix';
 const DEFAULT_RUNTIME_ENVIRONMENT = 'staging';
+const DEFAULT_DIALOGUE_PROFILE = 'business-user';
 const FEEDBACK_CHANNELS = new Set(['ui', 'cli', 'api', 'other']);
 const RUNTIME_MODES = new Set(['user-assist', 'ops-fix', 'feature-dev']);
 const RUNTIME_ENVIRONMENTS = new Set(['dev', 'staging', 'prod']);
+const DIALOGUE_PROFILES = new Set(['business-user', 'system-maintainer']);
 
 const SCRIPT_DIALOGUE = path.resolve(__dirname, 'interactive-dialogue-governance.js');
 const SCRIPT_INTENT = path.resolve(__dirname, 'interactive-intent-build.js');
@@ -38,6 +40,7 @@ function parseArgs(argv) {
     policy: null,
     catalog: null,
     dialoguePolicy: null,
+    dialogueProfile: DEFAULT_DIALOGUE_PROFILE,
     dialogueOut: null,
     runtimeMode: DEFAULT_RUNTIME_MODE,
     runtimeEnvironment: DEFAULT_RUNTIME_ENVIRONMENT,
@@ -106,6 +109,9 @@ function parseArgs(argv) {
       index += 1;
     } else if (token === '--dialogue-policy' && next) {
       options.dialoguePolicy = next;
+      index += 1;
+    } else if (token === '--dialogue-profile' && next) {
+      options.dialogueProfile = next;
       index += 1;
     } else if (token === '--dialogue-out' && next) {
       options.dialogueOut = next;
@@ -245,6 +251,7 @@ function parseArgs(argv) {
   options.approvalRolePolicy = `${options.approvalRolePolicy || ''}`.trim() || null;
   options.feedbackComment = `${options.feedbackComment || ''}`.trim() || null;
   options.dialoguePolicy = `${options.dialoguePolicy || ''}`.trim() || null;
+  options.dialogueProfile = `${options.dialogueProfile || ''}`.trim().toLowerCase() || DEFAULT_DIALOGUE_PROFILE;
   options.dialogueOut = `${options.dialogueOut || ''}`.trim() || null;
   options.runtimeMode = `${options.runtimeMode || ''}`.trim().toLowerCase() || DEFAULT_RUNTIME_MODE;
   options.runtimeEnvironment = `${options.runtimeEnvironment || ''}`.trim().toLowerCase() || DEFAULT_RUNTIME_ENVIRONMENT;
@@ -262,6 +269,9 @@ function parseArgs(argv) {
     throw new Error(`--feedback-channel must be one of: ${Array.from(FEEDBACK_CHANNELS).join(', ')}`);
   }
   options.feedbackTags = Array.from(new Set(options.feedbackTags.map(item => item.toLowerCase())));
+  if (!DIALOGUE_PROFILES.has(options.dialogueProfile)) {
+    throw new Error(`--dialogue-profile must be one of: ${Array.from(DIALOGUE_PROFILES).join(', ')}`);
+  }
 
   return options;
 }
@@ -283,6 +293,7 @@ function printHelpAndExit(code) {
     '  --policy <path>                  Guardrail policy override',
     '  --catalog <path>                 High-risk catalog override',
     '  --dialogue-policy <path>         Dialogue governance policy override',
+    `  --dialogue-profile <name>        business-user|system-maintainer (default: ${DEFAULT_DIALOGUE_PROFILE})`,
     '  --dialogue-out <path>            Dialogue governance report output path',
     `  --runtime-mode <name>            user-assist|ops-fix|feature-dev (default: ${DEFAULT_RUNTIME_MODE})`,
     `  --runtime-environment <name>     dev|staging|prod (default: ${DEFAULT_RUNTIME_ENVIRONMENT})`,
@@ -633,6 +644,9 @@ async function main() {
   }
   if (options.dialoguePolicy) {
     dialogueArgs.push('--policy', resolvePath(cwd, options.dialoguePolicy));
+  }
+  if (options.dialogueProfile) {
+    dialogueArgs.push('--profile', options.dialogueProfile);
   }
   const dialogueResult = runScript({
     label: 'interactive-dialogue-governance',
@@ -1211,6 +1225,7 @@ async function main() {
       feedback_tags: options.feedbackTags,
       feedback_channel: options.feedbackChannel,
       dialogue_policy: options.dialoguePolicy ? toRelative(cwd, resolvePath(cwd, options.dialoguePolicy)) : null,
+      dialogue_profile: options.dialogueProfile,
       runtime_mode: options.runtimeMode,
       runtime_environment: options.runtimeEnvironment,
       runtime_policy: options.runtimePolicy ? toRelative(cwd, resolvePath(cwd, options.runtimePolicy)) : null,
@@ -1219,6 +1234,7 @@ async function main() {
     },
     dialogue: {
       decision: dialogueDecision,
+      profile: dialoguePayload && dialoguePayload.policy ? dialoguePayload.policy.active_profile || null : null,
       reasons: Array.isArray(dialoguePayload && dialoguePayload.reasons) ? dialoguePayload.reasons : [],
       clarification_questions: Array.isArray(dialoguePayload && dialoguePayload.clarification_questions)
         ? dialoguePayload.clarification_questions
@@ -1316,9 +1332,11 @@ module.exports = {
   DEFAULT_FEEDBACK_CHANNEL,
   DEFAULT_RUNTIME_MODE,
   DEFAULT_RUNTIME_ENVIRONMENT,
+  DEFAULT_DIALOGUE_PROFILE,
   FEEDBACK_CHANNELS,
   RUNTIME_MODES,
   RUNTIME_ENVIRONMENTS,
+  DIALOGUE_PROFILES,
   parseArgs,
   resolvePath,
   normalizeSessionId,

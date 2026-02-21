@@ -15,6 +15,8 @@ const DEFAULT_MATRIX_MIN_SCORE = 70;
 const DEFAULT_MATRIX_MIN_VALID_RATE = 100;
 const DEFAULT_AUTH_PASSWORD_HASH_ENV = 'SCE_INTERACTIVE_AUTH_PASSWORD_SHA256';
 const FEEDBACK_CHANNELS = new Set(['ui', 'cli', 'api', 'other']);
+const DEFAULT_DIALOGUE_PROFILE = 'business-user';
+const DIALOGUE_PROFILES = new Set(['business-user', 'system-maintainer']);
 const DEFAULT_RUNTIME_MODE = 'ops-fix';
 const DEFAULT_RUNTIME_ENVIRONMENT = 'staging';
 const RUNTIME_MODES = new Set(['user-assist', 'ops-fix', 'feature-dev']);
@@ -36,6 +38,7 @@ function parseArgs(argv) {
     policy: null,
     catalog: null,
     dialoguePolicy: null,
+    dialogueProfile: DEFAULT_DIALOGUE_PROFILE,
     dialogueOut: null,
     runtimeMode: DEFAULT_RUNTIME_MODE,
     runtimeEnvironment: DEFAULT_RUNTIME_ENVIRONMENT,
@@ -123,6 +126,9 @@ function parseArgs(argv) {
       index += 1;
     } else if (token === '--dialogue-policy' && next) {
       options.dialoguePolicy = next;
+      index += 1;
+    } else if (token === '--dialogue-profile' && next) {
+      options.dialogueProfile = next;
       index += 1;
     } else if (token === '--dialogue-out' && next) {
       options.dialogueOut = next;
@@ -277,6 +283,7 @@ function parseArgs(argv) {
   options.policy = `${options.policy || ''}`.trim() || null;
   options.catalog = `${options.catalog || ''}`.trim() || null;
   options.dialoguePolicy = `${options.dialoguePolicy || ''}`.trim() || null;
+  options.dialogueProfile = `${options.dialogueProfile || ''}`.trim().toLowerCase() || DEFAULT_DIALOGUE_PROFILE;
   options.dialogueOut = `${options.dialogueOut || ''}`.trim() || null;
   options.runtimeMode = `${options.runtimeMode || ''}`.trim().toLowerCase() || DEFAULT_RUNTIME_MODE;
   options.runtimeEnvironment = `${options.runtimeEnvironment || ''}`.trim().toLowerCase() || DEFAULT_RUNTIME_ENVIRONMENT;
@@ -323,6 +330,9 @@ function parseArgs(argv) {
   }
   if (!['suggestion', 'apply'].includes(options.executionMode)) {
     throw new Error('--execution-mode must be one of: suggestion, apply');
+  }
+  if (!DIALOGUE_PROFILES.has(options.dialogueProfile)) {
+    throw new Error(`--dialogue-profile must be one of: ${Array.from(DIALOGUE_PROFILES).join(', ')}`);
   }
   if (!RUNTIME_MODES.has(options.runtimeMode)) {
     throw new Error(`--runtime-mode must be one of: ${Array.from(RUNTIME_MODES).join(', ')}`);
@@ -372,6 +382,7 @@ function printHelpAndExit(code) {
     '  --policy <path>                 Guardrail policy override',
     '  --catalog <path>                High-risk catalog override',
     '  --dialogue-policy <path>        Dialogue governance policy override',
+    `  --dialogue-profile <name>       business-user|system-maintainer (default: ${DEFAULT_DIALOGUE_PROFILE})`,
     '  --dialogue-out <path>           Dialogue governance report output path',
     `  --runtime-mode <name>           user-assist|ops-fix|feature-dev (default: ${DEFAULT_RUNTIME_MODE})`,
     `  --runtime-environment <name>    dev|staging|prod (default: ${DEFAULT_RUNTIME_ENVIRONMENT})`,
@@ -583,6 +594,9 @@ async function main() {
   }
   if (options.dialoguePolicy) {
     loopArgs.push('--dialogue-policy', resolvePath(cwd, options.dialoguePolicy));
+  }
+  if (options.dialogueProfile) {
+    loopArgs.push('--dialogue-profile', options.dialogueProfile);
   }
   if (options.dialogueOut) {
     loopArgs.push('--dialogue-out', resolvePath(cwd, options.dialogueOut));
@@ -824,6 +838,7 @@ async function main() {
     summary: {
       status: loopPayload && loopPayload.summary ? loopPayload.summary.status : null,
       dialogue_decision: loopPayload && loopPayload.dialogue ? loopPayload.dialogue.decision : null,
+      dialogue_profile: loopPayload && loopPayload.dialogue ? loopPayload.dialogue.profile || null : null,
       gate_decision: loopPayload && loopPayload.gate ? loopPayload.gate.decision : null,
       runtime_decision: loopPayload && loopPayload.runtime ? loopPayload.runtime.decision : null,
       runtime_mode: loopPayload && loopPayload.runtime ? loopPayload.runtime.mode : null,
@@ -931,8 +946,10 @@ module.exports = {
   DEFAULT_PROVIDER,
   DEFAULT_OUT_DIR,
   DEFAULT_USER_ID,
+  DEFAULT_DIALOGUE_PROFILE,
   DEFAULT_RUNTIME_MODE,
   DEFAULT_RUNTIME_ENVIRONMENT,
+  DIALOGUE_PROFILES,
   RUNTIME_MODES,
   RUNTIME_ENVIRONMENTS,
   parseArgs,

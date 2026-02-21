@@ -1,6 +1,7 @@
 {
   "version": "1.0.0",
   "mode": "business-safe-assistant",
+  "default_profile": "business-user",
   "length_policy": {
     "min_chars": 12,
     "max_chars": 1200,
@@ -45,5 +46,41 @@
   "clarification_templates": [
     "What business metric should improve first (speed, accuracy, cost, compliance)?",
     "Which module/page should be changed first, and what must remain unchanged?"
-  ]
+  ],
+  "profiles": {
+    "business-user": {
+      "mode": "business-safe-assistant",
+      "response_rules": [
+        "Prefer business outcomes and measurable impact language over implementation details."
+      ]
+    },
+    "system-maintainer": {
+      "mode": "maintenance-safe-assistant",
+      "length_policy": {
+        "min_chars": 8,
+        "max_chars": 1600,
+        "min_significant_tokens": 3
+      },
+      "deny_patterns": [
+        {
+          "id": "prod-change-without-ticket",
+          "pattern": "\\b(prod|production)\\b[^.\\n]{0,120}\\b(without ticket|no ticket|skip ticket)\\b",
+          "reason": "production maintenance request is missing approved change ticket"
+        },
+        {
+          "id": "maintenance-no-rollback",
+          "pattern": "\\b(hotfix|patch|change|deploy)\\b[^.\\n]{0,120}\\b(without rollback|no rollback)\\b",
+          "reason": "maintenance request lacks rollback safeguard"
+        }
+      ],
+      "response_rules": [
+        "For maintenance requests, require change ticket, rollback plan, and approval role before execution.",
+        "If request targets production, require staged validation evidence first."
+      ],
+      "clarification_templates": [
+        "What is the approved change ticket id and rollback plan reference?",
+        "Which environment should run first (dev/staging/prod), and who is the approver role?"
+      ]
+    }
+  }
 }

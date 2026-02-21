@@ -136,6 +136,7 @@ Ensure:
   - `KSE_RELEASE_WEEKLY_OPS_MAX_RISK_LEVEL`: `low|medium|high|unknown` (default `medium`)
   - `KSE_RELEASE_WEEKLY_OPS_MAX_GOVERNANCE_BREACHES`: optional max breach count
   - `KSE_RELEASE_WEEKLY_OPS_MAX_AUTHORIZATION_TIER_BLOCK_RATE_PERCENT`: max authorization-tier deny/review block rate percent (default `40`)
+  - `KSE_RELEASE_WEEKLY_OPS_MAX_DIALOGUE_AUTHORIZATION_BLOCK_RATE_PERCENT`: max dialogue-authorization block rate percent (default `40`)
   - `KSE_RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT`: optional max regression-positive rate percent
 - Optional: tune release asset integrity gate:
   - `KSE_RELEASE_ASSET_INTEGRITY_ENFORCE`: `true|false` (default `true`)

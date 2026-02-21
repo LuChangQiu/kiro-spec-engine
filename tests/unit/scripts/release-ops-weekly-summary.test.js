@@ -117,6 +117,10 @@ describe('release-ops-weekly-summary script', () => {
         authorization_tier_deny_total: 0,
         authorization_tier_review_required_total: 1,
         authorization_tier_block_rate_percent: 50,
+        dialogue_authorization_total: 4,
+        dialogue_authorization_block_total: 2,
+        dialogue_authorization_block_rate_percent: 50,
+        dialogue_authorization_user_app_apply_attempt_total: 1,
         matrix_signal_total: 2,
         matrix_portfolio_pass_rate_percent: 50,
         matrix_regression_positive_rate_percent: 50,
@@ -168,6 +172,8 @@ describe('release-ops-weekly-summary script', () => {
     expect(payload.snapshots.release_gate_history.drift_alert_positive_rate_percent).toBe(50);
     expect(payload.snapshots.interactive_governance.authorization_tier_total).toBe(2);
     expect(payload.snapshots.interactive_governance.authorization_tier_block_rate_percent).toBe(50);
+    expect(payload.snapshots.interactive_governance.dialogue_authorization_total).toBe(4);
+    expect(payload.snapshots.interactive_governance.dialogue_authorization_block_rate_percent).toBe(50);
     expect(payload.snapshots.matrix_signals.total_signals).toBe(2);
     expect(payload.health.risk).toMatch(/medium|high/);
 

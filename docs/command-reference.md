@@ -889,6 +889,7 @@ Release weekly ops gate helper (release hard-gate):
   - optional thresholds:
     - `RELEASE_WEEKLY_OPS_MAX_GOVERNANCE_BREACHES=<n>`
     - `RELEASE_WEEKLY_OPS_MAX_AUTHORIZATION_TIER_BLOCK_RATE_PERCENT=<n>` (default `40`)
+    - `RELEASE_WEEKLY_OPS_MAX_DIALOGUE_AUTHORIZATION_BLOCK_RATE_PERCENT=<n>` (default `40`)
     - `RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT=<n>`
   - merges result into `RELEASE_GATE_REPORT_FILE` when provided.
 - npm alias: `npm run gate:release-ops-weekly`

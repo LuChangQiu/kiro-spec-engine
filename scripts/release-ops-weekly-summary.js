@@ -487,6 +487,20 @@ function buildInteractiveGovernanceSnapshot(payload, window) {
     authorization_tier_block_rate_percent: Number.isFinite(Number(metrics.authorization_tier_block_rate_percent))
       ? Number(metrics.authorization_tier_block_rate_percent)
       : null,
+    dialogue_authorization_total: Number.isFinite(Number(metrics.dialogue_authorization_total))
+      ? Number(metrics.dialogue_authorization_total)
+      : null,
+    dialogue_authorization_block_total: Number.isFinite(Number(metrics.dialogue_authorization_block_total))
+      ? Number(metrics.dialogue_authorization_block_total)
+      : null,
+    dialogue_authorization_block_rate_percent: Number.isFinite(Number(metrics.dialogue_authorization_block_rate_percent))
+      ? Number(metrics.dialogue_authorization_block_rate_percent)
+      : null,
+    dialogue_authorization_user_app_apply_attempt_total: Number.isFinite(
+      Number(metrics.dialogue_authorization_user_app_apply_attempt_total)
+    )
+      ? Number(metrics.dialogue_authorization_user_app_apply_attempt_total)
+      : null,
     matrix_signal_total: Number.isFinite(Number(metrics.matrix_signal_total))
       ? Number(metrics.matrix_signal_total)
       : null,
@@ -646,6 +660,14 @@ function buildHealth(snapshots, warnings) {
     pushConcern(`authorization-tier block rate is ${governance.authorization_tier_block_rate_percent}%`);
     pushRecommendation('Tune dialogue profile + authorization-tier policy to reduce deny/review pressure for actionable requests.');
   }
+  if (
+    Number.isFinite(governance.dialogue_authorization_block_rate_percent)
+    && governance.dialogue_authorization_block_rate_percent > 40
+  ) {
+    risk = promoteRisk(risk, governance.dialogue_authorization_block_rate_percent >= 60 ? 'high' : 'medium');
+    pushConcern(`dialogue-authorization block rate is ${governance.dialogue_authorization_block_rate_percent}%`);
+    pushRecommendation('Tune authorization dialogue policy and ui-mode routing to reduce blocked user intent execution.');
+  }
 
   const matrix = snapshots.matrix_signals;
   if (matrix.total_signals === 0) {
@@ -704,6 +726,10 @@ function buildMarkdown(report) {
   lines.push(`- Authorization tier deny total: ${report.snapshots.interactive_governance.authorization_tier_deny_total == null ? 'n/a' : report.snapshots.interactive_governance.authorization_tier_deny_total}`);
   lines.push(`- Authorization tier review-required total: ${report.snapshots.interactive_governance.authorization_tier_review_required_total == null ? 'n/a' : report.snapshots.interactive_governance.authorization_tier_review_required_total}`);
   lines.push(`- Authorization tier block rate: ${report.snapshots.interactive_governance.authorization_tier_block_rate_percent == null ? 'n/a' : `${report.snapshots.interactive_governance.authorization_tier_block_rate_percent}%`}`);
+  lines.push(`- Dialogue authorization signals: ${report.snapshots.interactive_governance.dialogue_authorization_total == null ? 'n/a' : report.snapshots.interactive_governance.dialogue_authorization_total}`);
+  lines.push(`- Dialogue authorization block total: ${report.snapshots.interactive_governance.dialogue_authorization_block_total == null ? 'n/a' : report.snapshots.interactive_governance.dialogue_authorization_block_total}`);
+  lines.push(`- Dialogue authorization block rate: ${report.snapshots.interactive_governance.dialogue_authorization_block_rate_percent == null ? 'n/a' : `${report.snapshots.interactive_governance.dialogue_authorization_block_rate_percent}%`}`);
+  lines.push(`- Dialogue user-app apply attempts: ${report.snapshots.interactive_governance.dialogue_authorization_user_app_apply_attempt_total == null ? 'n/a' : report.snapshots.interactive_governance.dialogue_authorization_user_app_apply_attempt_total}`);
   lines.push('');
   lines.push('## Matrix Signals');
   lines.push('');

@@ -114,6 +114,7 @@ function buildWeeklyOpsSignals(payload) {
     governance_status: typeof governance.status === 'string' ? governance.status : null,
     governance_breaches: normalizeNumber(governance.breaches),
     authorization_tier_block_rate_percent: normalizeNumber(governance.authorization_tier_block_rate_percent),
+    dialogue_authorization_block_rate_percent: normalizeNumber(governance.dialogue_authorization_block_rate_percent),
     matrix_regression_positive_rate_percent: normalizeNumber(matrixSignals.regression_positive_rate_percent),
     handoff_gate_pass_rate_percent: normalizeNumber(handoff.gate_pass_rate_percent)
   };
@@ -154,6 +155,12 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
   );
   const maxAuthorizationTierBlockRatePercent = Number.isFinite(maxAuthorizationTierBlockRatePercentRaw)
     ? maxAuthorizationTierBlockRatePercentRaw
+    : 40;
+  const maxDialogueAuthorizationBlockRatePercentRaw = parseOptionalNumber(
+    readValue(env, 'RELEASE_WEEKLY_OPS_MAX_DIALOGUE_AUTHORIZATION_BLOCK_RATE_PERCENT', '')
+  );
+  const maxDialogueAuthorizationBlockRatePercent = Number.isFinite(maxDialogueAuthorizationBlockRatePercentRaw)
+    ? maxDialogueAuthorizationBlockRatePercentRaw
     : 40;
   const maxMatrixRegressionPositiveRatePercent = parseOptionalNumber(
     readValue(env, 'RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT', '')
@@ -196,6 +203,15 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
       );
     }
     if (
+      Number.isFinite(maxDialogueAuthorizationBlockRatePercent)
+      && Number.isFinite(signals.dialogue_authorization_block_rate_percent)
+      && signals.dialogue_authorization_block_rate_percent > maxDialogueAuthorizationBlockRatePercent
+    ) {
+      violations.push(
+        `weekly ops dialogue-authorization block rate ${signals.dialogue_authorization_block_rate_percent}% exceeds max ${maxDialogueAuthorizationBlockRatePercent}%`
+      );
+    }
+    if (
       Number.isFinite(maxMatrixRegressionPositiveRatePercent)
       && Number.isFinite(signals.matrix_regression_positive_rate_percent)
       && signals.matrix_regression_positive_rate_percent > maxMatrixRegressionPositiveRatePercent
@@ -218,6 +234,7 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
     max_risk_level: maxRiskLevel,
     max_governance_breaches: maxGovernanceBreaches,
     max_authorization_tier_block_rate_percent: maxAuthorizationTierBlockRatePercent,
+    max_dialogue_authorization_block_rate_percent: maxDialogueAuthorizationBlockRatePercent,
     max_matrix_regression_positive_rate_percent: maxMatrixRegressionPositiveRatePercent,
     signals,
     warnings,
@@ -242,6 +259,9 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
   if (Number.isFinite(maxAuthorizationTierBlockRatePercent)) {
     summaryLines.push(`- max authorization-tier block rate: ${maxAuthorizationTierBlockRatePercent}%`);
   }
+  if (Number.isFinite(maxDialogueAuthorizationBlockRatePercent)) {
+    summaryLines.push(`- max dialogue-authorization block rate: ${maxDialogueAuthorizationBlockRatePercent}%`);
+  }
   if (Number.isFinite(maxMatrixRegressionPositiveRatePercent)) {
     summaryLines.push(`- max matrix regression-positive rate: ${maxMatrixRegressionPositiveRatePercent}%`);
   }
@@ -250,6 +270,9 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
     summaryLines.push(`- governance breaches: ${signals.governance_breaches === null ? 'n/a' : signals.governance_breaches}`);
     summaryLines.push(
       `- authorization-tier block rate: ${signals.authorization_tier_block_rate_percent === null ? 'n/a' : `${signals.authorization_tier_block_rate_percent}%`}`
+    );
+    summaryLines.push(
+      `- dialogue-authorization block rate: ${signals.dialogue_authorization_block_rate_percent === null ? 'n/a' : `${signals.dialogue_authorization_block_rate_percent}%`}`
     );
     summaryLines.push(
       `- matrix regression-positive rate: ${signals.matrix_regression_positive_rate_percent === null ? 'n/a' : `${signals.matrix_regression_positive_rate_percent}%`}`
@@ -278,6 +301,7 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
     console.log(
       `[release-weekly-ops-gate] risk=${signals.risk} governance_breaches=${signals.governance_breaches === null ? 'n/a' : signals.governance_breaches} `
       + `authorization_tier_block_rate=${signals.authorization_tier_block_rate_percent === null ? 'n/a' : `${signals.authorization_tier_block_rate_percent}%`} `
+      + `dialogue_authorization_block_rate=${signals.dialogue_authorization_block_rate_percent === null ? 'n/a' : `${signals.dialogue_authorization_block_rate_percent}%`} `
       + `matrix_regression_positive_rate=${signals.matrix_regression_positive_rate_percent === null ? 'n/a' : `${signals.matrix_regression_positive_rate_percent}%`}`
     );
   }

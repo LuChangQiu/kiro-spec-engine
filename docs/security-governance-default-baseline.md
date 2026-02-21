@@ -55,3 +55,4 @@ node scripts/release-asset-integrity-check.js
 ```
 
 If weekly ops summary risk is `high`, freeze release and run remediation before next tag.
+Keep weekly ops block-rate thresholds enabled for both authorization tiers and dialogue authorization (default `40%` each).

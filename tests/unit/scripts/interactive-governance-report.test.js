@@ -42,6 +42,7 @@ describe('interactive-governance-report script', () => {
     const executionLedger = path.join(workspace, 'execution.jsonl');
     const feedbackFile = path.join(workspace, 'feedback.jsonl');
     const dialogueAuthorizationSignals = path.join(workspace, 'dialogue-authorization-signals.jsonl');
+    const runtimeSignals = path.join(workspace, 'runtime-signals.jsonl');
     const authorizationTierSignals = path.join(workspace, 'authorization-tier-signals.jsonl');
     const thresholdsFile = path.join(workspace, 'thresholds.json');
 
@@ -79,6 +80,12 @@ describe('interactive-governance-report script', () => {
       { decision: 'review-required', ui_mode: 'ops-console', execution_mode: 'apply', timestamp: now },
       { decision: 'allow', ui_mode: 'user-app', execution_mode: 'suggestion', timestamp: now }
     ]);
+    await writeJsonl(runtimeSignals, [
+      { decision: 'allow', ui_mode: 'user-app', execution_mode: 'suggestion', violation_codes: [], ui_mode_violation: false, timestamp: now },
+      { decision: 'allow', ui_mode: 'ops-console', execution_mode: 'apply', violation_codes: [], ui_mode_violation: false, timestamp: now },
+      { decision: 'review-required', ui_mode: 'ops-console', execution_mode: 'apply', violation_codes: ['approval-required'], ui_mode_violation: false, timestamp: now },
+      { decision: 'allow', ui_mode: 'ops-console', execution_mode: 'suggestion', violation_codes: [], ui_mode_violation: false, timestamp: now }
+    ]);
 
     await writeJsonl(authorizationTierSignals, [
       { decision: 'allow', timestamp: now },
@@ -96,6 +103,9 @@ describe('interactive-governance-report script', () => {
       min_feedback_samples: 2,
       min_dialogue_authorization_samples: 3,
       dialogue_authorization_block_rate_max_percent: 40,
+      min_runtime_samples: 3,
+      runtime_block_rate_max_percent: 40,
+      runtime_ui_mode_violation_max_total: 0,
       min_authorization_tier_samples: 3,
       authorization_tier_block_rate_max_percent: 40
     }, { spaces: 2 });
@@ -106,6 +116,7 @@ describe('interactive-governance-report script', () => {
       '--execution-ledger', executionLedger,
       '--feedback-file', feedbackFile,
       '--dialogue-authorization-signals', dialogueAuthorizationSignals,
+      '--runtime-signals', runtimeSignals,
       '--authorization-tier-signals', authorizationTierSignals,
       '--thresholds', thresholdsFile,
       '--period', 'all',
@@ -123,6 +134,10 @@ describe('interactive-governance-report script', () => {
     expect(payload.metrics.dialogue_authorization_review_required_total).toBe(1);
     expect(payload.metrics.dialogue_authorization_block_rate_percent).toBe(25);
     expect(payload.metrics.dialogue_authorization_user_app_apply_attempt_total).toBe(0);
+    expect(payload.metrics.runtime_total).toBe(4);
+    expect(payload.metrics.runtime_review_required_total).toBe(1);
+    expect(payload.metrics.runtime_block_rate_percent).toBe(25);
+    expect(payload.metrics.runtime_ui_mode_violation_total).toBe(0);
     expect(payload.metrics.authorization_tier_deny_total).toBe(0);
     expect(payload.metrics.authorization_tier_review_required_total).toBe(1);
     expect(payload.metrics.authorization_tier_block_rate_percent).toBe(25);
@@ -139,6 +154,7 @@ describe('interactive-governance-report script', () => {
     const executionLedger = path.join(workspace, 'execution.jsonl');
     const feedbackFile = path.join(workspace, 'feedback.jsonl');
     const dialogueAuthorizationSignals = path.join(workspace, 'dialogue-authorization-signals.jsonl');
+    const runtimeSignals = path.join(workspace, 'runtime-signals.jsonl');
     const authorizationTierSignals = path.join(workspace, 'authorization-tier-signals.jsonl');
     const thresholdsFile = path.join(workspace, 'thresholds.json');
 
@@ -179,6 +195,12 @@ describe('interactive-governance-report script', () => {
       { decision: 'review-required', ui_mode: 'ops-console', execution_mode: 'apply', timestamp: now },
       { decision: 'deny', ui_mode: 'ops-console', execution_mode: 'apply', timestamp: now }
     ]);
+    await writeJsonl(runtimeSignals, [
+      { decision: 'allow', ui_mode: 'ops-console', execution_mode: 'suggestion', violation_codes: [], ui_mode_violation: false, timestamp: now },
+      { decision: 'deny', ui_mode: 'user-app', execution_mode: 'apply', violation_codes: ['ui-mode-execution-mode-denied'], ui_mode_violation: true, timestamp: now },
+      { decision: 'review-required', ui_mode: 'ops-console', execution_mode: 'apply', violation_codes: ['manual-review-required-for-apply'], ui_mode_violation: false, timestamp: now },
+      { decision: 'deny', ui_mode: 'ops-console', execution_mode: 'apply', violation_codes: ['risk-exceeds-max-apply'], ui_mode_violation: false, timestamp: now }
+    ]);
 
     await writeJsonl(authorizationTierSignals, [
       { decision: 'allow', timestamp: now },
@@ -196,6 +218,9 @@ describe('interactive-governance-report script', () => {
       min_feedback_samples: 2,
       min_dialogue_authorization_samples: 3,
       dialogue_authorization_block_rate_max_percent: 40,
+      min_runtime_samples: 3,
+      runtime_block_rate_max_percent: 40,
+      runtime_ui_mode_violation_max_total: 0,
       min_authorization_tier_samples: 3,
       authorization_tier_block_rate_max_percent: 40
     }, { spaces: 2 });
@@ -206,6 +231,7 @@ describe('interactive-governance-report script', () => {
       '--execution-ledger', executionLedger,
       '--feedback-file', feedbackFile,
       '--dialogue-authorization-signals', dialogueAuthorizationSignals,
+      '--runtime-signals', runtimeSignals,
       '--authorization-tier-signals', authorizationTierSignals,
       '--thresholds', thresholdsFile,
       '--period', 'all',
@@ -224,6 +250,8 @@ describe('interactive-governance-report script', () => {
       'security-intercept-high',
       'satisfaction-low',
       'dialogue-authorization-block-rate-high',
+      'runtime-block-rate-high',
+      'runtime-ui-mode-violation-high',
       'authorization-tier-block-rate-high'
     ]));
   });

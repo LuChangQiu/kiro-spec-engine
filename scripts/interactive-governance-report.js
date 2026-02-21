@@ -10,6 +10,7 @@ const DEFAULT_EXECUTION_LEDGER = '.kiro/reports/interactive-execution-ledger.jso
 const DEFAULT_FEEDBACK_FILE = '.kiro/reports/interactive-user-feedback.jsonl';
 const DEFAULT_MATRIX_SIGNALS = '.kiro/reports/interactive-matrix-signals.jsonl';
 const DEFAULT_DIALOGUE_AUTHORIZATION_SIGNALS = '.kiro/reports/interactive-dialogue-authorization-signals.jsonl';
+const DEFAULT_RUNTIME_SIGNALS = '.kiro/reports/interactive-runtime-signals.jsonl';
 const DEFAULT_AUTHORIZATION_TIER_SIGNALS = '.kiro/reports/interactive-authorization-tier-signals.jsonl';
 const DEFAULT_THRESHOLDS = 'docs/interactive-customization/governance-threshold-baseline.json';
 const DEFAULT_OUT = '.kiro/reports/interactive-governance-report.json';
@@ -23,6 +24,7 @@ function parseArgs(argv) {
     feedbackFile: DEFAULT_FEEDBACK_FILE,
     matrixSignals: DEFAULT_MATRIX_SIGNALS,
     dialogueAuthorizationSignals: DEFAULT_DIALOGUE_AUTHORIZATION_SIGNALS,
+    runtimeSignals: DEFAULT_RUNTIME_SIGNALS,
     authorizationTierSignals: DEFAULT_AUTHORIZATION_TIER_SIGNALS,
     thresholds: DEFAULT_THRESHOLDS,
     period: 'weekly',
@@ -54,6 +56,9 @@ function parseArgs(argv) {
       i += 1;
     } else if (token === '--dialogue-authorization-signals' && next) {
       options.dialogueAuthorizationSignals = next;
+      i += 1;
+    } else if (token === '--runtime-signals' && next) {
+      options.runtimeSignals = next;
       i += 1;
     } else if (token === '--authorization-tier-signals' && next) {
       options.authorizationTierSignals = next;
@@ -112,6 +117,7 @@ function printHelpAndExit(code) {
     `  --feedback-file <path>     User feedback JSONL (default: ${DEFAULT_FEEDBACK_FILE})`,
     `  --matrix-signals <path>    Matrix signal JSONL (default: ${DEFAULT_MATRIX_SIGNALS})`,
     `  --dialogue-authorization-signals <path> Dialogue authorization signal JSONL (default: ${DEFAULT_DIALOGUE_AUTHORIZATION_SIGNALS})`,
+    `  --runtime-signals <path>    Runtime policy signal JSONL (default: ${DEFAULT_RUNTIME_SIGNALS})`,
     `  --authorization-tier-signals <path> Authorization tier signal JSONL (default: ${DEFAULT_AUTHORIZATION_TIER_SIGNALS})`,
     `  --thresholds <path>        Governance threshold JSON (default: ${DEFAULT_THRESHOLDS})`,
     '  --period <type>            weekly|monthly|all|custom (default: weekly)',
@@ -268,6 +274,15 @@ function loadThresholds(raw = {}) {
     dialogue_authorization_block_rate_max_percent: Number.isFinite(Number(thresholds.dialogue_authorization_block_rate_max_percent))
       ? Number(thresholds.dialogue_authorization_block_rate_max_percent)
       : 40,
+    min_runtime_samples: Number.isFinite(Number(thresholds.min_runtime_samples))
+      ? Number(thresholds.min_runtime_samples)
+      : 3,
+    runtime_block_rate_max_percent: Number.isFinite(Number(thresholds.runtime_block_rate_max_percent))
+      ? Number(thresholds.runtime_block_rate_max_percent)
+      : 40,
+    runtime_ui_mode_violation_max_total: Number.isFinite(Number(thresholds.runtime_ui_mode_violation_max_total))
+      ? Number(thresholds.runtime_ui_mode_violation_max_total)
+      : 0,
     min_authorization_tier_samples: Number.isFinite(Number(thresholds.min_authorization_tier_samples))
       ? Number(thresholds.min_authorization_tier_samples)
       : 3,
@@ -447,6 +462,50 @@ function evaluateAlerts(metrics, thresholds) {
     }));
   }
 
+  if (metrics.runtime_total < thresholds.min_runtime_samples) {
+    alerts.push({
+      id: 'runtime-sample-insufficient',
+      severity: 'low',
+      status: 'warning',
+      metric: 'runtime_total',
+      actual: metrics.runtime_total,
+      threshold: thresholds.min_runtime_samples,
+      direction: 'min',
+      message: 'Runtime policy sample size is below minimum; runtime block trend is not statistically stable.',
+      recommendation: 'Collect more runtime policy evaluations before tightening runtime thresholds.'
+    });
+  } else if (
+    metrics.runtime_block_rate_percent != null &&
+    metrics.runtime_block_rate_percent > thresholds.runtime_block_rate_max_percent
+  ) {
+    alerts.push(buildAlert({
+      id: 'runtime-block-rate-high',
+      severity: 'medium',
+      metric: 'runtime_block_rate_percent',
+      actual: metrics.runtime_block_rate_percent,
+      threshold: thresholds.runtime_block_rate_max_percent,
+      direction: 'max',
+      message: 'Runtime policy block/review rate is above maximum threshold.',
+      recommendation: 'Review runtime mode/environment defaults and reduce invalid apply paths before runtime gate.'
+    }));
+  }
+
+  if (
+    Number.isFinite(metrics.runtime_ui_mode_violation_total) &&
+    metrics.runtime_ui_mode_violation_total > thresholds.runtime_ui_mode_violation_max_total
+  ) {
+    alerts.push(buildAlert({
+      id: 'runtime-ui-mode-violation-high',
+      severity: 'medium',
+      metric: 'runtime_ui_mode_violation_total',
+      actual: metrics.runtime_ui_mode_violation_total,
+      threshold: thresholds.runtime_ui_mode_violation_max_total,
+      direction: 'max',
+      message: 'Runtime ui_mode policy violations are above maximum threshold.',
+      recommendation: 'Route user-app apply intents to ops-console and align runtime ui_mode policy with surface roles.'
+    }));
+  }
+
   if (metrics.authorization_tier_total < thresholds.min_authorization_tier_samples) {
     alerts.push({
       id: 'authorization-tier-sample-insufficient',
@@ -592,6 +651,10 @@ function buildMarkdown(report) {
   lines.push(`| Dialogue authorization review-required total | ${report.metrics.dialogue_authorization_review_required_total} |`);
   lines.push(`| Dialogue authorization block rate | ${report.metrics.dialogue_authorization_block_rate_percent == null ? 'n/a' : `${report.metrics.dialogue_authorization_block_rate_percent}%`} |`);
   lines.push(`| User-app apply attempt total | ${report.metrics.dialogue_authorization_user_app_apply_attempt_total} |`);
+  lines.push(`| Runtime deny total | ${report.metrics.runtime_deny_total} |`);
+  lines.push(`| Runtime review-required total | ${report.metrics.runtime_review_required_total} |`);
+  lines.push(`| Runtime block rate | ${report.metrics.runtime_block_rate_percent == null ? 'n/a' : `${report.metrics.runtime_block_rate_percent}%`} |`);
+  lines.push(`| Runtime ui-mode violation total | ${report.metrics.runtime_ui_mode_violation_total} |`);
   lines.push(`| Authorization tier deny total | ${report.metrics.authorization_tier_deny_total} |`);
   lines.push(`| Authorization tier review-required total | ${report.metrics.authorization_tier_review_required_total} |`);
   lines.push(`| Authorization tier block rate | ${report.metrics.authorization_tier_block_rate_percent == null ? 'n/a' : `${report.metrics.authorization_tier_block_rate_percent}%`} |`);
@@ -631,6 +694,7 @@ async function main() {
   const feedbackFilePath = resolvePath(cwd, options.feedbackFile);
   const matrixSignalsPath = resolvePath(cwd, options.matrixSignals);
   const dialogueAuthorizationSignalsPath = resolvePath(cwd, options.dialogueAuthorizationSignals);
+  const runtimeSignalsPath = resolvePath(cwd, options.runtimeSignals);
   const authorizationTierSignalsPath = resolvePath(cwd, options.authorizationTierSignals);
   const thresholdsPath = resolvePath(cwd, options.thresholds);
   const outPath = resolvePath(cwd, options.out);
@@ -645,6 +709,7 @@ async function main() {
     feedbackRaw,
     matrixSignalsRaw,
     dialogueAuthorizationSignalsRaw,
+    runtimeSignalsRaw,
     authorizationTierSignalsRaw
   ] = await Promise.all([
     readJsonLinesFile(intentAuditPath),
@@ -653,6 +718,7 @@ async function main() {
     readJsonLinesFile(feedbackFilePath),
     readJsonLinesFile(matrixSignalsPath),
     readJsonLinesFile(dialogueAuthorizationSignalsPath),
+    readJsonLinesFile(runtimeSignalsPath),
     readJsonLinesFile(authorizationTierSignalsPath)
   ]);
 
@@ -691,6 +757,11 @@ async function main() {
   );
   const dialogueAuthorizationSignals = filterByWindow(
     dialogueAuthorizationSignalsRaw.filter(item => item && item.decision),
+    ['timestamp', 'evaluated_at', 'generated_at', 'created_at'],
+    window
+  );
+  const runtimeSignals = filterByWindow(
+    runtimeSignalsRaw.filter(item => item && item.decision),
     ['timestamp', 'evaluated_at', 'generated_at', 'created_at'],
     window
   );
@@ -756,6 +827,25 @@ async function main() {
     `${item && item.ui_mode ? item.ui_mode : ''}`.trim().toLowerCase() === 'user-app' &&
     `${item && item.execution_mode ? item.execution_mode : ''}`.trim().toLowerCase() === 'apply'
   ).length;
+  const runtimeDenyCount = runtimeSignals.filter((item) =>
+    `${item && item.decision ? item.decision : ''}`.trim().toLowerCase() === 'deny'
+  ).length;
+  const runtimeReviewRequiredCount = runtimeSignals.filter((item) =>
+    `${item && item.decision ? item.decision : ''}`.trim().toLowerCase() === 'review-required'
+  ).length;
+  const runtimeAllowCount = runtimeSignals.filter((item) =>
+    `${item && item.decision ? item.decision : ''}`.trim().toLowerCase() === 'allow'
+  ).length;
+  const runtimeBlockCount = runtimeDenyCount + runtimeReviewRequiredCount;
+  const runtimeUiModeViolationCount = runtimeSignals.filter((item) => {
+    if (item && item.ui_mode_violation === true) {
+      return true;
+    }
+    const codes = Array.isArray(item && item.violation_codes)
+      ? item.violation_codes
+      : [];
+    return codes.some(code => `${code || ''}`.trim().toLowerCase().startsWith('ui-mode-'));
+  }).length;
   const authorizationTierDenyCount = authorizationTierSignals.filter((item) =>
     `${item && item.decision ? item.decision : ''}`.trim().toLowerCase() === 'deny'
   ).length;
@@ -801,6 +891,12 @@ async function main() {
     dialogue_authorization_review_required_total: dialogueAuthorizationReviewRequiredCount,
     dialogue_authorization_block_total: dialogueAuthorizationBlockCount,
     dialogue_authorization_user_app_apply_attempt_total: dialogueAuthorizationUserAppApplyAttemptCount,
+    runtime_total: runtimeSignals.length,
+    runtime_allow_total: runtimeAllowCount,
+    runtime_deny_total: runtimeDenyCount,
+    runtime_review_required_total: runtimeReviewRequiredCount,
+    runtime_block_total: runtimeBlockCount,
+    runtime_ui_mode_violation_total: runtimeUiModeViolationCount,
     authorization_tier_total: authorizationTierSignals.length,
     authorization_tier_allow_total: authorizationTierAllowCount,
     authorization_tier_deny_total: authorizationTierDenyCount,
@@ -813,6 +909,8 @@ async function main() {
     matrix_regression_positive_rate_percent: toRatePercent(matrixRegressionPositiveCount, matrixSignals.length),
     matrix_stage_error_rate_percent: toRatePercent(matrixStageErrorCount, matrixSignals.length),
     dialogue_authorization_block_rate_percent: toRatePercent(dialogueAuthorizationBlockCount, dialogueAuthorizationSignals.length),
+    runtime_block_rate_percent: toRatePercent(runtimeBlockCount, runtimeSignals.length),
+    runtime_ui_mode_violation_rate_percent: toRatePercent(runtimeUiModeViolationCount, runtimeSignals.length),
     authorization_tier_block_rate_percent: toRatePercent(authorizationTierBlockCount, authorizationTierSignals.length),
     matrix_avg_score: toAverage(matrixScoreValues),
     matrix_avg_valid_rate_percent: toAverage(matrixValidRateValues)
@@ -838,6 +936,7 @@ async function main() {
       feedback_file: path.relative(cwd, feedbackFilePath) || '.',
       matrix_signals: path.relative(cwd, matrixSignalsPath) || '.',
       dialogue_authorization_signals: path.relative(cwd, dialogueAuthorizationSignalsPath) || '.',
+      runtime_signals: path.relative(cwd, runtimeSignalsPath) || '.',
       authorization_tier_signals: path.relative(cwd, authorizationTierSignalsPath) || '.',
       thresholds: path.relative(cwd, thresholdsPath) || '.'
     },
@@ -893,6 +992,7 @@ module.exports = {
   DEFAULT_FEEDBACK_FILE,
   DEFAULT_MATRIX_SIGNALS,
   DEFAULT_DIALOGUE_AUTHORIZATION_SIGNALS,
+  DEFAULT_RUNTIME_SIGNALS,
   DEFAULT_AUTHORIZATION_TIER_SIGNALS,
   DEFAULT_THRESHOLDS,
   DEFAULT_OUT,

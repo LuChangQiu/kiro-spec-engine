@@ -121,6 +121,12 @@ describe('release-ops-weekly-summary script', () => {
         dialogue_authorization_block_total: 2,
         dialogue_authorization_block_rate_percent: 50,
         dialogue_authorization_user_app_apply_attempt_total: 1,
+        runtime_total: 4,
+        runtime_deny_total: 1,
+        runtime_review_required_total: 1,
+        runtime_block_rate_percent: 50,
+        runtime_ui_mode_violation_total: 1,
+        runtime_ui_mode_violation_rate_percent: 25,
         matrix_signal_total: 2,
         matrix_portfolio_pass_rate_percent: 50,
         matrix_regression_positive_rate_percent: 50,
@@ -174,8 +180,10 @@ describe('release-ops-weekly-summary script', () => {
     expect(payload.snapshots.interactive_governance.authorization_tier_block_rate_percent).toBe(50);
     expect(payload.snapshots.interactive_governance.dialogue_authorization_total).toBe(4);
     expect(payload.snapshots.interactive_governance.dialogue_authorization_block_rate_percent).toBe(50);
+    expect(payload.snapshots.interactive_governance.runtime_ui_mode_violation_total).toBe(1);
     expect(payload.snapshots.matrix_signals.total_signals).toBe(2);
     expect(payload.health.risk).toMatch(/medium|high/);
+    expect(payload.health.concerns.some(item => item.includes('runtime ui-mode violations'))).toBe(true);
 
     expect(await fs.pathExists(path.join(workspace, '.kiro', 'reports', 'release-evidence', 'weekly-ops-summary.json'))).toBe(true);
     expect(await fs.pathExists(path.join(workspace, '.kiro', 'reports', 'release-evidence', 'weekly-ops-summary.md'))).toBe(true);

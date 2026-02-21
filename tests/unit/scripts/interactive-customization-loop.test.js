@@ -217,6 +217,8 @@ describe('interactive-customization-loop script', () => {
       workspace,
       payload.artifacts.dialogue_authorization_signals_global_jsonl
     );
+    const runtimeSignalsSessionFile = path.join(workspace, payload.artifacts.runtime_signals_jsonl);
+    const runtimeSignalsGlobalFile = path.join(workspace, payload.artifacts.runtime_signals_global_jsonl);
     const authorizationTierSignalsSessionFile = path.join(workspace, payload.artifacts.authorization_tier_signals_jsonl);
     const authorizationTierSignalsGlobalFile = path.join(workspace, payload.artifacts.authorization_tier_signals_global_jsonl);
     expect(await fs.pathExists(summaryFile)).toBe(true);
@@ -224,6 +226,8 @@ describe('interactive-customization-loop script', () => {
     expect(await fs.pathExists(workOrderFile)).toBe(true);
     expect(await fs.pathExists(dialogueAuthorizationSignalsSessionFile)).toBe(true);
     expect(await fs.pathExists(dialogueAuthorizationSignalsGlobalFile)).toBe(true);
+    expect(await fs.pathExists(runtimeSignalsSessionFile)).toBe(true);
+    expect(await fs.pathExists(runtimeSignalsGlobalFile)).toBe(true);
     expect(await fs.pathExists(authorizationTierSignalsSessionFile)).toBe(true);
     expect(await fs.pathExists(authorizationTierSignalsGlobalFile)).toBe(true);
 
@@ -233,6 +237,14 @@ describe('interactive-customization-loop script', () => {
     expect(dialogueAuthorizationSignalLine).toBeTruthy();
     const dialogueAuthorizationSignal = JSON.parse(dialogueAuthorizationSignalLine);
     expect(dialogueAuthorizationSignal.event_type).toBe('interactive.dialogue.authorization.evaluated');
+
+    const runtimeSignalLine = (await fs.readFile(runtimeSignalsSessionFile, 'utf8'))
+      .split(/\r?\n/)
+      .find(Boolean);
+    expect(runtimeSignalLine).toBeTruthy();
+    const runtimeSignal = JSON.parse(runtimeSignalLine);
+    expect(runtimeSignal.event_type).toBe('interactive.runtime.policy.evaluated');
+    expect(runtimeSignal.ui_mode_violation).toBe(false);
 
     const authorizationTierSignalLine = (await fs.readFile(authorizationTierSignalsSessionFile, 'utf8'))
       .split(/\r?\n/)
@@ -437,6 +449,16 @@ describe('interactive-customization-loop script', () => {
     expect(payload.summary.status).toBe('blocked');
     expect(payload.summary.next_actions).toEqual(expect.arrayContaining([
       expect.stringContaining('--ui-mode user-app')
+    ]));
+
+    const runtimeSignalsSessionFile = path.join(workspace, payload.artifacts.runtime_signals_jsonl);
+    const runtimeSignalLine = (await fs.readFile(runtimeSignalsSessionFile, 'utf8'))
+      .split(/\r?\n/)
+      .find(Boolean);
+    const runtimeSignal = JSON.parse(runtimeSignalLine);
+    expect(runtimeSignal.ui_mode_violation).toBe(true);
+    expect(runtimeSignal.ui_mode_violation_codes).toEqual(expect.arrayContaining([
+      'ui-mode-execution-mode-denied'
     ]));
   });
 

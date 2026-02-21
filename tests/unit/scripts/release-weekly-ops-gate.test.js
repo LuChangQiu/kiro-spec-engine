@@ -26,7 +26,9 @@ describe('release weekly ops gate script', () => {
           status: 'ok',
           breaches: 0,
           authorization_tier_block_rate_percent: 10,
-          dialogue_authorization_block_rate_percent: 5
+          dialogue_authorization_block_rate_percent: 5,
+          runtime_ui_mode_violation_total: 0,
+          runtime_ui_mode_violation_rate_percent: 0
         },
         matrix_signals: {
           regression_positive_rate_percent: 10
@@ -54,7 +56,8 @@ describe('release weekly ops gate script', () => {
       blocked: false,
       max_risk_level: 'medium',
       max_authorization_tier_block_rate_percent: 40,
-      max_dialogue_authorization_block_rate_percent: 40
+      max_dialogue_authorization_block_rate_percent: 40,
+      max_runtime_ui_mode_violation_total: 0
     }));
   });
 
@@ -72,7 +75,8 @@ describe('release weekly ops gate script', () => {
           status: 'alert',
           breaches: 2,
           authorization_tier_block_rate_percent: 60,
-          dialogue_authorization_block_rate_percent: 55
+          dialogue_authorization_block_rate_percent: 55,
+          runtime_ui_mode_violation_total: 2
         },
         matrix_signals: {
           regression_positive_rate_percent: 40
@@ -107,7 +111,8 @@ describe('release weekly ops gate script', () => {
           status: 'alert',
           breaches: 3,
           authorization_tier_block_rate_percent: 70,
-          dialogue_authorization_block_rate_percent: 65
+          dialogue_authorization_block_rate_percent: 65,
+          runtime_ui_mode_violation_total: 3
         },
         matrix_signals: {
           regression_positive_rate_percent: 45
@@ -142,7 +147,8 @@ describe('release weekly ops gate script', () => {
           status: 'ok',
           breaches: 0,
           authorization_tier_block_rate_percent: 65,
-          dialogue_authorization_block_rate_percent: 10
+          dialogue_authorization_block_rate_percent: 10,
+          runtime_ui_mode_violation_total: 0
         },
         matrix_signals: {
           regression_positive_rate_percent: 5
@@ -176,7 +182,8 @@ describe('release weekly ops gate script', () => {
           status: 'ok',
           breaches: 0,
           authorization_tier_block_rate_percent: 15,
-          dialogue_authorization_block_rate_percent: 66
+          dialogue_authorization_block_rate_percent: 66,
+          runtime_ui_mode_violation_total: 0
         },
         matrix_signals: {
           regression_positive_rate_percent: 5
@@ -225,7 +232,8 @@ describe('release weekly ops gate script', () => {
           status: 'ok',
           breaches: 0,
           authorization_tier_block_rate_percent: 20,
-          dialogue_authorization_block_rate_percent: 15
+          dialogue_authorization_block_rate_percent: 15,
+          runtime_ui_mode_violation_total: 0
         },
         matrix_signals: {
           regression_positive_rate_percent: 5
@@ -251,5 +259,42 @@ describe('release weekly ops gate script', () => {
     expect(result.payload.warnings.some(item => item.includes('RELEASE_WEEKLY_OPS_MAX_AUTHORIZATION_TIER_BLOCK_RATE_PERCENT'))).toBe(true);
     expect(result.payload.warnings.some(item => item.includes('RELEASE_WEEKLY_OPS_MAX_DIALOGUE_AUTHORIZATION_BLOCK_RATE_PERCENT'))).toBe(true);
     expect(result.payload.warnings.some(item => item.includes('RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT'))).toBe(true);
+  });
+
+  test('blocks when runtime ui-mode violation total exceeds threshold', () => {
+    const tempDir = makeTempDir();
+    const summaryFile = path.join(tempDir, 'weekly-ops-summary.json');
+    fs.writeFileSync(summaryFile, JSON.stringify({
+      mode: 'release-weekly-ops-summary',
+      health: {
+        risk: 'medium'
+      },
+      snapshots: {
+        interactive_governance: {
+          status: 'ok',
+          breaches: 0,
+          authorization_tier_block_rate_percent: 10,
+          dialogue_authorization_block_rate_percent: 5,
+          runtime_ui_mode_violation_total: 2,
+          runtime_ui_mode_violation_rate_percent: 50
+        },
+        matrix_signals: {
+          regression_positive_rate_percent: 5
+        }
+      }
+    }, null, 2), 'utf8');
+
+    const result = evaluateReleaseWeeklyOpsGate({
+      env: {
+        RELEASE_WEEKLY_OPS_SUMMARY_FILE: summaryFile,
+        RELEASE_WEEKLY_OPS_MAX_RISK_LEVEL: 'high',
+        RELEASE_WEEKLY_OPS_MAX_AUTHORIZATION_TIER_BLOCK_RATE_PERCENT: '80',
+        RELEASE_WEEKLY_OPS_MAX_DIALOGUE_AUTHORIZATION_BLOCK_RATE_PERCENT: '80'
+      }
+    });
+
+    expect(result.exit_code).toBe(1);
+    expect(result.blocked).toBe(true);
+    expect(result.violations.some(item => item.includes('runtime ui-mode violation total'))).toBe(true);
   });
 });

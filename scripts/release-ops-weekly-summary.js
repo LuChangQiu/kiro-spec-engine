@@ -501,6 +501,24 @@ function buildInteractiveGovernanceSnapshot(payload, window) {
     )
       ? Number(metrics.dialogue_authorization_user_app_apply_attempt_total)
       : null,
+    runtime_total: Number.isFinite(Number(metrics.runtime_total))
+      ? Number(metrics.runtime_total)
+      : null,
+    runtime_deny_total: Number.isFinite(Number(metrics.runtime_deny_total))
+      ? Number(metrics.runtime_deny_total)
+      : null,
+    runtime_review_required_total: Number.isFinite(Number(metrics.runtime_review_required_total))
+      ? Number(metrics.runtime_review_required_total)
+      : null,
+    runtime_block_rate_percent: Number.isFinite(Number(metrics.runtime_block_rate_percent))
+      ? Number(metrics.runtime_block_rate_percent)
+      : null,
+    runtime_ui_mode_violation_total: Number.isFinite(Number(metrics.runtime_ui_mode_violation_total))
+      ? Number(metrics.runtime_ui_mode_violation_total)
+      : null,
+    runtime_ui_mode_violation_rate_percent: Number.isFinite(Number(metrics.runtime_ui_mode_violation_rate_percent))
+      ? Number(metrics.runtime_ui_mode_violation_rate_percent)
+      : null,
     matrix_signal_total: Number.isFinite(Number(metrics.matrix_signal_total))
       ? Number(metrics.matrix_signal_total)
       : null,
@@ -668,6 +686,14 @@ function buildHealth(snapshots, warnings) {
     pushConcern(`dialogue-authorization block rate is ${governance.dialogue_authorization_block_rate_percent}%`);
     pushRecommendation('Tune authorization dialogue policy and ui-mode routing to reduce blocked user intent execution.');
   }
+  if (
+    Number.isFinite(governance.runtime_ui_mode_violation_total)
+    && governance.runtime_ui_mode_violation_total > 0
+  ) {
+    risk = promoteRisk(risk, governance.runtime_ui_mode_violation_total >= 3 ? 'high' : 'medium');
+    pushConcern(`runtime ui-mode violations observed: ${governance.runtime_ui_mode_violation_total}`);
+    pushRecommendation('Enforce dual-surface routing: user-app suggestion-only, ops-console for apply workflows.');
+  }
 
   const matrix = snapshots.matrix_signals;
   if (matrix.total_signals === 0) {
@@ -730,6 +756,9 @@ function buildMarkdown(report) {
   lines.push(`- Dialogue authorization block total: ${report.snapshots.interactive_governance.dialogue_authorization_block_total == null ? 'n/a' : report.snapshots.interactive_governance.dialogue_authorization_block_total}`);
   lines.push(`- Dialogue authorization block rate: ${report.snapshots.interactive_governance.dialogue_authorization_block_rate_percent == null ? 'n/a' : `${report.snapshots.interactive_governance.dialogue_authorization_block_rate_percent}%`}`);
   lines.push(`- Dialogue user-app apply attempts: ${report.snapshots.interactive_governance.dialogue_authorization_user_app_apply_attempt_total == null ? 'n/a' : report.snapshots.interactive_governance.dialogue_authorization_user_app_apply_attempt_total}`);
+  lines.push(`- Runtime signals: ${report.snapshots.interactive_governance.runtime_total == null ? 'n/a' : report.snapshots.interactive_governance.runtime_total}`);
+  lines.push(`- Runtime block rate: ${report.snapshots.interactive_governance.runtime_block_rate_percent == null ? 'n/a' : `${report.snapshots.interactive_governance.runtime_block_rate_percent}%`}`);
+  lines.push(`- Runtime ui-mode violations: ${report.snapshots.interactive_governance.runtime_ui_mode_violation_total == null ? 'n/a' : report.snapshots.interactive_governance.runtime_ui_mode_violation_total}`);
   lines.push('');
   lines.push('## Matrix Signals');
   lines.push('');

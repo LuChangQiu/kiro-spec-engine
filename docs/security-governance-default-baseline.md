@@ -39,6 +39,7 @@ This baseline is the default operating policy for SCE-driven delivery, including
 - `.kiro/reports/release-evidence/weekly-ops-summary-<tag>.json`
 - `.kiro/reports/interactive-governance-report.json`
 - `.kiro/reports/interactive-dialogue-authorization-signals.jsonl`
+- `.kiro/reports/interactive-runtime-signals.jsonl`
 - `.kiro/reports/interactive-authorization-tier-signals.jsonl`
 - `.kiro/reports/interactive-dialogue-governance.json`
 - `.kiro/reports/interactive-execution-ledger.jsonl`
@@ -56,3 +57,4 @@ node scripts/release-asset-integrity-check.js
 
 If weekly ops summary risk is `high`, freeze release and run remediation before next tag.
 Keep weekly ops block-rate thresholds enabled for both authorization tiers and dialogue authorization (default `40%` each).
+Keep weekly ops runtime ui-mode violation threshold enabled (`RELEASE_WEEKLY_OPS_MAX_RUNTIME_UI_MODE_VIOLATION_TOTAL`, default `0`).

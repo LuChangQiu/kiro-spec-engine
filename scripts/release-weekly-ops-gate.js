@@ -119,6 +119,9 @@ function buildWeeklyOpsSignals(payload) {
     governance_breaches: normalizeNumber(governance.breaches),
     authorization_tier_block_rate_percent: normalizeNumber(governance.authorization_tier_block_rate_percent),
     dialogue_authorization_block_rate_percent: normalizeNumber(governance.dialogue_authorization_block_rate_percent),
+    runtime_block_rate_percent: normalizeNumber(governance.runtime_block_rate_percent),
+    runtime_ui_mode_violation_total: normalizeNumber(governance.runtime_ui_mode_violation_total),
+    runtime_ui_mode_violation_rate_percent: normalizeNumber(governance.runtime_ui_mode_violation_rate_percent),
     matrix_regression_positive_rate_percent: normalizeNumber(matrixSignals.regression_positive_rate_percent),
     handoff_gate_pass_rate_percent: normalizeNumber(handoff.gate_pass_rate_percent)
   };
@@ -175,6 +178,19 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
   const maxDialogueAuthorizationBlockRatePercent = Number.isFinite(maxDialogueAuthorizationBlockRatePercentRaw)
     ? maxDialogueAuthorizationBlockRatePercentRaw
     : 40;
+  const maxRuntimeUiModeViolationTotalRaw = parseOptionalNumberWithWarning(
+    env,
+    'RELEASE_WEEKLY_OPS_MAX_RUNTIME_UI_MODE_VIOLATION_TOTAL',
+    configWarnings
+  );
+  const maxRuntimeUiModeViolationTotal = Number.isFinite(maxRuntimeUiModeViolationTotalRaw)
+    ? maxRuntimeUiModeViolationTotalRaw
+    : 0;
+  const maxRuntimeUiModeViolationRatePercent = parseOptionalNumberWithWarning(
+    env,
+    'RELEASE_WEEKLY_OPS_MAX_RUNTIME_UI_MODE_VIOLATION_RATE_PERCENT',
+    configWarnings
+  );
   const maxMatrixRegressionPositiveRatePercent = parseOptionalNumberWithWarning(
     env,
     'RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT',
@@ -227,6 +243,24 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
       );
     }
     if (
+      Number.isFinite(maxRuntimeUiModeViolationTotal)
+      && Number.isFinite(signals.runtime_ui_mode_violation_total)
+      && signals.runtime_ui_mode_violation_total > maxRuntimeUiModeViolationTotal
+    ) {
+      violations.push(
+        `weekly ops runtime ui-mode violation total ${signals.runtime_ui_mode_violation_total} exceeds max ${maxRuntimeUiModeViolationTotal}`
+      );
+    }
+    if (
+      Number.isFinite(maxRuntimeUiModeViolationRatePercent)
+      && Number.isFinite(signals.runtime_ui_mode_violation_rate_percent)
+      && signals.runtime_ui_mode_violation_rate_percent > maxRuntimeUiModeViolationRatePercent
+    ) {
+      violations.push(
+        `weekly ops runtime ui-mode violation rate ${signals.runtime_ui_mode_violation_rate_percent}% exceeds max ${maxRuntimeUiModeViolationRatePercent}%`
+      );
+    }
+    if (
       Number.isFinite(maxMatrixRegressionPositiveRatePercent)
       && Number.isFinite(signals.matrix_regression_positive_rate_percent)
       && signals.matrix_regression_positive_rate_percent > maxMatrixRegressionPositiveRatePercent
@@ -250,6 +284,8 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
     max_governance_breaches: maxGovernanceBreaches,
     max_authorization_tier_block_rate_percent: maxAuthorizationTierBlockRatePercent,
     max_dialogue_authorization_block_rate_percent: maxDialogueAuthorizationBlockRatePercent,
+    max_runtime_ui_mode_violation_total: maxRuntimeUiModeViolationTotal,
+    max_runtime_ui_mode_violation_rate_percent: maxRuntimeUiModeViolationRatePercent,
     max_matrix_regression_positive_rate_percent: maxMatrixRegressionPositiveRatePercent,
     config_warnings: configWarnings,
     signals,
@@ -278,6 +314,12 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
   if (Number.isFinite(maxDialogueAuthorizationBlockRatePercent)) {
     summaryLines.push(`- max dialogue-authorization block rate: ${maxDialogueAuthorizationBlockRatePercent}%`);
   }
+  if (Number.isFinite(maxRuntimeUiModeViolationTotal)) {
+    summaryLines.push(`- max runtime ui-mode violation total: ${maxRuntimeUiModeViolationTotal}`);
+  }
+  if (Number.isFinite(maxRuntimeUiModeViolationRatePercent)) {
+    summaryLines.push(`- max runtime ui-mode violation rate: ${maxRuntimeUiModeViolationRatePercent}%`);
+  }
   if (Number.isFinite(maxMatrixRegressionPositiveRatePercent)) {
     summaryLines.push(`- max matrix regression-positive rate: ${maxMatrixRegressionPositiveRatePercent}%`);
   }
@@ -289,6 +331,12 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
     );
     summaryLines.push(
       `- dialogue-authorization block rate: ${signals.dialogue_authorization_block_rate_percent === null ? 'n/a' : `${signals.dialogue_authorization_block_rate_percent}%`}`
+    );
+    summaryLines.push(
+      `- runtime ui-mode violation total: ${signals.runtime_ui_mode_violation_total === null ? 'n/a' : signals.runtime_ui_mode_violation_total}`
+    );
+    summaryLines.push(
+      `- runtime ui-mode violation rate: ${signals.runtime_ui_mode_violation_rate_percent === null ? 'n/a' : `${signals.runtime_ui_mode_violation_rate_percent}%`}`
     );
     summaryLines.push(
       `- matrix regression-positive rate: ${signals.matrix_regression_positive_rate_percent === null ? 'n/a' : `${signals.matrix_regression_positive_rate_percent}%`}`
@@ -318,6 +366,8 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
       `[release-weekly-ops-gate] risk=${signals.risk} governance_breaches=${signals.governance_breaches === null ? 'n/a' : signals.governance_breaches} `
       + `authorization_tier_block_rate=${signals.authorization_tier_block_rate_percent === null ? 'n/a' : `${signals.authorization_tier_block_rate_percent}%`} `
       + `dialogue_authorization_block_rate=${signals.dialogue_authorization_block_rate_percent === null ? 'n/a' : `${signals.dialogue_authorization_block_rate_percent}%`} `
+      + `runtime_ui_mode_violation_total=${signals.runtime_ui_mode_violation_total === null ? 'n/a' : signals.runtime_ui_mode_violation_total} `
+      + `runtime_ui_mode_violation_rate=${signals.runtime_ui_mode_violation_rate_percent === null ? 'n/a' : `${signals.runtime_ui_mode_violation_rate_percent}%`} `
       + `matrix_regression_positive_rate=${signals.matrix_regression_positive_rate_percent === null ? 'n/a' : `${signals.matrix_regression_positive_rate_percent}%`}`
     );
   }

@@ -357,6 +357,7 @@ node scripts/interactive-governance-report.js \
 The governance report consumes feedback events from `.kiro/reports/interactive-user-feedback.jsonl` by default.
 The governance report also consumes matrix signals from `.kiro/reports/interactive-matrix-signals.jsonl` by default.
 The governance report consumes dialogue-authorization signals from `.kiro/reports/interactive-dialogue-authorization-signals.jsonl` by default.
+The governance report consumes runtime policy signals from `.kiro/reports/interactive-runtime-signals.jsonl` by default.
 The governance report consumes authorization-tier signals from `.kiro/reports/interactive-authorization-tier-signals.jsonl` by default.
 When `intent_total` is below `min_intent_samples` (default `5`), adoption emits a low-severity sample warning instead of a breach.
 

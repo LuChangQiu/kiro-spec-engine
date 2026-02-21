@@ -648,6 +648,7 @@ async function main() {
   const contextPath = resolvePath(cwd, options.context);
   const globalFeedbackPath = resolvePath(cwd, '.kiro/reports/interactive-user-feedback.jsonl');
   const globalDialogueAuthorizationSignalsPath = resolvePath(cwd, '.kiro/reports/interactive-dialogue-authorization-signals.jsonl');
+  const globalRuntimeSignalsPath = resolvePath(cwd, '.kiro/reports/interactive-runtime-signals.jsonl');
   const globalAuthorizationTierSignalsPath = resolvePath(cwd, '.kiro/reports/interactive-authorization-tier-signals.jsonl');
   const outRoot = resolvePath(cwd, options.outDir);
   const sessionDir = path.join(outRoot, sessionId);
@@ -685,6 +686,8 @@ async function main() {
       : path.join(sessionDir, 'interactive-work-order.md')),
     dialogue_authorization_signals_global_jsonl: toRelative(cwd, globalDialogueAuthorizationSignalsPath),
     dialogue_authorization_signals_jsonl: toRelative(cwd, path.join(sessionDir, 'interactive-dialogue-authorization-signals.jsonl')),
+    runtime_signals_global_jsonl: toRelative(cwd, globalRuntimeSignalsPath),
+    runtime_signals_jsonl: toRelative(cwd, path.join(sessionDir, 'interactive-runtime-signals.jsonl')),
     authorization_tier_signals_global_jsonl: toRelative(cwd, globalAuthorizationTierSignalsPath),
     authorization_tier_signals_jsonl: toRelative(cwd, path.join(sessionDir, 'interactive-authorization-tier-signals.jsonl')),
     feedback_global_jsonl: toRelative(cwd, globalFeedbackPath),
@@ -861,6 +864,39 @@ async function main() {
   const runtimeRequirements = runtimePayload && runtimePayload.requirements && typeof runtimePayload.requirements === 'object'
     ? runtimePayload.requirements
     : {};
+  const runtimeViolationCodes = Array.isArray(runtimePayload && runtimePayload.violations)
+    ? runtimePayload.violations
+      .map(item => `${item && item.code ? item.code : ''}`.trim().toLowerCase())
+      .filter(Boolean)
+    : [];
+  const runtimeUiModeViolationCodes = runtimeViolationCodes
+    .filter(code => code.startsWith('ui-mode-'));
+  const runtimeSignalRecord = {
+    event_type: 'interactive.runtime.policy.evaluated',
+    timestamp: new Date().toISOString(),
+    session_id: sessionId,
+    user_id: options.userId,
+    ui_mode: runtimePayload && runtimePayload.ui_mode ? runtimePayload.ui_mode : options.uiMode,
+    dialogue_profile: options.dialogueProfile,
+    execution_mode: options.executionMode,
+    runtime_mode: runtimePayload && runtimePayload.runtime_mode ? runtimePayload.runtime_mode : options.runtimeMode,
+    runtime_environment: runtimePayload && runtimePayload.runtime_environment
+      ? runtimePayload.runtime_environment
+      : options.runtimeEnvironment,
+    decision: runtimeDecision,
+    reasons: Array.isArray(runtimePayload && runtimePayload.reasons)
+      ? runtimePayload.reasons
+      : [],
+    violation_codes: runtimeViolationCodes,
+    ui_mode_violation: runtimeUiModeViolationCodes.length > 0,
+    ui_mode_violation_codes: runtimeUiModeViolationCodes
+  };
+  const runtimeSignalsGlobalPath = resolvePath(cwd, artifacts.runtime_signals_global_jsonl);
+  await fs.ensureDir(path.dirname(runtimeSignalsGlobalPath));
+  await fs.appendFile(runtimeSignalsGlobalPath, `${JSON.stringify(runtimeSignalRecord)}\n`, 'utf8');
+  const runtimeSignalsSessionPath = resolvePath(cwd, artifacts.runtime_signals_jsonl);
+  await fs.ensureDir(path.dirname(runtimeSignalsSessionPath));
+  await fs.appendFile(runtimeSignalsSessionPath, `${JSON.stringify(runtimeSignalRecord)}\n`, 'utf8');
 
   const authorizationTierArgs = [
     '--execution-mode', options.executionMode,

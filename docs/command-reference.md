@@ -902,6 +902,8 @@ Release weekly ops gate helper (release hard-gate):
     - `RELEASE_WEEKLY_OPS_MAX_GOVERNANCE_BREACHES=<n>`
     - `RELEASE_WEEKLY_OPS_MAX_AUTHORIZATION_TIER_BLOCK_RATE_PERCENT=<n>` (default `40`)
     - `RELEASE_WEEKLY_OPS_MAX_DIALOGUE_AUTHORIZATION_BLOCK_RATE_PERCENT=<n>` (default `40`)
+    - `RELEASE_WEEKLY_OPS_MAX_RUNTIME_UI_MODE_VIOLATION_TOTAL=<n>` (default `0`)
+    - `RELEASE_WEEKLY_OPS_MAX_RUNTIME_UI_MODE_VIOLATION_RATE_PERCENT=<n>`
     - `RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT=<n>`
   - invalid numeric threshold values emit `config_warnings` and fall back to defaults.
   - merges result into `RELEASE_GATE_REPORT_FILE` when provided.
@@ -1119,12 +1121,13 @@ Interactive user feedback helper (script-level stage-D feedback ingestion):
 - npm alias: `npm run log:interactive-feedback -- --score 5 --comment "clear and safe"`
 
 Interactive governance report helper (script-level stage-D/6 observability + alerting):
-- `node scripts/interactive-governance-report.js [--intent-audit <path>] [--approval-audit <path>] [--execution-ledger <path>] [--feedback-file <path>] [--matrix-signals <path>] [--dialogue-authorization-signals <path>] [--authorization-tier-signals <path>] [--thresholds <path>] [--period <weekly|monthly|all|custom>] [--from <iso>] [--to <iso>] [--out <path>] [--markdown-out <path>] [--fail-on-alert] [--json]`: compute interactive governance KPIs (adoption/success/rollback/security-intercept/satisfaction + matrix pass/regression/stage-error + dialogue-authorization pressure + authorization-tier pressure), evaluate threshold breaches, and emit machine/human-readable governance report.
+- `node scripts/interactive-governance-report.js [--intent-audit <path>] [--approval-audit <path>] [--execution-ledger <path>] [--feedback-file <path>] [--matrix-signals <path>] [--dialogue-authorization-signals <path>] [--runtime-signals <path>] [--authorization-tier-signals <path>] [--thresholds <path>] [--period <weekly|monthly|all|custom>] [--from <iso>] [--to <iso>] [--out <path>] [--markdown-out <path>] [--fail-on-alert] [--json]`: compute interactive governance KPIs (adoption/success/rollback/security-intercept/satisfaction + matrix pass/regression/stage-error + dialogue/runtime/authorization-tier pressure), evaluate threshold breaches, and emit machine/human-readable governance report.
   - Default thresholds: `docs/interactive-customization/governance-threshold-baseline.json`
   - Default minimum intent sample threshold: `min_intent_samples=5` (below this becomes warning, not breach)
   - Default feedback input: `.kiro/reports/interactive-user-feedback.jsonl`
   - Default matrix input: `.kiro/reports/interactive-matrix-signals.jsonl`
   - Default dialogue authorization signal input: `.kiro/reports/interactive-dialogue-authorization-signals.jsonl`
+  - Default runtime policy signal input: `.kiro/reports/interactive-runtime-signals.jsonl`
   - Default authorization tier signal input: `.kiro/reports/interactive-authorization-tier-signals.jsonl`
   - Default outputs:
     - `.kiro/reports/interactive-governance-report.json`

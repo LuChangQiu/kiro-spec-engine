@@ -6423,7 +6423,42 @@ if (process.argv.includes('--json')) {
       max_rounds: 3,
       performed_rounds: 3,
       converged: false,
-      stop_reason: 'max-rounds-exhausted',
+      stop_reason: 'release-gate-blocked',
+      stop_detail: {
+        type: 'release-gate-block',
+        reasons: [
+          'weekly-ops-latest-blocked',
+          'weekly-ops-config-warnings-positive:2',
+          'weekly-ops-auth-tier-block-rate-high:58',
+          'weekly-ops-dialogue-authorization-block-rate-high:66'
+        ],
+        weekly_ops: {
+          latest: {
+            blocked: true,
+            risk_level: 'high',
+            governance_status: 'alert',
+            authorization_tier_block_rate_percent: 58,
+            dialogue_authorization_block_rate_percent: 66,
+            config_warning_count: 2
+          },
+          aggregates: {
+            blocked_runs: 2,
+            block_rate_percent: 50,
+            violations_total: 3,
+            warnings_total: 5,
+            config_warnings_total: 2,
+            authorization_tier_block_rate_max_percent: 58,
+            dialogue_authorization_block_rate_max_percent: 66
+          },
+          pressure: {
+            blocked: true,
+            high: true,
+            config_warning_positive: true,
+            auth_tier_block_rate_high: true,
+            dialogue_authorization_block_rate_high: true
+          }
+        }
+      },
       execute_advisory: true,
       advisory_summary: {
         planned_actions: 2,
@@ -6558,6 +6593,9 @@ if (process.argv.includes('--json')) {
     expect(listPayload.sessions[0].id).toBe('governance-session-old');
     expect(listPayload.sessions[0].release_gate_latest_gate_passed).toBe(false);
     expect(listPayload.sessions[0].round_release_gate_changed).toBe(1);
+    expect(listPayload.sessions[0].stop_detail_weekly_ops_available).toBe(true);
+    expect(listPayload.sessions[0].stop_detail_weekly_ops_high_pressure).toBe(true);
+    expect(listPayload.sessions[0].stop_detail_weekly_ops_config_warning_positive).toBe(true);
 
     logSpy.mockClear();
     const resumedListProgram = buildProgram();
@@ -6622,6 +6660,27 @@ if (process.argv.includes('--json')) {
       round_telemetry_changed: 1,
       round_telemetry_change_rate_percent: 50
     }));
+    expect(statsPayload.release_gate.weekly_ops_stop).toEqual(expect.objectContaining({
+      sessions: 1,
+      session_rate_percent: 50,
+      blocked_sessions: 1,
+      blocked_session_rate_percent: 100,
+      high_pressure_sessions: 1,
+      high_pressure_session_rate_percent: 100,
+      config_warning_positive_sessions: 1,
+      config_warning_positive_rate_percent: 100,
+      auth_tier_pressure_sessions: 1,
+      auth_tier_pressure_rate_percent: 100,
+      dialogue_authorization_pressure_sessions: 1,
+      dialogue_authorization_pressure_rate_percent: 100,
+      blocked_runs_sum: 2,
+      average_blocked_runs: 2,
+      average_block_rate_percent: 50,
+      config_warnings_total_sum: 2,
+      average_config_warnings_total: 2,
+      average_auth_tier_block_rate_percent: 58,
+      average_dialogue_authorization_block_rate_percent: 66
+    }));
 
     logSpy.mockClear();
     const pruneProgram = buildProgram();
@@ -6643,6 +6702,87 @@ if (process.argv.includes('--json')) {
     expect(prunePayload.errors).toEqual([]);
     expect(await fs.pathExists(oldSession)).toBe(false);
     expect(await fs.pathExists(newSession)).toBe(true);
+  });
+
+  test('aggregates weekly-ops stop pressure from legacy reason-only governance sessions', async () => {
+    const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
+    await fs.ensureDir(governanceSessionDir);
+
+    const legacySession = path.join(governanceSessionDir, 'governance-session-legacy-weekly-ops.json');
+    await fs.writeJson(legacySession, {
+      mode: 'auto-governance-close-loop',
+      status: 'failed',
+      target_risk: 'low',
+      max_rounds: 2,
+      performed_rounds: 1,
+      converged: false,
+      stop_reason: 'release-gate-blocked',
+      stop_detail: {
+        type: 'release-gate-block',
+        reasons: [
+          'weekly-ops-latest-blocked',
+          'weekly-ops-latest-risk-high',
+          'weekly-ops-config-warnings-positive:2',
+          'weekly-ops-auth-tier-block-rate-high:58',
+          'weekly-ops-dialogue-authorization-block-rate-high:66'
+        ]
+      },
+      final_assessment: {
+        health: {
+          risk_level: 'high',
+          release_gate: {
+            available: true,
+            latest_gate_passed: false,
+            pass_rate_percent: 65,
+            scene_package_batch_pass_rate_percent: 70,
+            drift_alert_rate_percent: 0,
+            drift_blocked_runs: 0
+          }
+        }
+      },
+      governance_session: {
+        id: 'governance-session-legacy-weekly-ops',
+        file: legacySession
+      }
+    }, { spaces: 2 });
+    await fs.utimes(legacySession, new Date('2026-02-20T00:00:00.000Z'), new Date('2026-02-20T00:00:00.000Z'));
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'sce',
+      'auto',
+      'governance',
+      'session',
+      'stats',
+      '--json'
+    ]);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-governance-session-stats');
+    expect(parsed.total_sessions).toBe(1);
+    expect(parsed.release_gate.weekly_ops_stop).toEqual(expect.objectContaining({
+      sessions: 1,
+      session_rate_percent: 100,
+      blocked_sessions: 1,
+      blocked_session_rate_percent: 100,
+      high_pressure_sessions: 1,
+      high_pressure_session_rate_percent: 100,
+      config_warning_positive_sessions: 1,
+      config_warning_positive_rate_percent: 100,
+      auth_tier_pressure_sessions: 1,
+      auth_tier_pressure_rate_percent: 100,
+      dialogue_authorization_pressure_sessions: 1,
+      dialogue_authorization_pressure_rate_percent: 100
+    }));
+    expect(parsed.latest_sessions[0]).toEqual(expect.objectContaining({
+      id: 'governance-session-legacy-weekly-ops',
+      stop_detail_weekly_ops_available: true,
+      stop_detail_weekly_ops_blocked: true,
+      stop_detail_weekly_ops_high_pressure: true,
+      stop_detail_weekly_ops_config_warning_positive: true
+    }));
   });
 
   test('prunes close-loop-controller summary sessions with keep policy', async () => {

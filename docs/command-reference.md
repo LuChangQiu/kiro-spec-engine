@@ -766,6 +766,7 @@ Cross-archive autonomous governance maintenance:
     - `weekly-ops-dialogue-authorization-block-rate-high:<percent>`
 - `sce auto governance session list [--limit <n>] [--status <csv>] [--resume-only] [--json]`: list persisted governance close-loop sessions (`--resume-only` filters to resumed-chain sessions only).
 - `sce auto governance session stats [--days <n>] [--status <csv>] [--resume-only] [--json]`: aggregate governance close-loop session telemetry (completion/failure/convergence, rounds, risk/stop composition, resumed-chain ratios/source counts, and aggregated `release_gate` round telemetry trends).
+  - `release_gate.weekly_ops_stop` summarizes weekly-ops stop pressure across governance sessions (session counts/rates, high-pressure/config-warning/auth-tier/dialogue pressure rates, and averaged blocked-runs/block-rate/config-warning totals).
 - `sce auto governance session prune [--keep <n>] [--older-than-days <n>] [--dry-run] [--json]`: prune governance close-loop session archive by retention policy.
 
 Close-loop recovery memory maintenance:

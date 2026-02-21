@@ -816,6 +816,7 @@ Dual-track handoff integration:
   - When `manifest.capabilities` is not declared, sce attempts lexicon-based capability inference from `manifest.templates` first; only fully non-mappable manifests keep capability coverage in skipped mode.
   - Run output includes `release_gate_preflight` (latest release gate history signal snapshot + blocked reasons) and carries this context into `warnings`.
   - `release_gate_preflight` is advisory by default; use `--require-release-gate-preflight` to hard-fail when preflight is unavailable/blocked.
+  - `phases[*].details` for `observability` now includes weekly-ops stop pressure counters (`weekly_ops_stop_sessions`, `weekly_ops_high_pressure_sessions`, config-warning/auth-tier/dialogue pressure session counts) sourced from the unified observability snapshot.
   - `--profile` applies preset gate policy defaults before explicit option overrides:
     - `default`: current baseline gate policy.
     - `moqui`: explicit Moqui-intake baseline (same strict defaults as `default`).

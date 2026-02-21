@@ -8318,6 +8318,41 @@ if (process.argv.includes('--json')) {
   test('runs handoff pipeline end-to-end and archives run report', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
     const queueFile = path.join(tempDir, '.kiro', 'auto', 'handoff-goals.lines');
+    const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
+    await fs.ensureDir(governanceSessionDir);
+    const governanceSeedFile = path.join(governanceSessionDir, 'handoff-observability-seed.json');
+    await fs.writeJson(governanceSeedFile, {
+      mode: 'auto-governance-close-loop',
+      status: 'failed',
+      stop_reason: 'release-gate-blocked',
+      stop_detail: {
+        type: 'release-gate-block',
+        reasons: [
+          'weekly-ops-latest-blocked',
+          'weekly-ops-config-warnings-positive:1',
+          'weekly-ops-auth-tier-block-rate-high:58',
+          'weekly-ops-dialogue-authorization-block-rate-high:66'
+        ]
+      },
+      governance_session: {
+        id: 'handoff-observability-seed',
+        file: governanceSeedFile
+      },
+      final_assessment: {
+        health: {
+          risk_level: 'high',
+          release_gate: {
+            available: true,
+            latest_gate_passed: false,
+            pass_rate_percent: 60,
+            scene_package_batch_pass_rate_percent: 70,
+            drift_alert_rate_percent: 0,
+            drift_blocked_runs: 0
+          }
+        }
+      }
+    }, { spaces: 2 });
+
     await fs.writeJson(manifestFile, {
       timestamp: '2026-02-16T00:00:00.000Z',
       source_project: 'E:/workspace/331-poc',
@@ -8356,6 +8391,16 @@ if (process.argv.includes('--json')) {
     expect(payload.mode).toBe('auto-handoff-run');
     expect(payload.status).toBe('completed');
     expect(payload.gates.passed).toBe(true);
+    expect(payload.phases.find(item => item.id === 'observability')).toEqual(expect.objectContaining({
+      status: 'completed',
+      details: expect.objectContaining({
+        weekly_ops_stop_sessions: 1,
+        weekly_ops_high_pressure_sessions: 1,
+        weekly_ops_config_warning_positive_sessions: 1,
+        weekly_ops_auth_tier_pressure_sessions: 1,
+        weekly_ops_dialogue_authorization_pressure_sessions: 1
+      })
+    }));
     expect(payload.queue.output_file).toBe(queueFile);
     expect(payload.output_file).toContain(path.join('.kiro', 'reports', 'handoff-runs'));
     expect(payload.moqui_baseline).toEqual(expect.objectContaining({
@@ -8375,6 +8420,13 @@ if (process.argv.includes('--json')) {
     }));
     expect(Array.isArray(payload.recommendations)).toBe(true);
     expect(payload.recommendations.some(item => item.includes('sce auto handoff regression --session-id'))).toBe(true);
+    expect(payload.recommendations).toEqual(expect.arrayContaining([
+      'node scripts/release-ops-weekly-summary.js --json',
+      'node scripts/release-weekly-ops-gate.js'
+    ]));
+    expect(payload.failure_summary.highlights).toEqual(expect.arrayContaining([
+      expect.stringContaining('observability_weekly_ops_stop: sessions=1')
+    ]));
     expect(payload.release_evidence).toEqual(expect.objectContaining({
       mode: 'auto-handoff-release-evidence',
       merged: true,

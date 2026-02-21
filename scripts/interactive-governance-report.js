@@ -9,6 +9,7 @@ const DEFAULT_APPROVAL_AUDIT = '.kiro/reports/interactive-approval-events.jsonl'
 const DEFAULT_EXECUTION_LEDGER = '.kiro/reports/interactive-execution-ledger.jsonl';
 const DEFAULT_FEEDBACK_FILE = '.kiro/reports/interactive-user-feedback.jsonl';
 const DEFAULT_MATRIX_SIGNALS = '.kiro/reports/interactive-matrix-signals.jsonl';
+const DEFAULT_AUTHORIZATION_TIER_SIGNALS = '.kiro/reports/interactive-authorization-tier-signals.jsonl';
 const DEFAULT_THRESHOLDS = 'docs/interactive-customization/governance-threshold-baseline.json';
 const DEFAULT_OUT = '.kiro/reports/interactive-governance-report.json';
 const DEFAULT_MARKDOWN_OUT = '.kiro/reports/interactive-governance-report.md';
@@ -20,6 +21,7 @@ function parseArgs(argv) {
     executionLedger: DEFAULT_EXECUTION_LEDGER,
     feedbackFile: DEFAULT_FEEDBACK_FILE,
     matrixSignals: DEFAULT_MATRIX_SIGNALS,
+    authorizationTierSignals: DEFAULT_AUTHORIZATION_TIER_SIGNALS,
     thresholds: DEFAULT_THRESHOLDS,
     period: 'weekly',
     from: null,
@@ -47,6 +49,9 @@ function parseArgs(argv) {
       i += 1;
     } else if (token === '--matrix-signals' && next) {
       options.matrixSignals = next;
+      i += 1;
+    } else if (token === '--authorization-tier-signals' && next) {
+      options.authorizationTierSignals = next;
       i += 1;
     } else if (token === '--thresholds' && next) {
       options.thresholds = next;
@@ -101,6 +106,7 @@ function printHelpAndExit(code) {
     `  --execution-ledger <path>  Execution ledger JSONL (default: ${DEFAULT_EXECUTION_LEDGER})`,
     `  --feedback-file <path>     User feedback JSONL (default: ${DEFAULT_FEEDBACK_FILE})`,
     `  --matrix-signals <path>    Matrix signal JSONL (default: ${DEFAULT_MATRIX_SIGNALS})`,
+    `  --authorization-tier-signals <path> Authorization tier signal JSONL (default: ${DEFAULT_AUTHORIZATION_TIER_SIGNALS})`,
     `  --thresholds <path>        Governance threshold JSON (default: ${DEFAULT_THRESHOLDS})`,
     '  --period <type>            weekly|monthly|all|custom (default: weekly)',
     '  --from <ISO datetime>      Start time (required for custom period)',
@@ -250,6 +256,12 @@ function loadThresholds(raw = {}) {
     min_matrix_samples: Number.isFinite(Number(thresholds.min_matrix_samples))
       ? Number(thresholds.min_matrix_samples)
       : 3,
+    min_authorization_tier_samples: Number.isFinite(Number(thresholds.min_authorization_tier_samples))
+      ? Number(thresholds.min_authorization_tier_samples)
+      : 3,
+    authorization_tier_block_rate_max_percent: Number.isFinite(Number(thresholds.authorization_tier_block_rate_max_percent))
+      ? Number(thresholds.authorization_tier_block_rate_max_percent)
+      : 40,
     matrix_portfolio_pass_rate_min_percent: Number.isFinite(Number(thresholds.matrix_portfolio_pass_rate_min_percent))
       ? Number(thresholds.matrix_portfolio_pass_rate_min_percent)
       : 80,
@@ -395,6 +407,34 @@ function evaluateAlerts(metrics, thresholds) {
     });
   }
 
+  if (metrics.authorization_tier_total < thresholds.min_authorization_tier_samples) {
+    alerts.push({
+      id: 'authorization-tier-sample-insufficient',
+      severity: 'low',
+      status: 'warning',
+      metric: 'authorization_tier_total',
+      actual: metrics.authorization_tier_total,
+      threshold: thresholds.min_authorization_tier_samples,
+      direction: 'min',
+      message: 'Authorization tier sample size is below minimum; block trend is not statistically stable.',
+      recommendation: 'Collect more authorization-tier evaluations before tightening tier policy.'
+    });
+  } else if (
+    metrics.authorization_tier_block_rate_percent != null &&
+    metrics.authorization_tier_block_rate_percent > thresholds.authorization_tier_block_rate_max_percent
+  ) {
+    alerts.push(buildAlert({
+      id: 'authorization-tier-block-rate-high',
+      severity: 'medium',
+      metric: 'authorization_tier_block_rate_percent',
+      actual: metrics.authorization_tier_block_rate_percent,
+      threshold: thresholds.authorization_tier_block_rate_max_percent,
+      direction: 'max',
+      message: 'Authorization tier block/review rate is above maximum threshold.',
+      recommendation: 'Refine dialogue profile defaults and step-up policy to reduce non-actionable apply requests.'
+    }));
+  }
+
   if (metrics.matrix_signal_total < thresholds.min_matrix_samples) {
     alerts.push({
       id: 'matrix-sample-insufficient',
@@ -508,6 +548,9 @@ function buildMarkdown(report) {
   lines.push(`| Execution success rate | ${report.metrics.execution_success_rate_percent == null ? 'n/a' : `${report.metrics.execution_success_rate_percent}%`} |`);
   lines.push(`| Rollback rate | ${report.metrics.rollback_rate_percent == null ? 'n/a' : `${report.metrics.rollback_rate_percent}%`} |`);
   lines.push(`| Security intercept rate | ${report.metrics.security_intercept_rate_percent == null ? 'n/a' : `${report.metrics.security_intercept_rate_percent}%`} |`);
+  lines.push(`| Authorization tier deny total | ${report.metrics.authorization_tier_deny_total} |`);
+  lines.push(`| Authorization tier review-required total | ${report.metrics.authorization_tier_review_required_total} |`);
+  lines.push(`| Authorization tier block rate | ${report.metrics.authorization_tier_block_rate_percent == null ? 'n/a' : `${report.metrics.authorization_tier_block_rate_percent}%`} |`);
   lines.push(`| Satisfaction (avg) | ${report.metrics.satisfaction_avg_score == null ? 'n/a' : report.metrics.satisfaction_avg_score} |`);
   lines.push(`| Satisfaction samples | ${report.metrics.satisfaction_response_count} |`);
   lines.push(`| Matrix portfolio pass rate | ${report.metrics.matrix_portfolio_pass_rate_percent == null ? 'n/a' : `${report.metrics.matrix_portfolio_pass_rate_percent}%`} |`);
@@ -543,6 +586,7 @@ async function main() {
   const executionLedgerPath = resolvePath(cwd, options.executionLedger);
   const feedbackFilePath = resolvePath(cwd, options.feedbackFile);
   const matrixSignalsPath = resolvePath(cwd, options.matrixSignals);
+  const authorizationTierSignalsPath = resolvePath(cwd, options.authorizationTierSignals);
   const thresholdsPath = resolvePath(cwd, options.thresholds);
   const outPath = resolvePath(cwd, options.out);
   const markdownOutPath = resolvePath(cwd, options.markdownOut);
@@ -554,13 +598,15 @@ async function main() {
     approvalEventsRaw,
     executionRecordsRaw,
     feedbackRaw,
-    matrixSignalsRaw
+    matrixSignalsRaw,
+    authorizationTierSignalsRaw
   ] = await Promise.all([
     readJsonLinesFile(intentAuditPath),
     readJsonLinesFile(approvalAuditPath),
     readJsonLinesFile(executionLedgerPath),
     readJsonLinesFile(feedbackFilePath),
-    readJsonLinesFile(matrixSignalsPath)
+    readJsonLinesFile(matrixSignalsPath),
+    readJsonLinesFile(authorizationTierSignalsPath)
   ]);
 
   const thresholds = loadThresholds(
@@ -594,6 +640,11 @@ async function main() {
   const matrixSignals = filterByWindow(
     matrixSignalsRaw.filter(item => item && item.matrix && typeof item.matrix === 'object'),
     ['generated_at', 'timestamp', 'created_at'],
+    window
+  );
+  const authorizationTierSignals = filterByWindow(
+    authorizationTierSignalsRaw.filter(item => item && item.decision),
+    ['timestamp', 'evaluated_at', 'generated_at', 'created_at'],
     window
   );
 
@@ -639,6 +690,16 @@ async function main() {
     const status = `${item && item.matrix ? item.matrix.stage_status || '' : ''}`.trim().toLowerCase();
     return status === 'error' || status === 'non-zero-exit';
   }).length;
+  const authorizationTierDenyCount = authorizationTierSignals.filter((item) =>
+    `${item && item.decision ? item.decision : ''}`.trim().toLowerCase() === 'deny'
+  ).length;
+  const authorizationTierReviewRequiredCount = authorizationTierSignals.filter((item) =>
+    `${item && item.decision ? item.decision : ''}`.trim().toLowerCase() === 'review-required'
+  ).length;
+  const authorizationTierAllowCount = authorizationTierSignals.filter((item) =>
+    `${item && item.decision ? item.decision : ''}`.trim().toLowerCase() === 'allow'
+  ).length;
+  const authorizationTierBlockCount = authorizationTierDenyCount + authorizationTierReviewRequiredCount;
 
   const approvalSubmittedCount = approvalEvents.filter(item =>
     `${item.action || ''}`.trim().toLowerCase() === 'submit' && item.blocked !== true
@@ -668,12 +729,18 @@ async function main() {
     satisfaction_avg_score: toAverage(feedbackScores),
     satisfaction_response_count: feedbackScores.length,
     matrix_signal_total: matrixSignals.length,
+    authorization_tier_total: authorizationTierSignals.length,
+    authorization_tier_allow_total: authorizationTierAllowCount,
+    authorization_tier_deny_total: authorizationTierDenyCount,
+    authorization_tier_review_required_total: authorizationTierReviewRequiredCount,
+    authorization_tier_block_total: authorizationTierBlockCount,
     matrix_portfolio_pass_total: matrixPortfolioPassedCount,
     matrix_regression_positive_total: matrixRegressionPositiveCount,
     matrix_stage_error_total: matrixStageErrorCount,
     matrix_portfolio_pass_rate_percent: toRatePercent(matrixPortfolioPassedCount, matrixSignals.length),
     matrix_regression_positive_rate_percent: toRatePercent(matrixRegressionPositiveCount, matrixSignals.length),
     matrix_stage_error_rate_percent: toRatePercent(matrixStageErrorCount, matrixSignals.length),
+    authorization_tier_block_rate_percent: toRatePercent(authorizationTierBlockCount, authorizationTierSignals.length),
     matrix_avg_score: toAverage(matrixScoreValues),
     matrix_avg_valid_rate_percent: toAverage(matrixValidRateValues)
   };
@@ -697,6 +764,7 @@ async function main() {
       execution_ledger: path.relative(cwd, executionLedgerPath) || '.',
       feedback_file: path.relative(cwd, feedbackFilePath) || '.',
       matrix_signals: path.relative(cwd, matrixSignalsPath) || '.',
+      authorization_tier_signals: path.relative(cwd, authorizationTierSignalsPath) || '.',
       thresholds: path.relative(cwd, thresholdsPath) || '.'
     },
     thresholds,
@@ -750,6 +818,7 @@ module.exports = {
   DEFAULT_EXECUTION_LEDGER,
   DEFAULT_FEEDBACK_FILE,
   DEFAULT_MATRIX_SIGNALS,
+  DEFAULT_AUTHORIZATION_TIER_SIGNALS,
   DEFAULT_THRESHOLDS,
   DEFAULT_OUT,
   DEFAULT_MARKDOWN_OUT,

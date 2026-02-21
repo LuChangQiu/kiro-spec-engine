@@ -109,11 +109,14 @@ Flow output defaults:
 - Loop summary: `.kiro/reports/interactive-flow/<session-id>/interactive-customization-loop.summary.json`
 - Dialogue governance report: `.kiro/reports/interactive-flow/<session-id>/interactive-dialogue-governance.json`
 - Authorization tier report: `.kiro/reports/interactive-flow/<session-id>/interactive-authorization-tier.json`
+- Authorization tier signal stream:
+  - Session: `.kiro/reports/interactive-flow/<session-id>/interactive-authorization-tier-signals.jsonl`
+  - Global: `.kiro/reports/interactive-authorization-tier-signals.jsonl`
 - Matrix summary JSON: `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.json`
 - Matrix summary Markdown: `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.md`
 - Matrix signal stream: `.kiro/reports/interactive-matrix-signals.jsonl`
 - Loop/flow summaries now include execution block diagnostics:
-  - `summary.execution_block_reason_category` (`password-authorization|role-policy|runtime-policy|approval-policy|unknown`)
+  - `summary.execution_block_reason_category` (`password-authorization|role-policy|authorization-tier|runtime-policy|approval-policy|unknown`)
   - `summary.execution_block_remediation_hint` (human-readable fix hint)
   - `summary.authorization_execute_roles` (flow-level execute role requirements when role policy is enabled)
 
@@ -235,6 +238,7 @@ node scripts/interactive-work-order-build.js \
   --dialogue .kiro/reports/interactive-dialogue-governance.json \
   --gate .kiro/reports/interactive-change-plan-gate.json \
   --runtime .kiro/reports/interactive-runtime-policy.json \
+  --authorization-tier .kiro/reports/interactive-authorization-tier.json \
   --approval-state .kiro/reports/interactive-approval-state.json \
   --execution-attempted \
   --execution-result success \
@@ -336,6 +340,7 @@ node scripts/interactive-governance-report.js \
 
 The governance report consumes feedback events from `.kiro/reports/interactive-user-feedback.jsonl` by default.
 The governance report also consumes matrix signals from `.kiro/reports/interactive-matrix-signals.jsonl` by default.
+The governance report consumes authorization-tier signals from `.kiro/reports/interactive-authorization-tier-signals.jsonl` by default.
 When `intent_total` is below `min_intent_samples` (default `5`), adoption emits a low-severity sample warning instead of a breach.
 
 Export matrix regression remediation queue lines (for close-loop-batch):

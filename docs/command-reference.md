@@ -1040,6 +1040,9 @@ Interactive one-click loop helper (script-level orchestration entry):
   - `system-maintainer` profile can apply, but environment step-up requirements still apply (password/role separation/manual review)
 - Default runtime report: `.kiro/reports/interactive-loop/<session-id>/interactive-runtime-policy.json`
 - Default authorization tier report: `.kiro/reports/interactive-loop/<session-id>/interactive-authorization-tier.json`
+- Default authorization tier signal stream:
+  - Session: `.kiro/reports/interactive-loop/<session-id>/interactive-authorization-tier-signals.jsonl`
+  - Global: `.kiro/reports/interactive-authorization-tier-signals.jsonl`
 - Default work-order outputs:
   - `.kiro/reports/interactive-loop/<session-id>/interactive-work-order.json`
   - `.kiro/reports/interactive-loop/<session-id>/interactive-work-order.md`
@@ -1060,7 +1063,7 @@ Interactive authorization-tier helper (script-level profile/environment step-up 
   - `--fail-on-non-allow` exits with code `2` on `deny` or `review-required`.
 
 Interactive work-order helper (script-level usage/maintenance/dev closure):
-- `node scripts/interactive-work-order-build.js --plan <path> [--dialogue <path>] [--intent <path>] [--gate <path>] [--runtime <path>] [--approval-state <path>] [--execution-attempted] [--execution-result <value>] [--execution-id <id>] [--out <path>] [--markdown-out <path>] [--json]`: build auditable work-order record from dialogue/plan/gate/runtime/approval/execution signals.
+- `node scripts/interactive-work-order-build.js --plan <path> [--dialogue <path>] [--intent <path>] [--gate <path>] [--runtime <path>] [--authorization-tier <path>] [--approval-state <path>] [--execution-attempted] [--execution-result <value>] [--execution-id <id>] [--out <path>] [--markdown-out <path>] [--json]`: build auditable work-order record from dialogue/plan/gate/runtime/authorization-tier/approval/execution signals.
   - Default outputs:
     - `.kiro/reports/interactive-work-order.json`
     - `.kiro/reports/interactive-work-order.md`
@@ -1090,11 +1093,12 @@ Interactive user feedback helper (script-level stage-D feedback ingestion):
 - npm alias: `npm run log:interactive-feedback -- --score 5 --comment "clear and safe"`
 
 Interactive governance report helper (script-level stage-D/6 observability + alerting):
-- `node scripts/interactive-governance-report.js [--intent-audit <path>] [--approval-audit <path>] [--execution-ledger <path>] [--feedback-file <path>] [--matrix-signals <path>] [--thresholds <path>] [--period <weekly|monthly|all|custom>] [--from <iso>] [--to <iso>] [--out <path>] [--markdown-out <path>] [--fail-on-alert] [--json]`: compute interactive governance KPIs (adoption/success/rollback/security-intercept/satisfaction + matrix pass/regression/stage-error), evaluate threshold breaches, and emit machine/human-readable governance report.
+- `node scripts/interactive-governance-report.js [--intent-audit <path>] [--approval-audit <path>] [--execution-ledger <path>] [--feedback-file <path>] [--matrix-signals <path>] [--authorization-tier-signals <path>] [--thresholds <path>] [--period <weekly|monthly|all|custom>] [--from <iso>] [--to <iso>] [--out <path>] [--markdown-out <path>] [--fail-on-alert] [--json]`: compute interactive governance KPIs (adoption/success/rollback/security-intercept/satisfaction + matrix pass/regression/stage-error + authorization-tier deny/review pressure), evaluate threshold breaches, and emit machine/human-readable governance report.
   - Default thresholds: `docs/interactive-customization/governance-threshold-baseline.json`
   - Default minimum intent sample threshold: `min_intent_samples=5` (below this becomes warning, not breach)
   - Default feedback input: `.kiro/reports/interactive-user-feedback.jsonl`
   - Default matrix input: `.kiro/reports/interactive-matrix-signals.jsonl`
+  - Default authorization tier signal input: `.kiro/reports/interactive-authorization-tier-signals.jsonl`
   - Default outputs:
     - `.kiro/reports/interactive-governance-report.json`
     - `.kiro/reports/interactive-governance-report.md`

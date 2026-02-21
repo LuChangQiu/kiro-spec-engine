@@ -41,6 +41,7 @@ describe('interactive-governance-report script', () => {
     const approvalAudit = path.join(workspace, 'approval.jsonl');
     const executionLedger = path.join(workspace, 'execution.jsonl');
     const feedbackFile = path.join(workspace, 'feedback.jsonl');
+    const authorizationTierSignals = path.join(workspace, 'authorization-tier-signals.jsonl');
     const thresholdsFile = path.join(workspace, 'thresholds.json');
 
     const now = new Date().toISOString();
@@ -71,13 +72,22 @@ describe('interactive-governance-report script', () => {
       { satisfaction_score: 5, timestamp: now }
     ]);
 
+    await writeJsonl(authorizationTierSignals, [
+      { decision: 'allow', timestamp: now },
+      { decision: 'allow', timestamp: now },
+      { decision: 'allow', timestamp: now },
+      { decision: 'review-required', timestamp: now }
+    ]);
+
     await fs.writeJson(thresholdsFile, {
       adoption_rate_min_percent: 50,
       execution_success_rate_min_percent: 80,
       rollback_rate_max_percent: 30,
       security_intercept_rate_max_percent: 30,
       satisfaction_min_score: 4,
-      min_feedback_samples: 2
+      min_feedback_samples: 2,
+      min_authorization_tier_samples: 3,
+      authorization_tier_block_rate_max_percent: 40
     }, { spaces: 2 });
 
     const result = runScript(workspace, [
@@ -85,6 +95,7 @@ describe('interactive-governance-report script', () => {
       '--approval-audit', approvalAudit,
       '--execution-ledger', executionLedger,
       '--feedback-file', feedbackFile,
+      '--authorization-tier-signals', authorizationTierSignals,
       '--thresholds', thresholdsFile,
       '--period', 'all',
       '--json'
@@ -97,6 +108,9 @@ describe('interactive-governance-report script', () => {
     expect(payload.metrics.execution_success_rate_percent).toBe(100);
     expect(payload.metrics.rollback_rate_percent).toBe(0);
     expect(payload.metrics.security_intercept_rate_percent).toBe(0);
+    expect(payload.metrics.authorization_tier_deny_total).toBe(0);
+    expect(payload.metrics.authorization_tier_review_required_total).toBe(1);
+    expect(payload.metrics.authorization_tier_block_rate_percent).toBe(25);
     expect(payload.metrics.satisfaction_avg_score).toBe(4.67);
     expect(payload.summary.breaches).toBe(0);
   });
@@ -109,6 +123,7 @@ describe('interactive-governance-report script', () => {
     const approvalAudit = path.join(workspace, 'approval.jsonl');
     const executionLedger = path.join(workspace, 'execution.jsonl');
     const feedbackFile = path.join(workspace, 'feedback.jsonl');
+    const authorizationTierSignals = path.join(workspace, 'authorization-tier-signals.jsonl');
     const thresholdsFile = path.join(workspace, 'thresholds.json');
 
     const now = new Date().toISOString();
@@ -142,13 +157,22 @@ describe('interactive-governance-report script', () => {
       { satisfaction_score: 3, timestamp: now }
     ]);
 
+    await writeJsonl(authorizationTierSignals, [
+      { decision: 'allow', timestamp: now },
+      { decision: 'deny', timestamp: now },
+      { decision: 'deny', timestamp: now },
+      { decision: 'review-required', timestamp: now }
+    ]);
+
     await fs.writeJson(thresholdsFile, {
       adoption_rate_min_percent: 50,
       execution_success_rate_min_percent: 80,
       rollback_rate_max_percent: 20,
       security_intercept_rate_max_percent: 30,
       satisfaction_min_score: 4,
-      min_feedback_samples: 2
+      min_feedback_samples: 2,
+      min_authorization_tier_samples: 3,
+      authorization_tier_block_rate_max_percent: 40
     }, { spaces: 2 });
 
     const result = runScript(workspace, [
@@ -156,6 +180,7 @@ describe('interactive-governance-report script', () => {
       '--approval-audit', approvalAudit,
       '--execution-ledger', executionLedger,
       '--feedback-file', feedbackFile,
+      '--authorization-tier-signals', authorizationTierSignals,
       '--thresholds', thresholdsFile,
       '--period', 'all',
       '--fail-on-alert',
@@ -171,7 +196,8 @@ describe('interactive-governance-report script', () => {
       'execution-success-low',
       'rollback-rate-high',
       'security-intercept-high',
-      'satisfaction-low'
+      'satisfaction-low',
+      'authorization-tier-block-rate-high'
     ]));
   });
 

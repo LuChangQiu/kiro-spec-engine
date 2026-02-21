@@ -636,6 +636,7 @@ async function main() {
 
   const contextPath = resolvePath(cwd, options.context);
   const globalFeedbackPath = resolvePath(cwd, '.kiro/reports/interactive-user-feedback.jsonl');
+  const globalAuthorizationTierSignalsPath = resolvePath(cwd, '.kiro/reports/interactive-authorization-tier-signals.jsonl');
   const outRoot = resolvePath(cwd, options.outDir);
   const sessionDir = path.join(outRoot, sessionId);
   const summaryOutPath = options.out
@@ -670,6 +671,8 @@ async function main() {
     work_order_md: toRelative(cwd, options.workOrderMarkdownOut
       ? resolvePath(cwd, options.workOrderMarkdownOut)
       : path.join(sessionDir, 'interactive-work-order.md')),
+    authorization_tier_signals_global_jsonl: toRelative(cwd, globalAuthorizationTierSignalsPath),
+    authorization_tier_signals_jsonl: toRelative(cwd, path.join(sessionDir, 'interactive-authorization-tier-signals.jsonl')),
     feedback_global_jsonl: toRelative(cwd, globalFeedbackPath),
     feedback_jsonl: toRelative(cwd, path.join(sessionDir, 'interactive-user-feedback.jsonl')),
     summary_json: toRelative(cwd, summaryOutPath)
@@ -852,6 +855,32 @@ async function main() {
     typeof authorizationTierPayload.requirements === 'object'
     ? authorizationTierPayload.requirements
     : {};
+  const authorizationTierSignalRecord = {
+    event_type: 'interactive.authorization_tier.evaluated',
+    timestamp: new Date().toISOString(),
+    session_id: sessionId,
+    user_id: options.userId,
+    execution_mode: options.executionMode,
+    runtime_mode: options.runtimeMode,
+    runtime_environment: options.runtimeEnvironment,
+    dialogue_profile: options.dialogueProfile,
+    decision: authorizationTierDecision,
+    reasons: Array.isArray(authorizationTierPayload && authorizationTierPayload.reasons)
+      ? authorizationTierPayload.reasons
+      : [],
+    requirements: authorizationTierRequirements,
+    policy_source: authorizationTierPayload &&
+      authorizationTierPayload.policy &&
+      authorizationTierPayload.policy.source
+      ? authorizationTierPayload.policy.source
+      : null
+  };
+  const authorizationTierSignalsGlobalPath = resolvePath(cwd, artifacts.authorization_tier_signals_global_jsonl);
+  await fs.ensureDir(path.dirname(authorizationTierSignalsGlobalPath));
+  await fs.appendFile(authorizationTierSignalsGlobalPath, `${JSON.stringify(authorizationTierSignalRecord)}\n`, 'utf8');
+  const authorizationTierSignalsSessionPath = resolvePath(cwd, artifacts.authorization_tier_signals_jsonl);
+  await fs.ensureDir(path.dirname(authorizationTierSignalsSessionPath));
+  await fs.appendFile(authorizationTierSignalsSessionPath, `${JSON.stringify(authorizationTierSignalRecord)}\n`, 'utf8');
 
   const approvalInitArgs = [
     '--action', 'init',
@@ -1252,6 +1281,7 @@ async function main() {
     '--intent', resolvePath(cwd, artifacts.intent_json),
     '--gate', resolvePath(cwd, artifacts.gate_json),
     '--runtime', resolvePath(cwd, artifacts.runtime_json),
+    '--authorization-tier', resolvePath(cwd, artifacts.authorization_tier_json),
     '--approval-state', resolvePath(cwd, artifacts.approval_state_json),
     '--session-id', sessionId,
     '--runtime-mode', options.runtimeMode,

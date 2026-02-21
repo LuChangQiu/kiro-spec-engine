@@ -8,6 +8,8 @@
   "satisfaction_min_score": 4,
   "min_feedback_samples": 3,
   "min_matrix_samples": 3,
+  "min_authorization_tier_samples": 3,
+  "authorization_tier_block_rate_max_percent": 40,
   "matrix_portfolio_pass_rate_min_percent": 80,
   "matrix_regression_positive_rate_max_percent": 20,
   "matrix_stage_error_rate_max_percent": 20

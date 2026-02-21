@@ -197,9 +197,21 @@ describe('interactive-customization-loop script', () => {
     const summaryFile = path.join(workspace, payload.artifacts.summary_json);
     const runtimeFile = path.join(workspace, payload.artifacts.runtime_json);
     const workOrderFile = path.join(workspace, payload.artifacts.work_order_json);
+    const authorizationTierSignalsSessionFile = path.join(workspace, payload.artifacts.authorization_tier_signals_jsonl);
+    const authorizationTierSignalsGlobalFile = path.join(workspace, payload.artifacts.authorization_tier_signals_global_jsonl);
     expect(await fs.pathExists(summaryFile)).toBe(true);
     expect(await fs.pathExists(runtimeFile)).toBe(true);
     expect(await fs.pathExists(workOrderFile)).toBe(true);
+    expect(await fs.pathExists(authorizationTierSignalsSessionFile)).toBe(true);
+    expect(await fs.pathExists(authorizationTierSignalsGlobalFile)).toBe(true);
+
+    const authorizationTierSignalLine = (await fs.readFile(authorizationTierSignalsSessionFile, 'utf8'))
+      .split(/\r?\n/)
+      .find(Boolean);
+    expect(authorizationTierSignalLine).toBeTruthy();
+    const authorizationTierSignal = JSON.parse(authorizationTierSignalLine);
+    expect(authorizationTierSignal.event_type).toBe('interactive.authorization_tier.evaluated');
+    expect(authorizationTierSignal.decision).toBe('allow');
   });
 
   test('auto executes low-risk path in apply mode', async () => {

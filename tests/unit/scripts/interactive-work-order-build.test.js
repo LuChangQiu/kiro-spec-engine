@@ -33,6 +33,7 @@ describe('interactive-work-order-build script', () => {
     const planPath = path.join(workspace, 'plan.json');
     const gatePath = path.join(workspace, 'gate.json');
     const runtimePath = path.join(workspace, 'runtime.json');
+    const authorizationTierPath = path.join(workspace, 'authorization-tier.json');
     const approvalStatePath = path.join(workspace, 'approval-state.json');
 
     await fs.writeJson(dialoguePath, {
@@ -81,6 +82,19 @@ describe('interactive-work-order-build script', () => {
         require_work_order: true
       }
     }, { spaces: 2 });
+    await fs.writeJson(authorizationTierPath, {
+      decision: 'allow',
+      context: {
+        dialogue_profile: 'system-maintainer',
+        runtime_environment: 'staging'
+      },
+      requirements: {
+        require_secondary_authorization: true,
+        require_password_for_apply: true,
+        require_role_policy: false,
+        require_distinct_actor_roles: false
+      }
+    }, { spaces: 2 });
     await fs.writeJson(approvalStatePath, {
       workflow_id: 'wf-1',
       status: 'approved'
@@ -92,6 +106,7 @@ describe('interactive-work-order-build script', () => {
       planPath,
       gatePath,
       runtimePath,
+      authorizationTierPath,
       approvalStatePath,
       ...overrides
     };
@@ -108,6 +123,7 @@ describe('interactive-work-order-build script', () => {
       '--plan', inputs.planPath,
       '--gate', inputs.gatePath,
       '--runtime', inputs.runtimePath,
+      '--authorization-tier', inputs.authorizationTierPath,
       '--approval-state', inputs.approvalStatePath,
       '--session-id', 'session-1',
       '--execution-attempted',
@@ -122,6 +138,8 @@ describe('interactive-work-order-build script', () => {
     expect(payload.work_order.status).toBe('completed');
     expect(payload.work_order.execution.execution_id).toBe('exec-1');
     expect(payload.work_order.runtime.mode).toBe('ops-fix');
+    expect(payload.work_order.governance.authorization_tier_decision).toBe('allow');
+    expect(payload.work_order.authorization.decision).toBe('allow');
   });
 
   test('builds blocked work-order when gate/runtime deny', async () => {
@@ -142,6 +160,7 @@ describe('interactive-work-order-build script', () => {
       '--plan', inputs.planPath,
       '--gate', inputs.gatePath,
       '--runtime', inputs.runtimePath,
+      '--authorization-tier', inputs.authorizationTierPath,
       '--approval-state', inputs.approvalStatePath,
       '--json'
     ]);
@@ -150,5 +169,50 @@ describe('interactive-work-order-build script', () => {
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.work_order.status).toBe('blocked');
     expect(payload.work_order.priority).toBe('high');
+  });
+
+  test('marks pending-review when authorization tier requires review', async () => {
+    const workspace = path.join(tempDir, 'workspace-auth-review');
+    await fs.ensureDir(workspace);
+    const inputs = await writeInputs(workspace);
+    await fs.writeJson(inputs.approvalStatePath, {
+      workflow_id: 'wf-1',
+      status: 'submitted'
+    }, { spaces: 2 });
+    await fs.writeJson(inputs.authorizationTierPath, {
+      decision: 'review-required',
+      context: {
+        dialogue_profile: 'system-maintainer',
+        runtime_environment: 'prod'
+      },
+      requirements: {
+        require_secondary_authorization: true,
+        require_password_for_apply: true,
+        require_role_policy: true,
+        require_distinct_actor_roles: true
+      }
+    }, { spaces: 2 });
+
+    const result = runScript(workspace, [
+      '--dialogue', inputs.dialoguePath,
+      '--intent', inputs.intentPath,
+      '--plan', inputs.planPath,
+      '--gate', inputs.gatePath,
+      '--runtime', inputs.runtimePath,
+      '--authorization-tier', inputs.authorizationTierPath,
+      '--approval-state', inputs.approvalStatePath,
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.work_order.status).toBe('pending-review');
+    expect(payload.work_order.priority).toBe('medium');
+    expect(payload.work_order.governance.authorization_tier_decision).toBe('review-required');
+    expect(payload.work_order.next_actions).toEqual(expect.arrayContaining([
+      expect.stringContaining('manual review/approval'),
+      expect.stringContaining('one-time password authorization'),
+      expect.stringContaining('distinct operator role')
+    ]));
   });
 });

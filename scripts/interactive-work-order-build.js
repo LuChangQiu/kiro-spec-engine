@@ -17,6 +17,7 @@ function parseArgs(argv) {
     plan: null,
     gate: null,
     runtime: null,
+    authorizationTier: null,
     approvalState: null,
     runtimeMode: null,
     runtimeEnvironment: null,
@@ -54,6 +55,9 @@ function parseArgs(argv) {
       index += 1;
     } else if (token === '--runtime' && next) {
       options.runtime = next;
+      index += 1;
+    } else if (token === '--authorization-tier' && next) {
+      options.authorizationTier = next;
       index += 1;
     } else if (token === '--approval-state' && next) {
       options.approvalState = next;
@@ -107,6 +111,7 @@ function printHelpAndExit(code) {
     '  --intent <path>               Change intent JSON file',
     '  --gate <path>                 Change plan gate report JSON file',
     '  --runtime <path>              Runtime policy evaluation JSON file',
+    '  --authorization-tier <path>   Authorization tier evaluation JSON file',
     '  --approval-state <path>       Approval workflow state JSON file',
     '  --session-id <id>             Session identifier',
     '  --goal <text>                 Optional goal override',
@@ -169,12 +174,18 @@ function inferWorkOrderStatus({
   dialogueDecision,
   gateDecision,
   runtimeDecision,
+  authorizationTierDecision,
   approvalStatus,
   executionAttempted,
   executionBlocked,
   executionResult
 }) {
-  if (dialogueDecision === 'deny' || gateDecision === 'deny' || runtimeDecision === 'deny') {
+  if (
+    dialogueDecision === 'deny' ||
+    gateDecision === 'deny' ||
+    runtimeDecision === 'deny' ||
+    authorizationTierDecision === 'deny'
+  ) {
     return 'blocked';
   }
   if (executionAttempted && executionBlocked) {
@@ -183,7 +194,11 @@ function inferWorkOrderStatus({
   if (executionAttempted && executionResult === 'success') {
     return 'completed';
   }
-  if (gateDecision === 'review-required' || runtimeDecision === 'review-required') {
+  if (
+    gateDecision === 'review-required' ||
+    runtimeDecision === 'review-required' ||
+    authorizationTierDecision === 'review-required'
+  ) {
     return 'pending-review';
   }
   if (['draft', 'submitted', 'rejected'].includes(approvalStatus)) {
@@ -198,11 +213,21 @@ function inferWorkOrderStatus({
   return 'pending-review';
 }
 
-function inferPriority(riskLevel, gateDecision, runtimeDecision) {
-  if (gateDecision === 'deny' || runtimeDecision === 'deny' || riskLevel === 'high') {
+function inferPriority(riskLevel, gateDecision, runtimeDecision, authorizationTierDecision) {
+  if (
+    gateDecision === 'deny' ||
+    runtimeDecision === 'deny' ||
+    authorizationTierDecision === 'deny' ||
+    riskLevel === 'high'
+  ) {
     return 'high';
   }
-  if (gateDecision === 'review-required' || runtimeDecision === 'review-required' || riskLevel === 'medium') {
+  if (
+    gateDecision === 'review-required' ||
+    runtimeDecision === 'review-required' ||
+    authorizationTierDecision === 'review-required' ||
+    riskLevel === 'medium'
+  ) {
     return 'medium';
   }
   return 'low';
@@ -212,11 +237,13 @@ function inferNextActions({
   dialogueDecision,
   gateDecision,
   runtimeDecision,
+  authorizationTierDecision,
   approvalStatus,
   executionAttempted,
   executionBlocked,
   executionResult,
-  runtimeRequirements
+  runtimeRequirements,
+  authorizationTierRequirements
 }) {
   const actions = [];
   if (dialogueDecision === 'deny') {
@@ -231,11 +258,28 @@ function inferNextActions({
     actions.push('Switch runtime mode/environment or lower risk/action set before apply.');
     return actions;
   }
-  if (gateDecision === 'review-required' || runtimeDecision === 'review-required') {
+  if (authorizationTierDecision === 'deny') {
+    actions.push('Use system-maintainer profile and satisfy step-up authorization requirements before apply.');
+    return actions;
+  }
+  if (
+    gateDecision === 'review-required' ||
+    runtimeDecision === 'review-required' ||
+    authorizationTierDecision === 'review-required'
+  ) {
     actions.push('Create review ticket and complete manual review/approval before apply.');
   }
   if (runtimeRequirements && runtimeRequirements.require_work_order === true) {
     actions.push('Keep this work-order in audit trail and link approval/execution evidence.');
+  }
+  if (authorizationTierRequirements && authorizationTierRequirements.require_password_for_apply === true) {
+    actions.push('Provide one-time password authorization for apply execution.');
+  }
+  if (authorizationTierRequirements && authorizationTierRequirements.require_role_policy === true) {
+    actions.push('Provide approval role policy and actor role mapping for apply execution.');
+  }
+  if (authorizationTierRequirements && authorizationTierRequirements.require_distinct_actor_roles === true) {
+    actions.push('Use distinct operator role and approver role to satisfy separation-of-duties.');
   }
   if (!executionAttempted) {
     actions.push('Run apply path only after review checks and approval are satisfied.');
@@ -256,6 +300,7 @@ function buildMarkdown(payload) {
   const governance = workOrder.governance || {};
   const execution = workOrder.execution || {};
   const runtime = workOrder.runtime || {};
+  const authorization = workOrder.authorization || {};
 
   const lines = [];
   lines.push('# Interactive Work Order');
@@ -266,6 +311,7 @@ function buildMarkdown(payload) {
   lines.push(`- Priority: ${workOrder.priority}`);
   lines.push(`- Runtime: ${runtime.mode || 'n/a'} @ ${runtime.environment || 'n/a'}`);
   lines.push(`- Runtime decision: ${runtime.decision || 'unknown'}`);
+  lines.push(`- Authorization tier decision: ${authorization.decision || 'unknown'}`);
   lines.push('');
   lines.push('## Scope');
   lines.push('');
@@ -280,8 +326,19 @@ function buildMarkdown(payload) {
   lines.push(`- Dialogue: ${governance.dialogue_decision || 'unknown'}`);
   lines.push(`- Gate: ${governance.gate_decision || 'unknown'}`);
   lines.push(`- Runtime: ${governance.runtime_decision || 'unknown'}`);
+  lines.push(`- Authorization tier: ${governance.authorization_tier_decision || 'unknown'}`);
   lines.push(`- Approval: ${governance.approval_status || 'unknown'}`);
   lines.push(`- Risk level: ${governance.risk_level || 'unknown'}`);
+  lines.push('');
+  lines.push('## Authorization Tier');
+  lines.push('');
+  lines.push(`- Profile: ${authorization.profile || 'n/a'}`);
+  lines.push(`- Runtime environment: ${authorization.runtime_environment || 'n/a'}`);
+  lines.push(`- Decision: ${authorization.decision || 'unknown'}`);
+  lines.push(`- Require secondary authorization: ${authorization.requirements && authorization.requirements.require_secondary_authorization ? 'yes' : 'no'}`);
+  lines.push(`- Require password for apply: ${authorization.requirements && authorization.requirements.require_password_for_apply ? 'yes' : 'no'}`);
+  lines.push(`- Require role policy: ${authorization.requirements && authorization.requirements.require_role_policy ? 'yes' : 'no'}`);
+  lines.push(`- Require distinct actor roles: ${authorization.requirements && authorization.requirements.require_distinct_actor_roles ? 'yes' : 'no'}`);
   lines.push('');
   lines.push('## Execution');
   lines.push('');
@@ -318,16 +375,18 @@ async function main() {
   const intentPath = options.intent ? resolvePath(cwd, options.intent) : null;
   const gatePath = options.gate ? resolvePath(cwd, options.gate) : null;
   const runtimePath = options.runtime ? resolvePath(cwd, options.runtime) : null;
+  const authorizationTierPath = options.authorizationTier ? resolvePath(cwd, options.authorizationTier) : null;
   const approvalStatePath = options.approvalState ? resolvePath(cwd, options.approvalState) : null;
   const outPath = resolvePath(cwd, options.out);
   const markdownOutPath = resolvePath(cwd, options.markdownOut);
 
-  const [dialogue, intent, plan, gate, runtime, approvalState] = await Promise.all([
+  const [dialogue, intent, plan, gate, runtime, authorizationTier, approvalState] = await Promise.all([
     tryReadJsonFile(dialoguePath),
     tryReadJsonFile(intentPath),
     tryReadJsonFile(planPath),
     tryReadJsonFile(gatePath),
     tryReadJsonFile(runtimePath),
+    tryReadJsonFile(authorizationTierPath),
     tryReadJsonFile(approvalStatePath)
   ]);
 
@@ -338,6 +397,7 @@ async function main() {
   const dialogueDecision = normalizeDecision(dialogue && dialogue.decision, 'unknown');
   const gateDecision = normalizeDecision(gate && gate.decision, 'unknown');
   const runtimeDecision = normalizeDecision(runtime && runtime.decision, 'unknown');
+  const authorizationTierDecision = normalizeDecision(authorizationTier && authorizationTier.decision, 'unknown');
   const approvalStatus = normalizeStatus(approvalState && approvalState.status, 'unknown');
   const executionResult = normalizeDecision(options.executionResult, '');
   const riskLevel = normalizeRiskLevel(plan.risk_level);
@@ -348,24 +408,33 @@ async function main() {
     dialogueDecision,
     gateDecision,
     runtimeDecision,
+    authorizationTierDecision,
     approvalStatus,
     executionAttempted: options.executionAttempted,
     executionBlocked: options.executionBlocked,
     executionResult
   });
-  const priority = inferPriority(riskLevel, gateDecision, runtimeDecision);
+  const priority = inferPriority(riskLevel, gateDecision, runtimeDecision, authorizationTierDecision);
   const runtimeRequirements = runtime && runtime.requirements && typeof runtime.requirements === 'object'
     ? runtime.requirements
+    : {};
+  const authorizationTierContext = authorizationTier && authorizationTier.context && typeof authorizationTier.context === 'object'
+    ? authorizationTier.context
+    : {};
+  const authorizationTierRequirements = authorizationTier && authorizationTier.requirements && typeof authorizationTier.requirements === 'object'
+    ? authorizationTier.requirements
     : {};
   const nextActions = inferNextActions({
     dialogueDecision,
     gateDecision,
     runtimeDecision,
+    authorizationTierDecision,
     approvalStatus,
     executionAttempted: options.executionAttempted,
     executionBlocked: options.executionBlocked,
     executionResult,
-    runtimeRequirements
+    runtimeRequirements,
+    authorizationTierRequirements
   });
 
   const scope = plan.scope && typeof plan.scope === 'object' ? plan.scope : {};
@@ -393,6 +462,7 @@ async function main() {
       dialogue_decision: dialogueDecision,
       gate_decision: gateDecision,
       runtime_decision: runtimeDecision,
+      authorization_tier_decision: authorizationTierDecision,
       approval_status: approvalStatus,
       risk_level: riskLevel
     },
@@ -402,6 +472,13 @@ async function main() {
       decision: runtimeDecision,
       reasons: Array.isArray(runtime && runtime.reasons) ? runtime.reasons : [],
       requirements: runtimeRequirements
+    },
+    authorization: {
+      profile: authorizationTierContext.dialogue_profile || null,
+      runtime_environment: authorizationTierContext.runtime_environment || runtimeEnvironment,
+      decision: authorizationTierDecision,
+      reasons: Array.isArray(authorizationTier && authorizationTier.reasons) ? authorizationTier.reasons : [],
+      requirements: authorizationTierRequirements
     },
     execution: {
       attempted: options.executionAttempted,
@@ -427,6 +504,7 @@ async function main() {
       plan: path.relative(cwd, planPath) || '.',
       gate: gatePath ? (path.relative(cwd, gatePath) || '.') : null,
       runtime: runtimePath ? (path.relative(cwd, runtimePath) || '.') : null,
+      authorization_tier: authorizationTierPath ? (path.relative(cwd, authorizationTierPath) || '.') : null,
       approval_state: approvalStatePath ? (path.relative(cwd, approvalStatePath) || '.') : null
     },
     output: {

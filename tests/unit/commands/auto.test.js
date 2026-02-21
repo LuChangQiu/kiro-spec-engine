@@ -5688,6 +5688,80 @@ if (process.argv.includes('--json')) {
     ]));
   });
 
+  test('stops governance close-loop when weekly ops pressure blocks release gate', async () => {
+    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    await fs.ensureDir(releaseEvidenceDir);
+    await fs.writeJson(path.join(releaseEvidenceDir, 'release-gate-history.json'), {
+      mode: 'auto-handoff-release-gate-history',
+      total_entries: 4,
+      latest: {
+        tag: 'v1.47.36',
+        gate_passed: true,
+        risk_level: 'medium',
+        weekly_ops_blocked: true,
+        weekly_ops_risk_level: 'high',
+        weekly_ops_governance_status: 'alert',
+        weekly_ops_authorization_tier_block_rate_percent: 58,
+        weekly_ops_dialogue_authorization_block_rate_percent: 66,
+        weekly_ops_config_warning_count: 2
+      },
+      aggregates: {
+        pass_rate_percent: 100,
+        scene_package_batch_pass_rate_percent: 100,
+        drift_alert_rate_percent: 0,
+        drift_alert_runs: 0,
+        drift_blocked_runs: 0,
+        weekly_ops_known_runs: 4,
+        weekly_ops_blocked_runs: 2,
+        weekly_ops_block_rate_percent: 50,
+        weekly_ops_violations_total: 3,
+        weekly_ops_warnings_total: 5,
+        weekly_ops_config_warnings_total: 2,
+        weekly_ops_authorization_tier_block_rate_max_percent: 58,
+        weekly_ops_dialogue_authorization_block_rate_max_percent: 66
+      },
+      entries: []
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'sce',
+      'auto',
+      'governance',
+      'close-loop',
+      '--max-rounds',
+      '3',
+      '--target-risk',
+      'low',
+      '--json'
+    ]);
+
+    const output = logSpy.mock.calls.map(call => call.join(' ')).join('\n');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.mode).toBe('auto-governance-close-loop');
+    expect(parsed.stop_reason).toBe('release-gate-blocked');
+    expect(parsed.converged).toBe(false);
+    expect(parsed.stop_detail).toEqual(expect.objectContaining({
+      type: 'release-gate-block'
+    }));
+    expect(parsed.stop_detail.reasons).toEqual(expect.arrayContaining([
+      'weekly-ops-latest-blocked',
+      'weekly-ops-latest-risk-high',
+      'weekly-ops-governance-status:alert',
+      'weekly-ops-config-warnings-positive:2',
+      'weekly-ops-blocked-runs-positive:2',
+      'weekly-ops-auth-tier-block-rate-high:58',
+      'weekly-ops-dialogue-authorization-block-rate-high:66'
+    ]));
+    expect(parsed.recommendations).toEqual(expect.arrayContaining([
+      expect.stringContaining('release-ops-weekly-summary.js'),
+      expect.stringContaining('KSE_RELEASE_WEEKLY_OPS_*'),
+      expect.stringContaining('interactive-authorization-tier-evaluate.js'),
+      expect.stringContaining('interactive-dialogue-governance.js')
+    ]));
+  });
+
   test('stops governance close-loop when handoff quality is blocked', async () => {
     const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
     await fs.ensureDir(releaseEvidenceDir);

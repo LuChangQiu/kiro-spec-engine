@@ -7401,6 +7401,42 @@ if (process.argv.includes('--json')) {
       status: 'completed',
       target_risk: 'medium',
       converged: true,
+      stop_reason: 'release-gate-blocked',
+      stop_detail: {
+        type: 'release-gate-block',
+        reasons: [
+          'weekly-ops-latest-blocked',
+          'weekly-ops-config-warnings-positive:1',
+          'weekly-ops-auth-tier-block-rate-high:58',
+          'weekly-ops-dialogue-authorization-block-rate-high:66'
+        ],
+        weekly_ops: {
+          latest: {
+            blocked: true,
+            risk_level: 'high',
+            governance_status: 'alert',
+            authorization_tier_block_rate_percent: 58,
+            dialogue_authorization_block_rate_percent: 66,
+            config_warning_count: 1
+          },
+          aggregates: {
+            blocked_runs: 1,
+            block_rate_percent: 50,
+            violations_total: 1,
+            warnings_total: 1,
+            config_warnings_total: 1,
+            authorization_tier_block_rate_max_percent: 58,
+            dialogue_authorization_block_rate_max_percent: 66
+          },
+          pressure: {
+            blocked: true,
+            high: true,
+            config_warning_positive: true,
+            auth_tier_block_rate_high: true,
+            dialogue_authorization_block_rate_high: true
+          }
+        }
+      },
       governance_session: { id: 'obs-governance', file: governanceFile },
       final_assessment: {
         health: {
@@ -7422,6 +7458,22 @@ if (process.argv.includes('--json')) {
     expect(parsed.mode).toBe('auto-observability-snapshot');
     expect(parsed.highlights.total_sessions).toBeGreaterThanOrEqual(4);
     expect(parsed.snapshots.close_loop_session.total_sessions).toBeGreaterThanOrEqual(1);
+    expect(parsed.highlights).toEqual(expect.objectContaining({
+      governance_weekly_ops_stop_sessions: 1,
+      governance_weekly_ops_stop_session_rate_percent: 100,
+      governance_weekly_ops_high_pressure_sessions: 1,
+      governance_weekly_ops_high_pressure_rate_percent: 100,
+      governance_weekly_ops_config_warning_positive_sessions: 1,
+      governance_weekly_ops_auth_tier_pressure_sessions: 1,
+      governance_weekly_ops_dialogue_authorization_pressure_sessions: 1
+    }));
+    expect(parsed.snapshots.governance_weekly_ops_stop).toEqual(expect.objectContaining({
+      sessions: 1,
+      high_pressure_sessions: 1,
+      config_warning_positive_sessions: 1,
+      average_auth_tier_block_rate_percent: 58,
+      average_dialogue_authorization_block_rate_percent: 66
+    }));
     expect(parsed.snapshots.kpi_trend).toEqual(expect.objectContaining({
       mode: 'auto-kpi-trend',
       mode_filter: 'all'

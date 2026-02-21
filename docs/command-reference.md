@@ -784,6 +784,8 @@ Autonomous KPI trend:
 Unified observability snapshot:
 - `sce auto observability snapshot [--days <n>] [--status <csv>] [--weeks <n>] [--trend-mode <mode>] [--trend-period <period>] [--out <path>] [--json]`: generate one unified observability snapshot that combines close-loop session stats, batch stats, controller stats, governance session stats, governance health, and KPI trend.
 - JSON output includes top-level `highlights` plus detailed archive/trend payloads under `snapshots`.
+  - `highlights` includes governance weekly-ops pressure counters (`governance_weekly_ops_stop_sessions`, high-pressure/config-warning/auth-tier/dialogue pressure counts/rates).
+  - `snapshots.governance_weekly_ops_stop` exposes the full weekly-ops stop aggregate object from governance session stats for direct dashboard consumption.
 
 Agent-facing spec interfaces:
 - `sce auto spec status <spec-name> [--json]`: structured status for one spec (`docs`, `task_progress`, `collaboration`, `health`).

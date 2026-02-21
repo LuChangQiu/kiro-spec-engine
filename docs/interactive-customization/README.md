@@ -10,6 +10,7 @@ This directory contains baseline contracts and safety policy artifacts for the i
 - `page-context.schema.json`: schema for page-level read-only context payloads.
 - `guardrail-policy-baseline.json`: default secure-by-default guardrail policy.
 - `dialogue-governance-policy-baseline.json`: baseline communication rules for embedded assistant dialogue.
+- `authorization-tier-policy-baseline.json`: baseline authorization tier policy for profile/environment step-up requirements.
 - `runtime-mode-policy-baseline.json`: baseline runtime mode/environment policy (`user-assist|ops-fix|feature-dev` x `dev|staging|prod`).
 - `approval-role-policy-baseline.json`: optional approval role policy baseline (`submit/approve/execute/verify/archive` role requirements).
 - `high-risk-action-catalog.json`: baseline high-risk action classification for deny/review decisions.
@@ -71,11 +72,12 @@ Run one-command full flow (bridge -> loop):
 node scripts/interactive-flow.js \
   --input docs/interactive-customization/moqui-context-provider.sample.json \
   --goal "Adjust order screen field layout for clearer input flow" \
-  --dialogue-profile business-user \
+  --dialogue-profile system-maintainer \
   --runtime-mode ops-fix \
   --runtime-environment staging \
   --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
   --dialogue-policy docs/interactive-customization/dialogue-governance-policy-baseline.json \
+  --authorization-tier-policy docs/interactive-customization/authorization-tier-policy-baseline.json \
   --runtime-policy docs/interactive-customization/runtime-mode-policy-baseline.json \
   --execution-mode apply \
   --auto-execute-low-risk \
@@ -106,6 +108,7 @@ Flow output defaults:
 - Bridge context: `.kiro/reports/interactive-flow/<session-id>/interactive-page-context.normalized.json`
 - Loop summary: `.kiro/reports/interactive-flow/<session-id>/interactive-customization-loop.summary.json`
 - Dialogue governance report: `.kiro/reports/interactive-flow/<session-id>/interactive-dialogue-governance.json`
+- Authorization tier report: `.kiro/reports/interactive-flow/<session-id>/interactive-authorization-tier.json`
 - Matrix summary JSON: `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.json`
 - Matrix summary Markdown: `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.md`
 - Matrix signal stream: `.kiro/reports/interactive-matrix-signals.jsonl`
@@ -164,6 +167,7 @@ node scripts/interactive-customization-loop.js \
   --dialogue-profile system-maintainer \
   --runtime-mode ops-fix \
   --runtime-environment staging \
+  --authorization-tier-policy docs/interactive-customization/authorization-tier-policy-baseline.json \
   --runtime-policy docs/interactive-customization/runtime-mode-policy-baseline.json \
   --approval-role-policy docs/interactive-customization/approval-role-policy-baseline.json \
   --approval-actor-role product-owner \
@@ -182,7 +186,7 @@ sce scene interactive-loop \
   --context docs/interactive-customization/page-context.sample.json \
   --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
   --goal "Adjust order screen field layout for clearer input flow" \
-  --dialogue-profile business-user \
+  --dialogue-profile system-maintainer \
   --execution-mode apply \
   --auto-execute-low-risk \
   --auth-password-hash "<sha256-of-demo-pass>" \
@@ -195,6 +199,7 @@ sce scene interactive-loop \
 - Session artifact: `.kiro/reports/interactive-loop/<session-id>/interactive-user-feedback.jsonl`
 - Governance global stream: `.kiro/reports/interactive-user-feedback.jsonl`
 - `--dialogue-profile` defaults to `business-user`; use `system-maintainer` for operations/maintenance sessions that must surface ticket + rollback requirements before execution.
+- In default authorization tier, `business-user` only allows `suggestion` mode; apply path requires `system-maintainer` profile plus environment-specific step-up requirements.
 - Context contract validation is strict by default (required fields, payload size, forbidden keys). Use `--no-strict-contract` only for temporary diagnostics.
 - `--execution-mode apply` with mutating actions requires password authorization by default (`plan.authorization.password_required=true`).
 - Runtime policy defaults to `ops-fix@staging`; low-risk auto execute requires runtime decision `allow`.
@@ -207,6 +212,18 @@ node scripts/interactive-runtime-policy-evaluate.js \
   --runtime-mode ops-fix \
   --runtime-environment staging \
   --policy docs/interactive-customization/runtime-mode-policy-baseline.json \
+  --json
+```
+
+Run authorization tier profile/environment evaluation directly:
+
+```bash
+node scripts/interactive-authorization-tier-evaluate.js \
+  --execution-mode apply \
+  --dialogue-profile system-maintainer \
+  --runtime-environment staging \
+  --auto-execute-low-risk \
+  --policy docs/interactive-customization/authorization-tier-policy-baseline.json \
   --json
 ```
 

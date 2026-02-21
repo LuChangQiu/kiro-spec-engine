@@ -241,6 +241,7 @@ describe('interactive-flow script', () => {
       '--provider', 'moqui',
       '--goal', 'Adjust order screen field layout for clearer input flow',
       '--execution-mode', 'apply',
+      '--dialogue-profile', 'system-maintainer',
       '--auto-execute-low-risk',
       '--auth-password-hash', crypto.createHash('sha256').update('demo-pass').digest('hex'),
       '--auth-password', 'demo-pass',
@@ -331,6 +332,7 @@ describe('interactive-flow script', () => {
       '--provider', 'moqui',
       '--goal', 'Adjust order screen field layout for clearer input flow',
       '--execution-mode', 'apply',
+      '--dialogue-profile', 'system-maintainer',
       '--auto-approve-low-risk',
       '--auto-execute-low-risk',
       '--approval-role-policy', approvalRolePolicyPath,
@@ -354,7 +356,7 @@ describe('interactive-flow script', () => {
     expect(payload.summary.authorization_execute_roles).toEqual(['release-operator']);
   });
 
-  test('propagates password authorization block classification from loop summary', async () => {
+  test('propagates authorization-tier password step-up block classification from loop summary', async () => {
     const workspace = path.join(tempDir, 'workspace-password-block-flow');
     await fs.ensureDir(workspace);
     const { policyPath, catalogPath } = await writePolicyBundle(workspace);
@@ -365,6 +367,7 @@ describe('interactive-flow script', () => {
       '--provider', 'moqui',
       '--goal', 'Adjust order screen field layout for clearer input flow',
       '--execution-mode', 'apply',
+      '--dialogue-profile', 'system-maintainer',
       '--auto-execute-low-risk',
       '--auth-password-hash', crypto.createHash('sha256').update('demo-pass').digest('hex'),
       '--policy', policyPath,
@@ -375,9 +378,9 @@ describe('interactive-flow script', () => {
     expect(result.status).toBe(0);
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.summary.status).toBe('apply-blocked');
-    expect(payload.summary.execution_reason).toContain('password authorization required');
-    expect(payload.summary.execution_block_reason_category).toBe('password-authorization');
-    expect(payload.summary.execution_block_remediation_hint).toContain('password authorization');
+    expect(payload.summary.execution_reason).toContain('authorization tier requires one-time password');
+    expect(payload.summary.execution_block_reason_category).toBe('authorization-tier');
+    expect(payload.summary.execution_block_remediation_hint).toContain('secondary authorization');
   });
 
   test('propagates dialogue profile override into flow summary', async () => {
@@ -399,5 +402,29 @@ describe('interactive-flow script', () => {
     expect(result.status).toBe(0);
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.summary.dialogue_profile).toBe('system-maintainer');
+  });
+
+  test('blocks apply for business-user profile by default authorization tier', async () => {
+    const workspace = path.join(tempDir, 'workspace-business-user-apply-block-flow');
+    await fs.ensureDir(workspace);
+    const { policyPath, catalogPath } = await writePolicyBundle(workspace);
+    const payloadPath = await writeProviderPayload(workspace);
+
+    const result = runScript(workspace, [
+      '--input', payloadPath,
+      '--provider', 'moqui',
+      '--goal', 'Adjust order screen field layout for clearer input flow',
+      '--execution-mode', 'apply',
+      '--auto-execute-low-risk',
+      '--policy', policyPath,
+      '--catalog', catalogPath,
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.summary.authorization_tier_decision).toBe('deny');
+    expect(payload.summary.status).toBe('blocked');
+    expect(payload.summary.execution_result).toBe(null);
   });
 });

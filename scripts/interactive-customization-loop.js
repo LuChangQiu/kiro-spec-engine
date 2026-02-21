@@ -24,6 +24,7 @@ const SCRIPT_INTENT = path.resolve(__dirname, 'interactive-intent-build.js');
 const SCRIPT_PLAN = path.resolve(__dirname, 'interactive-plan-build.js');
 const SCRIPT_GATE = path.resolve(__dirname, 'interactive-change-plan-gate.js');
 const SCRIPT_RUNTIME = path.resolve(__dirname, 'interactive-runtime-policy-evaluate.js');
+const SCRIPT_AUTHORIZATION_TIER = path.resolve(__dirname, 'interactive-authorization-tier-evaluate.js');
 const SCRIPT_APPROVAL = path.resolve(__dirname, 'interactive-approval-workflow.js');
 const SCRIPT_ADAPTER = path.resolve(__dirname, 'interactive-moqui-adapter.js');
 const SCRIPT_FEEDBACK = path.resolve(__dirname, 'interactive-feedback-log.js');
@@ -46,6 +47,8 @@ function parseArgs(argv) {
     runtimeEnvironment: DEFAULT_RUNTIME_ENVIRONMENT,
     runtimePolicy: null,
     runtimeOut: null,
+    authorizationTierPolicy: null,
+    authorizationTierOut: null,
     contextContract: null,
     strictContract: true,
     moquiConfig: null,
@@ -127,6 +130,12 @@ function parseArgs(argv) {
       index += 1;
     } else if (token === '--runtime-out' && next) {
       options.runtimeOut = next;
+      index += 1;
+    } else if (token === '--authorization-tier-policy' && next) {
+      options.authorizationTierPolicy = next;
+      index += 1;
+    } else if (token === '--authorization-tier-out' && next) {
+      options.authorizationTierOut = next;
       index += 1;
     } else if (token === '--context-contract' && next) {
       options.contextContract = next;
@@ -257,6 +266,8 @@ function parseArgs(argv) {
   options.runtimeEnvironment = `${options.runtimeEnvironment || ''}`.trim().toLowerCase() || DEFAULT_RUNTIME_ENVIRONMENT;
   options.runtimePolicy = `${options.runtimePolicy || ''}`.trim() || null;
   options.runtimeOut = `${options.runtimeOut || ''}`.trim() || null;
+  options.authorizationTierPolicy = `${options.authorizationTierPolicy || ''}`.trim() || null;
+  options.authorizationTierOut = `${options.authorizationTierOut || ''}`.trim() || null;
   options.feedbackChannel = `${options.feedbackChannel || ''}`.trim().toLowerCase() || DEFAULT_FEEDBACK_CHANNEL;
   options.authPassword = options.authPassword == null ? null : `${options.authPassword}`;
   options.authPasswordHash = options.authPasswordHash == null
@@ -281,7 +292,7 @@ function printHelpAndExit(code) {
     'Usage: node scripts/interactive-customization-loop.js --context <path> (--goal <text> | --goal-file <path>) [options]',
     '',
     'Pipeline:',
-    '  dialogue -> intent -> plan -> gate -> approval(init/submit) -> optional low-risk apply',
+    '  dialogue -> intent -> plan -> gate -> runtime -> authorization-tier -> approval(init/submit) -> optional low-risk apply',
     '',
     'Options:',
     '  --context <path>                 Page context JSON file (required)',
@@ -299,6 +310,8 @@ function printHelpAndExit(code) {
     `  --runtime-environment <name>     dev|staging|prod (default: ${DEFAULT_RUNTIME_ENVIRONMENT})`,
     '  --runtime-policy <path>          Runtime mode/environment policy override',
     '  --runtime-out <path>             Runtime policy evaluation report output path',
+    '  --authorization-tier-policy <path> Authorization tier policy override',
+    '  --authorization-tier-out <path>  Authorization tier evaluation report output path',
     '  --context-contract <path>        Context contract override for intent build',
     '  --no-strict-contract             Do not fail when context contract validation has issues',
     '  --moqui-config <path>            Moqui adapter runtime config',
@@ -421,19 +434,24 @@ function shouldAutoLowRisk({
   riskLevel,
   dialogueDecision,
   runtimeDecision,
-  runtimeAutoExecuteAllowed
+  runtimeAutoExecuteAllowed,
+  authorizationTierDecision,
+  authorizationTierAutoExecuteAllowed
 }) {
   return `${dialogueDecision || ''}`.trim().toLowerCase() !== 'deny' &&
     `${gateDecision || ''}`.trim().toLowerCase() === 'allow' &&
     `${riskLevel || ''}`.trim().toLowerCase() === 'low' &&
     `${runtimeDecision || ''}`.trim().toLowerCase() === 'allow' &&
-    runtimeAutoExecuteAllowed === true;
+    runtimeAutoExecuteAllowed === true &&
+    `${authorizationTierDecision || ''}`.trim().toLowerCase() === 'allow' &&
+    authorizationTierAutoExecuteAllowed === true;
 }
 
 function buildSummaryStatus({
   dialogueDecision,
   gateDecision,
   runtimeDecision,
+  authorizationTierDecision,
   executionAttempted,
   executionBlocked,
   executionResult
@@ -441,8 +459,15 @@ function buildSummaryStatus({
   const normalizedDialogueDecision = `${dialogueDecision || ''}`.trim().toLowerCase();
   const decision = `${gateDecision || ''}`.trim().toLowerCase();
   const runtime = `${runtimeDecision || ''}`.trim().toLowerCase();
+  const authorization = `${authorizationTierDecision || ''}`.trim().toLowerCase();
   if (normalizedDialogueDecision === 'deny') {
     return 'blocked';
+  }
+  if (authorization === 'deny') {
+    return 'blocked';
+  }
+  if (authorization === 'review-required') {
+    return 'requires-review';
   }
   if (runtime === 'deny') {
     return 'blocked';
@@ -481,6 +506,9 @@ function detectExecutionBlockReasonCategory(execution) {
   if (reason.includes('password authorization')) {
     return 'password-authorization';
   }
+  if (reason.includes('authorization tier')) {
+    return 'authorization-tier';
+  }
   if (reason.includes('actor role') || reason.includes('allowed roles')) {
     return 'role-policy';
   }
@@ -506,6 +534,9 @@ function buildExecutionBlockRemediationHint({
   if (blockReasonCategory === 'role-policy') {
     return 'Use an actor role allowed by approval role policy for this action and rerun apply.';
   }
+  if (blockReasonCategory === 'authorization-tier') {
+    return 'Switch to an authorized dialogue profile/environment and satisfy secondary authorization requirements.';
+  }
   if (blockReasonCategory === 'runtime-policy') {
     return 'Adjust runtime mode/environment policy or run under an environment that permits the action.';
   }
@@ -522,8 +553,10 @@ function buildNextActions({
   dialogueDecision,
   gateDecision,
   runtimeDecision,
+  authorizationTierDecision,
   riskLevel,
   runtime,
+  authorizationTier,
   autoExecuteTriggered,
   executionPayload,
   executionBlockReasonCategory,
@@ -536,11 +569,19 @@ function buildNextActions({
   const dialogue = `${dialogueDecision || ''}`.trim().toLowerCase();
   const decision = `${gateDecision || ''}`.trim().toLowerCase();
   const runtimeDecisionNormalized = `${runtimeDecision || ''}`.trim().toLowerCase();
+  const authorizationDecision = `${authorizationTierDecision || ''}`.trim().toLowerCase();
   const risk = `${riskLevel || ''}`.trim().toLowerCase();
 
   if (dialogue === 'deny') {
     actions.push('Rewrite the goal to remove sensitive/forbidden requests and rerun dialogue governance.');
     actions.push(`node scripts/interactive-dialogue-governance.js --goal "..." --context ${artifacts.context_json} --json`);
+  } else if (authorizationDecision === 'deny') {
+    actions.push('Authorization tier denied apply for current profile/environment.');
+    actions.push(`node scripts/interactive-authorization-tier-evaluate.js --execution-mode apply --dialogue-profile ${authorizationTier.profile || DEFAULT_DIALOGUE_PROFILE} --runtime-environment ${runtime.environment || DEFAULT_RUNTIME_ENVIRONMENT} --json`);
+    actions.push('Use suggestion mode for business-user, or switch to system-maintainer with explicit approval controls.');
+  } else if (authorizationDecision === 'review-required') {
+    actions.push('Authorization tier requires manual review before apply.');
+    actions.push('Complete secondary authorization checks (password/role separation/change ticket) before execution.');
   } else if (runtimeDecisionNormalized === 'deny') {
     actions.push('Runtime policy denied the plan. Switch runtime mode/environment or reduce risky actions.');
     actions.push(`node scripts/interactive-runtime-policy-evaluate.js --plan ${artifacts.plan_json} --runtime-mode ${runtime.mode || DEFAULT_RUNTIME_MODE} --runtime-environment ${runtime.environment || DEFAULT_RUNTIME_ENVIRONMENT} --json`);
@@ -573,6 +614,9 @@ function buildNextActions({
   } else if (executionBlockReasonCategory === 'password-authorization') {
     actions.push('Provide one-time password authorization and rerun low-risk apply.');
     actions.push(`node scripts/interactive-customization-loop.js --context ${artifacts.context_json} --goal "..." --execution-mode apply --auto-execute-low-risk --auth-password "<password>" --json`);
+  } else if (executionBlockReasonCategory === 'authorization-tier') {
+    actions.push('Satisfy authorization tier step-up requirements (password/role policy/role separation) and rerun apply.');
+    actions.push(`node scripts/interactive-customization-loop.js --context ${artifacts.context_json} --goal "..." --dialogue-profile system-maintainer --execution-mode apply --auto-execute-low-risk --auth-password "<password>" --json`);
   } else if (executionBlockReasonCategory === 'role-policy') {
     actions.push('Use an approver actor role allowed by approval role policy, then rerun low-risk apply.');
     actions.push(`node scripts/interactive-approval-workflow.js --action status --state-file ${artifacts.approval_state_json} --json`);
@@ -607,6 +651,9 @@ async function main() {
     runtime_json: toRelative(cwd, options.runtimeOut
       ? resolvePath(cwd, options.runtimeOut)
       : path.join(sessionDir, 'interactive-runtime-policy.json')),
+    authorization_tier_json: toRelative(cwd, options.authorizationTierOut
+      ? resolvePath(cwd, options.authorizationTierOut)
+      : path.join(sessionDir, 'interactive-authorization-tier.json')),
     intent_json: toRelative(cwd, path.join(sessionDir, 'interactive-change-intent.json')),
     explain_md: toRelative(cwd, path.join(sessionDir, 'interactive-page-explain.md')),
     intent_audit_jsonl: toRelative(cwd, path.join(sessionDir, 'interactive-copilot-audit.jsonl')),
@@ -766,6 +813,46 @@ async function main() {
     ? runtimePayload.requirements
     : {};
 
+  const authorizationTierArgs = [
+    '--execution-mode', options.executionMode,
+    '--dialogue-profile', options.dialogueProfile,
+    '--runtime-mode', options.runtimeMode,
+    '--runtime-environment', options.runtimeEnvironment,
+    '--out', resolvePath(cwd, artifacts.authorization_tier_json),
+    '--json'
+  ];
+  if (options.autoExecuteLowRisk) {
+    authorizationTierArgs.push('--auto-execute-low-risk');
+  }
+  if (options.liveApply) {
+    authorizationTierArgs.push('--live-apply');
+  }
+  if (options.authorizationTierPolicy) {
+    authorizationTierArgs.push('--policy', resolvePath(cwd, options.authorizationTierPolicy));
+  }
+  const authorizationTierResult = runScript({
+    label: 'interactive-authorization-tier-evaluate',
+    scriptPath: SCRIPT_AUTHORIZATION_TIER,
+    args: authorizationTierArgs,
+    cwd,
+    allowedExitCodes: [0]
+  });
+  const authorizationTierPayload = parseJsonOutput(authorizationTierResult.stdout, 'interactive-authorization-tier-evaluate');
+  steps.push(buildStep(
+    'authorization_tier',
+    authorizationTierPayload,
+    buildCommandString(SCRIPT_AUTHORIZATION_TIER, authorizationTierArgs),
+    authorizationTierResult.exit_code
+  ));
+  const authorizationTierDecision = authorizationTierPayload && authorizationTierPayload.decision
+    ? authorizationTierPayload.decision
+    : 'deny';
+  const authorizationTierRequirements = authorizationTierPayload &&
+    authorizationTierPayload.requirements &&
+    typeof authorizationTierPayload.requirements === 'object'
+    ? authorizationTierPayload.requirements
+    : {};
+
   const approvalInitArgs = [
     '--action', 'init',
     '--plan', resolvePath(cwd, artifacts.plan_json),
@@ -831,8 +918,23 @@ async function main() {
     riskLevel,
     dialogueDecision,
     runtimeDecision,
-    runtimeAutoExecuteAllowed: runtimeRequirements.auto_execute_allowed === true
+    runtimeAutoExecuteAllowed: runtimeRequirements.auto_execute_allowed === true,
+    authorizationTierDecision,
+    authorizationTierAutoExecuteAllowed: authorizationTierRequirements.auto_execute_allowed === true
   });
+  if (options.autoExecuteLowRisk && !canAutoLowRisk && `${authorizationTierDecision || ''}`.trim().toLowerCase() !== 'allow') {
+    steps.push(buildStep(
+      'authorization_apply_guard',
+      {
+        decision: 'blocked',
+        reason: `authorization tier decision is "${authorizationTierDecision}"`,
+        dialogue_profile: options.dialogueProfile,
+        runtime_environment: options.runtimeEnvironment
+      },
+      'authorization-tier-guard',
+      2
+    ));
+  }
 
   if (options.autoApproveLowRisk && canAutoLowRisk) {
     const approvalApproveArgs = [
@@ -879,6 +981,17 @@ async function main() {
       runtimeRequirements.require_dry_run_before_live_apply === true
     ) {
       runtimeExecutionBlockReason = `runtime environment "${options.runtimeEnvironment}" requires dry-run before live apply`;
+    } else if (authorizationTierRequirements.require_password_for_apply === true && !options.authPassword) {
+      runtimeExecutionBlockReason = `authorization tier requires one-time password for apply in "${options.runtimeEnvironment}"`;
+    } else if (authorizationTierRequirements.require_role_policy === true && !options.approvalRolePolicy) {
+      runtimeExecutionBlockReason = `authorization tier requires approval role policy for apply in "${options.runtimeEnvironment}"`;
+    } else if (
+      authorizationTierRequirements.require_distinct_actor_roles === true &&
+      options.approvalActorRole &&
+      options.approverActorRole &&
+      options.approvalActorRole === options.approverActorRole
+    ) {
+      runtimeExecutionBlockReason = 'authorization tier requires distinct approval actor role and approver actor role';
     }
 
     if (runtimeExecutionBlockReason) {
@@ -1184,6 +1297,7 @@ async function main() {
     dialogueDecision,
     gateDecision,
     runtimeDecision,
+    authorizationTierDecision,
     executionAttempted: execution.attempted,
     executionBlocked: execution.blocked,
     executionResult: execution.result
@@ -1229,6 +1343,9 @@ async function main() {
       runtime_mode: options.runtimeMode,
       runtime_environment: options.runtimeEnvironment,
       runtime_policy: options.runtimePolicy ? toRelative(cwd, resolvePath(cwd, options.runtimePolicy)) : null,
+      authorization_tier_policy: options.authorizationTierPolicy
+        ? toRelative(cwd, resolvePath(cwd, options.authorizationTierPolicy))
+        : null,
       auth_password_hash: options.authPasswordHash ? '***' : null,
       auth_password_env: options.authPasswordEnv || DEFAULT_AUTH_PASSWORD_HASH_ENV
     },
@@ -1252,6 +1369,23 @@ async function main() {
       reasons: Array.isArray(runtimePayload && runtimePayload.reasons) ? runtimePayload.reasons : [],
       requirements: runtimeRequirements
     },
+    authorization_tier: {
+      decision: authorizationTierDecision,
+      profile: authorizationTierPayload &&
+        authorizationTierPayload.context &&
+        authorizationTierPayload.context.dialogue_profile
+        ? authorizationTierPayload.context.dialogue_profile
+        : options.dialogueProfile,
+      runtime_environment: authorizationTierPayload &&
+        authorizationTierPayload.context &&
+        authorizationTierPayload.context.runtime_environment
+        ? authorizationTierPayload.context.runtime_environment
+        : options.runtimeEnvironment,
+      reasons: Array.isArray(authorizationTierPayload && authorizationTierPayload.reasons)
+        ? authorizationTierPayload.reasons
+        : [],
+      requirements: authorizationTierRequirements
+    },
     approval: {
       workflow_id: approvalState.workflow_id || null,
       status: approvalStatus,
@@ -1264,16 +1398,26 @@ async function main() {
     execution,
     summary: {
       status: summaryStatus,
+      authorization_tier_decision: authorizationTierDecision,
       execution_block_reason_category: executionBlockReasonCategory,
       execution_block_remediation_hint: executionBlockRemediationHint,
       next_actions: buildNextActions({
         dialogueDecision,
         gateDecision,
         runtimeDecision,
+        authorizationTierDecision,
         riskLevel,
         runtime: {
           mode: runtimePayload && runtimePayload.runtime_mode ? runtimePayload.runtime_mode : options.runtimeMode,
           environment: runtimePayload && runtimePayload.runtime_environment ? runtimePayload.runtime_environment : options.runtimeEnvironment
+        },
+        authorizationTier: {
+          profile: authorizationTierPayload &&
+            authorizationTierPayload.context &&
+            authorizationTierPayload.context.dialogue_profile
+            ? authorizationTierPayload.context.dialogue_profile
+            : options.dialogueProfile,
+          requirements: authorizationTierRequirements
         },
         autoExecuteTriggered: execution.auto_triggered === true,
         executionPayload: execution.payload && execution.payload.payload ? execution.payload.payload : null,

@@ -1,0 +1,46 @@
+{
+  "version": "1.0.0",
+  "defaults": {
+    "profile": "business-user"
+  },
+  "profiles": {
+    "business-user": {
+      "allow_execution_modes": [
+        "suggestion"
+      ],
+      "auto_execute_allowed": false,
+      "allow_live_apply": false
+    },
+    "system-maintainer": {
+      "allow_execution_modes": [
+        "suggestion",
+        "apply"
+      ],
+      "auto_execute_allowed": true,
+      "allow_live_apply": true
+    }
+  },
+  "environments": {
+    "dev": {
+      "require_secondary_authorization": false,
+      "require_password_for_apply": false,
+      "require_role_policy": false,
+      "require_distinct_actor_roles": false,
+      "manual_review_required_for_apply": false
+    },
+    "staging": {
+      "require_secondary_authorization": true,
+      "require_password_for_apply": true,
+      "require_role_policy": false,
+      "require_distinct_actor_roles": false,
+      "manual_review_required_for_apply": false
+    },
+    "prod": {
+      "require_secondary_authorization": true,
+      "require_password_for_apply": true,
+      "require_role_policy": true,
+      "require_distinct_actor_roles": true,
+      "manual_review_required_for_apply": true
+    }
+  }
+}

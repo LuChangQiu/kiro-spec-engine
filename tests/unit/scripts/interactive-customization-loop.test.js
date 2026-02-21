@@ -212,6 +212,7 @@ describe('interactive-customization-loop script', () => {
       '--context', contextPath,
       '--goal', 'Adjust order screen field layout for clearer input flow',
       '--execution-mode', 'apply',
+      '--dialogue-profile', 'system-maintainer',
       '--auto-execute-low-risk',
       '--auth-password-hash', crypto.createHash('sha256').update('demo-pass').digest('hex'),
       '--auth-password', 'demo-pass',
@@ -266,6 +267,7 @@ describe('interactive-customization-loop script', () => {
       '--context', contextPath,
       '--goal', 'Adjust order screen field layout for clearer input flow',
       '--execution-mode', 'apply',
+      '--dialogue-profile', 'system-maintainer',
       '--auto-execute-low-risk',
       '--auth-password-hash', crypto.createHash('sha256').update('demo-pass').digest('hex'),
       '--auth-password', 'demo-pass',
@@ -351,6 +353,7 @@ describe('interactive-customization-loop script', () => {
       '--context', contextPath,
       '--goal', 'Adjust order screen field layout for clearer input flow',
       '--execution-mode', 'apply',
+      '--dialogue-profile', 'system-maintainer',
       '--runtime-mode', 'user-assist',
       '--runtime-environment', 'staging',
       '--user-id', 'biz-user',
@@ -376,6 +379,7 @@ describe('interactive-customization-loop script', () => {
       '--context', contextPath,
       '--goal', 'Adjust order screen field layout for clearer input flow',
       '--execution-mode', 'apply',
+      '--dialogue-profile', 'system-maintainer',
       '--auto-approve-low-risk',
       '--auto-execute-low-risk',
       '--approval-role-policy', approvalRolePolicyPath,
@@ -404,7 +408,7 @@ describe('interactive-customization-loop script', () => {
     ]));
   });
 
-  test('categorizes password authorization block and emits remediation hint', async () => {
+  test('categorizes authorization-tier password step-up block and emits remediation hint', async () => {
     const workspace = path.join(tempDir, 'workspace-password-block');
     await fs.ensureDir(workspace);
     const { policyPath, catalogPath } = await writePolicyBundle(workspace);
@@ -414,6 +418,7 @@ describe('interactive-customization-loop script', () => {
       '--context', contextPath,
       '--goal', 'Adjust order screen field layout for clearer input flow',
       '--execution-mode', 'apply',
+      '--dialogue-profile', 'system-maintainer',
       '--auto-execute-low-risk',
       '--auth-password-hash', crypto.createHash('sha256').update('demo-pass').digest('hex'),
       '--policy', policyPath,
@@ -425,9 +430,9 @@ describe('interactive-customization-loop script', () => {
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.summary.status).toBe('apply-blocked');
     expect(payload.execution.blocked).toBe(true);
-    expect(payload.execution.reason).toContain('password authorization required');
-    expect(payload.summary.execution_block_reason_category).toBe('password-authorization');
-    expect(payload.summary.execution_block_remediation_hint).toContain('password authorization');
+    expect(payload.execution.reason).toContain('authorization tier requires one-time password');
+    expect(payload.summary.execution_block_reason_category).toBe('authorization-tier');
+    expect(payload.summary.execution_block_remediation_hint).toContain('secondary authorization');
     expect(payload.summary.next_actions).toEqual(expect.arrayContaining([
       expect.stringContaining('--auth-password')
     ]));
@@ -452,5 +457,29 @@ describe('interactive-customization-loop script', () => {
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.dialogue.profile).toBe('system-maintainer');
     expect(payload.options.dialogue_profile).toBe('system-maintainer');
+  });
+
+  test('blocks apply for business-user profile by default authorization tier', async () => {
+    const workspace = path.join(tempDir, 'workspace-business-user-apply-block');
+    await fs.ensureDir(workspace);
+    const { policyPath, catalogPath } = await writePolicyBundle(workspace);
+    const contextPath = await writeContext(workspace);
+
+    const result = runScript(workspace, [
+      '--context', contextPath,
+      '--goal', 'Adjust order screen field layout for clearer input flow',
+      '--execution-mode', 'apply',
+      '--auto-execute-low-risk',
+      '--policy', policyPath,
+      '--catalog', catalogPath,
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.authorization_tier.decision).toBe('deny');
+    expect(payload.summary.authorization_tier_decision).toBe('deny');
+    expect(payload.summary.status).toBe('blocked');
+    expect(payload.execution.attempted).toBe(false);
   });
 });

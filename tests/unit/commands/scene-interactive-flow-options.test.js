@@ -14,6 +14,8 @@ describe('scene interactive-flow option helpers', () => {
       runtimeEnvironment: ' STAGING ',
       runtimePolicy: ' docs/interactive-customization/runtime-mode-policy-baseline.json ',
       runtimeOut: ' .kiro/reports/runtime.json ',
+      authorizationTierPolicy: ' docs/interactive-customization/authorization-tier-policy-baseline.json ',
+      authorizationTierOut: ' .kiro/reports/authorization-tier.json ',
       dialoguePolicy: ' docs/interactive-customization/dialogue-governance-policy-baseline.json ',
       dialogueProfile: ' SYSTEM-MAINTAINER ',
       contextContract: ' docs/interactive-customization/moqui-copilot-context-contract.json ',
@@ -42,6 +44,8 @@ describe('scene interactive-flow option helpers', () => {
     expect(normalized.runtimeEnvironment).toBe('staging');
     expect(normalized.runtimePolicy).toBe('docs/interactive-customization/runtime-mode-policy-baseline.json');
     expect(normalized.runtimeOut).toBe('.kiro/reports/runtime.json');
+    expect(normalized.authorizationTierPolicy).toBe('docs/interactive-customization/authorization-tier-policy-baseline.json');
+    expect(normalized.authorizationTierOut).toBe('.kiro/reports/authorization-tier.json');
     expect(normalized.dialoguePolicy).toBe('docs/interactive-customization/dialogue-governance-policy-baseline.json');
     expect(normalized.dialogueProfile).toBe('system-maintainer');
     expect(normalized.contextContract).toBe('docs/interactive-customization/moqui-copilot-context-contract.json');

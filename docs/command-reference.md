@@ -987,11 +987,12 @@ Interactive context bridge helper (script-level provider normalization):
   - npm alias: `npm run report:interactive-context-bridge`
 
 Interactive full flow helper (script-level one-command entry):
-- `node scripts/interactive-flow.js --input <path> (--goal <text> | --goal-file <path>) [--provider <moqui|generic>] [--execution-mode <suggestion|apply>] [--runtime-mode <user-assist|ops-fix|feature-dev>] [--runtime-environment <dev|staging|prod>] [--runtime-policy <path>] [--policy <path>] [--catalog <path>] [--dialogue-policy <path>] [--context-contract <path>] [--approval-role-policy <path>] [--approval-actor-role <name>] [--approver-actor-role <name>] [--auto-execute-low-risk] [--auth-password-hash <sha256>] [--auth-password <text>] [--feedback-score <0..5>] [--work-order-out <path>] [--work-order-markdown-out <path>] [--fail-on-runtime-non-allow] [--no-matrix] [--matrix-min-score <0..100>] [--matrix-min-valid-rate <0..100>] [--matrix-compare-with <path>] [--matrix-signals <path>] [--matrix-fail-on-portfolio-fail] [--matrix-fail-on-regression] [--json]`: run `context-bridge -> interactive-loop -> matrix-baseline-snapshot` in one command for Moqui workbench integration.
+- `node scripts/interactive-flow.js --input <path> (--goal <text> | --goal-file <path>) [--provider <moqui|generic>] [--execution-mode <suggestion|apply>] [--runtime-mode <user-assist|ops-fix|feature-dev>] [--runtime-environment <dev|staging|prod>] [--runtime-policy <path>] [--authorization-tier-policy <path>] [--authorization-tier-out <path>] [--policy <path>] [--catalog <path>] [--dialogue-policy <path>] [--dialogue-profile <business-user|system-maintainer>] [--context-contract <path>] [--approval-role-policy <path>] [--approval-actor-role <name>] [--approver-actor-role <name>] [--auto-execute-low-risk] [--auth-password-hash <sha256>] [--auth-password <text>] [--feedback-score <0..5>] [--work-order-out <path>] [--work-order-markdown-out <path>] [--fail-on-runtime-non-allow] [--no-matrix] [--matrix-min-score <0..100>] [--matrix-min-valid-rate <0..100>] [--matrix-compare-with <path>] [--matrix-signals <path>] [--matrix-fail-on-portfolio-fail] [--matrix-fail-on-regression] [--json]`: run `context-bridge -> interactive-loop -> matrix-baseline-snapshot` in one command for Moqui workbench integration.
   - Default flow artifact root: `.kiro/reports/interactive-flow/<session-id>/`
   - Default flow summary output: `.kiro/reports/interactive-flow/<session-id>/interactive-flow.summary.json`
   - Default dialogue report output: `.kiro/reports/interactive-flow/<session-id>/interactive-dialogue-governance.json`
   - Default runtime report output: `.kiro/reports/interactive-flow/<session-id>/interactive-runtime-policy.json`
+  - Default authorization tier report output: `.kiro/reports/interactive-flow/<session-id>/interactive-authorization-tier.json`
   - Default work-order outputs:
     - `.kiro/reports/interactive-flow/<session-id>/interactive-work-order.json`
     - `.kiro/reports/interactive-flow/<session-id>/interactive-work-order.md`
@@ -1028,13 +1029,17 @@ Interactive change-plan generator helper (script-level stage-B planning bridge):
   - Generated plans can be evaluated directly by `interactive-change-plan-gate`.
 
 Interactive one-click loop helper (script-level orchestration entry):
-- `node scripts/interactive-customization-loop.js --context <path> (--goal <text> | --goal-file <path>) [--execution-mode <suggestion|apply>] [--runtime-mode <user-assist|ops-fix|feature-dev>] [--runtime-environment <dev|staging|prod>] [--runtime-policy <path>] [--policy <path>] [--catalog <path>] [--dialogue-policy <path>] [--dialogue-profile <business-user|system-maintainer>] [--context-contract <path>] [--approval-role-policy <path>] [--approval-actor-role <name>] [--approver-actor-role <name>] [--no-strict-contract] [--auto-approve-low-risk] [--auto-execute-low-risk] [--auth-password-hash <sha256>] [--auth-password <text>] [--feedback-score <0..5>] [--feedback-comment <text>] [--feedback-tags <csv>] [--allow-suggestion-apply] [--work-order-out <path>] [--work-order-markdown-out <path>] [--fail-on-dialogue-deny] [--fail-on-gate-non-allow] [--fail-on-runtime-non-allow] [--json]`: run dialogue->intent->plan->gate->runtime->approval pipeline in one command and optionally trigger low-risk one-click apply via Moqui adapter.
+- `node scripts/interactive-customization-loop.js --context <path> (--goal <text> | --goal-file <path>) [--execution-mode <suggestion|apply>] [--runtime-mode <user-assist|ops-fix|feature-dev>] [--runtime-environment <dev|staging|prod>] [--runtime-policy <path>] [--authorization-tier-policy <path>] [--authorization-tier-out <path>] [--policy <path>] [--catalog <path>] [--dialogue-policy <path>] [--dialogue-profile <business-user|system-maintainer>] [--context-contract <path>] [--approval-role-policy <path>] [--approval-actor-role <name>] [--approver-actor-role <name>] [--no-strict-contract] [--auto-approve-low-risk] [--auto-execute-low-risk] [--auth-password-hash <sha256>] [--auth-password <text>] [--feedback-score <0..5>] [--feedback-comment <text>] [--feedback-tags <csv>] [--allow-suggestion-apply] [--work-order-out <path>] [--work-order-markdown-out <path>] [--fail-on-dialogue-deny] [--fail-on-gate-non-allow] [--fail-on-runtime-non-allow] [--json]`: run dialogue->intent->plan->gate->runtime->authorization-tier->approval pipeline in one command and optionally trigger low-risk one-click apply via Moqui adapter.
   - CLI equivalent: `sce scene interactive-loop --context <path> --goal "<goal>" --context-contract docs/interactive-customization/moqui-copilot-context-contract.json --execution-mode apply --auto-execute-low-risk --auth-password "<password>" --feedback-score 5 --json`
   - Default loop artifact root: `.kiro/reports/interactive-loop/<session-id>/`
   - Default summary output: `.kiro/reports/interactive-loop/<session-id>/interactive-customization-loop.summary.json`
 - `--auto-execute-low-risk` executes `interactive-moqui-adapter --action low-risk-apply` only when `risk_level=low`, dialogue decision != `deny`, and gate decision=`allow`.
 - `--runtime-mode` and `--runtime-environment` default to `ops-fix@staging`; runtime decision must be `allow` before low-risk auto execute.
+- Authorization tier defaults:
+  - `business-user` profile is suggestion-only (`apply` denied by default)
+  - `system-maintainer` profile can apply, but environment step-up requirements still apply (password/role separation/manual review)
 - Default runtime report: `.kiro/reports/interactive-loop/<session-id>/interactive-runtime-policy.json`
+- Default authorization tier report: `.kiro/reports/interactive-loop/<session-id>/interactive-authorization-tier.json`
 - Default work-order outputs:
   - `.kiro/reports/interactive-loop/<session-id>/interactive-work-order.json`
   - `.kiro/reports/interactive-loop/<session-id>/interactive-work-order.md`
@@ -1046,6 +1051,12 @@ Interactive runtime policy helper (script-level mode/environment gate):
 - `node scripts/interactive-runtime-policy-evaluate.js --plan <path> [--runtime-mode <user-assist|ops-fix|feature-dev>] [--runtime-environment <dev|staging|prod>] [--policy <path>] [--fail-on-non-allow] [--json]`: evaluate plan execution safety by runtime role and environment constraints.
   - Default policy: `docs/interactive-customization/runtime-mode-policy-baseline.json`
   - Default output: `.kiro/reports/interactive-runtime-policy.json`
+  - `--fail-on-non-allow` exits with code `2` on `deny` or `review-required`.
+
+Interactive authorization-tier helper (script-level profile/environment step-up gate):
+- `node scripts/interactive-authorization-tier-evaluate.js [--execution-mode <suggestion|apply>] [--dialogue-profile <business-user|system-maintainer>] [--runtime-mode <name>] [--runtime-environment <dev|staging|prod>] [--auto-execute-low-risk] [--live-apply] [--policy <path>] [--out <path>] [--fail-on-non-allow] [--json]`: evaluate whether execution intent is permitted under dialogue profile and runtime environment authorization tier.
+  - Default policy: `docs/interactive-customization/authorization-tier-policy-baseline.json`
+  - Default output: `.kiro/reports/interactive-authorization-tier.json`
   - `--fail-on-non-allow` exits with code `2` on `deny` or `review-required`.
 
 Interactive work-order helper (script-level usage/maintenance/dev closure):

@@ -6,6 +6,7 @@ const {
   DEFAULT_APPROVAL_ROLE_POLICY,
   DEFAULT_APPROVAL_ACTOR_ROLE,
   DEFAULT_APPROVER_ACTOR_ROLE,
+  DEFAULT_DIALOGUE_PROFILE,
   DEFAULT_OUT,
   parseArgs,
   parseJson
@@ -21,6 +22,7 @@ describe('interactive-flow-smoke helpers', () => {
     expect(options.approvalRolePolicy).toBe(DEFAULT_APPROVAL_ROLE_POLICY);
     expect(options.approvalActorRole).toBe(DEFAULT_APPROVAL_ACTOR_ROLE);
     expect(options.approverActorRole).toBe(DEFAULT_APPROVER_ACTOR_ROLE);
+    expect(options.dialogueProfile).toBe(DEFAULT_DIALOGUE_PROFILE);
     expect(options.out).toBe(DEFAULT_OUT);
     expect(options.json).toBe(false);
   });
@@ -34,6 +36,7 @@ describe('interactive-flow-smoke helpers', () => {
       '--approval-role-policy', 'approval-role-policy.json',
       '--approval-actor-role', 'product-owner',
       '--approver-actor-role', 'release-operator',
+      '--dialogue-profile', 'system-maintainer',
       '--out', 'summary.json',
       '--json'
     ]);
@@ -44,6 +47,7 @@ describe('interactive-flow-smoke helpers', () => {
     expect(options.approvalRolePolicy).toBe('approval-role-policy.json');
     expect(options.approvalActorRole).toBe('product-owner');
     expect(options.approverActorRole).toBe('release-operator');
+    expect(options.dialogueProfile).toBe('system-maintainer');
     expect(options.out).toBe('summary.json');
     expect(options.json).toBe(true);
   });

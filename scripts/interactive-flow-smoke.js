@@ -13,6 +13,7 @@ const DEFAULT_CATALOG = 'docs/interactive-customization/high-risk-action-catalog
 const DEFAULT_APPROVAL_ROLE_POLICY = 'docs/interactive-customization/approval-role-policy-baseline.json';
 const DEFAULT_APPROVAL_ACTOR_ROLE = 'workflow-operator';
 const DEFAULT_APPROVER_ACTOR_ROLE = 'workflow-operator';
+const DEFAULT_DIALOGUE_PROFILE = 'system-maintainer';
 const DEFAULT_OUT = '.kiro/reports/interactive-flow-smoke/interactive-flow-smoke.summary.json';
 
 function parseArgs(argv) {
@@ -24,6 +25,7 @@ function parseArgs(argv) {
     approvalRolePolicy: DEFAULT_APPROVAL_ROLE_POLICY,
     approvalActorRole: DEFAULT_APPROVAL_ACTOR_ROLE,
     approverActorRole: DEFAULT_APPROVER_ACTOR_ROLE,
+    dialogueProfile: DEFAULT_DIALOGUE_PROFILE,
     out: DEFAULT_OUT,
     json: false
   };
@@ -52,6 +54,9 @@ function parseArgs(argv) {
     } else if (token === '--approver-actor-role' && next) {
       options.approverActorRole = next;
       index += 1;
+    } else if (token === '--dialogue-profile' && next) {
+      options.dialogueProfile = next;
+      index += 1;
     } else if (token === '--out' && next) {
       options.out = next;
       index += 1;
@@ -77,6 +82,7 @@ function printHelpAndExit(code) {
     `  --approval-role-policy <path> Role policy path (default: ${DEFAULT_APPROVAL_ROLE_POLICY})`,
     `  --approval-actor-role <name>  Approval actor role (default: ${DEFAULT_APPROVAL_ACTOR_ROLE})`,
     `  --approver-actor-role <name>  Approver actor role (default: ${DEFAULT_APPROVER_ACTOR_ROLE})`,
+    `  --dialogue-profile <name>      Dialogue profile (default: ${DEFAULT_DIALOGUE_PROFILE})`,
     `  --out <path>       Flow summary output path (default: ${DEFAULT_OUT})`,
     '  --json             Print smoke payload as JSON',
     '  -h, --help         Show this help'
@@ -142,6 +148,7 @@ async function main() {
     '--approval-role-policy', approvalRolePolicyPath,
     '--approval-actor-role', options.approvalActorRole,
     '--approver-actor-role', options.approverActorRole,
+    '--dialogue-profile', options.dialogueProfile,
     '--execution-mode', 'apply',
     '--auto-execute-low-risk',
     '--auth-password-hash', crypto.createHash('sha256').update('smoke-pass').digest('hex'),
@@ -222,6 +229,7 @@ module.exports = {
   DEFAULT_APPROVAL_ROLE_POLICY,
   DEFAULT_APPROVAL_ACTOR_ROLE,
   DEFAULT_APPROVER_ACTOR_ROLE,
+  DEFAULT_DIALOGUE_PROFILE,
   DEFAULT_OUT,
   parseArgs,
   resolvePath,

@@ -44,6 +44,8 @@ function parseArgs(argv) {
     runtimeEnvironment: DEFAULT_RUNTIME_ENVIRONMENT,
     runtimePolicy: null,
     runtimeOut: null,
+    authorizationTierPolicy: null,
+    authorizationTierOut: null,
     contextContract: null,
     strictContract: true,
     moquiConfig: null,
@@ -144,6 +146,12 @@ function parseArgs(argv) {
       index += 1;
     } else if (token === '--runtime-out' && next) {
       options.runtimeOut = next;
+      index += 1;
+    } else if (token === '--authorization-tier-policy' && next) {
+      options.authorizationTierPolicy = next;
+      index += 1;
+    } else if (token === '--authorization-tier-out' && next) {
+      options.authorizationTierOut = next;
       index += 1;
     } else if (token === '--context-contract' && next) {
       options.contextContract = next;
@@ -289,6 +297,8 @@ function parseArgs(argv) {
   options.runtimeEnvironment = `${options.runtimeEnvironment || ''}`.trim().toLowerCase() || DEFAULT_RUNTIME_ENVIRONMENT;
   options.runtimePolicy = `${options.runtimePolicy || ''}`.trim() || null;
   options.runtimeOut = `${options.runtimeOut || ''}`.trim() || null;
+  options.authorizationTierPolicy = `${options.authorizationTierPolicy || ''}`.trim() || null;
+  options.authorizationTierOut = `${options.authorizationTierOut || ''}`.trim() || null;
   options.contextContract = `${options.contextContract || ''}`.trim() || null;
   options.moquiConfig = `${options.moquiConfig || ''}`.trim() || null;
   options.outDir = `${options.outDir || ''}`.trim() || DEFAULT_OUT_DIR;
@@ -388,6 +398,8 @@ function printHelpAndExit(code) {
     `  --runtime-environment <name>    dev|staging|prod (default: ${DEFAULT_RUNTIME_ENVIRONMENT})`,
     '  --runtime-policy <path>         Runtime mode/environment policy override',
     '  --runtime-out <path>            Runtime policy evaluation output path',
+    '  --authorization-tier-policy <path> Authorization tier policy override',
+    '  --authorization-tier-out <path> Authorization tier evaluation output path',
     '  --context-contract <path>       Context contract override',
     '  --no-strict-contract            Do not fail when context contract validation has issues',
     '  --moqui-config <path>           Moqui adapter runtime config',
@@ -612,6 +624,12 @@ async function main() {
   }
   if (options.runtimeOut) {
     loopArgs.push('--runtime-out', resolvePath(cwd, options.runtimeOut));
+  }
+  if (options.authorizationTierPolicy) {
+    loopArgs.push('--authorization-tier-policy', resolvePath(cwd, options.authorizationTierPolicy));
+  }
+  if (options.authorizationTierOut) {
+    loopArgs.push('--authorization-tier-out', resolvePath(cwd, options.authorizationTierOut));
   }
   if (options.contextContract) {
     loopArgs.push('--context-contract', resolvePath(cwd, options.contextContract));
@@ -841,6 +859,9 @@ async function main() {
       dialogue_profile: loopPayload && loopPayload.dialogue ? loopPayload.dialogue.profile || null : null,
       gate_decision: loopPayload && loopPayload.gate ? loopPayload.gate.decision : null,
       runtime_decision: loopPayload && loopPayload.runtime ? loopPayload.runtime.decision : null,
+      authorization_tier_decision: loopPayload && loopPayload.authorization_tier
+        ? loopPayload.authorization_tier.decision || null
+        : null,
       runtime_mode: loopPayload && loopPayload.runtime ? loopPayload.runtime.mode : null,
       runtime_environment: loopPayload && loopPayload.runtime ? loopPayload.runtime.environment : null,
       execution_result: loopPayload && loopPayload.execution ? loopPayload.execution.result : null,
@@ -876,6 +897,7 @@ async function main() {
       bridge_report_json: toRelative(cwd, bridgeOutReportPath),
       dialogue_json: loopPayload && loopPayload.artifacts ? loopPayload.artifacts.dialogue_json || null : null,
       runtime_json: loopPayload && loopPayload.artifacts ? loopPayload.artifacts.runtime_json || null : null,
+      authorization_tier_json: loopPayload && loopPayload.artifacts ? loopPayload.artifacts.authorization_tier_json || null : null,
       work_order_json: loopPayload && loopPayload.artifacts ? loopPayload.artifacts.work_order_json || null : null,
       work_order_markdown: loopPayload && loopPayload.artifacts ? loopPayload.artifacts.work_order_md || null : null,
       loop_summary_json: toRelative(cwd, loopOutPath),
@@ -897,6 +919,7 @@ async function main() {
     process.stdout.write(`- Session: ${flowPayload.session_id}\n`);
     process.stdout.write(`- Status: ${flowPayload.summary.status || 'unknown'}\n`);
     process.stdout.write(`- Dialogue decision: ${flowPayload.summary.dialogue_decision || 'n/a'}\n`);
+    process.stdout.write(`- Authorization tier: ${flowPayload.summary.authorization_tier_decision || 'n/a'}\n`);
     process.stdout.write(`- Gate decision: ${flowPayload.summary.gate_decision || 'n/a'}\n`);
     process.stdout.write(`- Runtime decision: ${flowPayload.summary.runtime_decision || 'n/a'}\n`);
     process.stdout.write(`- Work-order: ${flowPayload.summary.work_order_status || 'n/a'} (${flowPayload.summary.work_order_id || 'n/a'})\n`);

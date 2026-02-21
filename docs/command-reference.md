@@ -727,6 +727,7 @@ Close-loop controller session maintenance:
 Cross-archive autonomous governance maintenance:
 - `sce auto governance stats [--days <n>] [--status <csv>] [--json]`: aggregate a unified governance snapshot from session/batch-session/controller-session archives plus recovery memory state.
   - JSON output includes `totals`, `throughput`, `health` (`risk_level`, `concerns`, `recommendations`, `release_gate`, `handoff_quality`), `top_master_specs`, `recovery_memory`, and full per-archive stats under `archives`.
+  - `health.release_gate` now carries weekly-ops governance pressure signals from release gate history (`weekly_ops_*`, including block/warning/config-warning totals and authorization/dialogue block-rate maxima) for risk scoring and recommendation routing.
   - When handoff Moqui matrix regressions are positive, `health.recommendations` now include phased anti-429 baseline one-shot remediation commands.
   - `health.handoff_quality` carries Moqui matrix + capability lexicon governance signals:
     - `latest_capability_expected_unknown_count`

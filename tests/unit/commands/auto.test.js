@@ -4707,14 +4707,28 @@ if (process.argv.includes('--json')) {
       latest: {
         tag: 'v1.47.35',
         gate_passed: false,
-        risk_level: 'high'
+        risk_level: 'high',
+        weekly_ops_blocked: true,
+        weekly_ops_risk_level: 'high',
+        weekly_ops_governance_status: 'alert',
+        weekly_ops_authorization_tier_block_rate_percent: 58,
+        weekly_ops_dialogue_authorization_block_rate_percent: 66,
+        weekly_ops_config_warning_count: 2
       },
       aggregates: {
         pass_rate_percent: 40,
         scene_package_batch_pass_rate_percent: 50,
         drift_alert_rate_percent: 100,
         drift_alert_runs: 3,
-        drift_blocked_runs: 1
+        drift_blocked_runs: 1,
+        weekly_ops_known_runs: 4,
+        weekly_ops_blocked_runs: 2,
+        weekly_ops_block_rate_percent: 50,
+        weekly_ops_violations_total: 3,
+        weekly_ops_warnings_total: 5,
+        weekly_ops_config_warnings_total: 2,
+        weekly_ops_authorization_tier_block_rate_max_percent: 58,
+        weekly_ops_dialogue_authorization_block_rate_max_percent: 66
       },
       entries: []
     }, { spaces: 2 });
@@ -4729,13 +4743,18 @@ if (process.argv.includes('--json')) {
     expect(parsed.health.release_gate).toEqual(expect.objectContaining({
       available: true,
       latest_gate_passed: false,
-      drift_alert_rate_percent: 100
+      drift_alert_rate_percent: 100,
+      weekly_ops_blocked_runs: 2,
+      weekly_ops_dialogue_authorization_block_rate_max_percent: 66
     }));
     expect(parsed.health.concerns).toEqual(expect.arrayContaining([
-      expect.stringContaining('Latest release gate evaluation is failed')
+      expect.stringContaining('Latest release gate evaluation is failed'),
+      expect.stringContaining('Weekly ops config warnings total is 2')
     ]));
     expect(parsed.health.recommendations).toEqual(expect.arrayContaining([
-      expect.stringContaining('sce auto handoff evidence --window 5 --json')
+      expect.stringContaining('sce auto handoff evidence --window 5 --json'),
+      expect.stringContaining('KSE_RELEASE_WEEKLY_OPS_*'),
+      expect.stringContaining('interactive-dialogue-governance.js')
     ]));
   });
 

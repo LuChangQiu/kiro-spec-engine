@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Governance risk routing uses weekly-ops history pressure**: `auto governance stats` now ingests `weekly_ops_*` signals from release gate history (block/warning/config-warning pressure + auth-tier/dialogue block-rate maxima), elevates risk/concerns accordingly, and emits targeted remediation recommendations for weekly gate reruns, variable fixes, and policy tuning.
 - **Release gate history weekly-ops visibility uplift**: `sce auto handoff gate-index` now ingests nested `weekly_ops` telemetry from release-gate artifacts (blocked/warnings/config-warnings/dialogue/auth-tier rates), exposes new `weekly_ops_*` aggregates in JSON/markdown, and release workflow trend notes now surface config-warning totals and weekly-ops pressure signals.
 - **Weekly ops remediation + gate config warning hardening**: `release-risk-remediation-bundle` now outputs policy-specific remediation for `dialogue-authorization` and `authorization-tier` block-rate pressure; `release-weekly-ops-gate` now emits `config_warnings` when threshold env values are invalid and falls back to safe defaults.
 - **Dialogue-authorization telemetry defaultization**: `interactive-customization-loop` now appends dialogue-authorization signal streams (`interactive-dialogue-authorization-signals.jsonl` global + session), and `interactive-governance-report` now ingests these signals by default to compute deny/review block-rate metrics with threshold alerts.

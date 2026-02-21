@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Interactive dual-surface runtime policy contract**: `interactive-runtime-policy-evaluate` now supports `--ui-mode` and enforces optional `policy.ui_modes` constraints (UI mode vs runtime mode/execution mode), `interactive-customization-loop` now passes UI mode through runtime evaluation by default, and baseline runtime policy/docs now include `user-app`/`ops-console` contract defaults for safer embedded assistant routing.
 - **Handoff run observability-phase weekly-ops routing**: `sce auto handoff run` now injects weekly-ops stop pressure counters into the `observability` phase details, propagates weekly pressure into `failure_summary.highlights`, and auto-adds weekly summary/gate + policy-tuning recommendations when governance weekly pressure is observed.
 - **Observability snapshot weekly-ops governance highlights**: `sce auto observability snapshot` now exposes governance weekly-ops stop pressure in `highlights` and `snapshots.governance_weekly_ops_stop`, enabling dashboards to consume weekly pressure trends directly without traversing nested governance session payloads.
 - **Governance session stats weekly-ops pressure trend**: `sce auto governance session list|stats` now exposes weekly-ops stop-detail telemetry (per-session flags + aggregated `release_gate.weekly_ops_stop` counters/rates/averages), with backward-compatible fallback that infers pressure from historical `stop_detail.reasons`.

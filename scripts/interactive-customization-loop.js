@@ -595,7 +595,7 @@ function buildNextActions({
     actions.push('Complete secondary authorization checks (password/role separation/change ticket) before execution.');
   } else if (runtimeDecisionNormalized === 'deny') {
     actions.push('Runtime policy denied the plan. Switch runtime mode/environment or reduce risky actions.');
-    actions.push(`node scripts/interactive-runtime-policy-evaluate.js --plan ${artifacts.plan_json} --runtime-mode ${runtime.mode || DEFAULT_RUNTIME_MODE} --runtime-environment ${runtime.environment || DEFAULT_RUNTIME_ENVIRONMENT} --json`);
+    actions.push(`node scripts/interactive-runtime-policy-evaluate.js --plan ${artifacts.plan_json} --ui-mode ${runtime.ui_mode || 'user-app'} --runtime-mode ${runtime.mode || DEFAULT_RUNTIME_MODE} --runtime-environment ${runtime.environment || DEFAULT_RUNTIME_ENVIRONMENT} --json`);
   } else if (runtimeDecisionNormalized === 'review-required') {
     actions.push('Runtime policy requires manual review before apply.');
     actions.push('Complete review ticket and approval workflow before any execution step.');
@@ -834,6 +834,7 @@ async function main() {
 
   const runtimeArgs = [
     '--plan', resolvePath(cwd, artifacts.plan_json),
+    '--ui-mode', options.uiMode,
     '--runtime-mode', options.runtimeMode,
     '--runtime-environment', options.runtimeEnvironment,
     '--out', resolvePath(cwd, artifacts.runtime_json),
@@ -1451,9 +1452,11 @@ async function main() {
     },
     runtime: {
       decision: runtimeDecision,
+      ui_mode: runtimePayload && runtimePayload.ui_mode ? runtimePayload.ui_mode : options.uiMode,
       mode: runtimePayload && runtimePayload.runtime_mode ? runtimePayload.runtime_mode : options.runtimeMode,
       environment: runtimePayload && runtimePayload.runtime_environment ? runtimePayload.runtime_environment : options.runtimeEnvironment,
       reasons: Array.isArray(runtimePayload && runtimePayload.reasons) ? runtimePayload.reasons : [],
+      violations: Array.isArray(runtimePayload && runtimePayload.violations) ? runtimePayload.violations : [],
       requirements: runtimeRequirements
     },
     authorization_tier: {
@@ -1501,6 +1504,7 @@ async function main() {
         authorizationTierDecision,
         riskLevel,
         runtime: {
+          ui_mode: runtimePayload && runtimePayload.ui_mode ? runtimePayload.ui_mode : options.uiMode,
           mode: runtimePayload && runtimePayload.runtime_mode ? runtimePayload.runtime_mode : options.runtimeMode,
           environment: runtimePayload && runtimePayload.runtime_environment ? runtimePayload.runtime_environment : options.runtimeEnvironment
         },

@@ -51,6 +51,17 @@ describe('interactive-runtime-policy-evaluate script', () => {
           require_work_order: true
         }
       },
+      ui_modes: {
+        'user-app': {
+          allow_runtime_modes: ['user-assist', 'ops-fix'],
+          allow_execution_modes: ['suggestion'],
+          deny_execution_modes: ['apply']
+        },
+        'ops-console': {
+          allow_runtime_modes: ['ops-fix'],
+          allow_execution_modes: ['suggestion', 'apply']
+        }
+      },
       environments: {
         staging: {
           allow_live_apply: true,
@@ -101,6 +112,7 @@ describe('interactive-runtime-policy-evaluate script', () => {
     const result = runScript(workspace, [
       '--plan', planPath,
       '--policy', policyPath,
+      '--ui-mode', 'ops-console',
       '--runtime-mode', 'ops-fix',
       '--runtime-environment', 'staging',
       '--json'
@@ -166,5 +178,52 @@ describe('interactive-runtime-policy-evaluate script', () => {
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.decision).toBe('deny');
     expect(payload.violations.some(item => item.code === 'mutating-apply-not-allowed')).toBe(true);
+  });
+
+  test('returns deny when ui mode disallows apply execution', async () => {
+    const workspace = path.join(tempDir, 'workspace-ui-mode-apply-deny');
+    await fs.ensureDir(workspace);
+    const policyPath = await writePolicy(workspace);
+    const planPath = await writePlan(workspace);
+
+    const result = runScript(workspace, [
+      '--plan', planPath,
+      '--policy', policyPath,
+      '--ui-mode', 'user-app',
+      '--runtime-mode', 'ops-fix',
+      '--runtime-environment', 'staging',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.decision).toBe('deny');
+    expect(payload.violations.some(item => item.code === 'ui-mode-execution-mode-denied')).toBe(true);
+  });
+
+  test('returns deny when ui mode disallows runtime mode', async () => {
+    const workspace = path.join(tempDir, 'workspace-ui-mode-runtime-deny');
+    await fs.ensureDir(workspace);
+    const policyPath = await writePolicy(workspace);
+    const planPath = await writePlan(workspace, {
+      execution_mode: 'suggestion',
+      approval: {
+        status: 'not-required'
+      }
+    });
+
+    const result = runScript(workspace, [
+      '--plan', planPath,
+      '--policy', policyPath,
+      '--ui-mode', 'ops-console',
+      '--runtime-mode', 'user-assist',
+      '--runtime-environment', 'staging',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.decision).toBe('deny');
+    expect(payload.violations.some(item => item.code === 'ui-mode-runtime-mode-not-allowed')).toBe(true);
   });
 });

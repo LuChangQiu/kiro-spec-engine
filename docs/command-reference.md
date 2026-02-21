@@ -1076,8 +1076,9 @@ Interactive one-click loop helper (script-level orchestration entry):
 - npm alias: `npm run run:interactive-loop -- --context docs/interactive-customization/page-context.sample.json --goal "Improve order entry clarity" --json`
 
 Interactive runtime policy helper (script-level mode/environment gate):
-- `node scripts/interactive-runtime-policy-evaluate.js --plan <path> [--runtime-mode <user-assist|ops-fix|feature-dev>] [--runtime-environment <dev|staging|prod>] [--policy <path>] [--fail-on-non-allow] [--json]`: evaluate plan execution safety by runtime role and environment constraints.
+- `node scripts/interactive-runtime-policy-evaluate.js --plan <path> [--ui-mode <user-app|ops-console>] [--runtime-mode <user-assist|ops-fix|feature-dev>] [--runtime-environment <dev|staging|prod>] [--policy <path>] [--fail-on-non-allow] [--json]`: evaluate plan execution safety by runtime role, UI surface, and environment constraints.
   - Default policy: `docs/interactive-customization/runtime-mode-policy-baseline.json`
+  - `policy.ui_modes` (when configured) enforces UI-surface contract, such as `user-app` suggestion-only and apply routed to `ops-console`.
   - Default output: `.kiro/reports/interactive-runtime-policy.json`
   - `--fail-on-non-allow` exits with code `2` on `deny` or `review-required`.
 

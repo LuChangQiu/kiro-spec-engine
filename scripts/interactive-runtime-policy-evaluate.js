@@ -11,6 +11,7 @@ const RISK_ORDER = ['low', 'medium', 'high', 'critical'];
 function parseArgs(argv) {
   const options = {
     plan: null,
+    uiMode: null,
     runtimeMode: null,
     runtimeEnvironment: null,
     policy: DEFAULT_POLICY,
@@ -24,6 +25,9 @@ function parseArgs(argv) {
     const next = argv[index + 1];
     if (token === '--plan' && next) {
       options.plan = next;
+      index += 1;
+    } else if (token === '--ui-mode' && next) {
+      options.uiMode = `${next}`.trim().toLowerCase();
       index += 1;
     } else if (token === '--runtime-mode' && next) {
       options.runtimeMode = next;
@@ -58,6 +62,7 @@ function printHelpAndExit(code) {
     '',
     'Options:',
     '  --plan <path>                 Change plan JSON file (required)',
+    '  --ui-mode <name>              UI surface mode (optional, evaluated when policy.ui_modes is present)',
     '  --runtime-mode <name>         Runtime mode (default from policy defaults.runtime_mode)',
     '  --runtime-environment <name>  Runtime environment (default from policy defaults.runtime_environment)',
     `  --policy <path>               Runtime policy JSON file (default: ${DEFAULT_POLICY})`,
@@ -129,17 +134,30 @@ function decideFromViolations(violations = []) {
 
 function evaluateRuntimePolicy({
   plan,
+  uiMode,
   runtimeMode,
   runtimeEnvironment,
   policy
 }) {
-  const modeConfig = policy && policy.modes ? policy.modes[runtimeMode] : null;
-  const envConfig = policy && policy.environments ? policy.environments[runtimeEnvironment] : null;
+  const normalizedRuntimeMode = `${runtimeMode || ''}`.trim().toLowerCase();
+  const normalizedRuntimeEnvironment = `${runtimeEnvironment || ''}`.trim().toLowerCase();
+  const normalizedUiMode = `${uiMode || (plan && plan.ui_mode) || ''}`.trim().toLowerCase() || null;
+
+  const modeConfig = policy && policy.modes ? policy.modes[normalizedRuntimeMode] : null;
+  const envConfig = policy && policy.environments ? policy.environments[normalizedRuntimeEnvironment] : null;
+  const uiModePolicyConfig = policy && policy.ui_modes && typeof policy.ui_modes === 'object'
+    ? policy.ui_modes
+    : null;
+  const hasUiModePolicy = Boolean(uiModePolicyConfig && Object.keys(uiModePolicyConfig).length > 0);
+  const uiModeConfig = normalizedUiMode && hasUiModePolicy
+    ? uiModePolicyConfig[normalizedUiMode]
+    : null;
+
   if (!modeConfig) {
-    throw new Error(`runtime mode not defined in policy: ${runtimeMode}`);
+    throw new Error(`runtime mode not defined in policy: ${normalizedRuntimeMode}`);
   }
   if (!envConfig) {
-    throw new Error(`runtime environment not defined in policy: ${runtimeEnvironment}`);
+    throw new Error(`runtime environment not defined in policy: ${normalizedRuntimeEnvironment}`);
   }
 
   const executionMode = `${plan && plan.execution_mode ? plan.execution_mode : 'suggestion'}`.trim().toLowerCase();
@@ -173,6 +191,21 @@ function evaluateRuntimePolicy({
   const approvalRiskLevels = toUniqueList(
     Array.isArray(envConfig.require_approval_for_risk_levels)
       ? envConfig.require_approval_for_risk_levels.map(item => normalizeRiskLevel(item, 'medium'))
+      : []
+  );
+  const uiModeAllowedRuntimeModes = toUniqueList(
+    Array.isArray(uiModeConfig && uiModeConfig.allow_runtime_modes)
+      ? uiModeConfig.allow_runtime_modes.map(item => `${item || ''}`.trim().toLowerCase())
+      : []
+  );
+  const uiModeAllowedExecutionModes = toUniqueList(
+    Array.isArray(uiModeConfig && uiModeConfig.allow_execution_modes)
+      ? uiModeConfig.allow_execution_modes.map(item => `${item || ''}`.trim().toLowerCase())
+      : []
+  );
+  const uiModeDenyExecutionModes = toUniqueList(
+    Array.isArray(uiModeConfig && uiModeConfig.deny_execution_modes)
+      ? uiModeConfig.deny_execution_modes.map(item => `${item || ''}`.trim().toLowerCase())
       : []
   );
 
@@ -212,6 +245,56 @@ function evaluateRuntimePolicy({
       'deny-action-type-hit',
       'plan contains action types denied by runtime mode policy',
       { action_types: denyActionHits }
+    );
+  }
+  if (normalizedUiMode && hasUiModePolicy && !uiModeConfig) {
+    addViolation(
+      violations,
+      'deny',
+      'ui-mode-not-defined',
+      `ui_mode "${normalizedUiMode}" is not defined in runtime policy`,
+      { ui_mode: normalizedUiMode }
+    );
+  }
+  if (
+    normalizedUiMode &&
+    uiModeConfig &&
+    uiModeAllowedRuntimeModes.length > 0 &&
+    !uiModeAllowedRuntimeModes.includes(normalizedRuntimeMode)
+  ) {
+    addViolation(
+      violations,
+      'deny',
+      'ui-mode-runtime-mode-not-allowed',
+      `runtime_mode "${normalizedRuntimeMode}" is not allowed for ui_mode "${normalizedUiMode}"`,
+      { ui_mode: normalizedUiMode, runtime_mode: normalizedRuntimeMode, allowed_runtime_modes: uiModeAllowedRuntimeModes }
+    );
+  }
+  if (
+    normalizedUiMode &&
+    uiModeConfig &&
+    uiModeDenyExecutionModes.includes(executionMode)
+  ) {
+    addViolation(
+      violations,
+      'deny',
+      'ui-mode-execution-mode-denied',
+      `execution_mode "${executionMode}" is denied for ui_mode "${normalizedUiMode}"`,
+      { ui_mode: normalizedUiMode, execution_mode: executionMode, deny_execution_modes: uiModeDenyExecutionModes }
+    );
+  }
+  if (
+    normalizedUiMode &&
+    uiModeConfig &&
+    uiModeAllowedExecutionModes.length > 0 &&
+    !uiModeAllowedExecutionModes.includes(executionMode)
+  ) {
+    addViolation(
+      violations,
+      'deny',
+      'ui-mode-execution-mode-not-allowed',
+      `execution_mode "${executionMode}" is not allowed for ui_mode "${normalizedUiMode}"`,
+      { ui_mode: normalizedUiMode, execution_mode: executionMode, allowed_execution_modes: uiModeAllowedExecutionModes }
     );
   }
   if (executionMode === 'apply' && mutatingActions.length > 0 && !allowMutatingApply) {
@@ -285,6 +368,7 @@ function evaluateRuntimePolicy({
     reasons,
     violations,
     summary: {
+      ui_mode: normalizedUiMode,
       execution_mode: executionMode,
       risk_level: riskLevel,
       action_count: actionItems.length,
@@ -302,6 +386,17 @@ function evaluateRuntimePolicy({
       require_approval: approvalRequired,
       approval_satisfied: approvalSatisfied,
       approval_risk_levels: approvalRiskLevels,
+      ui_mode_policy_evaluated: normalizedUiMode !== null && hasUiModePolicy,
+      ui_mode_policy_configured: Boolean(uiModeConfig),
+      ui_mode_allowed_runtime_modes: uiModeAllowedRuntimeModes,
+      ui_mode_allowed_execution_modes: uiModeAllowedExecutionModes,
+      ui_mode_deny_execution_modes: uiModeDenyExecutionModes,
+      ui_mode_runtime_mode_allowed: uiModeAllowedRuntimeModes.length > 0
+        ? uiModeAllowedRuntimeModes.includes(normalizedRuntimeMode)
+        : null,
+      ui_mode_execution_mode_allowed: uiModeAllowedExecutionModes.length > 0
+        ? uiModeAllowedExecutionModes.includes(executionMode)
+        : null,
       max_risk_level_for_apply: maxRiskLevelForApply,
       max_auto_execute_risk_level: maxAutoExecuteRiskLevel,
       auto_execute_allowed: autoExecuteAllowed,
@@ -326,8 +421,9 @@ async function main() {
   const defaults = policy && policy.defaults && typeof policy.defaults === 'object'
     ? policy.defaults
     : {};
-  const runtimeMode = `${options.runtimeMode || defaults.runtime_mode || ''}`.trim();
-  const runtimeEnvironment = `${options.runtimeEnvironment || defaults.runtime_environment || ''}`.trim();
+  const uiMode = `${options.uiMode || defaults.ui_mode || ''}`.trim().toLowerCase() || null;
+  const runtimeMode = `${options.runtimeMode || defaults.runtime_mode || ''}`.trim().toLowerCase();
+  const runtimeEnvironment = `${options.runtimeEnvironment || defaults.runtime_environment || ''}`.trim().toLowerCase();
 
   if (!runtimeMode) {
     throw new Error('runtime_mode is required (set --runtime-mode or defaults.runtime_mode in policy).');
@@ -338,6 +434,7 @@ async function main() {
 
   const evaluation = evaluateRuntimePolicy({
     plan,
+    uiMode,
     runtimeMode,
     runtimeEnvironment,
     policy
@@ -346,6 +443,7 @@ async function main() {
   const payload = {
     mode: 'interactive-runtime-policy-evaluate',
     generated_at: new Date().toISOString(),
+    ui_mode: uiMode,
     runtime_mode: runtimeMode,
     runtime_environment: runtimeEnvironment,
     inputs: {

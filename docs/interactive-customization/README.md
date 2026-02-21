@@ -12,7 +12,7 @@ This directory contains baseline contracts and safety policy artifacts for the i
 - `dialogue-governance-policy-baseline.json`: baseline communication rules for embedded assistant dialogue.
 - `authorization-dialogue-policy-baseline.json`: machine-readable authorization dialogue policy (profile/env confirmation + step-up prompts).
 - `authorization-tier-policy-baseline.json`: baseline authorization tier policy for profile/environment step-up requirements.
-- `runtime-mode-policy-baseline.json`: baseline runtime mode/environment policy (`user-assist|ops-fix|feature-dev` x `dev|staging|prod`).
+- `runtime-mode-policy-baseline.json`: baseline runtime mode/environment policy (`user-assist|ops-fix|feature-dev` x `dev|staging|prod`) with optional `ui_modes` surface contract (`user-app|ops-console`).
 - `approval-role-policy-baseline.json`: optional approval role policy baseline (`submit/approve/execute/verify/archive` role requirements).
 - `high-risk-action-catalog.json`: baseline high-risk action classification for deny/review decisions.
 - `change-plan.sample.json`: runnable sample plan for gate checks.
@@ -220,12 +220,14 @@ sce scene interactive-loop \
 - Context contract validation is strict by default (required fields, payload size, forbidden keys). Use `--no-strict-contract` only for temporary diagnostics.
 - `--execution-mode apply` with mutating actions requires password authorization by default (`plan.authorization.password_required=true`).
 - Runtime policy defaults to `ops-fix@staging`; low-risk auto execute requires runtime decision `allow`.
+- Runtime policy can enforce UI-surface contract via `ui_modes` (default baseline: `user-app` suggestion-only, `ops-console` supports apply).
 
 Run runtime mode/environment policy evaluation directly:
 
 ```bash
 node scripts/interactive-runtime-policy-evaluate.js \
   --plan .kiro/reports/interactive-change-plan.generated.json \
+  --ui-mode ops-console \
   --runtime-mode ops-fix \
   --runtime-environment staging \
   --policy docs/interactive-customization/runtime-mode-policy-baseline.json \

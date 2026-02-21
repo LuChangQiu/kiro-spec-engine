@@ -59,7 +59,30 @@ Recommended rendering:
 - `dialogue_authorization_decision=review-required`: show review handoff panel.
 - `authorization_tier_decision=allow` and runtime/gate allow: enable guarded apply action.
 
-## 5. Audit and Compliance
+## 5. Runtime UI-Mode Contract (Default)
+
+`runtime-mode-policy-baseline.json` now includes `ui_modes` policy:
+
+- `user-app`
+  - `allow_execution_modes=["suggestion"]`
+  - `deny_execution_modes=["apply"]`
+  - Apply intents should switch to `ops-console`.
+- `ops-console`
+  - `allow_execution_modes=["suggestion","apply"]`
+  - Supports maintenance/apply flows with approval and authorization-tier gates.
+
+When evaluating runtime policy directly, pass `--ui-mode`:
+
+```bash
+node scripts/interactive-runtime-policy-evaluate.js \
+  --plan .kiro/reports/interactive-change-plan.generated.json \
+  --ui-mode user-app \
+  --runtime-mode ops-fix \
+  --runtime-environment staging \
+  --json
+```
+
+## 6. Audit and Compliance
 
 For both modes, persist:
 

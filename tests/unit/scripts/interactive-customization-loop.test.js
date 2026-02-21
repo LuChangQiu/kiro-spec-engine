@@ -92,6 +92,17 @@ describe('interactive-customization-loop script', () => {
           require_work_order: true
         }
       },
+      ui_modes: {
+        'user-app': {
+          allow_runtime_modes: ['user-assist', 'ops-fix'],
+          allow_execution_modes: ['suggestion'],
+          deny_execution_modes: ['apply']
+        },
+        'ops-console': {
+          allow_runtime_modes: ['ops-fix', 'feature-dev'],
+          allow_execution_modes: ['suggestion', 'apply']
+        }
+      },
       environments: {
         dev: {
           allow_live_apply: true,
@@ -397,6 +408,36 @@ describe('interactive-customization-loop script', () => {
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.runtime.decision).toBe('deny');
     expect(payload.summary.status).toBe('blocked');
+  });
+
+  test('denies apply on user-app surface by runtime ui-mode policy', async () => {
+    const workspace = path.join(tempDir, 'workspace-runtime-ui-mode-deny');
+    await fs.ensureDir(workspace);
+    const { policyPath, catalogPath } = await writePolicyBundle(workspace);
+    const contextPath = await writeContext(workspace);
+
+    const result = runScript(workspace, [
+      '--context', contextPath,
+      '--goal', 'Adjust order screen field layout for clearer input flow',
+      '--execution-mode', 'apply',
+      '--dialogue-profile', 'system-maintainer',
+      '--ui-mode', 'user-app',
+      '--runtime-mode', 'ops-fix',
+      '--runtime-environment', 'staging',
+      '--user-id', 'biz-user',
+      '--policy', policyPath,
+      '--catalog', catalogPath,
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.runtime.decision).toBe('deny');
+    expect(payload.runtime.violations.some(item => item.code === 'ui-mode-execution-mode-denied')).toBe(true);
+    expect(payload.summary.status).toBe('blocked');
+    expect(payload.summary.next_actions).toEqual(expect.arrayContaining([
+      expect.stringContaining('--ui-mode user-app')
+    ]));
   });
 
   test('blocks auto execute when approver role is not allowed by role policy', async () => {

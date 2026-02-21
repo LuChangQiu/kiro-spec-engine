@@ -647,6 +647,7 @@ async function main() {
 
   const contextPath = resolvePath(cwd, options.context);
   const globalFeedbackPath = resolvePath(cwd, '.kiro/reports/interactive-user-feedback.jsonl');
+  const globalDialogueAuthorizationSignalsPath = resolvePath(cwd, '.kiro/reports/interactive-dialogue-authorization-signals.jsonl');
   const globalAuthorizationTierSignalsPath = resolvePath(cwd, '.kiro/reports/interactive-authorization-tier-signals.jsonl');
   const outRoot = resolvePath(cwd, options.outDir);
   const sessionDir = path.join(outRoot, sessionId);
@@ -682,6 +683,8 @@ async function main() {
     work_order_md: toRelative(cwd, options.workOrderMarkdownOut
       ? resolvePath(cwd, options.workOrderMarkdownOut)
       : path.join(sessionDir, 'interactive-work-order.md')),
+    dialogue_authorization_signals_global_jsonl: toRelative(cwd, globalDialogueAuthorizationSignalsPath),
+    dialogue_authorization_signals_jsonl: toRelative(cwd, path.join(sessionDir, 'interactive-dialogue-authorization-signals.jsonl')),
     authorization_tier_signals_global_jsonl: toRelative(cwd, globalAuthorizationTierSignalsPath),
     authorization_tier_signals_jsonl: toRelative(cwd, path.join(sessionDir, 'interactive-authorization-tier-signals.jsonl')),
     feedback_global_jsonl: toRelative(cwd, globalFeedbackPath),
@@ -721,6 +724,34 @@ async function main() {
   });
   const dialoguePayload = parseJsonOutput(dialogueResult.stdout, 'interactive-dialogue-governance');
   const dialogueDecision = dialoguePayload && dialoguePayload.decision ? dialoguePayload.decision : 'allow';
+  const dialogueAuthorization = dialoguePayload &&
+    dialoguePayload.authorization_dialogue &&
+    typeof dialoguePayload.authorization_dialogue === 'object'
+    ? dialoguePayload.authorization_dialogue
+    : {};
+  const dialogueAuthorizationDecision = `${dialogueAuthorization.decision || 'allow'}`.trim().toLowerCase() || 'allow';
+  const dialogueAuthorizationSignalRecord = {
+    event_type: 'interactive.dialogue.authorization.evaluated',
+    timestamp: new Date().toISOString(),
+    session_id: sessionId,
+    user_id: options.userId,
+    ui_mode: options.uiMode,
+    dialogue_profile: options.dialogueProfile,
+    execution_mode: options.executionMode,
+    runtime_environment: options.runtimeEnvironment,
+    decision: dialogueAuthorizationDecision,
+    reasons: Array.isArray(dialogueAuthorization.reasons) ? dialogueAuthorization.reasons : [],
+    required_inputs: Array.isArray(dialogueAuthorization.required_inputs) ? dialogueAuthorization.required_inputs : [],
+    required_confirmation_steps: Array.isArray(dialogueAuthorization.required_confirmation_steps)
+      ? dialogueAuthorization.required_confirmation_steps
+      : []
+  };
+  const dialogueAuthorizationSignalsGlobalPath = resolvePath(cwd, artifacts.dialogue_authorization_signals_global_jsonl);
+  await fs.ensureDir(path.dirname(dialogueAuthorizationSignalsGlobalPath));
+  await fs.appendFile(dialogueAuthorizationSignalsGlobalPath, `${JSON.stringify(dialogueAuthorizationSignalRecord)}\n`, 'utf8');
+  const dialogueAuthorizationSignalsSessionPath = resolvePath(cwd, artifacts.dialogue_authorization_signals_jsonl);
+  await fs.ensureDir(path.dirname(dialogueAuthorizationSignalsSessionPath));
+  await fs.appendFile(dialogueAuthorizationSignalsSessionPath, `${JSON.stringify(dialogueAuthorizationSignalRecord)}\n`, 'utf8');
   steps.push(buildStep(
     'dialogue',
     dialoguePayload,

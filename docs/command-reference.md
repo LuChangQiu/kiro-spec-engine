@@ -992,6 +992,9 @@ Interactive full flow helper (script-level one-command entry):
   - Default flow artifact root: `.kiro/reports/interactive-flow/<session-id>/`
   - Default flow summary output: `.kiro/reports/interactive-flow/<session-id>/interactive-flow.summary.json`
   - Default dialogue report output: `.kiro/reports/interactive-flow/<session-id>/interactive-dialogue-governance.json`
+  - Default dialogue-authorization signal stream:
+    - `.kiro/reports/interactive-flow/<session-id>/interactive-dialogue-authorization-signals.jsonl` (session)
+    - `.kiro/reports/interactive-dialogue-authorization-signals.jsonl` (global append-only stream)
   - Default runtime report output: `.kiro/reports/interactive-flow/<session-id>/interactive-runtime-policy.json`
   - Default authorization tier report output: `.kiro/reports/interactive-flow/<session-id>/interactive-authorization-tier.json`
   - Default work-order outputs:
@@ -1016,7 +1019,7 @@ Interactive read-only intent helper (script-level stage-A copilot bridge):
   - This helper never executes write actions; it only produces suggestion-stage artifacts.
 
 Interactive dialogue governance helper (script-level communication-rule gate):
-- `node scripts/interactive-dialogue-governance.js (--goal <text> | --goal-file <path>) [--context <path>] [--policy <path>] [--profile <business-user|system-maintainer>] [--execution-mode <suggestion|apply>] [--runtime-environment <dev|staging|prod>] [--authorization-dialogue-policy <path>] [--out <path>] [--fail-on-deny] [--json]`: evaluate user request text against embedded-assistant communication policy, output `allow|clarify|deny`, and produce machine-readable authorization dialogue requirements (`authorization_dialogue`) for non-technical users.
+- `node scripts/interactive-dialogue-governance.js (--goal <text> | --goal-file <path>) [--context <path>] [--policy <path>] [--profile <business-user|system-maintainer>] [--ui-mode <user-app|ops-console>] [--execution-mode <suggestion|apply>] [--runtime-environment <dev|staging|prod>] [--authorization-dialogue-policy <path>] [--out <path>] [--fail-on-deny] [--json]`: evaluate user request text against embedded-assistant communication policy, output `allow|clarify|deny`, and produce machine-readable authorization dialogue requirements (`authorization_dialogue`) for non-technical users.
   - Embedded assistant authorization dialogue baseline: `docs/interactive-customization/embedded-assistant-authorization-dialogue-rules.md`
   - Dual-surface integration guide: `docs/interactive-customization/dual-ui-mode-integration-guide.md`
   - Default output: `.kiro/reports/interactive-dialogue-governance.json`
@@ -1047,6 +1050,9 @@ Interactive one-click loop helper (script-level orchestration entry):
 - Default authorization tier signal stream:
   - Session: `.kiro/reports/interactive-loop/<session-id>/interactive-authorization-tier-signals.jsonl`
   - Global: `.kiro/reports/interactive-authorization-tier-signals.jsonl`
+- Default dialogue-authorization signal stream:
+  - Session: `.kiro/reports/interactive-loop/<session-id>/interactive-dialogue-authorization-signals.jsonl`
+  - Global: `.kiro/reports/interactive-dialogue-authorization-signals.jsonl`
 - Default work-order outputs:
   - `.kiro/reports/interactive-loop/<session-id>/interactive-work-order.json`
   - `.kiro/reports/interactive-loop/<session-id>/interactive-work-order.md`
@@ -1097,11 +1103,12 @@ Interactive user feedback helper (script-level stage-D feedback ingestion):
 - npm alias: `npm run log:interactive-feedback -- --score 5 --comment "clear and safe"`
 
 Interactive governance report helper (script-level stage-D/6 observability + alerting):
-- `node scripts/interactive-governance-report.js [--intent-audit <path>] [--approval-audit <path>] [--execution-ledger <path>] [--feedback-file <path>] [--matrix-signals <path>] [--authorization-tier-signals <path>] [--thresholds <path>] [--period <weekly|monthly|all|custom>] [--from <iso>] [--to <iso>] [--out <path>] [--markdown-out <path>] [--fail-on-alert] [--json]`: compute interactive governance KPIs (adoption/success/rollback/security-intercept/satisfaction + matrix pass/regression/stage-error + authorization-tier deny/review pressure), evaluate threshold breaches, and emit machine/human-readable governance report.
+- `node scripts/interactive-governance-report.js [--intent-audit <path>] [--approval-audit <path>] [--execution-ledger <path>] [--feedback-file <path>] [--matrix-signals <path>] [--dialogue-authorization-signals <path>] [--authorization-tier-signals <path>] [--thresholds <path>] [--period <weekly|monthly|all|custom>] [--from <iso>] [--to <iso>] [--out <path>] [--markdown-out <path>] [--fail-on-alert] [--json]`: compute interactive governance KPIs (adoption/success/rollback/security-intercept/satisfaction + matrix pass/regression/stage-error + dialogue-authorization pressure + authorization-tier pressure), evaluate threshold breaches, and emit machine/human-readable governance report.
   - Default thresholds: `docs/interactive-customization/governance-threshold-baseline.json`
   - Default minimum intent sample threshold: `min_intent_samples=5` (below this becomes warning, not breach)
   - Default feedback input: `.kiro/reports/interactive-user-feedback.jsonl`
   - Default matrix input: `.kiro/reports/interactive-matrix-signals.jsonl`
+  - Default dialogue authorization signal input: `.kiro/reports/interactive-dialogue-authorization-signals.jsonl`
   - Default authorization tier signal input: `.kiro/reports/interactive-authorization-tier-signals.jsonl`
   - Default outputs:
     - `.kiro/reports/interactive-governance-report.json`

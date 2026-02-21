@@ -167,4 +167,18 @@ describe('interactive-dialogue-governance script', () => {
     expect(result.status).toBe(1);
     expect(`${result.stderr}`.toLowerCase()).toContain('--profile must be one of');
   });
+
+  test('fails fast for unsupported ui mode', async () => {
+    const workspace = path.join(tempDir, 'workspace-invalid-ui-mode');
+    await fs.ensureDir(workspace);
+
+    const result = runScript(workspace, [
+      '--goal', 'Reduce approval lead time by 20%',
+      '--ui-mode', 'operator-ui',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(1);
+    expect(`${result.stderr}`.toLowerCase()).toContain('--ui-mode must be one of');
+  });
 });

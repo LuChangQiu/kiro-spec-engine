@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "min_intent_samples": 5,
   "adoption_rate_min_percent": 30,
   "execution_success_rate_min_percent": 90,
@@ -8,6 +8,8 @@
   "satisfaction_min_score": 4,
   "min_feedback_samples": 3,
   "min_matrix_samples": 3,
+  "min_dialogue_authorization_samples": 3,
+  "dialogue_authorization_block_rate_max_percent": 40,
   "min_authorization_tier_samples": 3,
   "authorization_tier_block_rate_max_percent": 40,
   "matrix_portfolio_pass_rate_min_percent": 80,

@@ -41,6 +41,7 @@ describe('interactive-governance-report script', () => {
     const approvalAudit = path.join(workspace, 'approval.jsonl');
     const executionLedger = path.join(workspace, 'execution.jsonl');
     const feedbackFile = path.join(workspace, 'feedback.jsonl');
+    const dialogueAuthorizationSignals = path.join(workspace, 'dialogue-authorization-signals.jsonl');
     const authorizationTierSignals = path.join(workspace, 'authorization-tier-signals.jsonl');
     const thresholdsFile = path.join(workspace, 'thresholds.json');
 
@@ -72,6 +73,13 @@ describe('interactive-governance-report script', () => {
       { satisfaction_score: 5, timestamp: now }
     ]);
 
+    await writeJsonl(dialogueAuthorizationSignals, [
+      { decision: 'allow', ui_mode: 'user-app', execution_mode: 'suggestion', timestamp: now },
+      { decision: 'allow', ui_mode: 'ops-console', execution_mode: 'apply', timestamp: now },
+      { decision: 'review-required', ui_mode: 'ops-console', execution_mode: 'apply', timestamp: now },
+      { decision: 'allow', ui_mode: 'user-app', execution_mode: 'suggestion', timestamp: now }
+    ]);
+
     await writeJsonl(authorizationTierSignals, [
       { decision: 'allow', timestamp: now },
       { decision: 'allow', timestamp: now },
@@ -86,6 +94,8 @@ describe('interactive-governance-report script', () => {
       security_intercept_rate_max_percent: 30,
       satisfaction_min_score: 4,
       min_feedback_samples: 2,
+      min_dialogue_authorization_samples: 3,
+      dialogue_authorization_block_rate_max_percent: 40,
       min_authorization_tier_samples: 3,
       authorization_tier_block_rate_max_percent: 40
     }, { spaces: 2 });
@@ -95,6 +105,7 @@ describe('interactive-governance-report script', () => {
       '--approval-audit', approvalAudit,
       '--execution-ledger', executionLedger,
       '--feedback-file', feedbackFile,
+      '--dialogue-authorization-signals', dialogueAuthorizationSignals,
       '--authorization-tier-signals', authorizationTierSignals,
       '--thresholds', thresholdsFile,
       '--period', 'all',
@@ -108,6 +119,10 @@ describe('interactive-governance-report script', () => {
     expect(payload.metrics.execution_success_rate_percent).toBe(100);
     expect(payload.metrics.rollback_rate_percent).toBe(0);
     expect(payload.metrics.security_intercept_rate_percent).toBe(0);
+    expect(payload.metrics.dialogue_authorization_deny_total).toBe(0);
+    expect(payload.metrics.dialogue_authorization_review_required_total).toBe(1);
+    expect(payload.metrics.dialogue_authorization_block_rate_percent).toBe(25);
+    expect(payload.metrics.dialogue_authorization_user_app_apply_attempt_total).toBe(0);
     expect(payload.metrics.authorization_tier_deny_total).toBe(0);
     expect(payload.metrics.authorization_tier_review_required_total).toBe(1);
     expect(payload.metrics.authorization_tier_block_rate_percent).toBe(25);
@@ -123,6 +138,7 @@ describe('interactive-governance-report script', () => {
     const approvalAudit = path.join(workspace, 'approval.jsonl');
     const executionLedger = path.join(workspace, 'execution.jsonl');
     const feedbackFile = path.join(workspace, 'feedback.jsonl');
+    const dialogueAuthorizationSignals = path.join(workspace, 'dialogue-authorization-signals.jsonl');
     const authorizationTierSignals = path.join(workspace, 'authorization-tier-signals.jsonl');
     const thresholdsFile = path.join(workspace, 'thresholds.json');
 
@@ -157,6 +173,13 @@ describe('interactive-governance-report script', () => {
       { satisfaction_score: 3, timestamp: now }
     ]);
 
+    await writeJsonl(dialogueAuthorizationSignals, [
+      { decision: 'allow', ui_mode: 'user-app', execution_mode: 'suggestion', timestamp: now },
+      { decision: 'deny', ui_mode: 'user-app', execution_mode: 'apply', timestamp: now },
+      { decision: 'review-required', ui_mode: 'ops-console', execution_mode: 'apply', timestamp: now },
+      { decision: 'deny', ui_mode: 'ops-console', execution_mode: 'apply', timestamp: now }
+    ]);
+
     await writeJsonl(authorizationTierSignals, [
       { decision: 'allow', timestamp: now },
       { decision: 'deny', timestamp: now },
@@ -171,6 +194,8 @@ describe('interactive-governance-report script', () => {
       security_intercept_rate_max_percent: 30,
       satisfaction_min_score: 4,
       min_feedback_samples: 2,
+      min_dialogue_authorization_samples: 3,
+      dialogue_authorization_block_rate_max_percent: 40,
       min_authorization_tier_samples: 3,
       authorization_tier_block_rate_max_percent: 40
     }, { spaces: 2 });
@@ -180,6 +205,7 @@ describe('interactive-governance-report script', () => {
       '--approval-audit', approvalAudit,
       '--execution-ledger', executionLedger,
       '--feedback-file', feedbackFile,
+      '--dialogue-authorization-signals', dialogueAuthorizationSignals,
       '--authorization-tier-signals', authorizationTierSignals,
       '--thresholds', thresholdsFile,
       '--period', 'all',
@@ -197,6 +223,7 @@ describe('interactive-governance-report script', () => {
       'rollback-rate-high',
       'security-intercept-high',
       'satisfaction-low',
+      'dialogue-authorization-block-rate-high',
       'authorization-tier-block-rate-high'
     ]));
   });

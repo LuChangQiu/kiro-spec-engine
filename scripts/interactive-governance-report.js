@@ -9,6 +9,7 @@ const DEFAULT_APPROVAL_AUDIT = '.kiro/reports/interactive-approval-events.jsonl'
 const DEFAULT_EXECUTION_LEDGER = '.kiro/reports/interactive-execution-ledger.jsonl';
 const DEFAULT_FEEDBACK_FILE = '.kiro/reports/interactive-user-feedback.jsonl';
 const DEFAULT_MATRIX_SIGNALS = '.kiro/reports/interactive-matrix-signals.jsonl';
+const DEFAULT_DIALOGUE_AUTHORIZATION_SIGNALS = '.kiro/reports/interactive-dialogue-authorization-signals.jsonl';
 const DEFAULT_AUTHORIZATION_TIER_SIGNALS = '.kiro/reports/interactive-authorization-tier-signals.jsonl';
 const DEFAULT_THRESHOLDS = 'docs/interactive-customization/governance-threshold-baseline.json';
 const DEFAULT_OUT = '.kiro/reports/interactive-governance-report.json';
@@ -21,6 +22,7 @@ function parseArgs(argv) {
     executionLedger: DEFAULT_EXECUTION_LEDGER,
     feedbackFile: DEFAULT_FEEDBACK_FILE,
     matrixSignals: DEFAULT_MATRIX_SIGNALS,
+    dialogueAuthorizationSignals: DEFAULT_DIALOGUE_AUTHORIZATION_SIGNALS,
     authorizationTierSignals: DEFAULT_AUTHORIZATION_TIER_SIGNALS,
     thresholds: DEFAULT_THRESHOLDS,
     period: 'weekly',
@@ -49,6 +51,9 @@ function parseArgs(argv) {
       i += 1;
     } else if (token === '--matrix-signals' && next) {
       options.matrixSignals = next;
+      i += 1;
+    } else if (token === '--dialogue-authorization-signals' && next) {
+      options.dialogueAuthorizationSignals = next;
       i += 1;
     } else if (token === '--authorization-tier-signals' && next) {
       options.authorizationTierSignals = next;
@@ -106,6 +111,7 @@ function printHelpAndExit(code) {
     `  --execution-ledger <path>  Execution ledger JSONL (default: ${DEFAULT_EXECUTION_LEDGER})`,
     `  --feedback-file <path>     User feedback JSONL (default: ${DEFAULT_FEEDBACK_FILE})`,
     `  --matrix-signals <path>    Matrix signal JSONL (default: ${DEFAULT_MATRIX_SIGNALS})`,
+    `  --dialogue-authorization-signals <path> Dialogue authorization signal JSONL (default: ${DEFAULT_DIALOGUE_AUTHORIZATION_SIGNALS})`,
     `  --authorization-tier-signals <path> Authorization tier signal JSONL (default: ${DEFAULT_AUTHORIZATION_TIER_SIGNALS})`,
     `  --thresholds <path>        Governance threshold JSON (default: ${DEFAULT_THRESHOLDS})`,
     '  --period <type>            weekly|monthly|all|custom (default: weekly)',
@@ -256,6 +262,12 @@ function loadThresholds(raw = {}) {
     min_matrix_samples: Number.isFinite(Number(thresholds.min_matrix_samples))
       ? Number(thresholds.min_matrix_samples)
       : 3,
+    min_dialogue_authorization_samples: Number.isFinite(Number(thresholds.min_dialogue_authorization_samples))
+      ? Number(thresholds.min_dialogue_authorization_samples)
+      : 3,
+    dialogue_authorization_block_rate_max_percent: Number.isFinite(Number(thresholds.dialogue_authorization_block_rate_max_percent))
+      ? Number(thresholds.dialogue_authorization_block_rate_max_percent)
+      : 40,
     min_authorization_tier_samples: Number.isFinite(Number(thresholds.min_authorization_tier_samples))
       ? Number(thresholds.min_authorization_tier_samples)
       : 3,
@@ -407,6 +419,34 @@ function evaluateAlerts(metrics, thresholds) {
     });
   }
 
+  if (metrics.dialogue_authorization_total < thresholds.min_dialogue_authorization_samples) {
+    alerts.push({
+      id: 'dialogue-authorization-sample-insufficient',
+      severity: 'low',
+      status: 'warning',
+      metric: 'dialogue_authorization_total',
+      actual: metrics.dialogue_authorization_total,
+      threshold: thresholds.min_dialogue_authorization_samples,
+      direction: 'min',
+      message: 'Dialogue authorization sample size is below minimum; block trend is not statistically stable.',
+      recommendation: 'Collect more user-app/ops-console sessions before tightening dialogue authorization policy.'
+    });
+  } else if (
+    metrics.dialogue_authorization_block_rate_percent != null &&
+    metrics.dialogue_authorization_block_rate_percent > thresholds.dialogue_authorization_block_rate_max_percent
+  ) {
+    alerts.push(buildAlert({
+      id: 'dialogue-authorization-block-rate-high',
+      severity: 'medium',
+      metric: 'dialogue_authorization_block_rate_percent',
+      actual: metrics.dialogue_authorization_block_rate_percent,
+      threshold: thresholds.dialogue_authorization_block_rate_max_percent,
+      direction: 'max',
+      message: 'Dialogue authorization block/review rate is above maximum threshold.',
+      recommendation: 'Tune ui-mode/profile defaults and dialogue policy prompts to reduce non-actionable requests.'
+    }));
+  }
+
   if (metrics.authorization_tier_total < thresholds.min_authorization_tier_samples) {
     alerts.push({
       id: 'authorization-tier-sample-insufficient',
@@ -548,6 +588,10 @@ function buildMarkdown(report) {
   lines.push(`| Execution success rate | ${report.metrics.execution_success_rate_percent == null ? 'n/a' : `${report.metrics.execution_success_rate_percent}%`} |`);
   lines.push(`| Rollback rate | ${report.metrics.rollback_rate_percent == null ? 'n/a' : `${report.metrics.rollback_rate_percent}%`} |`);
   lines.push(`| Security intercept rate | ${report.metrics.security_intercept_rate_percent == null ? 'n/a' : `${report.metrics.security_intercept_rate_percent}%`} |`);
+  lines.push(`| Dialogue authorization deny total | ${report.metrics.dialogue_authorization_deny_total} |`);
+  lines.push(`| Dialogue authorization review-required total | ${report.metrics.dialogue_authorization_review_required_total} |`);
+  lines.push(`| Dialogue authorization block rate | ${report.metrics.dialogue_authorization_block_rate_percent == null ? 'n/a' : `${report.metrics.dialogue_authorization_block_rate_percent}%`} |`);
+  lines.push(`| User-app apply attempt total | ${report.metrics.dialogue_authorization_user_app_apply_attempt_total} |`);
   lines.push(`| Authorization tier deny total | ${report.metrics.authorization_tier_deny_total} |`);
   lines.push(`| Authorization tier review-required total | ${report.metrics.authorization_tier_review_required_total} |`);
   lines.push(`| Authorization tier block rate | ${report.metrics.authorization_tier_block_rate_percent == null ? 'n/a' : `${report.metrics.authorization_tier_block_rate_percent}%`} |`);
@@ -586,6 +630,7 @@ async function main() {
   const executionLedgerPath = resolvePath(cwd, options.executionLedger);
   const feedbackFilePath = resolvePath(cwd, options.feedbackFile);
   const matrixSignalsPath = resolvePath(cwd, options.matrixSignals);
+  const dialogueAuthorizationSignalsPath = resolvePath(cwd, options.dialogueAuthorizationSignals);
   const authorizationTierSignalsPath = resolvePath(cwd, options.authorizationTierSignals);
   const thresholdsPath = resolvePath(cwd, options.thresholds);
   const outPath = resolvePath(cwd, options.out);
@@ -599,6 +644,7 @@ async function main() {
     executionRecordsRaw,
     feedbackRaw,
     matrixSignalsRaw,
+    dialogueAuthorizationSignalsRaw,
     authorizationTierSignalsRaw
   ] = await Promise.all([
     readJsonLinesFile(intentAuditPath),
@@ -606,6 +652,7 @@ async function main() {
     readJsonLinesFile(executionLedgerPath),
     readJsonLinesFile(feedbackFilePath),
     readJsonLinesFile(matrixSignalsPath),
+    readJsonLinesFile(dialogueAuthorizationSignalsPath),
     readJsonLinesFile(authorizationTierSignalsPath)
   ]);
 
@@ -640,6 +687,11 @@ async function main() {
   const matrixSignals = filterByWindow(
     matrixSignalsRaw.filter(item => item && item.matrix && typeof item.matrix === 'object'),
     ['generated_at', 'timestamp', 'created_at'],
+    window
+  );
+  const dialogueAuthorizationSignals = filterByWindow(
+    dialogueAuthorizationSignalsRaw.filter(item => item && item.decision),
+    ['timestamp', 'evaluated_at', 'generated_at', 'created_at'],
     window
   );
   const authorizationTierSignals = filterByWindow(
@@ -690,6 +742,20 @@ async function main() {
     const status = `${item && item.matrix ? item.matrix.stage_status || '' : ''}`.trim().toLowerCase();
     return status === 'error' || status === 'non-zero-exit';
   }).length;
+  const dialogueAuthorizationDenyCount = dialogueAuthorizationSignals.filter((item) =>
+    `${item && item.decision ? item.decision : ''}`.trim().toLowerCase() === 'deny'
+  ).length;
+  const dialogueAuthorizationReviewRequiredCount = dialogueAuthorizationSignals.filter((item) =>
+    `${item && item.decision ? item.decision : ''}`.trim().toLowerCase() === 'review-required'
+  ).length;
+  const dialogueAuthorizationAllowCount = dialogueAuthorizationSignals.filter((item) =>
+    `${item && item.decision ? item.decision : ''}`.trim().toLowerCase() === 'allow'
+  ).length;
+  const dialogueAuthorizationBlockCount = dialogueAuthorizationDenyCount + dialogueAuthorizationReviewRequiredCount;
+  const dialogueAuthorizationUserAppApplyAttemptCount = dialogueAuthorizationSignals.filter((item) =>
+    `${item && item.ui_mode ? item.ui_mode : ''}`.trim().toLowerCase() === 'user-app' &&
+    `${item && item.execution_mode ? item.execution_mode : ''}`.trim().toLowerCase() === 'apply'
+  ).length;
   const authorizationTierDenyCount = authorizationTierSignals.filter((item) =>
     `${item && item.decision ? item.decision : ''}`.trim().toLowerCase() === 'deny'
   ).length;
@@ -729,6 +795,12 @@ async function main() {
     satisfaction_avg_score: toAverage(feedbackScores),
     satisfaction_response_count: feedbackScores.length,
     matrix_signal_total: matrixSignals.length,
+    dialogue_authorization_total: dialogueAuthorizationSignals.length,
+    dialogue_authorization_allow_total: dialogueAuthorizationAllowCount,
+    dialogue_authorization_deny_total: dialogueAuthorizationDenyCount,
+    dialogue_authorization_review_required_total: dialogueAuthorizationReviewRequiredCount,
+    dialogue_authorization_block_total: dialogueAuthorizationBlockCount,
+    dialogue_authorization_user_app_apply_attempt_total: dialogueAuthorizationUserAppApplyAttemptCount,
     authorization_tier_total: authorizationTierSignals.length,
     authorization_tier_allow_total: authorizationTierAllowCount,
     authorization_tier_deny_total: authorizationTierDenyCount,
@@ -740,6 +812,7 @@ async function main() {
     matrix_portfolio_pass_rate_percent: toRatePercent(matrixPortfolioPassedCount, matrixSignals.length),
     matrix_regression_positive_rate_percent: toRatePercent(matrixRegressionPositiveCount, matrixSignals.length),
     matrix_stage_error_rate_percent: toRatePercent(matrixStageErrorCount, matrixSignals.length),
+    dialogue_authorization_block_rate_percent: toRatePercent(dialogueAuthorizationBlockCount, dialogueAuthorizationSignals.length),
     authorization_tier_block_rate_percent: toRatePercent(authorizationTierBlockCount, authorizationTierSignals.length),
     matrix_avg_score: toAverage(matrixScoreValues),
     matrix_avg_valid_rate_percent: toAverage(matrixValidRateValues)
@@ -764,6 +837,7 @@ async function main() {
       execution_ledger: path.relative(cwd, executionLedgerPath) || '.',
       feedback_file: path.relative(cwd, feedbackFilePath) || '.',
       matrix_signals: path.relative(cwd, matrixSignalsPath) || '.',
+      dialogue_authorization_signals: path.relative(cwd, dialogueAuthorizationSignalsPath) || '.',
       authorization_tier_signals: path.relative(cwd, authorizationTierSignalsPath) || '.',
       thresholds: path.relative(cwd, thresholdsPath) || '.'
     },
@@ -818,6 +892,7 @@ module.exports = {
   DEFAULT_EXECUTION_LEDGER,
   DEFAULT_FEEDBACK_FILE,
   DEFAULT_MATRIX_SIGNALS,
+  DEFAULT_DIALOGUE_AUTHORIZATION_SIGNALS,
   DEFAULT_AUTHORIZATION_TIER_SIGNALS,
   DEFAULT_THRESHOLDS,
   DEFAULT_OUT,

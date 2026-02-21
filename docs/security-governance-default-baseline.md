@@ -38,6 +38,7 @@ This baseline is the default operating policy for SCE-driven delivery, including
 - `.kiro/reports/release-evidence/governance-snapshot-<tag>.json`
 - `.kiro/reports/release-evidence/weekly-ops-summary-<tag>.json`
 - `.kiro/reports/interactive-governance-report.json`
+- `.kiro/reports/interactive-dialogue-authorization-signals.jsonl`
 - `.kiro/reports/interactive-authorization-tier-signals.jsonl`
 - `.kiro/reports/interactive-dialogue-governance.json`
 - `.kiro/reports/interactive-execution-ledger.jsonl`

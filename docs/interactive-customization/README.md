@@ -111,6 +111,9 @@ Flow output defaults:
 - Bridge context: `.kiro/reports/interactive-flow/<session-id>/interactive-page-context.normalized.json`
 - Loop summary: `.kiro/reports/interactive-flow/<session-id>/interactive-customization-loop.summary.json`
 - Dialogue governance report: `.kiro/reports/interactive-flow/<session-id>/interactive-dialogue-governance.json`
+- Dialogue authorization signal stream:
+  - Session: `.kiro/reports/interactive-flow/<session-id>/interactive-dialogue-authorization-signals.jsonl`
+  - Global: `.kiro/reports/interactive-dialogue-authorization-signals.jsonl`
 - Authorization tier report: `.kiro/reports/interactive-flow/<session-id>/interactive-authorization-tier.json`
 - Authorization tier signal stream:
   - Session: `.kiro/reports/interactive-flow/<session-id>/interactive-authorization-tier-signals.jsonl`
@@ -152,6 +155,7 @@ node scripts/interactive-dialogue-governance.js \
   --execution-mode suggestion \
   --runtime-environment staging \
   --profile business-user \
+  --ui-mode user-app \
   --context docs/interactive-customization/page-context.sample.json \
   --policy docs/interactive-customization/dialogue-governance-policy-baseline.json \
   --authorization-dialogue-policy docs/interactive-customization/authorization-dialogue-policy-baseline.json \
@@ -350,6 +354,7 @@ node scripts/interactive-governance-report.js \
 
 The governance report consumes feedback events from `.kiro/reports/interactive-user-feedback.jsonl` by default.
 The governance report also consumes matrix signals from `.kiro/reports/interactive-matrix-signals.jsonl` by default.
+The governance report consumes dialogue-authorization signals from `.kiro/reports/interactive-dialogue-authorization-signals.jsonl` by default.
 The governance report consumes authorization-tier signals from `.kiro/reports/interactive-authorization-tier-signals.jsonl` by default.
 When `intent_total` is below `min_intent_samples` (default `5`), adoption emits a low-severity sample warning instead of a breach.
 

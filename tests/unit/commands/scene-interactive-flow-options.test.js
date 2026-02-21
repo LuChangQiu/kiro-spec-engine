@@ -10,8 +10,14 @@ describe('scene interactive-flow option helpers', () => {
       provider: ' MOQUI ',
       goal: ' improve approval speed ',
       executionMode: 'apply',
+      runtimeMode: ' OPS-FIX ',
+      runtimeEnvironment: ' STAGING ',
+      runtimePolicy: ' docs/interactive-customization/runtime-mode-policy-baseline.json ',
+      runtimeOut: ' .kiro/reports/runtime.json ',
       dialoguePolicy: ' docs/interactive-customization/dialogue-governance-policy-baseline.json ',
       contextContract: ' docs/interactive-customization/moqui-copilot-context-contract.json ',
+      workOrderOut: ' .kiro/reports/work-order.json ',
+      workOrderMarkdownOut: ' .kiro/reports/work-order.md ',
       feedbackScore: '4.5',
       feedbackTags: 'moqui,approval',
       feedbackChannel: 'UI',
@@ -28,8 +34,14 @@ describe('scene interactive-flow option helpers', () => {
     expect(normalized.provider).toBe('moqui');
     expect(normalized.goal).toBe('improve approval speed');
     expect(normalized.executionMode).toBe('apply');
+    expect(normalized.runtimeMode).toBe('ops-fix');
+    expect(normalized.runtimeEnvironment).toBe('staging');
+    expect(normalized.runtimePolicy).toBe('docs/interactive-customization/runtime-mode-policy-baseline.json');
+    expect(normalized.runtimeOut).toBe('.kiro/reports/runtime.json');
     expect(normalized.dialoguePolicy).toBe('docs/interactive-customization/dialogue-governance-policy-baseline.json');
     expect(normalized.contextContract).toBe('docs/interactive-customization/moqui-copilot-context-contract.json');
+    expect(normalized.workOrderOut).toBe('.kiro/reports/work-order.json');
+    expect(normalized.workOrderMarkdownOut).toBe('.kiro/reports/work-order.md');
     expect(normalized.feedbackScore).toBe(4.5);
     expect(normalized.feedbackTags).toBe('moqui,approval');
     expect(normalized.feedbackChannel).toBe('ui');
@@ -78,6 +90,8 @@ describe('scene interactive-flow option helpers', () => {
       provider: 'moqui',
       goal: 'x',
       executionMode: 'preview',
+      runtimeMode: 'ops-fix',
+      runtimeEnvironment: 'staging',
       feedbackChannel: 'ui',
       feedbackScore: null
     })).toBe('--execution-mode must be suggestion or apply');
@@ -87,6 +101,30 @@ describe('scene interactive-flow option helpers', () => {
       provider: 'moqui',
       goal: 'x',
       executionMode: 'apply',
+      runtimeMode: 'unknown',
+      runtimeEnvironment: 'staging',
+      feedbackChannel: 'ui',
+      feedbackScore: null
+    })).toBe('--runtime-mode must be one of: user-assist, ops-fix, feature-dev');
+
+    expect(validateSceneInteractiveFlowOptions({
+      input: 'docs/moqui-provider.json',
+      provider: 'moqui',
+      goal: 'x',
+      executionMode: 'apply',
+      runtimeMode: 'ops-fix',
+      runtimeEnvironment: 'preprod',
+      feedbackChannel: 'ui',
+      feedbackScore: null
+    })).toBe('--runtime-environment must be one of: dev, staging, prod');
+
+    expect(validateSceneInteractiveFlowOptions({
+      input: 'docs/moqui-provider.json',
+      provider: 'moqui',
+      goal: 'x',
+      executionMode: 'apply',
+      runtimeMode: 'ops-fix',
+      runtimeEnvironment: 'staging',
       feedbackChannel: 'mail',
       feedbackScore: 7
     })).toBe('--feedback-score must be a number between 0 and 5');
@@ -96,6 +134,8 @@ describe('scene interactive-flow option helpers', () => {
       provider: 'moqui',
       goal: 'x',
       executionMode: 'apply',
+      runtimeMode: 'ops-fix',
+      runtimeEnvironment: 'staging',
       feedbackChannel: 'mail',
       feedbackScore: null
     })).toBe('--feedback-channel must be one of: ui, cli, api, other');
@@ -105,6 +145,8 @@ describe('scene interactive-flow option helpers', () => {
       provider: 'moqui',
       goal: 'x',
       executionMode: 'apply',
+      runtimeMode: 'ops-fix',
+      runtimeEnvironment: 'staging',
       feedbackChannel: 'ui',
       feedbackScore: null,
       matrixMinScore: 120,
@@ -116,6 +158,8 @@ describe('scene interactive-flow option helpers', () => {
       provider: 'moqui',
       goal: 'x',
       executionMode: 'apply',
+      runtimeMode: 'ops-fix',
+      runtimeEnvironment: 'staging',
       feedbackChannel: 'ui',
       feedbackScore: null,
       matrixMinScore: 80,
@@ -127,6 +171,8 @@ describe('scene interactive-flow option helpers', () => {
       provider: 'moqui',
       goal: 'x',
       executionMode: 'apply',
+      runtimeMode: 'ops-fix',
+      runtimeEnvironment: 'staging',
       feedbackChannel: 'ui',
       feedbackScore: null,
       authPasswordHash: 'bad-hash'
@@ -139,6 +185,8 @@ describe('scene interactive-flow option helpers', () => {
       provider: 'moqui',
       goal: 'improve approval speed',
       executionMode: 'apply',
+      runtimeMode: 'ops-fix',
+      runtimeEnvironment: 'staging',
       feedbackChannel: 'ui',
       feedbackScore: 5
     });

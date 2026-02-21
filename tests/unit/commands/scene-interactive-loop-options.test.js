@@ -9,8 +9,14 @@ describe('scene interactive-loop option helpers', () => {
       context: ' docs/context.json ',
       goal: ' improve approval speed ',
       executionMode: 'apply',
+      runtimeMode: ' OPS-FIX ',
+      runtimeEnvironment: ' STAGING ',
+      runtimePolicy: ' docs/interactive-customization/runtime-mode-policy-baseline.json ',
+      runtimeOut: ' .kiro/reports/runtime.json ',
       dialoguePolicy: ' docs/interactive-customization/dialogue-governance-policy-baseline.json ',
       contextContract: ' docs/interactive-customization/moqui-copilot-context-contract.json ',
+      workOrderOut: ' .kiro/reports/work-order.json ',
+      workOrderMarkdownOut: ' .kiro/reports/work-order.md ',
       strictContract: false,
       feedbackScore: '4.5',
       feedbackTags: 'moqui,approval',
@@ -23,8 +29,14 @@ describe('scene interactive-loop option helpers', () => {
     expect(normalized.context).toBe('docs/context.json');
     expect(normalized.goal).toBe('improve approval speed');
     expect(normalized.executionMode).toBe('apply');
+    expect(normalized.runtimeMode).toBe('ops-fix');
+    expect(normalized.runtimeEnvironment).toBe('staging');
+    expect(normalized.runtimePolicy).toBe('docs/interactive-customization/runtime-mode-policy-baseline.json');
+    expect(normalized.runtimeOut).toBe('.kiro/reports/runtime.json');
     expect(normalized.dialoguePolicy).toBe('docs/interactive-customization/dialogue-governance-policy-baseline.json');
     expect(normalized.contextContract).toBe('docs/interactive-customization/moqui-copilot-context-contract.json');
+    expect(normalized.workOrderOut).toBe('.kiro/reports/work-order.json');
+    expect(normalized.workOrderMarkdownOut).toBe('.kiro/reports/work-order.md');
     expect(normalized.strictContract).toBe(false);
     expect(normalized.feedbackScore).toBe(4.5);
     expect(normalized.feedbackTags).toBe('moqui,approval');
@@ -58,6 +70,8 @@ describe('scene interactive-loop option helpers', () => {
       context: 'docs/context.json',
       goal: 'x',
       executionMode: 'preview',
+      runtimeMode: 'ops-fix',
+      runtimeEnvironment: 'staging',
       feedbackChannel: 'ui',
       feedbackScore: null
     })).toBe('--execution-mode must be suggestion or apply');
@@ -66,6 +80,28 @@ describe('scene interactive-loop option helpers', () => {
       context: 'docs/context.json',
       goal: 'x',
       executionMode: 'apply',
+      runtimeMode: 'unknown',
+      runtimeEnvironment: 'staging',
+      feedbackChannel: 'ui',
+      feedbackScore: null
+    })).toBe('--runtime-mode must be one of: user-assist, ops-fix, feature-dev');
+
+    expect(validateSceneInteractiveLoopOptions({
+      context: 'docs/context.json',
+      goal: 'x',
+      executionMode: 'apply',
+      runtimeMode: 'ops-fix',
+      runtimeEnvironment: 'preprod',
+      feedbackChannel: 'ui',
+      feedbackScore: null
+    })).toBe('--runtime-environment must be one of: dev, staging, prod');
+
+    expect(validateSceneInteractiveLoopOptions({
+      context: 'docs/context.json',
+      goal: 'x',
+      executionMode: 'apply',
+      runtimeMode: 'ops-fix',
+      runtimeEnvironment: 'staging',
       feedbackChannel: 'ui',
       feedbackScore: 7
     })).toBe('--feedback-score must be a number between 0 and 5');
@@ -74,6 +110,8 @@ describe('scene interactive-loop option helpers', () => {
       context: 'docs/context.json',
       goal: 'x',
       executionMode: 'apply',
+      runtimeMode: 'ops-fix',
+      runtimeEnvironment: 'staging',
       contextContract: '',
       feedbackChannel: 'ui',
       feedbackScore: null
@@ -83,6 +121,8 @@ describe('scene interactive-loop option helpers', () => {
       context: 'docs/context.json',
       goal: 'x',
       executionMode: 'apply',
+      runtimeMode: 'ops-fix',
+      runtimeEnvironment: 'staging',
       feedbackChannel: 'mail',
       feedbackScore: null
     })).toBe('--feedback-channel must be one of: ui, cli, api, other');
@@ -91,6 +131,8 @@ describe('scene interactive-loop option helpers', () => {
       context: 'docs/context.json',
       goal: 'x',
       executionMode: 'apply',
+      runtimeMode: 'ops-fix',
+      runtimeEnvironment: 'staging',
       feedbackChannel: 'ui',
       feedbackScore: null,
       authPasswordHash: 'bad-hash'
@@ -102,6 +144,8 @@ describe('scene interactive-loop option helpers', () => {
       context: 'docs/context.json',
       goal: 'improve approval speed',
       executionMode: 'apply',
+      runtimeMode: 'ops-fix',
+      runtimeEnvironment: 'staging',
       feedbackChannel: 'ui',
       feedbackScore: 5
     });

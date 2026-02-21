@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Interactive runtime policy + work-order default pipeline**: Added `interactive-runtime-policy-evaluate` and `interactive-work-order-build`, integrated both into `interactive-customization-loop` and `interactive-flow` (including `sce scene interactive-loop/interactive-flow` passthrough), with default `runtime_mode=ops-fix`, `runtime_environment=staging`, runtime non-allow fail gate option, and auditable work-order artifacts.
 - **Release weekly ops closed-loop summary**: Added `node scripts/release-ops-weekly-summary.js` (npm alias `npm run report:release-ops-weekly`) to aggregate handoff evidence, release-gate history, interactive governance, and matrix signals into one weekly risk/recommendation card (`weekly-ops-summary.json|.md`).
 - **Release workflow weekly ops asset publication**: `release.yml` now exports and publishes `weekly-ops-summary-<tag>.json|.md` alongside governance snapshot and Moqui release evidence assets.
 - **Release weekly ops hard gate**: Added `node scripts/release-weekly-ops-gate.js` (npm alias `npm run gate:release-ops-weekly`) and wired release workflow defaults to block publish when weekly ops summary risk exceeds `medium` (configurable via `KSE_RELEASE_WEEKLY_OPS_*` variables).

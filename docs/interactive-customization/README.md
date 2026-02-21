@@ -10,6 +10,7 @@ This directory contains baseline contracts and safety policy artifacts for the i
 - `page-context.schema.json`: schema for page-level read-only context payloads.
 - `guardrail-policy-baseline.json`: default secure-by-default guardrail policy.
 - `dialogue-governance-policy-baseline.json`: baseline communication rules for embedded assistant dialogue.
+- `runtime-mode-policy-baseline.json`: baseline runtime mode/environment policy (`user-assist|ops-fix|feature-dev` x `dev|staging|prod`).
 - `high-risk-action-catalog.json`: baseline high-risk action classification for deny/review decisions.
 - `change-plan.sample.json`: runnable sample plan for gate checks.
 - `page-context.sample.json`: runnable page context sample for read-only intent generation.
@@ -69,8 +70,11 @@ Run one-command full flow (bridge -> loop):
 node scripts/interactive-flow.js \
   --input docs/interactive-customization/moqui-context-provider.sample.json \
   --goal "Adjust order screen field layout for clearer input flow" \
+  --runtime-mode ops-fix \
+  --runtime-environment staging \
   --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
   --dialogue-policy docs/interactive-customization/dialogue-governance-policy-baseline.json \
+  --runtime-policy docs/interactive-customization/runtime-mode-policy-baseline.json \
   --execution-mode apply \
   --auto-execute-low-risk \
   --auth-password-hash "<sha256-of-demo-pass>" \
@@ -149,6 +153,9 @@ node scripts/interactive-customization-loop.js \
   --context docs/interactive-customization/page-context.sample.json \
   --context-contract docs/interactive-customization/moqui-copilot-context-contract.json \
   --goal "Adjust order screen field layout for clearer input flow" \
+  --runtime-mode ops-fix \
+  --runtime-environment staging \
+  --runtime-policy docs/interactive-customization/runtime-mode-policy-baseline.json \
   --execution-mode apply \
   --auto-execute-low-risk \
   --auth-password-hash "<sha256-of-demo-pass>" \
@@ -176,6 +183,33 @@ sce scene interactive-loop \
 - Governance global stream: `.kiro/reports/interactive-user-feedback.jsonl`
 - Context contract validation is strict by default (required fields, payload size, forbidden keys). Use `--no-strict-contract` only for temporary diagnostics.
 - `--execution-mode apply` with mutating actions requires password authorization by default (`plan.authorization.password_required=true`).
+- Runtime policy defaults to `ops-fix@staging`; low-risk auto execute requires runtime decision `allow`.
+
+Run runtime mode/environment policy evaluation directly:
+
+```bash
+node scripts/interactive-runtime-policy-evaluate.js \
+  --plan .kiro/reports/interactive-change-plan.generated.json \
+  --runtime-mode ops-fix \
+  --runtime-environment staging \
+  --policy docs/interactive-customization/runtime-mode-policy-baseline.json \
+  --json
+```
+
+Build interactive work-order artifacts directly:
+
+```bash
+node scripts/interactive-work-order-build.js \
+  --plan .kiro/reports/interactive-change-plan.generated.json \
+  --dialogue .kiro/reports/interactive-dialogue-governance.json \
+  --gate .kiro/reports/interactive-change-plan-gate.json \
+  --runtime .kiro/reports/interactive-runtime-policy.json \
+  --approval-state .kiro/reports/interactive-approval-state.json \
+  --execution-attempted \
+  --execution-result success \
+  --execution-id exec-xxxx \
+  --json
+```
 
 Run approval workflow state machine:
 

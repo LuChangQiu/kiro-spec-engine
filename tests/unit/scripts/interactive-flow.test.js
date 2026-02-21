@@ -34,6 +34,7 @@ describe('interactive-flow script', () => {
 
     const policyPath = path.join(docsDir, 'guardrail-policy-baseline.json');
     const catalogPath = path.join(docsDir, 'high-risk-action-catalog.json');
+    const runtimePolicyPath = path.join(docsDir, 'runtime-mode-policy-baseline.json');
 
     await fs.writeJson(policyPath, {
       version: '1.0.0',
@@ -61,7 +62,67 @@ describe('interactive-flow script', () => {
       }
     }, { spaces: 2 });
 
-    return { policyPath, catalogPath };
+    await fs.writeJson(runtimePolicyPath, {
+      version: '1.0.0',
+      defaults: {
+        runtime_mode: 'ops-fix',
+        runtime_environment: 'staging'
+      },
+      modes: {
+        'user-assist': {
+          allow_execution_modes: ['suggestion', 'apply'],
+          allow_mutating_apply: false,
+          deny_action_types: ['credential_export'],
+          review_required_action_types: ['workflow_approval_chain_change'],
+          require_work_order: true
+        },
+        'ops-fix': {
+          allow_execution_modes: ['suggestion', 'apply'],
+          allow_mutating_apply: true,
+          deny_action_types: ['credential_export'],
+          review_required_action_types: ['workflow_approval_chain_change'],
+          require_work_order: true
+        },
+        'feature-dev': {
+          allow_execution_modes: ['suggestion', 'apply'],
+          allow_mutating_apply: true,
+          deny_action_types: ['credential_export'],
+          review_required_action_types: ['workflow_approval_chain_change'],
+          require_work_order: true
+        }
+      },
+      environments: {
+        dev: {
+          allow_live_apply: true,
+          require_dry_run_before_live_apply: false,
+          require_password_for_apply_mutations: true,
+          require_approval_for_risk_levels: ['high'],
+          max_risk_level_for_apply: 'high',
+          max_auto_execute_risk_level: 'medium',
+          manual_review_required_for_apply: false
+        },
+        staging: {
+          allow_live_apply: true,
+          require_dry_run_before_live_apply: true,
+          require_password_for_apply_mutations: true,
+          require_approval_for_risk_levels: ['medium', 'high'],
+          max_risk_level_for_apply: 'high',
+          max_auto_execute_risk_level: 'low',
+          manual_review_required_for_apply: false
+        },
+        prod: {
+          allow_live_apply: false,
+          require_dry_run_before_live_apply: true,
+          require_password_for_apply_mutations: true,
+          require_approval_for_risk_levels: ['medium', 'high'],
+          max_risk_level_for_apply: 'medium',
+          max_auto_execute_risk_level: 'low',
+          manual_review_required_for_apply: true
+        }
+      }
+    }, { spaces: 2 });
+
+    return { policyPath, catalogPath, runtimePolicyPath };
   }
 
   async function writeProviderPayload(workspace) {
@@ -132,6 +193,8 @@ describe('interactive-flow script', () => {
     expect(payload.pipeline.matrix.status).toBe('completed');
     expect(payload.summary.status).toBe('ready-for-apply');
     expect(payload.summary.dialogue_decision).toBe('allow');
+    expect(payload.summary.runtime_decision).toBe('allow');
+    expect(payload.summary.work_order_status).toBeTruthy();
     expect(payload.summary.matrix_status).toBe('completed');
 
     const bridgeContextFile = path.join(workspace, payload.artifacts.bridge_context_json);
@@ -179,6 +242,7 @@ describe('interactive-flow script', () => {
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.summary.status).toBe('completed');
     expect(payload.summary.execution_result).toBe('success');
+    expect(payload.summary.runtime_decision).toBe('allow');
     expect(payload.summary.authorization_password_verified).toBe(true);
     expect(payload.pipeline.loop.payload.feedback.logged).toBe(true);
   });

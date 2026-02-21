@@ -34,6 +34,7 @@ describe('interactive-customization-loop script', () => {
 
     const policyPath = path.join(docsDir, 'guardrail-policy-baseline.json');
     const catalogPath = path.join(docsDir, 'high-risk-action-catalog.json');
+    const runtimePolicyPath = path.join(docsDir, 'runtime-mode-policy-baseline.json');
 
     await fs.writeJson(policyPath, {
       version: '1.0.0',
@@ -61,7 +62,67 @@ describe('interactive-customization-loop script', () => {
       }
     }, { spaces: 2 });
 
-    return { policyPath, catalogPath };
+    await fs.writeJson(runtimePolicyPath, {
+      version: '1.0.0',
+      defaults: {
+        runtime_mode: 'ops-fix',
+        runtime_environment: 'staging'
+      },
+      modes: {
+        'user-assist': {
+          allow_execution_modes: ['suggestion', 'apply'],
+          allow_mutating_apply: false,
+          deny_action_types: ['credential_export'],
+          review_required_action_types: ['workflow_approval_chain_change'],
+          require_work_order: true
+        },
+        'ops-fix': {
+          allow_execution_modes: ['suggestion', 'apply'],
+          allow_mutating_apply: true,
+          deny_action_types: ['credential_export'],
+          review_required_action_types: ['workflow_approval_chain_change'],
+          require_work_order: true
+        },
+        'feature-dev': {
+          allow_execution_modes: ['suggestion', 'apply'],
+          allow_mutating_apply: true,
+          deny_action_types: ['credential_export'],
+          review_required_action_types: ['workflow_approval_chain_change'],
+          require_work_order: true
+        }
+      },
+      environments: {
+        dev: {
+          allow_live_apply: true,
+          require_dry_run_before_live_apply: false,
+          require_password_for_apply_mutations: true,
+          require_approval_for_risk_levels: ['high'],
+          max_risk_level_for_apply: 'high',
+          max_auto_execute_risk_level: 'medium',
+          manual_review_required_for_apply: false
+        },
+        staging: {
+          allow_live_apply: true,
+          require_dry_run_before_live_apply: true,
+          require_password_for_apply_mutations: true,
+          require_approval_for_risk_levels: ['medium', 'high'],
+          max_risk_level_for_apply: 'high',
+          max_auto_execute_risk_level: 'low',
+          manual_review_required_for_apply: false
+        },
+        prod: {
+          allow_live_apply: false,
+          require_dry_run_before_live_apply: true,
+          require_password_for_apply_mutations: true,
+          require_approval_for_risk_levels: ['medium', 'high'],
+          max_risk_level_for_apply: 'medium',
+          max_auto_execute_risk_level: 'low',
+          manual_review_required_for_apply: true
+        }
+      }
+    }, { spaces: 2 });
+
+    return { policyPath, catalogPath, runtimePolicyPath };
   }
 
   async function writeContext(workspace) {
@@ -116,11 +177,17 @@ describe('interactive-customization-loop script', () => {
     expect(payload.mode).toBe('interactive-customization-loop');
     expect(payload.dialogue.decision).toBe('allow');
     expect(payload.gate.decision).toBe('allow');
+    expect(payload.runtime.decision).toBe('allow');
+    expect(payload.work_order).toBeTruthy();
     expect(payload.summary.status).toBe('ready-for-apply');
     expect(payload.execution.attempted).toBe(false);
 
     const summaryFile = path.join(workspace, payload.artifacts.summary_json);
+    const runtimeFile = path.join(workspace, payload.artifacts.runtime_json);
+    const workOrderFile = path.join(workspace, payload.artifacts.work_order_json);
     expect(await fs.pathExists(summaryFile)).toBe(true);
+    expect(await fs.pathExists(runtimeFile)).toBe(true);
+    expect(await fs.pathExists(workOrderFile)).toBe(true);
   });
 
   test('auto executes low-risk path in apply mode', async () => {
@@ -260,5 +327,30 @@ describe('interactive-customization-loop script', () => {
     expect(intentStep).toBeTruthy();
     expect(intentStep.payload.contract_validation.valid).toBe(false);
     expect(intentStep.payload.contract_validation.issues.length).toBeGreaterThan(0);
+  });
+
+  test('fails with exit code 2 when runtime policy is non-allow and fail flag is enabled', async () => {
+    const workspace = path.join(tempDir, 'workspace-runtime-fail');
+    await fs.ensureDir(workspace);
+    const { policyPath, catalogPath } = await writePolicyBundle(workspace);
+    const contextPath = await writeContext(workspace);
+
+    const result = runScript(workspace, [
+      '--context', contextPath,
+      '--goal', 'Adjust order screen field layout for clearer input flow',
+      '--execution-mode', 'apply',
+      '--runtime-mode', 'user-assist',
+      '--runtime-environment', 'staging',
+      '--user-id', 'biz-user',
+      '--policy', policyPath,
+      '--catalog', catalogPath,
+      '--fail-on-runtime-non-allow',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(2);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.runtime.decision).toBe('deny');
+    expect(payload.summary.status).toBe('blocked');
   });
 });

@@ -1,6 +1,6 @@
 {
   "name": "scene-capability-engine",
-  "version": "3.0.8",
+  "version": "3.1.0",
   "description": "SCE (Scene Capability Engine) - A CLI tool and npm package for spec-driven development with AI coding assistants.",
   "main": "index.js",
   "bin": {
@@ -53,6 +53,8 @@
     "report:interactive-dialogue-governance": "node scripts/interactive-dialogue-governance.js --goal \"Improve order entry speed without changing payment policy\" --context docs/interactive-customization/page-context.sample.json --json",
     "report:interactive-intent": "node scripts/interactive-intent-build.js --context docs/interactive-customization/page-context.sample.json --goal \"Must improve order approval speed without changing payment authorization policy\" --user-id demo-user --json",
     "report:interactive-plan": "node scripts/interactive-plan-build.js --intent .kiro/reports/interactive-change-intent.json --context docs/interactive-customization/page-context.sample.json --json",
+    "report:interactive-runtime-policy": "node scripts/interactive-runtime-policy-evaluate.js --plan docs/interactive-customization/change-plan.sample.json --json",
+    "report:interactive-work-order": "node scripts/interactive-work-order-build.js --plan docs/interactive-customization/change-plan.sample.json --json",
     "report:interactive-approval-status": "node scripts/interactive-approval-workflow.js --action status --json",
     "report:interactive-adapter-capabilities": "node scripts/interactive-moqui-adapter.js --action capabilities --json",
     "run:interactive-loop": "node scripts/interactive-customization-loop.js",

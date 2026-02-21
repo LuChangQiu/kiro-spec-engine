@@ -13,8 +13,11 @@ This baseline is the default operating policy for SCE-driven delivery, including
 
 - High-risk plans must pass approval workflow before `apply`.
 - Low-risk auto-apply is allowed only when gate result is `allow`.
+- Runtime policy gate is mandatory before apply (`runtime_mode=ops-fix`, `runtime_environment=staging` by default).
+- Runtime non-allow (`deny|review-required`) should block unattended apply (`--fail-on-runtime-non-allow`).
 - Apply-mode mutating plans require password authorization (`authorization.password_required=true` by default).
 - Password verifier hash must be supplied via `SCE_INTERACTIVE_AUTH_PASSWORD_SHA256` (or explicit override).
+- Work-order artifacts (`interactive-work-order.json|.md`) are required for usage/maintenance/dev integrated auditing.
 - Every apply/rollback must write execution ledger evidence.
 - Stage-C adapters must keep dry-run behavior as default unless explicitly switched.
 

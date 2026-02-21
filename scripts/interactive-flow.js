@@ -15,6 +15,10 @@ const DEFAULT_MATRIX_MIN_SCORE = 70;
 const DEFAULT_MATRIX_MIN_VALID_RATE = 100;
 const DEFAULT_AUTH_PASSWORD_HASH_ENV = 'SCE_INTERACTIVE_AUTH_PASSWORD_SHA256';
 const FEEDBACK_CHANNELS = new Set(['ui', 'cli', 'api', 'other']);
+const DEFAULT_RUNTIME_MODE = 'ops-fix';
+const DEFAULT_RUNTIME_ENVIRONMENT = 'staging';
+const RUNTIME_MODES = new Set(['user-assist', 'ops-fix', 'feature-dev']);
+const RUNTIME_ENVIRONMENTS = new Set(['dev', 'staging', 'prod']);
 
 const SCRIPT_CONTEXT_BRIDGE = path.resolve(__dirname, 'interactive-context-bridge.js');
 const SCRIPT_INTERACTIVE_LOOP = path.resolve(__dirname, 'interactive-customization-loop.js');
@@ -33,12 +37,18 @@ function parseArgs(argv) {
     catalog: null,
     dialoguePolicy: null,
     dialogueOut: null,
+    runtimeMode: DEFAULT_RUNTIME_MODE,
+    runtimeEnvironment: DEFAULT_RUNTIME_ENVIRONMENT,
+    runtimePolicy: null,
+    runtimeOut: null,
     contextContract: null,
     strictContract: true,
     moquiConfig: null,
     outDir: DEFAULT_OUT_DIR,
     out: null,
     loopOut: null,
+    workOrderOut: null,
+    workOrderMarkdownOut: null,
     bridgeOutContext: null,
     bridgeOutReport: null,
     approvalActor: null,
@@ -59,6 +69,7 @@ function parseArgs(argv) {
     failOnDialogueDeny: false,
     failOnGateDeny: false,
     failOnGateNonAllow: false,
+    failOnRuntimeNonAllow: false,
     failOnExecuteBlocked: false,
     matrix: true,
     matrixTemplateDir: null,
@@ -113,6 +124,18 @@ function parseArgs(argv) {
     } else if (token === '--dialogue-out' && next) {
       options.dialogueOut = next;
       index += 1;
+    } else if (token === '--runtime-mode' && next) {
+      options.runtimeMode = next;
+      index += 1;
+    } else if (token === '--runtime-environment' && next) {
+      options.runtimeEnvironment = next;
+      index += 1;
+    } else if (token === '--runtime-policy' && next) {
+      options.runtimePolicy = next;
+      index += 1;
+    } else if (token === '--runtime-out' && next) {
+      options.runtimeOut = next;
+      index += 1;
     } else if (token === '--context-contract' && next) {
       options.contextContract = next;
       index += 1;
@@ -129,6 +152,12 @@ function parseArgs(argv) {
       index += 1;
     } else if (token === '--loop-out' && next) {
       options.loopOut = next;
+      index += 1;
+    } else if (token === '--work-order-out' && next) {
+      options.workOrderOut = next;
+      index += 1;
+    } else if (token === '--work-order-markdown-out' && next) {
+      options.workOrderMarkdownOut = next;
       index += 1;
     } else if (token === '--bridge-out-context' && next) {
       options.bridgeOutContext = next;
@@ -181,6 +210,8 @@ function parseArgs(argv) {
       options.failOnGateDeny = true;
     } else if (token === '--fail-on-gate-non-allow') {
       options.failOnGateNonAllow = true;
+    } else if (token === '--fail-on-runtime-non-allow') {
+      options.failOnRuntimeNonAllow = true;
     } else if (token === '--fail-on-execute-blocked') {
       options.failOnExecuteBlocked = true;
     } else if (token === '--no-matrix') {
@@ -235,11 +266,17 @@ function parseArgs(argv) {
   options.catalog = `${options.catalog || ''}`.trim() || null;
   options.dialoguePolicy = `${options.dialoguePolicy || ''}`.trim() || null;
   options.dialogueOut = `${options.dialogueOut || ''}`.trim() || null;
+  options.runtimeMode = `${options.runtimeMode || ''}`.trim().toLowerCase() || DEFAULT_RUNTIME_MODE;
+  options.runtimeEnvironment = `${options.runtimeEnvironment || ''}`.trim().toLowerCase() || DEFAULT_RUNTIME_ENVIRONMENT;
+  options.runtimePolicy = `${options.runtimePolicy || ''}`.trim() || null;
+  options.runtimeOut = `${options.runtimeOut || ''}`.trim() || null;
   options.contextContract = `${options.contextContract || ''}`.trim() || null;
   options.moquiConfig = `${options.moquiConfig || ''}`.trim() || null;
   options.outDir = `${options.outDir || ''}`.trim() || DEFAULT_OUT_DIR;
   options.out = `${options.out || ''}`.trim() || null;
   options.loopOut = `${options.loopOut || ''}`.trim() || null;
+  options.workOrderOut = `${options.workOrderOut || ''}`.trim() || null;
+  options.workOrderMarkdownOut = `${options.workOrderMarkdownOut || ''}`.trim() || null;
   options.bridgeOutContext = `${options.bridgeOutContext || ''}`.trim() || null;
   options.bridgeOutReport = `${options.bridgeOutReport || ''}`.trim() || null;
   options.approvalActor = `${options.approvalActor || ''}`.trim() || null;
@@ -271,6 +308,12 @@ function parseArgs(argv) {
   }
   if (!['suggestion', 'apply'].includes(options.executionMode)) {
     throw new Error('--execution-mode must be one of: suggestion, apply');
+  }
+  if (!RUNTIME_MODES.has(options.runtimeMode)) {
+    throw new Error(`--runtime-mode must be one of: ${Array.from(RUNTIME_MODES).join(', ')}`);
+  }
+  if (!RUNTIME_ENVIRONMENTS.has(options.runtimeEnvironment)) {
+    throw new Error(`--runtime-environment must be one of: ${Array.from(RUNTIME_ENVIRONMENTS).join(', ')}`);
   }
   if (options.feedbackScore != null) {
     if (!Number.isFinite(options.feedbackScore) || options.feedbackScore < 0 || options.feedbackScore > 5) {
@@ -315,6 +358,10 @@ function printHelpAndExit(code) {
     '  --catalog <path>                High-risk catalog override',
     '  --dialogue-policy <path>        Dialogue governance policy override',
     '  --dialogue-out <path>           Dialogue governance report output path',
+    `  --runtime-mode <name>           user-assist|ops-fix|feature-dev (default: ${DEFAULT_RUNTIME_MODE})`,
+    `  --runtime-environment <name>    dev|staging|prod (default: ${DEFAULT_RUNTIME_ENVIRONMENT})`,
+    '  --runtime-policy <path>         Runtime mode/environment policy override',
+    '  --runtime-out <path>            Runtime policy evaluation output path',
     '  --context-contract <path>       Context contract override',
     '  --no-strict-contract            Do not fail when context contract validation has issues',
     '  --moqui-config <path>           Moqui adapter runtime config',
@@ -322,6 +369,8 @@ function printHelpAndExit(code) {
     '  --bridge-out-context <path>     Bridge normalized context output path',
     '  --bridge-out-report <path>      Bridge report output path',
     '  --loop-out <path>               Interactive-loop summary output path',
+    '  --work-order-out <path>         Work-order JSON output path',
+    '  --work-order-markdown-out <path> Work-order markdown output path',
     '  --out <path>                    Flow summary output path',
     '  --approval-actor <id>           Approval workflow actor',
     '  --approver-actor <id>           Auto-approve actor',
@@ -341,6 +390,7 @@ function printHelpAndExit(code) {
     '  --fail-on-dialogue-deny         Exit code 2 if dialogue decision is deny',
     '  --fail-on-gate-deny             Exit code 2 if gate decision is deny',
     '  --fail-on-gate-non-allow        Exit code 2 if gate decision is deny/review-required',
+    '  --fail-on-runtime-non-allow     Exit code 2 if runtime decision is deny/review-required',
     '  --fail-on-execute-blocked       Exit code 2 if auto execute is blocked/non-success',
     '  --no-matrix                     Disable matrix baseline snapshot stage',
     '  --matrix-template-dir <path>    Template library path for matrix stage',
@@ -519,6 +569,18 @@ async function main() {
   if (options.dialogueOut) {
     loopArgs.push('--dialogue-out', resolvePath(cwd, options.dialogueOut));
   }
+  if (options.runtimeMode) {
+    loopArgs.push('--runtime-mode', options.runtimeMode);
+  }
+  if (options.runtimeEnvironment) {
+    loopArgs.push('--runtime-environment', options.runtimeEnvironment);
+  }
+  if (options.runtimePolicy) {
+    loopArgs.push('--runtime-policy', resolvePath(cwd, options.runtimePolicy));
+  }
+  if (options.runtimeOut) {
+    loopArgs.push('--runtime-out', resolvePath(cwd, options.runtimeOut));
+  }
   if (options.contextContract) {
     loopArgs.push('--context-contract', resolvePath(cwd, options.contextContract));
   }
@@ -527,6 +589,12 @@ async function main() {
   }
   if (options.moquiConfig) {
     loopArgs.push('--moqui-config', resolvePath(cwd, options.moquiConfig));
+  }
+  if (options.workOrderOut) {
+    loopArgs.push('--work-order-out', resolvePath(cwd, options.workOrderOut));
+  }
+  if (options.workOrderMarkdownOut) {
+    loopArgs.push('--work-order-markdown-out', resolvePath(cwd, options.workOrderMarkdownOut));
   }
   if (options.approvalActor) {
     loopArgs.push('--approval-actor', options.approvalActor);
@@ -581,6 +649,9 @@ async function main() {
   }
   if (options.failOnGateNonAllow) {
     loopArgs.push('--fail-on-gate-non-allow');
+  }
+  if (options.failOnRuntimeNonAllow) {
+    loopArgs.push('--fail-on-runtime-non-allow');
   }
   if (options.failOnExecuteBlocked) {
     loopArgs.push('--fail-on-execute-blocked');
@@ -727,8 +798,13 @@ async function main() {
       status: loopPayload && loopPayload.summary ? loopPayload.summary.status : null,
       dialogue_decision: loopPayload && loopPayload.dialogue ? loopPayload.dialogue.decision : null,
       gate_decision: loopPayload && loopPayload.gate ? loopPayload.gate.decision : null,
+      runtime_decision: loopPayload && loopPayload.runtime ? loopPayload.runtime.decision : null,
+      runtime_mode: loopPayload && loopPayload.runtime ? loopPayload.runtime.mode : null,
+      runtime_environment: loopPayload && loopPayload.runtime ? loopPayload.runtime.environment : null,
       execution_result: loopPayload && loopPayload.execution ? loopPayload.execution.result : null,
       execution_reason: loopPayload && loopPayload.execution ? loopPayload.execution.reason || null : null,
+      work_order_id: loopPayload && loopPayload.work_order ? loopPayload.work_order.work_order_id || null : null,
+      work_order_status: loopPayload && loopPayload.work_order ? loopPayload.work_order.status || null : null,
       authorization_password_required: loopPayload && loopPayload.approval && loopPayload.approval.authorization
         ? loopPayload.approval.authorization.password_required === true
         : null,
@@ -744,6 +820,9 @@ async function main() {
       bridge_context_json: toRelative(cwd, bridgeOutContextPath),
       bridge_report_json: toRelative(cwd, bridgeOutReportPath),
       dialogue_json: loopPayload && loopPayload.artifacts ? loopPayload.artifacts.dialogue_json || null : null,
+      runtime_json: loopPayload && loopPayload.artifacts ? loopPayload.artifacts.runtime_json || null : null,
+      work_order_json: loopPayload && loopPayload.artifacts ? loopPayload.artifacts.work_order_json || null : null,
+      work_order_markdown: loopPayload && loopPayload.artifacts ? loopPayload.artifacts.work_order_md || null : null,
       loop_summary_json: toRelative(cwd, loopOutPath),
       flow_summary_json: toRelative(cwd, flowOutPath),
       matrix_summary_json: options.matrix ? toRelative(cwd, matrixOutPath) : null,
@@ -764,6 +843,8 @@ async function main() {
     process.stdout.write(`- Status: ${flowPayload.summary.status || 'unknown'}\n`);
     process.stdout.write(`- Dialogue decision: ${flowPayload.summary.dialogue_decision || 'n/a'}\n`);
     process.stdout.write(`- Gate decision: ${flowPayload.summary.gate_decision || 'n/a'}\n`);
+    process.stdout.write(`- Runtime decision: ${flowPayload.summary.runtime_decision || 'n/a'}\n`);
+    process.stdout.write(`- Work-order: ${flowPayload.summary.work_order_status || 'n/a'} (${flowPayload.summary.work_order_id || 'n/a'})\n`);
     if (options.matrix) {
       process.stdout.write(`- Matrix status: ${flowPayload.summary.matrix_status || 'unknown'}\n`);
       process.stdout.write(`- Matrix portfolio pass: ${flowPayload.summary.matrix_portfolio_passed === true ? 'yes' : 'no'}\n`);
@@ -810,6 +891,10 @@ module.exports = {
   DEFAULT_PROVIDER,
   DEFAULT_OUT_DIR,
   DEFAULT_USER_ID,
+  DEFAULT_RUNTIME_MODE,
+  DEFAULT_RUNTIME_ENVIRONMENT,
+  RUNTIME_MODES,
+  RUNTIME_ENVIRONMENTS,
   parseArgs,
   resolvePath,
   normalizeSessionId,

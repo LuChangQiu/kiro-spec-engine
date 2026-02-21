@@ -1,0 +1,99 @@
+{
+  "version": "1.0.0",
+  "profile": "interactive-runtime-default",
+  "defaults": {
+    "runtime_mode": "ops-fix",
+    "runtime_environment": "staging"
+  },
+  "modes": {
+    "user-assist": {
+      "description": "Business user guidance mode. Prefer suggestion and controlled changes.",
+      "allow_execution_modes": [
+        "suggestion",
+        "apply"
+      ],
+      "allow_mutating_apply": false,
+      "deny_action_types": [
+        "credential_export",
+        "permission_grant_super_admin",
+        "bulk_delete_without_filter"
+      ],
+      "review_required_action_types": [
+        "workflow_approval_chain_change",
+        "payment_rule_change",
+        "inventory_adjustment_bulk"
+      ],
+      "require_work_order": true
+    },
+    "ops-fix": {
+      "description": "Operational maintenance and bug-fix mode.",
+      "allow_execution_modes": [
+        "suggestion",
+        "apply"
+      ],
+      "allow_mutating_apply": true,
+      "deny_action_types": [
+        "credential_export"
+      ],
+      "review_required_action_types": [
+        "permission_grant_super_admin",
+        "bulk_delete_without_filter"
+      ],
+      "require_work_order": true
+    },
+    "feature-dev": {
+      "description": "Feature development mode for controlled iterative delivery.",
+      "allow_execution_modes": [
+        "suggestion",
+        "apply"
+      ],
+      "allow_mutating_apply": true,
+      "deny_action_types": [
+        "credential_export"
+      ],
+      "review_required_action_types": [
+        "workflow_approval_chain_change",
+        "permission_grant_super_admin",
+        "bulk_delete_without_filter"
+      ],
+      "require_work_order": true
+    }
+  },
+  "environments": {
+    "dev": {
+      "allow_live_apply": true,
+      "require_dry_run_before_live_apply": false,
+      "require_password_for_apply_mutations": true,
+      "require_approval_for_risk_levels": [
+        "high"
+      ],
+      "max_risk_level_for_apply": "high",
+      "max_auto_execute_risk_level": "medium",
+      "manual_review_required_for_apply": false
+    },
+    "staging": {
+      "allow_live_apply": true,
+      "require_dry_run_before_live_apply": true,
+      "require_password_for_apply_mutations": true,
+      "require_approval_for_risk_levels": [
+        "medium",
+        "high"
+      ],
+      "max_risk_level_for_apply": "high",
+      "max_auto_execute_risk_level": "low",
+      "manual_review_required_for_apply": false
+    },
+    "prod": {
+      "allow_live_apply": false,
+      "require_dry_run_before_live_apply": true,
+      "require_password_for_apply_mutations": true,
+      "require_approval_for_risk_levels": [
+        "medium",
+        "high"
+      ],
+      "max_risk_level_for_apply": "medium",
+      "max_auto_execute_risk_level": "low",
+      "manual_review_required_for_apply": true
+    }
+  }
+}

@@ -1148,6 +1148,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           body_path: ${{ steps.release_notes.outputs.release_body_file }}
+          fail_on_unmatched_files: false
           files: |
             ${{ steps.release_notes.outputs.asset_files }}
             ${{ steps.interactive_governance.outputs.json_file }}

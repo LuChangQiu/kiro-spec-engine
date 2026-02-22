@@ -784,7 +784,7 @@ Autonomous KPI trend:
 Unified observability snapshot:
 - `sce auto observability snapshot [--days <n>] [--status <csv>] [--weeks <n>] [--trend-mode <mode>] [--trend-period <period>] [--out <path>] [--json]`: generate one unified observability snapshot that combines close-loop session stats, batch stats, controller stats, governance session stats, governance health, and KPI trend.
 - JSON output includes top-level `highlights` plus detailed archive/trend payloads under `snapshots`.
-  - `highlights` includes governance weekly-ops pressure counters (`governance_weekly_ops_stop_sessions`, high-pressure/config-warning/auth-tier/dialogue pressure counts/rates).
+  - `highlights` includes governance weekly-ops pressure counters (`governance_weekly_ops_stop_sessions`, high-pressure/config-warning/auth-tier/dialogue pressure counts/rates) plus runtime pressure counters (`governance_weekly_ops_runtime_block_rate_high_sessions`, `governance_weekly_ops_runtime_ui_mode_violation_high_sessions`, `governance_weekly_ops_runtime_ui_mode_violation_total_sum`).
   - `snapshots.governance_weekly_ops_stop` exposes the full weekly-ops stop aggregate object from governance session stats for direct dashboard consumption.
 
 Agent-facing spec interfaces:
@@ -816,7 +816,7 @@ Dual-track handoff integration:
   - When `manifest.capabilities` is not declared, sce attempts lexicon-based capability inference from `manifest.templates` first; only fully non-mappable manifests keep capability coverage in skipped mode.
   - Run output includes `release_gate_preflight` (latest release gate history signal snapshot + blocked reasons) and carries this context into `warnings`.
   - `release_gate_preflight` is advisory by default; use `--require-release-gate-preflight` to hard-fail when preflight is unavailable/blocked.
-  - `phases[*].details` for `observability` now includes weekly-ops stop pressure counters (`weekly_ops_stop_sessions`, `weekly_ops_high_pressure_sessions`, config-warning/auth-tier/dialogue pressure session counts) sourced from the unified observability snapshot.
+  - `phases[*].details` for `observability` now includes weekly-ops stop pressure counters (`weekly_ops_stop_sessions`, `weekly_ops_high_pressure_sessions`, config-warning/auth-tier/dialogue pressure session counts) and runtime pressure counters (`weekly_ops_runtime_block_rate_high_sessions`, `weekly_ops_runtime_ui_mode_violation_high_sessions`, `weekly_ops_runtime_ui_mode_violation_total_sum`) sourced from the unified observability snapshot.
   - `--profile` applies preset gate policy defaults before explicit option overrides:
     - `default`: current baseline gate policy.
     - `moqui`: explicit Moqui-intake baseline (same strict defaults as `default`).
@@ -846,7 +846,7 @@ Dual-track handoff integration:
   - Default scan dir is `.kiro/reports/release-evidence`, default output file is `.kiro/reports/release-evidence/release-gate-history.json`.
   - `--history-file` merges an existing index (for example, previous release asset) before dedup/refresh.
   - `--keep` retains latest N entries (`1-5000`, default `200`).
-  - Aggregates include scene package batch, capability unknown trend, drift, weekly ops pressure, config warning pressure, and release-preflight/hard-gate signals (`scene_package_batch_*`, `capability_expected_unknown_*`, `capability_provided_unknown_*`, `drift_alert_*`, `drift_block_*`, `weekly_ops_*`, `config_warnings_total`, `release_gate_preflight_*`) when present in gate reports.
+  - Aggregates include scene package batch, capability unknown trend, drift, weekly ops pressure (including runtime ui-mode/runtime block-rate telemetry), config warning pressure, and release-preflight/hard-gate signals (`scene_package_batch_*`, `capability_expected_unknown_*`, `capability_provided_unknown_*`, `drift_alert_*`, `drift_block_*`, `weekly_ops_*`, `config_warnings_total`, `release_gate_preflight_*`) when present in gate reports.
   - `--markdown-out <path>` writes a human-readable trend card markdown for PR/Issue handoff.
 
 Moqui template library lexicon audit (script-level governance helper):

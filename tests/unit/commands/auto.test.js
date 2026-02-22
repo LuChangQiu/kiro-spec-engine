@@ -4713,7 +4713,10 @@ if (process.argv.includes('--json')) {
         weekly_ops_governance_status: 'alert',
         weekly_ops_authorization_tier_block_rate_percent: 58,
         weekly_ops_dialogue_authorization_block_rate_percent: 66,
-        weekly_ops_config_warning_count: 2
+        weekly_ops_config_warning_count: 2,
+        weekly_ops_runtime_block_rate_percent: 52,
+        weekly_ops_runtime_ui_mode_violation_total: 2,
+        weekly_ops_runtime_ui_mode_violation_rate_percent: 25
       },
       aggregates: {
         pass_rate_percent: 40,
@@ -4728,7 +4731,14 @@ if (process.argv.includes('--json')) {
         weekly_ops_warnings_total: 5,
         weekly_ops_config_warnings_total: 2,
         weekly_ops_authorization_tier_block_rate_max_percent: 58,
-        weekly_ops_dialogue_authorization_block_rate_max_percent: 66
+        weekly_ops_dialogue_authorization_block_rate_max_percent: 66,
+        weekly_ops_runtime_block_rate_max_percent: 52,
+        weekly_ops_runtime_ui_mode_violation_known_runs: 4,
+        weekly_ops_runtime_ui_mode_violation_runs: 2,
+        weekly_ops_runtime_ui_mode_violation_run_rate_percent: 50,
+        weekly_ops_runtime_ui_mode_violation_total: 2,
+        weekly_ops_runtime_ui_mode_violation_rate_avg_percent: 20,
+        weekly_ops_runtime_ui_mode_violation_rate_max_percent: 25
       },
       entries: []
     }, { spaces: 2 });
@@ -4745,16 +4755,19 @@ if (process.argv.includes('--json')) {
       latest_gate_passed: false,
       drift_alert_rate_percent: 100,
       weekly_ops_blocked_runs: 2,
-      weekly_ops_dialogue_authorization_block_rate_max_percent: 66
+      weekly_ops_dialogue_authorization_block_rate_max_percent: 66,
+      weekly_ops_runtime_ui_mode_violation_total: 2
     }));
     expect(parsed.health.concerns).toEqual(expect.arrayContaining([
       expect.stringContaining('Latest release gate evaluation is failed'),
-      expect.stringContaining('Weekly ops config warnings total is 2')
+      expect.stringContaining('Weekly ops config warnings total is 2'),
+      expect.stringContaining('runtime ui-mode violations total is 2')
     ]));
     expect(parsed.health.recommendations).toEqual(expect.arrayContaining([
       expect.stringContaining('sce auto handoff evidence --window 5 --json'),
       expect.stringContaining('KSE_RELEASE_WEEKLY_OPS_*'),
-      expect.stringContaining('interactive-dialogue-governance.js')
+      expect.stringContaining('interactive-dialogue-governance.js'),
+      expect.stringContaining('interactive-governance-report.js')
     ]));
   });
 
@@ -5703,7 +5716,10 @@ if (process.argv.includes('--json')) {
         weekly_ops_governance_status: 'alert',
         weekly_ops_authorization_tier_block_rate_percent: 58,
         weekly_ops_dialogue_authorization_block_rate_percent: 66,
-        weekly_ops_config_warning_count: 2
+        weekly_ops_config_warning_count: 2,
+        weekly_ops_runtime_block_rate_percent: 55,
+        weekly_ops_runtime_ui_mode_violation_total: 1,
+        weekly_ops_runtime_ui_mode_violation_rate_percent: 25
       },
       aggregates: {
         pass_rate_percent: 100,
@@ -5718,7 +5734,14 @@ if (process.argv.includes('--json')) {
         weekly_ops_warnings_total: 5,
         weekly_ops_config_warnings_total: 2,
         weekly_ops_authorization_tier_block_rate_max_percent: 58,
-        weekly_ops_dialogue_authorization_block_rate_max_percent: 66
+        weekly_ops_dialogue_authorization_block_rate_max_percent: 66,
+        weekly_ops_runtime_block_rate_max_percent: 55,
+        weekly_ops_runtime_ui_mode_violation_known_runs: 4,
+        weekly_ops_runtime_ui_mode_violation_runs: 1,
+        weekly_ops_runtime_ui_mode_violation_run_rate_percent: 25,
+        weekly_ops_runtime_ui_mode_violation_total: 1,
+        weekly_ops_runtime_ui_mode_violation_rate_avg_percent: 10,
+        weekly_ops_runtime_ui_mode_violation_rate_max_percent: 25
       },
       entries: []
     }, { spaces: 2 });
@@ -5752,7 +5775,14 @@ if (process.argv.includes('--json')) {
       'weekly-ops-config-warnings-positive:2',
       'weekly-ops-blocked-runs-positive:2',
       'weekly-ops-auth-tier-block-rate-high:58',
-      'weekly-ops-dialogue-authorization-block-rate-high:66'
+      'weekly-ops-dialogue-authorization-block-rate-high:66',
+      'weekly-ops-latest-runtime-block-rate-high:55',
+      'weekly-ops-latest-runtime-ui-mode-violations-positive:1',
+      'weekly-ops-latest-runtime-ui-mode-violation-rate-positive:25',
+      'weekly-ops-runtime-block-rate-high:55',
+      'weekly-ops-runtime-ui-mode-violations-positive:1',
+      'weekly-ops-runtime-ui-mode-violation-run-rate-positive:25',
+      'weekly-ops-runtime-ui-mode-violation-rate-high:25'
     ]));
     expect(parsed.stop_detail.weekly_ops).toEqual(expect.objectContaining({
       latest: expect.objectContaining({
@@ -5761,7 +5791,10 @@ if (process.argv.includes('--json')) {
         governance_status: 'alert',
         authorization_tier_block_rate_percent: 58,
         dialogue_authorization_block_rate_percent: 66,
-        config_warning_count: 2
+        config_warning_count: 2,
+        runtime_block_rate_percent: 55,
+        runtime_ui_mode_violation_total: 1,
+        runtime_ui_mode_violation_rate_percent: 25
       }),
       aggregates: expect.objectContaining({
         blocked_runs: 2,
@@ -5770,21 +5803,28 @@ if (process.argv.includes('--json')) {
         warnings_total: 5,
         config_warnings_total: 2,
         authorization_tier_block_rate_max_percent: 58,
-        dialogue_authorization_block_rate_max_percent: 66
+        dialogue_authorization_block_rate_max_percent: 66,
+        runtime_block_rate_max_percent: 55,
+        runtime_ui_mode_violation_total: 1,
+        runtime_ui_mode_violation_run_rate_percent: 25,
+        runtime_ui_mode_violation_rate_max_percent: 25
       }),
       pressure: expect.objectContaining({
         blocked: true,
         high: true,
         config_warning_positive: true,
         auth_tier_block_rate_high: true,
-        dialogue_authorization_block_rate_high: true
+        dialogue_authorization_block_rate_high: true,
+        runtime_block_rate_high: true,
+        runtime_ui_mode_violation_high: true
       })
     }));
     expect(parsed.recommendations).toEqual(expect.arrayContaining([
       expect.stringContaining('release-ops-weekly-summary.js'),
       expect.stringContaining('KSE_RELEASE_WEEKLY_OPS_*'),
       expect.stringContaining('interactive-authorization-tier-evaluate.js'),
-      expect.stringContaining('interactive-dialogue-governance.js')
+      expect.stringContaining('interactive-dialogue-governance.js'),
+      expect.stringContaining('interactive-governance-report.js')
     ]));
   });
 
@@ -6439,7 +6479,10 @@ if (process.argv.includes('--json')) {
             governance_status: 'alert',
             authorization_tier_block_rate_percent: 58,
             dialogue_authorization_block_rate_percent: 66,
-            config_warning_count: 2
+            config_warning_count: 2,
+            runtime_block_rate_percent: 55,
+            runtime_ui_mode_violation_total: 1,
+            runtime_ui_mode_violation_rate_percent: 25
           },
           aggregates: {
             blocked_runs: 2,
@@ -6448,14 +6491,20 @@ if (process.argv.includes('--json')) {
             warnings_total: 5,
             config_warnings_total: 2,
             authorization_tier_block_rate_max_percent: 58,
-            dialogue_authorization_block_rate_max_percent: 66
+            dialogue_authorization_block_rate_max_percent: 66,
+            runtime_block_rate_max_percent: 55,
+            runtime_ui_mode_violation_total: 1,
+            runtime_ui_mode_violation_run_rate_percent: 25,
+            runtime_ui_mode_violation_rate_max_percent: 25
           },
           pressure: {
             blocked: true,
             high: true,
             config_warning_positive: true,
             auth_tier_block_rate_high: true,
-            dialogue_authorization_block_rate_high: true
+            dialogue_authorization_block_rate_high: true,
+            runtime_block_rate_high: true,
+            runtime_ui_mode_violation_high: true
           }
         }
       },
@@ -6596,6 +6645,8 @@ if (process.argv.includes('--json')) {
     expect(listPayload.sessions[0].stop_detail_weekly_ops_available).toBe(true);
     expect(listPayload.sessions[0].stop_detail_weekly_ops_high_pressure).toBe(true);
     expect(listPayload.sessions[0].stop_detail_weekly_ops_config_warning_positive).toBe(true);
+    expect(listPayload.sessions[0].stop_detail_weekly_ops_runtime_block_rate_high).toBe(true);
+    expect(listPayload.sessions[0].stop_detail_weekly_ops_runtime_ui_mode_violation_high).toBe(true);
 
     logSpy.mockClear();
     const resumedListProgram = buildProgram();
@@ -6673,13 +6724,21 @@ if (process.argv.includes('--json')) {
       auth_tier_pressure_rate_percent: 100,
       dialogue_authorization_pressure_sessions: 1,
       dialogue_authorization_pressure_rate_percent: 100,
+      runtime_block_rate_high_sessions: 1,
+      runtime_block_rate_high_rate_percent: 100,
+      runtime_ui_mode_violation_high_sessions: 1,
+      runtime_ui_mode_violation_high_rate_percent: 100,
       blocked_runs_sum: 2,
       average_blocked_runs: 2,
       average_block_rate_percent: 50,
       config_warnings_total_sum: 2,
       average_config_warnings_total: 2,
       average_auth_tier_block_rate_percent: 58,
-      average_dialogue_authorization_block_rate_percent: 66
+      average_dialogue_authorization_block_rate_percent: 66,
+      average_runtime_block_rate_percent: 55,
+      runtime_ui_mode_violation_total_sum: 1,
+      average_runtime_ui_mode_violation_total: 1,
+      average_runtime_ui_mode_violation_rate_percent: 25
     }));
 
     logSpy.mockClear();
@@ -6724,7 +6783,9 @@ if (process.argv.includes('--json')) {
           'weekly-ops-latest-risk-high',
           'weekly-ops-config-warnings-positive:2',
           'weekly-ops-auth-tier-block-rate-high:58',
-          'weekly-ops-dialogue-authorization-block-rate-high:66'
+          'weekly-ops-dialogue-authorization-block-rate-high:66',
+          'weekly-ops-runtime-block-rate-high:55',
+          'weekly-ops-runtime-ui-mode-violations-positive:1'
         ]
       },
       final_assessment: {
@@ -6774,14 +6835,20 @@ if (process.argv.includes('--json')) {
       auth_tier_pressure_sessions: 1,
       auth_tier_pressure_rate_percent: 100,
       dialogue_authorization_pressure_sessions: 1,
-      dialogue_authorization_pressure_rate_percent: 100
+      dialogue_authorization_pressure_rate_percent: 100,
+      runtime_block_rate_high_sessions: 1,
+      runtime_block_rate_high_rate_percent: 100,
+      runtime_ui_mode_violation_high_sessions: 1,
+      runtime_ui_mode_violation_high_rate_percent: 100
     }));
     expect(parsed.latest_sessions[0]).toEqual(expect.objectContaining({
       id: 'governance-session-legacy-weekly-ops',
       stop_detail_weekly_ops_available: true,
       stop_detail_weekly_ops_blocked: true,
       stop_detail_weekly_ops_high_pressure: true,
-      stop_detail_weekly_ops_config_warning_positive: true
+      stop_detail_weekly_ops_config_warning_positive: true,
+      stop_detail_weekly_ops_runtime_block_rate_high: true,
+      stop_detail_weekly_ops_runtime_ui_mode_violation_high: true
     }));
   });
 
@@ -7408,7 +7475,9 @@ if (process.argv.includes('--json')) {
           'weekly-ops-latest-blocked',
           'weekly-ops-config-warnings-positive:1',
           'weekly-ops-auth-tier-block-rate-high:58',
-          'weekly-ops-dialogue-authorization-block-rate-high:66'
+          'weekly-ops-dialogue-authorization-block-rate-high:66',
+          'weekly-ops-runtime-block-rate-high:55',
+          'weekly-ops-runtime-ui-mode-violations-positive:1'
         ],
         weekly_ops: {
           latest: {
@@ -7417,7 +7486,10 @@ if (process.argv.includes('--json')) {
             governance_status: 'alert',
             authorization_tier_block_rate_percent: 58,
             dialogue_authorization_block_rate_percent: 66,
-            config_warning_count: 1
+            config_warning_count: 1,
+            runtime_block_rate_percent: 55,
+            runtime_ui_mode_violation_total: 1,
+            runtime_ui_mode_violation_rate_percent: 25
           },
           aggregates: {
             blocked_runs: 1,
@@ -7426,14 +7498,20 @@ if (process.argv.includes('--json')) {
             warnings_total: 1,
             config_warnings_total: 1,
             authorization_tier_block_rate_max_percent: 58,
-            dialogue_authorization_block_rate_max_percent: 66
+            dialogue_authorization_block_rate_max_percent: 66,
+            runtime_block_rate_max_percent: 55,
+            runtime_ui_mode_violation_total: 1,
+            runtime_ui_mode_violation_run_rate_percent: 100,
+            runtime_ui_mode_violation_rate_max_percent: 25
           },
           pressure: {
             blocked: true,
             high: true,
             config_warning_positive: true,
             auth_tier_block_rate_high: true,
-            dialogue_authorization_block_rate_high: true
+            dialogue_authorization_block_rate_high: true,
+            runtime_block_rate_high: true,
+            runtime_ui_mode_violation_high: true
           }
         }
       },
@@ -7465,14 +7543,20 @@ if (process.argv.includes('--json')) {
       governance_weekly_ops_high_pressure_rate_percent: 100,
       governance_weekly_ops_config_warning_positive_sessions: 1,
       governance_weekly_ops_auth_tier_pressure_sessions: 1,
-      governance_weekly_ops_dialogue_authorization_pressure_sessions: 1
+      governance_weekly_ops_dialogue_authorization_pressure_sessions: 1,
+      governance_weekly_ops_runtime_block_rate_high_sessions: 1,
+      governance_weekly_ops_runtime_ui_mode_violation_high_sessions: 1,
+      governance_weekly_ops_runtime_ui_mode_violation_total_sum: 1
     }));
     expect(parsed.snapshots.governance_weekly_ops_stop).toEqual(expect.objectContaining({
       sessions: 1,
       high_pressure_sessions: 1,
       config_warning_positive_sessions: 1,
       average_auth_tier_block_rate_percent: 58,
-      average_dialogue_authorization_block_rate_percent: 66
+      average_dialogue_authorization_block_rate_percent: 66,
+      average_runtime_block_rate_percent: 55,
+      runtime_ui_mode_violation_total_sum: 1,
+      average_runtime_ui_mode_violation_total: 1
     }));
     expect(parsed.snapshots.kpi_trend).toEqual(expect.objectContaining({
       mode: 'auto-kpi-trend',
@@ -8331,7 +8415,9 @@ if (process.argv.includes('--json')) {
           'weekly-ops-latest-blocked',
           'weekly-ops-config-warnings-positive:1',
           'weekly-ops-auth-tier-block-rate-high:58',
-          'weekly-ops-dialogue-authorization-block-rate-high:66'
+          'weekly-ops-dialogue-authorization-block-rate-high:66',
+          'weekly-ops-runtime-block-rate-high:55',
+          'weekly-ops-runtime-ui-mode-violations-positive:1'
         ]
       },
       governance_session: {
@@ -8398,7 +8484,10 @@ if (process.argv.includes('--json')) {
         weekly_ops_high_pressure_sessions: 1,
         weekly_ops_config_warning_positive_sessions: 1,
         weekly_ops_auth_tier_pressure_sessions: 1,
-        weekly_ops_dialogue_authorization_pressure_sessions: 1
+        weekly_ops_dialogue_authorization_pressure_sessions: 1,
+        weekly_ops_runtime_block_rate_high_sessions: 1,
+        weekly_ops_runtime_ui_mode_violation_high_sessions: 1,
+        weekly_ops_runtime_ui_mode_violation_total_sum: 0
       })
     }));
     expect(payload.queue.output_file).toBe(queueFile);
@@ -8422,7 +8511,8 @@ if (process.argv.includes('--json')) {
     expect(payload.recommendations.some(item => item.includes('sce auto handoff regression --session-id'))).toBe(true);
     expect(payload.recommendations).toEqual(expect.arrayContaining([
       'node scripts/release-ops-weekly-summary.js --json',
-      'node scripts/release-weekly-ops-gate.js'
+      'node scripts/release-weekly-ops-gate.js',
+      'node scripts/interactive-governance-report.js --period weekly --fail-on-alert --json'
     ]));
     expect(payload.failure_summary.highlights).toEqual(expect.arrayContaining([
       expect.stringContaining('observability_weekly_ops_stop: sessions=1')
@@ -11419,6 +11509,9 @@ if (process.argv.includes('--json')) {
           governance_status: 'ok',
           authorization_tier_block_rate_percent: 35,
           dialogue_authorization_block_rate_percent: 30,
+          runtime_block_rate_percent: 15,
+          runtime_ui_mode_violation_total: 0,
+          runtime_ui_mode_violation_rate_percent: 0,
           matrix_regression_positive_rate_percent: 10
         }
       },
@@ -11473,6 +11566,9 @@ if (process.argv.includes('--json')) {
           governance_status: 'alert',
           authorization_tier_block_rate_percent: 55,
           dialogue_authorization_block_rate_percent: 66,
+          runtime_block_rate_percent: 52,
+          runtime_ui_mode_violation_total: 2,
+          runtime_ui_mode_violation_rate_percent: 25,
           matrix_regression_positive_rate_percent: 40
         }
       },
@@ -11539,6 +11635,9 @@ if (process.argv.includes('--json')) {
       weekly_ops_authorization_tier_block_rate_percent: 55,
       weekly_ops_dialogue_authorization_block_rate_percent: 66,
       weekly_ops_matrix_regression_positive_rate_percent: 40,
+      weekly_ops_runtime_block_rate_percent: 52,
+      weekly_ops_runtime_ui_mode_violation_total: 2,
+      weekly_ops_runtime_ui_mode_violation_rate_percent: 25,
       weekly_ops_violations_count: 1,
       weekly_ops_warning_count: 0,
       weekly_ops_config_warning_count: 2,
@@ -11581,6 +11680,14 @@ if (process.argv.includes('--json')) {
       weekly_ops_dialogue_authorization_block_rate_max_percent: 66,
       weekly_ops_matrix_regression_positive_rate_avg_percent: 25,
       weekly_ops_matrix_regression_positive_rate_max_percent: 40,
+      weekly_ops_runtime_block_rate_avg_percent: 33.5,
+      weekly_ops_runtime_block_rate_max_percent: 52,
+      weekly_ops_runtime_ui_mode_violation_known_runs: 2,
+      weekly_ops_runtime_ui_mode_violation_runs: 1,
+      weekly_ops_runtime_ui_mode_violation_run_rate_percent: 50,
+      weekly_ops_runtime_ui_mode_violation_total: 2,
+      weekly_ops_runtime_ui_mode_violation_rate_avg_percent: 12.5,
+      weekly_ops_runtime_ui_mode_violation_rate_max_percent: 25,
       release_gate_preflight_known_runs: 2,
       release_gate_preflight_available_runs: 2,
       release_gate_preflight_blocked_runs: 1,
@@ -11601,6 +11708,9 @@ if (process.argv.includes('--json')) {
       weekly_ops_blocked: true,
       weekly_ops_dialogue_authorization_block_rate_percent: 66,
       weekly_ops_config_warning_count: 2,
+      weekly_ops_runtime_block_rate_percent: 52,
+      weekly_ops_runtime_ui_mode_violation_total: 2,
+      weekly_ops_runtime_ui_mode_violation_rate_percent: 25,
       drift_alert_count: 2,
       drift_blocked: true
     }));
@@ -11664,9 +11774,11 @@ if (process.argv.includes('--json')) {
     expect(markdown).toContain('Release preflight blocked runs');
     expect(markdown).toContain('Weekly ops known runs');
     expect(markdown).toContain('Weekly ops config warnings total');
+    expect(markdown).toContain('Weekly ops runtime ui-mode violations total');
     expect(markdown).toContain('drift-alerts=');
     expect(markdown).toContain('weekly-blocked=');
     expect(markdown).toContain('weekly-config-warnings=');
+    expect(markdown).toContain('weekly-runtime-ui-mode=');
     expect(markdown).toContain('capability-unknown=');
     expect(markdown).toContain('preflight-blocked=');
     expect(markdown).toContain('hard-gate=');

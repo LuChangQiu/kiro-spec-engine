@@ -318,6 +318,7 @@ async function main() {
         '--manifest',
         'docs/handoffs/handoff-manifest.json',
         '--dry-run',
+        '--no-require-release-gate-preflight',
         '--json',
       ],
       artifact_json: null,

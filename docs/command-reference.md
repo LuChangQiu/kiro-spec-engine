@@ -941,6 +941,20 @@ Release asset integrity check helper (release artifact completeness gate):
   - merges result into `RELEASE_GATE_REPORT_FILE` when provided.
 - npm alias: `npm run gate:release-asset-integrity`
 
+Release optional-asset nonempty normalize helper (pre-upload 0-byte guard):
+- `node scripts/release-asset-nonempty-normalize.js --file <path> [--file <path> ...] [--kind auto|json|jsonl|lines|text] [--note <text>] [--event <event>] [--dry-run] [--json]`:
+  - creates placeholder content when file is missing.
+  - fills placeholder content when file exists but is empty.
+  - keeps file untouched when it already has content.
+  - intended for optional release assets (`.jsonl`, `.lines`) before GitHub Release upload.
+
+Autonomous strategy router helper (answer/code/fix/rollback policy):
+- `node scripts/auto-strategy-router.js --input-file <path> [--policy-file <path>] --json`
+- `node scripts/auto-strategy-router.js --input '{"goal_type":"bugfix","requires_write":true}' --json`
+  - returns decision: `answer_only|code_change|code_fix|rollback`.
+  - returns `reasons[]` and `next_actions[]` for auditable routing.
+  - default policy baseline: `docs/agent-runtime/strategy-routing-policy-baseline.json`.
+
 Matrix regression gate helper (script-level configurable hard gate):
 - `node scripts/matrix-regression-gate.js [--baseline <path>] [--max-regressions <n>] [--enforce] [--out <path>] [--json]`: evaluate matrix regression count from baseline compare payload (`coverage_matrix_regressions` preferred, fallback `regressions`) and enforce hard gate when enabled.
   - Default baseline input: `.kiro/reports/release-evidence/moqui-template-baseline.json`

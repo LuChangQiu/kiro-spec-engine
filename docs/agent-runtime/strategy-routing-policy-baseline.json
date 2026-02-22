@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0",
+  "decision_actions": [
+    "answer_only",
+    "code_change",
+    "code_fix",
+    "rollback"
+  ],
+  "answer_only_goal_types": [
+    "question",
+    "analysis",
+    "explain",
+    "summarize"
+  ],
+  "rollback_when": {
+    "require_checkpoint": true,
+    "require_high_risk_or_explicit": true
+  },
+  "code_fix_when_tests_fail": true,
+  "notes": [
+    "default strategy is conservative and evidence-first",
+    "high-risk failures prefer rollback before iterative repair"
+  ]
+}

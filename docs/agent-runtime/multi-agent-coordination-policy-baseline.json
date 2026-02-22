@@ -1,0 +1,38 @@
+{
+  "version": "1.0.0",
+  "roles": {
+    "primary_agent": [
+      "goal decomposition",
+      "policy checks",
+      "final merge decision",
+      "release readiness summary"
+    ],
+    "sub_agent": [
+      "scoped implementation",
+      "targeted test execution",
+      "artifact evidence collection"
+    ]
+  },
+  "parallelism": {
+    "default_max_parallel": 3,
+    "adaptive_on_rate_limit": true,
+    "parallel_floor": 1,
+    "cooldown_ms": 45000
+  },
+  "coordination_rules": {
+    "require_scope_manifest": true,
+    "require_result_summary": true,
+    "block_merge_on_failed_tests": true,
+    "block_merge_on_unresolved_conflicts": true
+  },
+  "result_summary_contract": {
+    "required_fields": [
+      "spec_id",
+      "changed_files",
+      "tests_run",
+      "tests_passed",
+      "risk_level",
+      "open_issues"
+    ]
+  }
+}

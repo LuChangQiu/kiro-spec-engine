@@ -190,6 +190,12 @@
 - 主从编排与门禁增强
 - 跨轮次回归与发布治理集成
 
+### [SCE 能力矩阵路线图](../sce-capability-matrix-roadmap.md)
+**核心能力补齐路线（英文）** - 策略路由、符号证据、自修复、ontology 映射与多 agent 汇总
+- 任务策略决策闭环
+- 失败归因与有界修复
+- 跨项目能力沉淀与协同治理
+
 ### [Handoff Profile Integration Guide](../handoff-profile-integration-guide.md)
 **外部项目接入规范（英文）** - `default|moqui|enterprise` 三档 handoff profile 契约
 - profile 默认策略与显式参数覆盖规则

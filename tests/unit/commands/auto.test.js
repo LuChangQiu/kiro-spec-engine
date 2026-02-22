@@ -9181,14 +9181,21 @@ if (process.argv.includes('--json')) {
       latest: {
         tag: 'v1.47.35',
         gate_passed: false,
-        risk_level: 'high'
+        risk_level: 'high',
+        weekly_ops_runtime_block_rate_percent: 55,
+        weekly_ops_runtime_ui_mode_violation_total: 2,
+        weekly_ops_runtime_ui_mode_violation_rate_percent: 25
       },
       aggregates: {
         pass_rate_percent: 55,
         scene_package_batch_pass_rate_percent: 60,
         drift_alert_rate_percent: 100,
         drift_alert_runs: 2,
-        drift_blocked_runs: 1
+        drift_blocked_runs: 1,
+        weekly_ops_runtime_block_rate_max_percent: 55,
+        weekly_ops_runtime_ui_mode_violation_total: 2,
+        weekly_ops_runtime_ui_mode_violation_run_rate_percent: 50,
+        weekly_ops_runtime_ui_mode_violation_rate_max_percent: 25
       },
       entries: []
     }, { spaces: 2 });
@@ -9216,12 +9223,17 @@ if (process.argv.includes('--json')) {
     expect(payload.release_gate_preflight).toEqual(expect.objectContaining({
       available: true,
       blocked: true,
-      latest_gate_passed: false
+      latest_gate_passed: false,
+      latest_weekly_ops_runtime_block_rate_percent: 55,
+      latest_weekly_ops_runtime_ui_mode_violation_total: 2,
+      latest_weekly_ops_runtime_ui_mode_violation_rate_percent: 25
     }));
     expect(payload.phases.find(item => item.id === 'precheck').details.release_gate_preflight).toEqual(
       expect.objectContaining({
         available: true,
-        blocked: true
+        blocked: true,
+        latest_weekly_ops_runtime_block_rate_percent: 55,
+        latest_weekly_ops_runtime_ui_mode_violation_total: 2
       })
     );
     expect(Array.isArray(payload.warnings)).toBe(true);
@@ -9524,14 +9536,21 @@ if (process.argv.includes('--json')) {
       latest: {
         tag: 'v1.47.35',
         gate_passed: false,
-        risk_level: 'high'
+        risk_level: 'high',
+        weekly_ops_runtime_block_rate_percent: 48,
+        weekly_ops_runtime_ui_mode_violation_total: 1,
+        weekly_ops_runtime_ui_mode_violation_rate_percent: 20
       },
       aggregates: {
         pass_rate_percent: 55,
         scene_package_batch_pass_rate_percent: 60,
         drift_alert_rate_percent: 100,
         drift_alert_runs: 2,
-        drift_blocked_runs: 1
+        drift_blocked_runs: 1,
+        weekly_ops_runtime_block_rate_max_percent: 48,
+        weekly_ops_runtime_ui_mode_violation_total: 1,
+        weekly_ops_runtime_ui_mode_violation_run_rate_percent: 25,
+        weekly_ops_runtime_ui_mode_violation_rate_max_percent: 20
       },
       entries: []
     }, { spaces: 2 });
@@ -9559,7 +9578,9 @@ if (process.argv.includes('--json')) {
     expect(payload.error).toContain('handoff release gate preflight failed');
     expect(payload.release_gate_preflight).toEqual(expect.objectContaining({
       available: true,
-      blocked: true
+      blocked: true,
+      latest_weekly_ops_runtime_block_rate_percent: 48,
+      latest_weekly_ops_runtime_ui_mode_violation_total: 1
     }));
     expect(payload.recommendations.some(item => item.includes('sce auto handoff evidence --window 5 --json'))).toBe(true);
     expect(runAutoCloseLoop).not.toHaveBeenCalled();
@@ -11334,6 +11355,13 @@ if (process.argv.includes('--json')) {
             blocked: true,
             latest_tag: 'v1.47.35',
             latest_gate_passed: false,
+            latest_weekly_ops_runtime_block_rate_percent: 45,
+            latest_weekly_ops_runtime_ui_mode_violation_total: 1,
+            latest_weekly_ops_runtime_ui_mode_violation_rate_percent: 20,
+            weekly_ops_runtime_block_rate_max_percent: 45,
+            weekly_ops_runtime_ui_mode_violation_total: 1,
+            weekly_ops_runtime_ui_mode_violation_run_rate_percent: 100,
+            weekly_ops_runtime_ui_mode_violation_rate_max_percent: 20,
             reasons: ['latest-release-gate-failed', 'drift-alert-rate-positive:100']
           },
           failure_summary: {
@@ -11444,6 +11472,8 @@ if (process.argv.includes('--json')) {
     expect(releaseDraft).toContain('## Handoff Evidence Summary');
     expect(releaseDraft).toContain('Release gate preflight blocked: yes');
     expect(releaseDraft).toContain('Release gate preflight hard-gate: enabled');
+    expect(releaseDraft).toContain('Release gate runtime block rate (latest/max): 45/45%');
+    expect(releaseDraft).toContain('Release gate runtime ui-mode violations (latest/total): 1/1');
     expect(releaseDraft).toContain('Moqui entity coverage: 100%');
     expect(releaseDraft).toContain('Moqui business-rule closed: 83.33%');
     expect(releaseDraft).toContain('Moqui business-rule closed delta: 16.67%');
@@ -11459,6 +11489,8 @@ if (process.argv.includes('--json')) {
     expect(reviewMarkdown).toContain('# Auto Handoff Release Evidence Review');
     expect(reviewMarkdown).toContain('## Current Gate');
     expect(reviewMarkdown).toContain('## Current Release Gate Preflight');
+    expect(reviewMarkdown).toContain('Runtime block rate (latest/max): 45/45%');
+    expect(reviewMarkdown).toContain('Runtime ui-mode violations (latest/total): 1/1');
     expect(reviewMarkdown).toContain('## Current Failure Summary');
     expect(reviewMarkdown).toContain('Delta business-rule closed: 16.67%');
     expect(reviewMarkdown).toContain('Matrix regression gate (max): 0');

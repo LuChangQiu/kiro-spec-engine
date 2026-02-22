@@ -815,6 +815,7 @@ Dual-track handoff integration:
   - Run output includes `moqui_capability_coverage` snapshot by default (when manifest `capabilities` is declared), with artifacts at `.kiro/reports/release-evidence/moqui-capability-coverage.json` and `.kiro/reports/release-evidence/moqui-capability-coverage.md`.
   - When `manifest.capabilities` is not declared, sce attempts lexicon-based capability inference from `manifest.templates` first; only fully non-mappable manifests keep capability coverage in skipped mode.
   - Run output includes `release_gate_preflight` (latest release gate history signal snapshot + blocked reasons) and carries this context into `warnings`.
+  - `release_gate_preflight` now also carries runtime weekly-ops pressure metrics (`latest_weekly_ops_runtime_block_rate_percent`, `latest_weekly_ops_runtime_ui_mode_violation_total`, `latest_weekly_ops_runtime_ui_mode_violation_rate_percent`) for UI-mode policy diagnostics.
   - `release_gate_preflight` is advisory by default; use `--require-release-gate-preflight` to hard-fail when preflight is unavailable/blocked.
   - `phases[*].details` for `observability` now includes weekly-ops stop pressure counters (`weekly_ops_stop_sessions`, `weekly_ops_high_pressure_sessions`, config-warning/auth-tier/dialogue pressure session counts) and runtime pressure counters (`weekly_ops_runtime_block_rate_high_sessions`, `weekly_ops_runtime_ui_mode_violation_high_sessions`, `weekly_ops_runtime_ui_mode_violation_total_sum`) sourced from the unified observability snapshot.
   - `--profile` applies preset gate policy defaults before explicit option overrides:
@@ -839,6 +840,7 @@ Dual-track handoff integration:
   - `--window` (1-50, default `5`) controls how many recent sessions are aggregated in review.
   - JSON output includes `current_overview` (with `release_gate_preflight`, `failure_summary`, and preflight policy flags), `aggregates.status_counts`, `aggregates.gate_pass_rate_percent`, and `risk_layers`.
   - Markdown output includes `Current Gate`, `Current Release Gate Preflight`, `Current Failure Summary`, `Current Ontology`, `Current Regression`, `Current Moqui Baseline`, `Current Capability Coverage`, `Trend Series`, and `Risk Layer View`.
+  - `Current Release Gate Preflight` includes runtime pressure lines (runtime block-rate and ui-mode violation totals/rates) when signals exist in release-gate history.
   - Add `--release-draft <path>` to auto-generate a release notes draft and evidence review markdown in one run.
   - `--release-version` sets draft version tag (defaults to `v<package.json version>`), and `--release-date` accepts `YYYY-MM-DD` (default: current UTC date).
   - Use `--review-out <path>` to override the generated evidence review markdown path (default `.kiro/reports/release-evidence/handoff-evidence-review.md`).

@@ -98,7 +98,10 @@ jobs:
           if [[ -f "${SIGNAL_SOURCE}" ]]; then
             cp "${SIGNAL_SOURCE}" "${SIGNAL_RELEASE_FILE}"
           else
-            : > "${SIGNAL_RELEASE_FILE}"
+            printf '%s\n' '{"event":"no-interactive-matrix-signals","note":"No interactive matrix signals collected for this release."}' > "${SIGNAL_RELEASE_FILE}"
+          fi
+          if [[ ! -s "${SIGNAL_RELEASE_FILE}" ]]; then
+            printf '%s\n' '{"event":"empty-interactive-matrix-signals","note":"Interactive matrix signal file was empty; emitted placeholder entry for release asset integrity."}' > "${SIGNAL_RELEASE_FILE}"
           fi
           echo "signal_file=${SIGNAL_RELEASE_FILE}" >> "$GITHUB_OUTPUT"
 
@@ -252,6 +255,16 @@ jobs:
             --medium-lines "${REMEDIATION_MEDIUM_LINES}" \
             --dry-run \
             --json > "${REMEDIATION_PHASED_PLAN_JSON}"
+
+          if [[ ! -s "${REMEDIATION_LINES}" ]]; then
+            printf '%s\n' '# no matrix remediation items for this release' > "${REMEDIATION_LINES}"
+          fi
+          if [[ ! -s "${REMEDIATION_HIGH_LINES}" ]]; then
+            printf '%s\n' '# no high-priority matrix remediation items for this release' > "${REMEDIATION_HIGH_LINES}"
+          fi
+          if [[ ! -s "${REMEDIATION_MEDIUM_LINES}" ]]; then
+            printf '%s\n' '# no medium-priority matrix remediation items for this release' > "${REMEDIATION_MEDIUM_LINES}"
+          fi
 
           echo "json_file=${REMEDIATION_JSON}" >> "$GITHUB_OUTPUT"
           echo "markdown_file=${REMEDIATION_MD}" >> "$GITHUB_OUTPUT"
@@ -1110,6 +1123,10 @@ jobs:
             --markdown-out "${BUNDLE_MD}" \
             --lines-out "${BUNDLE_LINES}" \
             --json
+
+          if [[ ! -s "${BUNDLE_LINES}" ]]; then
+            printf '%s\n' '# no release risk remediation actions generated for this release' > "${BUNDLE_LINES}"
+          fi
 
           echo "json_file=${BUNDLE_JSON}" >> "$GITHUB_OUTPUT"
           echo "markdown_file=${BUNDLE_MD}" >> "$GITHUB_OUTPUT"

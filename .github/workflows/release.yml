@@ -733,6 +733,8 @@ jobs:
           RELEASE_WEEKLY_OPS_MAX_GOVERNANCE_BREACHES: ${{ vars.KSE_RELEASE_WEEKLY_OPS_MAX_GOVERNANCE_BREACHES }}
           RELEASE_WEEKLY_OPS_MAX_AUTHORIZATION_TIER_BLOCK_RATE_PERCENT: ${{ vars.KSE_RELEASE_WEEKLY_OPS_MAX_AUTHORIZATION_TIER_BLOCK_RATE_PERCENT }}
           RELEASE_WEEKLY_OPS_MAX_DIALOGUE_AUTHORIZATION_BLOCK_RATE_PERCENT: ${{ vars.KSE_RELEASE_WEEKLY_OPS_MAX_DIALOGUE_AUTHORIZATION_BLOCK_RATE_PERCENT }}
+          RELEASE_WEEKLY_OPS_MAX_RUNTIME_UI_MODE_VIOLATION_TOTAL: ${{ vars.KSE_RELEASE_WEEKLY_OPS_MAX_RUNTIME_UI_MODE_VIOLATION_TOTAL }}
+          RELEASE_WEEKLY_OPS_MAX_RUNTIME_UI_MODE_VIOLATION_RATE_PERCENT: ${{ vars.KSE_RELEASE_WEEKLY_OPS_MAX_RUNTIME_UI_MODE_VIOLATION_RATE_PERCENT }}
           RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT: ${{ vars.KSE_RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT }}
           RELEASE_GATE_REPORT_FILE: ${{ steps.release_notes.outputs.gate_file }}
         run: |
@@ -1065,6 +1067,31 @@ jobs:
             fi
           fi
 
+      - name: Enforce handoff preflight hard gate
+        id: handoff_preflight_gate
+        shell: bash
+        env:
+          RELEASE_HANDOFF_PREFLIGHT_ENFORCE: ${{ vars.KSE_RELEASE_HANDOFF_PREFLIGHT_ENFORCE }}
+          RELEASE_HANDOFF_PREFLIGHT_PROFILE: ${{ vars.KSE_RELEASE_HANDOFF_PREFLIGHT_PROFILE }}
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          NOTES_DIR=".kiro/reports/release-evidence"
+          HISTORY_FILE="${NOTES_DIR}/release-gate-history.json"
+          PREFLIGHT_JSON="${NOTES_DIR}/handoff-preflight-${TAG}.json"
+          PREFLIGHT_ENFORCE_RAW="${RELEASE_HANDOFF_PREFLIGHT_ENFORCE:-true}"
+          PREFLIGHT_PROFILE="${RELEASE_HANDOFF_PREFLIGHT_PROFILE:-default}"
+          PREFLIGHT_ENFORCE="$(echo "${PREFLIGHT_ENFORCE_RAW}" | tr '[:upper:]' '[:lower:]')"
+
+          CMD=(node bin/sce.js auto handoff preflight-check --profile "${PREFLIGHT_PROFILE}" --history-file "${HISTORY_FILE}" --json)
+          if [[ "${PREFLIGHT_ENFORCE}" != "0" && "${PREFLIGHT_ENFORCE}" != "false" && "${PREFLIGHT_ENFORCE}" != "no" && "${PREFLIGHT_ENFORCE}" != "off" ]]; then
+            CMD+=(--require-pass)
+          fi
+
+          "${CMD[@]}" > "${PREFLIGHT_JSON}"
+          cat "${PREFLIGHT_JSON}"
+          echo "json_file=${PREFLIGHT_JSON}" >> "$GITHUB_OUTPUT"
+
       - name: Build release risk remediation bundle
         id: release_risk_remediation
         shell: bash
@@ -1150,6 +1177,7 @@ jobs:
             ${{ steps.release_risk_remediation.outputs.lines_file }}
             ${{ steps.release_asset_integrity.outputs.json_file }}
             ${{ steps.release_asset_integrity.outputs.markdown_file }}
+            ${{ steps.handoff_preflight_gate.outputs.json_file }}
             ${{ steps.moqui_core_regression.outputs.json_file }}
             ${{ steps.moqui_core_regression.outputs.markdown_file }}
           draft: false

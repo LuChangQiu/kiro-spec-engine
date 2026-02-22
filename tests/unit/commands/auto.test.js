@@ -97,6 +97,48 @@ if (process.argv.includes('--json')) {
 `,
       'utf8'
     );
+    const defaultReleaseGateHistoryFile = path.join(
+      tempDir,
+      '.kiro',
+      'reports',
+      'release-evidence',
+      'release-gate-history.json'
+    );
+    await fs.ensureDir(path.dirname(defaultReleaseGateHistoryFile));
+    await fs.writeJson(defaultReleaseGateHistoryFile, {
+      mode: 'auto-handoff-release-gate-history',
+      total_entries: 1,
+      latest: {
+        tag: 'v0.0.0-test',
+        gate_passed: true,
+        risk_level: 'low',
+        weekly_ops_runtime_block_rate_percent: 0,
+        weekly_ops_runtime_ui_mode_violation_total: 0,
+        weekly_ops_runtime_ui_mode_violation_rate_percent: 0
+      },
+      aggregates: {
+        pass_rate_percent: 100,
+        scene_package_batch_pass_rate_percent: 100,
+        scene_package_batch_failed_count: 0,
+        drift_alert_rate_percent: 0,
+        drift_alert_runs: 0,
+        drift_blocked_runs: 0,
+        weekly_ops_runtime_block_rate_max_percent: 0,
+        weekly_ops_runtime_ui_mode_violation_total: 0,
+        weekly_ops_runtime_ui_mode_violation_run_rate_percent: 0,
+        weekly_ops_runtime_ui_mode_violation_rate_max_percent: 0
+      },
+      entries: [
+        {
+          tag: 'v0.0.0-test',
+          gate_passed: true,
+          risk_level: 'low',
+          weekly_ops_runtime_block_rate_percent: 0,
+          weekly_ops_runtime_ui_mode_violation_total: 0,
+          weekly_ops_runtime_ui_mode_violation_rate_percent: 0
+        }
+      ]
+    }, { spaces: 2 });
     exitSpy = jest.spyOn(process, 'exit').mockImplementation(() => {
       throw new Error('process.exit called');
     });
@@ -8653,6 +8695,140 @@ if (process.argv.includes('--json')) {
     }));
   });
 
+  test('runs handoff preflight-check in pass state with default hard-gate policy', async () => {
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'sce',
+      'auto',
+      'handoff',
+      'preflight-check',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-preflight-check');
+    expect(payload.status).toBe('pass');
+    expect(payload.policy).toEqual(expect.objectContaining({
+      profile: 'default',
+      require_release_gate_preflight: true
+    }));
+    expect(payload.release_gate_preflight).toEqual(expect.objectContaining({
+      available: true,
+      blocked: false
+    }));
+    expect(Array.isArray(payload.recommended_commands)).toBe(true);
+  });
+
+  test('fails handoff preflight-check with --require-pass when preflight is blocked', async () => {
+    const releaseGateHistoryFile = path.join(
+      tempDir,
+      '.kiro',
+      'reports',
+      'release-evidence',
+      'release-gate-history.json'
+    );
+    await fs.writeJson(releaseGateHistoryFile, {
+      mode: 'auto-handoff-release-gate-history',
+      total_entries: 1,
+      latest: {
+        tag: 'v9.9.9',
+        gate_passed: false,
+        risk_level: 'high',
+        weekly_ops_runtime_block_rate_percent: 55,
+        weekly_ops_runtime_ui_mode_violation_total: 2,
+        weekly_ops_runtime_ui_mode_violation_rate_percent: 20
+      },
+      aggregates: {
+        pass_rate_percent: 0,
+        scene_package_batch_pass_rate_percent: 0,
+        drift_alert_rate_percent: 100,
+        drift_alert_runs: 1,
+        drift_blocked_runs: 1,
+        weekly_ops_runtime_block_rate_max_percent: 55,
+        weekly_ops_runtime_ui_mode_violation_total: 2,
+        weekly_ops_runtime_ui_mode_violation_run_rate_percent: 100,
+        weekly_ops_runtime_ui_mode_violation_rate_max_percent: 20
+      },
+      entries: [
+        {
+          tag: 'v9.9.9',
+          gate_passed: false,
+          risk_level: 'high',
+          weekly_ops_runtime_block_rate_percent: 55,
+          weekly_ops_runtime_ui_mode_violation_total: 2,
+          weekly_ops_runtime_ui_mode_violation_rate_percent: 20
+        }
+      ]
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await expect(
+      program.parseAsync([
+        'node',
+        'sce',
+        'auto',
+        'handoff',
+        'preflight-check',
+        '--require-pass',
+        '--json'
+      ])
+    ).rejects.toThrow('process.exit called');
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-preflight-check');
+    expect(payload.status).toBe('blocked');
+    expect(payload.reasons.some(item => item.includes('release gate preflight blocked'))).toBe(true);
+    expect(payload.release_gate_preflight).toEqual(expect.objectContaining({
+      available: true,
+      blocked: true
+    }));
+  });
+
+  test('supports advisory preflight-check mode via --no-require-release-gate-preflight', async () => {
+    const releaseGateHistoryFile = path.join(
+      tempDir,
+      '.kiro',
+      'reports',
+      'release-evidence',
+      'release-gate-history.json'
+    );
+    await fs.writeJson(releaseGateHistoryFile, {
+      mode: 'auto-handoff-release-gate-history',
+      total_entries: 1,
+      latest: {
+        tag: 'v9.9.8',
+        gate_passed: false,
+        risk_level: 'high'
+      },
+      aggregates: {
+        pass_rate_percent: 0,
+        scene_package_batch_pass_rate_percent: 0,
+        drift_alert_rate_percent: 100,
+        drift_alert_runs: 1,
+        drift_blocked_runs: 1
+      },
+      entries: []
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'sce',
+      'auto',
+      'handoff',
+      'preflight-check',
+      '--no-require-release-gate-preflight',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-preflight-check');
+    expect(payload.status).toBe('warning');
+    expect(payload.policy.require_release_gate_preflight).toBe(false);
+    expect(payload.reasons.some(item => item.includes('advisory mode'))).toBe(true);
+  });
+
   test('validates handoff run profile option', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
     await fs.writeJson(manifestFile, {
@@ -9212,12 +9388,14 @@ if (process.argv.includes('--json')) {
       '--queue-out',
       queueFile,
       '--dry-run',
+      '--no-require-release-gate-preflight',
       '--json'
     ]);
 
     const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
     expect(payload.mode).toBe('auto-handoff-run');
     expect(payload.status).toBe('dry-run');
+    expect(payload.policy.require_release_gate_preflight).toBe(false);
     expect(payload.phases.find(item => item.id === 'execution').status).toBe('skipped');
     expect(payload.phases.find(item => item.id === 'observability').status).toBe('skipped');
     expect(payload.release_gate_preflight).toEqual(expect.objectContaining({

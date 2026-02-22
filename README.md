@@ -275,8 +275,7 @@ sequenceDiagram
 - [Adoption Guide](docs/adoption-guide.md) - Adopting sce in existing projects
 - [Upgrade Guide](docs/upgrade-guide.md) - Version upgrade instructions
 - [Release Archive](docs/releases/README.md) - Versioned release notes and validation report index
-- [Release Notes v1.46.2](docs/releases/v1.46.2.md) - Current release highlights and impact
-- [Validation Report v1.46.2](docs/releases/v1.46.2-validation.md) - Release-readiness evidence and verification results
+- [GitHub Releases](https://github.com/heguangyong/scene-capability-engine/releases) - Latest published versions and release assets
 - [Release Checklist](docs/release-checklist.md) - Repeatable pre-release verification flow
 - [Manual Workflows](docs/manual-workflows-guide.md) - Step-by-step workflows
 - [Developer Guide](docs/developer-guide.md) - Contributing and extending sce
@@ -288,7 +287,12 @@ sequenceDiagram
 
 ## Key Features
 
-### Autonomous Control 🚀 NEW in v1.23.0
+### Current Baseline
+- **Default hard gate for handoff preflight**: Release flow enforces `sce auto handoff preflight-check --require-pass --json` and blocks publish on failures.
+- **Takeover-first execution**: Once sce is adopted, autonomous and orchestrated flows are designed to run end-to-end without per-step confirmation loops.
+- **Tag-driven release**: Pushing `v*` tags to GitHub triggers automated test, release evidence gates, and npm publish workflow.
+
+### Autonomous Control 🚀
 - **Fully Autonomous Execution**: AI independently manages entire development workflows from requirements to delivery
 - **Closed-Loop Program Execution**: `sce auto close-loop "<goal>"` runs from goal decomposition to terminal orchestration state without manual confirmation gates
 - **Automatic Master/Sub Portfolio Split**: Large goals are auto-split into dependency-wired sub-specs and coordinated by a master spec
@@ -327,21 +331,21 @@ sce auto resume
 ### Spec-Driven Development
 Structure your work with Requirements → Design → Tasks workflow
 
-### KPI Automation & Observability 🚀 NEW in v1.46.2
+### KPI Automation & Observability 🚀
 - **Unified Metric Contract**: Load and validate KPI definitions from `metric-definition.yaml`
 - **Weekly Snapshot Pipeline**: Generate machine-readable snapshots with risk level and audit reasons
 - **Baseline and Trend Analysis**: Build baseline from historical data and detect worsening trends automatically
 - **Gate-Ready Summary**: Emit Day30/Day60-consumable summary payloads with evidence paths
 - **CLI Commands**: `value metrics sample`, `value metrics snapshot`, `value metrics baseline`, `value metrics trend` with `--json` support
 
-### Multi-Workspace Management 🚀 NEW in v1.11.0
+### Multi-Workspace Management 🚀
 - **Workspace Registry**: Manage multiple sce projects from a single location
 - **Quick Switching**: Switch between projects without directory navigation
 - **Data Atomicity**: Single source of truth (`~/.kse/workspace-state.json`)
 - **Cross-Platform**: Consistent path handling across Windows/Linux/macOS
 - **Auto Migration**: Seamless upgrade from legacy workspace format
 
-### Environment Configuration Management 🚀 NEW in v1.14.0
+### Environment Configuration Management 🚀
 - **Environment Registry**: Manage multiple environment configurations (dev, test, staging, prod)
 - **Quick Switching**: Switch between environments with automatic backup
 - **Automatic Backup**: Create timestamped backups before each switch
@@ -350,7 +354,7 @@ Structure your work with Requirements → Design → Tasks workflow
 - **Command Execution**: Run commands in specific environment context
 - **Cross-Platform**: Works seamlessly on Windows, Linux, and macOS
 
-### Multi-Repository Management 🚀 NEW in v1.20.0
+### Multi-Repository Management 🚀
 - **Unified Interface**: Manage multiple Git subrepositories from a single command
 - **Auto-Discovery**: Automatically scan and configure all Git repositories in your project
 - **Nested Repository Support**: Discover and manage Git repositories nested inside other repositories
@@ -361,7 +365,7 @@ Structure your work with Requirements → Design → Tasks workflow
 - **Cross-Platform**: Consistent path handling across Windows/Linux/macOS
 - **Smart Exclusions**: Automatically skip common non-repository directories (node_modules, build, etc.)
 
-### Moqui ERP Integration 🚀 NEW in v1.39.0
+### Moqui ERP Integration 🚀
 - **Moqui ERP Adapter**: Connect sce scene runtime to live Moqui ERP instances
   - `MoquiClient` — HTTP client with JWT auth lifecycle (login, refresh, re-login, logout) and retry logic
   - `MoquiAdapter` — Binding handler for `spec.erp.*` and `moqui.*` refs, entity CRUD, service invocation, screen discovery
@@ -370,7 +374,7 @@ Structure your work with Requirements → Design → Tasks workflow
   - Pattern-based manifest generation with governance contracts
 - **CLI Commands**: `scene connect`, `scene discover`, `scene extract` with `--json` support
 
-### Multi-Agent Parallel Coordination 🚀 NEW in v1.43.0
+### Multi-Agent Parallel Coordination 🚀
 - **Agent Registry**: MachineIdentifier-based agent lifecycle with heartbeat monitoring and inactive cleanup
 - **Task Lock Manager**: File-based task locking with atomic operations, single-agent backward compatibility
 - **Task Status Store**: Concurrent-safe task status updates with exponential backoff retry
@@ -381,7 +385,7 @@ Structure your work with Requirements → Design → Tasks workflow
 
 [Learn more about Multi-Agent Coordination →](docs/multi-agent-coordination-guide.md)
 
-### Agent Orchestrator 🚀 NEW in v1.45.0
+### Agent Orchestrator 🚀
 - **Automated Multi-Agent Spec Execution**: Replace manual multi-terminal workflows with a single command
 - **DAG-Based Scheduling**: Analyze Spec dependencies, compute execution batches via topological sort
 - **Parallel Execution**: Run up to N Specs simultaneously via Codex CLI sub-agents (`--max-parallel`)
@@ -429,7 +433,7 @@ Tip: `sce spec bootstrap|pipeline run|gate run --specs ...` now defaults to this
 If Codex CLI is globally installed, you can set `"codexCommand": "codex"`.
 Use the `rateLimit*` settings to absorb transient 429/too-many-requests failures without stalling orchestration.
 
-### Spec-Level Steering & Context Sync 🚀 NEW in v1.44.0
+### Spec-Level Steering & Context Sync 🚀
 - **Spec Steering (L4)**: Independent `steering.md` per Spec with constraints, notes, and decisions — zero cross-agent conflict
 - **Steering Loader**: Unified L1-L4 four-layer steering loader with priority-based merging
 - **Context Sync Manager**: Multi-agent friendly CURRENT_CONTEXT.md with structured Spec progress table, concurrent-safe updates
@@ -437,7 +441,7 @@ Use the `rateLimit*` settings to absorb transient 429/too-many-requests failures
 - **Sync Barrier**: Agent Spec-switch synchronization — uncommitted change check + steering reload
 - **Coordinator Integration**: Auto Spec completion check on task complete, SyncBarrier on task assign
 
-### Scene Ontology Enhancement 🚀 NEW in v1.42.0
+### Scene Ontology Enhancement 🚀
 - **OntologyGraph**: Semantic relationship graph for binding refs (depends_on, composes, extends, produces)
 - **Action Abstraction**: Intent, preconditions, postconditions per binding for AI agent understanding
 - **Data Lineage**: Source → transform → sink tracking in governance_contract
@@ -445,19 +449,19 @@ Use the `rateLimit*` settings to absorb transient 429/too-many-requests failures
 - **Agent Readiness Score**: Bonus quality dimension (max +10 points)
 - **CLI Commands**: `scene ontology show|deps|validate|actions|lineage|agent-info` with `--json` support
 
-### Scene Template Quality Pipeline 🚀 NEW in v1.41.0
+### Scene Template Quality Pipeline 🚀
 - **Template Lint Engine**: 10-category quality checks for scene packages (manifest completeness, binding refs, governance, consistency, variables, documentation, action abstraction, data lineage, agent hints)
 - **Quality Score Calculator**: 4-dimension scoring + agent_readiness bonus (contract validity, lint pass rate, documentation quality, governance completeness + agent readiness max +10) with 0-100+ scale
 - **One-Stop Contribute Pipeline**: Validate → Lint → Score → Preview → Publish in a single command
 - **CLI Commands**: `scene lint`, `scene score`, `scene contribute` with `--strict`, `--dry-run`, `--skip-lint`, `--json` support
 
-### Scene Template Engine 🚀 NEW in v1.25.0
+### Scene Template Engine 🚀
 - **Template Variable Schema**: Define typed variables (string, number, boolean, enum, array) with validation rules in scene-package.json
 - **Multi-File Rendering**: Recursive template processing with `{{variable}}` substitution, `{{#if}}` conditionals, `{{#each}}` loops
 - **Three-Layer Inheritance**: L1-Capability / L2-Domain / L3-Instance package hierarchy with schema and file merging
 - **CLI Commands**: `scene template-validate`, `scene template-resolve`, `scene template-render` with `--json` support
 
-### Spec-Level Collaboration 🚀 NEW in v1.22.0
+### Spec-Level Collaboration 🚀
 - **Parallel Development**: Enable multiple AI instances to work on different Specs simultaneously
 - **Dependency Management**: Define and track dependencies between Specs with circular dependency detection
 - **Interface Contracts**: Formal API definitions ensuring compatibility between independently developed Specs
@@ -468,7 +472,7 @@ Use the `rateLimit*` settings to absorb transient 429/too-many-requests failures
 
 [Learn more about Spec-Level Collaboration →](docs/spec-collaboration-guide.md)
 
-### Spec Locking Mechanism 🚀 NEW
+### Spec Locking Mechanism 🚀
 - **Multi-User Coordination**: Prevent conflicts when multiple developers work on the same Spec
 - **Machine Identification**: Unique machine IDs for accurate lock ownership tracking
 - **Stale Lock Detection**: Automatic detection and cleanup of abandoned locks (default: 24h timeout)
@@ -566,7 +570,7 @@ sce spec gate run --specs "<spec-a,spec-b>" --max-parallel <N>     # Multi-Spec 
 sce context export <spec-name>     # Export context for AI tools
 sce prompt generate <spec> <task>  # Generate task-specific prompt
 
-# KPI automation and observability (NEW in v1.46.2)
+# KPI automation and observability
 sce value metrics sample --out <path> --json               # Generate sample KPI input JSON
 sce value metrics snapshot --input <path> --json          # Generate weekly KPI snapshot + gate summary
 sce value metrics baseline --from-history <N> --json      # Build baseline from earliest N snapshots
@@ -575,14 +579,14 @@ sce auto kpi trend --weeks 8 --period week --json         # Aggregate autonomous
 sce auto kpi trend --weeks 8 --period day --csv --out <path> # Export autonomous KPI trend as CSV
 sce auto kpi trend --weeks 8 --mode controller --json     # Filter trend to close-loop-controller sessions only
 
-# Workspace management (NEW in v1.11.0)
+# Workspace management
 sce workspace create <name> [path] # Register a new workspace
 sce workspace list                 # List all workspaces
 sce workspace switch <name>        # Switch active workspace
 sce workspace info [name]          # Show workspace details
 sce workspace remove <name>        # Remove workspace
 
-# Environment management (NEW in v1.14.0)
+# Environment management
 sce env list                       # List all environments
 sce env switch <name>              # Switch to environment (with backup)
 sce env info                       # Show active environment details
@@ -592,13 +596,13 @@ sce env rollback                   # Rollback to previous environment
 sce env verify                     # Verify current environment
 sce env run "<command>"            # Run command in environment context
 
-# Multi-repository management (NEW in v1.20.0)
+# Multi-repository management
 sce repo init [--nested]           # Initialize repository configuration (nested scanning by default)
 sce repo init --no-nested          # Initialize without nested repository scanning
 sce repo status [--verbose]        # Show status of all repositories (including nested)
 sce repo exec "<command>"          # Execute command in all repositories
 
-# Spec-level collaboration (NEW in v1.22.0)
+# Spec-level collaboration
 sce collab init <master> [options] # Initialize Master Spec with Sub-Specs
 sce collab status [spec] [--graph] # Display collaboration status
 sce collab assign <spec> <assignee> # Assign Spec to an assignee
@@ -607,22 +611,22 @@ sce collab integrate <specs...>    # Run integration tests
 sce collab migrate <spec>          # Convert standalone Spec to collaborative
 sce repo health                    # Check repository health
 
-# Scene template engine (NEW in v1.25.0)
+# Scene template engine
 sce scene template-validate --package <path>   # Validate template variable schema
 sce scene template-resolve --package <name>    # Resolve inheritance chain and merged schema
 sce scene template-render --package <name> --values <json> --out <dir>  # Render template files
 
-# Moqui ERP integration (NEW in v1.39.0)
+# Moqui ERP integration
 sce scene connect --config <path>              # Test connectivity to Moqui ERP instance
 sce scene discover --config <path>             # Discover entities, services, screens from Moqui
 sce scene extract --config <path> --out <dir>  # Extract scene templates from Moqui (v1.40.0)
 
-# Scene template quality pipeline (NEW in v1.41.0)
+# Scene template quality pipeline
 sce scene lint --package <path>                # Lint scene package for quality issues
 sce scene score --package <path>               # Calculate quality score (0-100)
 sce scene contribute --package <path>          # One-stop validate → lint → score → publish
 
-# Scene ontology (NEW in v1.42.0)
+# Scene ontology
 sce scene ontology show --package <path>       # Show ontology graph
 sce scene ontology deps --ref <ref>            # Query dependency chain
 sce scene ontology impact --ref <ref>          # Analyze reverse impact radius
@@ -633,10 +637,15 @@ sce scene ontology lineage --ref <ref>         # Show data lineage
 sce scene ontology agent-info --package <path> # Show agent hints
 sce scene contribute --package <path>          # One-stop validate → lint → score → publish
 
-# Agent orchestration (NEW in v1.45.0)
+# Agent orchestration
 sce orchestrate run --specs "<spec-list>" --max-parallel <N>  # Start multi-agent orchestration
 sce orchestrate status                         # View orchestration progress
 sce orchestrate stop                           # Stop all sub-agents
+
+# Release baseline (default in CI)
+sce auto handoff preflight-check --require-pass --json  # Hard gate: block release on preflight failures
+git tag -a vX.Y.Z -m "vX.Y.Z"                          # Create release tag
+git push origin vX.Y.Z                                  # Push tag to trigger GitHub release + npm publish
 
 # DevOps operations
 sce ops init <project-name>        # Initialize operations specs
@@ -760,6 +769,6 @@ A deep conversation about AI development trends, Neo-Confucian philosophy, and s
 
 ---
 
-**Version**: 2.0.0  
-**Last Updated**: 2026-02-18
+**Version**: 3.3.1  
+**Last Updated**: 2026-02-22
 

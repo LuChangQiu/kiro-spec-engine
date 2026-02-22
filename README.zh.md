@@ -270,8 +270,7 @@ sequenceDiagram
 - [采用指南](docs/adoption-guide.md) - 在现有项目中采用 sce
 - [升级指南](docs/upgrade-guide.md) - 版本升级说明
 - [发布归档](docs/zh/releases/README.md) - 版本化发布说明与验证报告入口
-- [发布说明 v1.46.2](docs/zh/releases/v1.46.2.md) - 当前版本更新亮点
-- [验证报告 v1.46.2](docs/zh/releases/v1.46.2-validation.md) - 发布就绪验证与证据结果
+- [GitHub Releases](https://github.com/heguangyong/scene-capability-engine/releases) - 最新发布版本与发布资产
 - [发布检查清单](docs/zh/release-checklist.md) - 可重复执行的发版前核验流程
 - [手动工作流](docs/manual-workflows-guide.md) - 分步工作流
 - [开发者指南](docs/developer-guide.md) - 贡献和扩展 sce
@@ -283,6 +282,11 @@ sequenceDiagram
 
 ## 主要功能
 
+### 当前基线能力
+- **默认 preflight 硬门禁**：发布流程强制执行 `sce auto handoff preflight-check --require-pass --json`，未通过即阻断发布。
+- **接管优先执行**：项目采用 sce 后，默认按自治/编排方式端到端推进，不再依赖逐步人工确认。
+- **Tag 驱动发版**：向 GitHub 推送 `v*` tag 即触发自动测试、发布证据门禁与 npm 发布流程。
+
 ### Autonomous Control（自动闭环）🚀
 - **自动闭环推进**：`sce auto close-loop "<目标>"` 从目标拆分到编排完成全程自动推进
 - **自动主从拆分**：自动生成 Master/Sub Spec 组合、依赖关系与 Agent 分配
@@ -293,21 +297,21 @@ sequenceDiagram
 ### Spec 驱动开发
 使用需求 → 设计 → 任务工作流结构化你的工作
 
-### KPI 自动化与可观测 🚀 v1.46.2 新增
+### KPI 自动化与可观测 🚀
 - **统一指标契约**：从 `metric-definition.yaml` 加载并校验 KPI 定义
 - **周快照流水线**：生成包含风险级别和审计原因的 machine-readable 快照
 - **基线与趋势分析**：基于历史快照生成 baseline，并自动识别连续恶化趋势
 - **门禁可复用摘要**：输出 Day30/Day60 可直接消费的 summary 与证据路径
 - **CLI 命令**：`value metrics sample`、`value metrics snapshot`、`value metrics baseline`、`value metrics trend`，支持 `--json`
 
-### 多工作区管理 🚀 v1.11.0 新功能
+### 多工作区管理 🚀
 - **工作区注册表**：从单一位置管理多个 sce 项目
 - **快速切换**：无需目录导航即可在项目间切换
 - **数据原子性**：单一数据源（`~/.kse/workspace-state.json`）
 - **跨平台**：Windows/Linux/macOS 一致的路径处理
 - **自动迁移**：从旧版工作区格式无缝升级
 
-### 环境配置管理 🚀 v1.14.0 新功能
+### 环境配置管理 🚀
 - **环境注册表**：管理多个环境配置（dev, test, staging, prod）
 - **快速切换**：自动备份的环境切换
 - **自动备份**：每次切换前创建时间戳备份
@@ -316,7 +320,7 @@ sequenceDiagram
 - **命令执行**：在特定环境上下文中运行命令
 - **跨平台**：在 Windows、Linux 和 macOS 上无缝工作
 
-### Moqui ERP 集成 🚀 v1.39.0 新增
+### Moqui ERP 集成 🚀
 - **Moqui ERP 适配器**: 将 sce 场景运行时连接到 Moqui ERP 实例
   - `MoquiClient` — 支持 JWT 认证生命周期（登录、刷新、重登录、登出）和重试逻辑的 HTTP 客户端
   - `MoquiAdapter` — 处理 `spec.erp.*` 和 `moqui.*` 引用的绑定处理器，支持实体 CRUD、服务调用、屏幕发现
@@ -325,7 +329,7 @@ sequenceDiagram
   - 基于模式的清单生成，包含治理合约
 - **CLI 命令**: `scene connect`、`scene discover`、`scene extract`，支持 `--json` 输出
 
-### 多 Agent 并行协调 🚀 v1.43.0 新增
+### 多 Agent 并行协调 🚀
 - **Agent 注册表**: 基于 MachineIdentifier 的 Agent 生命周期管理，心跳监控和不活跃清理
 - **任务锁管理器**: 基于文件的任务锁定，原子操作，单 Agent 向后兼容
 - **任务状态存储**: 并发安全的任务状态更新，指数退避重试
@@ -336,7 +340,7 @@ sequenceDiagram
 
 [了解更多多 Agent 协调 →](docs/multi-agent-coordination-guide.md)
 
-### Agent 编排器 🚀 v1.45.0 新增
+### Agent 编排器 🚀
 - **自动化多 Agent Spec 执行**: 一条命令替代手工开多个终端分配 Spec 给 Codex Agent
 - **DAG 依赖调度**: 分析 Spec 间依赖关系，拓扑排序计算执行批次
 - **并行执行**: 通过 Codex CLI 子进程同时运行多个 Spec（`--max-parallel` 控制并行度）
@@ -380,7 +384,7 @@ sce orchestrate stop
 如果你已全局安装 Codex CLI，可将 `"codexCommand"` 改为 `"codex"`。
 可通过 `rateLimit*` 配置吸收 429/too-many-requests 等限流抖动，避免编排流程卡死。
 
-### Spec 级 Steering 与上下文同步 🚀 v1.44.0 新增
+### Spec 级 Steering 与上下文同步 🚀
 - **Spec Steering (L4)**: 每个 Spec 独立的 `steering.md`，包含约束、注意事项、决策记录 — 跨 Agent 零冲突
 - **Steering 加载器**: 统一 L1-L4 四层 Steering 加载，优先级合并
 - **上下文同步管理器**: 多 Agent 友好的 CURRENT_CONTEXT.md，结构化 Spec 进度表，并发安全更新
@@ -388,7 +392,7 @@ sce orchestrate stop
 - **同步屏障**: Agent 切换 Spec 时的同步检查 — 未提交更改检测 + Steering 重新加载
 - **Coordinator 集成**: 任务完成时自动检测 Spec 完成，任务分配时运行同步屏障
 
-### 场景 Ontology 增强 🚀 v1.42.0 新增
+### 场景 Ontology 增强 🚀
 - **OntologyGraph**: 绑定引用语义关系图（depends_on、composes、extends、produces）
 - **Action Abstraction**: 每个绑定的 intent、preconditions、postconditions，提升 AI 可读性
 - **Data Lineage**: governance_contract 中的数据血缘追踪（source → transform → sink）
@@ -396,13 +400,13 @@ sce orchestrate stop
 - **Agent Readiness 评分**: 质量评分新增可选加分维度（最高 +10 分）
 - **CLI 命令**: `scene ontology show|deps|validate|actions|lineage|agent-info`，支持 `--json`
 
-### 场景模板质量流水线 🚀 v1.41.0 新增
+### 场景模板质量流水线 🚀
 - **模板 Lint 引擎**: 10 类质量检查（清单完整性、绑定引用、治理合约、一致性、变量、文档、Action Abstraction、Data Lineage、Agent Hints）
 - **质量评分计算器**: 4 维度评分 + agent_readiness 加分（合约有效性、lint 通过率、文档质量、治理完整性 + Agent Readiness 最高 +10），0-100+ 分制
 - **一站式贡献流水线**: 验证 → Lint → 评分 → 预览 → 发布，一条命令完成
 - **CLI 命令**: `scene lint`、`scene score`、`scene contribute`，支持 `--strict`、`--dry-run`、`--skip-lint`、`--json`
 
-### 场景模板引擎 🚀 v1.25.0 新增
+### 场景模板引擎 🚀
 - **模板变量 Schema**: 在 scene-package.json 中定义类型化变量（string, number, boolean, enum, array）及验证规则
 - **多文件渲染**: 递归模板处理，支持 `{{variable}}` 替换、`{{#if}}` 条件、`{{#each}}` 循环
 - **三层继承**: L1-能力层 / L2-领域层 / L3-实例层包层级结构，支持 schema 和文件合并
@@ -480,7 +484,7 @@ sce spec gate run --specs "<spec-a,spec-b>" --max-parallel <N>     # 多 Spec �
 sce context export <spec-name>     # 为 AI 工具导出上下文
 sce prompt generate <spec> <task>  # 生成任务特定提示
 
-# KPI 自动化与可观测（v1.46.2 新增）
+# KPI 自动化与可观测
 sce value metrics sample --out <path> --json               # 生成 KPI 输入样例 JSON
 sce value metrics snapshot --input <path> --json          # 生成周度 KPI 快照 + gate 摘要
 sce value metrics baseline --from-history <N> --json      # 从最早 N 个快照生成 baseline
@@ -489,14 +493,14 @@ sce auto kpi trend --weeks 8 --period week --json         # 聚合自动交付 K
 sce auto kpi trend --weeks 8 --period day --csv --out <path> # 以 CSV 导出自动 KPI 趋势
 sce auto kpi trend --weeks 8 --mode controller --json     # 仅查看 close-loop-controller 会话趋势
 
-# 工作区管理（v1.11.0 新增）
+# 工作区管理
 sce workspace create <name> [path] # 注册新工作区
 sce workspace list                 # 列出所有工作区
 sce workspace switch <name>        # 切换活动工作区
 sce workspace info [name]          # 显示工作区详情
 sce workspace remove <name>        # 删除工作区
 
-# 环境管理（v1.14.0 新增）
+# 环境管理
 sce env list                       # 列出所有环境
 sce env switch <name>              # 切换到环境（自动备份）
 sce env info                       # 显示活动环境详情
@@ -506,22 +510,22 @@ sce env rollback                   # 回滚到上一个环境
 sce env verify                     # 验证当前环境
 sce env run "<command>"            # 在环境上下文中运行命令
 
-# 场景模板引擎 (v1.25.0 新增)
+# 场景模板引擎
 sce scene template-validate --package <path>   # 验证模板变量 schema
 sce scene template-resolve --package <name>    # 解析继承链和合并 schema
 sce scene template-render --package <name> --values <json> --out <dir>  # 渲染模板文件
 
-# Moqui ERP 集成 (v1.39.0 新增)
+# Moqui ERP 集成
 sce scene connect --config <path>              # 测试 Moqui ERP 实例连接
 sce scene discover --config <path>             # 发现 Moqui 实体、服务、屏幕
 sce scene extract --config <path> --out <dir>  # 从 Moqui 提取场景模板 (v1.40.0)
 
-# 场景模板质量流水线 (v1.41.0 新增)
+# 场景模板质量流水线
 sce scene lint --package <path>                # Lint 场景包质量检查
 sce scene score --package <path>               # 计算质量评分 (0-100)
 sce scene contribute --package <path>          # 一站式验证 → lint → 评分 → 发布
 
-# 场景 Ontology (v1.42.0 新增)
+# 场景 Ontology
 sce scene ontology show --package <path>       # 显示 Ontology 图
 sce scene ontology deps --ref <ref>            # 查询依赖链
 sce scene ontology impact --ref <ref>          # 分析反向影响面
@@ -531,12 +535,17 @@ sce scene ontology actions --ref <ref>         # 显示 Action Abstraction
 sce scene ontology lineage --ref <ref>         # 显示数据血缘
 sce scene ontology agent-info --package <path> # 显示 Agent Hints
 
-# Agent 编排 (v1.45.0 新增)
+# Agent 编排
 sce orchestrate run --specs "<spec列表>" --max-parallel <N>  # 启动多 Agent 编排
 sce orchestrate status                         # 查看编排进度
 sce orchestrate stop                           # 停止所有子 Agent
 
 # 说明：当使用 --specs 调用 sce spec bootstrap/pipeline run/gate run 时，会默认转到 orchestrate 模式
+
+# 发布基线（CI 默认）
+sce auto handoff preflight-check --require-pass --json  # 硬门禁：preflight 不通过则阻断发布
+git tag -a vX.Y.Z -m "vX.Y.Z"                          # 创建发布 tag
+git push origin vX.Y.Z                                  # 推送 tag，触发 GitHub Release + npm 自动发布
 
 # DevOps 运维
 sce ops init <project-name>        # 初始化运维 specs
@@ -621,7 +630,7 @@ sce spec bootstrap --name 01-00-my-first-feature --non-interactive
 
 ---
 
-**版本**：2.0.0  
-**最后更新**：2026-02-18
+**版本**：3.3.1  
+**最后更新**：2026-02-22
 
 

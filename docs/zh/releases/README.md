@@ -6,8 +6,9 @@
 - 验证报告
 - 发布流程参考
 
-## 已收录版本
+## 历史版本归档
 
 - [发布检查清单](../release-checklist.md)
-- [v1.46.2 发布说明](./v1.46.2.md)
-- [v1.46.2 验证报告](./v1.46.2-validation.md)
+- [v1.46.2 发布说明](./v1.46.2.md)（历史归档）
+- [v1.46.2 验证报告](./v1.46.2-validation.md)（历史归档）
+- [GitHub Releases](https://github.com/heguangyong/scene-capability-engine/releases)（最新）

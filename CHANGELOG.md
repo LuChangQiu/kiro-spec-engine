@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.5] - 2026-02-22
+
+### Added
+- Capability matrix execution assets for Spec 117:
+  - `scripts/symbol-evidence-locate.js`
+  - `scripts/failure-attribution-repair.js`
+  - `scripts/capability-mapping-report.js`
+- New machine-readable contracts and examples under `docs/agent-runtime/`:
+  - `symbol-evidence.schema.json`
+  - `failure-taxonomy-baseline.json`
+  - `capability-mapping-report.schema.json`
+  - `agent-result-summary-contract.schema.json`
+- End-to-end capability matrix runbook:
+  - `docs/sce-capability-matrix-e2e-example.md`
+
+### Changed
+- Orchestration merge governance now enforces sub-agent result summary contract and blocks merge on invalid summaries, failed tests, or unresolved conflict issues when policy requires it.
+- `bootstrap-prompt-builder` now instructs sub-agents to emit a terminal `result_summary` JSON payload.
+- Command reference and roadmap docs now include strategy/symbol/failure/mapping entrypoints and default merge-governance behavior.
+- Core package version updated to `3.3.5`.
+
 ### Added
 - **Auto handoff default takeover hard gate + preflight-check command**: `sce auto handoff` profiles now default to release-gate preflight hard requirement (`default|moqui|enterprise`), added `sce auto handoff preflight-check` (`pass|warning|blocked` + reasons/signals/recommended commands), and `handoff run` precheck/details now exposes full runtime ui-mode pressure aggregates for machine-readable triage.
 - **Interactive runtime ui-mode telemetry closed-loop**: `interactive-customization-loop` now emits runtime policy signal streams (`interactive-runtime-signals.jsonl` global + session) with `ui_mode` violation markers; `interactive-governance-report` now ingests runtime signals by default and reports runtime/ui-mode pressure metrics + alerts; weekly ops summary/gate now carry and enforce runtime ui-mode violation signals (default `RELEASE_WEEKLY_OPS_MAX_RUNTIME_UI_MODE_VIOLATION_TOTAL=0`).

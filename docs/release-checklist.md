@@ -143,6 +143,12 @@ Ensure:
   - `KSE_RELEASE_ASSET_INTEGRITY_ENFORCE`: `true|false` (default `true`)
   - `KSE_RELEASE_ASSET_INTEGRITY_REQUIRE_NON_EMPTY`: `true|false` (default `true`)
   - `KSE_RELEASE_ASSET_INTEGRITY_REQUIRED_FILES`: override required asset list (comma-separated, supports `{tag}`)
+- Optional release-asset 0-byte guard (enabled in workflow by default):
+  - `scripts/release-asset-nonempty-normalize.js` auto-fills placeholder content for optional assets such as `.lines` and `.jsonl` before GitHub Release upload.
+  - Local dry-run example:
+    - `node scripts/release-asset-nonempty-normalize.js --file .kiro/reports/release-evidence/matrix-remediation-vX.Y.Z.lines --kind lines --note "no matrix remediation items for this release" --dry-run --json`
+  - Local normalize example:
+    - `node scripts/release-asset-nonempty-normalize.js --file .kiro/reports/release-evidence/interactive-matrix-signals-vX.Y.Z.jsonl --kind jsonl --event interactive-matrix-signals --note "No interactive matrix signals collected for this release." --json`
 - Optional local dry-run for gate history index artifact:
   - `sce auto handoff gate-index --dir .kiro/reports/release-evidence --out .kiro/reports/release-evidence/release-gate-history.json --json`
 

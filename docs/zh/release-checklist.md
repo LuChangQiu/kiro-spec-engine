@@ -115,6 +115,12 @@ git log --oneline -n 15
   - `KSE_RELEASE_DRIFT_PREFLIGHT_BLOCK_RATE_MIN_PERCENT`：近 5 版（有 preflight 信号）blocked 占比告警阈值（默认 `40`）
   - `KSE_RELEASE_DRIFT_HARD_GATE_BLOCK_STREAK_MIN`：hard-gate preflight 连续 blocked 告警阈值（最近窗口，默认 `2`）
   - `KSE_RELEASE_DRIFT_PREFLIGHT_UNAVAILABLE_STREAK_MIN`：release preflight 连续 unavailable 告警阈值（最近窗口，默认 `2`）
+- 可选：发布资产 0 字节防护（workflow 默认开启）
+  - `scripts/release-asset-nonempty-normalize.js` 会在上传 GitHub Release 资产前，为可选 `.lines` / `.jsonl` 资产自动补齐占位内容，避免 422。
+  - 本地 dry-run 示例：
+    - `node scripts/release-asset-nonempty-normalize.js --file .kiro/reports/release-evidence/matrix-remediation-vX.Y.Z.lines --kind lines --note "no matrix remediation items for this release" --dry-run --json`
+  - 本地规范化示例：
+    - `node scripts/release-asset-nonempty-normalize.js --file .kiro/reports/release-evidence/interactive-matrix-signals-vX.Y.Z.jsonl --kind jsonl --event interactive-matrix-signals --note "No interactive matrix signals collected for this release." --json`
 - 可选本地预演 release gate 历史索引产物：
   - `sce auto handoff gate-index --dir .kiro/reports/release-evidence --out .kiro/reports/release-evidence/release-gate-history.json --json`
 

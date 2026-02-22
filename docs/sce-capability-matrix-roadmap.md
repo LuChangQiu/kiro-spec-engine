@@ -15,8 +15,16 @@ This roadmap consolidates the next capability uplift priorities for SCE and maps
 ## Current Baseline Artifacts (This Iteration)
 
 - `scripts/auto-strategy-router.js`
+- `scripts/symbol-evidence-locate.js`
+- `scripts/failure-attribution-repair.js`
+- `scripts/capability-mapping-report.js`
 - `docs/agent-runtime/strategy-routing-policy-baseline.json`
+- `docs/agent-runtime/symbol-evidence.schema.json`
+- `docs/agent-runtime/failure-taxonomy-baseline.json`
+- `docs/agent-runtime/capability-mapping-report.schema.json`
+- `docs/agent-runtime/agent-result-summary-contract.schema.json`
 - `docs/agent-runtime/multi-agent-coordination-policy-baseline.json`
+- `docs/sce-capability-matrix-e2e-example.md`
 
 ## Execution Plan
 

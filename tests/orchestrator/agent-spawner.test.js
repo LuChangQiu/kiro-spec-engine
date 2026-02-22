@@ -791,6 +791,71 @@ describe('AgentSpawner', () => {
   });
 
   // -------------------------------------------------------------------------
+  // getResultSummary()
+  // -------------------------------------------------------------------------
+
+  describe('getResultSummary()', () => {
+    test('extracts result_summary object from agent events', async () => {
+      await spawner.spawn('my-spec');
+
+      mockChildProcess.stdout.emit('data', Buffer.from(
+        JSON.stringify({
+          type: 'turn.completed',
+          result_summary: {
+            spec_id: 'my-spec',
+            changed_files: ['src/app.js'],
+            tests_run: 3,
+            tests_passed: 3,
+            risk_level: 'low',
+            open_issues: []
+          }
+        }) + '\n'
+      ));
+
+      const summary = spawner.getResultSummary('test-agent-1');
+      expect(summary).toEqual(expect.objectContaining({
+        spec_id: 'my-spec',
+        tests_run: 3,
+        tests_passed: 3
+      }));
+    });
+
+    test('returns null when no summary-like payload is present', async () => {
+      await spawner.spawn('my-spec');
+      mockChildProcess.stdout.emit('data', Buffer.from(
+        JSON.stringify({ type: 'thread.started' }) + '\n'
+      ));
+
+      const summary = spawner.getResultSummary('test-agent-1');
+      expect(summary).toBeNull();
+    });
+
+    test('parses summary from text payload when embedded as JSON block', async () => {
+      await spawner.spawn('my-spec');
+      mockChildProcess.stdout.emit('data', Buffer.from(
+        JSON.stringify({
+          type: 'turn.completed',
+          item: {
+            text: [
+              'Execution done.',
+              '```json',
+              '{"spec_id":"my-spec","changed_files":[],"tests_run":1,"tests_passed":1,"risk_level":"low","open_issues":[]}',
+              '```'
+            ].join('\n')
+          }
+        }) + '\n'
+      ));
+
+      const summary = spawner.getResultSummary('test-agent-1');
+      expect(summary).toEqual(expect.objectContaining({
+        spec_id: 'my-spec',
+        tests_run: 1,
+        tests_passed: 1
+      }));
+    });
+  });
+
+  // -------------------------------------------------------------------------
   // stdout JSON Lines parsing → agent:output events
   // -------------------------------------------------------------------------
 

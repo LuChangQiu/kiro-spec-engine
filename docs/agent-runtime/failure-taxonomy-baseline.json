@@ -1,0 +1,99 @@
+{
+  "version": "1.0.0",
+  "default_category": "unknown",
+  "categories": [
+    {
+      "id": "rate_limit",
+      "repairable": true,
+      "patterns": [
+        "429",
+        "too many requests",
+        "rate limit",
+        "retry after"
+      ],
+      "default_actions": [
+        "reduce parallelism and retry with backoff",
+        "delay launch window before next execution"
+      ]
+    },
+    {
+      "id": "dependency",
+      "repairable": true,
+      "patterns": [
+        "cannot find module",
+        "module not found",
+        "missing dependency",
+        "no such package"
+      ],
+      "default_actions": [
+        "install or restore missing dependencies",
+        "reconcile lockfile and package manifest"
+      ]
+    },
+    {
+      "id": "compilation",
+      "repairable": true,
+      "patterns": [
+        "syntax error",
+        "type error",
+        "compile failed",
+        "build failed"
+      ],
+      "default_actions": [
+        "fix compile diagnostics at failing symbol",
+        "re-run targeted build validation"
+      ]
+    },
+    {
+      "id": "test_assertion",
+      "repairable": true,
+      "patterns": [
+        "expected",
+        "received",
+        "test suite failed",
+        "assertion"
+      ],
+      "default_actions": [
+        "inspect failing tests and related symbols",
+        "apply minimal fix and re-run failing tests only"
+      ]
+    },
+    {
+      "id": "environment",
+      "repairable": true,
+      "patterns": [
+        "permission denied",
+        "enoent",
+        "timed out",
+        "network"
+      ],
+      "default_actions": [
+        "verify runtime prerequisites",
+        "stabilize environment and re-run deterministic checks"
+      ]
+    },
+    {
+      "id": "policy_gate",
+      "repairable": false,
+      "patterns": [
+        "policy gate",
+        "governance blocked",
+        "authorization denied",
+        "approval required"
+      ],
+      "default_actions": [
+        "request required authorization or approval",
+        "switch to advisory response mode"
+      ]
+    },
+    {
+      "id": "unknown",
+      "repairable": false,
+      "patterns": [],
+      "default_actions": [
+        "collect diagnostics",
+        "escalate with failure summary"
+      ]
+    }
+  ]
+}

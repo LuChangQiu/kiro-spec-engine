@@ -95,6 +95,7 @@ Detailed technical documentation:
 - **[331-poc Dual-Track Integration Guide](331-poc-dual-track-integration-guide.md)** - Handoff contract and integration playbook between 331-poc and sce
 - **[331-poc Adaptation Roadmap](331-poc-adaptation-roadmap.md)** - Ongoing sce-side adaptation backlog and rollout phases
 - **[SCE Capability Matrix Roadmap](sce-capability-matrix-roadmap.md)** - Strategy routing, symbol evidence, self-repair, ontology mapping, and multi-agent merge policy roadmap
+- **[SCE Capability Matrix E2E Example](sce-capability-matrix-e2e-example.md)** - End-to-end example from strategy decision to summary-driven merge block/allow
 - **[Handoff Profile Integration Guide](handoff-profile-integration-guide.md)** - External project intake contract for `default|moqui|enterprise` handoff profiles
 - **[Multi-Agent Coordination Guide](multi-agent-coordination-guide.md)** - Multi-agent parallel coordination for concurrent development
 - **[Troubleshooting](troubleshooting.md)** - Solutions to common problems

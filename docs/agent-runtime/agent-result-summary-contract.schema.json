@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://scene-capability-engine.dev/contracts/agent-result-summary-contract.schema.json",
+  "title": "Agent Result Summary Contract",
+  "type": "object",
+  "required": [
+    "spec_id",
+    "changed_files",
+    "tests_run",
+    "tests_passed",
+    "risk_level",
+    "open_issues"
+  ],
+  "properties": {
+    "spec_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "changed_files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tests_run": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "tests_passed": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "unknown"
+      ]
+    },
+    "open_issues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,11 @@
+{
+  "spec_id": "117-02-symbol-evidence-locator",
+  "changed_files": [
+    "scripts/symbol-evidence-locate.js",
+    "tests/unit/scripts/symbol-evidence-locate.test.js"
+  ],
+  "tests_run": 6,
+  "tests_passed": 6,
+  "risk_level": "low",
+  "open_issues": []
+}

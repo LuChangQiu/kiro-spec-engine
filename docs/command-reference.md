@@ -267,6 +267,56 @@ sce orchestrate stop
 
 When you pass `--specs` to `sce spec bootstrap|pipeline run|gate run`, sce now defaults to this orchestrate mode automatically.
 
+### Capability Matrix Utilities
+
+```bash
+# 1) Strategy routing: decide answer_only | code_change | code_fix | rollback
+node scripts/auto-strategy-router.js \
+  --input '{"goal_type":"bugfix","requires_write":true,"test_failures":2,"changed_files":1}' \
+  --policy-file docs/agent-runtime/strategy-routing-policy-baseline.json \
+  --json
+
+# 2) Symbol evidence localization: query -> ranked file/line/symbol hits
+node scripts/symbol-evidence-locate.js \
+  --workspace . \
+  --query "approve order" \
+  --min-reliable-score 0.60 \
+  --json
+
+# Strict evidence gate: exit code 2 when no reliable hit is found
+node scripts/symbol-evidence-locate.js \
+  --workspace . \
+  --query "reconcile invoice accrual" \
+  --strict \
+  --json
+
+# 3) Failure attribution + bounded self-repair plan (single repair pass max by default)
+node scripts/failure-attribution-repair.js \
+  --error "Cannot find module @acme/order-core" \
+  --attempted-passes 0 \
+  --max-repair-passes 1 \
+  --tests "npm run test -- order-service" \
+  --json
+
+# 4) Scene template + ontology capability mapping report
+node scripts/capability-mapping-report.js \
+  --input-file .kiro/reports/capability-mapping-input.json \
+  --out .kiro/reports/capability-mapping-report.json \
+  --json
+```
+
+Contract/baseline files:
+- `docs/agent-runtime/symbol-evidence.schema.json`
+- `docs/agent-runtime/failure-taxonomy-baseline.json`
+- `docs/agent-runtime/capability-mapping-report.schema.json`
+- `docs/agent-runtime/agent-result-summary-contract.schema.json`
+- `docs/agent-runtime/multi-agent-coordination-policy-baseline.json`
+
+Multi-agent merge governance default:
+- `sce orchestrate run` loads `docs/agent-runtime/multi-agent-coordination-policy-baseline.json`.
+- When `coordination_rules.require_result_summary=true`, each sub-agent must produce `spec_id/changed_files/tests_run/tests_passed/risk_level/open_issues`.
+- Merge is blocked when summary contract is invalid, when `tests_passed < tests_run` (if enabled), or when unresolved conflict issues are present (if enabled).
+
 ### Autonomous Close-Loop Program
 
 ```bash

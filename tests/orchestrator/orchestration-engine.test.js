@@ -20,6 +20,7 @@ const { EventEmitter } = require('events');
 // --- Mock fs-utils (pathExists for spec validation) ---
 jest.mock('../../lib/utils/fs-utils', () => ({
   pathExists: jest.fn(),
+  readJSON: jest.fn(),
 }));
 
 const fsUtils = require('../../lib/utils/fs-utils');
@@ -53,6 +54,20 @@ describe('OrchestrationEngine', () => {
         mockSpawner.emit('agent:completed', { agentId, specName, exitCode: 0 });
       });
       return Promise.resolve({ agentId, specName, status: 'running' });
+    });
+    mockSpawner.getResultSummary = jest.fn().mockImplementation((agentId) => {
+      const agentText = `${agentId || ''}`;
+      const normalizedSpecId = agentText.startsWith('agent-')
+        ? agentText.replace(/^agent-/, '').replace(/-\d+$/, '')
+        : 'unknown-spec';
+      return {
+        spec_id: normalizedSpecId,
+        changed_files: [],
+        tests_run: 0,
+        tests_passed: 0,
+        risk_level: 'low',
+        open_issues: []
+      };
     });
     mockSpawner.kill = jest.fn().mockResolvedValue(undefined);
     mockSpawner.killAll = jest.fn().mockResolvedValue(undefined);
@@ -103,8 +118,14 @@ describe('OrchestrationEngine', () => {
     // --- MockAgentRegistry ---
     mockRegistry = {};
 
-    // All specs exist by default
-    fsUtils.pathExists.mockResolvedValue(true);
+    // All specs exist by default. Coordination policy file is absent unless explicitly mocked.
+    fsUtils.pathExists.mockImplementation(async (targetPath) => {
+      if (`${targetPath || ''}`.includes('multi-agent-coordination-policy-baseline.json')) {
+        return false;
+      }
+      return true;
+    });
+    fsUtils.readJSON.mockResolvedValue({});
 
     engine = new OrchestrationEngine('/workspace', {
       agentSpawner: mockSpawner,
@@ -836,6 +857,180 @@ describe('OrchestrationEngine', () => {
       } finally {
         jest.useRealTimers();
       }
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Result summary contract (Req 5.2, 5.3)
+  // -------------------------------------------------------------------------
+
+  describe('result summary contract and merge policy', () => {
+    test('enforces required summary when baseline policy enables require_result_summary', async () => {
+      fsUtils.pathExists.mockImplementation(async () => true);
+      fsUtils.readJSON.mockResolvedValue({
+        coordination_rules: {
+          require_result_summary: true,
+          block_merge_on_failed_tests: true,
+          block_merge_on_unresolved_conflicts: true
+        },
+        result_summary_contract: {
+          required_fields: [
+            'spec_id',
+            'changed_files',
+            'tests_run',
+            'tests_passed',
+            'risk_level',
+            'open_issues'
+          ]
+        }
+      });
+      mockDependencyManager.buildDependencyGraph.mockResolvedValue({
+        nodes: ['spec-a'],
+        edges: [],
+      });
+      mockConfig.getConfig.mockResolvedValue({
+        maxParallel: 3,
+        maxRetries: 0,
+      });
+      mockSpawner.getResultSummary.mockReturnValue(null);
+
+      const result = await engine.start(['spec-a']);
+
+      expect(result.status).toBe('failed');
+      expect(result.failed).toContain('spec-a');
+      expect(fsUtils.readJSON).toHaveBeenCalled();
+    });
+
+    test('fails when summary contract is required but missing', async () => {
+      mockDependencyManager.buildDependencyGraph.mockResolvedValue({
+        nodes: ['spec-a'],
+        edges: [],
+      });
+      mockConfig.getConfig.mockResolvedValue({
+        maxParallel: 3,
+        maxRetries: 0,
+        coordinationRules: {
+          require_result_summary: true,
+          block_merge_on_failed_tests: true,
+          block_merge_on_unresolved_conflicts: true,
+        },
+      });
+      mockSpawner.getResultSummary.mockReturnValue(null);
+
+      const result = await engine.start(['spec-a']);
+
+      expect(result.status).toBe('failed');
+      expect(result.failed).toContain('spec-a');
+      expect(result.error).toBeNull();
+      expect(mockStatusMonitor.updateSpecStatus).toHaveBeenCalledWith(
+        'spec-a',
+        'failed',
+        'agent-spec-a',
+        expect.stringContaining('result summary contract missing')
+      );
+    });
+
+    test('fails when summary contract payload is invalid', async () => {
+      mockDependencyManager.buildDependencyGraph.mockResolvedValue({
+        nodes: ['spec-a'],
+        edges: [],
+      });
+      mockConfig.getConfig.mockResolvedValue({
+        maxParallel: 3,
+        maxRetries: 0,
+        coordinationRules: {
+          require_result_summary: true,
+        },
+      });
+      mockSpawner.getResultSummary.mockReturnValue({
+        spec_id: 'spec-a',
+        changed_files: [],
+        tests_run: 2,
+        tests_passed: 3,
+        risk_level: 'critical',
+        open_issues: []
+      });
+
+      const result = await engine.start(['spec-a']);
+
+      expect(result.status).toBe('failed');
+      expect(result.failed).toContain('spec-a');
+      expect(mockStatusMonitor.updateSpecStatus).toHaveBeenCalledWith(
+        'spec-a',
+        'failed',
+        'agent-spec-a',
+        expect.stringContaining('result summary contract invalid')
+      );
+    });
+
+    test('blocks merge when summary reports failed tests', async () => {
+      mockDependencyManager.buildDependencyGraph.mockResolvedValue({
+        nodes: ['spec-a'],
+        edges: [],
+      });
+      mockConfig.getConfig.mockResolvedValue({
+        maxParallel: 3,
+        maxRetries: 0,
+        coordinationRules: {
+          require_result_summary: true,
+          block_merge_on_failed_tests: true,
+        },
+      });
+      mockSpawner.getResultSummary.mockReturnValue({
+        spec_id: 'spec-a',
+        changed_files: ['src/a.js'],
+        tests_run: 5,
+        tests_passed: 4,
+        risk_level: 'medium',
+        open_issues: []
+      });
+
+      const result = await engine.start(['spec-a']);
+
+      expect(result.status).toBe('failed');
+      expect(result.failed).toContain('spec-a');
+      expect(result.completed).not.toContain('spec-a');
+      expect(result.result_summaries['spec-a']).toBeUndefined();
+      expect(mockStatusMonitor.updateSpecStatus).toHaveBeenCalledWith(
+        'spec-a',
+        'failed',
+        'agent-spec-a',
+        expect.stringContaining('merge blocked')
+      );
+    });
+
+    test('stores validated summary when merge policy passes', async () => {
+      mockDependencyManager.buildDependencyGraph.mockResolvedValue({
+        nodes: ['spec-a'],
+        edges: [],
+      });
+      mockConfig.getConfig.mockResolvedValue({
+        maxParallel: 3,
+        maxRetries: 0,
+        coordinationRules: {
+          require_result_summary: true,
+          block_merge_on_failed_tests: true,
+          block_merge_on_unresolved_conflicts: true,
+        },
+      });
+      mockSpawner.getResultSummary.mockReturnValue({
+        spec_id: 'spec-a',
+        changed_files: ['src/a.js'],
+        tests_run: 2,
+        tests_passed: 2,
+        risk_level: 'low',
+        open_issues: []
+      });
+
+      const result = await engine.start(['spec-a']);
+
+      expect(result.status).toBe('completed');
+      expect(result.result_summaries['spec-a']).toEqual(expect.objectContaining({
+        spec_id: 'spec-a',
+        tests_run: 2,
+        tests_passed: 2,
+        risk_level: 'low'
+      }));
     });
   });
 

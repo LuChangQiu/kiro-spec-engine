@@ -1,0 +1,42 @@
+{
+  "mode": "capability-mapping-report",
+  "mapping_report": [
+    {
+      "change_id": "entity:Order",
+      "capability": "entity:order",
+      "mapped_templates": [
+        "scene-moqui-order-core"
+      ],
+      "ontology_status": "covered",
+      "status": "mapped"
+    },
+    {
+      "change_id": "business_rule:credit-check",
+      "capability": "rule:credit-check",
+      "mapped_templates": [],
+      "ontology_status": "gap",
+      "status": "missing_template_and_ontology_gap"
+    }
+  ],
+  "missing_capabilities": [
+    "rule:credit-check"
+  ],
+  "recommended_templates": [
+    "scene-moqui-order-core"
+  ],
+  "ontology_gaps": [
+    {
+      "change_id": "business_rule:credit-check",
+      "type": "business_rule",
+      "name": "credit-check",
+      "capability": "rule:credit-check"
+    }
+  ],
+  "summary": {
+    "total_changes": 2,
+    "mapped_changes": 1,
+    "missing_capabilities": 1,
+    "ontology_gaps": 1,
+    "coverage_percent": 50
+  }
+}

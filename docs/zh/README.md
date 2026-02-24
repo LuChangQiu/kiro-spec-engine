@@ -199,6 +199,9 @@
 ### [SCE 能力矩阵端到端示例](../sce-capability-matrix-e2e-example.md)
 **端到端流程示例（英文）** - 从策略决策到符号证据、失败修复、能力映射和主从摘要合并阻断
 
+### [SCE 业务模式能力地图](../sce-business-mode-map.md)
+**三态执行治理（英文）** - 用户态 / 运维态 / 开发态的默认接管、授权门禁与审计要求
+
 ### [Handoff Profile Integration Guide](../handoff-profile-integration-guide.md)
 **外部项目接入规范（英文）** - `default|moqui|enterprise` 三档 handoff profile 契约
 - profile 默认策略与显式参数覆盖规则

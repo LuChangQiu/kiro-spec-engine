@@ -97,6 +97,7 @@ Detailed technical documentation:
 - **[SCE Capability Matrix Roadmap](sce-capability-matrix-roadmap.md)** - Strategy routing, symbol evidence, self-repair, ontology mapping, and multi-agent merge policy roadmap
 - **[SCE Capability Matrix E2E Example](sce-capability-matrix-e2e-example.md)** - End-to-end example from strategy decision to summary-driven merge block/allow
 - **[Handoff Profile Integration Guide](handoff-profile-integration-guide.md)** - External project intake contract for `default|moqui|enterprise` handoff profiles
+- **[SCE Business Mode Map](sce-business-mode-map.md)** - Default takeover model and `user/ops/dev` mode execution governance
 - **[Multi-Agent Coordination Guide](multi-agent-coordination-guide.md)** - Multi-agent parallel coordination for concurrent development
 - **[Troubleshooting](troubleshooting.md)** - Solutions to common problems
 - **[FAQ](faq.md)** - Answers to frequently asked questions
@@ -109,6 +110,7 @@ Detailed technical documentation:
 - **[Upgrade Guide](upgrade-guide.md)** - Upgrading sce to newer versions
 - **[Release Checklist](release-checklist.md)** - Repeatable pre-release verification flow
 - **[Security Governance Default Baseline](security-governance-default-baseline.md)** - Default safety, approval, and audit controls for SCE delivery
+- **[SCE Business Mode Map](sce-business-mode-map.md)** - User-mode, ops-mode, and dev-mode capability map with default gate policy
 - **[Release-Ready Starter Kit](starter-kit/README.md)** - Starter manifest + workflow sample for external project onboarding
 - **[Release Archive](releases/README.md)** - Index of release notes and validation reports
 - **[Release Notes v1.46.2](releases/v1.46.2.md)** - Summary of value observability and onboarding improvements
@@ -197,6 +199,7 @@ Detailed technical documentation:
 - [331-poc Dual-Track Integration Guide](331-poc-dual-track-integration-guide.md)
 - [331-poc Adaptation Roadmap](331-poc-adaptation-roadmap.md)
 - [Handoff Profile Integration Guide](handoff-profile-integration-guide.md)
+- [SCE Business Mode Map](sce-business-mode-map.md)
 - [Release-Ready Starter Kit](starter-kit/README.md)
 - [Security Governance Default Baseline](security-governance-default-baseline.md)
 - [Scene Template Engine](command-reference.md#scene-template-engine)

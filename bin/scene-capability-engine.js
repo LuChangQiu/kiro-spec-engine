@@ -21,6 +21,11 @@ const { registerSpecPipelineCommand } = require('../lib/commands/spec-pipeline')
 const { registerSpecGateCommand } = require('../lib/commands/spec-gate');
 const { registerValueCommands } = require('../lib/commands/value');
 const VersionChecker = require('../lib/version/version-checker');
+const {
+  findLegacyKiroDirectories,
+  migrateLegacyKiroDirectories,
+  autoMigrateLegacyKiroDirectories,
+} = require('../lib/workspace/legacy-kiro-migrator');
 
 const i18n = getI18n();
 const t = (key, params) => i18n.t(key, params);
@@ -122,6 +127,7 @@ program
     i18n.setLocale(locale);
   })
   .option('--no-version-check', 'Suppress version mismatch warnings')
+  .option('--skip-legacy-migration', 'Skip automatic legacy .kiro -> .sce migration check')
   .option('--skip-steering-check', 'Skip steering directory compliance check (not recommended)')
   .option('--force-steering-check', 'Force steering directory compliance check even if cache is valid');
 
@@ -584,6 +590,70 @@ workspaceCmd
     await workspaceCommand.infoWorkspace(name);
   });
 
+workspaceCmd
+  .command('legacy-scan')
+  .description('Scan workspace tree for legacy .kiro directories')
+  .option('--max-depth <n>', 'Maximum recursive scan depth', parseInt)
+  .option('--json', 'Output in JSON format')
+  .action(async (options) => {
+    const workspaceRoot = process.cwd();
+    const candidates = await findLegacyKiroDirectories(workspaceRoot, {
+      maxDepth: Number.isInteger(options.maxDepth) ? options.maxDepth : undefined,
+    });
+
+    if (options.json) {
+      console.log(JSON.stringify({
+        root: workspaceRoot,
+        legacy_directories: candidates,
+        count: candidates.length,
+      }, null, 2));
+      return;
+    }
+
+    if (candidates.length === 0) {
+      console.log(chalk.green('✓ No legacy .kiro directories found.'));
+      return;
+    }
+    console.log(chalk.yellow(`Found ${candidates.length} legacy .kiro director${candidates.length > 1 ? 'ies' : 'y'}:`));
+    for (const dir of candidates) {
+      console.log(chalk.gray(`  - ${dir}`));
+    }
+  });
+
+workspaceCmd
+  .command('legacy-migrate')
+  .description('Migrate legacy .kiro directories to .sce')
+  .option('--dry-run', 'Preview migration actions without writing changes')
+  .option('--max-depth <n>', 'Maximum recursive scan depth', parseInt)
+  .option('--json', 'Output in JSON format')
+  .action(async (options) => {
+    const workspaceRoot = process.cwd();
+    const report = await migrateLegacyKiroDirectories(workspaceRoot, {
+      dryRun: options.dryRun === true,
+      maxDepth: Number.isInteger(options.maxDepth) ? options.maxDepth : undefined,
+    });
+
+    if (options.json) {
+      console.log(JSON.stringify(report, null, 2));
+      return;
+    }
+
+    if (report.scanned === 0) {
+      console.log(chalk.green('✓ No legacy .kiro directories found.'));
+      return;
+    }
+
+    const modeLabel = report.dryRun ? ' (dry-run)' : '';
+    console.log(chalk.green(`Legacy migration completed${modeLabel}.`));
+    console.log(chalk.gray(`Scanned: ${report.scanned}`));
+    console.log(chalk.gray(`Migrated: ${report.migrated}`));
+    console.log(chalk.gray(`Renamed: ${report.renamed}`));
+    console.log(chalk.gray(`Merged: ${report.merged}`));
+    console.log(chalk.gray(`Moved files: ${report.moved_files}`));
+    console.log(chalk.gray(`Deduped files: ${report.deduped_files}`));
+    console.log(chalk.gray(`Conflict files: ${report.conflict_files}`));
+  });
+
 // Environment configuration management commands
 const envCommand = require('../lib/commands/env');
 
@@ -785,9 +855,20 @@ async function updateProjectConfig(projectName) {
   
   // Check for bypass flags
   const args = process.argv.slice(2);
+  const skipLegacyMigration = args.includes('--skip-legacy-migration') ||
+    process.env.SCE_SKIP_LEGACY_MIGRATION === '1';
   const skipCheck = args.includes('--skip-steering-check') || 
                     process.env.KSE_SKIP_STEERING_CHECK === '1';
   const forceCheck = args.includes('--force-steering-check');
+
+  if (!skipLegacyMigration) {
+    const migration = await autoMigrateLegacyKiroDirectories(process.cwd(), { maxDepth: 6 });
+    if (migration.detected > 0) {
+      console.log(chalk.yellow(
+        `Detected ${migration.detected} legacy .kiro director${migration.detected > 1 ? 'ies' : 'y'}; migrated ${migration.migrated} to .sce.`
+      ));
+    }
+  }
   
   // Run compliance check
   await runSteeringComplianceCheck({

@@ -220,6 +220,14 @@ sce workspace info [name]
 # Remove a workspace
 sce workspace remove <name> [--force]
 
+# Scan for legacy .kiro directories in the workspace tree
+sce workspace legacy-scan
+sce workspace legacy-scan --max-depth 8 --json
+
+# Migrate legacy .kiro directories to .sce (safe merge when .sce already exists)
+sce workspace legacy-migrate
+sce workspace legacy-migrate --dry-run --json
+
 # Legacy commands (still supported)
 sce workspace sync
 sce workspace team
@@ -1491,6 +1499,9 @@ sce <command> --help
 
 # Show version
 sce --version
+
+# Skip automatic legacy workspace migration for this run
+sce --skip-legacy-migration <command>
 ```
 
 ---

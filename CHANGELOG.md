@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.6] - 2026-02-24
+
+### Added
+- Workspace legacy guardrail:
+  - automatic startup migration from legacy `.kiro` directories to `.sce`
+  - `sce workspace legacy-scan` for recursive legacy detection
+  - `sce workspace legacy-migrate` for dry-run and apply migration flows
+
+### Fixed
+- Adoption path normalization for `.sce/...` prefixed paths, restoring correct conflict classification and automatic resolution behavior.
+
 ## [3.3.5] - 2026-02-22
 
 ### Added

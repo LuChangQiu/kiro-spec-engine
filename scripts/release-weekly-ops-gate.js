@@ -122,6 +122,7 @@ function buildWeeklyOpsSignals(payload) {
     runtime_block_rate_percent: normalizeNumber(governance.runtime_block_rate_percent),
     runtime_ui_mode_violation_total: normalizeNumber(governance.runtime_ui_mode_violation_total),
     runtime_ui_mode_violation_rate_percent: normalizeNumber(governance.runtime_ui_mode_violation_rate_percent),
+    business_mode_unknown_signal_total: normalizeNumber(governance.business_mode_unknown_signal_total),
     matrix_regression_positive_rate_percent: normalizeNumber(matrixSignals.regression_positive_rate_percent),
     handoff_gate_pass_rate_percent: normalizeNumber(handoff.gate_pass_rate_percent)
   };
@@ -191,6 +192,14 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
     'RELEASE_WEEKLY_OPS_MAX_RUNTIME_UI_MODE_VIOLATION_RATE_PERCENT',
     configWarnings
   );
+  const maxBusinessModeUnknownSignalTotalRaw = parseOptionalNumberWithWarning(
+    env,
+    'RELEASE_WEEKLY_OPS_MAX_BUSINESS_MODE_UNKNOWN_SIGNAL_TOTAL',
+    configWarnings
+  );
+  const maxBusinessModeUnknownSignalTotal = Number.isFinite(maxBusinessModeUnknownSignalTotalRaw)
+    ? maxBusinessModeUnknownSignalTotalRaw
+    : 0;
   const maxMatrixRegressionPositiveRatePercent = parseOptionalNumberWithWarning(
     env,
     'RELEASE_WEEKLY_OPS_MAX_MATRIX_REGRESSION_RATE_PERCENT',
@@ -261,6 +270,15 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
       );
     }
     if (
+      Number.isFinite(maxBusinessModeUnknownSignalTotal)
+      && Number.isFinite(signals.business_mode_unknown_signal_total)
+      && signals.business_mode_unknown_signal_total > maxBusinessModeUnknownSignalTotal
+    ) {
+      violations.push(
+        `weekly ops business-mode unknown signal total ${signals.business_mode_unknown_signal_total} exceeds max ${maxBusinessModeUnknownSignalTotal}`
+      );
+    }
+    if (
       Number.isFinite(maxMatrixRegressionPositiveRatePercent)
       && Number.isFinite(signals.matrix_regression_positive_rate_percent)
       && signals.matrix_regression_positive_rate_percent > maxMatrixRegressionPositiveRatePercent
@@ -286,6 +304,7 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
     max_dialogue_authorization_block_rate_percent: maxDialogueAuthorizationBlockRatePercent,
     max_runtime_ui_mode_violation_total: maxRuntimeUiModeViolationTotal,
     max_runtime_ui_mode_violation_rate_percent: maxRuntimeUiModeViolationRatePercent,
+    max_business_mode_unknown_signal_total: maxBusinessModeUnknownSignalTotal,
     max_matrix_regression_positive_rate_percent: maxMatrixRegressionPositiveRatePercent,
     config_warnings: configWarnings,
     signals,
@@ -320,6 +339,9 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
   if (Number.isFinite(maxRuntimeUiModeViolationRatePercent)) {
     summaryLines.push(`- max runtime ui-mode violation rate: ${maxRuntimeUiModeViolationRatePercent}%`);
   }
+  if (Number.isFinite(maxBusinessModeUnknownSignalTotal)) {
+    summaryLines.push(`- max business-mode unknown signal total: ${maxBusinessModeUnknownSignalTotal}`);
+  }
   if (Number.isFinite(maxMatrixRegressionPositiveRatePercent)) {
     summaryLines.push(`- max matrix regression-positive rate: ${maxMatrixRegressionPositiveRatePercent}%`);
   }
@@ -337,6 +359,9 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
     );
     summaryLines.push(
       `- runtime ui-mode violation rate: ${signals.runtime_ui_mode_violation_rate_percent === null ? 'n/a' : `${signals.runtime_ui_mode_violation_rate_percent}%`}`
+    );
+    summaryLines.push(
+      `- business-mode unknown signal total: ${signals.business_mode_unknown_signal_total === null ? 'n/a' : signals.business_mode_unknown_signal_total}`
     );
     summaryLines.push(
       `- matrix regression-positive rate: ${signals.matrix_regression_positive_rate_percent === null ? 'n/a' : `${signals.matrix_regression_positive_rate_percent}%`}`
@@ -368,6 +393,7 @@ function evaluateReleaseWeeklyOpsGate(options = {}) {
       + `dialogue_authorization_block_rate=${signals.dialogue_authorization_block_rate_percent === null ? 'n/a' : `${signals.dialogue_authorization_block_rate_percent}%`} `
       + `runtime_ui_mode_violation_total=${signals.runtime_ui_mode_violation_total === null ? 'n/a' : signals.runtime_ui_mode_violation_total} `
       + `runtime_ui_mode_violation_rate=${signals.runtime_ui_mode_violation_rate_percent === null ? 'n/a' : `${signals.runtime_ui_mode_violation_rate_percent}%`} `
+      + `business_mode_unknown_signal_total=${signals.business_mode_unknown_signal_total === null ? 'n/a' : signals.business_mode_unknown_signal_total} `
       + `matrix_regression_positive_rate=${signals.matrix_regression_positive_rate_percent === null ? 'n/a' : `${signals.matrix_regression_positive_rate_percent}%`}`
     );
   }

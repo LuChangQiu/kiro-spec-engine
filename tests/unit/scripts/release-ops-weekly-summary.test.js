@@ -121,12 +121,16 @@ describe('release-ops-weekly-summary script', () => {
         dialogue_authorization_block_total: 2,
         dialogue_authorization_block_rate_percent: 50,
         dialogue_authorization_user_app_apply_attempt_total: 1,
+        dialogue_authorization_unknown_business_mode_total: 0,
         runtime_total: 4,
         runtime_deny_total: 1,
         runtime_review_required_total: 1,
         runtime_block_rate_percent: 50,
         runtime_ui_mode_violation_total: 1,
         runtime_ui_mode_violation_rate_percent: 25,
+        runtime_unknown_business_mode_total: 0,
+        authorization_tier_unknown_business_mode_total: 0,
+        business_mode_unknown_signal_total: 0,
         matrix_signal_total: 2,
         matrix_portfolio_pass_rate_percent: 50,
         matrix_regression_positive_rate_percent: 50,
@@ -180,7 +184,11 @@ describe('release-ops-weekly-summary script', () => {
     expect(payload.snapshots.interactive_governance.authorization_tier_block_rate_percent).toBe(50);
     expect(payload.snapshots.interactive_governance.dialogue_authorization_total).toBe(4);
     expect(payload.snapshots.interactive_governance.dialogue_authorization_block_rate_percent).toBe(50);
+    expect(payload.snapshots.interactive_governance.dialogue_authorization_unknown_business_mode_total).toBe(0);
     expect(payload.snapshots.interactive_governance.runtime_ui_mode_violation_total).toBe(1);
+    expect(payload.snapshots.interactive_governance.runtime_unknown_business_mode_total).toBe(0);
+    expect(payload.snapshots.interactive_governance.authorization_tier_unknown_business_mode_total).toBe(0);
+    expect(payload.snapshots.interactive_governance.business_mode_unknown_signal_total).toBe(0);
     expect(payload.snapshots.matrix_signals.total_signals).toBe(2);
     expect(payload.health.risk).toMatch(/medium|high/);
     expect(payload.health.concerns.some(item => item.includes('runtime ui-mode violations'))).toBe(true);
@@ -206,5 +214,37 @@ describe('release-ops-weekly-summary script', () => {
     expect(payload.warnings.length).toBeGreaterThan(0);
     expect(payload.health.risk).toMatch(/medium|high/);
     expect(payload.health.recommendations.some(item => item.includes('auto handoff run'))).toBe(true);
+  });
+
+  test('raises concern when governance signals miss business-mode tagging', async () => {
+    const projectRoot = path.resolve(__dirname, '..', '..', '..');
+    const scriptPath = path.join(projectRoot, 'scripts', 'release-ops-weekly-summary.js');
+    const workspace = path.join(tempDir, 'workspace-business-mode-missing');
+    const governanceFile = path.join(workspace, '.sce', 'reports', 'interactive-governance-report.json');
+    await fs.ensureDir(path.dirname(governanceFile));
+
+    await fs.writeJson(governanceFile, {
+      mode: 'interactive-governance-report',
+      generated_at: '2026-02-16T10:00:00.000Z',
+      summary: {
+        status: 'ok',
+        breaches: 0,
+        warnings: 0
+      },
+      metrics: {
+        business_mode_unknown_signal_total: 3
+      }
+    }, { spaces: 2 });
+
+    const result = spawnSync(process.execPath, [scriptPath, '--period', 'all', '--json'], {
+      cwd: workspace,
+      encoding: 'utf8'
+    });
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.snapshots.interactive_governance.business_mode_unknown_signal_total).toBe(3);
+    expect(payload.health.concerns.some(item => item.includes('missing business-mode tags'))).toBe(true);
+    expect(payload.health.recommendations.some(item => item.includes('business_mode'))).toBe(true);
   });
 });

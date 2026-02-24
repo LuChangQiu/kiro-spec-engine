@@ -501,6 +501,11 @@ function buildInteractiveGovernanceSnapshot(payload, window) {
     )
       ? Number(metrics.dialogue_authorization_user_app_apply_attempt_total)
       : null,
+    dialogue_authorization_unknown_business_mode_total: Number.isFinite(
+      Number(metrics.dialogue_authorization_unknown_business_mode_total)
+    )
+      ? Number(metrics.dialogue_authorization_unknown_business_mode_total)
+      : null,
     runtime_total: Number.isFinite(Number(metrics.runtime_total))
       ? Number(metrics.runtime_total)
       : null,
@@ -518,6 +523,17 @@ function buildInteractiveGovernanceSnapshot(payload, window) {
       : null,
     runtime_ui_mode_violation_rate_percent: Number.isFinite(Number(metrics.runtime_ui_mode_violation_rate_percent))
       ? Number(metrics.runtime_ui_mode_violation_rate_percent)
+      : null,
+    runtime_unknown_business_mode_total: Number.isFinite(Number(metrics.runtime_unknown_business_mode_total))
+      ? Number(metrics.runtime_unknown_business_mode_total)
+      : null,
+    authorization_tier_unknown_business_mode_total: Number.isFinite(
+      Number(metrics.authorization_tier_unknown_business_mode_total)
+    )
+      ? Number(metrics.authorization_tier_unknown_business_mode_total)
+      : null,
+    business_mode_unknown_signal_total: Number.isFinite(Number(metrics.business_mode_unknown_signal_total))
+      ? Number(metrics.business_mode_unknown_signal_total)
       : null,
     matrix_signal_total: Number.isFinite(Number(metrics.matrix_signal_total))
       ? Number(metrics.matrix_signal_total)
@@ -694,6 +710,14 @@ function buildHealth(snapshots, warnings) {
     pushConcern(`runtime ui-mode violations observed: ${governance.runtime_ui_mode_violation_total}`);
     pushRecommendation('Enforce dual-surface routing: user-app suggestion-only, ops-console for apply workflows.');
   }
+  if (
+    Number.isFinite(governance.business_mode_unknown_signal_total)
+    && governance.business_mode_unknown_signal_total > 0
+  ) {
+    risk = promoteRisk(risk, 'medium');
+    pushConcern(`interactive governance signals missing business-mode tags: ${governance.business_mode_unknown_signal_total}`);
+    pushRecommendation('Upgrade to latest interactive-flow/loop so governance signals always include business_mode.');
+  }
 
   const matrix = snapshots.matrix_signals;
   if (matrix.total_signals === 0) {
@@ -756,9 +780,13 @@ function buildMarkdown(report) {
   lines.push(`- Dialogue authorization block total: ${report.snapshots.interactive_governance.dialogue_authorization_block_total == null ? 'n/a' : report.snapshots.interactive_governance.dialogue_authorization_block_total}`);
   lines.push(`- Dialogue authorization block rate: ${report.snapshots.interactive_governance.dialogue_authorization_block_rate_percent == null ? 'n/a' : `${report.snapshots.interactive_governance.dialogue_authorization_block_rate_percent}%`}`);
   lines.push(`- Dialogue user-app apply attempts: ${report.snapshots.interactive_governance.dialogue_authorization_user_app_apply_attempt_total == null ? 'n/a' : report.snapshots.interactive_governance.dialogue_authorization_user_app_apply_attempt_total}`);
+  lines.push(`- Dialogue unknown business-mode signals: ${report.snapshots.interactive_governance.dialogue_authorization_unknown_business_mode_total == null ? 'n/a' : report.snapshots.interactive_governance.dialogue_authorization_unknown_business_mode_total}`);
   lines.push(`- Runtime signals: ${report.snapshots.interactive_governance.runtime_total == null ? 'n/a' : report.snapshots.interactive_governance.runtime_total}`);
   lines.push(`- Runtime block rate: ${report.snapshots.interactive_governance.runtime_block_rate_percent == null ? 'n/a' : `${report.snapshots.interactive_governance.runtime_block_rate_percent}%`}`);
   lines.push(`- Runtime ui-mode violations: ${report.snapshots.interactive_governance.runtime_ui_mode_violation_total == null ? 'n/a' : report.snapshots.interactive_governance.runtime_ui_mode_violation_total}`);
+  lines.push(`- Runtime unknown business-mode signals: ${report.snapshots.interactive_governance.runtime_unknown_business_mode_total == null ? 'n/a' : report.snapshots.interactive_governance.runtime_unknown_business_mode_total}`);
+  lines.push(`- Authorization-tier unknown business-mode signals: ${report.snapshots.interactive_governance.authorization_tier_unknown_business_mode_total == null ? 'n/a' : report.snapshots.interactive_governance.authorization_tier_unknown_business_mode_total}`);
+  lines.push(`- Total unknown business-mode signals: ${report.snapshots.interactive_governance.business_mode_unknown_signal_total == null ? 'n/a' : report.snapshots.interactive_governance.business_mode_unknown_signal_total}`);
   lines.push('');
   lines.push('## Matrix Signals');
   lines.push('');

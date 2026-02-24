@@ -5,6 +5,12 @@ const path = require('path');
 const fs = require('fs-extra');
 const crypto = require('crypto');
 const { spawnSync } = require('child_process');
+const {
+  DEFAULT_BUSINESS_MODE_POLICY,
+  BUSINESS_MODES,
+  normalizeBusinessMode,
+  applyBusinessModePolicy
+} = require('../lib/runtime/business-mode-resolver');
 
 const DEFAULT_PROVIDER = 'moqui';
 const DEFAULT_OUT_DIR = '.sce/reports/interactive-flow';
@@ -28,6 +34,7 @@ const SCRIPT_INTERACTIVE_LOOP = path.resolve(__dirname, 'interactive-customizati
 const SCRIPT_MOQUI_BASELINE = path.resolve(__dirname, 'moqui-template-baseline-report.js');
 
 function parseArgs(argv) {
+  const explicitKeys = new Set();
   const options = {
     input: null,
     provider: DEFAULT_PROVIDER,
@@ -36,6 +43,9 @@ function parseArgs(argv) {
     userId: DEFAULT_USER_ID,
     sessionId: null,
     executionMode: 'suggestion',
+    businessMode: null,
+    businessModePolicy: DEFAULT_BUSINESS_MODE_POLICY,
+    allowModeOverride: false,
     policy: null,
     catalog: null,
     dialoguePolicy: null,
@@ -121,7 +131,16 @@ function parseArgs(argv) {
       index += 1;
     } else if (token === '--execution-mode' && next) {
       options.executionMode = next;
+      explicitKeys.add('executionMode');
       index += 1;
+    } else if (token === '--business-mode' && next) {
+      options.businessMode = next;
+      index += 1;
+    } else if (token === '--business-mode-policy' && next) {
+      options.businessModePolicy = next;
+      index += 1;
+    } else if (token === '--allow-mode-override') {
+      options.allowModeOverride = true;
     } else if (token === '--policy' && next) {
       options.policy = next;
       index += 1;
@@ -133,18 +152,22 @@ function parseArgs(argv) {
       index += 1;
     } else if (token === '--dialogue-profile' && next) {
       options.dialogueProfile = next;
+      explicitKeys.add('dialogueProfile');
       index += 1;
     } else if (token === '--ui-mode' && next) {
       options.uiMode = next;
+      explicitKeys.add('uiMode');
       index += 1;
     } else if (token === '--dialogue-out' && next) {
       options.dialogueOut = next;
       index += 1;
     } else if (token === '--runtime-mode' && next) {
       options.runtimeMode = next;
+      explicitKeys.add('runtimeMode');
       index += 1;
     } else if (token === '--runtime-environment' && next) {
       options.runtimeEnvironment = next;
+      explicitKeys.add('runtimeEnvironment');
       index += 1;
     } else if (token === '--runtime-policy' && next) {
       options.runtimePolicy = next;
@@ -208,6 +231,7 @@ function parseArgs(argv) {
       options.autoApproveLowRisk = true;
     } else if (token === '--auto-execute-low-risk') {
       options.autoExecuteLowRisk = true;
+      explicitKeys.add('autoExecuteLowRisk');
     } else if (token === '--allow-suggestion-apply') {
       options.allowSuggestionApply = true;
     } else if (token === '--live-apply') {
@@ -292,7 +316,9 @@ function parseArgs(argv) {
   options.goalFile = `${options.goalFile || ''}`.trim();
   options.userId = `${options.userId || ''}`.trim() || DEFAULT_USER_ID;
   options.sessionId = `${options.sessionId || ''}`.trim() || null;
-  options.executionMode = `${options.executionMode || ''}`.trim() || 'suggestion';
+  options.executionMode = `${options.executionMode || ''}`.trim().toLowerCase() || 'suggestion';
+  options.businessMode = normalizeBusinessMode(options.businessMode);
+  options.businessModePolicy = `${options.businessModePolicy || ''}`.trim() || DEFAULT_BUSINESS_MODE_POLICY;
   options.policy = `${options.policy || ''}`.trim() || null;
   options.catalog = `${options.catalog || ''}`.trim() || null;
   options.dialoguePolicy = `${options.dialoguePolicy || ''}`.trim() || null;
@@ -345,6 +371,10 @@ function parseArgs(argv) {
   if (!['moqui', 'generic'].includes(options.provider)) {
     throw new Error('--provider must be one of: moqui, generic');
   }
+  if (options.businessMode && !BUSINESS_MODES.has(options.businessMode)) {
+    throw new Error(`--business-mode must be one of: ${Array.from(BUSINESS_MODES).join(', ')}`);
+  }
+  options.businessModeState = applyBusinessModePolicy(options, explicitKeys, process.cwd());
   if (!['suggestion', 'apply'].includes(options.executionMode)) {
     throw new Error('--execution-mode must be one of: suggestion, apply');
   }
@@ -399,6 +429,9 @@ function printHelpAndExit(code) {
     `  --user-id <id>                  User identifier (default: ${DEFAULT_USER_ID})`,
     '  --session-id <id>               Session id (default: auto-generated)',
     '  --execution-mode <mode>         suggestion|apply (default: suggestion)',
+    '  --business-mode <mode>          user-mode|ops-mode|dev-mode (preset routing profile)',
+    `  --business-mode-policy <path>   Business mode policy override (default: ${DEFAULT_BUSINESS_MODE_POLICY})`,
+    '  --allow-mode-override           Allow option overrides that conflict with business mode preset',
     '  --policy <path>                 Guardrail policy override',
     '  --catalog <path>                High-risk catalog override',
     '  --dialogue-policy <path>        Dialogue governance policy override',
@@ -604,6 +637,15 @@ async function main() {
     '--out', loopOutPath,
     '--json'
   ];
+  if (options.businessModeState && options.businessModeState.mode_explicit === true) {
+    loopArgs.push('--business-mode', options.businessMode);
+    if (options.businessModePolicy) {
+      loopArgs.push('--business-mode-policy', resolvePath(cwd, options.businessModePolicy));
+    }
+    if (options.allowModeOverride) {
+      loopArgs.push('--allow-mode-override');
+    }
+  }
   if (options.goal) {
     loopArgs.push('--goal', options.goal);
   } else {
@@ -848,6 +890,15 @@ async function main() {
     generated_at: new Date().toISOString(),
     session_id: sessionId,
     provider: options.provider,
+    routing: {
+      business_mode: options.businessMode,
+      mode_explicit: options.businessModeState ? options.businessModeState.mode_explicit === true : false,
+      allow_mode_override: options.allowModeOverride === true,
+      policy: options.businessModeState
+        ? toRelative(cwd, options.businessModeState.policy_path)
+        : toRelative(cwd, resolvePath(cwd, options.businessModePolicy)),
+      policy_source: options.businessModeState ? options.businessModeState.policy_source : 'unknown'
+    },
     pipeline: {
       bridge: {
         exit_code: bridgeResult.exitCode,
@@ -887,6 +938,7 @@ async function main() {
       execution_block_reason_category: loopPayload && loopPayload.summary
         ? loopPayload.summary.execution_block_reason_category || null
         : null,
+      business_mode: options.businessMode,
       execution_block_remediation_hint: loopPayload && loopPayload.summary
         ? loopPayload.summary.execution_block_remediation_hint || null
         : null,

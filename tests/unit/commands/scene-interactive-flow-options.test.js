@@ -10,6 +10,9 @@ describe('scene interactive-flow option helpers', () => {
       provider: ' MOQUI ',
       goal: ' improve approval speed ',
       executionMode: 'apply',
+      businessMode: ' DEV-MODE ',
+      businessModePolicy: ' docs/interactive-customization/business-mode-policy-baseline.json ',
+      allowModeOverride: true,
       runtimeMode: ' OPS-FIX ',
       runtimeEnvironment: ' STAGING ',
       runtimePolicy: ' docs/interactive-customization/runtime-mode-policy-baseline.json ',
@@ -41,6 +44,9 @@ describe('scene interactive-flow option helpers', () => {
     expect(normalized.provider).toBe('moqui');
     expect(normalized.goal).toBe('improve approval speed');
     expect(normalized.executionMode).toBe('apply');
+    expect(normalized.businessMode).toBe('dev-mode');
+    expect(normalized.businessModePolicy).toBe('docs/interactive-customization/business-mode-policy-baseline.json');
+    expect(normalized.allowModeOverride).toBe(true);
     expect(normalized.runtimeMode).toBe('ops-fix');
     expect(normalized.runtimeEnvironment).toBe('staging');
     expect(normalized.runtimePolicy).toBe('docs/interactive-customization/runtime-mode-policy-baseline.json');
@@ -109,6 +115,18 @@ describe('scene interactive-flow option helpers', () => {
       feedbackChannel: 'ui',
       feedbackScore: null
     })).toBe('--execution-mode must be suggestion or apply');
+
+    expect(validateSceneInteractiveFlowOptions({
+      input: 'docs/moqui-provider.json',
+      provider: 'moqui',
+      goal: 'x',
+      executionMode: 'apply',
+      businessMode: 'legacy-mode',
+      runtimeMode: 'ops-fix',
+      runtimeEnvironment: 'staging',
+      feedbackChannel: 'ui',
+      feedbackScore: null
+    })).toBe('--business-mode must be one of: user-mode, ops-mode, dev-mode');
 
     expect(validateSceneInteractiveFlowOptions({
       input: 'docs/moqui-provider.json',

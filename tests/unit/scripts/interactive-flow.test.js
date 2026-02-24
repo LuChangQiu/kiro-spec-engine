@@ -405,6 +405,52 @@ describe('interactive-flow script', () => {
     expect(payload.summary.ui_mode).toBe('ops-console');
   });
 
+  test('applies dev-mode preset defaults when business-mode is selected', async () => {
+    const workspace = path.join(tempDir, 'workspace-business-mode-dev-flow');
+    await fs.ensureDir(workspace);
+    const { policyPath, catalogPath } = await writePolicyBundle(workspace);
+    const payloadPath = await writeProviderPayload(workspace);
+
+    const result = runScript(workspace, [
+      '--input', payloadPath,
+      '--provider', 'moqui',
+      '--goal', 'Tune order validations for development rollout',
+      '--business-mode', 'dev-mode',
+      '--policy', policyPath,
+      '--catalog', catalogPath,
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.summary.business_mode).toBe('dev-mode');
+    expect(payload.summary.ui_mode).toBe('ops-console');
+    expect(payload.summary.dialogue_profile).toBe('system-maintainer');
+    expect(payload.summary.runtime_mode).toBe('feature-dev');
+    expect(payload.summary.runtime_environment).toBe('dev');
+  });
+
+  test('blocks conflicting execution override unless allow-mode-override is set', async () => {
+    const workspace = path.join(tempDir, 'workspace-business-mode-conflict-flow');
+    await fs.ensureDir(workspace);
+    const { policyPath, catalogPath } = await writePolicyBundle(workspace);
+    const payloadPath = await writeProviderPayload(workspace);
+
+    const result = runScript(workspace, [
+      '--input', payloadPath,
+      '--provider', 'moqui',
+      '--goal', 'Attempt direct apply from user mode',
+      '--business-mode', 'user-mode',
+      '--execution-mode', 'apply',
+      '--policy', policyPath,
+      '--catalog', catalogPath,
+      '--json'
+    ]);
+
+    expect(result.status).toBe(1);
+    expect(`${result.stderr}`).toContain('--business-mode user-mode conflicts with explicit options');
+  });
+
   test('blocks apply for business-user profile by default authorization tier', async () => {
     const workspace = path.join(tempDir, 'workspace-business-user-apply-block-flow');
     await fs.ensureDir(workspace);

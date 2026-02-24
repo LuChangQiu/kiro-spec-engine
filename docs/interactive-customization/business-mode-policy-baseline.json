@@ -1,0 +1,33 @@
+{
+  "version": "1.0.0",
+  "defaults": {
+    "mode": null,
+    "enforce_alignment": true
+  },
+  "modes": {
+    "user-mode": {
+      "execution_mode": "suggestion",
+      "dialogue_profile": "business-user",
+      "ui_mode": "user-app",
+      "runtime_mode": "user-assist",
+      "runtime_environment": "staging",
+      "auto_execute_low_risk": false
+    },
+    "ops-mode": {
+      "execution_mode": "apply",
+      "dialogue_profile": "system-maintainer",
+      "ui_mode": "ops-console",
+      "runtime_mode": "ops-fix",
+      "runtime_environment": "staging",
+      "auto_execute_low_risk": false
+    },
+    "dev-mode": {
+      "execution_mode": "apply",
+      "dialogue_profile": "system-maintainer",
+      "ui_mode": "ops-console",
+      "runtime_mode": "feature-dev",
+      "runtime_environment": "dev",
+      "auto_execute_low_risk": false
+    }
+  }
+}

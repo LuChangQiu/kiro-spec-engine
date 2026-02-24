@@ -556,6 +556,52 @@ describe('interactive-customization-loop script', () => {
     expect(payload.options.dialogue_profile).toBe('system-maintainer');
   });
 
+  test('applies dev-mode preset defaults when business-mode is selected', async () => {
+    const workspace = path.join(tempDir, 'workspace-business-mode-dev');
+    await fs.ensureDir(workspace);
+    const { policyPath, catalogPath } = await writePolicyBundle(workspace);
+    const contextPath = await writeContext(workspace);
+
+    const result = runScript(workspace, [
+      '--context', contextPath,
+      '--goal', 'Tune order entry validations for engineering review',
+      '--business-mode', 'dev-mode',
+      '--policy', policyPath,
+      '--catalog', catalogPath,
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.summary.business_mode).toBe('dev-mode');
+    expect(payload.options.business_mode).toBe('dev-mode');
+    expect(payload.options.dialogue_profile).toBe('system-maintainer');
+    expect(payload.options.ui_mode).toBe('ops-console');
+    expect(payload.input.execution_mode).toBe('apply');
+    expect(payload.runtime.mode).toBe('feature-dev');
+    expect(payload.runtime.environment).toBe('dev');
+  });
+
+  test('blocks conflicting execution override unless allow-mode-override is set', async () => {
+    const workspace = path.join(tempDir, 'workspace-business-mode-conflict');
+    await fs.ensureDir(workspace);
+    const { policyPath, catalogPath } = await writePolicyBundle(workspace);
+    const contextPath = await writeContext(workspace);
+
+    const result = runScript(workspace, [
+      '--context', contextPath,
+      '--goal', 'Attempt direct apply from user mode',
+      '--business-mode', 'user-mode',
+      '--execution-mode', 'apply',
+      '--policy', policyPath,
+      '--catalog', catalogPath,
+      '--json'
+    ]);
+
+    expect(result.status).toBe(1);
+    expect(`${result.stderr}`).toContain('--business-mode user-mode conflicts with explicit options');
+  });
+
   test('blocks apply for business-user profile by default authorization tier', async () => {
     const workspace = path.join(tempDir, 'workspace-business-user-apply-block');
     await fs.ensureDir(workspace);

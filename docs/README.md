@@ -111,6 +111,7 @@ Detailed technical documentation:
 - **[Release Checklist](release-checklist.md)** - Repeatable pre-release verification flow
 - **[Security Governance Default Baseline](security-governance-default-baseline.md)** - Default safety, approval, and audit controls for SCE delivery
 - **[SCE Business Mode Map](sce-business-mode-map.md)** - User-mode, ops-mode, and dev-mode capability map with default gate policy
+- **[Business Mode Policy Baseline](interactive-customization/business-mode-policy-baseline.json)** - Executable mode preset contract for `user/ops/dev` routing
 - **[Release-Ready Starter Kit](starter-kit/README.md)** - Starter manifest + workflow sample for external project onboarding
 - **[Release Archive](releases/README.md)** - Index of release notes and validation reports
 - **[Release Notes v1.46.2](releases/v1.46.2.md)** - Summary of value observability and onboarding improvements

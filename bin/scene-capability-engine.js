@@ -24,7 +24,6 @@ const VersionChecker = require('../lib/version/version-checker');
 const {
   findLegacyKiroDirectories,
   migrateLegacyKiroDirectories,
-  autoMigrateLegacyKiroDirectories,
 } = require('../lib/workspace/legacy-kiro-migrator');
 
 const i18n = getI18n();
@@ -127,7 +126,7 @@ program
     i18n.setLocale(locale);
   })
   .option('--no-version-check', 'Suppress version mismatch warnings')
-  .option('--skip-legacy-migration', 'Skip automatic legacy .kiro -> .sce migration check')
+  .option('--skip-legacy-migration', 'Skip legacy .kiro detection warning at startup')
   .option('--skip-steering-check', 'Skip steering directory compliance check (not recommended)')
   .option('--force-steering-check', 'Force steering directory compliance check even if cache is valid');
 
@@ -855,18 +854,23 @@ async function updateProjectConfig(projectName) {
   
   // Check for bypass flags
   const args = process.argv.slice(2);
-  const skipLegacyMigration = args.includes('--skip-legacy-migration') ||
+  const skipLegacyMigrationCheck = args.includes('--skip-legacy-migration') ||
     process.env.SCE_SKIP_LEGACY_MIGRATION === '1';
+  const isLegacyWorkspaceCommand = args[0] === 'workspace' &&
+    (args[1] === 'legacy-scan' || args[1] === 'legacy-migrate');
   const skipCheck = args.includes('--skip-steering-check') || 
                     process.env.KSE_SKIP_STEERING_CHECK === '1';
   const forceCheck = args.includes('--force-steering-check');
 
-  if (!skipLegacyMigration) {
-    const migration = await autoMigrateLegacyKiroDirectories(process.cwd(), { maxDepth: 6 });
-    if (migration.detected > 0) {
+  if (!skipLegacyMigrationCheck && !isLegacyWorkspaceCommand) {
+    const legacyDirs = await findLegacyKiroDirectories(process.cwd(), { maxDepth: 6 });
+    if (legacyDirs.length > 0) {
       console.log(chalk.yellow(
-        `Detected ${migration.detected} legacy .kiro director${migration.detected > 1 ? 'ies' : 'y'}; migrated ${migration.migrated} to .sce.`
+        `Detected ${legacyDirs.length} legacy .kiro director${legacyDirs.length > 1 ? 'ies' : 'y'}.`
       ));
+      console.log(chalk.yellow('Automatic migration is disabled for safety.'));
+      console.log(chalk.gray('Review first:  sce workspace legacy-migrate --dry-run'));
+      console.log(chalk.gray('Apply manually: sce workspace legacy-migrate'));
     }
   }
   

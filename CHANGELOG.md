@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.10] - 2026-02-24
+
+### Fixed
+- Restored release-pipeline determinism for Moqui core regression stage:
+  - Added tracked fixture assets under `tests/fixtures/moqui-core-regression/workspace/.sce/specs/**` and `.sce/templates/**` so CI checkout contains required baseline inputs.
+  - Updated `.gitignore` with explicit allowlist entries for the Moqui regression fixture `.sce/specs` and `.sce/templates` paths.
+- `scripts/moqui-core-regression-suite.js` default workspace now passes in clean CI environments without relying on locally generated `.sce` state.
+
 ## [3.3.9] - 2026-02-24
 
 ### Fixed

@@ -231,6 +231,10 @@ sce workspace legacy-migrate --dry-run --json
 # sce workspace legacy-migrate --dry-run
 # sce workspace legacy-migrate
 
+# Safety guardrail (default):
+# If legacy .kiro directories exist, sce blocks non-migration commands
+# until manual migration is completed.
+
 # Legacy commands (still supported)
 sce workspace sync
 sce workspace team
@@ -1503,8 +1507,6 @@ sce <command> --help
 # Show version
 sce --version
 
-# Skip legacy .kiro detection warning for this run
-sce --skip-legacy-migration <command>
 ```
 
 ---

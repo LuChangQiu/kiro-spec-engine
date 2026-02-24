@@ -117,6 +117,40 @@ function findCommandIndex(args) {
   return -1;
 }
 
+/**
+ * Allowlist commands that can run before legacy workspace migration.
+ * These commands help users discover and execute the migration itself.
+ *
+ * @param {string[]} args
+ * @returns {boolean}
+ */
+function isLegacyMigrationAllowlistedCommand(args) {
+  if (!Array.isArray(args) || args.length === 0) {
+    return false;
+  }
+
+  if (args.includes('-h') || args.includes('--help') || args.includes('-v') || args.includes('--version')) {
+    return true;
+  }
+
+  const commandIndex = findCommandIndex(args);
+  if (commandIndex < 0) {
+    return false;
+  }
+
+  const command = args[commandIndex];
+  if (command === 'help') {
+    return true;
+  }
+
+  if (command === 'workspace') {
+    const subcommand = args[commandIndex + 1];
+    return subcommand === 'legacy-scan' || subcommand === 'legacy-migrate';
+  }
+
+  return false;
+}
+
 // 版本和基本信息
 program
   .name(t('cli.name'))
@@ -126,7 +160,6 @@ program
     i18n.setLocale(locale);
   })
   .option('--no-version-check', 'Suppress version mismatch warnings')
-  .option('--skip-legacy-migration', 'Skip legacy .kiro detection warning at startup')
   .option('--skip-steering-check', 'Skip steering directory compliance check (not recommended)')
   .option('--force-steering-check', 'Force steering directory compliance check even if cache is valid');
 
@@ -852,25 +885,23 @@ async function updateProjectConfig(projectName) {
   const normalizedArgs = normalizeSpecCommandArgs(process.argv.slice(2));
   process.argv = [process.argv[0], process.argv[1], ...normalizedArgs];
   
-  // Check for bypass flags
+  // Parse startup flags and guardrails
   const args = process.argv.slice(2);
-  const skipLegacyMigrationCheck = args.includes('--skip-legacy-migration') ||
-    process.env.SCE_SKIP_LEGACY_MIGRATION === '1';
-  const isLegacyWorkspaceCommand = args[0] === 'workspace' &&
-    (args[1] === 'legacy-scan' || args[1] === 'legacy-migrate');
+  const isLegacyAllowlistedCommand = isLegacyMigrationAllowlistedCommand(args);
   const skipCheck = args.includes('--skip-steering-check') || 
                     process.env.KSE_SKIP_STEERING_CHECK === '1';
   const forceCheck = args.includes('--force-steering-check');
 
-  if (!skipLegacyMigrationCheck && !isLegacyWorkspaceCommand) {
+  if (!isLegacyAllowlistedCommand) {
     const legacyDirs = await findLegacyKiroDirectories(process.cwd(), { maxDepth: 6 });
     if (legacyDirs.length > 0) {
-      console.log(chalk.yellow(
-        `Detected ${legacyDirs.length} legacy .kiro director${legacyDirs.length > 1 ? 'ies' : 'y'}.`
+      console.error(chalk.red(
+        `Legacy workspace migration required: found ${legacyDirs.length} .kiro director${legacyDirs.length > 1 ? 'ies' : 'y'}.`
       ));
-      console.log(chalk.yellow('Automatic migration is disabled for safety.'));
-      console.log(chalk.gray('Review first:  sce workspace legacy-migrate --dry-run'));
-      console.log(chalk.gray('Apply manually: sce workspace legacy-migrate'));
+      console.error(chalk.yellow('SCE blocks all non-migration commands until migration is completed.'));
+      console.error(chalk.gray('Review first:  sce workspace legacy-migrate --dry-run'));
+      console.error(chalk.gray('Apply manually: sce workspace legacy-migrate'));
+      process.exit(2);
     }
   }
   

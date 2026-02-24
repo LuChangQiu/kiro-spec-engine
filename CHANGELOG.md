@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.8] - 2026-02-24
+
+### Added
+- Interactive business-mode presets for loop/flow pipelines:
+  - `business-user`
+  - `system-maintainer`
+- Governance signal metrics for business-mode quality evaluation.
+- Weekly ops summary signal quality rollups for business-mode telemetry.
+
+### Changed
+- Release gate now blocks publish when required business-mode governance signals are missing.
+- Documentation now includes business-mode map and index links for embedded assistant rollout.
+
 ## [3.3.7] - 2026-02-24
 
 ### Changed

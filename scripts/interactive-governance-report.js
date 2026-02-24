@@ -241,6 +241,73 @@ function toAverage(values) {
   return Number((numbers.reduce((acc, value) => acc + value, 0) / numbers.length).toFixed(2));
 }
 
+function normalizeBusinessMode(value) {
+  const normalized = `${value || ''}`.trim().toLowerCase();
+  if (normalized === 'user-mode' || normalized === 'ops-mode' || normalized === 'dev-mode') {
+    return normalized;
+  }
+  return 'unknown';
+}
+
+function createBusinessModeBucket() {
+  return {
+    total: 0,
+    allow_total: 0,
+    deny_total: 0,
+    review_required_total: 0,
+    block_total: 0,
+    block_rate_percent: null
+  };
+}
+
+function buildBusinessModeBreakdown(entries = []) {
+  const byMode = {
+    user_mode: createBusinessModeBucket(),
+    ops_mode: createBusinessModeBucket(),
+    dev_mode: createBusinessModeBucket(),
+    unknown: createBusinessModeBucket()
+  };
+
+  const modeKeyMap = {
+    'user-mode': 'user_mode',
+    'ops-mode': 'ops_mode',
+    'dev-mode': 'dev_mode',
+    unknown: 'unknown'
+  };
+
+  for (const entry of entries) {
+    const mode = normalizeBusinessMode(entry && entry.business_mode);
+    const modeKey = modeKeyMap[mode] || 'unknown';
+    const decision = `${entry && entry.decision ? entry.decision : ''}`.trim().toLowerCase();
+    const bucket = byMode[modeKey];
+    bucket.total += 1;
+    if (decision === 'allow') {
+      bucket.allow_total += 1;
+    } else if (decision === 'deny') {
+      bucket.deny_total += 1;
+    } else if (decision === 'review-required') {
+      bucket.review_required_total += 1;
+    }
+  }
+
+  for (const bucket of Object.values(byMode)) {
+    bucket.block_total = bucket.deny_total + bucket.review_required_total;
+    bucket.block_rate_percent = toRatePercent(bucket.block_total, bucket.total);
+  }
+
+  const total = Object.values(byMode).reduce((acc, bucket) => acc + bucket.total, 0);
+  const unknownTotal = byMode.unknown.total;
+  return {
+    total,
+    known_total: total - unknownTotal,
+    unknown_total: unknownTotal,
+    user_mode_total: byMode.user_mode.total,
+    ops_mode_total: byMode.ops_mode.total,
+    dev_mode_total: byMode.dev_mode.total,
+    by_mode: byMode
+  };
+}
+
 function loadThresholds(raw = {}) {
   const thresholds = raw && typeof raw === 'object' ? raw : {};
   return {
@@ -506,6 +573,20 @@ function evaluateAlerts(metrics, thresholds) {
     }));
   }
 
+  if (Number.isFinite(metrics.business_mode_unknown_signal_total) && metrics.business_mode_unknown_signal_total > 0) {
+    alerts.push({
+      id: 'business-mode-signal-missing',
+      severity: 'low',
+      status: 'warning',
+      metric: 'business_mode_unknown_signal_total',
+      actual: metrics.business_mode_unknown_signal_total,
+      threshold: 0,
+      direction: 'max',
+      message: 'Some governance signals are missing business_mode tagging.',
+      recommendation: 'Upgrade interactive-loop/flow signal emitters so every signal includes business_mode.'
+    });
+  }
+
   if (metrics.authorization_tier_total < thresholds.min_authorization_tier_samples) {
     alerts.push({
       id: 'authorization-tier-sample-insufficient',
@@ -655,9 +736,11 @@ function buildMarkdown(report) {
   lines.push(`| Runtime review-required total | ${report.metrics.runtime_review_required_total} |`);
   lines.push(`| Runtime block rate | ${report.metrics.runtime_block_rate_percent == null ? 'n/a' : `${report.metrics.runtime_block_rate_percent}%`} |`);
   lines.push(`| Runtime ui-mode violation total | ${report.metrics.runtime_ui_mode_violation_total} |`);
+  lines.push(`| Runtime unknown business-mode total | ${report.metrics.runtime_unknown_business_mode_total} |`);
   lines.push(`| Authorization tier deny total | ${report.metrics.authorization_tier_deny_total} |`);
   lines.push(`| Authorization tier review-required total | ${report.metrics.authorization_tier_review_required_total} |`);
   lines.push(`| Authorization tier block rate | ${report.metrics.authorization_tier_block_rate_percent == null ? 'n/a' : `${report.metrics.authorization_tier_block_rate_percent}%`} |`);
+  lines.push(`| Authorization tier unknown business-mode total | ${report.metrics.authorization_tier_unknown_business_mode_total} |`);
   lines.push(`| Satisfaction (avg) | ${report.metrics.satisfaction_avg_score == null ? 'n/a' : report.metrics.satisfaction_avg_score} |`);
   lines.push(`| Satisfaction samples | ${report.metrics.satisfaction_response_count} |`);
   lines.push(`| Matrix portfolio pass rate | ${report.metrics.matrix_portfolio_pass_rate_percent == null ? 'n/a' : `${report.metrics.matrix_portfolio_pass_rate_percent}%`} |`);
@@ -665,6 +748,8 @@ function buildMarkdown(report) {
   lines.push(`| Matrix stage error rate | ${report.metrics.matrix_stage_error_rate_percent == null ? 'n/a' : `${report.metrics.matrix_stage_error_rate_percent}%`} |`);
   lines.push(`| Matrix avg semantic score | ${report.metrics.matrix_avg_score == null ? 'n/a' : report.metrics.matrix_avg_score} |`);
   lines.push(`| Matrix signal samples | ${report.metrics.matrix_signal_total} |`);
+  lines.push(`| Dialogue unknown business-mode total | ${report.metrics.dialogue_authorization_unknown_business_mode_total} |`);
+  lines.push(`| All unknown business-mode signals | ${report.metrics.business_mode_unknown_signal_total} |`);
   lines.push('');
   lines.push('## Alerts');
   lines.push('');
@@ -856,6 +941,13 @@ async function main() {
     `${item && item.decision ? item.decision : ''}`.trim().toLowerCase() === 'allow'
   ).length;
   const authorizationTierBlockCount = authorizationTierDenyCount + authorizationTierReviewRequiredCount;
+  const dialogueAuthorizationBusinessModeBreakdown = buildBusinessModeBreakdown(dialogueAuthorizationSignals);
+  const runtimeBusinessModeBreakdown = buildBusinessModeBreakdown(runtimeSignals);
+  const authorizationTierBusinessModeBreakdown = buildBusinessModeBreakdown(authorizationTierSignals);
+  const businessModeUnknownSignalTotal =
+    dialogueAuthorizationBusinessModeBreakdown.unknown_total +
+    runtimeBusinessModeBreakdown.unknown_total +
+    authorizationTierBusinessModeBreakdown.unknown_total;
 
   const approvalSubmittedCount = approvalEvents.filter(item =>
     `${item.action || ''}`.trim().toLowerCase() === 'submit' && item.blocked !== true
@@ -891,17 +983,24 @@ async function main() {
     dialogue_authorization_review_required_total: dialogueAuthorizationReviewRequiredCount,
     dialogue_authorization_block_total: dialogueAuthorizationBlockCount,
     dialogue_authorization_user_app_apply_attempt_total: dialogueAuthorizationUserAppApplyAttemptCount,
+    dialogue_authorization_unknown_business_mode_total: dialogueAuthorizationBusinessModeBreakdown.unknown_total,
+    dialogue_authorization_business_mode_breakdown: dialogueAuthorizationBusinessModeBreakdown,
     runtime_total: runtimeSignals.length,
     runtime_allow_total: runtimeAllowCount,
     runtime_deny_total: runtimeDenyCount,
     runtime_review_required_total: runtimeReviewRequiredCount,
     runtime_block_total: runtimeBlockCount,
     runtime_ui_mode_violation_total: runtimeUiModeViolationCount,
+    runtime_unknown_business_mode_total: runtimeBusinessModeBreakdown.unknown_total,
+    runtime_business_mode_breakdown: runtimeBusinessModeBreakdown,
     authorization_tier_total: authorizationTierSignals.length,
     authorization_tier_allow_total: authorizationTierAllowCount,
     authorization_tier_deny_total: authorizationTierDenyCount,
     authorization_tier_review_required_total: authorizationTierReviewRequiredCount,
     authorization_tier_block_total: authorizationTierBlockCount,
+    authorization_tier_unknown_business_mode_total: authorizationTierBusinessModeBreakdown.unknown_total,
+    authorization_tier_business_mode_breakdown: authorizationTierBusinessModeBreakdown,
+    business_mode_unknown_signal_total: businessModeUnknownSignalTotal,
     matrix_portfolio_pass_total: matrixPortfolioPassedCount,
     matrix_regression_positive_total: matrixRegressionPositiveCount,
     matrix_stage_error_total: matrixStageErrorCount,
@@ -1003,6 +1102,8 @@ module.exports = {
   filterByWindow,
   toRatePercent,
   toAverage,
+  normalizeBusinessMode,
+  buildBusinessModeBreakdown,
   loadThresholds,
   evaluateAlerts,
   parseFeedbackScore,

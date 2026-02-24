@@ -237,6 +237,7 @@ describe('interactive-customization-loop script', () => {
     expect(dialogueAuthorizationSignalLine).toBeTruthy();
     const dialogueAuthorizationSignal = JSON.parse(dialogueAuthorizationSignalLine);
     expect(dialogueAuthorizationSignal.event_type).toBe('interactive.dialogue.authorization.evaluated');
+    expect(dialogueAuthorizationSignal.business_mode).toBe('user-mode');
 
     const runtimeSignalLine = (await fs.readFile(runtimeSignalsSessionFile, 'utf8'))
       .split(/\r?\n/)
@@ -245,6 +246,7 @@ describe('interactive-customization-loop script', () => {
     const runtimeSignal = JSON.parse(runtimeSignalLine);
     expect(runtimeSignal.event_type).toBe('interactive.runtime.policy.evaluated');
     expect(runtimeSignal.ui_mode_violation).toBe(false);
+    expect(runtimeSignal.business_mode).toBe('user-mode');
 
     const authorizationTierSignalLine = (await fs.readFile(authorizationTierSignalsSessionFile, 'utf8'))
       .split(/\r?\n/)
@@ -253,6 +255,7 @@ describe('interactive-customization-loop script', () => {
     const authorizationTierSignal = JSON.parse(authorizationTierSignalLine);
     expect(authorizationTierSignal.event_type).toBe('interactive.authorization_tier.evaluated');
     expect(authorizationTierSignal.decision).toBe('allow');
+    expect(authorizationTierSignal.business_mode).toBe('user-mode');
   });
 
   test('auto executes low-risk path in apply mode', async () => {

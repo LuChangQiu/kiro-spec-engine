@@ -75,23 +75,23 @@ describe('interactive-governance-report script', () => {
     ]);
 
     await writeJsonl(dialogueAuthorizationSignals, [
-      { decision: 'allow', ui_mode: 'user-app', execution_mode: 'suggestion', timestamp: now },
-      { decision: 'allow', ui_mode: 'ops-console', execution_mode: 'apply', timestamp: now },
-      { decision: 'review-required', ui_mode: 'ops-console', execution_mode: 'apply', timestamp: now },
-      { decision: 'allow', ui_mode: 'user-app', execution_mode: 'suggestion', timestamp: now }
+      { decision: 'allow', business_mode: 'user-mode', ui_mode: 'user-app', execution_mode: 'suggestion', timestamp: now },
+      { decision: 'allow', business_mode: 'ops-mode', ui_mode: 'ops-console', execution_mode: 'apply', timestamp: now },
+      { decision: 'review-required', business_mode: 'ops-mode', ui_mode: 'ops-console', execution_mode: 'apply', timestamp: now },
+      { decision: 'allow', business_mode: 'user-mode', ui_mode: 'user-app', execution_mode: 'suggestion', timestamp: now }
     ]);
     await writeJsonl(runtimeSignals, [
-      { decision: 'allow', ui_mode: 'user-app', execution_mode: 'suggestion', violation_codes: [], ui_mode_violation: false, timestamp: now },
-      { decision: 'allow', ui_mode: 'ops-console', execution_mode: 'apply', violation_codes: [], ui_mode_violation: false, timestamp: now },
-      { decision: 'review-required', ui_mode: 'ops-console', execution_mode: 'apply', violation_codes: ['approval-required'], ui_mode_violation: false, timestamp: now },
-      { decision: 'allow', ui_mode: 'ops-console', execution_mode: 'suggestion', violation_codes: [], ui_mode_violation: false, timestamp: now }
+      { decision: 'allow', business_mode: 'user-mode', ui_mode: 'user-app', execution_mode: 'suggestion', violation_codes: [], ui_mode_violation: false, timestamp: now },
+      { decision: 'allow', business_mode: 'ops-mode', ui_mode: 'ops-console', execution_mode: 'apply', violation_codes: [], ui_mode_violation: false, timestamp: now },
+      { decision: 'review-required', business_mode: 'ops-mode', ui_mode: 'ops-console', execution_mode: 'apply', violation_codes: ['approval-required'], ui_mode_violation: false, timestamp: now },
+      { decision: 'allow', business_mode: 'ops-mode', ui_mode: 'ops-console', execution_mode: 'suggestion', violation_codes: [], ui_mode_violation: false, timestamp: now }
     ]);
 
     await writeJsonl(authorizationTierSignals, [
-      { decision: 'allow', timestamp: now },
-      { decision: 'allow', timestamp: now },
-      { decision: 'allow', timestamp: now },
-      { decision: 'review-required', timestamp: now }
+      { decision: 'allow', business_mode: 'user-mode', timestamp: now },
+      { decision: 'allow', business_mode: 'ops-mode', timestamp: now },
+      { decision: 'allow', business_mode: 'ops-mode', timestamp: now },
+      { decision: 'review-required', business_mode: 'dev-mode', timestamp: now }
     ]);
 
     await fs.writeJson(thresholdsFile, {
@@ -138,9 +138,16 @@ describe('interactive-governance-report script', () => {
     expect(payload.metrics.runtime_review_required_total).toBe(1);
     expect(payload.metrics.runtime_block_rate_percent).toBe(25);
     expect(payload.metrics.runtime_ui_mode_violation_total).toBe(0);
+    expect(payload.metrics.runtime_unknown_business_mode_total).toBe(0);
     expect(payload.metrics.authorization_tier_deny_total).toBe(0);
     expect(payload.metrics.authorization_tier_review_required_total).toBe(1);
     expect(payload.metrics.authorization_tier_block_rate_percent).toBe(25);
+    expect(payload.metrics.authorization_tier_unknown_business_mode_total).toBe(0);
+    expect(payload.metrics.dialogue_authorization_unknown_business_mode_total).toBe(0);
+    expect(payload.metrics.business_mode_unknown_signal_total).toBe(0);
+    expect(payload.metrics.runtime_business_mode_breakdown.by_mode.user_mode.total).toBe(1);
+    expect(payload.metrics.runtime_business_mode_breakdown.by_mode.ops_mode.total).toBe(3);
+    expect(payload.metrics.authorization_tier_business_mode_breakdown.by_mode.dev_mode.total).toBe(1);
     expect(payload.metrics.satisfaction_avg_score).toBe(4.67);
     expect(payload.summary.breaches).toBe(0);
   });
@@ -190,23 +197,23 @@ describe('interactive-governance-report script', () => {
     ]);
 
     await writeJsonl(dialogueAuthorizationSignals, [
-      { decision: 'allow', ui_mode: 'user-app', execution_mode: 'suggestion', timestamp: now },
-      { decision: 'deny', ui_mode: 'user-app', execution_mode: 'apply', timestamp: now },
-      { decision: 'review-required', ui_mode: 'ops-console', execution_mode: 'apply', timestamp: now },
-      { decision: 'deny', ui_mode: 'ops-console', execution_mode: 'apply', timestamp: now }
+      { decision: 'allow', business_mode: 'user-mode', ui_mode: 'user-app', execution_mode: 'suggestion', timestamp: now },
+      { decision: 'deny', business_mode: 'user-mode', ui_mode: 'user-app', execution_mode: 'apply', timestamp: now },
+      { decision: 'review-required', business_mode: 'ops-mode', ui_mode: 'ops-console', execution_mode: 'apply', timestamp: now },
+      { decision: 'deny', business_mode: 'ops-mode', ui_mode: 'ops-console', execution_mode: 'apply', timestamp: now }
     ]);
     await writeJsonl(runtimeSignals, [
-      { decision: 'allow', ui_mode: 'ops-console', execution_mode: 'suggestion', violation_codes: [], ui_mode_violation: false, timestamp: now },
-      { decision: 'deny', ui_mode: 'user-app', execution_mode: 'apply', violation_codes: ['ui-mode-execution-mode-denied'], ui_mode_violation: true, timestamp: now },
-      { decision: 'review-required', ui_mode: 'ops-console', execution_mode: 'apply', violation_codes: ['manual-review-required-for-apply'], ui_mode_violation: false, timestamp: now },
-      { decision: 'deny', ui_mode: 'ops-console', execution_mode: 'apply', violation_codes: ['risk-exceeds-max-apply'], ui_mode_violation: false, timestamp: now }
+      { decision: 'allow', business_mode: 'ops-mode', ui_mode: 'ops-console', execution_mode: 'suggestion', violation_codes: [], ui_mode_violation: false, timestamp: now },
+      { decision: 'deny', business_mode: 'user-mode', ui_mode: 'user-app', execution_mode: 'apply', violation_codes: ['ui-mode-execution-mode-denied'], ui_mode_violation: true, timestamp: now },
+      { decision: 'review-required', business_mode: 'ops-mode', ui_mode: 'ops-console', execution_mode: 'apply', violation_codes: ['manual-review-required-for-apply'], ui_mode_violation: false, timestamp: now },
+      { decision: 'deny', business_mode: 'ops-mode', ui_mode: 'ops-console', execution_mode: 'apply', violation_codes: ['risk-exceeds-max-apply'], ui_mode_violation: false, timestamp: now }
     ]);
 
     await writeJsonl(authorizationTierSignals, [
-      { decision: 'allow', timestamp: now },
-      { decision: 'deny', timestamp: now },
-      { decision: 'deny', timestamp: now },
-      { decision: 'review-required', timestamp: now }
+      { decision: 'allow', business_mode: 'ops-mode', timestamp: now },
+      { decision: 'deny', business_mode: 'user-mode', timestamp: now },
+      { decision: 'deny', business_mode: 'ops-mode', timestamp: now },
+      { decision: 'review-required', business_mode: 'ops-mode', timestamp: now }
     ]);
 
     await fs.writeJson(thresholdsFile, {
@@ -254,6 +261,7 @@ describe('interactive-governance-report script', () => {
       'runtime-ui-mode-violation-high',
       'authorization-tier-block-rate-high'
     ]));
+    expect(payload.metrics.business_mode_unknown_signal_total).toBe(0);
   });
 
   test('handles missing evidence files without crashing', async () => {
@@ -431,5 +439,38 @@ describe('interactive-governance-report script', () => {
     expect(payload.summary.breaches).toBe(0);
     expect(payload.alerts.map(item => item.id)).toContain('adoption-sample-insufficient');
     expect(payload.alerts.map(item => item.id)).not.toContain('adoption-rate-low');
+  });
+
+  test('emits warning when business-mode tag is missing in governance signals', async () => {
+    const workspace = path.join(tempDir, 'workspace-business-mode-missing');
+    await fs.ensureDir(workspace);
+
+    const runtimeSignals = path.join(workspace, 'runtime-signals.jsonl');
+    const thresholdsFile = path.join(workspace, 'thresholds.json');
+    const now = new Date().toISOString();
+
+    await writeJsonl(runtimeSignals, [
+      { decision: 'allow', ui_mode: 'ops-console', execution_mode: 'suggestion', timestamp: now },
+      { decision: 'allow', business_mode: 'ops-mode', ui_mode: 'ops-console', execution_mode: 'suggestion', timestamp: now }
+    ]);
+
+    await fs.writeJson(thresholdsFile, {
+      min_runtime_samples: 1,
+      runtime_block_rate_max_percent: 100,
+      runtime_ui_mode_violation_max_total: 99
+    }, { spaces: 2 });
+
+    const result = runScript(workspace, [
+      '--runtime-signals', runtimeSignals,
+      '--thresholds', thresholdsFile,
+      '--period', 'all',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.metrics.runtime_unknown_business_mode_total).toBe(1);
+    expect(payload.metrics.business_mode_unknown_signal_total).toBe(1);
+    expect(payload.alerts.map(item => item.id)).toContain('business-mode-signal-missing');
   });
 });

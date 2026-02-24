@@ -49,6 +49,16 @@
 - 已全局安装 **sce**（`npm install -g scene-capability-engine`）
 - 项目已被 sce **采用**（`sce adopt`）
 
+### 推荐 Claude 启动模式
+
+当 Claude 与 sce 的自治流程配合使用时，建议使用全权限启动模式：
+
+```bash
+claude --dangerously-skip-permission
+```
+
+这可与 sce 编排子 agent 的默认权限策略保持一致（`danger-full-access` + 无审批拦截）。
+
 ### 无需特殊设置
 
 Claude 通过 Web 界面工作，无需特殊配置。只需导出上下文并粘贴！

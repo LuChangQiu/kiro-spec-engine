@@ -1245,6 +1245,11 @@ Recommended `.kiro/config/orchestrator.json`:
 
 `rateLimit*` settings provide dedicated retry/backoff and adaptive parallel throttling when providers return 429 / too-many-requests errors. Engine retry honors `Retry-After` / `try again in ...` hints from provider error messages and clamps final retry waits by `rateLimitBackoffMaxMs` to avoid unbounded pause windows. During active backoff windows, new pending spec launches are paused to reduce request bursts (launch hold remains active even if adaptive parallel throttling is disabled). `orchestrate stop` now interrupts pending retry waits immediately so long backoff does not look like a deadlock.
 
+Codex sub-agent permission defaults:
+- `--sandbox danger-full-access` is always injected by orchestrator runtime.
+- `--ask-for-approval never` is injected by default when `codexArgs` does not explicitly set approval mode.
+- Explicit `codexArgs` values still win, for example `--ask-for-approval on-request`.
+
 ### Scene Template Engine
 
 ```bash

@@ -135,6 +135,35 @@ describe('AgentSpawner', () => {
       expect(args).toContain('--json');
     });
 
+    test('defaults to --ask-for-approval never when config does not set approval mode', async () => {
+      await spawner.spawn('my-spec');
+
+      const [, args] = mockSpawn.mock.calls[0];
+      const approvalIndex = args.indexOf('--ask-for-approval');
+      expect(approvalIndex).toBeGreaterThanOrEqual(0);
+      expect(args[approvalIndex + 1]).toBe('never');
+    });
+
+    test('respects explicit --ask-for-approval value in codexArgs', async () => {
+      mockConfig.getConfig.mockResolvedValue({
+        agentBackend: 'codex',
+        maxParallel: 3,
+        timeoutSeconds: 0,
+        maxRetries: 2,
+        apiKeyEnvVar: 'CODEX_API_KEY',
+        bootstrapTemplate: null,
+        codexArgs: ['--ask-for-approval', 'on-request'],
+      });
+
+      await spawner.spawn('my-spec');
+
+      const [, args] = mockSpawn.mock.calls[0];
+      const approvalIndex = args.indexOf('--ask-for-approval');
+      expect(approvalIndex).toBeGreaterThanOrEqual(0);
+      expect(args[approvalIndex + 1]).toBe('on-request');
+      expect(args.filter((arg) => arg === '--ask-for-approval')).toHaveLength(1);
+    });
+
     test('passes the bootstrap prompt as the last argument', async () => {
       await spawner.spawn('my-spec');
 

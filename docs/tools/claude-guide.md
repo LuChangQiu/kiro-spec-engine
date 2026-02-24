@@ -48,6 +48,16 @@
 - **sce installed** globally (`npm install -g scene-capability-engine`)
 - **Project adopted** by sce (`sce adopt`)
 
+### Recommended Claude Launch Mode
+
+When pairing Claude with sce-managed autonomous work, use the full-permission launch mode:
+
+```bash
+claude --dangerously-skip-permission
+```
+
+This keeps Claude runtime behavior aligned with sce orchestrator sub-agent defaults (`danger-full-access` + no approval prompts).
+
 ### Step 1: Create Shell Alias (Recommended)
 
 Add to your `~/.bashrc` or `~/.zshrc`:

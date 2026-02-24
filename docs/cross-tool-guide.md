@@ -90,7 +90,7 @@ sce adopt
 
 ### Best Practices
 
-- Keep steering rules in `.kiro/steering/` for automatic loading
+- Keep steering rules in `.sce/steering/` for automatic loading
 - Use `CURRENT_CONTEXT.md` to maintain session context
 - Leverage agent hooks for automated workflows
 - Use multi-user workspaces for team collaboration
@@ -116,8 +116,8 @@ Claude Code requires manual context loading via exported files.
 
 2. **Copy exported file**:
    ```bash
-   # Location: .kiro/specs/01-00-user-authentication/context-export.md
-   cat .kiro/specs/01-00-user-authentication/context-export.md
+   # Location: .sce/specs/01-00-user-authentication/context-export.md
+   cat .sce/specs/01-00-user-authentication/context-export.md
    ```
 
 3. **Load into Claude Code**:
@@ -464,7 +464,7 @@ sce context export <spec> --no-design
 **Solution**: Manual update required for non-SCE tools
 ```bash
 # Edit tasks.md manually
-vim .kiro/specs/<spec-name>/tasks.md
+vim .sce/specs/<spec-name>/tasks.md
 
 # Or use sce commands
 sce task claim <spec> <task-id>
@@ -536,10 +536,10 @@ For other tools: Manual coordination required
 ## Additional Resources
 
 - [sce Documentation](../README.md)
-- [Spec Workflow Guide](../.kiro/specs/SPEC_WORKFLOW_GUIDE.md)
+- [Spec Workflow Guide](../.sce/specs/SPEC_WORKFLOW_GUIDE.md)
 - [Steering Strategy Guide](./steering-strategy-guide.md)
-- [Phase 1 Summary](../.kiro/specs/03-00-multi-user-and-cross-tool-support/docs/phase-1-summary.md)
-- [Phase 2 Summary](../.kiro/specs/03-00-multi-user-and-cross-tool-support/docs/phase-2-summary.md)
+- [Phase 1 Summary](../.sce/specs/03-00-multi-user-and-cross-tool-support/docs/phase-1-summary.md)
+- [Phase 2 Summary](../.sce/specs/03-00-multi-user-and-cross-tool-support/docs/phase-2-summary.md)
 
 ---
 

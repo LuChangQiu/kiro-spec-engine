@@ -350,7 +350,7 @@ module.exports = {
     const changes = [];
     
     // Example: Create backups directory
-    await ensureDirectory(path.join(projectPath, '.kiro/backups'));
+    await ensureDirectory(path.join(projectPath, '.sce/backups'));
     changes.push('Created backups/ directory');
     
     return { success: true, changes };
@@ -456,8 +456,8 @@ sce rollback
 df -h
 
 # Clean old backups
-ls .kiro/backups/
-rm -rf .kiro/backups/old-backup-id
+ls .sce/backups/
+rm -rf .sce/backups/old-backup-id
 
 # Try upgrade again
 sce upgrade
@@ -508,7 +508,7 @@ sce status
 sce doctor
 
 # Test your specs
-sce enhance requirements .kiro/specs/your-spec/requirements.md
+sce enhance requirements .sce/specs/your-spec/requirements.md
 ```
 
 ### 3. Keep Upgrade History
@@ -516,7 +516,7 @@ sce enhance requirements .kiro/specs/your-spec/requirements.md
 Don't delete backups immediately:
 ```bash
 # Keep last 5 backups
-ls -lt .kiro/backups/ | head -6
+ls -lt .sce/backups/ | head -6
 ```
 
 ### 4. Read Release Notes
@@ -581,8 +581,8 @@ sce rollback
 If automatic rollback fails:
 
 ```bash
-# Backups are in .kiro/backups/
-cd .kiro/backups/
+# Backups are in .sce/backups/
+cd .sce/backups/
 
 # Find the upgrade backup
 ls -lt
@@ -621,7 +621,7 @@ After successful upgrade:
 5. **Clean old backups** (optional):
    ```bash
    # Keep last 3 backups
-   ls .kiro/backups/
+   ls .sce/backups/
    ```
 
 ---

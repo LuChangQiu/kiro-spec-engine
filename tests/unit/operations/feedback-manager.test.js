@@ -216,7 +216,7 @@ describe('FeedbackManager', () => {
       );
       
       // Check that critical response was saved
-      const responseFile = path.join(tempDir, '.kiro/feedback/critical-responses.json');
+      const responseFile = path.join(tempDir, '.sce/feedback/critical-responses.json');
       const exists = await fs.pathExists(responseFile);
       expect(exists).toBe(true);
       
@@ -238,7 +238,7 @@ describe('FeedbackManager', () => {
       await feedbackManager.routeFeedback(feedback);
       
       // Check that routing was logged
-      const logFile = path.join(tempDir, '.kiro/feedback/routing-log.json');
+      const logFile = path.join(tempDir, '.sce/feedback/routing-log.json');
       const exists = await fs.pathExists(logFile);
       expect(exists).toBe(true);
       

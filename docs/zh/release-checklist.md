@@ -118,10 +118,10 @@ git log --oneline -n 15
 - 可选：发布资产 0 字节防护（workflow 默认开启）
   - `scripts/release-asset-nonempty-normalize.js` 会在上传 GitHub Release 资产前，为可选 `.lines` / `.jsonl` 资产自动补齐占位内容，避免 422。
   - 本地 dry-run 示例：
-    - `node scripts/release-asset-nonempty-normalize.js --file .kiro/reports/release-evidence/matrix-remediation-vX.Y.Z.lines --kind lines --note "no matrix remediation items for this release" --dry-run --json`
+    - `node scripts/release-asset-nonempty-normalize.js --file .sce/reports/release-evidence/matrix-remediation-vX.Y.Z.lines --kind lines --note "no matrix remediation items for this release" --dry-run --json`
   - 本地规范化示例：
-    - `node scripts/release-asset-nonempty-normalize.js --file .kiro/reports/release-evidence/interactive-matrix-signals-vX.Y.Z.jsonl --kind jsonl --event interactive-matrix-signals --note "No interactive matrix signals collected for this release." --json`
+    - `node scripts/release-asset-nonempty-normalize.js --file .sce/reports/release-evidence/interactive-matrix-signals-vX.Y.Z.jsonl --kind jsonl --event interactive-matrix-signals --note "No interactive matrix signals collected for this release." --json`
 - 可选本地预演 release gate 历史索引产物：
-  - `sce auto handoff gate-index --dir .kiro/reports/release-evidence --out .kiro/reports/release-evidence/release-gate-history.json --json`
+  - `sce auto handoff gate-index --dir .sce/reports/release-evidence --out .sce/reports/release-evidence/release-gate-history.json --json`
 
 然后再执行你的正式发布流程（打 tag、push、npm publish、GitHub Release）。

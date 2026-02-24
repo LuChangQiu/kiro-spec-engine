@@ -11,7 +11,7 @@ describe('close-loop-runner', () => {
 
   beforeEach(async () => {
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-close-loop-runner-'));
-    await fs.ensureDir(path.join(tempDir, '.kiro', 'specs'));
+    await fs.ensureDir(path.join(tempDir, '.sce', 'specs'));
 
     originalLog = console.log;
     output = [];
@@ -85,7 +85,7 @@ describe('close-loop-runner', () => {
     }));
 
     const masterSpec = result.portfolio.master_spec;
-    const masterPath = path.join(tempDir, '.kiro', 'specs', masterSpec);
+    const masterPath = path.join(tempDir, '.sce', 'specs', masterSpec);
     expect(await fs.pathExists(path.join(masterPath, 'requirements.md'))).toBe(true);
     expect(await fs.pathExists(path.join(masterPath, 'design.md'))).toBe(true);
     expect(await fs.pathExists(path.join(masterPath, 'tasks.md'))).toBe(true);
@@ -104,12 +104,12 @@ describe('close-loop-runner', () => {
     expect(dodReport.portfolio.master_spec).toBe(masterSpec);
     expect(dodReport.dod.passed).toBe(true);
 
-    const strategyMemoryFile = path.join(tempDir, '.kiro', 'auto', 'close-loop-strategy-memory.json');
+    const strategyMemoryFile = path.join(tempDir, '.sce', 'auto', 'close-loop-strategy-memory.json');
     expect(await fs.pathExists(strategyMemoryFile)).toBe(true);
   });
 
   test('enforces DoD risk, completion KPI, and baseline drop thresholds', async () => {
-    const baselineSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const baselineSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
     await fs.ensureDir(baselineSessionDir);
     const baselineFile = path.join(baselineSessionDir, 'baseline.json');
     await fs.writeJson(baselineFile, {
@@ -254,7 +254,7 @@ describe('close-loop-runner', () => {
     expect(result.dod_report_file).toBeUndefined();
     const reportPath = path.join(
       tempDir,
-      '.kiro',
+      '.sce',
       'specs',
       result.portfolio.master_spec,
       'custom',
@@ -274,7 +274,7 @@ describe('close-loop-runner', () => {
     const result = await runAutoCloseLoop(
       'Close-loop with custom DoD report path',
       {
-        dodReport: '.kiro/reports/custom-dod-report.json'
+        dodReport: '.sce/reports/custom-dod-report.json'
       },
       {
         projectPath: tempDir,
@@ -282,7 +282,7 @@ describe('close-loop-runner', () => {
       }
     );
 
-    const customPath = path.join(tempDir, '.kiro', 'reports', 'custom-dod-report.json');
+    const customPath = path.join(tempDir, '.sce', 'reports', 'custom-dod-report.json');
     expect(result.dod_report_file).toBe(customPath);
     expect(await fs.pathExists(customPath)).toBe(true);
   });
@@ -495,7 +495,7 @@ describe('close-loop-runner', () => {
 
     const sessionFile = path.join(
       tempDir,
-      '.kiro',
+      '.sce',
       'auto',
       'close-loop-sessions',
       'interruption-checkpoint.json'
@@ -553,7 +553,7 @@ describe('close-loop-runner', () => {
     );
 
     expect(result.session).toBeUndefined();
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
     expect(await fs.pathExists(sessionDir)).toBe(false);
   });
 
@@ -591,7 +591,7 @@ describe('close-loop-runner', () => {
   });
 
   test('supports automatic session retention prune by age filter', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
     await fs.ensureDir(sessionDir);
     const staleFile = path.join(sessionDir, 'stale-manual-session.json');
     await fs.writeJson(staleFile, {
@@ -685,7 +685,7 @@ describe('close-loop-runner', () => {
 
     const remediationSpecName = result.replan.attempts[0].added_specs[0];
     expect(result.portfolio.sub_specs).toContain(remediationSpecName);
-    expect(await fs.pathExists(path.join(tempDir, '.kiro', 'specs', remediationSpecName, 'tasks.md'))).toBe(true);
+    expect(await fs.pathExists(path.join(tempDir, '.sce', 'specs', remediationSpecName, 'tasks.md'))).toBe(true);
   });
 
   test('supports disabling automatic replan attempts', async () => {
@@ -860,7 +860,7 @@ describe('close-loop-runner', () => {
     expect(result.dry_run).toBe(true);
     expect(mockRunOrchestration).not.toHaveBeenCalled();
 
-    const specsPath = path.join(tempDir, '.kiro', 'specs');
+    const specsPath = path.join(tempDir, '.sce', 'specs');
     const specs = await fs.readdir(specsPath);
     expect(specs).toEqual([]);
   });

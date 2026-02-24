@@ -284,7 +284,7 @@ describe('interactive-flow script', () => {
     expect(payload.artifacts.matrix_summary_json).toBe(null);
     expect(payload.artifacts.matrix_signal_json).toBe(null);
 
-    const matrixSignalsFile = path.join(workspace, '.kiro', 'reports', 'interactive-matrix-signals.jsonl');
+    const matrixSignalsFile = path.join(workspace, '.sce', 'reports', 'interactive-matrix-signals.jsonl');
     expect(await fs.pathExists(matrixSignalsFile)).toBe(false);
   });
 

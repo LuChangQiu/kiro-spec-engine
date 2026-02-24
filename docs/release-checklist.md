@@ -32,7 +32,7 @@ node bin/scene-capability-engine.js value metrics --help
 sce value metrics sample --out ./kpi-input.json --json
 sce value metrics snapshot --input ./kpi-input.json --json
 node scripts/release-ops-weekly-summary.js --json
-node scripts/release-risk-remediation-bundle.js --gate-report .kiro/reports/release-evidence/release-gate.json --json
+node scripts/release-risk-remediation-bundle.js --gate-report .sce/reports/release-evidence/release-gate.json --json
 ```
 
 Expected:
@@ -146,10 +146,10 @@ Ensure:
 - Optional release-asset 0-byte guard (enabled in workflow by default):
   - `scripts/release-asset-nonempty-normalize.js` auto-fills placeholder content for optional assets such as `.lines` and `.jsonl` before GitHub Release upload.
   - Local dry-run example:
-    - `node scripts/release-asset-nonempty-normalize.js --file .kiro/reports/release-evidence/matrix-remediation-vX.Y.Z.lines --kind lines --note "no matrix remediation items for this release" --dry-run --json`
+    - `node scripts/release-asset-nonempty-normalize.js --file .sce/reports/release-evidence/matrix-remediation-vX.Y.Z.lines --kind lines --note "no matrix remediation items for this release" --dry-run --json`
   - Local normalize example:
-    - `node scripts/release-asset-nonempty-normalize.js --file .kiro/reports/release-evidence/interactive-matrix-signals-vX.Y.Z.jsonl --kind jsonl --event interactive-matrix-signals --note "No interactive matrix signals collected for this release." --json`
+    - `node scripts/release-asset-nonempty-normalize.js --file .sce/reports/release-evidence/interactive-matrix-signals-vX.Y.Z.jsonl --kind jsonl --event interactive-matrix-signals --note "No interactive matrix signals collected for this release." --json`
 - Optional local dry-run for gate history index artifact:
-  - `sce auto handoff gate-index --dir .kiro/reports/release-evidence --out .kiro/reports/release-evidence/release-gate-history.json --json`
+  - `sce auto handoff gate-index --dir .sce/reports/release-evidence --out .sce/reports/release-evidence/release-gate-history.json --json`
 
 Then proceed with your release workflow (tag, push, npm publish, GitHub release).

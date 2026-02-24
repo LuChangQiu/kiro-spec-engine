@@ -10,7 +10,7 @@ const DEFAULT_MARKDOWN_OUT = 'docs/moqui/metadata-catalog.md';
 const DEFAULT_HANDOFF_MANIFEST = 'docs/handoffs/handoff-manifest.json';
 const DEFAULT_CAPABILITY_MATRIX = 'docs/handoffs/capability-matrix.md';
 const DEFAULT_EVIDENCE_DIR = 'docs/handoffs/evidence';
-const DEFAULT_SALVAGE_DIR = '.kiro/recovery/salvage';
+const DEFAULT_SALVAGE_DIR = '.sce/recovery/salvage';
 const MAX_HINT_ITEMS = 64;
 
 function parseArgs(argv) {

@@ -67,7 +67,7 @@ describe('AuditLogger', () => {
     });
     
     test('should create audit directory if not exists', async () => {
-      const auditPath = path.join(testRoot, '.kiro/audit');
+      const auditPath = path.join(testRoot, '.sce/audit');
       expect(await fs.pathExists(auditPath)).toBe(false);
       
       await logger.logOperation({ project: 'test', outcome: 'success' });
@@ -507,7 +507,7 @@ describe('AuditLogger', () => {
   
   describe('error handling', () => {
     test('should handle corrupted log file gracefully', async () => {
-      const logFile = path.join(testRoot, '.kiro/audit/operations.jsonl');
+      const logFile = path.join(testRoot, '.sce/audit/operations.jsonl');
       await fs.ensureDir(path.dirname(logFile));
       await fs.writeFile(logFile, 'invalid json\n', 'utf8');
       

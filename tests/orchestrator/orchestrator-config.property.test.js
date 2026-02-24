@@ -59,7 +59,7 @@ function createTempDir() {
 }
 
 function writeConfigFile(tempDir, data) {
-  const configDir = path.join(tempDir, '.kiro', 'config');
+  const configDir = path.join(tempDir, '.sce', 'config');
   fs.mkdirSync(configDir, { recursive: true });
   fs.writeJsonSync(path.join(configDir, 'orchestrator.json'), data);
 }

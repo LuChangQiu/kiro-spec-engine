@@ -106,7 +106,7 @@ sce watch start
 
 2. **读取上下文：**
    ```
-   请读取 .kiro/specs/01-00-user-login/context-export.md
+   请读取 .sce/specs/01-00-user-login/context-export.md
    ```
 
 3. **实现任务：**
@@ -117,7 +117,7 @@ sce watch start
 
 4. **更新任务状态：**
    ```
-   请在 .kiro/specs/01-00-user-login/tasks.md 中将任务 1.1 标记为完成
+   请在 .sce/specs/01-00-user-login/tasks.md 中将任务 1.1 标记为完成
    ```
 
 ### 方法 3：Watch 模式 + 自动更新
@@ -133,8 +133,8 @@ sce watch start
 
 2. **配置 Watch 模式以在更改时导出：**
    ```bash
-   sce watch add --pattern ".kiro/specs/*/requirements.md" --action "sce context export {spec}"
-   sce watch add --pattern ".kiro/specs/*/design.md" --action "sce context export {spec}"
+   sce watch add --pattern ".sce/specs/*/requirements.md" --action "sce context export {spec}"
+   sce watch add --pattern ".sce/specs/*/design.md" --action "sce context export {spec}"
    ```
 
 3. **现在，当你更新 Spec 文件时：**
@@ -237,7 +237,7 @@ Windsurf 可以实现多个任务：
 ### 实现新功能
 
 ```
-使用 sce 检查 .kiro/specs/01-00-user-login/ 中的 spec 并实现任务 1.1："设置项目依赖"。
+使用 sce 检查 .sce/specs/01-00-user-login/ 中的 spec 并实现任务 1.1："设置项目依赖"。
 
 严格遵循 design.md 中的架构。
 完成后在 tasks.md 中标记任务为完成。
@@ -277,13 +277,13 @@ Windsurf 可以实现多个任务：
 
 ```bash
 # 监视 requirements.md 更改
-sce watch add --pattern ".kiro/specs/*/requirements.md" --action "sce context export {spec}"
+sce watch add --pattern ".sce/specs/*/requirements.md" --action "sce context export {spec}"
 
 # 监视 design.md 更改
-sce watch add --pattern ".kiro/specs/*/design.md" --action "sce context export {spec}"
+sce watch add --pattern ".sce/specs/*/design.md" --action "sce context export {spec}"
 
 # 监视 tasks.md 更改
-sce watch add --pattern ".kiro/specs/*/tasks.md" --action "sce context export {spec}"
+sce watch add --pattern ".sce/specs/*/tasks.md" --action "sce context export {spec}"
 ```
 
 ### 高级 Watch 配置
@@ -292,10 +292,10 @@ sce watch add --pattern ".kiro/specs/*/tasks.md" --action "sce context export {s
 
 ```bash
 # 在任务更新时运行测试
-sce watch add --pattern ".kiro/specs/*/tasks.md" --action "npm test"
+sce watch add --pattern ".sce/specs/*/tasks.md" --action "npm test"
 
 # 在设计更改时运行 linter
-sce watch add --pattern ".kiro/specs/*/design.md" --action "npm run lint"
+sce watch add --pattern ".sce/specs/*/design.md" --action "npm run lint"
 ```
 
 ### 检查 Watch 状态
@@ -349,7 +349,7 @@ sce watch stop
 2. 在提示中明确："严格遵循 design.md"
 3. 要求 Windsurf 先读取设计：
    ```
-   首先读取 .kiro/specs/01-00-user-login/design.md
+   首先读取 .sce/specs/01-00-user-login/design.md
    然后实现任务 1.1
    ```
 

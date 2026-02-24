@@ -46,7 +46,7 @@
 ### Prerequisites
 
 - **AI IDE installed**
-- **Project with .kiro/ directory**
+- **Project with .sce/ directory**
 
 ### No Setup Required!
 
@@ -64,7 +64,7 @@ AI IDE automatically detects and uses sce Specs. Just start working.
 You: "Implement the user login feature"
 
 SCE AI:
-  [Automatically reads] .kiro/specs/01-00-user-login/
+  [Automatically reads] .sce/specs/01-00-user-login/
   [Understands] Requirements, Design, Tasks
   [Implements] Code according to design
   [Updates] tasks.md automatically
@@ -108,7 +108,7 @@ SCE AI:
 You: "Create a new Spec for user login"
 
 SCE AI:
-  [Creates] .kiro/specs/01-00-user-login/
+  [Creates] .sce/specs/01-00-user-login/
   [Generates] requirements.md, design.md, tasks.md templates
   [Opens] Files for editing
 ```
@@ -258,7 +258,7 @@ Also good: "Let's work on authentication"
 ### Issue: SCE doesn't see my Spec
 
 **Check:**
-1. Spec is in `.kiro/specs/` directory
+1. Spec is in `.sce/specs/` directory
 2. Spec has requirements.md, design.md, tasks.md
 3. Files are not empty
 

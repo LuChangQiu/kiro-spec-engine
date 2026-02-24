@@ -77,7 +77,7 @@ Create `.vscode/sce.code-snippets`:
     "prefix": "sce-ref",
     "body": [
       "/**",
-      " * Spec: .kiro/specs/${1:spec-name}/",
+      " * Spec: .sce/specs/${1:spec-name}/",
       " * Task: ${2:task-id}",
       " * ",
       " * Requirements: ${3:requirement-summary}",
@@ -101,7 +101,7 @@ Create `.vscode/sce.code-snippets`:
 /**
  * AuthController - Handles user authentication
  * 
- * Spec: .kiro/specs/01-00-user-login/
+ * Spec: .sce/specs/01-00-user-login/
  * Task: 2.1 - Implement AuthController
  * 
  * Requirements:
@@ -110,7 +110,7 @@ Create `.vscode/sce.code-snippets`:
  * - Return JWT token on success
  * - Return error on failure
  * 
- * Design: See .kiro/specs/01-00-user-login/design.md#authcontroller
+ * Design: See .sce/specs/01-00-user-login/design.md#authcontroller
  */
 class AuthController {
   // Start typing, Copilot will suggest based on comments and Spec files
@@ -120,7 +120,7 @@ class AuthController {
 
 **Copilot reads:**
 - Your comments
-- Spec files in `.kiro/specs/`
+- Spec files in `.sce/specs/`
 - Other project files
 
 **Copilot suggests:**
@@ -156,7 +156,7 @@ Please help me implement the AuthController.
 ```javascript
 /**
  * @file AuthController.js
- * @spec .kiro/specs/01-00-user-login/
+ * @spec .sce/specs/01-00-user-login/
  * @task 2.1
  * 
  * Implements user authentication according to Spec.
@@ -184,7 +184,7 @@ sce spec bootstrap --name 01-00-user-login --non-interactive
 /**
  * AuthService.js
  * 
- * Spec: .kiro/specs/01-00-user-login/
+ * Spec: .sce/specs/01-00-user-login/
  * Task: 2.2 - Implement AuthService
  * 
  * Methods to implement:
@@ -251,7 +251,7 @@ function validateEmail(email) {
 ### 2. Reference Spec Files
 
 ```javascript
-// See: .kiro/specs/01-00-user-login/design.md#api-design
+// See: .sce/specs/01-00-user-login/design.md#api-design
 ```
 
 Copilot can read the referenced file.
@@ -260,7 +260,7 @@ Copilot can read the referenced file.
 
 ```typescript
 /**
- * Spec: .kiro/specs/01-00-user-login/
+ * Spec: .sce/specs/01-00-user-login/
  * Task: 2.2
  */
 interface User {
@@ -298,7 +298,7 @@ For complex implementations, use Copilot Chat with exported context.
 ```javascript
 /**
  * AuthService Tests
- * Spec: .kiro/specs/01-00-user-login/
+ * Spec: .sce/specs/01-00-user-login/
  * 
  * Test cases from acceptance criteria:
  * - AC-1: Valid credentials return user
@@ -314,7 +314,7 @@ describe('AuthService', () => {
 ```javascript
 /**
  * Related files:
- * - .kiro/specs/01-00-user-login/design.md
+ * - .sce/specs/01-00-user-login/design.md
  * - src/models/User.js
  * - src/services/ValidationService.js
  */
@@ -326,7 +326,7 @@ Copilot considers all referenced files.
 
 ```javascript
 // TODO: Implement according to Spec task 2.2.1
-// See: .kiro/specs/01-00-user-login/design.md#authservice
+// See: .sce/specs/01-00-user-login/design.md#authservice
 
 // Copilot suggests implementation when you start typing
 ```
@@ -371,13 +371,13 @@ Copilot considers all referenced files.
 ```javascript
 /**
  * Detailed description of what this should do
- * Reference: .kiro/specs/01-00-user-login/design.md
+ * Reference: .sce/specs/01-00-user-login/design.md
  */
 ```
 
 **Solution 2:** Ensure Spec files are in workspace
 - Copilot only reads files in open workspace
-- Make sure `.kiro/specs/` is included
+- Make sure `.sce/specs/` is included
 
 ### Issue: Suggestions don't match design
 

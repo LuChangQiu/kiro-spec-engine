@@ -73,7 +73,7 @@ describe('moqui-template-baseline-report script', () => {
 
   beforeEach(async () => {
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-moqui-baseline-'));
-    templateRoot = path.join(tempDir, '.kiro', 'templates', 'scene-packages');
+    templateRoot = path.join(tempDir, '.sce', 'templates', 'scene-packages');
     outFile = path.join(tempDir, 'baseline.json');
     markdownFile = path.join(tempDir, 'baseline.md');
     projectRoot = path.resolve(__dirname, '..', '..', '..');
@@ -202,7 +202,7 @@ describe('moqui-template-baseline-report script', () => {
 
     await fs.writeJson(compareFile, {
       generated_at: '2026-02-16T00:00:00.000Z',
-      template_root: '.kiro/templates/scene-packages',
+      template_root: '.sce/templates/scene-packages',
       summary: {
         scoped_templates: 2,
         avg_score: 90,
@@ -300,7 +300,7 @@ describe('moqui-template-baseline-report script', () => {
 
     await fs.writeJson(compareFile, {
       generated_at: '2026-02-16T00:00:00.000Z',
-      template_root: '.kiro/templates/scene-packages',
+      template_root: '.sce/templates/scene-packages',
       summary: {
         scoped_templates: 2,
         avg_score: 92,

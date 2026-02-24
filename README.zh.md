@@ -92,7 +92,7 @@ sce value metrics snapshot --input ./kpi-input.json --json
 **你的 AI 会：**
 1. 全局安装 sce（`npm install -g scene-capability-engine`）
 2. 在项目中采用它（`sce adopt`）
-3. 阅读方法论指南（`.kiro/README.md`）
+3. 阅读方法论指南（`.sce/README.md`）
 4. 按照 Spec 驱动方式开始工作
 
 **就这样！** 你的 AI 处理一切。不需要手动步骤。
@@ -124,7 +124,7 @@ cd your-project
 sce adopt
 ```
 
-这会创建一个 `.kiro/` 目录，包含：
+这会创建一个 `.sce/` 目录，包含：
 - `README.md` - 给 AI 的项目开发指南
 - `specs/` - Spec 存放位置
 - `steering/` - 开发规则（可选）
@@ -134,7 +134,7 @@ sce adopt
 **在你的 AI 工具中（Cursor、Claude、Windsurf 等），说：**
 
 ```
-请阅读 .kiro/README.md 了解项目的开发方法。
+请阅读 .sce/README.md 了解项目的开发方法。
 ```
 
 **你的 AI 会学到：**
@@ -348,7 +348,7 @@ sequenceDiagram
 - **重试机制**: 可配置的失败自动重试
 - **实时监控**: 跟踪每个 Spec 状态和整体编排进度
 - **优雅终止**: 干净停止所有子 Agent（SIGTERM → SIGKILL）
-- **可配置**: 通过 `.kiro/config/orchestrator.json` 配置 Codex 命令、参数、并行度、超时、重试次数
+- **可配置**: 通过 `.sce/config/orchestrator.json` 配置 Codex 命令、参数、并行度、超时、重试次数
 
 **快速开始**:
 ```bash
@@ -362,7 +362,7 @@ sce orchestrate status
 sce orchestrate stop
 ```
 
-**推荐 Codex 编排配置（`.kiro/config/orchestrator.json`）**:
+**推荐 Codex 编排配置（`.sce/config/orchestrator.json`）**:
 ```json
 {
   "agentBackend": "codex",
@@ -462,7 +462,7 @@ sce auto close-loop 继续           # 简写：续跑最近一个未完成 clos
 sce auto continue                  # 快捷命令：续跑最近一个未完成 close-loop 会话
 sce auto close-loop "<目标>" --dry-run --json  # 仅预览拆分与依赖计划
 sce auto close-loop-program "<目标>" --program-govern-until-stable --program-govern-use-action 1 --json # 程序级自动恢复 + 治理循环（含 remediation action 执行）直到稳定
-sce auto close-loop-controller .kiro/auto/program-queue.lines --wait-on-empty --dequeue-limit 2 --json # 队列驱动自治控制器，持续处理广义目标积压
+sce auto close-loop-controller .sce/auto/program-queue.lines --wait-on-empty --dequeue-limit 2 --json # 队列驱动自治控制器，持续处理广义目标积压
 sce auto close-loop-controller --controller-resume latest --json # 从最近一次 controller 检查点恢复自治推进
 sce auto controller-session list --limit 50 --json # 查看持久化 close-loop-controller 摘要会话
 sce auto controller-session prune --keep 20 --older-than-days 14 --dry-run --json # 按保留策略清理旧 controller 摘要

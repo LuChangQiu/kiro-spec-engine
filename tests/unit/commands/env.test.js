@@ -29,7 +29,7 @@ describe('EnvironmentCLI', () => {
   beforeEach(async () => {
     tempDir = path.join(__dirname, '../../temp', `env-cli-${Date.now()}`);
     await fs.ensureDir(tempDir);
-    await fs.ensureDir(path.join(tempDir, '.kiro'));
+    await fs.ensureDir(path.join(tempDir, '.sce'));
     originalCwd = process.cwd();
     process.chdir(tempDir);
   });

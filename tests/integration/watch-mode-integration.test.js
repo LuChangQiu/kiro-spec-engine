@@ -12,7 +12,7 @@ describe('Watch Mode Integration', () => {
     
     manager = new WatchManager({
       basePath: testDir,
-      configFile: '.kiro/watch-config.json'
+      configFile: '.sce/watch-config.json'
     });
   });
 

@@ -17,8 +17,8 @@ sce repo init
 This command:
 - Scans your project directory for Git repositories
 - Extracts remote URLs and current branches
-- Creates `.kiro/project-repos.json` configuration file
-- Excludes the `.kiro` directory from scanning
+- Creates `.sce/project-repos.json` configuration file
+- Excludes the `.sce` directory from scanning
 
 **Example output:**
 ```
@@ -28,7 +28,7 @@ Found 3 repositories:
   ✓ backend (develop) - https://github.com/user/backend.git
   ✓ shared (main) - https://github.com/user/shared.git
 
-Configuration saved to .kiro/project-repos.json
+Configuration saved to .sce/project-repos.json
 ```
 
 ### 2. Check Repository Status
@@ -110,7 +110,7 @@ Overall Health: 2 healthy, 1 unhealthy
 
 ## Configuration File Format
 
-The configuration is stored in `.kiro/project-repos.json`:
+The configuration is stored in `.sce/project-repos.json`:
 
 ```json
 {
@@ -197,7 +197,7 @@ Paths can be specified as:
 
 ### Overview
 
-Starting with v1.21.0, you can manually create and edit the `.kiro/project-repos.json` configuration file without relying solely on `sce repo init`. This is useful for:
+Starting with v1.21.0, you can manually create and edit the `.sce/project-repos.json` configuration file without relying solely on `sce repo init`. This is useful for:
 
 - Curating a specific list of repositories
 - Removing false positives from auto-scan
@@ -307,12 +307,12 @@ When you manually create or edit the configuration, `sce` validates:
 **Step 1: Create the directory structure**
 
 ```bash
-mkdir -p .kiro
+mkdir -p .sce
 ```
 
 **Step 2: Create the configuration file**
 
-Create `.kiro/project-repos.json` with your repositories:
+Create `.sce/project-repos.json` with your repositories:
 
 ```json
 {
@@ -691,7 +691,7 @@ Error: Circular parent reference detected: repo-a -> repo-b -> repo-a
 ```
 
 **Solution:**
-1. Open `.kiro/project-repos.json`
+1. Open `.sce/project-repos.json`
 2. Check the `parent` fields
 3. Remove or fix the circular reference
 4. Run `sce repo health` to verify
@@ -724,7 +724,7 @@ To migrate an existing configuration to use nested scanning:
 
 ```bash
 # Backup existing configuration
-cp .kiro/project-repos.json .kiro/project-repos.json.backup
+cp .sce/project-repos.json .sce/project-repos.json.backup
 
 # Re-initialize with nested scanning
 sce repo init --nested -y
@@ -754,7 +754,7 @@ sce repo init [options]
 
 **Behavior:**
 - Scans project directory recursively for Git repositories
-- Excludes `.kiro` directory and common build directories (node_modules, build, dist, etc.)
+- Excludes `.sce` directory and common build directories (node_modules, build, dist, etc.)
 - Extracts remote URL from `origin` remote (or first available remote)
 - Detects current branch
 - Prompts for confirmation if configuration already exists
@@ -970,7 +970,7 @@ sce repo exec "git push"
 
 ## Manual Configuration
 
-You can manually edit `.kiro/project-repos.json` to:
+You can manually edit `.sce/project-repos.json` to:
 
 ### Add a Repository
 
@@ -1081,7 +1081,7 @@ If you're using a version prior to v1.20.5, the scanner may incorrectly identify
 
 **Error:**
 ```
-Error: Configuration file not found at .kiro/project-repos.json
+Error: Configuration file not found at .sce/project-repos.json
 ```
 
 **Solution:**
@@ -1095,7 +1095,7 @@ Error: Repository path does not exist: packages/frontend
 ```
 
 **Solution:**
-1. Verify the path in `.kiro/project-repos.json`
+1. Verify the path in `.sce/project-repos.json`
 2. Ensure the repository is cloned
 3. Update the path if the repository moved
 
@@ -1122,7 +1122,7 @@ Error: Configuration validation failed:
 ```
 
 **Solution:**
-1. Open `.kiro/project-repos.json`
+1. Open `.sce/project-repos.json`
 2. Fix validation errors
 3. Ensure all required fields are present
 4. Remove duplicate names
@@ -1157,10 +1157,10 @@ Error: Permission denied accessing repository: frontend
 
 ### 1. Keep Configuration in Version Control
 
-Add `.kiro/project-repos.json` to your main repository:
+Add `.sce/project-repos.json` to your main repository:
 
 ```bash
-git add .kiro/project-repos.json
+git add .sce/project-repos.json
 git commit -m "docs: add multi-repo configuration"
 ```
 
@@ -1299,7 +1299,7 @@ Validate configuration before committing:
 ```bash
 # Add to pre-commit hook
 #!/bin/bash
-if [ -f .kiro/project-repos.json ]; then
+if [ -f .sce/project-repos.json ]; then
   sce repo health || exit 1
 fi
 ```

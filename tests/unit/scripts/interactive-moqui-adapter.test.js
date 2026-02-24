@@ -254,7 +254,7 @@ describe('interactive-moqui-adapter script', () => {
 
     const ledgerFile = path.join(
       workspace,
-      '.kiro',
+      '.sce',
       'reports',
       'interactive-execution-ledger.jsonl'
     );

@@ -79,7 +79,7 @@ describe('ConfigManager', () => {
       };
       
       // Create config file
-      const configPath = path.join(tempDir, '.kiro/config/docs.json');
+      const configPath = path.join(tempDir, '.sce/config/docs.json');
       await fs.ensureDir(path.dirname(configPath));
       await fs.writeJson(configPath, customConfig);
       
@@ -96,7 +96,7 @@ describe('ConfigManager', () => {
       };
       
       // Create config file with partial data
-      const configPath = path.join(tempDir, '.kiro/config/docs.json');
+      const configPath = path.join(tempDir, '.sce/config/docs.json');
       await fs.ensureDir(path.dirname(configPath));
       await fs.writeJson(configPath, partialConfig);
       
@@ -110,7 +110,7 @@ describe('ConfigManager', () => {
     
     it('should use defaults when config file is corrupted', async () => {
       // Create corrupted config file
-      const configPath = path.join(tempDir, '.kiro/config/docs.json');
+      const configPath = path.join(tempDir, '.sce/config/docs.json');
       await fs.ensureDir(path.dirname(configPath));
       await fs.writeFile(configPath, 'invalid json {{{', 'utf8');
       
@@ -137,7 +137,7 @@ describe('ConfigManager', () => {
       
       await configManager.save(customConfig);
       
-      const configPath = path.join(tempDir, '.kiro/config/docs.json');
+      const configPath = path.join(tempDir, '.sce/config/docs.json');
       const savedConfig = await fs.readJson(configPath);
       
       expect(savedConfig).toEqual(customConfig);
@@ -152,7 +152,7 @@ describe('ConfigManager', () => {
       
       await configManager.save(customConfig);
       
-      const configDir = path.join(tempDir, '.kiro/config');
+      const configDir = path.join(tempDir, '.sce/config');
       const exists = await fs.pathExists(configDir);
       
       expect(exists).toBe(true);
@@ -187,7 +187,7 @@ describe('ConfigManager', () => {
       const newValue = ['README.md', 'CUSTOM.md'];
       await configManager.set('rootAllowedFiles', newValue);
       
-      const configPath = path.join(tempDir, '.kiro/config/docs.json');
+      const configPath = path.join(tempDir, '.sce/config/docs.json');
       const savedConfig = await fs.readJson(configPath);
       
       expect(savedConfig.rootAllowedFiles).toEqual(newValue);
@@ -275,7 +275,7 @@ describe('ConfigManager', () => {
       // Reset
       await configManager.reset();
       
-      const configPath = path.join(tempDir, '.kiro/config/docs.json');
+      const configPath = path.join(tempDir, '.sce/config/docs.json');
       const savedConfig = await fs.readJson(configPath);
       const defaults = configManager.getDefaults();
       

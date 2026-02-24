@@ -6,9 +6,9 @@ const fs = require('fs-extra');
 const { spawnSync } = require('child_process');
 
 const DEFAULT_METADATA = 'tests/fixtures/moqui-standard-rebuild/metadata.json';
-const DEFAULT_OUT = '.kiro/reports/ci/moqui-rebuild-gate.json';
-const DEFAULT_MARKDOWN_OUT = '.kiro/reports/ci/moqui-rebuild-gate.md';
-const DEFAULT_BUNDLE_OUT = '.kiro/reports/ci/moqui-rebuild-bundle';
+const DEFAULT_OUT = '.sce/reports/ci/moqui-rebuild-gate.json';
+const DEFAULT_MARKDOWN_OUT = '.sce/reports/ci/moqui-rebuild-gate.md';
+const DEFAULT_BUNDLE_OUT = '.sce/reports/ci/moqui-rebuild-bundle';
 const DEFAULT_MIN_READY = 6;
 const DEFAULT_MAX_PARTIAL = 0;
 const DEFAULT_MAX_GAP = 0;
@@ -150,7 +150,7 @@ async function main() {
     passed
   };
 
-  const gateOut = path.resolve(process.cwd(), '.kiro/reports/ci/moqui-rebuild-gate-check.json');
+  const gateOut = path.resolve(process.cwd(), '.sce/reports/ci/moqui-rebuild-gate-check.json');
   await fs.ensureDir(path.dirname(gateOut));
   await fs.writeJson(gateOut, report, { spaces: 2 });
 

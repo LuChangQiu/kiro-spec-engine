@@ -21,7 +21,7 @@ describe('moqui-core-regression-suite script', () => {
 
   afterEach(async () => {
     if (fixtureWorkspace) {
-      await fs.remove(path.join(fixtureWorkspace, '.kiro', 'reports', 'moqui-core-regression'));
+      await fs.remove(path.join(fixtureWorkspace, '.sce', 'reports', 'moqui-core-regression'));
     }
     if (tempDir) {
       await fs.remove(tempDir);

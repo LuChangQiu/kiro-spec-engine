@@ -33,7 +33,7 @@ describe('ArchiveTool', () => {
   
   describe('archive', () => {
     test('should move script files to scripts subdirectory', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -50,7 +50,7 @@ describe('ArchiveTool', () => {
     });
     
     test('should move report files to reports subdirectory', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -66,7 +66,7 @@ describe('ArchiveTool', () => {
     });
     
     test('should move test files to tests subdirectory', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -82,7 +82,7 @@ describe('ArchiveTool', () => {
     });
     
     test('should move result files to results subdirectory', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -98,7 +98,7 @@ describe('ArchiveTool', () => {
     });
     
     test('should move documentation files to docs subdirectory', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -114,7 +114,7 @@ describe('ArchiveTool', () => {
     });
     
     test('should not move required files', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -130,7 +130,7 @@ describe('ArchiveTool', () => {
     });
     
     test('should handle multiple files', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -149,7 +149,7 @@ describe('ArchiveTool', () => {
     });
     
     test('should create subdirectories if they do not exist', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -175,7 +175,7 @@ describe('ArchiveTool', () => {
     });
     
     test('should handle file move errors gracefully', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -196,7 +196,7 @@ describe('ArchiveTool', () => {
   
   describe('archive with dry run', () => {
     test('should preview moves without actually moving files', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -216,7 +216,7 @@ describe('ArchiveTool', () => {
     });
     
     test('should show all files that would be moved', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -239,7 +239,7 @@ describe('ArchiveTool', () => {
   
   describe('determineTargetSubdir', () => {
     test('should classify JavaScript files as scripts', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -252,7 +252,7 @@ describe('ArchiveTool', () => {
     });
     
     test('should classify Python files as scripts', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -265,7 +265,7 @@ describe('ArchiveTool', () => {
     });
     
     test('should classify shell scripts as scripts', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -278,7 +278,7 @@ describe('ArchiveTool', () => {
     });
     
     test('should classify test files correctly', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -293,7 +293,7 @@ describe('ArchiveTool', () => {
     });
     
     test('should classify report files correctly', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -308,7 +308,7 @@ describe('ArchiveTool', () => {
     });
     
     test('should default to docs for unclassified files', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -347,7 +347,7 @@ describe('ArchiveTool', () => {
   
   describe('generateReport', () => {
     test('should include summary statistics', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -365,7 +365,7 @@ describe('ArchiveTool', () => {
   
   describe('edge cases', () => {
     test('should handle empty Spec directory', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');

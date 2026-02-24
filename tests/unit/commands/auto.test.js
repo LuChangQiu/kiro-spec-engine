@@ -99,7 +99,7 @@ if (process.argv.includes('--json')) {
     );
     const defaultReleaseGateHistoryFile = path.join(
       tempDir,
-      '.kiro',
+      '.sce',
       'reports',
       'release-evidence',
       'release-gate-history.json'
@@ -451,7 +451,7 @@ if (process.argv.includes('--json')) {
     await fs.writeJson(goalsFile, {
       goals: ['goal one', 'goal two', 'goal three']
     }, { spaces: 2 });
-    await fs.ensureDir(path.join(tempDir, '.kiro', 'specs', '210-00-existing'));
+    await fs.ensureDir(path.join(tempDir, '.sce', 'specs', '210-00-existing'));
 
     runAutoCloseLoop.mockImplementation(async (_goal, options) => ({
       status: 'completed',
@@ -750,7 +750,7 @@ if (process.argv.includes('--json')) {
 
   test('supports --resume-from-summary latest using persisted batch session summaries', async () => {
     const goalsFile = path.join(tempDir, 'goals.json');
-    const summaryDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const summaryDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
     const latestSummaryFile = path.join(summaryDir, 'batch-latest.json');
     await fs.ensureDir(summaryDir);
     await fs.writeJson(goalsFile, {
@@ -846,7 +846,7 @@ if (process.argv.includes('--json')) {
     const summary = JSON.parse(output.trim());
     expect(summary.batch_session).toBeUndefined();
 
-    const summaryDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const summaryDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
     expect(await fs.pathExists(summaryDir)).toBe(false);
   });
 
@@ -1379,7 +1379,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('governance loop reduces concurrency when high rate-limit anomaly is detected', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
     await fs.ensureDir(sessionDir);
     const baselineFile = path.join(sessionDir, 'govern-rate-limit-baseline.json');
     await fs.writeJson(baselineFile, {
@@ -1553,7 +1553,7 @@ if (process.argv.includes('--json')) {
 
     const queueFile = path.join(tempDir, 'resume-controller-goals.lines');
     await fs.writeFile(queueFile, 'deliver resume goal one\n', 'utf8');
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(sessionDir);
     const sessionFile = path.join(sessionDir, 'controller-resume.json');
     await fs.writeJson(sessionFile, {
@@ -3450,7 +3450,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('lists close-loop sessions in json mode', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
     await fs.ensureDir(sessionDir);
     const sessionPath = path.join(sessionDir, 'demo-session.json');
     await fs.writeJson(sessionPath, {
@@ -3478,7 +3478,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('filters close-loop sessions by status in json mode', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
     await fs.ensureDir(sessionDir);
     const completedSession = path.join(sessionDir, 'session-completed.json');
     const failedSession = path.join(sessionDir, 'session-failed.json');
@@ -3507,7 +3507,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('aggregates close-loop session stats in json mode', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
     await fs.ensureDir(sessionDir);
     const completedSession = path.join(sessionDir, 'session-stats-completed.json');
     const failedSession = path.join(sessionDir, 'session-stats-failed.json');
@@ -3556,7 +3556,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('filters close-loop session stats by days and status', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
     await fs.ensureDir(sessionDir);
     const oldSession = path.join(sessionDir, 'session-stats-old.json');
     const freshSession = path.join(sessionDir, 'session-stats-fresh.json');
@@ -3599,7 +3599,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('lists spec-session directories in json mode', async () => {
-    const specsDir = path.join(tempDir, '.kiro', 'specs');
+    const specsDir = path.join(tempDir, '.sce', 'specs');
     const specA = path.join(specsDir, '121-00-demo-a');
     const specB = path.join(specsDir, '121-01-demo-b');
     await fs.ensureDir(specA);
@@ -3619,7 +3619,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('prunes spec-session directories with keep policy', async () => {
-    const specsDir = path.join(tempDir, '.kiro', 'specs');
+    const specsDir = path.join(tempDir, '.sce', 'specs');
     const oldSpec = path.join(specsDir, '121-00-old-spec');
     const newSpec = path.join(specsDir, '122-00-new-spec');
     await fs.ensureDir(oldSpec);
@@ -3639,7 +3639,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('protects active spec-session directories by default', async () => {
-    const specsDir = path.join(tempDir, '.kiro', 'specs');
+    const specsDir = path.join(tempDir, '.sce', 'specs');
     const activeSpec = path.join(specsDir, '121-00-active');
     const staleSpec = path.join(specsDir, '121-01-stale');
     await fs.ensureDir(activeSpec);
@@ -3674,7 +3674,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('allows pruning active specs with --no-protect-active', async () => {
-    const specsDir = path.join(tempDir, '.kiro', 'specs');
+    const specsDir = path.join(tempDir, '.sce', 'specs');
     const activeSpec = path.join(specsDir, '121-00-active');
     await fs.ensureDir(activeSpec);
     await fs.writeJson(path.join(activeSpec, 'collaboration.json'), {
@@ -3725,7 +3725,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('includes protection ranking top in spec-session prune output', async () => {
-    const specsDir = path.join(tempDir, '.kiro', 'specs');
+    const specsDir = path.join(tempDir, '.sce', 'specs');
     const activeSpec = path.join(specsDir, '121-00-active');
     const staleSpec = path.join(specsDir, '121-01-stale');
     await fs.ensureDir(activeSpec);
@@ -3764,7 +3764,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('shows detailed protection reasons when requested in spec-session prune', async () => {
-    const specsDir = path.join(tempDir, '.kiro', 'specs');
+    const specsDir = path.join(tempDir, '.sce', 'specs');
     const activeSpec = path.join(specsDir, '121-00-active');
     const staleSpec = path.join(specsDir, '121-01-stale');
     await fs.ensureDir(activeSpec);
@@ -3813,7 +3813,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('protects specs referenced by controller sessions during spec-session prune', async () => {
-    const specsDir = path.join(tempDir, '.kiro', 'specs');
+    const specsDir = path.join(tempDir, '.sce', 'specs');
     const activeSpec = path.join(specsDir, '121-00-controller-active');
     const staleSpec = path.join(specsDir, '121-01-stale');
     await fs.ensureDir(activeSpec);
@@ -3821,7 +3821,7 @@ if (process.argv.includes('--json')) {
     await fs.utimes(activeSpec, new Date('2020-01-01T00:00:00.000Z'), new Date('2020-01-01T00:00:00.000Z'));
     await fs.utimes(staleSpec, new Date('2020-01-01T00:00:00.000Z'), new Date('2020-01-01T00:00:00.000Z'));
 
-    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const batchSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
     await fs.ensureDir(batchSessionDir);
     const nestedBatchSummary = path.join(batchSessionDir, 'controller-protected-summary.json');
     await fs.writeJson(nestedBatchSummary, {
@@ -3837,7 +3837,7 @@ if (process.argv.includes('--json')) {
       ]
     }, { spaces: 2 });
 
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(controllerSessionDir);
     const controllerSessionFile = path.join(controllerSessionDir, 'controller-protected-session.json');
     await fs.writeJson(controllerSessionFile, {
@@ -3887,7 +3887,7 @@ if (process.argv.includes('--json')) {
   test('applies automatic spec-session retention policy in close-loop-batch summary', async () => {
     const goalsFile = path.join(tempDir, 'goals.json');
     await fs.writeJson(goalsFile, ['goal one'], { spaces: 2 });
-    const specsDir = path.join(tempDir, '.kiro', 'specs');
+    const specsDir = path.join(tempDir, '.sce', 'specs');
     const oldSpec = path.join(specsDir, '121-00-old');
     const newSpec = path.join(specsDir, '122-00-new');
     await fs.ensureDir(oldSpec);
@@ -3927,7 +3927,7 @@ if (process.argv.includes('--json')) {
   test('reports spec-session budget telemetry in close-loop-batch summary', async () => {
     const goalsFile = path.join(tempDir, 'goals.json');
     await fs.writeJson(goalsFile, ['goal one'], { spaces: 2 });
-    const specsDir = path.join(tempDir, '.kiro', 'specs');
+    const specsDir = path.join(tempDir, '.sce', 'specs');
     await fs.ensureDir(path.join(specsDir, '121-00-existing-a'));
     await fs.ensureDir(path.join(specsDir, '121-01-existing-b'));
 
@@ -3964,7 +3964,7 @@ if (process.argv.includes('--json')) {
   test('fails close-loop-batch after run when spec growth guard exceeds max-created with hard-fail', async () => {
     const goalsFile = path.join(tempDir, 'goals.json');
     await fs.writeJson(goalsFile, ['goal one'], { spaces: 2 });
-    const specsDir = path.join(tempDir, '.kiro', 'specs');
+    const specsDir = path.join(tempDir, '.sce', 'specs');
     await fs.ensureDir(path.join(specsDir, '121-00-existing-a'));
 
     runAutoCloseLoop.mockImplementationOnce(async () => {
@@ -4004,7 +4004,7 @@ if (process.argv.includes('--json')) {
   test('fails close-loop-batch before run when spec-session budget is already exceeded with hard-fail', async () => {
     const goalsFile = path.join(tempDir, 'goals.json');
     await fs.writeJson(goalsFile, ['goal one'], { spaces: 2 });
-    const specsDir = path.join(tempDir, '.kiro', 'specs');
+    const specsDir = path.join(tempDir, '.sce', 'specs');
     await fs.ensureDir(path.join(specsDir, '121-00-existing-a'));
     await fs.ensureDir(path.join(specsDir, '121-01-existing-b'));
 
@@ -4032,7 +4032,7 @@ if (process.argv.includes('--json')) {
   test('fails close-loop-batch after run when spec-session budget exceeds limit with hard-fail', async () => {
     const goalsFile = path.join(tempDir, 'goals.json');
     await fs.writeJson(goalsFile, ['goal one'], { spaces: 2 });
-    const specsDir = path.join(tempDir, '.kiro', 'specs');
+    const specsDir = path.join(tempDir, '.sce', 'specs');
     await fs.ensureDir(path.join(specsDir, '121-00-existing-a'));
 
     runAutoCloseLoop.mockImplementationOnce(async () => {
@@ -4107,13 +4107,13 @@ if (process.argv.includes('--json')) {
   });
 
   test('lists close-loop-batch summary sessions in json mode', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
     await fs.ensureDir(sessionDir);
     const sessionPath = path.join(sessionDir, 'demo-batch-session.json');
     await fs.writeJson(sessionPath, {
       mode: 'auto-close-loop-batch',
       status: 'completed',
-      goals_file: '.kiro/goals.json',
+      goals_file: '.sce/goals.json',
       total_goals: 2,
       processed_goals: 2,
       updated_at: '2026-02-14T10:00:00.000Z',
@@ -4137,7 +4137,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('filters close-loop-batch summary sessions by status in json mode', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
     await fs.ensureDir(sessionDir);
     const completedSession = path.join(sessionDir, 'batch-completed.json');
     const failedSession = path.join(sessionDir, 'batch-failed.json');
@@ -4175,7 +4175,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('aggregates close-loop-batch summary session stats in json mode', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
     await fs.ensureDir(sessionDir);
     const completedSession = path.join(sessionDir, 'batch-stats-completed.json');
     const failedSession = path.join(sessionDir, 'batch-stats-failed.json');
@@ -4218,7 +4218,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('filters close-loop-batch summary session stats by days and status', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
     await fs.ensureDir(sessionDir);
     const oldSession = path.join(sessionDir, 'batch-stats-old.json');
     const freshSession = path.join(sessionDir, 'batch-stats-fresh.json');
@@ -4266,7 +4266,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('prunes sessions with keep policy', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
     await fs.ensureDir(sessionDir);
     const oldSession = path.join(sessionDir, 'old-session.json');
     const newSession = path.join(sessionDir, 'new-session.json');
@@ -4287,7 +4287,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('supports prune dry-run without deleting files', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
     await fs.ensureDir(sessionDir);
     const candidate = path.join(sessionDir, 'candidate.json');
     await fs.writeJson(candidate, { session_id: 'candidate', portfolio: { sub_specs: [] } }, { spaces: 2 });
@@ -4316,7 +4316,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('prunes close-loop-batch summary sessions with keep policy', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
     await fs.ensureDir(sessionDir);
     const oldSession = path.join(sessionDir, 'old-batch-session.json');
     const newSession = path.join(sessionDir, 'new-batch-session.json');
@@ -4343,13 +4343,13 @@ if (process.argv.includes('--json')) {
   });
 
   test('lists close-loop-controller summary sessions in json mode', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(sessionDir);
     const sessionPath = path.join(sessionDir, 'demo-controller-session.json');
     await fs.writeJson(sessionPath, {
       mode: 'auto-close-loop-controller',
       status: 'completed',
-      queue_file: '.kiro/auto/controller-goals.lines',
+      queue_file: '.sce/auto/controller-goals.lines',
       queue_format: 'lines',
       processed_goals: 2,
       pending_goals: 0,
@@ -4374,7 +4374,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('filters close-loop-controller summary sessions by status in json mode', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(sessionDir);
     const completedSession = path.join(sessionDir, 'controller-completed.json');
     const partialFailedSession = path.join(sessionDir, 'controller-partial-failed.json');
@@ -4412,7 +4412,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('aggregates close-loop-controller session stats in json mode', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(sessionDir);
     const completedSession = path.join(sessionDir, 'controller-stats-completed.json');
     const failedSession = path.join(sessionDir, 'controller-stats-partial-failed.json');
@@ -4459,7 +4459,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('filters close-loop-controller session stats by days and status', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(sessionDir);
     const oldSession = path.join(sessionDir, 'controller-stats-old.json');
     const freshSession = path.join(sessionDir, 'controller-stats-fresh.json');
@@ -4508,9 +4508,9 @@ if (process.argv.includes('--json')) {
   });
 
   test('aggregates governance stats across session archives in json mode', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
-    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.ensureDir(batchSessionDir);
     await fs.ensureDir(controllerSessionDir);
@@ -4545,7 +4545,7 @@ if (process.argv.includes('--json')) {
       controller_session: { id: 'governance-controller', file: controllerFile }
     }, { spaces: 2 });
 
-    const recoveryMemoryFile = path.join(tempDir, '.kiro', 'auto', 'close-loop-recovery-memory.json');
+    const recoveryMemoryFile = path.join(tempDir, '.sce', 'auto', 'close-loop-recovery-memory.json');
     await fs.ensureDir(path.dirname(recoveryMemoryFile));
     await fs.writeJson(recoveryMemoryFile, {
       version: 1,
@@ -4609,9 +4609,9 @@ if (process.argv.includes('--json')) {
   });
 
   test('filters governance stats by days and status', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
-    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.ensureDir(batchSessionDir);
     await fs.ensureDir(controllerSessionDir);
@@ -4705,10 +4705,10 @@ if (process.argv.includes('--json')) {
   });
 
   test('elevates governance risk when release gate history degrades', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
-    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
-    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
+    const releaseEvidenceDir = path.join(tempDir, '.sce', 'reports', 'release-evidence');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.ensureDir(batchSessionDir);
     await fs.ensureDir(controllerSessionDir);
@@ -4814,10 +4814,10 @@ if (process.argv.includes('--json')) {
   });
 
   test('elevates governance risk when handoff quality degrades', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
-    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
-    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
+    const releaseEvidenceDir = path.join(tempDir, '.sce', 'reports', 'release-evidence');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.ensureDir(batchSessionDir);
     await fs.ensureDir(controllerSessionDir);
@@ -4946,10 +4946,10 @@ if (process.argv.includes('--json')) {
   });
 
   test('elevates governance risk when handoff Moqui matrix regressions exceed gate', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
-    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
-    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
+    const releaseEvidenceDir = path.join(tempDir, '.sce', 'reports', 'release-evidence');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.ensureDir(batchSessionDir);
     await fs.ensureDir(controllerSessionDir);
@@ -5090,10 +5090,10 @@ if (process.argv.includes('--json')) {
   });
 
   test('elevates governance risk when handoff lexicon unknown capability counts are positive', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
-    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
-    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
+    const releaseEvidenceDir = path.join(tempDir, '.sce', 'reports', 'release-evidence');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.ensureDir(batchSessionDir);
     await fs.ensureDir(controllerSessionDir);
@@ -5211,7 +5211,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('plans governance maintenance actions in json mode without apply', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
     await fs.ensureDir(closeLoopSessionDir);
     const sessionFile = path.join(closeLoopSessionDir, 'governance-maintain-plan-session.json');
     await fs.writeJson(sessionFile, {
@@ -5220,7 +5220,7 @@ if (process.argv.includes('--json')) {
       portfolio: { master_spec: '121-00-plan', sub_specs: [] }
     }, { spaces: 2 });
 
-    const recoveryMemoryFile = path.join(tempDir, '.kiro', 'auto', 'close-loop-recovery-memory.json');
+    const recoveryMemoryFile = path.join(tempDir, '.sce', 'auto', 'close-loop-recovery-memory.json');
     await fs.ensureDir(path.dirname(recoveryMemoryFile));
     await fs.writeJson(recoveryMemoryFile, {
       version: 1,
@@ -5280,7 +5280,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('prioritizes release gate remediation actions in governance maintain plan', async () => {
-    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    const releaseEvidenceDir = path.join(tempDir, '.sce', 'reports', 'release-evidence');
     await fs.ensureDir(releaseEvidenceDir);
     await fs.writeJson(path.join(releaseEvidenceDir, 'release-gate-history.json'), {
       mode: 'auto-handoff-release-gate-history',
@@ -5328,7 +5328,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('adds handoff remediation action in governance maintain plan when handoff quality blocks', async () => {
-    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    const releaseEvidenceDir = path.join(tempDir, '.sce', 'reports', 'release-evidence');
     await fs.ensureDir(releaseEvidenceDir);
     await fs.writeJson(path.join(releaseEvidenceDir, 'handoff-runs.json'), {
       mode: 'auto-handoff-release-evidence',
@@ -5389,9 +5389,9 @@ if (process.argv.includes('--json')) {
   });
 
   test('applies governance maintenance actions and returns after assessment', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
-    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.ensureDir(batchSessionDir);
     await fs.ensureDir(controllerSessionDir);
@@ -5452,7 +5452,7 @@ if (process.argv.includes('--json')) {
     await fs.utimes(batchNew, now, now);
     await fs.utimes(controllerNew, now, now);
 
-    const recoveryMemoryFile = path.join(tempDir, '.kiro', 'auto', 'close-loop-recovery-memory.json');
+    const recoveryMemoryFile = path.join(tempDir, '.sce', 'auto', 'close-loop-recovery-memory.json');
     await fs.ensureDir(path.dirname(recoveryMemoryFile));
     await fs.writeJson(recoveryMemoryFile, {
       version: 1,
@@ -5526,8 +5526,8 @@ if (process.argv.includes('--json')) {
   });
 
   test('runs governance close-loop in plan-only mode', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
-    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
+    const releaseEvidenceDir = path.join(tempDir, '.sce', 'reports', 'release-evidence');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.ensureDir(releaseEvidenceDir);
     const failedSession = path.join(closeLoopSessionDir, 'governance-close-loop-plan-failed.json');
@@ -5591,9 +5591,9 @@ if (process.argv.includes('--json')) {
   });
 
   test('runs governance close-loop with apply and converges to target risk', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
-    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.ensureDir(batchSessionDir);
     await fs.ensureDir(controllerSessionDir);
@@ -5693,7 +5693,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('stops governance close-loop when release gate is blocked', async () => {
-    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    const releaseEvidenceDir = path.join(tempDir, '.sce', 'reports', 'release-evidence');
     await fs.ensureDir(releaseEvidenceDir);
     await fs.writeJson(path.join(releaseEvidenceDir, 'release-gate-history.json'), {
       mode: 'auto-handoff-release-gate-history',
@@ -5744,7 +5744,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('stops governance close-loop when weekly ops pressure blocks release gate', async () => {
-    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    const releaseEvidenceDir = path.join(tempDir, '.sce', 'reports', 'release-evidence');
     await fs.ensureDir(releaseEvidenceDir);
     await fs.writeJson(path.join(releaseEvidenceDir, 'release-gate-history.json'), {
       mode: 'auto-handoff-release-gate-history',
@@ -5871,7 +5871,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('stops governance close-loop when handoff quality is blocked', async () => {
-    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    const releaseEvidenceDir = path.join(tempDir, '.sce', 'reports', 'release-evidence');
     await fs.ensureDir(releaseEvidenceDir);
     await fs.writeJson(path.join(releaseEvidenceDir, 'release-gate-history.json'), {
       mode: 'auto-handoff-release-gate-history',
@@ -5958,7 +5958,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('stops governance close-loop when handoff Moqui matrix regressions exceed gate', async () => {
-    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    const releaseEvidenceDir = path.join(tempDir, '.sce', 'reports', 'release-evidence');
     await fs.ensureDir(releaseEvidenceDir);
     await fs.writeJson(path.join(releaseEvidenceDir, 'handoff-runs.json'), {
       mode: 'auto-handoff-release-evidence',
@@ -6048,7 +6048,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('stops governance close-loop when handoff lexicon unknown counts are positive', async () => {
-    const releaseEvidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    const releaseEvidenceDir = path.join(tempDir, '.sce', 'reports', 'release-evidence');
     await fs.ensureDir(releaseEvidenceDir);
     await fs.writeJson(path.join(releaseEvidenceDir, 'handoff-runs.json'), {
       mode: 'auto-handoff-release-evidence',
@@ -6122,10 +6122,10 @@ if (process.argv.includes('--json')) {
       portfolio: { master_spec: '121-00-advisory', sub_specs: ['121-01-advisory'] }
     });
 
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
-    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
-    const controllerQueueFile = path.join(tempDir, '.kiro', 'auto', 'controller-queue.lines');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
+    const controllerQueueFile = path.join(tempDir, '.sce', 'auto', 'controller-queue.lines');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.ensureDir(batchSessionDir);
     await fs.ensureDir(controllerSessionDir);
@@ -6221,7 +6221,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('skips unavailable advisory sources without failing governance close-loop', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.writeJson(path.join(closeLoopSessionDir, 'governance-advisory-skip-failed-session.json'), {
       session_id: 'governance-advisory-skip-failed-session',
@@ -6267,7 +6267,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('persists and resumes governance close-loop session', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.writeJson(path.join(closeLoopSessionDir, 'governance-resume-failed-session.json'), {
       session_id: 'governance-resume-failed-session',
@@ -6448,7 +6448,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('applies governance session retention policy after close-loop run', async () => {
-    const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
+    const governanceSessionDir = path.join(tempDir, '.sce', 'auto', 'governance-close-loop-sessions');
     await fs.ensureDir(governanceSessionDir);
     const staleFile = path.join(governanceSessionDir, 'governance-retention-stale.json');
     await fs.writeJson(staleFile, {
@@ -6493,7 +6493,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('lists, stats, and prunes governance close-loop sessions in json mode', async () => {
-    const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
+    const governanceSessionDir = path.join(tempDir, '.sce', 'auto', 'governance-close-loop-sessions');
     await fs.ensureDir(governanceSessionDir);
 
     const oldSession = path.join(governanceSessionDir, 'governance-session-old.json');
@@ -6806,7 +6806,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('aggregates weekly-ops stop pressure from legacy reason-only governance sessions', async () => {
-    const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
+    const governanceSessionDir = path.join(tempDir, '.sce', 'auto', 'governance-close-loop-sessions');
     await fs.ensureDir(governanceSessionDir);
 
     const legacySession = path.join(governanceSessionDir, 'governance-session-legacy-weekly-ops.json');
@@ -6895,7 +6895,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('prunes close-loop-controller summary sessions with keep policy', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(sessionDir);
     const oldSession = path.join(sessionDir, 'old-controller-session.json');
     const newSession = path.join(sessionDir, 'new-controller-session.json');
@@ -6922,7 +6922,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('aggregates weekly autonomous KPI trend in json mode', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
     await fs.ensureDir(sessionDir);
     const fileA = path.join(sessionDir, 'week-a.json');
     const fileB = path.join(sessionDir, 'week-b.json');
@@ -7001,7 +7001,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('aggregates daily autonomous KPI trend in json mode and flags anomalies', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
     await fs.ensureDir(sessionDir);
     const fileA = path.join(sessionDir, 'day-a.json');
     const fileB = path.join(sessionDir, 'day-b.json');
@@ -7095,8 +7095,8 @@ if (process.argv.includes('--json')) {
   });
 
   test('aggregates controller autonomous KPI trend in controller mode', async () => {
-    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const batchSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(batchSessionDir);
     await fs.ensureDir(controllerSessionDir);
 
@@ -7162,7 +7162,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('supports autonomous KPI trend csv output and csv file export', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
     await fs.ensureDir(sessionDir);
     const outputPath = path.join(tempDir, 'kpi-trend.csv');
     const fileA = path.join(sessionDir, 'csv-a.json');
@@ -7250,7 +7250,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('shows recovery memory stats in json mode', async () => {
-    const memoryFile = path.join(tempDir, '.kiro', 'auto', 'close-loop-recovery-memory.json');
+    const memoryFile = path.join(tempDir, '.sce', 'auto', 'close-loop-recovery-memory.json');
     await fs.ensureDir(path.dirname(memoryFile));
     await fs.writeJson(memoryFile, {
       version: 1,
@@ -7284,7 +7284,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('prunes and clears recovery memory through commands', async () => {
-    const memoryFile = path.join(tempDir, '.kiro', 'auto', 'close-loop-recovery-memory.json');
+    const memoryFile = path.join(tempDir, '.sce', 'auto', 'close-loop-recovery-memory.json');
     await fs.ensureDir(path.dirname(memoryFile));
     await fs.writeJson(memoryFile, {
       version: 1,
@@ -7344,7 +7344,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('filters and prunes recovery memory by scope', async () => {
-    const memoryFile = path.join(tempDir, '.kiro', 'auto', 'close-loop-recovery-memory.json');
+    const memoryFile = path.join(tempDir, '.sce', 'auto', 'close-loop-recovery-memory.json');
     await fs.ensureDir(path.dirname(memoryFile));
     await fs.writeJson(memoryFile, {
       version: 1,
@@ -7420,7 +7420,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('shows recovery memory scope aggregates', async () => {
-    const memoryFile = path.join(tempDir, '.kiro', 'auto', 'close-loop-recovery-memory.json');
+    const memoryFile = path.join(tempDir, '.sce', 'auto', 'close-loop-recovery-memory.json');
     await fs.ensureDir(path.dirname(memoryFile));
     await fs.writeJson(memoryFile, {
       version: 1,
@@ -7458,11 +7458,11 @@ if (process.argv.includes('--json')) {
   });
 
   test('builds unified observability snapshot in json mode', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
-    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
-    const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
-    const recoveryMemoryFile = path.join(tempDir, '.kiro', 'auto', 'close-loop-recovery-memory.json');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
+    const governanceSessionDir = path.join(tempDir, '.sce', 'auto', 'governance-close-loop-sessions');
+    const recoveryMemoryFile = path.join(tempDir, '.sce', 'auto', 'close-loop-recovery-memory.json');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.ensureDir(batchSessionDir);
     await fs.ensureDir(controllerSessionDir);
@@ -7607,7 +7607,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('provides spec status and instructions json interfaces', async () => {
-    const specDir = path.join(tempDir, '.kiro', 'specs', '121-00-agent-interface');
+    const specDir = path.join(tempDir, '.sce', 'specs', '121-00-agent-interface');
     await fs.ensureDir(specDir);
     await fs.writeFile(path.join(specDir, 'requirements.md'), '# Requirements\n\nDeliver feature X.\n', 'utf8');
     await fs.writeFile(path.join(specDir, 'design.md'), '# Design\n\nUse modular design.\n', 'utf8');
@@ -7649,10 +7649,10 @@ if (process.argv.includes('--json')) {
   });
 
   test('checks schema compatibility across autonomous archives', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
-    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
-    const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
+    const governanceSessionDir = path.join(tempDir, '.sce', 'auto', 'governance-close-loop-sessions');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.ensureDir(batchSessionDir);
     await fs.ensureDir(controllerSessionDir);
@@ -7685,8 +7685,8 @@ if (process.argv.includes('--json')) {
   });
 
   test('migrates schema_version in dry-run and apply modes', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.ensureDir(controllerSessionDir);
 
@@ -7819,7 +7819,7 @@ if (process.argv.includes('--json')) {
 
   test('generates handoff queue goals and writes queue file', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
-    const queueFile = path.join(tempDir, '.kiro', 'auto', 'handoff-goals.lines');
+    const queueFile = path.join(tempDir, '.sce', 'auto', 'handoff-goals.lines');
     await fs.writeJson(manifestFile, {
       timestamp: '2026-02-16T00:00:00.000Z',
       source_project: 'E:/workspace/331-poc',
@@ -7853,7 +7853,7 @@ if (process.argv.includes('--json')) {
 
   test('supports dry-run queue generation without known gaps', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
-    const queueFile = path.join(tempDir, '.kiro', 'auto', 'handoff-goals.lines');
+    const queueFile = path.join(tempDir, '.sce', 'auto', 'handoff-goals.lines');
     await fs.writeJson(manifestFile, {
       timestamp: '2026-02-16T00:00:00.000Z',
       source_project: 'E:/workspace/331-poc',
@@ -7895,10 +7895,10 @@ if (process.argv.includes('--json')) {
       templates: ['tpl-a', 'tpl-b']
     }, { spaces: 2 });
 
-    await fs.ensureDir(path.join(tempDir, '.kiro', 'templates', 'exports', 'tpl-a'));
-    await fs.ensureDir(path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-c'));
+    await fs.ensureDir(path.join(tempDir, '.sce', 'templates', 'exports', 'tpl-a'));
+    await fs.ensureDir(path.join(tempDir, '.sce', 'templates', 'scene-packages', 'tpl-c'));
     await fs.writeJson(
-      path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'registry.json'),
+      path.join(tempDir, '.sce', 'templates', 'scene-packages', 'registry.json'),
       {
         templates: [
           { name: 'tpl-c' },
@@ -7930,7 +7930,7 @@ if (process.argv.includes('--json')) {
 
   test('builds handoff capability matrix in json mode and writes remediation queue', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
-    const remediationQueueFile = path.join(tempDir, '.kiro', 'auto', 'matrix-remediation.lines');
+    const remediationQueueFile = path.join(tempDir, '.sce', 'auto', 'matrix-remediation.lines');
     await fs.writeJson(manifestFile, {
       timestamp: '2026-02-16T00:00:00.000Z',
       source_project: 'E:/workspace/331-poc',
@@ -7942,7 +7942,7 @@ if (process.argv.includes('--json')) {
       }
     }, { spaces: 2 });
 
-    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-matrix');
+    const templateDir = path.join(tempDir, '.sce', 'templates', 'scene-packages', 'tpl-matrix');
     await fs.ensureDir(templateDir);
     await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
       capabilities: {
@@ -7999,7 +7999,7 @@ if (process.argv.includes('--json')) {
       }
     }, { spaces: 2 });
 
-    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-matrix-profile');
+    const templateDir = path.join(tempDir, '.sce', 'templates', 'scene-packages', 'tpl-matrix-profile');
     await fs.ensureDir(templateDir);
     await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
       capabilities: {
@@ -8106,7 +8106,7 @@ if (process.argv.includes('--json')) {
       'utf8'
     );
 
-    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-matrix-regression');
+    const templateDir = path.join(tempDir, '.sce', 'templates', 'scene-packages', 'tpl-matrix-regression');
     await fs.ensureDir(templateDir);
     await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
       capabilities: {
@@ -8150,7 +8150,7 @@ if (process.argv.includes('--json')) {
       }
     }, { spaces: 2 });
 
-    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'order-management');
+    const templateDir = path.join(tempDir, '.sce', 'templates', 'scene-packages', 'order-management');
     await fs.ensureDir(templateDir);
     await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
       capabilities: {
@@ -8211,7 +8211,7 @@ if (process.argv.includes('--json')) {
 
   test('supports capability matrix markdown format output file', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
-    const outFile = path.join(tempDir, '.kiro', 'reports', 'handoff-capability-matrix.md');
+    const outFile = path.join(tempDir, '.sce', 'reports', 'handoff-capability-matrix.md');
     await fs.writeJson(manifestFile, {
       timestamp: '2026-02-16T00:00:00.000Z',
       source_project: 'E:/workspace/331-poc',
@@ -8223,7 +8223,7 @@ if (process.argv.includes('--json')) {
       }
     }, { spaces: 2 });
 
-    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-matrix-ready');
+    const templateDir = path.join(tempDir, '.sce', 'templates', 'scene-packages', 'tpl-matrix-ready');
     await fs.ensureDir(templateDir);
     await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
       capabilities: {
@@ -8289,7 +8289,7 @@ if (process.argv.includes('--json')) {
       }
     }, { spaces: 2 });
 
-    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-matrix-fail');
+    const templateDir = path.join(tempDir, '.sce', 'templates', 'scene-packages', 'tpl-matrix-fail');
     await fs.ensureDir(templateDir);
     await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
       capabilities: {
@@ -8364,7 +8364,7 @@ if (process.argv.includes('--json')) {
       }
     }, { spaces: 2 });
 
-    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-matrix-semantic-missing');
+    const templateDir = path.join(tempDir, '.sce', 'templates', 'scene-packages', 'tpl-matrix-semantic-missing');
     await fs.ensureDir(templateDir);
     await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
       capabilities: {
@@ -8409,7 +8409,7 @@ if (process.argv.includes('--json')) {
       }
     }, { spaces: 2 });
 
-    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-matrix-semantic-bypass');
+    const templateDir = path.join(tempDir, '.sce', 'templates', 'scene-packages', 'tpl-matrix-semantic-bypass');
     await fs.ensureDir(templateDir);
     await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
       capabilities: {
@@ -8443,8 +8443,8 @@ if (process.argv.includes('--json')) {
 
   test('runs handoff pipeline end-to-end and archives run report', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
-    const queueFile = path.join(tempDir, '.kiro', 'auto', 'handoff-goals.lines');
-    const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
+    const queueFile = path.join(tempDir, '.sce', 'auto', 'handoff-goals.lines');
+    const governanceSessionDir = path.join(tempDir, '.sce', 'auto', 'governance-close-loop-sessions');
     await fs.ensureDir(governanceSessionDir);
     const governanceSeedFile = path.join(governanceSessionDir, 'handoff-observability-seed.json');
     await fs.writeJson(governanceSeedFile, {
@@ -8533,7 +8533,7 @@ if (process.argv.includes('--json')) {
       })
     }));
     expect(payload.queue.output_file).toBe(queueFile);
-    expect(payload.output_file).toContain(path.join('.kiro', 'reports', 'handoff-runs'));
+    expect(payload.output_file).toContain(path.join('.sce', 'reports', 'handoff-runs'));
     expect(payload.moqui_baseline).toEqual(expect.objectContaining({
       status: 'passed',
       generated: true
@@ -8574,7 +8574,7 @@ if (process.argv.includes('--json')) {
     expect(await fs.pathExists(payload.output_file)).toBe(true);
     expect(await fs.pathExists(queueFile)).toBe(true);
     expect(runAutoCloseLoop).toHaveBeenCalledTimes(payload.queue.goal_count);
-    const releaseEvidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+    const releaseEvidenceFile = path.join(tempDir, '.sce', 'reports', 'release-evidence', 'handoff-runs.json');
     expect(payload.release_evidence.file).toBe(releaseEvidenceFile);
     expect(await fs.pathExists(releaseEvidenceFile)).toBe(true);
     const releaseEvidence = await fs.readJson(releaseEvidenceFile);
@@ -8606,7 +8606,7 @@ if (process.argv.includes('--json')) {
       }),
       coverage_matrix_regressions: []
     }));
-    expect(releaseEvidence.sessions[0].handoff_report_file).toContain('.kiro/reports/handoff-runs/');
+    expect(releaseEvidence.sessions[0].handoff_report_file).toContain('.sce/reports/handoff-runs/');
     expect(releaseEvidence.sessions[0].trend_window).toEqual(expect.objectContaining({
       window: expect.objectContaining({
         requested: 5
@@ -8618,7 +8618,7 @@ if (process.argv.includes('--json')) {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
     const releaseGateHistoryFile = path.join(
       tempDir,
-      '.kiro',
+      '.sce',
       'reports',
       'release-evidence',
       'release-gate-history.json'
@@ -8723,7 +8723,7 @@ if (process.argv.includes('--json')) {
   test('fails handoff preflight-check with --require-pass when preflight is blocked', async () => {
     const releaseGateHistoryFile = path.join(
       tempDir,
-      '.kiro',
+      '.sce',
       'reports',
       'release-evidence',
       'release-gate-history.json'
@@ -8788,7 +8788,7 @@ if (process.argv.includes('--json')) {
   test('supports advisory preflight-check mode via --no-require-release-gate-preflight', async () => {
     const releaseGateHistoryFile = path.join(
       tempDir,
-      '.kiro',
+      '.sce',
       'reports',
       'release-evidence',
       'release-gate-history.json'
@@ -8969,7 +8969,7 @@ if (process.argv.includes('--json')) {
         updated_existing: true,
         total_runs: 1
       }));
-      const releaseEvidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+      const releaseEvidenceFile = path.join(tempDir, '.sce', 'reports', 'release-evidence', 'handoff-runs.json');
       const releaseEvidence = await fs.readJson(releaseEvidenceFile);
       expect(releaseEvidence.total_runs).toBe(1);
       expect(releaseEvidence.sessions).toHaveLength(1);
@@ -9021,7 +9021,7 @@ if (process.argv.includes('--json')) {
         requested: 3
       })
     }));
-    const releaseEvidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+    const releaseEvidenceFile = path.join(tempDir, '.sce', 'reports', 'release-evidence', 'handoff-runs.json');
     const releaseEvidence = await fs.readJson(releaseEvidenceFile);
     expect(releaseEvidence.latest_trend_window).toEqual(expect.objectContaining({
       window: expect.objectContaining({
@@ -9042,7 +9042,7 @@ if (process.argv.includes('--json')) {
       }
     }, { spaces: 2 });
 
-    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    const reportDir = path.join(tempDir, '.sce', 'reports', 'handoff-runs');
     await fs.ensureDir(reportDir);
     await fs.writeJson(path.join(reportDir, 'handoff-previous.json'), {
       mode: 'auto-handoff-run',
@@ -9128,7 +9128,7 @@ if (process.argv.includes('--json')) {
       }
     }, { spaces: 2 });
 
-    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    const reportDir = path.join(tempDir, '.sce', 'reports', 'handoff-runs');
     await fs.ensureDir(reportDir);
     await fs.writeJson(path.join(reportDir, 'handoff-failed-only.json'), {
       mode: 'auto-handoff-run',
@@ -9204,7 +9204,7 @@ if (process.argv.includes('--json')) {
       }
     }, { spaces: 2 });
 
-    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    const reportDir = path.join(tempDir, '.sce', 'reports', 'handoff-runs');
     await fs.ensureDir(reportDir);
     await fs.writeJson(path.join(reportDir, 'handoff-auto-failed-only.json'), {
       mode: 'auto-handoff-run',
@@ -9284,7 +9284,7 @@ if (process.argv.includes('--json')) {
       }
     }, { spaces: 2 });
 
-    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    const reportDir = path.join(tempDir, '.sce', 'reports', 'handoff-runs');
     await fs.ensureDir(reportDir);
     await fs.writeJson(path.join(reportDir, 'handoff-mismatch.json'), {
       mode: 'auto-handoff-run',
@@ -9332,10 +9332,10 @@ if (process.argv.includes('--json')) {
 
   test('supports handoff run dry-run without executing close-loop-batch', async () => {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
-    const queueFile = path.join(tempDir, '.kiro', 'auto', 'handoff-goals.lines');
+    const queueFile = path.join(tempDir, '.sce', 'auto', 'handoff-goals.lines');
     const releaseGateHistoryFile = path.join(
       tempDir,
-      '.kiro',
+      '.sce',
       'reports',
       'release-evidence',
       'release-gate-history.json'
@@ -9426,7 +9426,7 @@ if (process.argv.includes('--json')) {
       skipped: true,
       reason: 'dry-run'
     }));
-    const releaseEvidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+    const releaseEvidenceFile = path.join(tempDir, '.sce', 'reports', 'release-evidence', 'handoff-runs.json');
     expect(await fs.pathExists(releaseEvidenceFile)).toBe(false);
   });
 
@@ -9693,7 +9693,7 @@ if (process.argv.includes('--json')) {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
     const releaseGateHistoryFile = path.join(
       tempDir,
-      '.kiro',
+      '.sce',
       'reports',
       'release-evidence',
       'release-gate-history.json'
@@ -9784,7 +9784,7 @@ if (process.argv.includes('--json')) {
       }
     });
 
-    const blockedEvidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+    const blockedEvidenceFile = path.join(tempDir, '.sce', 'reports', 'release-evidence', 'handoff-runs.json');
     await fs.ensureDir(blockedEvidenceFile);
 
     const program = buildProgram();
@@ -9817,7 +9817,7 @@ if (process.argv.includes('--json')) {
     const manifestFile = path.join(tempDir, 'handoff-manifest.json');
     const releaseGateHistoryFile = path.join(
       tempDir,
-      '.kiro',
+      '.sce',
       'reports',
       'release-evidence',
       'release-gate-history.json'
@@ -10098,7 +10098,7 @@ if (process.argv.includes('--json')) {
       }
     }, { spaces: 2 });
 
-    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-capability');
+    const templateDir = path.join(tempDir, '.sce', 'templates', 'scene-packages', 'tpl-capability');
     await fs.ensureDir(templateDir);
     await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
       capabilities: {
@@ -10160,7 +10160,7 @@ if (process.argv.includes('--json')) {
       }
     }, { spaces: 2 });
 
-    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-capability-lexicon');
+    const templateDir = path.join(tempDir, '.sce', 'templates', 'scene-packages', 'tpl-capability-lexicon');
     await fs.ensureDir(templateDir);
     await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
       capabilities: {
@@ -10222,7 +10222,7 @@ if (process.argv.includes('--json')) {
       }
     }, { spaces: 2 });
 
-    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-capability-lexicon-331');
+    const templateDir = path.join(tempDir, '.sce', 'templates', 'scene-packages', 'tpl-capability-lexicon-331');
     await fs.ensureDir(templateDir);
     await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
       capabilities: {
@@ -10281,7 +10281,7 @@ if (process.argv.includes('--json')) {
       }
     }, { spaces: 2 });
 
-    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-capability-lexicon-provided-unknown');
+    const templateDir = path.join(tempDir, '.sce', 'templates', 'scene-packages', 'tpl-capability-lexicon-provided-unknown');
     await fs.ensureDir(templateDir);
     await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
       capabilities: {
@@ -10337,7 +10337,7 @@ if (process.argv.includes('--json')) {
       }
     }, { spaces: 2 });
 
-    const templateDir = path.join(tempDir, '.kiro', 'templates', 'scene-packages', 'tpl-capability-lexicon-unknown');
+    const templateDir = path.join(tempDir, '.sce', 'templates', 'scene-packages', 'tpl-capability-lexicon-unknown');
     await fs.ensureDir(templateDir);
     await fs.writeJson(path.join(templateDir, 'scene-package.json'), {
       capabilities: {
@@ -10624,7 +10624,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('builds handoff regression by comparing latest run report with previous one', async () => {
-    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    const reportDir = path.join(tempDir, '.sce', 'reports', 'handoff-runs');
     await fs.ensureDir(reportDir);
     await fs.writeJson(path.join(reportDir, 'handoff-old.json'), {
       mode: 'auto-handoff-run',
@@ -10686,7 +10686,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('includes ontology quality and rule/decision metrics in handoff regression output', async () => {
-    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    const reportDir = path.join(tempDir, '.sce', 'reports', 'handoff-runs');
     await fs.ensureDir(reportDir);
     await fs.writeJson(path.join(reportDir, 'handoff-old-ontology.json'), {
       mode: 'auto-handoff-run',
@@ -10772,7 +10772,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('builds handoff regression trend series within custom window', async () => {
-    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    const reportDir = path.join(tempDir, '.sce', 'reports', 'handoff-runs');
     await fs.ensureDir(reportDir);
     await fs.writeJson(path.join(reportDir, 'handoff-oldest.json'), {
       mode: 'auto-handoff-run',
@@ -10887,7 +10887,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('validates regression window range', async () => {
-    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    const reportDir = path.join(tempDir, '.sce', 'reports', 'handoff-runs');
     await fs.ensureDir(reportDir);
     await fs.writeJson(path.join(reportDir, 'handoff-one.json'), {
       mode: 'auto-handoff-run',
@@ -10921,7 +10921,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('adds regression recommendations when trend degrades', async () => {
-    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    const reportDir = path.join(tempDir, '.sce', 'reports', 'handoff-runs');
     await fs.ensureDir(reportDir);
     await fs.writeJson(path.join(reportDir, 'handoff-good.json'), {
       mode: 'auto-handoff-run',
@@ -10985,8 +10985,8 @@ if (process.argv.includes('--json')) {
   });
 
   test('supports handoff regression out file option', async () => {
-    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
-    const outFile = path.join(tempDir, '.kiro', 'reports', 'handoff-regression.json');
+    const reportDir = path.join(tempDir, '.sce', 'reports', 'handoff-runs');
+    const outFile = path.join(tempDir, '.sce', 'reports', 'handoff-regression.json');
     await fs.ensureDir(reportDir);
     await fs.writeJson(path.join(reportDir, 'handoff-old.json'), {
       mode: 'auto-handoff-run',
@@ -11036,8 +11036,8 @@ if (process.argv.includes('--json')) {
   });
 
   test('supports handoff regression markdown format output file', async () => {
-    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
-    const outFile = path.join(tempDir, '.kiro', 'reports', 'handoff-regression.md');
+    const reportDir = path.join(tempDir, '.sce', 'reports', 'handoff-runs');
+    const outFile = path.join(tempDir, '.sce', 'reports', 'handoff-regression.md');
     await fs.ensureDir(reportDir);
     await fs.writeJson(path.join(reportDir, 'handoff-old.json'), {
       mode: 'auto-handoff-run',
@@ -11096,7 +11096,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('validates regression format option', async () => {
-    const reportDir = path.join(tempDir, '.kiro', 'reports', 'handoff-runs');
+    const reportDir = path.join(tempDir, '.sce', 'reports', 'handoff-runs');
     await fs.ensureDir(reportDir);
     await fs.writeJson(path.join(reportDir, 'handoff-one.json'), {
       mode: 'auto-handoff-run',
@@ -11130,7 +11130,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('builds handoff release evidence review summary in json mode', async () => {
-    const evidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+    const evidenceFile = path.join(tempDir, '.sce', 'reports', 'release-evidence', 'handoff-runs.json');
     await fs.ensureDir(path.dirname(evidenceFile));
     await fs.writeJson(evidenceFile, {
       mode: 'auto-handoff-release-evidence',
@@ -11187,7 +11187,7 @@ if (process.argv.includes('--json')) {
               ]
             },
             output: {
-              json: '.kiro/reports/release-evidence/scene-package-publish-batch-dry-run.json'
+              json: '.sce/reports/release-evidence/scene-package-publish-batch-dry-run.json'
             }
           },
           batch_summary: {
@@ -11265,8 +11265,8 @@ if (process.argv.includes('--json')) {
               }
             },
             output: {
-              json: '.kiro/reports/release-evidence/moqui-template-baseline.json',
-              markdown: '.kiro/reports/release-evidence/moqui-template-baseline.md'
+              json: '.sce/reports/release-evidence/moqui-template-baseline.json',
+              markdown: '.sce/reports/release-evidence/moqui-template-baseline.md'
             }
           },
           scene_package_batch: {
@@ -11283,7 +11283,7 @@ if (process.argv.includes('--json')) {
               failures: []
             },
             output: {
-              json: '.kiro/reports/release-evidence/scene-package-publish-batch-dry-run.json'
+              json: '.sce/reports/release-evidence/scene-package-publish-batch-dry-run.json'
             }
           },
           batch_summary: {
@@ -11355,8 +11355,8 @@ if (process.argv.includes('--json')) {
   });
 
   test('supports handoff evidence markdown format output file', async () => {
-    const evidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
-    const outFile = path.join(tempDir, '.kiro', 'reports', 'handoff-evidence.md');
+    const evidenceFile = path.join(tempDir, '.sce', 'reports', 'release-evidence', 'handoff-runs.json');
+    const outFile = path.join(tempDir, '.sce', 'reports', 'handoff-evidence.md');
     await fs.ensureDir(path.dirname(evidenceFile));
     await fs.writeJson(evidenceFile, {
       mode: 'auto-handoff-release-evidence',
@@ -11447,7 +11447,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('validates handoff evidence window option range', async () => {
-    const evidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+    const evidenceFile = path.join(tempDir, '.sce', 'reports', 'release-evidence', 'handoff-runs.json');
     await fs.ensureDir(path.dirname(evidenceFile));
     await fs.writeJson(evidenceFile, {
       mode: 'auto-handoff-release-evidence',
@@ -11501,7 +11501,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('writes handoff release draft and evidence review files', async () => {
-    const evidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+    const evidenceFile = path.join(tempDir, '.sce', 'reports', 'release-evidence', 'handoff-runs.json');
     const releaseDraftFile = path.join(tempDir, 'docs', 'releases', 'v9.9.9-draft.md');
     await fs.ensureDir(path.dirname(evidenceFile));
     await fs.writeJson(evidenceFile, {
@@ -11515,7 +11515,7 @@ if (process.argv.includes('--json')) {
           session_id: 'handoff-one',
           merged_at: '2026-02-16T01:00:00.000Z',
           status: 'completed',
-          handoff_report_file: '.kiro/reports/handoff-runs/handoff-one.json',
+          handoff_report_file: '.sce/reports/handoff-runs/handoff-one.json',
           policy: {
             max_moqui_matrix_regressions: 0,
             require_release_gate_preflight: true
@@ -11605,8 +11605,8 @@ if (process.argv.includes('--json')) {
               }
             },
             output: {
-              json: '.kiro/reports/release-evidence/moqui-template-baseline.json',
-              markdown: '.kiro/reports/release-evidence/moqui-template-baseline.md'
+              json: '.sce/reports/release-evidence/moqui-template-baseline.json',
+              markdown: '.sce/reports/release-evidence/moqui-template-baseline.md'
             }
           },
           batch_summary: {
@@ -11676,7 +11676,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('builds release gate history index by merging reports with seed history', async () => {
-    const evidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    const evidenceDir = path.join(tempDir, '.sce', 'reports', 'release-evidence');
     const outFile = path.join(evidenceDir, 'release-gate-history.json');
     await fs.ensureDir(evidenceDir);
 
@@ -11932,7 +11932,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('writes gate-index markdown trend card when --markdown-out is provided', async () => {
-    const evidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    const evidenceDir = path.join(tempDir, '.sce', 'reports', 'release-evidence');
     const outFile = path.join(evidenceDir, 'release-gate-history.json');
     const markdownFile = path.join(evidenceDir, 'release-gate-history.md');
     await fs.ensureDir(evidenceDir);
@@ -11996,7 +11996,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('validates handoff gate-index keep option range', async () => {
-    const evidenceDir = path.join(tempDir, '.kiro', 'reports', 'release-evidence');
+    const evidenceDir = path.join(tempDir, '.sce', 'reports', 'release-evidence');
     await fs.ensureDir(evidenceDir);
     await fs.writeJson(path.join(evidenceDir, 'release-gate-v1.0.0.json'), {
       gate_passed: true,
@@ -12024,7 +12024,7 @@ if (process.argv.includes('--json')) {
   });
 
   test('validates handoff evidence release date format', async () => {
-    const evidenceFile = path.join(tempDir, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
+    const evidenceFile = path.join(tempDir, '.sce', 'reports', 'release-evidence', 'handoff-runs.json');
     await fs.ensureDir(path.dirname(evidenceFile));
     await fs.writeJson(evidenceFile, {
       mode: 'auto-handoff-release-evidence',

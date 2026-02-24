@@ -11,11 +11,11 @@ describe('WatchManager', () => {
     testDir = path.join(__dirname, '../fixtures/watch-manager-test');
     await fs.ensureDir(testDir);
     
-    configPath = path.join(testDir, '.kiro/watch-config.json');
+    configPath = path.join(testDir, '.sce/watch-config.json');
     
     manager = new WatchManager({
       basePath: testDir,
-      configFile: '.kiro/watch-config.json'
+      configFile: '.sce/watch-config.json'
     });
   });
 
@@ -37,7 +37,7 @@ describe('WatchManager', () => {
     test('should create WatchManager with default config', () => {
       expect(manager).toBeDefined();
       expect(manager.isRunning).toBe(false);
-      expect(manager.config.configFile).toBe('.kiro/watch-config.json');
+      expect(manager.config.configFile).toBe('.sce/watch-config.json');
     });
 
     test('should create WatchManager with custom config', () => {

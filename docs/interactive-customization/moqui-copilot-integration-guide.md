@@ -97,4 +97,4 @@ node scripts/interactive-intent-build.js \
 2. Context contract gate passes (required fields + payload size + forbidden keys).
 3. Sensitive keys are masked or removed.
 4. Copilot outputs contain `readonly=true`.
-5. Audit event is appended to `.kiro/reports/interactive-copilot-audit.jsonl`.
+5. Audit event is appended to `.sce/reports/interactive-copilot-audit.jsonl`.

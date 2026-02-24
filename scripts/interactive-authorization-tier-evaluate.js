@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs-extra');
 
 const DEFAULT_POLICY = 'docs/interactive-customization/authorization-tier-policy-baseline.json';
-const DEFAULT_OUT = '.kiro/reports/interactive-authorization-tier.json';
+const DEFAULT_OUT = '.sce/reports/interactive-authorization-tier.json';
 const DIALOGUE_PROFILES = new Set(['business-user', 'system-maintainer']);
 const RUNTIME_ENVIRONMENTS = new Set(['dev', 'staging', 'prod']);
 

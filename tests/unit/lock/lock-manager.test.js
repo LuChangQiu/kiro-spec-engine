@@ -9,8 +9,8 @@ describe('LockManager', () => {
 
   beforeEach(async () => {
     tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-lock-manager-'));
-    await fs.ensureDir(path.join(tempRoot, '.kiro', 'specs', 'spec-a'));
-    await fs.ensureDir(path.join(tempRoot, '.kiro', 'specs', 'spec-b'));
+    await fs.ensureDir(path.join(tempRoot, '.sce', 'specs', 'spec-a'));
+    await fs.ensureDir(path.join(tempRoot, '.sce', 'specs', 'spec-b'));
   });
 
   afterEach(async () => {

@@ -90,7 +90,7 @@ cd your-project
 sce adopt
 ```
 
-这会在项目中创建 `.kiro/` 目录。
+这会在项目中创建 `.sce/` 目录。
 
 ### 步骤 3：创建你的第一个 Spec
 
@@ -99,9 +99,9 @@ sce spec bootstrap --name 01-00-user-login --non-interactive
 ```
 
 然后编辑生成的文件：
-- `.kiro/specs/01-00-user-login/requirements.md` - 写需求
-- `.kiro/specs/01-00-user-login/design.md` - 写设计
-- `.kiro/specs/01-00-user-login/tasks.md` - 列任务
+- `.sce/specs/01-00-user-login/requirements.md` - 写需求
+- `.sce/specs/01-00-user-login/design.md` - 写设计
+- `.sce/specs/01-00-user-login/tasks.md` - 列任务
 
 ### 步骤 4：导出上下文
 
@@ -109,7 +109,7 @@ sce spec bootstrap --name 01-00-user-login --non-interactive
 sce context export 01-00-user-login
 ```
 
-这会生成：`.kiro/specs/01-00-user-login/context-export.md`
+这会生成：`.sce/specs/01-00-user-login/context-export.md`
 
 ### 步骤 5：使用 AI 工具
 
@@ -136,7 +136,7 @@ sce context export 01-00-user-login
 1. 在代码文件中添加注释：
    ```javascript
    // Task 1.1: Implement user login
-   // See: .kiro/specs/01-00-user-login/design.md
+   // See: .sce/specs/01-00-user-login/design.md
    ```
 
 2. Copilot 会根据 Spec 文件生成代码
@@ -302,7 +302,7 @@ sce context export 01-00-user-login --steering --steering-files=CORE_PRINCIPLES.
 
 ### 1. 使用 Steering Rules 控制 AI 行为
 
-创建 `.kiro/steering/CODING_STANDARDS.md`：
+创建 `.sce/steering/CODING_STANDARDS.md`：
 
 ```markdown
 # 编码规范

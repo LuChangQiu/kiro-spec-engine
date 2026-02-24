@@ -5,14 +5,14 @@ const path = require('path');
 const fs = require('fs-extra');
 const { buildMoquiRegressionRecoverySequenceLines } = require('../lib/auto/moqui-recovery-sequence');
 
-const DEFAULT_EVIDENCE = '.kiro/reports/release-evidence/handoff-runs.json';
-const DEFAULT_BASELINE = '.kiro/reports/release-evidence/moqui-template-baseline.json';
-const DEFAULT_LEXICON = '.kiro/reports/release-evidence/moqui-lexicon-audit.json';
-const DEFAULT_CAPABILITY_MATRIX = '.kiro/reports/handoff-capability-matrix.json';
-const DEFAULT_INTERACTIVE_GOVERNANCE = '.kiro/reports/interactive-governance-report.json';
-const DEFAULT_MATRIX_REMEDIATION_PLAN = '.kiro/reports/release-evidence/matrix-remediation-plan.json';
-const DEFAULT_OUT = '.kiro/reports/release-evidence/moqui-release-summary.json';
-const DEFAULT_MARKDOWN_OUT = '.kiro/reports/release-evidence/moqui-release-summary.md';
+const DEFAULT_EVIDENCE = '.sce/reports/release-evidence/handoff-runs.json';
+const DEFAULT_BASELINE = '.sce/reports/release-evidence/moqui-template-baseline.json';
+const DEFAULT_LEXICON = '.sce/reports/release-evidence/moqui-lexicon-audit.json';
+const DEFAULT_CAPABILITY_MATRIX = '.sce/reports/handoff-capability-matrix.json';
+const DEFAULT_INTERACTIVE_GOVERNANCE = '.sce/reports/interactive-governance-report.json';
+const DEFAULT_MATRIX_REMEDIATION_PLAN = '.sce/reports/release-evidence/matrix-remediation-plan.json';
+const DEFAULT_OUT = '.sce/reports/release-evidence/moqui-release-summary.json';
+const DEFAULT_MARKDOWN_OUT = '.sce/reports/release-evidence/moqui-release-summary.md';
 
 function parseArgs(argv) {
   const options = {
@@ -398,7 +398,7 @@ function buildRecommendations(summary, matrixRemediation = {}) {
       'Recover matrix regressions to policy limit before release: `npx sce auto handoff run --manifest docs/handoffs/handoff-manifest.json --dry-run --json`.'
     );
     push(
-      'Generate phased matrix remediation package: `node scripts/moqui-matrix-remediation-queue.js --baseline .kiro/reports/release-evidence/moqui-template-baseline.json --json`.'
+      'Generate phased matrix remediation package: `node scripts/moqui-matrix-remediation-queue.js --baseline .sce/reports/release-evidence/moqui-template-baseline.json --json`.'
     );
     for (const line of buildMoquiRegressionRecoverySequenceLines({
       wrapCommands: true,

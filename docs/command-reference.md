@@ -78,7 +78,7 @@ sce value metrics sample --out ./kpi-input.json --period 2026-W10 --json
 
 # Generate weekly KPI snapshot + gate summary
 sce value metrics snapshot \
-  --input .kiro/specs/112-00-spec-value-realization-program/custom/weekly-metrics/2026-W09.sample.json \
+  --input .sce/specs/112-00-spec-value-realization-program/custom/weekly-metrics/2026-W09.sample.json \
   --period 2026-W09 \
   --checkpoint day-60 \
   --json
@@ -86,22 +86,22 @@ sce value metrics snapshot \
 # Use custom metric contract and output paths
 sce value metrics snapshot \
   --input ./metrics-input.json \
-  --definitions .kiro/specs/112-00-spec-value-realization-program/custom/metric-definition.yaml \
-  --history-dir .kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics \
-  --out .kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/2026-W10.json
+  --definitions .sce/specs/112-00-spec-value-realization-program/custom/metric-definition.yaml \
+  --history-dir .sce/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics \
+  --out .sce/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/2026-W10.json
 
 # Generate baseline from earliest 3 history snapshots
 sce value metrics baseline \
-  --definitions .kiro/specs/112-00-spec-value-realization-program/custom/metric-definition.yaml \
-  --history-dir .kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics \
+  --definitions .sce/specs/112-00-spec-value-realization-program/custom/metric-definition.yaml \
+  --history-dir .sce/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics \
   --from-history 3 \
   --period 2026-W10 \
   --json
 
 # Generate trend report from latest 6 snapshots
 sce value metrics trend \
-  --definitions .kiro/specs/112-00-spec-value-realization-program/custom/metric-definition.yaml \
-  --history-dir .kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics \
+  --definitions .sce/specs/112-00-spec-value-realization-program/custom/metric-definition.yaml \
+  --history-dir .sce/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics \
   --window 6 \
   --json
 ```
@@ -138,7 +138,7 @@ sce prompt generate <spec-name> <task-id> --tool=claude-code
 ### Universal Steering & Session
 
 ```bash
-# Initialize universal steering contract (.sce/steering + .kiro compatibility fallback)
+# Initialize universal steering contract (.sce/steering)
 sce steering init
 
 # Compile steering package for a specific agent tool
@@ -317,8 +317,8 @@ node scripts/failure-attribution-repair.js \
 
 # 4) Scene template + ontology capability mapping report
 node scripts/capability-mapping-report.js \
-  --input-file .kiro/reports/capability-mapping-input.json \
-  --out .kiro/reports/capability-mapping-report.json \
+  --input-file .sce/reports/capability-mapping-input.json \
+  --out .sce/reports/capability-mapping-report.json \
   --json
 ```
 
@@ -361,7 +361,7 @@ sce auto close-loop "build autonomous close-loop and master/sub orchestration" \
 
 # Write DoD evidence to custom report path
 sce auto close-loop "build autonomous close-loop and master/sub orchestration" \
-  --dod-report ".kiro/reports/close-loop-dod.json"
+  --dod-report ".sce/reports/close-loop-dod.json"
 
 # Resume from the latest close-loop session snapshot
 sce auto close-loop --resume latest
@@ -391,8 +391,8 @@ sce auto close-loop "build autonomous close-loop and master/sub orchestration" \
   --replan-strategy adaptive
 
 # Run multiple goals in one autonomous batch (one master/sub portfolio per goal)
-sce auto close-loop-batch .kiro/goals.txt
-sce auto close-loop-batch .kiro/goals.json --dry-run --json
+sce auto close-loop-batch .sce/goals.txt
+sce auto close-loop-batch .sce/goals.json --dry-run --json
 
 # Generate batch goals from one broad program goal (no goals file needed)
 sce auto close-loop-batch \
@@ -416,20 +416,20 @@ sce auto close-loop-program \
   --program-govern-until-stable \
   --program-govern-max-rounds 3 \
   --program-govern-use-action 1 \
-  --program-kpi-out .kiro/reports/close-loop-program-kpi.json \
-  --program-audit-out .kiro/reports/close-loop-program-audit.json \
+  --program-kpi-out .sce/reports/close-loop-program-kpi.json \
+  --program-audit-out .sce/reports/close-loop-program-audit.json \
   --json
 
 # Controller command: drain queued broad goals with close-loop-program runtime
-sce auto close-loop-controller .kiro/auto/program-queue.lines \
+sce auto close-loop-controller .sce/auto/program-queue.lines \
   --dequeue-limit 2 \
   --max-cycles 20 \
-  --controller-done-file .kiro/auto/program-done.lines \
-  --controller-failed-file .kiro/auto/program-failed.lines \
+  --controller-done-file .sce/auto/program-done.lines \
+  --controller-failed-file .sce/auto/program-failed.lines \
   --json
 
 # Persistent controller mode: keep polling queue and execute new goals automatically
-sce auto close-loop-controller .kiro/auto/program-queue.lines \
+sce auto close-loop-controller .sce/auto/program-queue.lines \
   --wait-on-empty \
   --poll-seconds 30 \
   --max-cycles 1000 \
@@ -440,59 +440,59 @@ sce auto close-loop-controller --controller-resume latest --json
 
 # Recovery command: replay unresolved goals from summary using remediation action strategy
 sce auto close-loop-recover latest --json
-sce auto close-loop-recover .kiro/auto/close-loop-batch-summaries/batch-20260215090000.json \
+sce auto close-loop-recover .sce/auto/close-loop-batch-summaries/batch-20260215090000.json \
   --use-action 2 \
   --recover-until-complete \
   --recover-max-rounds 3 \
   --recover-max-minutes 20 \
   --recovery-memory-ttl-days 30 \
   --recovery-memory-scope release-main \
-  --program-audit-out .kiro/reports/close-loop-recover-audit.json \
+  --program-audit-out .sce/reports/close-loop-recover-audit.json \
   --dry-run --json
 
 # Default autonomous batch run (continue-on-error + adaptive scheduling + retry-until-complete)
-sce auto close-loop-batch .kiro/goals.json --json
+sce auto close-loop-batch .sce/goals.json --json
 
 # Run batch goals with concurrent close-loop workers
-sce auto close-loop-batch .kiro/goals.json --batch-parallel 3 --json
+sce auto close-loop-batch .sce/goals.json --batch-parallel 3 --json
 
 # Apply global agent budget across all concurrent goals
-sce auto close-loop-batch .kiro/goals.json \
+sce auto close-loop-batch .sce/goals.json \
   --batch-parallel 3 \
   --batch-agent-budget 6 \
   --json
 
 # Prioritize complex goals first and enable anti-starvation aging
-sce auto close-loop-batch .kiro/goals.json \
+sce auto close-loop-batch .sce/goals.json \
   --batch-priority critical-first \
   --batch-aging-factor 3 \
   --json
 
 # Automatically retry failed/stopped goals for one extra round
-sce auto close-loop-batch .kiro/goals.json \
+sce auto close-loop-batch .sce/goals.json \
   --batch-retry-rounds 1 \
   --batch-retry-strategy adaptive \
   --json
 
 # Retry until all goals complete (bounded by max rounds)
-sce auto close-loop-batch .kiro/goals.json \
+sce auto close-loop-batch .sce/goals.json \
   --batch-retry-until-complete \
   --batch-retry-max-rounds 10 \
   --json
 
 # Disable autonomous batch policy explicitly (only when you need legacy/manual tuning)
-sce auto close-loop-batch .kiro/goals.json \
+sce auto close-loop-batch .sce/goals.json \
   --no-batch-autonomous \
   --json
 
 # Resume only pending goals from a previous batch summary
-sce auto close-loop-batch --resume-from-summary .kiro/reports/close-loop-batch.json --json
+sce auto close-loop-batch --resume-from-summary .sce/reports/close-loop-batch.json --json
 
 # Resume pending goals from latest persisted batch session summary
 sce auto close-loop-batch --resume-from-summary latest --json
 
 # Resume only failed/error goals from summary (ignore unprocessed goals)
-sce auto close-loop-batch --resume-from-summary .kiro/reports/close-loop-batch.json \
+sce auto close-loop-batch --resume-from-summary .sce/reports/close-loop-batch.json \
   --resume-strategy failed-only --json
 
 # List persisted close-loop sessions
@@ -572,7 +572,7 @@ sce auto kpi trend --weeks 8 --period day --mode program --csv --out ./auto-kpi-
 
 # Unified observability snapshot (sessions + governance + KPI trend)
 sce auto observability snapshot --days 14 --status completed,failed --json
-sce auto observability snapshot --out .kiro/reports/auto-observability.json --json
+sce auto observability snapshot --out .sce/reports/auto-observability.json --json
 
 # Agent-facing spec interfaces
 sce auto spec status 121-00-master --json
@@ -586,21 +586,21 @@ sce auto schema migrate --only close-loop-session,batch-session --apply --json
 
 # Dual-track handoff integration (generic external project -> sce)
 sce auto handoff plan --manifest docs/handoffs/handoff-manifest.json --json
-sce auto handoff plan --manifest docs/handoffs/handoff-manifest.json --strict --out .kiro/reports/handoff-plan.json --json
-sce auto handoff queue --manifest docs/handoffs/handoff-manifest.json --out .kiro/auto/handoff-goals.lines --json
+sce auto handoff plan --manifest docs/handoffs/handoff-manifest.json --strict --out .sce/reports/handoff-plan.json --json
+sce auto handoff queue --manifest docs/handoffs/handoff-manifest.json --out .sce/auto/handoff-goals.lines --json
 sce auto handoff template-diff --manifest docs/handoffs/handoff-manifest.json --json
 sce auto handoff capability-matrix --manifest docs/handoffs/handoff-manifest.json --json
 sce auto handoff capability-matrix --manifest docs/handoffs/handoff-manifest.json --profile moqui --json
-sce auto handoff capability-matrix --manifest docs/handoffs/handoff-manifest.json --format markdown --out .kiro/reports/handoff-capability-matrix.md --fail-on-gap --json
+sce auto handoff capability-matrix --manifest docs/handoffs/handoff-manifest.json --format markdown --out .sce/reports/handoff-capability-matrix.md --fail-on-gap --json
 sce auto handoff run --manifest docs/handoffs/handoff-manifest.json --json
 sce auto handoff run --manifest docs/handoffs/handoff-manifest.json --profile enterprise --json
 sce auto handoff run --manifest docs/handoffs/handoff-manifest.json --min-spec-success-rate 95 --max-risk-level medium --json
 sce auto handoff run --manifest docs/handoffs/handoff-manifest.json --continue-from latest --continue-strategy auto --json
 sce auto handoff regression --session-id latest --json
 sce auto handoff regression --session-id latest --window 5 --json
-sce auto handoff regression --session-id latest --format markdown --out .kiro/reports/handoff-regression.md --json
-sce auto handoff regression --session-id latest --window 5 --out .kiro/reports/handoff-regression.json --json
-sce auto close-loop-batch .kiro/auto/handoff-goals.lines --format lines --json
+sce auto handoff regression --session-id latest --format markdown --out .sce/reports/handoff-regression.md --json
+sce auto handoff regression --session-id latest --window 5 --out .sce/reports/handoff-regression.json --json
+sce auto close-loop-batch .sce/auto/handoff-goals.lines --format lines --json
 ``` 
 
 DoD-related options:
@@ -653,11 +653,11 @@ Close-loop batch (`sce auto close-loop-batch <goals-file>`) options:
 - `--batch-session-id <id>`: set explicit persisted batch session id
 - `--batch-session-keep <n>`: keep newest `n` persisted batch summaries after each run (`0-1000`)
 - `--batch-session-older-than-days <n>`: when pruning persisted batch summaries, only delete sessions older than `n` days (`0-36500`)
-- `--spec-session-keep <n>`: keep newest `n` spec directories under `.kiro/specs` after run (`0-5000`)
+- `--spec-session-keep <n>`: keep newest `n` spec directories under `.sce/specs` after run (`0-5000`)
 - `--spec-session-older-than-days <n>`: when pruning specs, only delete directories older than `n` days (`0-36500`)
 - `--no-spec-session-protect-active`: allow pruning active/recently referenced spec directories
 - `--spec-session-protect-window-days <n>`: protection window (days) for recent session references during spec pruning (`0-36500`, default `7`)
-- `--spec-session-max-total <n>`: spec directory budget ceiling under `.kiro/specs` (`1-500000`)
+- `--spec-session-max-total <n>`: spec directory budget ceiling under `.sce/specs` (`1-500000`)
 - `--spec-session-max-created <n>`: spec growth guard for maximum estimated created directories per run (`0-500000`)
 - `--spec-session-max-created-per-goal <n>`: spec growth guard for estimated created directories per processed goal (`0-1000`)
 - `--spec-session-max-duplicate-goals <n>`: goal-input duplicate guard for batch runs (`0-500000`)
@@ -722,7 +722,7 @@ Close-loop program (`sce auto close-loop-program "<goal>"`) options:
 - Program summary includes `program_coordination` (master/sub topology, unresolved goal indexes, scheduler snapshot) and `auto_recovery` metadata.
 
 Close-loop controller (`sce auto close-loop-controller [queue-file]`) options:
-- `queue-file`: optional queue file path (default `.kiro/auto/close-loop-controller-goals.lines`)
+- `queue-file`: optional queue file path (default `.sce/auto/close-loop-controller-goals.lines`)
 - `--controller-resume <session-or-file>`: resume from persisted controller session (`latest`, session id, or file path)
 - `--queue-format <auto|json|lines>`: queue parser mode (default `auto`)
 - `--no-controller-dedupe`: disable duplicate broad-goal deduplication (default dedupe enabled)
@@ -771,7 +771,7 @@ Close-loop session maintenance:
   - Stats JSON output includes `criteria`, completion/failure rates, `sub_spec_count_sum`, `master_spec_counts`, and `latest_sessions`.
 
 Spec directory maintenance:
-- `sce auto spec-session list [--limit <n>] [--json]`: list persisted spec directories under `.kiro/specs`
+- `sce auto spec-session list [--limit <n>] [--json]`: list persisted spec directories under `.sce/specs`
 - `sce auto spec-session prune [--keep <n>] [--older-than-days <n>] [--no-protect-active] [--protect-window-days <n>] [--show-protection-reasons] [--dry-run] [--json]`: prune old spec directories by retention policy (default protects active/recent specs)
   - Protection sources include collaboration state, close-loop sessions, batch summaries, and controller sessions (via nested batch summary references).
   - JSON output always includes `protection_ranking_top` (top protected specs by reason count); `--show-protection-reasons` additionally includes per-spec `reasons` and full `protection_ranking`.
@@ -812,7 +812,7 @@ Cross-archive autonomous governance maintenance:
   - JSON output includes `assessment` (pre-maintenance governance snapshot), `plan`, `executed_actions`, `summary`, and `after_assessment` (only when `--apply` without `--dry-run`).
 - `sce auto governance close-loop [--days <n>] [--status <csv>] [--session-keep <n>] [--batch-session-keep <n>] [--controller-session-keep <n>] [--recovery-memory-older-than-days <n>] [--max-rounds <n>] [--target-risk <low|medium|high>] [--governance-resume <session|latest|file>] [--governance-resume-allow-drift] [--governance-session-id <id>] [--no-governance-session] [--governance-session-keep <n>] [--governance-session-older-than-days <n>] [--execute-advisory] [--advisory-recover-max-rounds <n>] [--advisory-controller-max-cycles <n>] [--plan-only] [--dry-run] [--json]`: run governance rounds until stop condition (target risk reached, release gate blocked, no actionable maintenance/advisory, non-mutating mode, maintenance/advisory failures, or max rounds).
   - `--plan-only` runs a single non-mutating planning round.
-  - Governance close-loop sessions are persisted by default at `.kiro/auto/governance-close-loop-sessions/*.json`; use `--governance-resume` to continue interrupted governance loops.
+  - Governance close-loop sessions are persisted by default at `.sce/auto/governance-close-loop-sessions/*.json`; use `--governance-resume` to continue interrupted governance loops.
   - On resume, sce reuses persisted policy defaults (`target_risk`, `execute_advisory`, `advisory_policy`) unless explicitly overridden. Explicit policy drift is blocked by default; add `--governance-resume-allow-drift` to force override.
   - `--governance-session-keep` (with optional `--governance-session-older-than-days`) enables post-run governance session retention pruning while protecting the current session snapshot.
   - `--execute-advisory` enables automatic advisory action execution (`recover-latest`, `controller-resume-latest`) when governance assessment detects failed sessions or controller pending goals; sce auto-selects the latest actionable advisory source and reports `skipped` (not `failed`) when no actionable source exists.
@@ -865,7 +865,7 @@ Autonomous archive schema compatibility:
 
 Dual-track handoff integration:
 - `sce auto handoff plan --manifest <path> [--out <path>] [--strict] [--strict-warnings] [--json]`: parse handoff manifest (source project, specs, templates, known gaps) and generate an executable sce integration phase plan.
-- `sce auto handoff queue --manifest <path> [--out <path>] [--append] [--no-include-known-gaps] [--dry-run] [--json]`: generate close-loop batch goal queue from handoff manifest and optionally persist line-based queue file (default `.kiro/auto/handoff-goals.lines`).
+- `sce auto handoff queue --manifest <path> [--out <path>] [--append] [--no-include-known-gaps] [--dry-run] [--json]`: generate close-loop batch goal queue from handoff manifest and optionally persist line-based queue file (default `.sce/auto/handoff-goals.lines`).
 - `sce auto handoff template-diff --manifest <path> [--json]`: compare manifest templates against local template exports/registry and report `missing_in_local` and `extra_in_local`.
 - `sce auto handoff capability-matrix --manifest <path> [--profile <default|moqui|enterprise>] [--strict] [--strict-warnings] [--min-capability-coverage <n>] [--min-capability-semantic <n>] [--no-require-capability-semantic] [--format <json|markdown>] [--out <path>] [--remediation-queue-out <path>] [--fail-on-gap] [--json]`: generate a fast Moqui capability matrix (`template-diff + baseline + capability coverage + semantic completeness`) and optionally fail fast on gaps.
 - When matrix regressions are detected in baseline compare, recommendations prioritize capability-cluster phased execution first (`npm run run:matrix-remediation-clusters-phased -- --json`), then baseline phased one-shot (`node scripts/moqui-matrix-remediation-phased-runner.js --baseline ... --json`).
@@ -873,16 +873,16 @@ Dual-track handoff integration:
 - `sce auto handoff preflight-check [--profile <default|moqui|enterprise>] [--history-file <path>] [--require-release-gate-preflight|--no-require-release-gate-preflight] [--release-evidence-window <n>] [--require-pass] [--json]`: inspect release-gate history preflight readiness and return machine-readable `pass|warning|blocked` status with reasons, runtime weekly-ops pressure signals, and executable remediation commands.
   - `--require-pass` exits non-zero when status is not `pass` (recommended for CI/release hard gates).
   - Default policy follows profile defaults and enforces release-gate preflight hard requirement (`default`/`moqui`/`enterprise` all require preflight by default).
-- `sce auto handoff run --manifest <path> [--profile <default|moqui|enterprise>] [--out <path>] [--queue-out <path>] [--append] [--no-include-known-gaps] [--continue-from <session|latest|file>] [--continue-strategy <auto|pending|failed-only>] [--dry-run] [--strict] [--strict-warnings] [--no-dependency-batching] [--min-spec-success-rate <n>] [--max-risk-level <level>] [--max-moqui-matrix-regressions <n>] [--no-require-ontology-validation] [--no-require-moqui-baseline] [--min-capability-coverage <n>] [--no-require-capability-coverage] [--require-release-gate-preflight] [--release-evidence-window <n>] [--json]`: execute handoff end-to-end (`plan -> queue -> close-loop-batch -> observability`) with automatic report archive to `.kiro/reports/handoff-runs/<session>.json`.
+- `sce auto handoff run --manifest <path> [--profile <default|moqui|enterprise>] [--out <path>] [--queue-out <path>] [--append] [--no-include-known-gaps] [--continue-from <session|latest|file>] [--continue-strategy <auto|pending|failed-only>] [--dry-run] [--strict] [--strict-warnings] [--no-dependency-batching] [--min-spec-success-rate <n>] [--max-risk-level <level>] [--max-moqui-matrix-regressions <n>] [--no-require-ontology-validation] [--no-require-moqui-baseline] [--min-capability-coverage <n>] [--no-require-capability-coverage] [--require-release-gate-preflight] [--release-evidence-window <n>] [--json]`: execute handoff end-to-end (`plan -> queue -> close-loop-batch -> observability`) with automatic report archive to `.sce/reports/handoff-runs/<session>.json`.
   - Default mode is dependency-aware: spec integration goals are grouped into dependency batches and executed in topological order.
   - `--continue-from` resumes pending goals from an existing handoff run report (`latest`, session id, or JSON file path). For safety, sce enforces manifest-path consistency between the previous report and current run.
   - `--continue-strategy auto|pending|failed-only` controls resumed scope. `auto` (default) derives the best strategy from prior run state (`pending` when unprocessed/planned goals exist, otherwise `failed-only` for pure failure replay).
-  - Non-dry runs auto-merge release evidence into `.kiro/reports/release-evidence/handoff-runs.json` with session-level gate/ontology/regression/moqui-baseline/capability-coverage snapshots. Merge failures are recorded as warnings without aborting the run.
+  - Non-dry runs auto-merge release evidence into `.sce/reports/release-evidence/handoff-runs.json` with session-level gate/ontology/regression/moqui-baseline/capability-coverage snapshots. Merge failures are recorded as warnings without aborting the run.
   - `--release-evidence-window` controls trend snapshot window size (2-50, default `5`) used in merged release evidence (`latest_trend_window` and per-session `trend_window`).
-  - Run output includes `moqui_baseline` snapshot by default, with artifacts at `.kiro/reports/release-evidence/moqui-template-baseline.json` and `.kiro/reports/release-evidence/moqui-template-baseline.md`.
+  - Run output includes `moqui_baseline` snapshot by default, with artifacts at `.sce/reports/release-evidence/moqui-template-baseline.json` and `.sce/reports/release-evidence/moqui-template-baseline.md`.
   - `moqui_baseline.summary` now includes `scope_breakdown`, `coverage_matrix`, and `gap_frequency` for ER/BR/decision closure tracking.
   - `moqui_baseline.compare` now includes `coverage_matrix_deltas` and `coverage_matrix_regressions` for trend-level entity/relation/rule/decision closure movement and negative-delta alerts (used by matrix-regression hard gate).
-  - Run output includes `moqui_capability_coverage` snapshot by default (when manifest `capabilities` is declared), with artifacts at `.kiro/reports/release-evidence/moqui-capability-coverage.json` and `.kiro/reports/release-evidence/moqui-capability-coverage.md`.
+  - Run output includes `moqui_capability_coverage` snapshot by default (when manifest `capabilities` is declared), with artifacts at `.sce/reports/release-evidence/moqui-capability-coverage.json` and `.sce/reports/release-evidence/moqui-capability-coverage.md`.
   - When `manifest.capabilities` is not declared, sce attempts lexicon-based capability inference from `manifest.templates` first; only fully non-mappable manifests keep capability coverage in skipped mode.
   - Run output includes `release_gate_preflight` (latest release gate history signal snapshot + blocked reasons) and carries this context into `warnings`.
   - `release_gate_preflight` now also carries runtime weekly-ops pressure metrics (`latest_weekly_ops_runtime_block_rate_percent`, `latest_weekly_ops_runtime_ui_mode_violation_total`, `latest_weekly_ops_runtime_ui_mode_violation_rate_percent`) for UI-mode policy diagnostics.
@@ -892,7 +892,7 @@ Dual-track handoff integration:
     - `default`: default takeover policy (release-gate preflight hard requirement enabled).
     - `moqui`: explicit Moqui-intake baseline (same hard-gate defaults as `default`).
     - `enterprise`: stricter release control baseline (`max-risk-level=medium`, `release-evidence-window=10`, preflight hard requirement enabled).
-  - When Moqui baseline/capability gates fail, sce auto-generates remediation queue lines at `.kiro/auto/moqui-remediation.lines`.
+  - When Moqui baseline/capability gates fail, sce auto-generates remediation queue lines at `.sce/auto/moqui-remediation.lines`.
   - Run result includes `failure_summary` (failed phase/gate/release-gate preflight highlights) and `recommendations` with executable follow-up commands (for example, auto-generated `--continue-from <session>` on failed/incomplete batches).
   - When matrix regressions are detected, recommendations now prioritize capability-cluster phased execution (`npm run run:matrix-remediation-clusters-phased -- --json`) and include capability-cluster batch fallback plus baseline phased one-shot remediation (`node scripts/moqui-matrix-remediation-phased-runner.js --baseline ... --json`).
   - Moqui regression recovery recommendations now include an explicit labeled sequence block: `Step 1 (Cluster phased)` then `Step 2 (Baseline phased)`.
@@ -906,16 +906,16 @@ Dual-track handoff integration:
   - `--out` writes the generated regression report using the selected format.
   - Output includes `recommendations` to guide next action when trend degrades or risk escalates, including phased anti-429 baseline one-shot remediation when Moqui matrix regressions are detected.
 - `sce auto handoff evidence [--file <path>] [--session-id <id|latest>] [--window <n>] [--format <json|markdown>] [--out <path>] [--json]`: quick-review merged release evidence and render current-batch gate/ontology/regression/moqui-baseline/capability-coverage/risk-layer overview.
-  - Default evidence file is `.kiro/reports/release-evidence/handoff-runs.json`.
+  - Default evidence file is `.sce/reports/release-evidence/handoff-runs.json`.
   - `--window` (1-50, default `5`) controls how many recent sessions are aggregated in review.
   - JSON output includes `current_overview` (with `release_gate_preflight`, `failure_summary`, and preflight policy flags), `aggregates.status_counts`, `aggregates.gate_pass_rate_percent`, and `risk_layers`.
   - Markdown output includes `Current Gate`, `Current Release Gate Preflight`, `Current Failure Summary`, `Current Ontology`, `Current Regression`, `Current Moqui Baseline`, `Current Capability Coverage`, `Trend Series`, and `Risk Layer View`.
   - `Current Release Gate Preflight` includes runtime pressure lines (runtime block-rate and ui-mode violation totals/rates) when signals exist in release-gate history.
   - Add `--release-draft <path>` to auto-generate a release notes draft and evidence review markdown in one run.
   - `--release-version` sets draft version tag (defaults to `v<package.json version>`), and `--release-date` accepts `YYYY-MM-DD` (default: current UTC date).
-  - Use `--review-out <path>` to override the generated evidence review markdown path (default `.kiro/reports/release-evidence/handoff-evidence-review.md`).
+  - Use `--review-out <path>` to override the generated evidence review markdown path (default `.sce/reports/release-evidence/handoff-evidence-review.md`).
 - `sce auto handoff gate-index [--dir <path>] [--history-file <path>] [--keep <n>] [--out <path>] [--json]`: aggregate `release-gate-*.json` audits into a cross-version history index.
-  - Default scan dir is `.kiro/reports/release-evidence`, default output file is `.kiro/reports/release-evidence/release-gate-history.json`.
+  - Default scan dir is `.sce/reports/release-evidence`, default output file is `.sce/reports/release-evidence/release-gate-history.json`.
   - `--history-file` merges an existing index (for example, previous release asset) before dedup/refresh.
   - `--keep` retains latest N entries (`1-5000`, default `200`).
   - Aggregates include scene package batch, capability unknown trend, drift, weekly ops pressure (including runtime ui-mode/runtime block-rate telemetry), config warning pressure, and release-preflight/hard-gate signals (`scene_package_batch_*`, `capability_expected_unknown_*`, `capability_provided_unknown_*`, `drift_alert_*`, `drift_block_*`, `weekly_ops_*`, `config_warnings_total`, `release_gate_preflight_*`) when present in gate reports.
@@ -932,13 +932,13 @@ Moqui release summary helper (script-level consolidated gate view):
   - When matrix regressions exist and remediation plan is available, recommendations include concrete template/capability priority order from `template_priority_matrix` and `capability_clusters`.
   - Matrix-regression recovery recommendations now use explicit labeled sequence steps: `Step 1 (Cluster phased)` then `Step 2 (Baseline phased)`.
   - Default inputs:
-    - `.kiro/reports/release-evidence/handoff-runs.json`
-    - `.kiro/reports/release-evidence/moqui-template-baseline.json`
-    - `.kiro/reports/release-evidence/moqui-lexicon-audit.json`
-    - `.kiro/reports/handoff-capability-matrix.json`
+    - `.sce/reports/release-evidence/handoff-runs.json`
+    - `.sce/reports/release-evidence/moqui-template-baseline.json`
+    - `.sce/reports/release-evidence/moqui-lexicon-audit.json`
+    - `.sce/reports/handoff-capability-matrix.json`
   - Default outputs:
-    - `.kiro/reports/release-evidence/moqui-release-summary.json`
-    - `.kiro/reports/release-evidence/moqui-release-summary.md`
+    - `.sce/reports/release-evidence/moqui-release-summary.json`
+    - `.sce/reports/release-evidence/moqui-release-summary.md`
   - `--fail-on-gate-fail` exits with code `2` when summary gate is `failed`.
 
 Release governance snapshot export helper (release-asset extraction):
@@ -946,20 +946,20 @@ Release governance snapshot export helper (release-asset extraction):
   - reads release evidence summary from `RELEASE_EVIDENCE_SUMMARY_FILE`
   - extracts `governance_snapshot` into independent audit assets
   - writes:
-    - `RELEASE_GOVERNANCE_SNAPSHOT_JSON` (default `.kiro/reports/release-evidence/governance-snapshot.json`)
-    - `RELEASE_GOVERNANCE_SNAPSHOT_MD` (default `.kiro/reports/release-evidence/governance-snapshot.md`)
+    - `RELEASE_GOVERNANCE_SNAPSHOT_JSON` (default `.sce/reports/release-evidence/governance-snapshot.json`)
+    - `RELEASE_GOVERNANCE_SNAPSHOT_MD` (default `.sce/reports/release-evidence/governance-snapshot.md`)
   - never hard-fails release flow when summary is missing; writes unavailable placeholder with warning instead.
 
 Release weekly ops summary helper (ops closed-loop evidence):
 - `node scripts/release-ops-weekly-summary.js [--evidence <path>] [--gate-history <path>] [--interactive-governance <path>] [--matrix-signals <path>] [--from <iso>] [--to <iso>] [--window-days <n>] [--out <path>] [--markdown-out <path>] [--json]`: aggregate weekly handoff/gate/governance/matrix telemetry into one operational risk card.
   - Default inputs:
-    - `.kiro/reports/release-evidence/handoff-runs.json`
-    - `.kiro/reports/release-evidence/release-gate-history.json`
-    - `.kiro/reports/interactive-governance-report.json`
-    - `.kiro/reports/interactive-matrix-signals.jsonl`
+    - `.sce/reports/release-evidence/handoff-runs.json`
+    - `.sce/reports/release-evidence/release-gate-history.json`
+    - `.sce/reports/interactive-governance-report.json`
+    - `.sce/reports/interactive-matrix-signals.jsonl`
   - Default outputs:
-    - `.kiro/reports/release-evidence/weekly-ops-summary.json`
-    - `.kiro/reports/release-evidence/weekly-ops-summary.md`
+    - `.sce/reports/release-evidence/weekly-ops-summary.json`
+    - `.sce/reports/release-evidence/weekly-ops-summary.md`
   - Missing inputs are reported as warnings and reflected in `health.risk`/recommendations.
 - npm alias: `npm run report:release-ops-weekly`
 
@@ -984,16 +984,16 @@ Release weekly ops gate helper (release hard-gate):
 Release risk remediation bundle helper (weekly + drift unified command pack):
 - `node scripts/release-risk-remediation-bundle.js [--gate-report <path>] [--out <path>] [--markdown-out <path>] [--lines-out <path>] [--json]`: derive deduplicated remediation commands from `release-gate` report signals (`weekly_ops`, `drift`) and export JSON/Markdown/lines artifacts.
   - when weekly gate includes `dialogue-authorization`/`authorization-tier` block-rate pressure, plan includes policy-specific diagnostics (`interactive-dialogue-governance`, `interactive-authorization-tier-evaluate`).
-  - Default input: `.kiro/reports/release-evidence/release-gate.json`
+  - Default input: `.sce/reports/release-evidence/release-gate.json`
   - Default outputs:
-    - `.kiro/reports/release-evidence/release-risk-remediation-bundle.json`
-    - `.kiro/reports/release-evidence/release-risk-remediation-bundle.md`
-    - `.kiro/reports/release-evidence/release-risk-remediation.commands.lines`
+    - `.sce/reports/release-evidence/release-risk-remediation-bundle.json`
+    - `.sce/reports/release-evidence/release-risk-remediation-bundle.md`
+    - `.sce/reports/release-evidence/release-risk-remediation.commands.lines`
 - npm alias: `npm run report:release-risk-remediation`
 
 Release asset integrity check helper (release artifact completeness gate):
 - `node scripts/release-asset-integrity-check.js`:
-  - validates required release evidence assets in `RELEASE_ASSET_INTEGRITY_DIR` (default `.kiro/reports/release-evidence`).
+  - validates required release evidence assets in `RELEASE_ASSET_INTEGRITY_DIR` (default `.sce/reports/release-evidence`).
   - default required files:
     - `release-gate-{tag}.json`
     - `release-gate-history-{tag}.json|.md`
@@ -1024,8 +1024,8 @@ Autonomous strategy router helper (answer/code/fix/rollback policy):
 
 Matrix regression gate helper (script-level configurable hard gate):
 - `node scripts/matrix-regression-gate.js [--baseline <path>] [--max-regressions <n>] [--enforce] [--out <path>] [--json]`: evaluate matrix regression count from baseline compare payload (`coverage_matrix_regressions` preferred, fallback `regressions`) and enforce hard gate when enabled.
-  - Default baseline input: `.kiro/reports/release-evidence/moqui-template-baseline.json`
-  - Default output: `.kiro/reports/release-evidence/matrix-regression-gate.json`
+  - Default baseline input: `.sce/reports/release-evidence/moqui-template-baseline.json`
+  - Default output: `.sce/reports/release-evidence/matrix-regression-gate.json`
   - `--enforce` exits with code `2` when regressions exceed `--max-regressions`.
 - npm alias: `npm run gate:matrix-regression`
 
@@ -1034,17 +1034,17 @@ Moqui matrix remediation queue helper (script-level automatic queue export):
   - JSON output includes `template_priority_matrix` (cross-regression template priority ranking) and `capability_clusters` (capability-level remediation clusters with suggested templates).
   - JSON output includes `capability_cluster_goal_count` and writes `mode=moqui-matrix-capability-cluster-goals` payload with cluster-level `goals` for direct batch execution.
   - Default inputs/outputs:
-    - Baseline: `.kiro/reports/release-evidence/moqui-template-baseline.json`
-    - Plan JSON: `.kiro/reports/release-evidence/matrix-remediation-plan.json`
-    - Queue lines: `.kiro/auto/matrix-remediation.lines`
-    - Plan Markdown: `.kiro/reports/release-evidence/matrix-remediation-plan.md`
-    - Batch goals JSON: `.kiro/auto/matrix-remediation.goals.json`
-    - Capability-cluster goals JSON: `.kiro/auto/matrix-remediation.capability-clusters.json`
-    - Commands Markdown: `.kiro/reports/release-evidence/matrix-remediation-commands.md`
-    - High queue lines: `.kiro/auto/matrix-remediation.high.lines`
-    - Medium queue lines: `.kiro/auto/matrix-remediation.medium.lines`
-    - High goals JSON: `.kiro/auto/matrix-remediation.goals.high.json`
-    - Medium goals JSON: `.kiro/auto/matrix-remediation.goals.medium.json`
+    - Baseline: `.sce/reports/release-evidence/moqui-template-baseline.json`
+    - Plan JSON: `.sce/reports/release-evidence/matrix-remediation-plan.json`
+    - Queue lines: `.sce/auto/matrix-remediation.lines`
+    - Plan Markdown: `.sce/reports/release-evidence/matrix-remediation-plan.md`
+    - Batch goals JSON: `.sce/auto/matrix-remediation.goals.json`
+    - Capability-cluster goals JSON: `.sce/auto/matrix-remediation.capability-clusters.json`
+    - Commands Markdown: `.sce/reports/release-evidence/matrix-remediation-commands.md`
+    - High queue lines: `.sce/auto/matrix-remediation.high.lines`
+    - Medium queue lines: `.sce/auto/matrix-remediation.medium.lines`
+    - High goals JSON: `.sce/auto/matrix-remediation.goals.high.json`
+    - Medium goals JSON: `.sce/auto/matrix-remediation.goals.medium.json`
   - Default phased execution policy:
     - High phase: `--batch-parallel 1 --batch-agent-budget 2`
     - Medium phase: `--batch-parallel 1 --batch-agent-budget 2`
@@ -1054,17 +1054,17 @@ Moqui matrix remediation queue helper (script-level automatic queue export):
 Moqui matrix remediation phased runner helper (script-level one-shot execution):
 - `node scripts/moqui-matrix-remediation-phased-runner.js [--baseline <path>] [--queue-out <path>] [--queue-lines-out <path>] [--queue-markdown-out <path>] [--queue-batch-json-out <path>] [--queue-commands-out <path>] [--cluster-goals <path>] [--cluster-high-goals-out <path>] [--cluster-medium-goals-out <path>] [--min-delta-abs <n>] [--top-templates <n>] [--high-goals <path>] [--medium-goals <path>] [--high-lines <path>] [--medium-lines <path>] [--phase-high-parallel <n>] [--phase-high-agent-budget <n>] [--phase-medium-parallel <n>] [--phase-medium-agent-budget <n>] [--phase-cooldown-seconds <n>] [--high-retry-max-rounds <n>] [--medium-retry-max-rounds <n>] [--phase-recovery-attempts <n>] [--phase-recovery-cooldown-seconds <n>] [--no-fallback-lines] [--continue-on-error] [--dry-run] [--json]`: execute matrix remediation in anti-429 phased order (`high -> cooldown -> medium`) using `sce auto close-loop-batch`; when `--baseline` is provided, it auto-generates the queue package first (`prepare + run` in one command), and when `--cluster-goals` is provided it derives phase goals from capability clusters before execution.
   - Default inputs:
-    - High goals JSON: `.kiro/auto/matrix-remediation.goals.high.json`
-    - Medium goals JSON: `.kiro/auto/matrix-remediation.goals.medium.json`
-    - High lines fallback: `.kiro/auto/matrix-remediation.high.lines`
-    - Medium lines fallback: `.kiro/auto/matrix-remediation.medium.lines`
+    - High goals JSON: `.sce/auto/matrix-remediation.goals.high.json`
+    - Medium goals JSON: `.sce/auto/matrix-remediation.goals.medium.json`
+    - High lines fallback: `.sce/auto/matrix-remediation.high.lines`
+    - Medium lines fallback: `.sce/auto/matrix-remediation.medium.lines`
   - Default execution policy:
     - High: `--batch-parallel 1 --batch-agent-budget 2 --batch-retry-max-rounds 3`
     - Medium: `--batch-parallel 1 --batch-agent-budget 2 --batch-retry-max-rounds 2`
     - Cooldown: `30` seconds
     - Phase process recovery: `--phase-recovery-attempts 2` with `--phase-recovery-cooldown-seconds 30`; on retry, phase parallel/agent-budget are halved (floor, min=1)
   - Zero-prep mode:
-    - `node scripts/moqui-matrix-remediation-phased-runner.js --baseline .kiro/reports/release-evidence/moqui-template-baseline.json --json`
+    - `node scripts/moqui-matrix-remediation-phased-runner.js --baseline .sce/reports/release-evidence/moqui-template-baseline.json --json`
 - npm alias: `npm run run:matrix-remediation-phased`
 - npm alias (baseline zero-prep): `npm run run:matrix-remediation-from-baseline -- --json`
 - npm alias (capability clusters): `npm run run:matrix-remediation-clusters`
@@ -1075,8 +1075,8 @@ Interactive customization plan gate helper (script-level secure-by-default check
   - Default policy: `docs/interactive-customization/guardrail-policy-baseline.json`
   - Default catalog: `docs/interactive-customization/high-risk-action-catalog.json` (or `policy.catalog_policy.catalog_file`)
   - Default outputs:
-    - `.kiro/reports/interactive-change-plan-gate.json`
-    - `.kiro/reports/interactive-change-plan-gate.md`
+    - `.sce/reports/interactive-change-plan-gate.json`
+    - `.sce/reports/interactive-change-plan-gate.md`
   - `--fail-on-block` exits with code `2` on `deny`
   - `--fail-on-non-allow` exits with code `2` on `deny` or `review-required`
 
@@ -1084,29 +1084,29 @@ Interactive context bridge helper (script-level provider normalization):
 - `node scripts/interactive-context-bridge.js --input <path> [--provider <moqui|generic>] [--out-context <path>] [--out-report <path>] [--context-contract <path>] [--no-strict-contract] [--json]`: normalize raw UI/provider payload into standard interactive `page-context` and validate against context contract before intent generation.
   - Default input sample: `docs/interactive-customization/moqui-context-provider.sample.json`
   - Default outputs:
-    - `.kiro/reports/interactive-page-context.normalized.json`
-    - `.kiro/reports/interactive-context-bridge.json`
+    - `.sce/reports/interactive-page-context.normalized.json`
+    - `.sce/reports/interactive-context-bridge.json`
   - Strict contract validation is enabled by default; `--no-strict-contract` keeps report generation for diagnostics.
   - CLI equivalent: `sce scene context-bridge --input <path> --json`
   - npm alias: `npm run report:interactive-context-bridge`
 
 Interactive full flow helper (script-level one-command entry):
 - `node scripts/interactive-flow.js --input <path> (--goal <text> | --goal-file <path>) [--provider <moqui|generic>] [--execution-mode <suggestion|apply>] [--runtime-mode <user-assist|ops-fix|feature-dev>] [--runtime-environment <dev|staging|prod>] [--runtime-policy <path>] [--authorization-tier-policy <path>] [--authorization-tier-out <path>] [--policy <path>] [--catalog <path>] [--dialogue-policy <path>] [--dialogue-profile <business-user|system-maintainer>] [--ui-mode <user-app|ops-console>] [--context-contract <path>] [--approval-role-policy <path>] [--approval-actor-role <name>] [--approver-actor-role <name>] [--auto-execute-low-risk] [--auth-password-hash <sha256>] [--auth-password <text>] [--feedback-score <0..5>] [--work-order-out <path>] [--work-order-markdown-out <path>] [--fail-on-runtime-non-allow] [--no-matrix] [--matrix-min-score <0..100>] [--matrix-min-valid-rate <0..100>] [--matrix-compare-with <path>] [--matrix-signals <path>] [--matrix-fail-on-portfolio-fail] [--matrix-fail-on-regression] [--json]`: run `context-bridge -> interactive-loop -> matrix-baseline-snapshot` in one command for Moqui workbench integration.
-  - Default flow artifact root: `.kiro/reports/interactive-flow/<session-id>/`
-  - Default flow summary output: `.kiro/reports/interactive-flow/<session-id>/interactive-flow.summary.json`
-  - Default dialogue report output: `.kiro/reports/interactive-flow/<session-id>/interactive-dialogue-governance.json`
+  - Default flow artifact root: `.sce/reports/interactive-flow/<session-id>/`
+  - Default flow summary output: `.sce/reports/interactive-flow/<session-id>/interactive-flow.summary.json`
+  - Default dialogue report output: `.sce/reports/interactive-flow/<session-id>/interactive-dialogue-governance.json`
   - Default dialogue-authorization signal stream:
-    - `.kiro/reports/interactive-flow/<session-id>/interactive-dialogue-authorization-signals.jsonl` (session)
-    - `.kiro/reports/interactive-dialogue-authorization-signals.jsonl` (global append-only stream)
-  - Default runtime report output: `.kiro/reports/interactive-flow/<session-id>/interactive-runtime-policy.json`
-  - Default authorization tier report output: `.kiro/reports/interactive-flow/<session-id>/interactive-authorization-tier.json`
+    - `.sce/reports/interactive-flow/<session-id>/interactive-dialogue-authorization-signals.jsonl` (session)
+    - `.sce/reports/interactive-dialogue-authorization-signals.jsonl` (global append-only stream)
+  - Default runtime report output: `.sce/reports/interactive-flow/<session-id>/interactive-runtime-policy.json`
+  - Default authorization tier report output: `.sce/reports/interactive-flow/<session-id>/interactive-authorization-tier.json`
   - Default work-order outputs:
-    - `.kiro/reports/interactive-flow/<session-id>/interactive-work-order.json`
-    - `.kiro/reports/interactive-flow/<session-id>/interactive-work-order.md`
+    - `.sce/reports/interactive-flow/<session-id>/interactive-work-order.json`
+    - `.sce/reports/interactive-flow/<session-id>/interactive-work-order.md`
   - Default matrix outputs:
-    - `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.json`
-    - `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.md`
-    - `.kiro/reports/interactive-matrix-signals.jsonl` (append-only signal stream)
+    - `.sce/reports/interactive-flow/<session-id>/moqui-template-baseline.json`
+    - `.sce/reports/interactive-flow/<session-id>/moqui-template-baseline.md`
+    - `.sce/reports/interactive-matrix-signals.jsonl` (append-only signal stream)
   - Matrix stage is enabled by default; use `--no-matrix` only for diagnostics.
   - CLI equivalent: `sce scene interactive-flow --input <path> --goal "<goal>" --json`
   - npm alias: `npm run run:interactive-flow -- --input docs/interactive-customization/moqui-context-provider.sample.json --goal "Adjust order screen field layout for clearer input flow" --json`
@@ -1114,9 +1114,9 @@ Interactive full flow helper (script-level one-command entry):
 Interactive read-only intent helper (script-level stage-A copilot bridge):
 - `node scripts/interactive-intent-build.js --context <path> (--goal <text> | --goal-file <path>) [--user-id <id>] [--session-id <id>] [--out-intent <path>] [--out-explain <path>] [--audit-file <path>] [--context-contract <path>] [--no-strict-contract] [--mask-keys <csv>] [--json]`: build a read-only `Change_Intent` from page context + business goal, emit masked context preview, append audit event JSONL, and generate explain markdown.
   - Default outputs:
-    - `.kiro/reports/interactive-change-intent.json`
-    - `.kiro/reports/interactive-page-explain.md`
-    - `.kiro/reports/interactive-copilot-audit.jsonl`
+    - `.sce/reports/interactive-change-intent.json`
+    - `.sce/reports/interactive-page-explain.md`
+    - `.sce/reports/interactive-copilot-audit.jsonl`
   - Default context contract: `docs/interactive-customization/moqui-copilot-context-contract.json` (fallback built-in baseline when file is absent)
   - Contract validation is strict by default (required fields, payload size, forbidden keys).
   - This helper never executes write actions; it only produces suggestion-stage artifacts.
@@ -1125,7 +1125,7 @@ Interactive dialogue governance helper (script-level communication-rule gate):
 - `node scripts/interactive-dialogue-governance.js (--goal <text> | --goal-file <path>) [--context <path>] [--policy <path>] [--profile <business-user|system-maintainer>] [--ui-mode <user-app|ops-console>] [--execution-mode <suggestion|apply>] [--runtime-environment <dev|staging|prod>] [--authorization-dialogue-policy <path>] [--out <path>] [--fail-on-deny] [--json]`: evaluate user request text against embedded-assistant communication policy, output `allow|clarify|deny`, and produce machine-readable authorization dialogue requirements (`authorization_dialogue`) for non-technical users.
   - Embedded assistant authorization dialogue baseline: `docs/interactive-customization/embedded-assistant-authorization-dialogue-rules.md`
   - Dual-surface integration guide: `docs/interactive-customization/dual-ui-mode-integration-guide.md`
-  - Default output: `.kiro/reports/interactive-dialogue-governance.json`
+  - Default output: `.sce/reports/interactive-dialogue-governance.json`
   - Default policy: `docs/interactive-customization/dialogue-governance-policy-baseline.json` (fallback builtin policy when missing)
   - Default authorization dialogue policy: `docs/interactive-customization/authorization-dialogue-policy-baseline.json`
   - Default profile: `business-user` (use `system-maintainer` for maintenance/operator conversations)
@@ -1134,75 +1134,75 @@ Interactive dialogue governance helper (script-level communication-rule gate):
 Interactive change-plan generator helper (script-level stage-B planning bridge):
 - `node scripts/interactive-plan-build.js --intent <path> [--context <path>] [--execution-mode <suggestion|apply>] [--out-plan <path>] [--out-markdown <path>] [--json]`: generate structured `Change_Plan` from `Change_Intent`, including action candidates, risk level, verification checks, rollback plan, approval status, and gate hint command.
   - Default outputs:
-    - `.kiro/reports/interactive-change-plan.generated.json`
-    - `.kiro/reports/interactive-change-plan.generated.md`
+    - `.sce/reports/interactive-change-plan.generated.json`
+    - `.sce/reports/interactive-change-plan.generated.md`
   - Generated plans can be evaluated directly by `interactive-change-plan-gate`.
 
 Interactive one-click loop helper (script-level orchestration entry):
 - `node scripts/interactive-customization-loop.js --context <path> (--goal <text> | --goal-file <path>) [--execution-mode <suggestion|apply>] [--runtime-mode <user-assist|ops-fix|feature-dev>] [--runtime-environment <dev|staging|prod>] [--runtime-policy <path>] [--authorization-tier-policy <path>] [--authorization-tier-out <path>] [--policy <path>] [--catalog <path>] [--dialogue-policy <path>] [--dialogue-profile <business-user|system-maintainer>] [--ui-mode <user-app|ops-console>] [--context-contract <path>] [--approval-role-policy <path>] [--approval-actor-role <name>] [--approver-actor-role <name>] [--no-strict-contract] [--auto-approve-low-risk] [--auto-execute-low-risk] [--auth-password-hash <sha256>] [--auth-password <text>] [--feedback-score <0..5>] [--feedback-comment <text>] [--feedback-tags <csv>] [--allow-suggestion-apply] [--work-order-out <path>] [--work-order-markdown-out <path>] [--fail-on-dialogue-deny] [--fail-on-gate-non-allow] [--fail-on-runtime-non-allow] [--json]`: run dialogue->intent->plan->gate->runtime->authorization-tier->approval pipeline in one command and optionally trigger low-risk one-click apply via Moqui adapter.
   - CLI equivalent: `sce scene interactive-loop --context <path> --goal "<goal>" --context-contract docs/interactive-customization/moqui-copilot-context-contract.json --execution-mode apply --auto-execute-low-risk --auth-password "<password>" --feedback-score 5 --json`
-  - Default loop artifact root: `.kiro/reports/interactive-loop/<session-id>/`
-  - Default summary output: `.kiro/reports/interactive-loop/<session-id>/interactive-customization-loop.summary.json`
+  - Default loop artifact root: `.sce/reports/interactive-loop/<session-id>/`
+  - Default summary output: `.sce/reports/interactive-loop/<session-id>/interactive-customization-loop.summary.json`
 - `--auto-execute-low-risk` executes `interactive-moqui-adapter --action low-risk-apply` only when `risk_level=low`, dialogue decision != `deny`, and gate decision=`allow`.
 - `--runtime-mode` and `--runtime-environment` default to `ops-fix@staging`; runtime decision must be `allow` before low-risk auto execute.
 - Authorization tier defaults:
   - `business-user` profile is suggestion-only (`apply` denied by default)
   - `system-maintainer` profile can apply, but environment step-up requirements still apply (password/role separation/manual review)
-- Default runtime report: `.kiro/reports/interactive-loop/<session-id>/interactive-runtime-policy.json`
-- Default authorization tier report: `.kiro/reports/interactive-loop/<session-id>/interactive-authorization-tier.json`
+- Default runtime report: `.sce/reports/interactive-loop/<session-id>/interactive-runtime-policy.json`
+- Default authorization tier report: `.sce/reports/interactive-loop/<session-id>/interactive-authorization-tier.json`
 - Default authorization tier signal stream:
-  - Session: `.kiro/reports/interactive-loop/<session-id>/interactive-authorization-tier-signals.jsonl`
-  - Global: `.kiro/reports/interactive-authorization-tier-signals.jsonl`
+  - Session: `.sce/reports/interactive-loop/<session-id>/interactive-authorization-tier-signals.jsonl`
+  - Global: `.sce/reports/interactive-authorization-tier-signals.jsonl`
 - Default dialogue-authorization signal stream:
-  - Session: `.kiro/reports/interactive-loop/<session-id>/interactive-dialogue-authorization-signals.jsonl`
-  - Global: `.kiro/reports/interactive-dialogue-authorization-signals.jsonl`
+  - Session: `.sce/reports/interactive-loop/<session-id>/interactive-dialogue-authorization-signals.jsonl`
+  - Global: `.sce/reports/interactive-dialogue-authorization-signals.jsonl`
 - Default work-order outputs:
-  - `.kiro/reports/interactive-loop/<session-id>/interactive-work-order.json`
-  - `.kiro/reports/interactive-loop/<session-id>/interactive-work-order.md`
+  - `.sce/reports/interactive-loop/<session-id>/interactive-work-order.json`
+  - `.sce/reports/interactive-loop/<session-id>/interactive-work-order.md`
 - Apply-mode mutating plans require password authorization by default (`plan.authorization.password_required=true`).
-- `--feedback-score` logs feedback to both session artifact and global governance file (`.kiro/reports/interactive-user-feedback.jsonl`).
+- `--feedback-score` logs feedback to both session artifact and global governance file (`.sce/reports/interactive-user-feedback.jsonl`).
 - npm alias: `npm run run:interactive-loop -- --context docs/interactive-customization/page-context.sample.json --goal "Improve order entry clarity" --json`
 
 Interactive runtime policy helper (script-level mode/environment gate):
 - `node scripts/interactive-runtime-policy-evaluate.js --plan <path> [--ui-mode <user-app|ops-console>] [--runtime-mode <user-assist|ops-fix|feature-dev>] [--runtime-environment <dev|staging|prod>] [--policy <path>] [--fail-on-non-allow] [--json]`: evaluate plan execution safety by runtime role, UI surface, and environment constraints.
   - Default policy: `docs/interactive-customization/runtime-mode-policy-baseline.json`
   - `policy.ui_modes` (when configured) enforces UI-surface contract, such as `user-app` suggestion-only and apply routed to `ops-console`.
-  - Default output: `.kiro/reports/interactive-runtime-policy.json`
+  - Default output: `.sce/reports/interactive-runtime-policy.json`
   - `--fail-on-non-allow` exits with code `2` on `deny` or `review-required`.
 
 Interactive authorization-tier helper (script-level profile/environment step-up gate):
 - `node scripts/interactive-authorization-tier-evaluate.js [--execution-mode <suggestion|apply>] [--dialogue-profile <business-user|system-maintainer>] [--runtime-mode <name>] [--runtime-environment <dev|staging|prod>] [--auto-execute-low-risk] [--live-apply] [--policy <path>] [--out <path>] [--fail-on-non-allow] [--json]`: evaluate whether execution intent is permitted under dialogue profile and runtime environment authorization tier.
   - Default policy: `docs/interactive-customization/authorization-tier-policy-baseline.json`
-  - Default output: `.kiro/reports/interactive-authorization-tier.json`
+  - Default output: `.sce/reports/interactive-authorization-tier.json`
   - `--fail-on-non-allow` exits with code `2` on `deny` or `review-required`.
 
 Interactive work-order helper (script-level usage/maintenance/dev closure):
 - `node scripts/interactive-work-order-build.js --plan <path> [--dialogue <path>] [--intent <path>] [--gate <path>] [--runtime <path>] [--authorization-tier <path>] [--approval-state <path>] [--execution-attempted] [--execution-result <value>] [--execution-id <id>] [--out <path>] [--markdown-out <path>] [--json]`: build auditable work-order record from dialogue/plan/gate/runtime/authorization-tier/approval/execution signals.
   - Default outputs:
-    - `.kiro/reports/interactive-work-order.json`
-    - `.kiro/reports/interactive-work-order.md`
+    - `.sce/reports/interactive-work-order.json`
+    - `.sce/reports/interactive-work-order.md`
 
 Interactive approval workflow helper (script-level stage-B approval state machine):
 - `node scripts/interactive-approval-workflow.js --action <init|submit|approve|reject|execute|verify|archive|status> [--plan <path>] [--state-file <path>] [--audit-file <path>] [--actor <id>] [--actor-role <name>] [--role-policy <path>] [--comment <text>] [--password <text>] [--password-hash <sha256>] [--password-hash-env <name>] [--password-required] [--password-scope <csv>] [--json]`: maintain approval lifecycle state for interactive change plans and append approval events to JSONL audit logs.
-  - Default state file: `.kiro/reports/interactive-approval-state.json`
-  - Default audit file: `.kiro/reports/interactive-approval-events.jsonl`
+  - Default state file: `.sce/reports/interactive-approval-state.json`
+  - Default audit file: `.sce/reports/interactive-approval-events.jsonl`
   - `init` requires `--plan`; high-risk plans are marked as `approval_required=true`.
   - Password authorization can be required per plan (`plan.authorization.password_required=true`) or overridden in `init`.
   - `execute` is blocked (exit code `2`) when approval is required but current status is not `approved`.
 
 Interactive Moqui adapter helper (script-level stage-C controlled execution contract):
 - `node scripts/interactive-moqui-adapter.js --action <capabilities|plan|validate|apply|low-risk-apply|rollback> [--intent <path>] [--context <path>] [--plan <path>] [--execution-id <id>] [--execution-mode <suggestion|apply>] [--policy <path>] [--catalog <path>] [--moqui-config <path>] [--live-apply] [--no-dry-run] [--allow-suggestion-apply] [--json]`: run unified Moqui adapter interface (`capabilities/plan/validate/apply/low-risk-apply/rollback`) for interactive customization stage-C.
-  - Default plan output (`--action plan`): `.kiro/reports/interactive-change-plan.adapter.json`
-  - Default command output: `.kiro/reports/interactive-moqui-adapter.json`
-  - Default execution record (for `apply`/`rollback`): `.kiro/reports/interactive-execution-record.latest.json`
-  - Default append-only execution ledger: `.kiro/reports/interactive-execution-ledger.jsonl`
+  - Default plan output (`--action plan`): `.sce/reports/interactive-change-plan.adapter.json`
+  - Default command output: `.sce/reports/interactive-moqui-adapter.json`
+  - Default execution record (for `apply`/`rollback`): `.sce/reports/interactive-execution-record.latest.json`
+  - Default append-only execution ledger: `.sce/reports/interactive-execution-ledger.jsonl`
   - `low-risk-apply` is one-click mode: only `risk_level=low` and gate decision `allow` can execute.
   - `apply` exits with code `2` when result is non-success (`failed` or `skipped`), ensuring CI-safe gating.
 - npm alias: `npm run report:interactive-adapter-capabilities`
 
 Interactive user feedback helper (script-level stage-D feedback ingestion):
 - `node scripts/interactive-feedback-log.js --score <0..5> [--comment <text>] [--user-id <id>] [--session-id <id>] [--intent-id <id>] [--plan-id <id>] [--execution-id <id>] [--channel <ui|cli|api|other>] [--tags <csv>] [--product <name>] [--module <name>] [--page <name>] [--scene-id <name>] [--feedback-file <path>] [--json]`: append structured business-user feedback records into the interactive feedback JSONL stream for governance metrics.
-  - Default feedback file: `.kiro/reports/interactive-user-feedback.jsonl`
+  - Default feedback file: `.sce/reports/interactive-user-feedback.jsonl`
   - Score range: `0..5`
 - npm alias: `npm run log:interactive-feedback -- --score 5 --comment "clear and safe"`
 
@@ -1210,14 +1210,14 @@ Interactive governance report helper (script-level stage-D/6 observability + ale
 - `node scripts/interactive-governance-report.js [--intent-audit <path>] [--approval-audit <path>] [--execution-ledger <path>] [--feedback-file <path>] [--matrix-signals <path>] [--dialogue-authorization-signals <path>] [--runtime-signals <path>] [--authorization-tier-signals <path>] [--thresholds <path>] [--period <weekly|monthly|all|custom>] [--from <iso>] [--to <iso>] [--out <path>] [--markdown-out <path>] [--fail-on-alert] [--json]`: compute interactive governance KPIs (adoption/success/rollback/security-intercept/satisfaction + matrix pass/regression/stage-error + dialogue/runtime/authorization-tier pressure), evaluate threshold breaches, and emit machine/human-readable governance report.
   - Default thresholds: `docs/interactive-customization/governance-threshold-baseline.json`
   - Default minimum intent sample threshold: `min_intent_samples=5` (below this becomes warning, not breach)
-  - Default feedback input: `.kiro/reports/interactive-user-feedback.jsonl`
-  - Default matrix input: `.kiro/reports/interactive-matrix-signals.jsonl`
-  - Default dialogue authorization signal input: `.kiro/reports/interactive-dialogue-authorization-signals.jsonl`
-  - Default runtime policy signal input: `.kiro/reports/interactive-runtime-signals.jsonl`
-  - Default authorization tier signal input: `.kiro/reports/interactive-authorization-tier-signals.jsonl`
+  - Default feedback input: `.sce/reports/interactive-user-feedback.jsonl`
+  - Default matrix input: `.sce/reports/interactive-matrix-signals.jsonl`
+  - Default dialogue authorization signal input: `.sce/reports/interactive-dialogue-authorization-signals.jsonl`
+  - Default runtime policy signal input: `.sce/reports/interactive-runtime-signals.jsonl`
+  - Default authorization tier signal input: `.sce/reports/interactive-authorization-tier-signals.jsonl`
   - Default outputs:
-    - `.kiro/reports/interactive-governance-report.json`
-    - `.kiro/reports/interactive-governance-report.md`
+    - `.sce/reports/interactive-governance-report.json`
+    - `.sce/reports/interactive-governance-report.md`
   - `--fail-on-alert` exits with code `2` when medium/high breaches exist.
 - npm alias: `npm run report:interactive-governance`
 
@@ -1234,11 +1234,11 @@ Moqui rebuild gate helper (CI/pre-release readiness gate):
 - npm alias: `npm run gate:moqui-rebuild`
 
 Moqui metadata extractor helper (script-level catalog bootstrap):
-- `node scripts/moqui-metadata-extract.js [--project-dir <path>] [--out <path>] [--markdown-out <path>] [--json]`: build a normalized metadata catalog from multiple sources for rebuild automation. Default sources include Moqui XML resources (`entity/service/screen/form/rule/decision`), scene package contracts (`.kiro/specs/**/docs/scene-package.json`), handoff manifest/capability matrix, and handoff evidence JSON.
+- `node scripts/moqui-metadata-extract.js [--project-dir <path>] [--out <path>] [--markdown-out <path>] [--json]`: build a normalized metadata catalog from multiple sources for rebuild automation. Default sources include Moqui XML resources (`entity/service/screen/form/rule/decision`), scene package contracts (`.sce/specs/**/docs/scene-package.json`), handoff manifest/capability matrix, and handoff evidence JSON.
   - Recommended first step before `moqui-standard-rebuild`.
   - Keep extraction source read-only and run rebuild generation against SCE output directories.
 
-Recommended `.kiro/config/orchestrator.json`:
+Recommended `.sce/config/orchestrator.json`:
 
 ```json
 {
@@ -1309,7 +1309,7 @@ sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json -
 sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --ontology-min-score 70 --json
 
 # Persist ontology/publish batch report for governance tracking
-sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-report-out .kiro/reports/scene-package-ontology-batch.json --json
+sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-report-out .sce/reports/scene-package-ontology-batch.json --json
 
 # Enforce batch-level ontology portfolio gate (average score + valid-rate)
 sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-min-average-score 60 --ontology-min-valid-rate 90 --json
@@ -1318,10 +1318,10 @@ sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json -
 sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --no-require-ontology-validation --json
 
 # Export ontology remediation task draft markdown
-sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-task-out .kiro/reports/scene-package-ontology-task-draft.md --json
+sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-task-out .sce/reports/scene-package-ontology-task-draft.md --json
 
 # Export ontology remediation queue lines (directly consumable by close-loop-batch)
-sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-task-queue-out .kiro/auto/ontology-remediation.lines --json
+sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-task-queue-out .sce/auto/ontology-remediation.lines --json
 ```
 
 ### Scene Package Ontology Backfill Batch
@@ -1337,7 +1337,7 @@ sce scene package-ontology-backfill-batch --from-331 --dry-run --json
 sce scene package-ontology-backfill-batch --from-331 --include 62-00-moqui-full-capability-closure-program,62-01-moqui-capability-itemized-parity-matrix --dry-run --json
 
 # Export detailed backfill report for governance review
-sce scene package-ontology-backfill-batch --from-331 --dry-run --out-report .kiro/reports/scene-package-ontology-backfill-report.json --json
+sce scene package-ontology-backfill-batch --from-331 --dry-run --out-report .sce/reports/scene-package-ontology-backfill-report.json --json
 ```
 
 ### Moqui Template Baseline Scorecard
@@ -1360,13 +1360,13 @@ sce scene moqui-baseline --include-all --json
 sce scene moqui-baseline \
   --min-score 75 \
   --min-valid-rate 100 \
-  --out .kiro/reports/moqui-template-baseline.json \
-  --markdown-out .kiro/reports/moqui-template-baseline.md \
+  --out .sce/reports/moqui-template-baseline.json \
+  --markdown-out .sce/reports/moqui-template-baseline.md \
   --json
 
 # Compare with a previous baseline and fail CI on portfolio gate fail
 sce scene moqui-baseline \
-  --compare-with .kiro/reports/release-evidence/moqui-template-baseline-prev.json \
+  --compare-with .sce/reports/release-evidence/moqui-template-baseline-prev.json \
   --fail-on-portfolio-fail \
   --json
 ```
@@ -1633,11 +1633,11 @@ sce repo init [options]
 
 **Behavior:**
 - Scans project directory recursively for Git repositories
-- Excludes `.kiro` directory from scanning
+- Excludes `.sce` directory from scanning
 - Extracts remote URL from `origin` remote (or first available remote)
 - Detects current branch for each repository
 - Prompts for confirmation if configuration already exists (unless `--force`)
-- Creates `.kiro/project-repos.json` configuration file
+- Creates `.sce/project-repos.json` configuration file
 
 **Example:**
 ```bash
@@ -1659,7 +1659,7 @@ Found 3 repositories:
   ✓ backend (develop) - https://github.com/user/backend.git
   ✓ shared (main) - https://github.com/user/shared.git
 
-Configuration saved to .kiro/project-repos.json
+Configuration saved to .sce/project-repos.json
 ```
 
 ---

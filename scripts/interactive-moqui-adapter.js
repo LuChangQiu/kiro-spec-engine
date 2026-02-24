@@ -7,8 +7,8 @@ const {
   MoquiInteractiveAdapter
 } = require('../lib/interactive-customization/moqui-interactive-adapter');
 
-const DEFAULT_OUT_PLAN = '.kiro/reports/interactive-change-plan.adapter.json';
-const DEFAULT_OUTPUT = '.kiro/reports/interactive-moqui-adapter.json';
+const DEFAULT_OUT_PLAN = '.sce/reports/interactive-change-plan.adapter.json';
+const DEFAULT_OUTPUT = '.sce/reports/interactive-moqui-adapter.json';
 
 function parseArgs(argv) {
   const options = {

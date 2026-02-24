@@ -32,19 +32,19 @@ describe('Tool Detector', () => {
   });
   
   describe('detectKiroIDE', () => {
-    it('should detect AI IDE by .kiro directory', async () => {
-      await fs.ensureDir(path.join(testDir, '.kiro'));
+    it('should detect AI IDE by .sce directory', async () => {
+      await fs.ensureDir(path.join(testDir, '.sce'));
       
       const result = await detectKiroIDE(testDir);
       
       expect(result.detected).toBe(true);
       expect(result.confidence).toBe('medium');
-      expect(result.indicators).toContain('.kiro directory exists');
+      expect(result.indicators).toContain('.sce directory exists');
     });
     
     it('should have high confidence with multiple indicators', async () => {
-      await fs.ensureDir(path.join(testDir, '.kiro/steering'));
-      await fs.ensureDir(path.join(testDir, '.kiro/specs'));
+      await fs.ensureDir(path.join(testDir, '.sce/steering'));
+      await fs.ensureDir(path.join(testDir, '.sce/specs'));
       
       const result = await detectKiroIDE(testDir);
       
@@ -126,7 +126,7 @@ describe('Tool Detector', () => {
   
   describe('detectTool', () => {
     it('should detect SCE as primary tool', async () => {
-      await fs.ensureDir(path.join(testDir, '.kiro/steering'));
+      await fs.ensureDir(path.join(testDir, '.sce/steering'));
       
       const result = await detectTool(testDir);
       
@@ -153,7 +153,7 @@ describe('Tool Detector', () => {
     });
     
     it('should prioritize SCE over VS Code', async () => {
-      await fs.ensureDir(path.join(testDir, '.kiro'));
+      await fs.ensureDir(path.join(testDir, '.sce'));
       await fs.ensureDir(path.join(testDir, '.vscode'));
       
       const result = await detectTool(testDir);
@@ -245,7 +245,7 @@ describe('Tool Detector', () => {
       expect(config.tool).toBe('vscode');
       expect(config.suggestedPresets).toContain('auto-sync');
       expect(config.suggestedCommands.some(c => c.includes('sce watch init'))).toBe(true);
-      expect(config.configPath).toContain('.kiro');
+      expect(config.configPath).toContain('.sce');
       expect(config.configPath).toContain('watch-config.json');
     });
 

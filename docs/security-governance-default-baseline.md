@@ -33,17 +33,17 @@ This baseline is the default operating policy for SCE-driven delivery, including
 
 ## 4. Mandatory Audit Artifacts
 
-- `.kiro/reports/release-evidence/handoff-runs.json`
-- `.kiro/reports/release-evidence/release-gate-history.json`
-- `.kiro/reports/release-evidence/governance-snapshot-<tag>.json`
-- `.kiro/reports/release-evidence/weekly-ops-summary-<tag>.json`
-- `.kiro/reports/interactive-governance-report.json`
-- `.kiro/reports/interactive-dialogue-authorization-signals.jsonl`
-- `.kiro/reports/interactive-runtime-signals.jsonl`
-- `.kiro/reports/interactive-authorization-tier-signals.jsonl`
-- `.kiro/reports/interactive-dialogue-governance.json`
-- `.kiro/reports/interactive-execution-ledger.jsonl`
-- `.kiro/reports/interactive-approval-events.jsonl`
+- `.sce/reports/release-evidence/handoff-runs.json`
+- `.sce/reports/release-evidence/release-gate-history.json`
+- `.sce/reports/release-evidence/governance-snapshot-<tag>.json`
+- `.sce/reports/release-evidence/weekly-ops-summary-<tag>.json`
+- `.sce/reports/interactive-governance-report.json`
+- `.sce/reports/interactive-dialogue-authorization-signals.jsonl`
+- `.sce/reports/interactive-runtime-signals.jsonl`
+- `.sce/reports/interactive-authorization-tier-signals.jsonl`
+- `.sce/reports/interactive-dialogue-governance.json`
+- `.sce/reports/interactive-execution-ledger.jsonl`
+- `.sce/reports/interactive-approval-events.jsonl`
 
 ## 5. Weekly Control Loop
 
@@ -51,7 +51,7 @@ This baseline is the default operating policy for SCE-driven delivery, including
 node scripts/interactive-governance-report.js --period weekly --fail-on-alert --json
 node scripts/release-ops-weekly-summary.js --json
 node scripts/release-weekly-ops-gate.js
-node scripts/release-risk-remediation-bundle.js --gate-report .kiro/reports/release-evidence/release-gate.json --json
+node scripts/release-risk-remediation-bundle.js --gate-report .sce/reports/release-evidence/release-gate.json --json
 node scripts/release-asset-integrity-check.js
 ```
 

@@ -30,7 +30,7 @@ describe('interactive-feedback-log script', () => {
   test('appends one feedback entry to JSONL and returns payload', async () => {
     const workspace = path.join(tempDir, 'workspace-success');
     await fs.ensureDir(workspace);
-    const feedbackFile = path.join(workspace, '.kiro', 'reports', 'interactive-user-feedback.jsonl');
+    const feedbackFile = path.join(workspace, '.sce', 'reports', 'interactive-user-feedback.jsonl');
 
     const result = runScript(workspace, [
       '--score', '4.5',

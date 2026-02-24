@@ -44,7 +44,7 @@ node scripts/release-ops-weekly-summary.js --json
 
 ## Default Evidence Set
 
-- `.kiro/reports/release-evidence/handoff-runs.json`
-- `.kiro/reports/release-evidence/release-gate-history.json`
-- `.kiro/reports/release-evidence/governance-snapshot-<tag>.json`
-- `.kiro/reports/release-evidence/weekly-ops-summary-<tag>.json`
+- `.sce/reports/release-evidence/handoff-runs.json`
+- `.sce/reports/release-evidence/release-gate-history.json`
+- `.sce/reports/release-evidence/governance-snapshot-<tag>.json`
+- `.sce/reports/release-evidence/weekly-ops-summary-<tag>.json`

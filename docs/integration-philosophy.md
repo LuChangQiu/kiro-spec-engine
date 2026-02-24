@@ -45,7 +45,7 @@
 
 AI：好的，让我先查看项目的 Spec
     [自动执行] sce context export 01-00-user-login
-    [读取文件] .kiro/specs/01-00-user-login/context-export.md
+    [读取文件] .sce/specs/01-00-user-login/context-export.md
     
     我看到设计文档中定义了 AuthController...
     [生成代码]
@@ -90,7 +90,7 @@ AI：好的，让我先查看项目的 Spec
 sce context export 01-00-user-login
 
 # 2. 复制内容
-cat .kiro/specs/01-00-user-login/context-export.md | pbcopy
+cat .sce/specs/01-00-user-login/context-export.md | pbcopy
 
 # 3. 粘贴到 Claude/ChatGPT
 
@@ -142,9 +142,9 @@ sce watch start
 ```json
 {
   "patterns": [
-    ".kiro/specs/**/requirements.md",
-    ".kiro/specs/**/design.md",
-    ".kiro/specs/**/tasks.md"
+    ".sce/specs/**/requirements.md",
+    ".sce/specs/**/design.md",
+    ".sce/specs/**/tasks.md"
   ],
   "actions": [
     {
@@ -202,7 +202,7 @@ sce watch start
 
 ```bash
 # ~/.bashrc 或 ~/.zshrc
-alias sce-clip='sce context export $1 && cat .kiro/specs/$1/context-export.md | pbcopy && echo "✅ 已复制到剪贴板"'
+alias sce-clip='sce context export $1 && cat .sce/specs/$1/context-export.md | pbcopy && echo "✅ 已复制到剪贴板"'
 
 # 使用
 sce-clip 01-00-user-login
@@ -219,13 +219,13 @@ sce-clip 01-00-user-login
 
 项目使用 sce 管理 Spec。实现功能前：
 
-1. 查看 `.kiro/specs/<spec-name>/design.md`
+1. 查看 `.sce/specs/<spec-name>/design.md`
 2. 按照设计实现
-3. 更新 `.kiro/specs/<spec-name>/tasks.md`
+3. 更新 `.sce/specs/<spec-name>/tasks.md`
 
 示例：
-- 设计文档：`.kiro/specs/01-00-user-login/design.md`
-- 任务列表：`.kiro/specs/01-00-user-login/tasks.md`
+- 设计文档：`.sce/specs/01-00-user-login/design.md`
+- 任务列表：`.sce/specs/01-00-user-login/tasks.md`
 ```
 
 ---
@@ -274,7 +274,7 @@ sce serve
 - 做成插件会限制在特定工具
 - CLI 工具更灵活，可以被任何工具调用
 
-### Q: 能否让 AI 工具自动读取 .kiro/ 目录？
+### Q: 能否让 AI 工具自动读取 .sce/ 目录？
 
 **A**: 
 - 部分工具支持（Cursor、Copilot）

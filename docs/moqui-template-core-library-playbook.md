@@ -46,7 +46,7 @@ Default onboarding and safety baselines:
 
 ## Template Capability Matrix Contract
 
-Use the baseline report as the canonical matrix contract (`.kiro/reports/moqui-template-baseline.json`):
+Use the baseline report as the canonical matrix contract (`.sce/reports/moqui-template-baseline.json`):
 
 | Matrix Dimension | Meaning | Default Gate Target |
 | --- | --- | --- |
@@ -88,7 +88,7 @@ sce scene moqui-baseline --json
 
 # 0.1) CI/release mode: compare against previous baseline and enforce portfolio gate
 sce scene moqui-baseline \
-  --compare-with .kiro/reports/release-evidence/moqui-template-baseline-prev.json \
+  --compare-with .sce/reports/release-evidence/moqui-template-baseline-prev.json \
   --fail-on-portfolio-fail \
   --json
 
@@ -96,14 +96,14 @@ sce scene moqui-baseline \
 sce auto handoff capability-matrix \
   --manifest docs/handoffs/handoff-manifest.json \
   --format markdown \
-  --out .kiro/reports/handoff-capability-matrix.md \
+  --out .sce/reports/handoff-capability-matrix.md \
   --fail-on-gap \
   --json
 
 # 0.3) Capability lexicon audit (expected/provided canonical alignment)
 node scripts/moqui-lexicon-audit.js \
   --manifest docs/handoffs/handoff-manifest.json \
-  --template-dir .kiro/templates/scene-packages \
+  --template-dir .sce/templates/scene-packages \
   --fail-on-gap \
   --json
 
@@ -133,36 +133,36 @@ sce scene package-publish-batch \
 sce scene package-publish-batch \
   --manifest docs/handoffs/handoff-manifest.json \
   --dry-run \
-  --ontology-report-out .kiro/reports/scene-package-ontology-batch.json \
+  --ontology-report-out .sce/reports/scene-package-ontology-batch.json \
   --json
 
 # 4) Validate registry + package gate
-sce scene package-registry --template-dir .kiro/templates/scene-packages --strict --json
-sce scene package-gate-template --out .kiro/templates/scene-package-gate-policy.json --profile three-layer --force --json
-sce scene package-gate --registry .kiro/templates/scene-packages/registry.json --policy .kiro/templates/scene-package-gate-policy.json --strict --json
+sce scene package-registry --template-dir .sce/templates/scene-packages --strict --json
+sce scene package-gate-template --out .sce/templates/scene-package-gate-policy.json --profile three-layer --force --json
+sce scene package-gate --registry .sce/templates/scene-packages/registry.json --policy .sce/templates/scene-package-gate-policy.json --strict --json
 ```
 
 ## Evidence Contract
 
 Required artifacts for each intake batch:
 
-- `.kiro/reports/moqui-template-baseline.json`
-- `.kiro/reports/moqui-template-baseline.md`
-- `.kiro/reports/release-evidence/moqui-template-baseline.json`
-- `.kiro/reports/release-evidence/moqui-template-baseline.md`
-- `.kiro/reports/release-evidence/moqui-capability-coverage.json`
-- `.kiro/reports/release-evidence/moqui-capability-coverage.md`
-- `.kiro/reports/release-evidence/moqui-lexicon-audit.json`
-- `.kiro/reports/release-evidence/moqui-lexicon-audit.md`
-- `.kiro/reports/release-evidence/moqui-release-summary.json`
-- `.kiro/reports/release-evidence/moqui-release-summary.md`
-- `.kiro/reports/release-evidence/weekly-ops-summary.json`
-- `.kiro/reports/release-evidence/weekly-ops-summary.md`
-- `.kiro/reports/handoff-capability-matrix.md` (or JSON equivalent from `sce auto handoff capability-matrix`)
-- `.kiro/reports/handoff-runs/<session>.json`
-- `.kiro/reports/scene-package-ontology-batch.json`
-- `.kiro/auto/moqui-remediation.lines` (when baseline/coverage gaps exist)
-- `.kiro/templates/scene-packages/registry.json`
+- `.sce/reports/moqui-template-baseline.json`
+- `.sce/reports/moqui-template-baseline.md`
+- `.sce/reports/release-evidence/moqui-template-baseline.json`
+- `.sce/reports/release-evidence/moqui-template-baseline.md`
+- `.sce/reports/release-evidence/moqui-capability-coverage.json`
+- `.sce/reports/release-evidence/moqui-capability-coverage.md`
+- `.sce/reports/release-evidence/moqui-lexicon-audit.json`
+- `.sce/reports/release-evidence/moqui-lexicon-audit.md`
+- `.sce/reports/release-evidence/moqui-release-summary.json`
+- `.sce/reports/release-evidence/moqui-release-summary.md`
+- `.sce/reports/release-evidence/weekly-ops-summary.json`
+- `.sce/reports/release-evidence/weekly-ops-summary.md`
+- `.sce/reports/handoff-capability-matrix.md` (or JSON equivalent from `sce auto handoff capability-matrix`)
+- `.sce/reports/handoff-runs/<session>.json`
+- `.sce/reports/scene-package-ontology-batch.json`
+- `.sce/auto/moqui-remediation.lines` (when baseline/coverage gaps exist)
+- `.sce/templates/scene-packages/registry.json`
 - gate output/evidence linked from release notes or handoff summary
 
 `moqui-template-baseline.json` summary should be consumed as a matrix gate:
@@ -191,10 +191,10 @@ If any area is weak, export remediation queue lines and feed back to close-loop:
 sce scene package-publish-batch \
   --manifest docs/handoffs/handoff-manifest.json \
   --dry-run \
-  --ontology-task-queue-out .kiro/auto/ontology-remediation.lines \
+  --ontology-task-queue-out .sce/auto/ontology-remediation.lines \
   --json
 
-sce auto close-loop-batch .kiro/auto/ontology-remediation.lines --format lines --json
+sce auto close-loop-batch .sce/auto/ontology-remediation.lines --format lines --json
 ```
 
 ## Interactive Customization Template Baseline

@@ -6,7 +6,7 @@ const fs = require('fs-extra');
 
 const DEFAULT_POLICY = 'docs/interactive-customization/dialogue-governance-policy-baseline.json';
 const DEFAULT_AUTHORIZATION_DIALOGUE_POLICY = 'docs/interactive-customization/authorization-dialogue-policy-baseline.json';
-const DEFAULT_OUT = '.kiro/reports/interactive-dialogue-governance.json';
+const DEFAULT_OUT = '.sce/reports/interactive-dialogue-governance.json';
 const DEFAULT_PROFILE = 'business-user';
 const DIALOGUE_PROFILES = new Set(['business-user', 'system-maintainer']);
 const EXECUTION_MODES = new Set(['suggestion', 'apply']);

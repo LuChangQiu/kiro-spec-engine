@@ -12,7 +12,7 @@ describe('goal-decomposer', () => {
 
   beforeEach(async () => {
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-goal-decomposer-'));
-    await fs.ensureDir(path.join(tempDir, '.kiro', 'specs', '115-00-existing-program'));
+    await fs.ensureDir(path.join(tempDir, '.sce', 'specs', '115-00-existing-program'));
   });
 
   afterEach(async () => {

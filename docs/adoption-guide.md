@@ -65,10 +65,10 @@ Adoption Plan:
 📦 Creating backup... ✅ backup-20260128-143022
 ✓ Validating backup... ✅ 5 files verified
 📝 Updating files...
-  ✅ .kiro/steering/CORE_PRINCIPLES.md
-  ✅ .kiro/steering/ENVIRONMENT.md
-  ✅ .kiro/tools/ultrawork_enhancer.py
-  ⏭️  .kiro/specs/ (preserved)
+  ✅ .sce/steering/CORE_PRINCIPLES.md
+  ✅ .sce/steering/ENVIRONMENT.md
+  ✅ .sce/tools/ultrawork_enhancer.py
+  ⏭️  .sce/specs/ (preserved)
 ✅ Adoption completed successfully!
 
 📊 Summary:
@@ -94,7 +94,7 @@ sce adopt --dry-run
 ### Automatic Detection
 
 The system automatically detects your project state:
-- Checks for existing `.kiro/` directory
+- Checks for existing `.sce/` directory
 - Reads version information
 - Identifies user content (specs, custom files)
 - Detects potential conflicts
@@ -105,11 +105,11 @@ Based on detection, it chooses the optimal mode:
 
 | Project State | Selected Mode | What Happens |
 |--------------|---------------|--------------|
-| No `.kiro/` | **Fresh** | Creates complete structure |
-| `.kiro/` + same version | **Skip** | Already up-to-date |
-| `.kiro/` + older version | **Smart Update** | Updates templates only |
-| `.kiro/` + newer version | **Warning** | Version mismatch alert |
-| `.kiro/` + no version | **Smart Adopt** | Full adoption with backup |
+| No `.sce/` | **Fresh** | Creates complete structure |
+| `.sce/` + same version | **Skip** | Already up-to-date |
+| `.sce/` + older version | **Smart Update** | Updates templates only |
+| `.sce/` + newer version | **Warning** | Version mismatch alert |
+| `.sce/` + no version | **Smart Adopt** | Full adoption with backup |
 
 ### Automatic Conflict Resolution
 
@@ -136,10 +136,10 @@ Before any modifications:
 
 ### 1. Fresh Adoption
 
-**When**: No `.kiro/` directory exists
+**When**: No `.sce/` directory exists
 
 **Actions**:
-- Creates complete `.kiro/` structure
+- Creates complete `.sce/` structure
 - Copies all template files
 - Creates `version.json`
 - No conflicts, no backup needed
@@ -150,7 +150,7 @@ $ sce adopt
 
 Mode: Fresh
 Actions:
-  - Create .kiro/ directory structure
+  - Create .sce/ directory structure
   - Copy template files
   - Create version.json
 
@@ -180,7 +180,7 @@ No changes needed.
 
 ### 3. Smart Update
 
-**When**: Existing `.kiro/` with older version
+**When**: Existing `.sce/` with older version
 
 **Actions**:
 - Backs up files that will change
@@ -202,10 +202,10 @@ Preserved: 3 specs, CURRENT_CONTEXT.md
 
 ### 4. Smart Adopt
 
-**When**: `.kiro/` exists but no version info
+**When**: `.sce/` exists but no version info
 
 **Actions**:
-- Backs up entire `.kiro/` directory
+- Backs up entire `.sce/` directory
 - Adopts with full structure
 - Preserves user content
 - Creates version.json
@@ -392,13 +392,13 @@ Problem: Unable to create backup of existing files
 
 Possible causes:
   - Insufficient disk space
-  - Permission denied for .kiro/backups/
+  - Permission denied for .sce/backups/
   - File system error
 ```
 
 **Solutions**:
 1. Free up disk space (need ~50MB)
-2. Check file permissions: `ls -la .kiro/`
+2. Check file permissions: `ls -la .sce/`
 3. Try running with elevated permissions (if appropriate)
 
 ---
@@ -409,18 +409,18 @@ Possible causes:
 ```
 ❌ Error: Permission Denied
 
-Problem: Cannot write to .kiro/ directory
+Problem: Cannot write to .sce/ directory
 ```
 
 **Solutions**:
 ```bash
 # Check permissions
-ls -la .kiro/
+ls -la .sce/
 
 # Fix permissions (Unix/Mac)
-chmod -R u+w .kiro/
+chmod -R u+w .sce/
 
-# Windows: Right-click .kiro/ → Properties → Security → Edit
+# Windows: Right-click .sce/ → Properties → Security → Edit
 ```
 
 ---
@@ -535,8 +535,8 @@ sce version-info
 
 Don't delete automatic backups immediately:
 ```bash
-# Backups are in .kiro/backups/
-ls .kiro/backups/
+# Backups are in .sce/backups/
+ls .sce/backups/
 ```
 
 ### 5. Use Verbose for Debugging
@@ -554,7 +554,7 @@ After adoption, your project will have:
 
 ```
 your-project/
-├── .kiro/                          # sce core directory
+├── .sce/                          # sce core directory
 │   ├── version.json                # Version tracking
 │   ├── specs/                      # Spec storage
 │   ├── steering/                   # AI behavior rules
@@ -594,18 +594,18 @@ After successful adoption:
    ```
 
 4. **Read the spec workflow guide**:
-   - See `.kiro/specs/SPEC_WORKFLOW_GUIDE.md`
+   - See `.sce/specs/SPEC_WORKFLOW_GUIDE.md`
 
 5. **Explore Ultrawork**:
    ```bash
-   sce enhance requirements .kiro/specs/01-00-my-feature/requirements.md
+   sce enhance requirements .sce/specs/01-00-my-feature/requirements.md
    ```
 
 ---
 
 ## Getting Help
 
-- **Documentation**: Check README.md in your `.kiro/` directory
+- **Documentation**: Check README.md in your `.sce/` directory
 - **System Check**: `sce doctor`
 - **Version Info**: `sce version-info`
 - **Issues**: https://github.com/heguangyong/scene-capability-engine/issues

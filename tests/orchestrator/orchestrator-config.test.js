@@ -2,7 +2,7 @@
  * OrchestratorConfig Unit Tests
  *
  * Validates: Requirements 7.1-7.5
- * - 7.1: Read config from .kiro/config/orchestrator.json
+ * - 7.1: Read config from .sce/config/orchestrator.json
  * - 7.2: Default values when config file missing
  * - 7.3: Supported config fields
  * - 7.4: Invalid JSON fallback to defaults
@@ -87,8 +87,8 @@ describe('OrchestratorConfig', () => {
       expect(a).toEqual(b);
     });
 
-    test('reads config from .kiro/config/orchestrator.json (Req 7.1)', async () => {
-      const configDir = path.join(tempDir, '.kiro', 'config');
+    test('reads config from .sce/config/orchestrator.json (Req 7.1)', async () => {
+      const configDir = path.join(tempDir, '.sce', 'config');
       fs.mkdirSync(configDir, { recursive: true });
       fs.writeJsonSync(path.join(configDir, 'orchestrator.json'), {
         maxParallel: 5,
@@ -115,7 +115,7 @@ describe('OrchestratorConfig', () => {
     });
 
     test('reads all supported config fields (Req 7.3)', async () => {
-      const configDir = path.join(tempDir, '.kiro', 'config');
+      const configDir = path.join(tempDir, '.sce', 'config');
       fs.mkdirSync(configDir, { recursive: true });
       const customConfig = {
         agentBackend: 'claude',
@@ -142,7 +142,7 @@ describe('OrchestratorConfig', () => {
     });
 
     test('falls back to defaults on invalid JSON (Req 7.4)', async () => {
-      const configDir = path.join(tempDir, '.kiro', 'config');
+      const configDir = path.join(tempDir, '.sce', 'config');
       fs.mkdirSync(configDir, { recursive: true });
       fs.writeFileSync(path.join(configDir, 'orchestrator.json'), '{invalid json!!!');
 
@@ -156,7 +156,7 @@ describe('OrchestratorConfig', () => {
     });
 
     test('ignores unknown fields (Req 7.5)', async () => {
-      const configDir = path.join(tempDir, '.kiro', 'config');
+      const configDir = path.join(tempDir, '.sce', 'config');
       fs.mkdirSync(configDir, { recursive: true });
       fs.writeJsonSync(path.join(configDir, 'orchestrator.json'), {
         maxParallel: 4,
@@ -177,7 +177,7 @@ describe('OrchestratorConfig', () => {
     });
 
     test('handles empty JSON object', async () => {
-      const configDir = path.join(tempDir, '.kiro', 'config');
+      const configDir = path.join(tempDir, '.sce', 'config');
       fs.mkdirSync(configDir, { recursive: true });
       fs.writeJsonSync(path.join(configDir, 'orchestrator.json'), {});
 
@@ -202,7 +202,7 @@ describe('OrchestratorConfig', () => {
 
     test('merges updates with existing config', async () => {
       // Write initial config
-      const configDir = path.join(tempDir, '.kiro', 'config');
+      const configDir = path.join(tempDir, '.sce', 'config');
       fs.mkdirSync(configDir, { recursive: true });
       fs.writeJsonSync(path.join(configDir, 'orchestrator.json'), {
         maxParallel: 5,
@@ -216,7 +216,7 @@ describe('OrchestratorConfig', () => {
     });
 
     test('overwrites existing fields', async () => {
-      const configDir = path.join(tempDir, '.kiro', 'config');
+      const configDir = path.join(tempDir, '.sce', 'config');
       fs.mkdirSync(configDir, { recursive: true });
       fs.writeJsonSync(path.join(configDir, 'orchestrator.json'), {
         maxParallel: 5,
@@ -252,7 +252,7 @@ describe('OrchestratorConfig', () => {
     });
 
     test('returns null when bootstrapTemplate is null in config', async () => {
-      const configDir = path.join(tempDir, '.kiro', 'config');
+      const configDir = path.join(tempDir, '.sce', 'config');
       fs.mkdirSync(configDir, { recursive: true });
       fs.writeJsonSync(path.join(configDir, 'orchestrator.json'), {
         bootstrapTemplate: null,
@@ -263,7 +263,7 @@ describe('OrchestratorConfig', () => {
     });
 
     test('reads template file content when configured', async () => {
-      const configDir = path.join(tempDir, '.kiro', 'config');
+      const configDir = path.join(tempDir, '.sce', 'config');
       fs.mkdirSync(configDir, { recursive: true });
       const templateContent = 'Execute Spec {{specName}} with full context.';
       fs.writeFileSync(path.join(tempDir, 'my-template.md'), templateContent);
@@ -276,7 +276,7 @@ describe('OrchestratorConfig', () => {
     });
 
     test('returns null and warns when template file does not exist', async () => {
-      const configDir = path.join(tempDir, '.kiro', 'config');
+      const configDir = path.join(tempDir, '.sce', 'config');
       fs.mkdirSync(configDir, { recursive: true });
       fs.writeJsonSync(path.join(configDir, 'orchestrator.json'), {
         bootstrapTemplate: 'nonexistent-template.md',
@@ -294,7 +294,7 @@ describe('OrchestratorConfig', () => {
 
   describe('configPath', () => {
     test('returns the expected path', () => {
-      const expected = path.join(tempDir, '.kiro', 'config', 'orchestrator.json');
+      const expected = path.join(tempDir, '.sce', 'config', 'orchestrator.json');
       expect(config.configPath).toBe(expected);
     });
   });

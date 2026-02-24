@@ -86,9 +86,9 @@ describe('Status Command - Document Compliance Integration', () => {
   
   describe('Document Compliance Display', () => {
     test('should display compliant status when no violations found', async () => {
-      // Setup: Project with .kiro directory
+      // Setup: Project with .sce directory
       fs.pathExists.mockImplementation(async (p) => {
-        if (p.includes('.kiro')) return true;
+        if (p.includes('.sce')) return true;
         if (p.includes('specs')) return true;
         return false;
       });
@@ -115,9 +115,9 @@ describe('Status Command - Document Compliance Integration', () => {
     });
     
     test('should display violation count when violations found', async () => {
-      // Setup: Project with .kiro directory
+      // Setup: Project with .sce directory
       fs.pathExists.mockImplementation(async (p) => {
-        if (p.includes('.kiro')) return true;
+        if (p.includes('.sce')) return true;
         if (p.includes('specs')) return true;
         return false;
       });
@@ -138,7 +138,7 @@ describe('Status Command - Document Compliance Integration', () => {
             },
             {
               type: 'misplaced_artifact',
-              path: '/test/project/.kiro/specs/test-spec/report.md',
+              path: '/test/project/.sce/specs/test-spec/report.md',
               description: 'Artifact not in subdirectory',
               severity: 'warning',
               recommendation: 'Move to reports/ subdirectory'
@@ -162,9 +162,9 @@ describe('Status Command - Document Compliance Integration', () => {
     });
     
     test('should display quick fix commands when violations found', async () => {
-      // Setup: Project with .kiro directory
+      // Setup: Project with .sce directory
       fs.pathExists.mockImplementation(async (p) => {
-        if (p.includes('.kiro')) return true;
+        if (p.includes('.sce')) return true;
         if (p.includes('specs')) return true;
         return false;
       });
@@ -201,9 +201,9 @@ describe('Status Command - Document Compliance Integration', () => {
     });
     
     test('should handle multiple violation types correctly', async () => {
-      // Setup: Project with .kiro directory
+      // Setup: Project with .sce directory
       fs.pathExists.mockImplementation(async (p) => {
-        if (p.includes('.kiro')) return true;
+        if (p.includes('.sce')) return true;
         if (p.includes('specs')) return true;
         return false;
       });
@@ -227,17 +227,17 @@ describe('Status Command - Document Compliance Integration', () => {
             },
             {
               type: 'missing_file',
-              path: '/test/project/.kiro/specs/test/requirements.md',
+              path: '/test/project/.sce/specs/test/requirements.md',
               severity: 'error'
             },
             {
               type: 'misplaced_artifact',
-              path: '/test/project/.kiro/specs/test/script.js',
+              path: '/test/project/.sce/specs/test/script.js',
               severity: 'warning'
             },
             {
               type: 'temporary_document',
-              path: '/test/project/.kiro/specs/test/SESSION.md',
+              path: '/test/project/.sce/specs/test/SESSION.md',
               severity: 'warning'
             }
           ],
@@ -259,9 +259,9 @@ describe('Status Command - Document Compliance Integration', () => {
     });
     
     test('should gracefully handle governance component errors', async () => {
-      // Setup: Project with .kiro directory
+      // Setup: Project with .sce directory
       fs.pathExists.mockImplementation(async (p) => {
-        if (p.includes('.kiro')) return true;
+        if (p.includes('.sce')) return true;
         if (p.includes('specs')) return true;
         return false;
       });
@@ -282,9 +282,9 @@ describe('Status Command - Document Compliance Integration', () => {
     });
     
     test('should skip compliance check if governance not available', async () => {
-      // Setup: Project with .kiro directory
+      // Setup: Project with .sce directory
       fs.pathExists.mockImplementation(async (p) => {
-        if (p.includes('.kiro')) return true;
+        if (p.includes('.sce')) return true;
         if (p.includes('specs')) return true;
         return false;
       });
@@ -312,9 +312,9 @@ describe('Status Command - Document Compliance Integration', () => {
   
   describe('Integration with Existing Status Features', () => {
     test('should display compliance section after project info and before specs', async () => {
-      // Setup: Project with .kiro directory and specs
+      // Setup: Project with .sce directory and specs
       fs.pathExists.mockImplementation(async (p) => {
-        if (p.includes('.kiro')) return true;
+        if (p.includes('.sce')) return true;
         if (p.includes('specs')) return true;
         if (p.includes('tasks.md')) return true;
         return false;
@@ -358,9 +358,9 @@ describe('Status Command - Document Compliance Integration', () => {
     });
     
     test('should work with verbose flag', async () => {
-      // Setup: Project with .kiro directory
+      // Setup: Project with .sce directory
       fs.pathExists.mockImplementation(async (p) => {
-        if (p.includes('.kiro')) return true;
+        if (p.includes('.sce')) return true;
         if (p.includes('specs')) return true;
         return false;
       });
@@ -376,9 +376,9 @@ describe('Status Command - Document Compliance Integration', () => {
     });
     
     test('should work with team flag', async () => {
-      // Setup: Project with .kiro directory
+      // Setup: Project with .sce directory
       fs.pathExists.mockImplementation(async (p) => {
-        if (p.includes('.kiro')) return true;
+        if (p.includes('.sce')) return true;
         if (p.includes('specs')) return true;
         return false;
       });
@@ -396,9 +396,9 @@ describe('Status Command - Document Compliance Integration', () => {
   
   describe('ConfigManager and DiagnosticEngine Integration', () => {
     test('should initialize ConfigManager with project path', async () => {
-      // Setup: Project with .kiro directory
+      // Setup: Project with .sce directory
       fs.pathExists.mockImplementation(async (p) => {
-        if (p.includes('.kiro')) return true;
+        if (p.includes('.sce')) return true;
         if (p.includes('specs')) return true;
         return false;
       });
@@ -412,9 +412,9 @@ describe('Status Command - Document Compliance Integration', () => {
     });
     
     test('should load configuration before running diagnostics', async () => {
-      // Setup: Project with .kiro directory
+      // Setup: Project with .sce directory
       fs.pathExists.mockImplementation(async (p) => {
-        if (p.includes('.kiro')) return true;
+        if (p.includes('.sce')) return true;
         if (p.includes('specs')) return true;
         return false;
       });
@@ -434,9 +434,9 @@ describe('Status Command - Document Compliance Integration', () => {
     });
     
     test('should pass configuration to DiagnosticEngine', async () => {
-      // Setup: Project with .kiro directory
+      // Setup: Project with .sce directory
       fs.pathExists.mockImplementation(async (p) => {
-        if (p.includes('.kiro')) return true;
+        if (p.includes('.sce')) return true;
         if (p.includes('specs')) return true;
         return false;
       });
@@ -460,9 +460,9 @@ describe('Status Command - Document Compliance Integration', () => {
     });
     
     test('should call scan method on DiagnosticEngine', async () => {
-      // Setup: Project with .kiro directory
+      // Setup: Project with .sce directory
       fs.pathExists.mockImplementation(async (p) => {
-        if (p.includes('.kiro')) return true;
+        if (p.includes('.sce')) return true;
         if (p.includes('specs')) return true;
         return false;
       });

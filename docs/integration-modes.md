@@ -61,7 +61,7 @@ sequenceDiagram
 You: "Implement the user login feature"
 
 SCE AI: 
-  [Automatically reads .kiro/specs/01-00-user-login/]
+  [Automatically reads .sce/specs/01-00-user-login/]
   [Understands requirements and design]
   [Generates code]
   [Updates tasks.md automatically]
@@ -142,7 +142,7 @@ AI Tool:
 ```bash
 # You run this once
 sce context export 01-00-user-login
-cat .kiro/specs/01-00-user-login/context-export.md | pbcopy
+cat .sce/specs/01-00-user-login/context-export.md | pbcopy
 
 # Then paste into AI tool
 You: "Here's my Spec context: [paste]
@@ -151,7 +151,7 @@ You: "Here's my Spec context: [paste]
 AI: [Generates code based on your Spec]
 
 # You update tasks manually
-# Edit .kiro/specs/01-00-user-login/tasks.md
+# Edit .sce/specs/01-00-user-login/tasks.md
 ```
 
 ### Advantages
@@ -174,7 +174,7 @@ AI: [Generates code based on your Spec]
 
 ```bash
 # Add to ~/.bashrc or ~/.zshrc
-alias sce-clip='sce context export $1 && cat .kiro/specs/$1/context-export.md | pbcopy && echo "✅ Context copied to clipboard"'
+alias sce-clip='sce context export $1 && cat .sce/specs/$1/context-export.md | pbcopy && echo "✅ Context copied to clipboard"'
 
 # Usage
 sce-clip 01-00-user-login
@@ -247,7 +247,7 @@ sce watch status
 Expected output:
 ```
 Watch Mode: Active
-Watching: .kiro/specs/**/*.md
+Watching: .sce/specs/**/*.md
 Actions: context-export
 Last execution: 2 minutes ago
 ```
@@ -258,7 +258,7 @@ Last execution: 2 minutes ago
 
 1. **Edit your Spec** (e.g., add a new requirement)
    ```bash
-   # Edit .kiro/specs/01-00-user-login/requirements.md
+   # Edit .sce/specs/01-00-user-login/requirements.md
    ```
 
 2. **sce automatically detects the change**
@@ -271,7 +271,7 @@ Last execution: 2 minutes ago
 3. **Use updated context immediately**
    ```bash
    # Context is already up-to-date
-   cat .kiro/specs/01-00-user-login/context-export.md | pbcopy
+   cat .sce/specs/01-00-user-login/context-export.md | pbcopy
    ```
 
 ### Advantages
@@ -293,9 +293,9 @@ Last execution: 2 minutes ago
 ```json
 {
   "patterns": [
-    ".kiro/specs/**/requirements.md",
-    ".kiro/specs/**/design.md",
-    ".kiro/specs/**/tasks.md"
+    ".sce/specs/**/requirements.md",
+    ".sce/specs/**/design.md",
+    ".sce/specs/**/tasks.md"
   ],
   "actions": [
     {
@@ -375,7 +375,7 @@ sce watch start
 # Terminal 2: Work normally
 # Edit Specs, context auto-updates
 # Copy latest context when needed
-cat .kiro/specs/01-00-user-login/context-export.md | pbcopy
+cat .sce/specs/01-00-user-login/context-export.md | pbcopy
 ```
 
 **Benefits:**
@@ -466,7 +466,7 @@ sequenceDiagram
 ### Native Integration Issues
 
 **Problem:** AI doesn't see Spec files  
-**Solution:** Ensure `.kiro/specs/` directory exists and has correct permissions
+**Solution:** Ensure `.sce/specs/` directory exists and has correct permissions
 
 ### Manual Export Issues
 

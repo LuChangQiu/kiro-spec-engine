@@ -42,8 +42,8 @@ jobs:
       - name: Build Moqui baseline (CI)
         run: |
           node scripts/moqui-template-baseline-report.js \
-            --out .kiro/reports/moqui-template-baseline-ci.json \
-            --markdown-out .kiro/reports/moqui-template-baseline-ci.md \
+            --out .sce/reports/moqui-template-baseline-ci.json \
+            --markdown-out .sce/reports/moqui-template-baseline-ci.md \
             --json
 
       - name: Evaluate matrix regression gate (CI)
@@ -60,9 +60,9 @@ jobs:
           fi
           MAX_REGRESSIONS="${MATRIX_REGRESSION_GATE_MAX:-0}"
           node scripts/matrix-regression-gate.js \
-            --baseline .kiro/reports/moqui-template-baseline-ci.json \
+            --baseline .sce/reports/moqui-template-baseline-ci.json \
             --max-regressions "${MAX_REGRESSIONS}" \
-            --out .kiro/reports/release-evidence/matrix-regression-gate-ci.json \
+            --out .sce/reports/release-evidence/matrix-regression-gate-ci.json \
             ${ENFORCE_FLAG} \
             --json
 
@@ -72,10 +72,10 @@ jobs:
       - name: Build Moqui release summary (CI advisory)
         run: |
           node scripts/moqui-release-summary.js \
-            --baseline .kiro/reports/moqui-template-baseline-ci.json \
-            --interactive-governance .kiro/reports/interactive-governance-report.json \
-            --out .kiro/reports/release-evidence/moqui-release-summary-ci.json \
-            --markdown-out .kiro/reports/release-evidence/moqui-release-summary-ci.md \
+            --baseline .sce/reports/moqui-template-baseline-ci.json \
+            --interactive-governance .sce/reports/interactive-governance-report.json \
+            --out .sce/reports/release-evidence/moqui-release-summary-ci.json \
+            --markdown-out .sce/reports/release-evidence/moqui-release-summary-ci.md \
             --json
 
       - name: Check coverage
@@ -95,12 +95,12 @@ jobs:
           name: interactive-governance-matrix-${{ github.run_id }}
           if-no-files-found: warn
           path: |
-            .kiro/reports/interactive-governance-report.json
-            .kiro/reports/interactive-governance-report.md
-            .kiro/reports/interactive-matrix-signals.jsonl
-            .kiro/reports/interactive-flow-smoke/interactive-flow-smoke.summary.json
-            .kiro/reports/moqui-template-baseline-ci.json
-            .kiro/reports/moqui-template-baseline-ci.md
-            .kiro/reports/release-evidence/moqui-release-summary-ci.json
-            .kiro/reports/release-evidence/moqui-release-summary-ci.md
-            .kiro/reports/release-evidence/matrix-regression-gate-ci.json
+            .sce/reports/interactive-governance-report.json
+            .sce/reports/interactive-governance-report.md
+            .sce/reports/interactive-matrix-signals.jsonl
+            .sce/reports/interactive-flow-smoke/interactive-flow-smoke.summary.json
+            .sce/reports/moqui-template-baseline-ci.json
+            .sce/reports/moqui-template-baseline-ci.md
+            .sce/reports/release-evidence/moqui-release-summary-ci.json
+            .sce/reports/release-evidence/moqui-release-summary-ci.md
+            .sce/reports/release-evidence/matrix-regression-gate-ci.json

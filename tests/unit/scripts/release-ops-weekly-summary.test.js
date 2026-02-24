@@ -20,10 +20,10 @@ describe('release-ops-weekly-summary script', () => {
     const projectRoot = path.resolve(__dirname, '..', '..', '..');
     const scriptPath = path.join(projectRoot, 'scripts', 'release-ops-weekly-summary.js');
     const workspace = path.join(tempDir, 'workspace');
-    const evidenceFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
-    const gateHistoryFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'release-gate-history.json');
-    const governanceFile = path.join(workspace, '.kiro', 'reports', 'interactive-governance-report.json');
-    const matrixSignalsFile = path.join(workspace, '.kiro', 'reports', 'interactive-matrix-signals.jsonl');
+    const evidenceFile = path.join(workspace, '.sce', 'reports', 'release-evidence', 'handoff-runs.json');
+    const gateHistoryFile = path.join(workspace, '.sce', 'reports', 'release-evidence', 'release-gate-history.json');
+    const governanceFile = path.join(workspace, '.sce', 'reports', 'interactive-governance-report.json');
+    const matrixSignalsFile = path.join(workspace, '.sce', 'reports', 'interactive-matrix-signals.jsonl');
 
     await fs.ensureDir(path.dirname(evidenceFile));
     await fs.ensureDir(path.dirname(governanceFile));
@@ -185,8 +185,8 @@ describe('release-ops-weekly-summary script', () => {
     expect(payload.health.risk).toMatch(/medium|high/);
     expect(payload.health.concerns.some(item => item.includes('runtime ui-mode violations'))).toBe(true);
 
-    expect(await fs.pathExists(path.join(workspace, '.kiro', 'reports', 'release-evidence', 'weekly-ops-summary.json'))).toBe(true);
-    expect(await fs.pathExists(path.join(workspace, '.kiro', 'reports', 'release-evidence', 'weekly-ops-summary.md'))).toBe(true);
+    expect(await fs.pathExists(path.join(workspace, '.sce', 'reports', 'release-evidence', 'weekly-ops-summary.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(workspace, '.sce', 'reports', 'release-evidence', 'weekly-ops-summary.md'))).toBe(true);
   });
 
   test('emits warnings and recommendations when evidence files are missing', () => {

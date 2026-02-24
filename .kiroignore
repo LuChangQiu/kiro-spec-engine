@@ -3,6 +3,6 @@
 
 template/
 test-project/
-.kiro-test/
+.sce-test/
 node_modules/
 coverage/

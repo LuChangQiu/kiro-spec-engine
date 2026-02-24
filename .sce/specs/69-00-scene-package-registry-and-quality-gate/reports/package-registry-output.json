@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-02-09T09:26:59.353Z",
+  "template_root": ".sce/templates/scene-packages",
+  "summary": {
+    "total_templates": 1,
+    "valid_templates": 1,
+    "invalid_templates": 0,
+    "layer_counts": {
+      "l1_capability": 0,
+      "l2_domain": 1,
+      "l3_instance": 0,
+      "unknown": 0
+    }
+  },
+  "templates": [
+    {
+      "template_id": "kse.scene--scene-package-contract-declaration--0.2.0",
+      "template_dir": ".sce/templates/scene-packages/kse.scene--scene-package-contract-declaration--0.2.0",
+      "coordinate": "kse.scene/scene-package-contract-declaration@0.2.0",
+      "kind": "scene-domain-profile",
+      "layer": "l2-domain",
+      "valid": true,
+      "issues": [],
+      "source_spec": "67-00-scene-package-contract-declaration",
+      "paths": {
+        "manifest": ".sce/templates/scene-packages/kse.scene--scene-package-contract-declaration--0.2.0/template.manifest.json",
+        "package_contract": ".sce/templates/scene-packages/kse.scene--scene-package-contract-declaration--0.2.0/scene-package.json",
+        "scene_template": ".sce/templates/scene-packages/kse.scene--scene-package-contract-declaration--0.2.0/scene.template.yaml"
+      }
+    }
+  ]
+}

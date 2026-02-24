@@ -73,7 +73,7 @@ describe('WorkspaceRegistry', () => {
       
       // Create
       const projectPath = path.join(tempDir, 'test-project');
-      await fs.ensureDir(path.join(projectPath, '.kiro'));
+      await fs.ensureDir(path.join(projectPath, '.sce'));
       const workspace = await registry.createWorkspace('test', projectPath);
       
       expect(workspace.name).toBe('test');
@@ -93,14 +93,14 @@ describe('WorkspaceRegistry', () => {
       await expect(registry.createWorkspace('test', '/nonexistent')).rejects.toThrow('not a valid sce project');
       
       const projectPath = path.join(tempDir, 'project');
-      await fs.ensureDir(path.join(projectPath, '.kiro'));
+      await fs.ensureDir(path.join(projectPath, '.sce'));
       await registry.createWorkspace('test', projectPath);
       await expect(registry.createWorkspace('test', projectPath)).rejects.toThrow('already exists');
     });
 
     it('should persist changes to disk', async () => {
       const projectPath = path.join(tempDir, 'project');
-      await fs.ensureDir(path.join(projectPath, '.kiro'));
+      await fs.ensureDir(path.join(projectPath, '.sce'));
       await registry.createWorkspace('test', projectPath);
       
       const newRegistry = new WorkspaceRegistry(registry.configPath);
@@ -112,7 +112,7 @@ describe('WorkspaceRegistry', () => {
   describe('Path Operations', () => {
     it('should validate workspace paths', async () => {
       const validPath = path.join(tempDir, 'valid');
-      await fs.ensureDir(path.join(validPath, '.kiro'));
+      await fs.ensureDir(path.join(validPath, '.sce'));
       expect(await registry.validateWorkspacePath(validPath)).toBe(true);
       
       const invalidPath = path.join(tempDir, 'invalid');
@@ -122,7 +122,7 @@ describe('WorkspaceRegistry', () => {
 
     it('should find workspace by path', async () => {
       const projectPath = path.join(tempDir, 'project');
-      await fs.ensureDir(path.join(projectPath, '.kiro'));
+      await fs.ensureDir(path.join(projectPath, '.sce'));
       await registry.createWorkspace('test', projectPath);
       
       const subPath = path.join(projectPath, 'subdir', 'file.txt');

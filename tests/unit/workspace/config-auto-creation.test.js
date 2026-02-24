@@ -36,7 +36,7 @@ describe('Configuration Directory Auto-Creation', () => {
 
       // Create a valid sce project directory
       const projectDir = path.join(tempDir, 'test-project');
-      await fs.ensureDir(path.join(projectDir, '.kiro'));
+      await fs.ensureDir(path.join(projectDir, '.sce'));
 
       // Create workspace should trigger save and create directory
       await stateManager.createWorkspace('test-ws', projectDir);
@@ -52,7 +52,7 @@ describe('Configuration Directory Auto-Creation', () => {
 
       // Create a valid sce project directory
       const projectDir = path.join(tempDir, 'test-project2');
-      await fs.ensureDir(path.join(projectDir, '.kiro'));
+      await fs.ensureDir(path.join(projectDir, '.sce'));
 
       await stateManager.createWorkspace('test-ws', projectDir);
 
@@ -72,7 +72,7 @@ describe('Configuration Directory Auto-Creation', () => {
 
       // Create a valid sce project directory
       const projectDir = path.join(tempDir, 'test-project3');
-      await fs.ensureDir(path.join(projectDir, '.kiro'));
+      await fs.ensureDir(path.join(projectDir, '.sce'));
 
       await stateManager.createWorkspace('test-ws', projectDir);
 
@@ -132,7 +132,7 @@ describe('Configuration Directory Auto-Creation', () => {
 
       // Create a valid sce project directory
       const projectDir = path.join(tempDir, 'test-project4');
-      await fs.ensureDir(path.join(projectDir, '.kiro'));
+      await fs.ensureDir(path.join(projectDir, '.sce'));
 
       await expect(stateManager.createWorkspace('test', projectDir)).rejects.toThrow();
 

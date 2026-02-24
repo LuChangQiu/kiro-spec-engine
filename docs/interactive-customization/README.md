@@ -66,8 +66,8 @@ node scripts/interactive-context-bridge.js \
 
 Bridge output defaults:
 
-- Normalized page-context: `.kiro/reports/interactive-page-context.normalized.json`
-- Bridge report: `.kiro/reports/interactive-context-bridge.json`
+- Normalized page-context: `.sce/reports/interactive-page-context.normalized.json`
+- Bridge report: `.sce/reports/interactive-context-bridge.json`
 
 Run one-command full flow (bridge -> loop):
 
@@ -107,20 +107,20 @@ Common matrix flags:
 
 Flow output defaults:
 
-- Flow summary: `.kiro/reports/interactive-flow/<session-id>/interactive-flow.summary.json`
-- Bridge context: `.kiro/reports/interactive-flow/<session-id>/interactive-page-context.normalized.json`
-- Loop summary: `.kiro/reports/interactive-flow/<session-id>/interactive-customization-loop.summary.json`
-- Dialogue governance report: `.kiro/reports/interactive-flow/<session-id>/interactive-dialogue-governance.json`
+- Flow summary: `.sce/reports/interactive-flow/<session-id>/interactive-flow.summary.json`
+- Bridge context: `.sce/reports/interactive-flow/<session-id>/interactive-page-context.normalized.json`
+- Loop summary: `.sce/reports/interactive-flow/<session-id>/interactive-customization-loop.summary.json`
+- Dialogue governance report: `.sce/reports/interactive-flow/<session-id>/interactive-dialogue-governance.json`
 - Dialogue authorization signal stream:
-  - Session: `.kiro/reports/interactive-flow/<session-id>/interactive-dialogue-authorization-signals.jsonl`
-  - Global: `.kiro/reports/interactive-dialogue-authorization-signals.jsonl`
-- Authorization tier report: `.kiro/reports/interactive-flow/<session-id>/interactive-authorization-tier.json`
+  - Session: `.sce/reports/interactive-flow/<session-id>/interactive-dialogue-authorization-signals.jsonl`
+  - Global: `.sce/reports/interactive-dialogue-authorization-signals.jsonl`
+- Authorization tier report: `.sce/reports/interactive-flow/<session-id>/interactive-authorization-tier.json`
 - Authorization tier signal stream:
-  - Session: `.kiro/reports/interactive-flow/<session-id>/interactive-authorization-tier-signals.jsonl`
-  - Global: `.kiro/reports/interactive-authorization-tier-signals.jsonl`
-- Matrix summary JSON: `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.json`
-- Matrix summary Markdown: `.kiro/reports/interactive-flow/<session-id>/moqui-template-baseline.md`
-- Matrix signal stream: `.kiro/reports/interactive-matrix-signals.jsonl`
+  - Session: `.sce/reports/interactive-flow/<session-id>/interactive-authorization-tier-signals.jsonl`
+  - Global: `.sce/reports/interactive-authorization-tier-signals.jsonl`
+- Matrix summary JSON: `.sce/reports/interactive-flow/<session-id>/moqui-template-baseline.json`
+- Matrix summary Markdown: `.sce/reports/interactive-flow/<session-id>/moqui-template-baseline.md`
+- Matrix signal stream: `.sce/reports/interactive-matrix-signals.jsonl`
 - Loop/flow summaries now include execution block diagnostics:
   - `summary.dialogue_authorization_decision` (`allow|review-required|deny`)
   - `summary.execution_block_reason_category` (`password-authorization|role-policy|authorization-tier|runtime-policy|approval-policy|unknown`)
@@ -142,7 +142,7 @@ Generate a change plan from intent (suggestion stage):
 
 ```bash
 node scripts/interactive-plan-build.js \
-  --intent .kiro/reports/interactive-change-intent.json \
+  --intent .sce/reports/interactive-change-intent.json \
   --context docs/interactive-customization/page-context.sample.json \
   --json
 ```
@@ -212,8 +212,8 @@ sce scene interactive-loop \
 ```
 
 `--feedback-score` writes feedback into both:
-- Session artifact: `.kiro/reports/interactive-loop/<session-id>/interactive-user-feedback.jsonl`
-- Governance global stream: `.kiro/reports/interactive-user-feedback.jsonl`
+- Session artifact: `.sce/reports/interactive-loop/<session-id>/interactive-user-feedback.jsonl`
+- Governance global stream: `.sce/reports/interactive-user-feedback.jsonl`
 - `--dialogue-profile` defaults to `business-user`; use `system-maintainer` for operations/maintenance sessions that must surface ticket + rollback requirements before execution.
 - `--ui-mode user-app|ops-console` binds interaction surface semantics (user app vs management console) and participates in authorization dialogue decisioning.
 - In default authorization tier, `business-user` only allows `suggestion` mode; apply path requires `system-maintainer` profile plus environment-specific step-up requirements.
@@ -226,7 +226,7 @@ Run runtime mode/environment policy evaluation directly:
 
 ```bash
 node scripts/interactive-runtime-policy-evaluate.js \
-  --plan .kiro/reports/interactive-change-plan.generated.json \
+  --plan .sce/reports/interactive-change-plan.generated.json \
   --ui-mode ops-console \
   --runtime-mode ops-fix \
   --runtime-environment staging \
@@ -250,12 +250,12 @@ Build interactive work-order artifacts directly:
 
 ```bash
 node scripts/interactive-work-order-build.js \
-  --plan .kiro/reports/interactive-change-plan.generated.json \
-  --dialogue .kiro/reports/interactive-dialogue-governance.json \
-  --gate .kiro/reports/interactive-change-plan-gate.json \
-  --runtime .kiro/reports/interactive-runtime-policy.json \
-  --authorization-tier .kiro/reports/interactive-authorization-tier.json \
-  --approval-state .kiro/reports/interactive-approval-state.json \
+  --plan .sce/reports/interactive-change-plan.generated.json \
+  --dialogue .sce/reports/interactive-dialogue-governance.json \
+  --gate .sce/reports/interactive-change-plan-gate.json \
+  --runtime .sce/reports/interactive-runtime-policy.json \
+  --authorization-tier .sce/reports/interactive-authorization-tier.json \
+  --approval-state .sce/reports/interactive-approval-state.json \
   --execution-attempted \
   --execution-result success \
   --execution-id exec-xxxx \
@@ -268,7 +268,7 @@ Run approval workflow state machine:
 # init from generated plan
 node scripts/interactive-approval-workflow.js \
   --action init \
-  --plan .kiro/reports/interactive-change-plan.generated.json \
+  --plan .sce/reports/interactive-change-plan.generated.json \
   --actor product-owner \
   --json
 
@@ -294,24 +294,24 @@ node scripts/interactive-moqui-adapter.js \
 # build plan from intent through adapter contract
 node scripts/interactive-moqui-adapter.js \
   --action plan \
-  --intent .kiro/reports/interactive-change-intent.json \
+  --intent .sce/reports/interactive-change-intent.json \
   --execution-mode suggestion \
   --json
 
 # validate/apply with policy gate and execution record output
 node scripts/interactive-moqui-adapter.js \
   --action validate \
-  --plan .kiro/reports/interactive-change-plan.adapter.json \
+  --plan .sce/reports/interactive-change-plan.adapter.json \
   --json
 node scripts/interactive-moqui-adapter.js \
   --action apply \
-  --plan .kiro/reports/interactive-change-plan.adapter.json \
+  --plan .sce/reports/interactive-change-plan.adapter.json \
   --json
 
 # one-click path: only accepts low-risk + allow decision
 node scripts/interactive-moqui-adapter.js \
   --action low-risk-apply \
-  --plan .kiro/reports/interactive-change-plan.adapter.json \
+  --plan .sce/reports/interactive-change-plan.adapter.json \
   --json
 
 # rollback by execution id from execution ledger
@@ -323,8 +323,8 @@ node scripts/interactive-moqui-adapter.js \
 
 Execution artifacts:
 
-- Latest execution record: `.kiro/reports/interactive-execution-record.latest.json`
-- Append-only execution ledger: `.kiro/reports/interactive-execution-ledger.jsonl`
+- Latest execution record: `.sce/reports/interactive-execution-record.latest.json`
+- Append-only execution ledger: `.sce/reports/interactive-execution-ledger.jsonl`
 - Execution records include diff summary, gate decision, validation snapshot, and rollback reference.
 
 Append business-user feedback for governance scoring:
@@ -354,29 +354,29 @@ node scripts/interactive-governance-report.js \
   --json
 ```
 
-The governance report consumes feedback events from `.kiro/reports/interactive-user-feedback.jsonl` by default.
-The governance report also consumes matrix signals from `.kiro/reports/interactive-matrix-signals.jsonl` by default.
-The governance report consumes dialogue-authorization signals from `.kiro/reports/interactive-dialogue-authorization-signals.jsonl` by default.
-The governance report consumes runtime policy signals from `.kiro/reports/interactive-runtime-signals.jsonl` by default.
-The governance report consumes authorization-tier signals from `.kiro/reports/interactive-authorization-tier-signals.jsonl` by default.
+The governance report consumes feedback events from `.sce/reports/interactive-user-feedback.jsonl` by default.
+The governance report also consumes matrix signals from `.sce/reports/interactive-matrix-signals.jsonl` by default.
+The governance report consumes dialogue-authorization signals from `.sce/reports/interactive-dialogue-authorization-signals.jsonl` by default.
+The governance report consumes runtime policy signals from `.sce/reports/interactive-runtime-signals.jsonl` by default.
+The governance report consumes authorization-tier signals from `.sce/reports/interactive-authorization-tier-signals.jsonl` by default.
 When `intent_total` is below `min_intent_samples` (default `5`), adoption emits a low-severity sample warning instead of a breach.
 
 Export matrix regression remediation queue lines (for close-loop-batch):
 
 ```bash
 node scripts/moqui-matrix-remediation-queue.js \
-  --baseline .kiro/reports/release-evidence/moqui-template-baseline.json \
+  --baseline .sce/reports/release-evidence/moqui-template-baseline.json \
   --top-templates 5 \
-  --lines-out .kiro/auto/matrix-remediation.lines \
-  --batch-json-out .kiro/auto/matrix-remediation.goals.json \
-  --commands-out .kiro/reports/release-evidence/matrix-remediation-commands.md \
+  --lines-out .sce/auto/matrix-remediation.lines \
+  --batch-json-out .sce/auto/matrix-remediation.goals.json \
+  --commands-out .sce/reports/release-evidence/matrix-remediation-commands.md \
   --json
 ```
 
 Recommended anti-429 phased execution (default outputs):
 
 ```bash
-sce auto close-loop-batch .kiro/auto/matrix-remediation.goals.high.json \
+sce auto close-loop-batch .sce/auto/matrix-remediation.goals.high.json \
   --format json \
   --batch-parallel 1 \
   --batch-agent-budget 2 \
@@ -386,7 +386,7 @@ sce auto close-loop-batch .kiro/auto/matrix-remediation.goals.high.json \
 
 sleep 30
 
-sce auto close-loop-batch .kiro/auto/matrix-remediation.goals.medium.json \
+sce auto close-loop-batch .sce/auto/matrix-remediation.goals.medium.json \
   --format json \
   --batch-parallel 1 \
   --batch-agent-budget 2 \
@@ -405,7 +405,7 @@ Zero-prep one-shot (prepare from baseline + run phased):
 
 ```bash
 node scripts/moqui-matrix-remediation-phased-runner.js \
-  --baseline .kiro/reports/release-evidence/moqui-template-baseline.json \
+  --baseline .sce/reports/release-evidence/moqui-template-baseline.json \
   --json
 
 npm run run:matrix-remediation-from-baseline -- --json

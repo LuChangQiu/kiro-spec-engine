@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs-extra');
 
 const DEFAULT_POLICY = 'docs/interactive-customization/runtime-mode-policy-baseline.json';
-const DEFAULT_OUT = '.kiro/reports/interactive-runtime-policy.json';
+const DEFAULT_OUT = '.sce/reports/interactive-runtime-policy.json';
 const RISK_ORDER = ['low', 'medium', 'high', 'critical'];
 
 function parseArgs(argv) {

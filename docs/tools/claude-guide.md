@@ -64,10 +64,10 @@ Add to your `~/.bashrc` or `~/.zshrc`:
 
 ```bash
 # Quick export and copy to clipboard
-alias sce-clip='sce context export $1 && cat .kiro/specs/$1/context-export.md | pbcopy && echo "✅ Context copied to clipboard"'
+alias sce-clip='sce context export $1 && cat .sce/specs/$1/context-export.md | pbcopy && echo "✅ Context copied to clipboard"'
 
 # Windows PowerShell (add to $PROFILE)
-function sce-clip { sce context export $args[0]; Get-Content ".kiro\specs\$($args[0])\context-export.md" | Set-Clipboard; Write-Host "✅ Context copied to clipboard" }
+function sce-clip { sce context export $args[0]; Get-Content ".sce\specs\$($args[0])\context-export.md" | Set-Clipboard; Write-Host "✅ Context copied to clipboard" }
 ```
 
 ---
@@ -112,7 +112,7 @@ Claude: [Generates ValidationService with all methods]
 ```
 
 **Step 5: Update tasks as you complete them**
-Edit `.kiro/specs/01-00-user-login/tasks.md`:
+Edit `.sce/specs/01-00-user-login/tasks.md`:
 ```markdown
 - [x] 1.1 Set up project dependencies
 - [x] 1.2 Create User model and database schema
@@ -545,7 +545,7 @@ Now let's continue with task 3.1..."
 ### With Git
 ```bash
 # Commit Spec
-git add .kiro/specs/01-00-user-login/
+git add .sce/specs/01-00-user-login/
 git commit -m "Add user login Spec"
 
 # Implement with Claude

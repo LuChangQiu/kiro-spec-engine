@@ -6,8 +6,8 @@ const { spawnSync } = require('child_process');
 const fs = require('fs-extra');
 
 const DEFAULT_WORKSPACE = 'tests/fixtures/moqui-core-regression/workspace';
-const DEFAULT_OUT = '.kiro/reports/release-evidence/moqui-core-regression-suite.json';
-const DEFAULT_MARKDOWN_OUT = '.kiro/reports/release-evidence/moqui-core-regression-suite.md';
+const DEFAULT_OUT = '.sce/reports/release-evidence/moqui-core-regression-suite.json';
+const DEFAULT_MARKDOWN_OUT = '.sce/reports/release-evidence/moqui-core-regression-suite.md';
 
 function parseArgs(argv) {
   const options = {
@@ -257,7 +257,7 @@ async function main() {
     throw new Error(`regression workspace not found: ${workspace}`);
   }
 
-  const stageArtifactDir = path.join(workspace, '.kiro', 'reports', 'moqui-core-regression');
+  const stageArtifactDir = path.join(workspace, '.sce', 'reports', 'moqui-core-regression');
   await fs.ensureDir(stageArtifactDir);
 
   const baselineJsonFile = path.join(stageArtifactDir, 'moqui-template-baseline.json');
@@ -270,7 +270,7 @@ async function main() {
       name: 'moqui-baseline',
       args: [
         path.join(projectRoot, 'scripts', 'moqui-template-baseline-report.js'),
-        '--template-dir', '.kiro/templates/scene-packages',
+        '--template-dir', '.sce/templates/scene-packages',
         '--out', baselineJsonFile,
         '--markdown-out', baselineMarkdownFile,
         '--include-all',
@@ -299,7 +299,7 @@ async function main() {
       args: [
         path.join(projectRoot, 'scripts', 'moqui-lexicon-audit.js'),
         '--manifest', 'docs/handoffs/handoff-manifest.json',
-        '--template-dir', '.kiro/templates/scene-packages',
+        '--template-dir', '.sce/templates/scene-packages',
         '--lexicon', path.join(projectRoot, 'lib', 'data', 'moqui-capability-lexicon.json'),
         '--out', lexiconAuditJsonFile,
         '--markdown-out', lexiconAuditMarkdownFile,

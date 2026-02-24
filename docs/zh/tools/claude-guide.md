@@ -81,13 +81,13 @@ Claude 通过 Web 界面工作，无需特殊配置。只需导出上下文并�
 2. **复制上下文到剪贴板：**
    ```bash
    # macOS
-   cat .kiro/specs/01-00-user-login/context-export.md | pbcopy
+   cat .sce/specs/01-00-user-login/context-export.md | pbcopy
    
    # Windows
-   type .kiro\specs\01-00-user-login\context-export.md | clip
+   type .sce\specs\01-00-user-login\context-export.md | clip
    
    # Linux
-   cat .kiro/specs/01-00-user-login/context-export.md | xclip -selection clipboard
+   cat .sce/specs/01-00-user-login/context-export.md | xclip -selection clipboard
    ```
 
 3. **开始新的 Claude 对话**
@@ -145,7 +145,7 @@ sce spec bootstrap --name 01-00-user-login --non-interactive
 
 # 3. 导出并复制上下文
 sce context export 01-00-user-login
-cat .kiro/specs/01-00-user-login/context-export.md | pbcopy
+cat .sce/specs/01-00-user-login/context-export.md | pbcopy
 
 # 4. 在 Claude 中：
 # - 粘贴上下文
@@ -240,7 +240,7 @@ Claude 擅长解释。询问：
 ### 调试问题
 
 ```
-我正在实现 .kiro/specs/01-00-user-login/ 中的用户登录功能。
+我正在实现 .sce/specs/01-00-user-login/ 中的用户登录功能。
 
 任务 2.1（ValidationService）已完成，但测试失败并出现此错误：
 [粘贴错误消息]
@@ -254,7 +254,7 @@ Claude 擅长解释。询问：
 ### 代码审查
 
 ```
-我已实现 .kiro/specs/01-00-user-login/ 中的任务 1.1-1.3。
+我已实现 .sce/specs/01-00-user-login/ 中的任务 1.1-1.3。
 
 这是我的代码：
 [粘贴代码]

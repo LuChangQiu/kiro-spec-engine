@@ -162,12 +162,12 @@ describe('Scene command', () => {
 
   test('validateEvalOptions enforces result or feedback source', () => {
     expect(validateEvalOptions({})).toBe('at least one of --result or --feedback is required');
-    expect(validateEvalOptions({ result: '.kiro/results/run.json' })).toBeNull();
-    expect(validateEvalOptions({ feedback: '.kiro/results/feedback.md' })).toBeNull();
-    expect(validateEvalOptions({ result: '.kiro/results/run.json', syncSpecTasks: true })).toBe('--sync-spec-tasks requires --spec source');
-    expect(validateEvalOptions({ result: '.kiro/results/run.json', env: 'prod' })).toBe('--env requires --eval-config');
-    expect(validateEvalOptions({ result: '.kiro/results/run.json', profile: 'finance' })).toBe('profile must be one of default, erp, ops, robot');
-    expect(validateEvalOptions({ result: '.kiro/results/run.json', profileRules: {} })).toBe('--profile-rules must be a non-empty path');
+    expect(validateEvalOptions({ result: '.sce/results/run.json' })).toBeNull();
+    expect(validateEvalOptions({ feedback: '.sce/results/feedback.md' })).toBeNull();
+    expect(validateEvalOptions({ result: '.sce/results/run.json', syncSpecTasks: true })).toBe('--sync-spec-tasks requires --spec source');
+    expect(validateEvalOptions({ result: '.sce/results/run.json', env: 'prod' })).toBe('--env requires --eval-config');
+    expect(validateEvalOptions({ result: '.sce/results/run.json', profile: 'finance' })).toBe('profile must be one of default, erp, ops, robot');
+    expect(validateEvalOptions({ result: '.sce/results/run.json', profileRules: {} })).toBe('--profile-rules must be a non-empty path');
   });
 
   test('validateCatalogOptions enforces catalog constraints', () => {
@@ -192,41 +192,41 @@ describe('Scene command', () => {
 
   test('validateRoutePolicyTemplateOptions enforces template constraints', () => {
     expect(validateRoutePolicyTemplateOptions({ out: '' })).toBe('--out must be a non-empty path');
-    expect(validateRoutePolicyTemplateOptions({ out: '.kiro/results/route-policy.json', profile: 'finance' }))
+    expect(validateRoutePolicyTemplateOptions({ out: '.sce/results/route-policy.json', profile: 'finance' }))
       .toBe('profile must be one of default, erp, hybrid, robot');
-    expect(validateRoutePolicyTemplateOptions({ out: '.kiro/results/route-policy.json', profile: 'robot' })).toBeNull();
+    expect(validateRoutePolicyTemplateOptions({ out: '.sce/results/route-policy.json', profile: 'robot' })).toBeNull();
   });
 
   test('validateRoutePolicySuggestOptions enforces eval source and tuning constraints', () => {
     expect(validateRoutePolicySuggestOptions({ eval: [], profile: 'default', maxAdjustment: 6 }))
       .toBe('at least one eval source is required (--eval/--eval-dir)');
-    expect(validateRoutePolicySuggestOptions({ eval: ['.kiro/results/eval.json'], profile: 'finance', maxAdjustment: 6 }))
+    expect(validateRoutePolicySuggestOptions({ eval: ['.sce/results/eval.json'], profile: 'finance', maxAdjustment: 6 }))
       .toBe('profile must be one of default, erp, hybrid, robot');
-    expect(validateRoutePolicySuggestOptions({ eval: ['.kiro/results/eval.json'], profile: 'erp', maxAdjustment: Number.NaN }))
+    expect(validateRoutePolicySuggestOptions({ eval: ['.sce/results/eval.json'], profile: 'erp', maxAdjustment: Number.NaN }))
       .toBe('--max-adjustment must be a number');
-    expect(validateRoutePolicySuggestOptions({ eval: ['.kiro/results/eval.json'], profile: 'erp', maxAdjustment: -1 }))
+    expect(validateRoutePolicySuggestOptions({ eval: ['.sce/results/eval.json'], profile: 'erp', maxAdjustment: -1 }))
       .toBe('--max-adjustment must be greater than or equal to 0');
     expect(validateRoutePolicySuggestOptions({
-      eval: ['.kiro/results/eval.json'],
+      eval: ['.sce/results/eval.json'],
       profile: 'hybrid',
       maxAdjustment: 4,
-      policyOut: '.kiro/results/route-policy.json'
+      policyOut: '.sce/results/route-policy.json'
     })).toBeNull();
   });
 
   test('validateRoutePolicyRolloutOptions enforces rollout packaging constraints', () => {
-    expect(validateRoutePolicyRolloutOptions({ targetPolicy: '.kiro/config/scene-route-policy.json', outDir: '.kiro/releases' }))
+    expect(validateRoutePolicyRolloutOptions({ targetPolicy: '.sce/config/scene-route-policy.json', outDir: '.sce/releases' }))
       .toBe('--suggestion is required');
     expect(validateRoutePolicyRolloutOptions({
-      suggestion: '.kiro/results/route-policy-suggest.json',
-      targetPolicy: '.kiro/config/scene-route-policy.json',
-      outDir: '.kiro/releases',
+      suggestion: '.sce/results/route-policy-suggest.json',
+      targetPolicy: '.sce/config/scene-route-policy.json',
+      outDir: '.sce/releases',
       name: '***'
     })).toBe('--name must contain at least one alphanumeric character');
     expect(validateRoutePolicyRolloutOptions({
-      suggestion: '.kiro/results/route-policy-suggest.json',
-      targetPolicy: '.kiro/config/scene-route-policy.json',
-      outDir: '.kiro/releases',
+      suggestion: '.sce/results/route-policy-suggest.json',
+      targetPolicy: '.sce/config/scene-route-policy.json',
+      outDir: '.sce/releases',
       name: 'pilot-wave-01'
     })).toBeNull();
   });
@@ -234,18 +234,18 @@ describe('Scene command', () => {
   test('validateScenePackageTemplateOptions enforces package template constraints', () => {
     expect(validateScenePackageTemplateOptions({ kind: 'scene-template', group: 'sce.scene', version: '0.1.0' }))
       .toBe('--out must be a non-empty path');
-    expect(validateScenePackageTemplateOptions({ out: '.kiro/templates/scene-package.json', kind: 'bad-kind', group: 'sce.scene', version: '0.1.0' }))
+    expect(validateScenePackageTemplateOptions({ out: '.sce/templates/scene-package.json', kind: 'bad-kind', group: 'sce.scene', version: '0.1.0' }))
       .toContain('kind must be one of');
-    expect(validateScenePackageTemplateOptions({ out: '.kiro/templates/scene-package.json', kind: 'scene-template', group: 'sce.scene', version: 'v1' }))
+    expect(validateScenePackageTemplateOptions({ out: '.sce/templates/scene-package.json', kind: 'scene-template', group: 'sce.scene', version: 'v1' }))
       .toBe('--pkg-version must be a semantic version (x.y.z)');
-    expect(validateScenePackageTemplateOptions({ out: '.kiro/templates/scene-package.json', kind: 'scene-template', group: 'sce.scene', version: '1.2.3' }))
+    expect(validateScenePackageTemplateOptions({ out: '.sce/templates/scene-package.json', kind: 'scene-template', group: 'sce.scene', version: '1.2.3' }))
       .toBeNull();
   });
 
   test('validateScenePackageValidateOptions enforces package source constraints', () => {
     expect(validateScenePackageValidateOptions({ specPackage: 'custom/scene-package.json' }))
       .toBe('either --spec or --package is required');
-    expect(validateScenePackageValidateOptions({ spec: '67-00-scene-package-contract', packagePath: '.kiro/package.json', specPackage: 'custom/scene-package.json' }))
+    expect(validateScenePackageValidateOptions({ spec: '67-00-scene-package-contract', packagePath: '.sce/package.json', specPackage: 'custom/scene-package.json' }))
       .toBe('use --spec or --package, not both');
     expect(validateScenePackageValidateOptions({ spec: '67-00-scene-package-contract', specPackage: '/tmp/package.json' }))
       .toBe('--spec-package must be a relative path');
@@ -254,55 +254,55 @@ describe('Scene command', () => {
   });
 
   test('validateScenePackagePublishOptions enforces publish constraints', () => {
-    expect(validateScenePackagePublishOptions({ specPackage: 'custom/scene-package.json', sceneManifest: 'custom/scene.yaml', outDir: '.kiro/templates' }))
+    expect(validateScenePackagePublishOptions({ specPackage: 'custom/scene-package.json', sceneManifest: 'custom/scene.yaml', outDir: '.sce/templates' }))
       .toBe('--spec is required');
-    expect(validateScenePackagePublishOptions({ spec: '67-00-scene-package', specPackage: '/tmp/scene-package.json', sceneManifest: 'custom/scene.yaml', outDir: '.kiro/templates' }))
+    expect(validateScenePackagePublishOptions({ spec: '67-00-scene-package', specPackage: '/tmp/scene-package.json', sceneManifest: 'custom/scene.yaml', outDir: '.sce/templates' }))
       .toBe('--spec-package must be a non-empty relative path');
-    expect(validateScenePackagePublishOptions({ spec: '67-00-scene-package', specPackage: 'custom/scene-package.json', sceneManifest: '/tmp/scene.yaml', outDir: '.kiro/templates' }))
+    expect(validateScenePackagePublishOptions({ spec: '67-00-scene-package', specPackage: 'custom/scene-package.json', sceneManifest: '/tmp/scene.yaml', outDir: '.sce/templates' }))
       .toBe('--scene-manifest must be a non-empty relative path');
-    expect(validateScenePackagePublishOptions({ spec: '67-00-scene-package', specPackage: 'custom/scene-package.json', sceneManifest: 'custom/scene.yaml', outDir: '.kiro/templates', templateId: '***' }))
+    expect(validateScenePackagePublishOptions({ spec: '67-00-scene-package', specPackage: 'custom/scene-package.json', sceneManifest: 'custom/scene.yaml', outDir: '.sce/templates', templateId: '***' }))
       .toBe('--template-id must contain at least one alphanumeric character');
     expect(validateScenePackagePublishOptions({
       spec: '67-00-scene-package',
       specPackage: 'custom/scene-package.json',
       sceneManifest: 'custom/scene.yaml',
-      outDir: '.kiro/templates',
+      outDir: '.sce/templates',
       ontologyMinScore: 101
     })).toBe('--ontology-min-score must be a number between 0 and 100');
-    expect(validateScenePackagePublishOptions({ spec: '67-00-scene-package', specPackage: 'custom/scene-package.json', sceneManifest: 'custom/scene.yaml', outDir: '.kiro/templates' }))
+    expect(validateScenePackagePublishOptions({ spec: '67-00-scene-package', specPackage: 'custom/scene-package.json', sceneManifest: 'custom/scene.yaml', outDir: '.sce/templates' }))
       .toBeNull();
   });
 
   test('validateScenePackagePublishBatchOptions enforces batch publish constraints', () => {
-    expect(validateScenePackagePublishBatchOptions({ outDir: '.kiro/templates/scene-packages' }))
+    expect(validateScenePackagePublishBatchOptions({ outDir: '.sce/templates/scene-packages' }))
       .toBe('--manifest is required');
     expect(validateScenePackagePublishBatchOptions({
       manifest: 'docs/handoffs/handoff-manifest.json',
       manifestSpecPath: '',
       fallbackSpecPackage: 'custom/scene-package.json',
       fallbackSceneManifest: 'custom/scene.yaml',
-      outDir: '.kiro/templates/scene-packages'
+      outDir: '.sce/templates/scene-packages'
     })).toBe('--manifest-spec-path must be a non-empty path selector');
     expect(validateScenePackagePublishBatchOptions({
       manifest: 'docs/handoffs/handoff-manifest.json',
       manifestSpecPath: 'specs',
       fallbackSpecPackage: '/tmp/scene-package.json',
       fallbackSceneManifest: 'custom/scene.yaml',
-      outDir: '.kiro/templates/scene-packages'
+      outDir: '.sce/templates/scene-packages'
     })).toBe('--fallback-spec-package must be a non-empty relative path');
     expect(validateScenePackagePublishBatchOptions({
       manifest: 'docs/handoffs/handoff-manifest.json',
       manifestSpecPath: 'specs',
       fallbackSpecPackage: 'custom/scene-package.json',
       fallbackSceneManifest: '/tmp/scene.yaml',
-      outDir: '.kiro/templates/scene-packages'
+      outDir: '.sce/templates/scene-packages'
     })).toBe('--fallback-scene-manifest must be a non-empty relative path');
     expect(validateScenePackagePublishBatchOptions({
       manifest: 'docs/handoffs/handoff-manifest.json',
       manifestSpecPath: 'specs',
       fallbackSpecPackage: 'custom/scene-package.json',
       fallbackSceneManifest: 'custom/scene.yaml',
-      outDir: '.kiro/templates/scene-packages',
+      outDir: '.sce/templates/scene-packages',
       ontologyMinScore: -1
     })).toBe('--ontology-min-score must be a number between 0 and 100');
     expect(validateScenePackagePublishBatchOptions({
@@ -311,7 +311,7 @@ describe('Scene command', () => {
       fallbackSpecPackage: 'custom/scene-package.json',
       fallbackSceneManifest: 'custom/scene.yaml',
       ontologyReportOut: '',
-      outDir: '.kiro/templates/scene-packages'
+      outDir: '.sce/templates/scene-packages'
     })).toBe('--ontology-report-out must be a non-empty path');
     expect(validateScenePackagePublishBatchOptions({
       manifest: 'docs/handoffs/handoff-manifest.json',
@@ -319,7 +319,7 @@ describe('Scene command', () => {
       fallbackSpecPackage: 'custom/scene-package.json',
       fallbackSceneManifest: 'custom/scene.yaml',
       ontologyTaskOut: '',
-      outDir: '.kiro/templates/scene-packages'
+      outDir: '.sce/templates/scene-packages'
     })).toBe('--ontology-task-out must be a non-empty path');
     expect(validateScenePackagePublishBatchOptions({
       manifest: 'docs/handoffs/handoff-manifest.json',
@@ -327,7 +327,7 @@ describe('Scene command', () => {
       fallbackSpecPackage: 'custom/scene-package.json',
       fallbackSceneManifest: 'custom/scene.yaml',
       ontologyTaskQueueOut: '',
-      outDir: '.kiro/templates/scene-packages'
+      outDir: '.sce/templates/scene-packages'
     })).toBe('--ontology-task-queue-out must be a non-empty path');
     expect(validateScenePackagePublishBatchOptions({
       manifest: 'docs/handoffs/handoff-manifest.json',
@@ -335,7 +335,7 @@ describe('Scene command', () => {
       fallbackSpecPackage: 'custom/scene-package.json',
       fallbackSceneManifest: 'custom/scene.yaml',
       ontologyMinAverageScore: 110,
-      outDir: '.kiro/templates/scene-packages'
+      outDir: '.sce/templates/scene-packages'
     })).toBe('--ontology-min-average-score must be a number between 0 and 100');
     expect(validateScenePackagePublishBatchOptions({
       manifest: 'docs/handoffs/handoff-manifest.json',
@@ -343,14 +343,14 @@ describe('Scene command', () => {
       fallbackSpecPackage: 'custom/scene-package.json',
       fallbackSceneManifest: 'custom/scene.yaml',
       ontologyMinValidRate: -2,
-      outDir: '.kiro/templates/scene-packages'
+      outDir: '.sce/templates/scene-packages'
     })).toBe('--ontology-min-valid-rate must be a number between 0 and 100');
     expect(validateScenePackagePublishBatchOptions({
       manifest: 'docs/handoffs/handoff-manifest.json',
       manifestSpecPath: 'specs',
       fallbackSpecPackage: 'custom/scene-package.json',
       fallbackSceneManifest: 'custom/scene.yaml',
-      outDir: '.kiro/templates/scene-packages',
+      outDir: '.sce/templates/scene-packages',
       status: 'completed'
     })).toBeNull();
   });
@@ -385,52 +385,52 @@ describe('Scene command', () => {
   test('validateScenePackageInstantiateOptions enforces instantiate constraints', () => {
     expect(validateScenePackageInstantiateOptions({ targetSpec: '68-00-scene-package-template' }))
       .toBe('--template is required');
-    expect(validateScenePackageInstantiateOptions({ template: '.kiro/templates/template.manifest.json' }))
+    expect(validateScenePackageInstantiateOptions({ template: '.sce/templates/template.manifest.json' }))
       .toBe('--target-spec is required');
     expect(validateScenePackageInstantiateOptions({
-      template: '.kiro/templates/template.manifest.json',
+      template: '.sce/templates/template.manifest.json',
       targetSpec: '68-00-scene-package-template',
       values: ''
     })).toBe('--values must be a non-empty path');
     expect(validateScenePackageInstantiateOptions({
-      template: '.kiro/templates/template.manifest.json',
+      template: '.sce/templates/template.manifest.json',
       targetSpec: '68-00-scene-package-template',
-      values: '.kiro/templates/values.json'
+      values: '.sce/templates/values.json'
     })).toBeNull();
   });
 
   test('validateScenePackageRegistryOptions enforces registry constraints', () => {
     expect(validateScenePackageRegistryOptions({})).toBe('--template-dir must be a non-empty path');
-    expect(validateScenePackageRegistryOptions({ templateDir: '.kiro/templates/scene-packages', out: '' }))
+    expect(validateScenePackageRegistryOptions({ templateDir: '.sce/templates/scene-packages', out: '' }))
       .toBe('--out must be a non-empty path');
-    expect(validateScenePackageRegistryOptions({ templateDir: '.kiro/templates/scene-packages' }))
+    expect(validateScenePackageRegistryOptions({ templateDir: '.sce/templates/scene-packages' }))
       .toBeNull();
   });
 
   test('validateScenePackageGateTemplateOptions enforces template constraints', () => {
     expect(validateScenePackageGateTemplateOptions({ profile: 'baseline' }))
       .toBe('--out must be a non-empty path');
-    expect(validateScenePackageGateTemplateOptions({ out: '.kiro/templates/scene-package-gate-policy.json', profile: 'invalid' }))
+    expect(validateScenePackageGateTemplateOptions({ out: '.sce/templates/scene-package-gate-policy.json', profile: 'invalid' }))
       .toContain('profile must be one of');
-    expect(validateScenePackageGateTemplateOptions({ out: '.kiro/templates/scene-package-gate-policy.json', profile: 'three-layer' }))
+    expect(validateScenePackageGateTemplateOptions({ out: '.sce/templates/scene-package-gate-policy.json', profile: 'three-layer' }))
       .toBeNull();
   });
 
   test('validateScenePackageGateOptions enforces gate constraints', () => {
-    expect(validateScenePackageGateOptions({ policy: '.kiro/templates/scene-package-gate-policy.json' }))
+    expect(validateScenePackageGateOptions({ policy: '.sce/templates/scene-package-gate-policy.json' }))
       .toBe('--registry is required');
-    expect(validateScenePackageGateOptions({ registry: '.kiro/reports/scene-package-registry.json', policy: '' }))
+    expect(validateScenePackageGateOptions({ registry: '.sce/reports/scene-package-registry.json', policy: '' }))
       .toBe('--policy must be a non-empty path');
     expect(validateScenePackageGateOptions({
-      registry: '.kiro/reports/scene-package-registry.json',
-      policy: '.kiro/templates/scene-package-gate-policy.json',
+      registry: '.sce/reports/scene-package-registry.json',
+      policy: '.sce/templates/scene-package-gate-policy.json',
       syncSpecTasks: true
     })).toBe('--sync-spec-tasks requires --spec source');
-    expect(validateScenePackageGateOptions({ registry: '.kiro/reports/scene-package-registry.json', policy: '.kiro/templates/scene-package-gate-policy.json', runbookOut: '' }))
+    expect(validateScenePackageGateOptions({ registry: '.sce/reports/scene-package-registry.json', policy: '.sce/templates/scene-package-gate-policy.json', runbookOut: '' }))
       .toBe('--runbook-out must be a non-empty path');
-    expect(validateScenePackageGateOptions({ registry: '.kiro/reports/scene-package-registry.json', policy: '.kiro/templates/scene-package-gate-policy.json', out: '' }))
+    expect(validateScenePackageGateOptions({ registry: '.sce/reports/scene-package-registry.json', policy: '.sce/templates/scene-package-gate-policy.json', out: '' }))
       .toBe('--out must be a non-empty path');
-    expect(validateScenePackageGateOptions({ registry: '.kiro/reports/scene-package-registry.json', policy: '.kiro/templates/scene-package-gate-policy.json' }))
+    expect(validateScenePackageGateOptions({ registry: '.sce/reports/scene-package-registry.json', policy: '.sce/templates/scene-package-gate-policy.json' }))
       .toBeNull();
   });
 
@@ -576,7 +576,7 @@ Trace: doctor-trace-feedback
 
 - [x] Status: done
 - [x] Owner: ops-team
-- [x] Evidence Paths: .kiro/results/approval-evidence.json
+- [x] Evidence Paths: .sce/results/approval-evidence.json
 - [x] Completion Notes: Approval completed and verified
 - [x] Eval Update:
   - cycle_time_ms: 980
@@ -746,9 +746,9 @@ Trace: doctor-trace-feedback
       adapterReadinessChecker: jest.fn(),
       bindingPluginLoad: {
         handlers_loaded: 1,
-        plugin_dirs: ['/workspace/.kiro/plugins/scene-bindings'],
-        plugin_files: ['/workspace/.kiro/plugins/scene-bindings/custom-plugin.js'],
-        manifest_path: '/workspace/.kiro/config/scene-binding-plugins.json',
+        plugin_dirs: ['/workspace/.sce/plugins/scene-bindings'],
+        plugin_files: ['/workspace/.sce/plugins/scene-bindings/custom-plugin.js'],
+        manifest_path: '/workspace/.sce/config/scene-binding-plugins.json',
         manifest_loaded: true,
         warnings: []
       }
@@ -771,7 +771,7 @@ Trace: doctor-trace-feedback
     expect(report.policy.allowed).toBe(true);
     expect(report.binding_plugins).toMatchObject({
       handlers_loaded: 1,
-      manifest_path: '/workspace/.kiro/config/scene-binding-plugins.json',
+      manifest_path: '/workspace/.sce/config/scene-binding-plugins.json',
       manifest_loaded: true
     });
     expect(Array.isArray(report.suggestions)).toBe(true);
@@ -884,16 +884,16 @@ Trace: doctor-trace-feedback
           handlers_loaded: 0,
           plugin_dirs: [],
           plugin_files: [],
-          manifest_path: '/workspace/.kiro/config/scene-binding-plugins.json',
+          manifest_path: '/workspace/.sce/config/scene-binding-plugins.json',
           manifest_loaded: false,
-          warnings: ['binding plugin manifest not found: /workspace/.kiro/config/scene-binding-plugins.json']
+          warnings: ['binding plugin manifest not found: /workspace/.sce/config/scene-binding-plugins.json']
         }
       }
     });
 
     expect(report.status).toBe('healthy');
     expect(report.binding_plugins).toMatchObject({
-      manifest_path: '/workspace/.kiro/config/scene-binding-plugins.json',
+      manifest_path: '/workspace/.sce/config/scene-binding-plugins.json',
       manifest_loaded: false
     });
     expect(report.suggestions.some((item) => item.code === 'binding-plugin-manifest-missing')).toBe(true);
@@ -940,9 +940,9 @@ Trace: doctor-trace-feedback
         adapterReadinessChecker: jest.fn(),
         bindingPluginLoad: {
           handlers_loaded: 1,
-          plugin_dirs: ['/workspace/.kiro/plugins/scene-bindings'],
-          plugin_files: ['/workspace/.kiro/plugins/scene-bindings/custom-plugin.js'],
-          manifest_path: '/workspace/.kiro/config/scene-binding-plugins.json',
+          plugin_dirs: ['/workspace/.sce/plugins/scene-bindings'],
+          plugin_files: ['/workspace/.sce/plugins/scene-bindings/custom-plugin.js'],
+          manifest_path: '/workspace/.sce/config/scene-binding-plugins.json',
           manifest_loaded: true,
           warnings: []
         }
@@ -984,7 +984,7 @@ Trace: doctor-trace-feedback
     const report = await runSceneDoctorCommand({
       spec: '37-00-scene-runtime-execution-pilot',
       mode: 'commit',
-      todoOut: '.kiro/results/doctor-remediation.md',
+      todoOut: '.sce/results/doctor-remediation.md',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -1007,7 +1007,7 @@ Trace: doctor-trace-feedback
       fileSystem
     });
 
-    expect(normalizePath(report.todo_output)).toBe('/workspace/.kiro/results/doctor-remediation.md');
+    expect(normalizePath(report.todo_output)).toBe('/workspace/.sce/results/doctor-remediation.md');
     expect(fileSystem.ensureDir).toHaveBeenCalled();
     expect(fileSystem.writeFile).toHaveBeenCalledTimes(1);
   });
@@ -1072,7 +1072,7 @@ Trace: doctor-trace-feedback
     expect(report.task_sync).toBeDefined();
     expect(report.task_sync.trace_id).toBe('doctor-trace-1');
     expect(report.task_sync.added_count).toBe(1);
-    expect(normalizePath(report.task_sync.tasks_path)).toBe('/workspace/.kiro/specs/37-00-scene-runtime-execution-pilot/tasks.md');
+    expect(normalizePath(report.task_sync.tasks_path)).toBe('/workspace/.sce/specs/37-00-scene-runtime-execution-pilot/tasks.md');
 
     const syncedTasks = fileSystem.writeFile.mock.calls[fileSystem.writeFile.mock.calls.length - 1][1];
     expect(syncedTasks).toContain('## Doctor Suggested Tasks');
@@ -1118,7 +1118,7 @@ Trace: doctor-trace-feedback
       mode: 'commit',
       traceId: 'doctor-trace-feedback',
       syncSpecTasks: true,
-      feedbackOut: '.kiro/results/doctor-feedback-template.md',
+      feedbackOut: '.sce/results/doctor-feedback-template.md',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -1141,9 +1141,9 @@ Trace: doctor-trace-feedback
       fileSystem
     });
 
-    expect(normalizePath(report.feedback_output)).toBe('/workspace/.kiro/results/doctor-feedback-template.md');
+    expect(normalizePath(report.feedback_output)).toBe('/workspace/.sce/results/doctor-feedback-template.md');
 
-    const feedbackCall = fileSystem.writeFile.mock.calls.find((call) => normalizePath(call[0]) === '/workspace/.kiro/results/doctor-feedback-template.md');
+    const feedbackCall = fileSystem.writeFile.mock.calls.find((call) => normalizePath(call[0]) === '/workspace/.sce/results/doctor-feedback-template.md');
     expect(feedbackCall).toBeDefined();
 
     const feedbackContent = feedbackCall[1];
@@ -1183,7 +1183,7 @@ Trace: doctor-trace-feedback
     const report = await runSceneDoctorCommand({
       spec: '37-00-scene-runtime-execution-pilot',
       mode: 'commit',
-      taskOut: '.kiro/results/doctor-task-draft.md',
+      taskOut: '.sce/results/doctor-task-draft.md',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -1206,7 +1206,7 @@ Trace: doctor-trace-feedback
       fileSystem
     });
 
-    expect(normalizePath(report.task_output)).toBe('/workspace/.kiro/results/doctor-task-draft.md');
+    expect(normalizePath(report.task_output)).toBe('/workspace/.sce/results/doctor-task-draft.md');
     expect(fileSystem.writeFile).toHaveBeenCalledTimes(1);
 
     const draftContent = fileSystem.writeFile.mock.calls[0][1];
@@ -1256,7 +1256,7 @@ Trace: doctor-trace-feedback
 
 - [x] Status: done
 - [x] Owner: ops-team
-- [x] Evidence Paths: .kiro/results/approval.json
+- [x] Evidence Paths: .sce/results/approval.json
 - [x] Completion Notes: done
 - [x] Eval Update:
   - cycle_time_ms: 1200
@@ -1284,10 +1284,10 @@ Trace: doctor-trace-feedback
     const fileSystem = {
       readJson: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        if (normalizedPath === '/workspace/.kiro/results/run-result.json') {
+        if (normalizedPath === '/workspace/.sce/results/run-result.json') {
           return runResultPayload;
         }
-        if (normalizedPath === '/workspace/.kiro/results/eval-target.json') {
+        if (normalizedPath === '/workspace/.sce/results/eval-target.json') {
           return {
             max_cycle_time_ms: 1000,
             min_completion_rate: 0.6,
@@ -1304,10 +1304,10 @@ Trace: doctor-trace-feedback
     };
 
     const report = await runSceneEvalCommand({
-      result: '.kiro/results/run-result.json',
-      feedback: '.kiro/results/doctor-feedback.md',
-      target: '.kiro/results/eval-target.json',
-      out: '.kiro/results/eval-report.json',
+      result: '.sce/results/run-result.json',
+      feedback: '.sce/results/doctor-feedback.md',
+      target: '.sce/results/eval-target.json',
+      out: '.sce/results/eval-report.json',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -1325,9 +1325,9 @@ Trace: doctor-trace-feedback
     expect(report.feedback_evaluation.score).toBe(0.6);
     expect(report.overall.score).toBeCloseTo(0.84, 2);
     expect(report.overall.grade).toBe('watch');
-    expect(report.output_path).toBe('.kiro/results/eval-report.json');
+    expect(report.output_path).toBe('.sce/results/eval-report.json');
 
-    const writeCall = fileSystem.writeJson.mock.calls.find((call) => normalizePath(call[0]) === '/workspace/.kiro/results/eval-report.json');
+    const writeCall = fileSystem.writeJson.mock.calls.find((call) => normalizePath(call[0]) === '/workspace/.sce/results/eval-report.json');
     expect(writeCall).toBeDefined();
   });
 
@@ -1353,7 +1353,7 @@ Trace: doctor-trace-erp
     };
 
     const report = await runSceneEvalCommand({
-      feedback: '.kiro/results/doctor-feedback-empty.md',
+      feedback: '.sce/results/doctor-feedback-empty.md',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -1382,15 +1382,15 @@ Trace: doctor-trace-erp
     const fileSystem = {
       pathExists: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        return normalizedPath === '/workspace/.kiro/specs/37-00-scene-runtime-execution-pilot/tasks.md';
+        return normalizedPath === '/workspace/.sce/specs/37-00-scene-runtime-execution-pilot/tasks.md';
       }),
       readFile: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        if (normalizedPath === '/workspace/.kiro/results/doctor-feedback-empty.md') {
+        if (normalizedPath === '/workspace/.sce/results/doctor-feedback-empty.md') {
           return feedbackTemplate;
         }
 
-        if (normalizedPath === '/workspace/.kiro/specs/37-00-scene-runtime-execution-pilot/tasks.md') {
+        if (normalizedPath === '/workspace/.sce/specs/37-00-scene-runtime-execution-pilot/tasks.md') {
           return `# Implementation Plan: Demo
 
 ## Tasks
@@ -1408,7 +1408,7 @@ Trace: doctor-trace-erp
     };
 
     const report = await runSceneEvalCommand({
-      feedback: '.kiro/results/doctor-feedback-empty.md',
+      feedback: '.sce/results/doctor-feedback-empty.md',
       spec: '37-00-scene-runtime-execution-pilot',
       syncSpecTasks: true,
       json: true
@@ -1424,7 +1424,7 @@ Trace: doctor-trace-erp
       profile: 'erp',
       profile_source: 'feedback'
     });
-    expect(normalizePath(report.task_sync.tasks_path)).toBe('/workspace/.kiro/specs/37-00-scene-runtime-execution-pilot/tasks.md');
+    expect(normalizePath(report.task_sync.tasks_path)).toBe('/workspace/.sce/specs/37-00-scene-runtime-execution-pilot/tasks.md');
 
     const syncedTasks = fileSystem.writeFile.mock.calls[fileSystem.writeFile.mock.calls.length - 1][1];
     expect(syncedTasks).toContain('## Scene Eval Suggested Tasks');
@@ -1461,7 +1461,7 @@ Trace: doctor-trace-erp
     const fileSystem = {
       pathExists: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        return normalizedPath === '/workspace/.kiro/specs/37-00-scene-runtime-execution-pilot/tasks.md';
+        return normalizedPath === '/workspace/.sce/specs/37-00-scene-runtime-execution-pilot/tasks.md';
       }),
       readFile: jest.fn().mockResolvedValue(`# Implementation Plan: Demo
 
@@ -1471,11 +1471,11 @@ Trace: doctor-trace-erp
 `),
       readJson: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        if (normalizedPath === '/workspace/.kiro/results/run-result-failed.json') {
+        if (normalizedPath === '/workspace/.sce/results/run-result-failed.json') {
           return runResultPayload;
         }
 
-        if (normalizedPath === '/workspace/.kiro/results/eval-task-policy.json') {
+        if (normalizedPath === '/workspace/.sce/results/eval-task-policy.json') {
           return {
             default_priority: 'low',
             priority_by_grade: {
@@ -1499,10 +1499,10 @@ Trace: doctor-trace-erp
     };
 
     const report = await runSceneEvalCommand({
-      result: '.kiro/results/run-result-failed.json',
+      result: '.sce/results/run-result-failed.json',
       spec: '37-00-scene-runtime-execution-pilot',
       syncSpecTasks: true,
-      taskPolicy: '.kiro/results/eval-task-policy.json',
+      taskPolicy: '.sce/results/eval-task-policy.json',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -1545,7 +1545,7 @@ Trace: doctor-trace-erp
     const fileSystem = {
       pathExists: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        return normalizedPath === '/workspace/.kiro/specs/37-00-scene-runtime-execution-pilot/tasks.md';
+        return normalizedPath === '/workspace/.sce/specs/37-00-scene-runtime-execution-pilot/tasks.md';
       }),
       readFile: jest.fn().mockResolvedValue(`# Implementation Plan: Demo
 
@@ -1555,7 +1555,7 @@ Trace: doctor-trace-erp
 `),
       readJson: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        if (normalizedPath === '/workspace/.kiro/results/run-result-robot.json') {
+        if (normalizedPath === '/workspace/.sce/results/run-result-robot.json') {
           return runResultPayload;
         }
 
@@ -1567,7 +1567,7 @@ Trace: doctor-trace-erp
     };
 
     const report = await runSceneEvalCommand({
-      result: '.kiro/results/run-result-robot.json',
+      result: '.sce/results/run-result-robot.json',
       spec: '37-00-scene-runtime-execution-pilot',
       syncSpecTasks: true,
       json: true
@@ -1621,7 +1621,7 @@ Trace: doctor-trace-erp
     const fileSystem = {
       pathExists: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        return normalizedPath === '/workspace/.kiro/specs/37-00-scene-runtime-execution-pilot/tasks.md';
+        return normalizedPath === '/workspace/.sce/specs/37-00-scene-runtime-execution-pilot/tasks.md';
       }),
       readFile: jest.fn().mockResolvedValue(`# Implementation Plan: Demo
 
@@ -1631,7 +1631,7 @@ Trace: doctor-trace-erp
 `),
       readJson: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        if (normalizedPath === '/workspace/.kiro/results/run-result-robot-fallback.json') {
+        if (normalizedPath === '/workspace/.sce/results/run-result-robot-fallback.json') {
           return runResultPayload;
         }
 
@@ -1647,7 +1647,7 @@ Trace: doctor-trace-erp
     };
 
     const report = await runSceneEvalCommand({
-      result: '.kiro/results/run-result-robot-fallback.json',
+      result: '.sce/results/run-result-robot-fallback.json',
       spec: '37-00-scene-runtime-execution-pilot',
       syncSpecTasks: true,
       json: true
@@ -1695,11 +1695,11 @@ Trace: doctor-trace-erp
     const fileSystem = {
       pathExists: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        return normalizedPath === '/workspace/.kiro/specs/37-00-scene-runtime-execution-pilot/scene.yaml';
+        return normalizedPath === '/workspace/.sce/specs/37-00-scene-runtime-execution-pilot/scene.yaml';
       }),
       readJson: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        if (normalizedPath === '/workspace/.kiro/results/run-result-ops-manifest.json') {
+        if (normalizedPath === '/workspace/.sce/results/run-result-ops-manifest.json') {
           return runResultPayload;
         }
 
@@ -1729,7 +1729,7 @@ Trace: doctor-trace-erp
     };
 
     const report = await runSceneEvalCommand({
-      result: '.kiro/results/run-result-ops-manifest.json',
+      result: '.sce/results/run-result-ops-manifest.json',
       spec: '37-00-scene-runtime-execution-pilot',
       json: true
     }, {
@@ -1777,7 +1777,7 @@ Trace: doctor-trace-erp
     };
 
     const report = await runSceneEvalCommand({
-      result: '.kiro/results/run-result-strict.json',
+      result: '.sce/results/run-result-strict.json',
       profileInferStrict: true,
       json: true
     }, {
@@ -1817,11 +1817,11 @@ Trace: doctor-trace-erp
     const fileSystem = {
       readJson: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        if (normalizedPath === '/workspace/.kiro/results/run-result-rules.json') {
+        if (normalizedPath === '/workspace/.sce/results/run-result-rules.json') {
           return runResultPayload;
         }
 
-        if (normalizedPath === '/workspace/.kiro/config/custom-profile-rules.json') {
+        if (normalizedPath === '/workspace/.sce/config/custom-profile-rules.json') {
           return {
             domain_aliases: {
               warehouse: 'erp'
@@ -1837,8 +1837,8 @@ Trace: doctor-trace-erp
     };
 
     const report = await runSceneEvalCommand({
-      result: '.kiro/results/run-result-rules.json',
-      profileRules: '.kiro/config/custom-profile-rules.json',
+      result: '.sce/results/run-result-rules.json',
+      profileRules: '.sce/config/custom-profile-rules.json',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -1848,8 +1848,8 @@ Trace: doctor-trace-erp
     expect(report.inputs).toMatchObject({
       profile: 'erp',
       profile_source: 'result:scene_ref',
-      profile_rules: '.kiro/config/custom-profile-rules.json',
-      profile_rules_source: '.kiro/config/custom-profile-rules.json'
+      profile_rules: '.sce/config/custom-profile-rules.json',
+      profile_rules_source: '.sce/config/custom-profile-rules.json'
     });
     expect(report.inputs.profile_warnings).toEqual([]);
   });
@@ -1881,7 +1881,7 @@ Trace: doctor-trace-erp
     const fileSystem = {
       pathExists: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        return normalizedPath === '/workspace/.kiro/specs/37-00-scene-runtime-execution-pilot/tasks.md';
+        return normalizedPath === '/workspace/.sce/specs/37-00-scene-runtime-execution-pilot/tasks.md';
       }),
       readFile: jest.fn().mockResolvedValue(`# Implementation Plan: Demo
 
@@ -1891,11 +1891,11 @@ Trace: doctor-trace-erp
 `),
       readJson: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        if (normalizedPath === '/workspace/.kiro/results/run-result-failed-env.json') {
+        if (normalizedPath === '/workspace/.sce/results/run-result-failed-env.json') {
           return runResultPayload;
         }
 
-        if (normalizedPath === '/workspace/.kiro/results/eval-config.json') {
+        if (normalizedPath === '/workspace/.sce/results/eval-config.json') {
           return {
             target: {
               max_cycle_time_ms: 2600,
@@ -1935,8 +1935,8 @@ Trace: doctor-trace-erp
     };
 
     const report = await runSceneEvalCommand({
-      result: '.kiro/results/run-result-failed-env.json',
-      evalConfig: '.kiro/results/eval-config.json',
+      result: '.sce/results/run-result-failed-env.json',
+      evalConfig: '.sce/results/eval-config.json',
       env: 'prod',
       spec: '37-00-scene-runtime-execution-pilot',
       syncSpecTasks: true,
@@ -1951,7 +1951,7 @@ Trace: doctor-trace-erp
       max_manual_takeover_rate: 0.15
     });
     expect(report.inputs).toMatchObject({
-      eval_config: '.kiro/results/eval-config.json',
+      eval_config: '.sce/results/eval-config.json',
       env: 'prod',
       profile: 'robot',
       profile_source: 'result:scene_ref'
@@ -1971,7 +1971,7 @@ Trace: doctor-trace-erp
     };
 
     const summary = await runSceneEvalPolicyTemplateCommand({
-      out: '.kiro/results/eval-policy-template.json',
+      out: '.sce/results/eval-policy-template.json',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -1981,7 +1981,7 @@ Trace: doctor-trace-erp
     expect(summary).toMatchObject({
       created: true,
       overwritten: false,
-      output_path: '.kiro/results/eval-policy-template.json'
+      output_path: '.sce/results/eval-policy-template.json'
     });
 
     expect(fileSystem.writeJson).toHaveBeenCalledTimes(1);
@@ -1999,7 +1999,7 @@ Trace: doctor-trace-erp
     };
 
     const summary = await runSceneEvalConfigTemplateCommand({
-      out: '.kiro/results/eval-config-template.json',
+      out: '.sce/results/eval-config-template.json',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -2010,7 +2010,7 @@ Trace: doctor-trace-erp
       created: true,
       overwritten: false,
       profile: 'default',
-      output_path: '.kiro/results/eval-config-template.json'
+      output_path: '.sce/results/eval-config-template.json'
     });
 
     expect(fileSystem.writeJson).toHaveBeenCalledTimes(1);
@@ -2031,7 +2031,7 @@ Trace: doctor-trace-erp
     };
 
     const summary = await runSceneEvalConfigTemplateCommand({
-      out: '.kiro/results/eval-config-ops-template.json',
+      out: '.sce/results/eval-config-ops-template.json',
       profile: 'ops',
       json: true
     }, {
@@ -2051,7 +2051,7 @@ Trace: doctor-trace-erp
 
   test('runSceneEvalConfigTemplateCommand rejects unsupported profile', async () => {
     const result = await runSceneEvalConfigTemplateCommand({
-      out: '.kiro/results/eval-config-bad-template.json',
+      out: '.sce/results/eval-config-bad-template.json',
       profile: 'finance',
       json: true
     }, {
@@ -2076,7 +2076,7 @@ Trace: doctor-trace-erp
     };
 
     const summary = await runSceneEvalProfileRulesTemplateCommand({
-      out: '.kiro/results/eval-profile-rules-template.json',
+      out: '.sce/results/eval-profile-rules-template.json',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -2086,7 +2086,7 @@ Trace: doctor-trace-erp
     expect(summary).toMatchObject({
       created: true,
       overwritten: false,
-      output_path: '.kiro/results/eval-profile-rules-template.json'
+      output_path: '.sce/results/eval-profile-rules-template.json'
     });
     expect(summary.rules).toMatchObject({
       domain_aliases: {
@@ -2094,10 +2094,10 @@ Trace: doctor-trace-erp
       }
     });
 
-    expect(normalizePath(fileSystem.ensureDir.mock.calls[0][0])).toBe('/workspace/.kiro/results');
+    expect(normalizePath(fileSystem.ensureDir.mock.calls[0][0])).toBe('/workspace/.sce/results');
 
     const writeCall = fileSystem.writeJson.mock.calls[0];
-    expect(normalizePath(writeCall[0])).toBe('/workspace/.kiro/results/eval-profile-rules-template.json');
+    expect(normalizePath(writeCall[0])).toBe('/workspace/.sce/results/eval-profile-rules-template.json');
     expect(writeCall[1]).toEqual(expect.objectContaining({
       domain_aliases: expect.objectContaining({
         erp: 'erp',
@@ -2116,7 +2116,7 @@ Trace: doctor-trace-erp
     };
 
     const summary = await runSceneRoutePolicyTemplateCommand({
-      out: '.kiro/results/route-policy-template.json',
+      out: '.sce/results/route-policy-template.json',
       profile: 'hybrid',
       json: true
     }, {
@@ -2128,7 +2128,7 @@ Trace: doctor-trace-erp
       created: true,
       overwritten: false,
       profile: 'hybrid',
-      output_path: '.kiro/results/route-policy-template.json'
+      output_path: '.sce/results/route-policy-template.json'
     });
 
     const routePolicy = fileSystem.writeJson.mock.calls[0][1];
@@ -2155,7 +2155,7 @@ Trace: doctor-trace-erp
     const fileSystem = {
       readdir: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        if (normalizedPath === '/workspace/.kiro/specs') {
+        if (normalizedPath === '/workspace/.sce/specs') {
           return [
             dirent('36-00-scene-contract-kind-model', 'dir'),
             dirent('37-00-scene-runtime-execution-pilot', 'dir'),
@@ -2230,7 +2230,7 @@ Trace: doctor-trace-erp
 
     const catalog = await runSceneCatalogCommand({
       domain: 'erp',
-      out: '.kiro/results/scene-catalog.json',
+      out: '.sce/results/scene-catalog.json',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -2252,8 +2252,8 @@ Trace: doctor-trace-erp
       valid: true
     });
 
-    expect(normalizePath(fileSystem.ensureDir.mock.calls[0][0])).toBe('/workspace/.kiro/results');
-    expect(normalizePath(fileSystem.writeJson.mock.calls[0][0])).toBe('/workspace/.kiro/results/scene-catalog.json');
+    expect(normalizePath(fileSystem.ensureDir.mock.calls[0][0])).toBe('/workspace/.sce/results');
+    expect(normalizePath(fileSystem.writeJson.mock.calls[0][0])).toBe('/workspace/.sce/results/scene-catalog.json');
   });
 
   test('runSceneCatalogCommand includes invalid entries when requested', async () => {
@@ -2261,7 +2261,7 @@ Trace: doctor-trace-erp
       pathExists: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
 
-        if (normalizedPath === '/workspace/.kiro/specs/37-00-scene-runtime-execution-pilot') {
+        if (normalizedPath === '/workspace/.sce/specs/37-00-scene-runtime-execution-pilot') {
           return true;
         }
 
@@ -2313,7 +2313,7 @@ Trace: doctor-trace-erp
     const fileSystem = {
       readdir: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        if (normalizedPath === '/workspace/.kiro/specs') {
+        if (normalizedPath === '/workspace/.sce/specs') {
           return [
             dirent('36-00-scene-contract-kind-model', 'dir'),
             dirent('37-00-scene-runtime-execution-pilot', 'dir')
@@ -2387,7 +2387,7 @@ Trace: doctor-trace-erp
     const route = await runSceneRouteCommand({
       sceneRef: 'scene.erp.order.query',
       mode: 'dry_run',
-      out: '.kiro/results/scene-route.json',
+      out: '.sce/results/scene-route.json',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -2408,7 +2408,7 @@ Trace: doctor-trace-erp
       doctor: 'sce scene doctor --spec 36-00-scene-contract-kind-model --spec-manifest custom/scene.yaml --mode dry_run',
       run: 'sce scene run --spec 36-00-scene-contract-kind-model --spec-manifest custom/scene.yaml --mode dry_run'
     });
-    expect(normalizePath(fileSystem.writeJson.mock.calls[0][0])).toBe('/workspace/.kiro/results/scene-route.json');
+    expect(normalizePath(fileSystem.writeJson.mock.calls[0][0])).toBe('/workspace/.sce/results/scene-route.json');
   });
 
   test('runSceneRouteCommand applies custom route policy file', async () => {
@@ -2421,7 +2421,7 @@ Trace: doctor-trace-erp
     const fileSystem = {
       readdir: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        if (normalizedPath === '/workspace/.kiro/specs') {
+        if (normalizedPath === '/workspace/.sce/specs') {
           return [
             dirent('61-00-scene-catalog-discovery-and-routing', 'dir'),
             dirent('63-00-scene-routing-decision-layer', 'dir')
@@ -2468,14 +2468,14 @@ Trace: doctor-trace-erp
 
     const route = await runSceneRouteCommand({
       query: 'routing',
-      routePolicy: '.kiro/config/scene-route-policy.json',
+      routePolicy: '.sce/config/scene-route-policy.json',
       json: true
     }, {
       projectRoot: '/workspace',
       fileSystem
     });
 
-    expect(route.route_policy_source).toBe('.kiro/config/scene-route-policy.json');
+    expect(route.route_policy_source).toBe('.sce/config/scene-route-policy.json');
     expect(route.route_policy).toMatchObject({
       weights: {
         query_token_match: 0
@@ -2483,7 +2483,7 @@ Trace: doctor-trace-erp
       max_alternatives: 1
     });
     expect(route.alternatives.length).toBeLessThanOrEqual(1);
-    expect(normalizePath(fileSystem.readJson.mock.calls[0][0])).toBe('/workspace/.kiro/config/scene-route-policy.json');
+    expect(normalizePath(fileSystem.readJson.mock.calls[0][0])).toBe('/workspace/.sce/config/scene-route-policy.json');
   });
 
   test('runSceneRouteCommand fails when top candidates tie and requireUnique is true', async () => {
@@ -2496,7 +2496,7 @@ Trace: doctor-trace-erp
     const fileSystem = {
       readdir: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        if (normalizedPath === '/workspace/.kiro/specs') {
+        if (normalizedPath === '/workspace/.sce/specs') {
           return [
             dirent('36-00-scene-contract-kind-model', 'dir'),
             dirent('38-00-scene-runtime-cli-integration', 'dir')
@@ -2554,7 +2554,7 @@ Trace: doctor-trace-erp
       readJson: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
 
-        if (normalizedPath === '/workspace/.kiro/config/scene-route-policy.json') {
+        if (normalizedPath === '/workspace/.sce/config/scene-route-policy.json') {
           return {
             weights: {
               scene_ref_mismatch: -12,
@@ -2570,7 +2570,7 @@ Trace: doctor-trace-erp
           };
         }
 
-        if (normalizedPath === '/workspace/.kiro/results/eval-critical.json') {
+        if (normalizedPath === '/workspace/.sce/results/eval-critical.json') {
           return {
             scene_ref: 'scene.hybrid.pick.critical',
             run_evaluation: {
@@ -2589,7 +2589,7 @@ Trace: doctor-trace-erp
           };
         }
 
-        if (normalizedPath === '/workspace/.kiro/results/eval-at-risk.json') {
+        if (normalizedPath === '/workspace/.sce/results/eval-at-risk.json') {
           return {
             scene_ref: 'scene.hybrid.pick.watch',
             run_evaluation: {
@@ -2614,11 +2614,11 @@ Trace: doctor-trace-erp
     };
 
     const payload = await runSceneRoutePolicySuggestCommand({
-      eval: ['.kiro/results/eval-critical.json', '.kiro/results/eval-at-risk.json'],
-      routePolicy: '.kiro/config/scene-route-policy.json',
+      eval: ['.sce/results/eval-critical.json', '.sce/results/eval-at-risk.json'],
+      routePolicy: '.sce/config/scene-route-policy.json',
       maxAdjustment: 6,
-      out: '.kiro/results/route-policy-suggest.json',
-      policyOut: '.kiro/results/route-policy-suggested.json',
+      out: '.sce/results/route-policy-suggest.json',
+      policyOut: '.sce/results/route-policy-suggested.json',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -2626,13 +2626,13 @@ Trace: doctor-trace-erp
     });
 
     expect(payload).toBeDefined();
-    expect(payload.baseline.source).toBe('.kiro/config/scene-route-policy.json');
+    expect(payload.baseline.source).toBe('.sce/config/scene-route-policy.json');
     expect(payload.adjustments.length).toBeGreaterThan(0);
     expect(payload.suggested_policy.mode_bias.commit.high).toBeLessThan(-4);
     expect(payload.suggested_policy.weights.scene_ref_mismatch).toBeLessThan(-12);
 
-    expect(normalizePath(fileSystem.writeJson.mock.calls[0][0])).toBe('/workspace/.kiro/results/route-policy-suggest.json');
-    expect(normalizePath(fileSystem.writeJson.mock.calls[1][0])).toBe('/workspace/.kiro/results/route-policy-suggested.json');
+    expect(normalizePath(fileSystem.writeJson.mock.calls[0][0])).toBe('/workspace/.sce/results/route-policy-suggest.json');
+    expect(normalizePath(fileSystem.writeJson.mock.calls[1][0])).toBe('/workspace/.sce/results/route-policy-suggested.json');
   });
 
   test('runSceneRoutePolicySuggestCommand discovers eval reports from directory and infers baseline profile', async () => {
@@ -2646,7 +2646,7 @@ Trace: doctor-trace-erp
       readdir: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
 
-        if (normalizedPath === '/workspace/.kiro/results') {
+        if (normalizedPath === '/workspace/.sce/results') {
           return [
             dirent('eval-hybrid-1.json', 'file'),
             dirent('eval-hybrid-2.json', 'file'),
@@ -2660,7 +2660,7 @@ Trace: doctor-trace-erp
       readJson: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
 
-        if (normalizedPath === '/workspace/.kiro/results/eval-hybrid-1.json') {
+        if (normalizedPath === '/workspace/.sce/results/eval-hybrid-1.json') {
           return {
             scene_ref: 'scene.hybrid.pick.route-one',
             run_evaluation: {
@@ -2676,7 +2676,7 @@ Trace: doctor-trace-erp
           };
         }
 
-        if (normalizedPath === '/workspace/.kiro/results/eval-hybrid-2.json') {
+        if (normalizedPath === '/workspace/.sce/results/eval-hybrid-2.json') {
           return {
             scene_ref: 'scene.hybrid.pick.route-two',
             run_evaluation: {
@@ -2699,7 +2699,7 @@ Trace: doctor-trace-erp
     };
 
     const payload = await runSceneRoutePolicySuggestCommand({
-      evalDir: '.kiro/results',
+      evalDir: '.sce/results',
       maxAdjustment: 4,
       json: true
     }, {
@@ -2712,7 +2712,7 @@ Trace: doctor-trace-erp
     expect(payload.baseline.source).toBe('profile:auto:hybrid');
     expect(payload.suggested_policy.weights.query_token_match).toBeGreaterThan(10);
     expect(payload.eval_reports).toHaveLength(2);
-    expect(payload.eval_reports[0].source_path).toContain('.kiro/results/');
+    expect(payload.eval_reports[0].source_path).toContain('.sce/results/');
   });
 
   test('runSceneRoutePolicySuggestCommand fails when eval directory resolves no JSON reports', async () => {
@@ -2733,7 +2733,7 @@ Trace: doctor-trace-erp
     };
 
     const payload = await runSceneRoutePolicySuggestCommand({
-      evalDir: '.kiro/results',
+      evalDir: '.sce/results',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -2750,10 +2750,10 @@ Trace: doctor-trace-erp
       readJson: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
 
-        if (normalizedPath === '/workspace/.kiro/results/route-policy-suggest.json') {
+        if (normalizedPath === '/workspace/.sce/results/route-policy-suggest.json') {
           return {
             baseline: {
-              source: '.kiro/config/scene-route-policy.json',
+              source: '.sce/config/scene-route-policy.json',
               policy: {
                 weights: {
                   scene_ref_mismatch: -12
@@ -2795,9 +2795,9 @@ Trace: doctor-trace-erp
     };
 
     const payload = await runSceneRoutePolicyRolloutCommand({
-      suggestion: '.kiro/results/route-policy-suggest.json',
-      targetPolicy: '.kiro/config/scene-route-policy.json',
-      outDir: '.kiro/releases/scene-route-policy',
+      suggestion: '.sce/results/route-policy-suggest.json',
+      targetPolicy: '.sce/config/scene-route-policy.json',
+      outDir: '.sce/releases/scene-route-policy',
       name: 'Wave 01',
       json: true
     }, {
@@ -2816,12 +2816,12 @@ Trace: doctor-trace-erp
     expect(payload.files.runbook).toContain('runbook.md');
 
     const writeJsonTargets = fileSystem.writeJson.mock.calls.map((call) => normalizePath(call[0]));
-    expect(writeJsonTargets).toContain('/workspace/.kiro/releases/scene-route-policy/wave-01/route-policy.next.json');
-    expect(writeJsonTargets).toContain('/workspace/.kiro/releases/scene-route-policy/wave-01/route-policy.rollback.json');
-    expect(writeJsonTargets).toContain('/workspace/.kiro/releases/scene-route-policy/wave-01/rollout-plan.json');
+    expect(writeJsonTargets).toContain('/workspace/.sce/releases/scene-route-policy/wave-01/route-policy.next.json');
+    expect(writeJsonTargets).toContain('/workspace/.sce/releases/scene-route-policy/wave-01/route-policy.rollback.json');
+    expect(writeJsonTargets).toContain('/workspace/.sce/releases/scene-route-policy/wave-01/rollout-plan.json');
 
     expect(normalizePath(fileSystem.writeFile.mock.calls[0][0]))
-      .toBe('/workspace/.kiro/releases/scene-route-policy/wave-01/runbook.md');
+      .toBe('/workspace/.sce/releases/scene-route-policy/wave-01/runbook.md');
   });
 
   test('runSceneRoutePolicyRolloutCommand fails when suggestion payload misses policies', async () => {
@@ -2834,7 +2834,7 @@ Trace: doctor-trace-erp
     };
 
     const payload = await runSceneRoutePolicyRolloutCommand({
-      suggestion: '.kiro/results/route-policy-suggest.json',
+      suggestion: '.sce/results/route-policy-suggest.json',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -2865,14 +2865,14 @@ Trace: doctor-trace-erp
     });
 
     expect(payload).toBeDefined();
-    expect(payload.output_path).toBe('.kiro/specs/67-00-scene-package-contract-declaration/custom/scene-package.json');
+    expect(payload.output_path).toBe('.sce/specs/67-00-scene-package-contract-declaration/custom/scene-package.json');
     expect(payload.summary).toMatchObject({
       kind: 'scene-domain-profile'
     });
 
     const writeCall = fileSystem.writeJson.mock.calls[0];
     expect(normalizePath(writeCall[0]))
-      .toBe('/workspace/.kiro/specs/67-00-scene-package-contract-declaration/custom/scene-package.json');
+      .toBe('/workspace/.sce/specs/67-00-scene-package-contract-declaration/custom/scene-package.json');
     expect(writeCall[1]).toMatchObject({
       apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-domain-profile',
@@ -2892,7 +2892,7 @@ Trace: doctor-trace-erp
     };
 
     const payload = await runScenePackageValidateCommand({
-      package: '.kiro/templates/scene-package.json',
+      package: '.sce/templates/scene-package.json',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -2940,13 +2940,13 @@ Trace: doctor-trace-erp
     const fileSystem = {
       pathExists: jest.fn().mockImplementation(async (targetPath) => {
         const normalized = normalizePath(targetPath);
-        if (normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration') {
+        if (normalized === '/workspace/.sce/specs/67-00-scene-package-contract-declaration') {
           return true;
         }
-        if (normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration/custom/scene.yaml') {
+        if (normalized === '/workspace/.sce/specs/67-00-scene-package-contract-declaration/custom/scene.yaml') {
           return true;
         }
-        if (normalized === '/workspace/.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0') {
+        if (normalized === '/workspace/.sce/templates/scene-packages/sce.scene--erp-order-query--0.2.0') {
           return false;
         }
         return false;
@@ -2968,14 +2968,14 @@ Trace: doctor-trace-erp
 
     expect(payload).toBeDefined();
     expect(payload.template.id).toBe('sce.scene--erp-order-query--0.2.0');
-    expect(payload.template.output_dir).toBe('.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0');
+    expect(payload.template.output_dir).toBe('.sce/templates/scene-packages/sce.scene--erp-order-query--0.2.0');
 
     const writeJsonTargets = fileSystem.writeJson.mock.calls.map((call) => normalizePath(call[0]));
-    expect(writeJsonTargets).toContain('/workspace/.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0/template.manifest.json');
-    expect(writeJsonTargets).toContain('/workspace/.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0/scene-package.json');
+    expect(writeJsonTargets).toContain('/workspace/.sce/templates/scene-packages/sce.scene--erp-order-query--0.2.0/template.manifest.json');
+    expect(writeJsonTargets).toContain('/workspace/.sce/templates/scene-packages/sce.scene--erp-order-query--0.2.0/scene-package.json');
 
     expect(normalizePath(fileSystem.writeFile.mock.calls[0][0]))
-      .toBe('/workspace/.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0/scene.template.yaml');
+      .toBe('/workspace/.sce/templates/scene-packages/sce.scene--erp-order-query--0.2.0/scene.template.yaml');
   });
 
   test('runScenePackagePublishCommand supports dry-run preview without writes', async () => {
@@ -3012,13 +3012,13 @@ Trace: doctor-trace-erp
     const fileSystem = {
       pathExists: jest.fn().mockImplementation(async (targetPath) => {
         const normalized = normalizePath(targetPath);
-        if (normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration') {
+        if (normalized === '/workspace/.sce/specs/67-00-scene-package-contract-declaration') {
           return true;
         }
-        if (normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration/custom/scene.yaml') {
+        if (normalized === '/workspace/.sce/specs/67-00-scene-package-contract-declaration/custom/scene.yaml') {
           return true;
         }
-        if (normalized === '/workspace/.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0') {
+        if (normalized === '/workspace/.sce/templates/scene-packages/sce.scene--erp-order-query--0.2.0') {
           return false;
         }
         return false;
@@ -3082,13 +3082,13 @@ Trace: doctor-trace-erp
     const fileSystem = {
       pathExists: jest.fn().mockImplementation(async (targetPath) => {
         const normalized = normalizePath(targetPath);
-        if (normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration') {
+        if (normalized === '/workspace/.sce/specs/67-00-scene-package-contract-declaration') {
           return true;
         }
-        if (normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration/custom/scene.yaml') {
+        if (normalized === '/workspace/.sce/specs/67-00-scene-package-contract-declaration/custom/scene.yaml') {
           return true;
         }
-        if (normalized === '/workspace/.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0') {
+        if (normalized === '/workspace/.sce/templates/scene-packages/sce.scene--erp-order-query--0.2.0') {
           return true;
         }
         return false;
@@ -3157,7 +3157,7 @@ Trace: doctor-trace-erp
     const fileSystem = {
       pathExists: jest.fn().mockImplementation(async (targetPath) => {
         const normalized = normalizePath(targetPath);
-        return normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration';
+        return normalized === '/workspace/.sce/specs/67-00-scene-package-contract-declaration';
       }),
       readJson: jest.fn().mockResolvedValue(contract),
       readFile: jest.fn().mockResolvedValue('apiVersion: sce.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{entity_name}}\n'),
@@ -3216,7 +3216,7 @@ Trace: doctor-trace-erp
     const fileSystem = {
       pathExists: jest.fn().mockImplementation(async (targetPath) => {
         const normalized = normalizePath(targetPath);
-        return normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration';
+        return normalized === '/workspace/.sce/specs/67-00-scene-package-contract-declaration';
       }),
       readJson: jest.fn().mockResolvedValue(contract),
       readFile: jest.fn().mockResolvedValue('apiVersion: sce.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{entity_name}}\n'),
@@ -3275,7 +3275,7 @@ Trace: doctor-trace-erp
     const fileSystem = {
       pathExists: jest.fn().mockImplementation(async (targetPath) => {
         const normalized = normalizePath(targetPath);
-        return normalized === '/workspace/.kiro/specs/67-00-scene-package-contract-declaration';
+        return normalized === '/workspace/.sce/specs/67-00-scene-package-contract-declaration';
       }),
       readJson: jest.fn().mockResolvedValue(contract),
       readFile: jest.fn().mockResolvedValue('apiVersion: sce.scene/v0.2\nmetadata:\n  obj_id: scene.erp.{{entity_name}}\n'),
@@ -3314,14 +3314,14 @@ Trace: doctor-trace-erp
           {
             id: '60-01-master-data-deepening',
             status: 'completed',
-            scene_package: '.kiro/specs/60-01-master-data-deepening/docs/scene-package.json',
-            scene_manifest: '.kiro/specs/60-01-master-data-deepening/docs/scene.yaml'
+            scene_package: '.sce/specs/60-01-master-data-deepening/docs/scene-package.json',
+            scene_manifest: '.sce/specs/60-01-master-data-deepening/docs/scene.yaml'
           },
           {
             id: '60-02-sales-lifecycle-enhancement',
             status: 'in_progress',
-            scene_package: '.kiro/specs/60-02-sales-lifecycle-enhancement/docs/scene-package.json',
-            scene_manifest: '.kiro/specs/60-02-sales-lifecycle-enhancement/docs/scene.yaml'
+            scene_package: '.sce/specs/60-02-sales-lifecycle-enhancement/docs/scene-package.json',
+            scene_manifest: '.sce/specs/60-02-sales-lifecycle-enhancement/docs/scene.yaml'
           }
         ]
       })
@@ -3381,8 +3381,8 @@ Trace: doctor-trace-erp
           {
             id: '62-01-moqui-capability-itemized-parity-matrix',
             status: 'completed',
-            scene_package: '.kiro/specs/62-01-moqui-capability-itemized-parity-matrix/docs/scene-package.json',
-            scene_manifest: '.kiro/specs/62-01-moqui-capability-itemized-parity-matrix/docs/scene.yaml'
+            scene_package: '.sce/specs/62-01-moqui-capability-itemized-parity-matrix/docs/scene-package.json',
+            scene_manifest: '.sce/specs/62-01-moqui-capability-itemized-parity-matrix/docs/scene.yaml'
           }
         ]
       })
@@ -3697,7 +3697,7 @@ Trace: doctor-trace-erp
       manifest: 'docs/handoffs/handoff-manifest.json',
       requireOntologyValidation: true,
       ontologyMinScore: 70,
-      ontologyReportOut: '.kiro/reports/scene-package-ontology-batch.json',
+      ontologyReportOut: '.sce/reports/scene-package-ontology-batch.json',
       dryRun: true,
       json: true
     }, {
@@ -3708,11 +3708,11 @@ Trace: doctor-trace-erp
 
     expect(payload).toBeDefined();
     expect(payload.success).toBe(true);
-    expect(payload.ontology_report_path).toBe('.kiro/reports/scene-package-ontology-batch.json');
-    expect(normalizePath(fileSystem.ensureDir.mock.calls[0][0])).toBe('/workspace/.kiro/reports');
+    expect(payload.ontology_report_path).toBe('.sce/reports/scene-package-ontology-batch.json');
+    expect(normalizePath(fileSystem.ensureDir.mock.calls[0][0])).toBe('/workspace/.sce/reports');
     expect(fileSystem.writeJson).toHaveBeenCalledTimes(1);
     expect(normalizePath(fileSystem.writeJson.mock.calls[0][0]))
-      .toBe('/workspace/.kiro/reports/scene-package-ontology-batch.json');
+      .toBe('/workspace/.sce/reports/scene-package-ontology-batch.json');
 
     const reportPayload = fileSystem.writeJson.mock.calls[0][1];
     expect(reportPayload.summary.selected).toBe(1);
@@ -3816,7 +3816,7 @@ Trace: doctor-trace-erp
       manifest: 'docs/handoffs/handoff-manifest.json',
       requireOntologyValidation: true,
       ontologyMinScore: 50,
-      ontologyTaskOut: '.kiro/reports/scene-package-ontology-task-draft.md',
+      ontologyTaskOut: '.sce/reports/scene-package-ontology-task-draft.md',
       dryRun: true,
       json: true
     }, {
@@ -3828,11 +3828,11 @@ Trace: doctor-trace-erp
     expect(payload).toBeDefined();
     expect(payload.success).toBe(false);
     expect(payload.ontology_task_draft).toMatchObject({
-      output_path: '.kiro/reports/scene-package-ontology-task-draft.md'
+      output_path: '.sce/reports/scene-package-ontology-task-draft.md'
     });
     expect(fileSystem.writeFile).toHaveBeenCalledTimes(1);
     expect(normalizePath(fileSystem.writeFile.mock.calls[0][0]))
-      .toBe('/workspace/.kiro/reports/scene-package-ontology-task-draft.md');
+      .toBe('/workspace/.sce/reports/scene-package-ontology-task-draft.md');
     expect(fileSystem.writeFile.mock.calls[0][1]).toContain('# Scene Package Ontology Remediation Task Draft');
     expect(fileSystem.writeFile.mock.calls[0][1]).toContain('repair ontology and republish 62-00-moqui-full-capability-closure-program');
     expect(fileSystem.writeFile.mock.calls[0][1]).toContain('ontology semantic quality score 30 is below minimum 50');
@@ -3871,7 +3871,7 @@ Trace: doctor-trace-erp
       manifest: 'docs/handoffs/handoff-manifest.json',
       requireOntologyValidation: true,
       ontologyMinScore: 50,
-      ontologyTaskQueueOut: '.kiro/auto/ontology-remediation.lines',
+      ontologyTaskQueueOut: '.sce/auto/ontology-remediation.lines',
       dryRun: true,
       json: true
     }, {
@@ -3883,12 +3883,12 @@ Trace: doctor-trace-erp
     expect(payload).toBeDefined();
     expect(payload.success).toBe(false);
     expect(payload.ontology_task_queue).toMatchObject({
-      output_path: '.kiro/auto/ontology-remediation.lines',
+      output_path: '.sce/auto/ontology-remediation.lines',
       queued_tasks: 2
     });
     expect(fileSystem.writeFile).toHaveBeenCalledTimes(1);
     expect(normalizePath(fileSystem.writeFile.mock.calls[0][0]))
-      .toBe('/workspace/.kiro/auto/ontology-remediation.lines');
+      .toBe('/workspace/.sce/auto/ontology-remediation.lines');
     expect(fileSystem.writeFile.mock.calls[0][1])
       .toContain('[ontology-remediation][high] repair ontology and republish 62-00-moqui-full-capability-closure-program');
     expect(fileSystem.writeFile.mock.calls[0][1])
@@ -3942,13 +3942,13 @@ Trace: doctor-trace-erp
               {
                 id: specId,
                 status: 'completed',
-                scene_package: `.kiro/specs/${specId}/docs/scene-package.json`
+                scene_package: `.sce/specs/${specId}/docs/scene-package.json`
               }
             ]
           };
         }
 
-        if (normalized.endsWith(`/.kiro/specs/${specId}/docs/scene-package.json`)) {
+        if (normalized.endsWith(`/.sce/specs/${specId}/docs/scene-package.json`)) {
           return contract;
         }
 
@@ -4035,12 +4035,12 @@ Trace: doctor-trace-erp
               {
                 id: specId,
                 status: 'completed',
-                scene_package: `.kiro/specs/${specId}/docs/scene-package.json`
+                scene_package: `.sce/specs/${specId}/docs/scene-package.json`
               }
             ]
           };
         }
-        if (normalized.endsWith(`/.kiro/specs/${specId}/docs/scene-package.json`)) {
+        if (normalized.endsWith(`/.sce/specs/${specId}/docs/scene-package.json`)) {
           return contract;
         }
         throw new Error(`unexpected readJson path: ${targetPath}`);
@@ -4064,7 +4064,7 @@ Trace: doctor-trace-erp
     expect(payload.summary.updated).toBe(1);
     expect(fileSystem.writeJson).toHaveBeenCalledTimes(1);
     expect(normalizePath(fileSystem.writeJson.mock.calls[0][0]))
-      .toBe(`/workspace/.kiro/specs/${specId}/docs/scene-package.json`);
+      .toBe(`/workspace/.sce/specs/${specId}/docs/scene-package.json`);
     const writtenContract = fileSystem.writeJson.mock.calls[0][1];
     expect(writtenContract.ontology_model).toBeDefined();
     expect(Array.isArray(writtenContract.ontology_model.entities)).toBe(true);
@@ -4084,12 +4084,12 @@ Trace: doctor-trace-erp
               {
                 id: specId,
                 status: 'completed',
-                scene_package: `.kiro/specs/${specId}/docs/scene-package.json`
+                scene_package: `.sce/specs/${specId}/docs/scene-package.json`
               }
             ]
           };
         }
-        if (normalized.endsWith(`/.kiro/specs/${specId}/docs/scene-package.json`)) {
+        if (normalized.endsWith(`/.sce/specs/${specId}/docs/scene-package.json`)) {
           return {
             apiVersion: 'sce.scene.package/v0.1',
             kind: 'scene-template',
@@ -4192,10 +4192,10 @@ Trace: doctor-trace-erp
         if (normalized.endsWith('/scene.template.yaml')) {
           return true;
         }
-        if (normalized.endsWith('/.kiro/specs/68-00-scene-package-template-publish-and-instantiate/custom/scene.yaml')) {
+        if (normalized.endsWith('/.sce/specs/68-00-scene-package-template-publish-and-instantiate/custom/scene.yaml')) {
           return false;
         }
-        if (normalized.endsWith('/.kiro/specs/68-00-scene-package-template-publish-and-instantiate/custom/scene-package.json')) {
+        if (normalized.endsWith('/.sce/specs/68-00-scene-package-template-publish-and-instantiate/custom/scene-package.json')) {
           return false;
         }
 
@@ -4208,9 +4208,9 @@ Trace: doctor-trace-erp
     };
 
     const payload = await runScenePackageInstantiateCommand({
-      template: '.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0/template.manifest.json',
+      template: '.sce/templates/scene-packages/sce.scene--erp-order-query--0.2.0/template.manifest.json',
       targetSpec: '68-00-scene-package-template-publish-and-instantiate',
-      values: '.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0/values.json',
+      values: '.sce/templates/scene-packages/sce.scene--erp-order-query--0.2.0/values.json',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -4225,12 +4225,12 @@ Trace: doctor-trace-erp
     });
 
     expect(normalizePath(fileSystem.writeFile.mock.calls[0][0]))
-      .toBe('/workspace/.kiro/specs/68-00-scene-package-template-publish-and-instantiate/custom/scene.yaml');
+      .toBe('/workspace/.sce/specs/68-00-scene-package-template-publish-and-instantiate/custom/scene.yaml');
     expect(fileSystem.writeFile.mock.calls[0][1]).toContain('scene.erp.Project');
     expect(fileSystem.writeFile.mock.calls[0][1]).toContain('queryService');
 
     expect(normalizePath(fileSystem.writeJson.mock.calls[0][0]))
-      .toBe('/workspace/.kiro/specs/68-00-scene-package-template-publish-and-instantiate/custom/scene-package.json');
+      .toBe('/workspace/.sce/specs/68-00-scene-package-template-publish-and-instantiate/custom/scene-package.json');
     expect(fileSystem.writeJson.mock.calls[0][1].metadata.name)
       .toBe('scene-package-template-publish-and-instantiate');
   });
@@ -4291,7 +4291,7 @@ Trace: doctor-trace-erp
     };
 
     const payload = await runScenePackageInstantiateCommand({
-      template: '.kiro/templates/scene-packages/sce.scene--erp-order-query--0.2.0/template.manifest.json',
+      template: '.sce/templates/scene-packages/sce.scene--erp-order-query--0.2.0/template.manifest.json',
       targetSpec: '68-00-scene-package-template-publish-and-instantiate',
       json: true
     }, {
@@ -4353,7 +4353,7 @@ Trace: doctor-trace-erp
     const fileSystem = {
       pathExists: jest.fn().mockImplementation(async (targetPath) => {
         const normalized = normalizePath(targetPath);
-        if (normalized === '/workspace/.kiro/templates/scene-packages') {
+        if (normalized === '/workspace/.sce/templates/scene-packages') {
           return true;
         }
         if (normalized.endsWith('/sce.scene--erp-order-query--0.2.0/template.manifest.json')) {
@@ -4395,8 +4395,8 @@ Trace: doctor-trace-erp
     };
 
     const payload = await runScenePackageRegistryCommand({
-      templateDir: '.kiro/templates/scene-packages',
-      out: '.kiro/reports/scene-package-registry.json',
+      templateDir: '.sce/templates/scene-packages',
+      out: '.sce/reports/scene-package-registry.json',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -4411,16 +4411,16 @@ Trace: doctor-trace-erp
     });
     expect(payload.summary.layer_counts.l3_instance).toBe(1);
     expect(payload.templates[0].template_id).toBe('broken-template');
-    expect(payload.output_path).toBe('.kiro/reports/scene-package-registry.json');
+    expect(payload.output_path).toBe('.sce/reports/scene-package-registry.json');
     expect(normalizePath(fileSystem.writeJson.mock.calls[0][0]))
-      .toBe('/workspace/.kiro/reports/scene-package-registry.json');
+      .toBe('/workspace/.sce/reports/scene-package-registry.json');
   });
 
   test('runScenePackageRegistryCommand sets non-zero exit code in strict mode', async () => {
     const fileSystem = {
       pathExists: jest.fn().mockImplementation(async (targetPath) => {
         const normalized = normalizePath(targetPath);
-        if (normalized === '/workspace/.kiro/templates/scene-packages') {
+        if (normalized === '/workspace/.sce/templates/scene-packages') {
           return true;
         }
         if (normalized.endsWith('/broken-template/template.manifest.json')) {
@@ -4443,7 +4443,7 @@ Trace: doctor-trace-erp
     };
 
     const payload = await runScenePackageRegistryCommand({
-      templateDir: '.kiro/templates/scene-packages',
+      templateDir: '.sce/templates/scene-packages',
       strict: true,
       json: true
     }, {
@@ -4464,7 +4464,7 @@ Trace: doctor-trace-erp
     };
 
     const payload = await runScenePackageGateTemplateCommand({
-      out: '.kiro/templates/scene-package-gate-policy.json',
+      out: '.sce/templates/scene-package-gate-policy.json',
       profile: 'three-layer',
       json: true
     }, {
@@ -4476,7 +4476,7 @@ Trace: doctor-trace-erp
     expect(payload.profile).toBe('three-layer');
     expect(payload.policy.rules.required_layers).toEqual(['l1-capability', 'l2-domain', 'l3-instance']);
     expect(normalizePath(fileSystem.writeJson.mock.calls[0][0]))
-      .toBe('/workspace/.kiro/templates/scene-package-gate-policy.json');
+      .toBe('/workspace/.sce/templates/scene-package-gate-policy.json');
   });
 
   test('runScenePackageGateCommand evaluates pass result and writes output', async () => {
@@ -4522,9 +4522,9 @@ Trace: doctor-trace-erp
     };
 
     const payload = await runScenePackageGateCommand({
-      registry: '.kiro/reports/scene-package-registry.json',
-      policy: '.kiro/templates/scene-package-gate-policy.json',
-      out: '.kiro/reports/scene-package-gate-result.json',
+      registry: '.sce/reports/scene-package-registry.json',
+      policy: '.sce/templates/scene-package-gate-policy.json',
+      out: '.sce/reports/scene-package-gate-result.json',
       json: true
     }, {
       projectRoot: '/workspace',
@@ -4547,7 +4547,7 @@ Trace: doctor-trace-erp
       actions: []
     });
     expect(normalizePath(fileSystem.writeJson.mock.calls[0][0]))
-      .toBe('/workspace/.kiro/reports/scene-package-gate-result.json');
+      .toBe('/workspace/.sce/reports/scene-package-gate-result.json');
   });
 
   test('runScenePackageGateCommand sets non-zero exit code when strict gate fails', async () => {
@@ -4593,8 +4593,8 @@ Trace: doctor-trace-erp
     };
 
     const payload = await runScenePackageGateCommand({
-      registry: '.kiro/reports/scene-package-registry.json',
-      policy: '.kiro/templates/scene-package-gate-policy.json',
+      registry: '.sce/reports/scene-package-registry.json',
+      policy: '.sce/templates/scene-package-gate-policy.json',
       strict: true,
       json: true
     }, {
@@ -4667,11 +4667,11 @@ Trace: doctor-trace-erp
     };
 
     const payload = await runScenePackageGateCommand({
-      registry: '.kiro/reports/scene-package-registry.json',
-      policy: '.kiro/templates/scene-package-gate-policy.json',
+      registry: '.sce/reports/scene-package-registry.json',
+      policy: '.sce/templates/scene-package-gate-policy.json',
       spec: '71-00-scene-package-gate-task-draft-and-sync',
-      taskOut: '.kiro/reports/scene-package-gate-task-draft.md',
-      runbookOut: '.kiro/reports/scene-package-gate-remediation-runbook.md',
+      taskOut: '.sce/reports/scene-package-gate-task-draft.md',
+      runbookOut: '.sce/reports/scene-package-gate-remediation-runbook.md',
       syncSpecTasks: true,
       json: true
     }, {
@@ -4689,10 +4689,10 @@ Trace: doctor-trace-erp
     const increaseAction = payload.remediation.actions.find((item) => item.id === 'increase-valid-templates');
     expect(increaseAction.source_check_ids).toEqual(['min-valid-templates']);
 
-    expect(payload.task_draft.output_path).toBe('.kiro/reports/scene-package-gate-task-draft.md');
+    expect(payload.task_draft.output_path).toBe('.sce/reports/scene-package-gate-task-draft.md');
     expect(payload.task_draft.suggested_actions).toBe(3);
     expect(payload.runbook).toMatchObject({
-      output_path: '.kiro/reports/scene-package-gate-remediation-runbook.md',
+      output_path: '.sce/reports/scene-package-gate-remediation-runbook.md',
       action_count: 3
     });
     expect(payload.task_sync).toMatchObject({
@@ -4719,7 +4719,7 @@ Trace: doctor-trace-erp
     expect(runbookCall).toBeDefined();
     expect(runbookCall[1]).toContain('Scene Package Gate Remediation Runbook');
     expect(runbookCall[1]).toContain('### 1. [high] increase-valid-templates');
-    expect(runbookCall[1]).toContain('command: `sce scene package-registry --template-dir .kiro/templates/scene-packages --json`');
+    expect(runbookCall[1]).toContain('command: `sce scene package-registry --template-dir .sce/templates/scene-packages --json`');
 
     const syncedTasksCall = fileSystem.writeFile.mock.calls.find((call) =>
       normalizePath(call[0]).endsWith('/71-00-scene-package-gate-task-draft-and-sync/tasks.md')
@@ -4737,7 +4737,7 @@ Trace: doctor-trace-erp
     const fileSystem = {
       pathExists: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        if (normalizedPath === '/workspace/.kiro/specs/39-00-scene-validation-and-starter-manifests') {
+        if (normalizedPath === '/workspace/.sce/specs/39-00-scene-validation-and-starter-manifests') {
           return true;
         }
         if (normalizedPath.endsWith('custom/scene.yaml')) {
@@ -4799,10 +4799,10 @@ spec:
     const fileSystem = {
       pathExists: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        if (normalizedPath === '/workspace/.kiro/specs/39-00-scene-validation-and-starter-manifests') {
+        if (normalizedPath === '/workspace/.sce/specs/39-00-scene-validation-and-starter-manifests') {
           return true;
         }
-        if (normalizedPath === '/workspace/.kiro/specs/39-00-scene-validation-and-starter-manifests/custom/scene.yaml') {
+        if (normalizedPath === '/workspace/.sce/specs/39-00-scene-validation-and-starter-manifests/custom/scene.yaml') {
           return false;
         }
         return true;
@@ -4852,10 +4852,10 @@ spec:
     const fileSystem = {
       pathExists: jest.fn().mockImplementation(async (targetPath) => {
         const normalizedPath = normalizePath(targetPath);
-        if (normalizedPath === '/workspace/.kiro/specs/39-00-scene-validation-and-starter-manifests') {
+        if (normalizedPath === '/workspace/.sce/specs/39-00-scene-validation-and-starter-manifests') {
           return true;
         }
-        if (normalizedPath === '/workspace/.kiro/specs/39-00-scene-validation-and-starter-manifests/custom/scene.yaml') {
+        if (normalizedPath === '/workspace/.sce/specs/39-00-scene-validation-and-starter-manifests/custom/scene.yaml') {
           return true;
         }
         return true;
@@ -4940,8 +4940,8 @@ spec:
     const result = await runSceneCommand({
       spec: '37-00-scene-runtime-execution-pilot',
       mode: 'dry_run',
-      planOut: '.kiro/tmp/plan.json',
-      resultOut: '.kiro/tmp/result.json'
+      planOut: '.sce/tmp/plan.json',
+      resultOut: '.sce/tmp/result.json'
     }, {
       projectRoot: '/workspace',
       sceneLoader,
@@ -4983,9 +4983,9 @@ spec:
             handlers_loaded: 0,
             plugin_dirs: [],
             plugin_files: [],
-            manifest_path: '/workspace/.kiro/config/scene-binding-plugins.json',
+            manifest_path: '/workspace/.sce/config/scene-binding-plugins.json',
             manifest_loaded: false,
-            warnings: ['binding plugin manifest not found: /workspace/.kiro/config/scene-binding-plugins.json']
+            warnings: ['binding plugin manifest not found: /workspace/.sce/config/scene-binding-plugins.json']
           }
         },
         eval_payload: { status: 'success' }
@@ -6125,7 +6125,7 @@ spec:
     const result = normalizeScenePackageRegistryPublishOptions({});
     expect(result).toEqual({
       package: undefined,
-      registry: '.kiro/registry',
+      registry: '.sce/registry',
       dryRun: false,
       force: false,
       json: false
@@ -6178,8 +6178,8 @@ spec:
       overwritten: false,
       coordinate: 'sce.scene/test-pkg@1.0.0',
       package: { name: 'test-pkg', group: 'sce.scene', version: '1.0.0', kind: 'scene-template' },
-      tarball: { path: '.kiro/registry/packages/test-pkg/1.0.0/test-pkg-1.0.0.tgz', size: 512, file_count: 2, integrity: 'sha256-abc' },
-      registry: { index_path: '.kiro/registry/registry-index.json', total_packages: 1, total_versions: 1 }
+      tarball: { path: '.sce/registry/packages/test-pkg/1.0.0/test-pkg-1.0.0.tgz', size: 512, file_count: 2, integrity: 'sha256-abc' },
+      registry: { index_path: '.sce/registry/registry-index.json', total_packages: 1, total_versions: 1 }
     };
     printScenePackageRegistryPublishSummary({ json: true }, payload, '/project');
     expect(console.log).toHaveBeenCalled();
@@ -6195,8 +6195,8 @@ spec:
       overwritten: false,
       coordinate: 'sce.scene/test-pkg@1.0.0',
       package: { name: 'test-pkg', group: 'sce.scene', version: '1.0.0', kind: 'scene-template' },
-      tarball: { path: '.kiro/registry/packages/test-pkg/1.0.0/test-pkg-1.0.0.tgz', size: 512, file_count: 2, integrity: 'sha256-abc' },
-      registry: { index_path: '.kiro/registry/registry-index.json', total_packages: 1, total_versions: 1 }
+      tarball: { path: '.sce/registry/packages/test-pkg/1.0.0/test-pkg-1.0.0.tgz', size: 512, file_count: 2, integrity: 'sha256-abc' },
+      registry: { index_path: '.sce/registry/registry-index.json', total_packages: 1, total_versions: 1 }
     };
     printScenePackageRegistryPublishSummary({ json: false }, payload, '/project');
     const output = console.log.mock.calls.map(c => c[0]).join('\n');
@@ -6213,8 +6213,8 @@ spec:
       overwritten: false,
       coordinate: 'sce.scene/test-pkg@1.0.0',
       package: { name: 'test-pkg', group: 'sce.scene', version: '1.0.0', kind: 'scene-template' },
-      tarball: { path: '.kiro/registry/packages/test-pkg/1.0.0/test-pkg-1.0.0.tgz', size: 512, file_count: 2, integrity: 'sha256-abc' },
-      registry: { index_path: '.kiro/registry/registry-index.json', total_packages: 0, total_versions: 0 }
+      tarball: { path: '.sce/registry/packages/test-pkg/1.0.0/test-pkg-1.0.0.tgz', size: 512, file_count: 2, integrity: 'sha256-abc' },
+      registry: { index_path: '.sce/registry/registry-index.json', total_packages: 0, total_versions: 0 }
     };
     printScenePackageRegistryPublishSummary({ json: false }, payload, '/project');
     const output = console.log.mock.calls.map(c => c[0]).join('\n');
@@ -6357,7 +6357,7 @@ spec:
     expect(result).toEqual({
       name: undefined,
       version: undefined,
-      registry: '.kiro/registry',
+      registry: '.sce/registry',
       json: false
     });
   });
@@ -6414,7 +6414,7 @@ spec:
       package: { name: 'test-pkg', version: '1.0.0' },
       remaining_versions: 2,
       new_latest: '0.9.0',
-      registry: { index_path: '.kiro/registry/registry-index.json' }
+      registry: { index_path: '.sce/registry/registry-index.json' }
     };
     printSceneUnpublishSummary({ json: true }, payload, '/project');
     expect(console.log).toHaveBeenCalled();
@@ -6432,7 +6432,7 @@ spec:
       package: { name: 'test-pkg', version: '1.0.0' },
       remaining_versions: 2,
       new_latest: '0.9.0',
-      registry: { index_path: '.kiro/registry/registry-index.json' }
+      registry: { index_path: '.sce/registry/registry-index.json' }
     };
     printSceneUnpublishSummary({ json: false }, payload, '/project');
     const output = console.log.mock.calls.map(c => c[0]).join('\n');
@@ -6449,7 +6449,7 @@ spec:
       package: { name: 'test-pkg', version: '1.0.0' },
       remaining_versions: 0,
       new_latest: null,
-      registry: { index_path: '.kiro/registry/registry-index.json' }
+      registry: { index_path: '.sce/registry/registry-index.json' }
     };
     printSceneUnpublishSummary({ json: false }, payload, '/project');
     const output = console.log.mock.calls.map(c => c[0]).join('\n');
@@ -6629,7 +6629,7 @@ describe('Scene Extract CLI', () => {
     expect(result.config).toBeUndefined();
     expect(result.type).toBeUndefined();
     expect(result.pattern).toBeUndefined();
-    expect(result.out).toBe('.kiro/templates/extracted');
+    expect(result.out).toBe('.sce/templates/extracted');
     expect(result.dryRun).toBe(false);
     expect(result.json).toBe(false);
   });

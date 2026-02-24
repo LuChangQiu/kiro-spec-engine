@@ -12,8 +12,8 @@ const {
   buildCheck,
   evaluatePlanGate
 } = require('../lib/interactive-customization/change-plan-gate-core');
-const DEFAULT_OUT = '.kiro/reports/interactive-change-plan-gate.json';
-const DEFAULT_MARKDOWN_OUT = '.kiro/reports/interactive-change-plan-gate.md';
+const DEFAULT_OUT = '.sce/reports/interactive-change-plan-gate.json';
+const DEFAULT_MARKDOWN_OUT = '.sce/reports/interactive-change-plan-gate.md';
 
 function parseArgs(argv) {
   const options = {

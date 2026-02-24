@@ -6,7 +6,7 @@ const fs = require('fs-extra');
 const crypto = require('crypto');
 const { spawnSync } = require('child_process');
 
-const DEFAULT_OUT_DIR = '.kiro/reports/interactive-loop';
+const DEFAULT_OUT_DIR = '.sce/reports/interactive-loop';
 const DEFAULT_USER_ID = 'anonymous-user';
 const DEFAULT_APPROVAL_ACTOR = 'workflow-operator';
 const DEFAULT_FEEDBACK_CHANNEL = 'ui';
@@ -646,10 +646,10 @@ async function main() {
   const sessionId = normalizeSessionId(options.sessionId);
 
   const contextPath = resolvePath(cwd, options.context);
-  const globalFeedbackPath = resolvePath(cwd, '.kiro/reports/interactive-user-feedback.jsonl');
-  const globalDialogueAuthorizationSignalsPath = resolvePath(cwd, '.kiro/reports/interactive-dialogue-authorization-signals.jsonl');
-  const globalRuntimeSignalsPath = resolvePath(cwd, '.kiro/reports/interactive-runtime-signals.jsonl');
-  const globalAuthorizationTierSignalsPath = resolvePath(cwd, '.kiro/reports/interactive-authorization-tier-signals.jsonl');
+  const globalFeedbackPath = resolvePath(cwd, '.sce/reports/interactive-user-feedback.jsonl');
+  const globalDialogueAuthorizationSignalsPath = resolvePath(cwd, '.sce/reports/interactive-dialogue-authorization-signals.jsonl');
+  const globalRuntimeSignalsPath = resolvePath(cwd, '.sce/reports/interactive-runtime-signals.jsonl');
+  const globalAuthorizationTierSignalsPath = resolvePath(cwd, '.sce/reports/interactive-authorization-tier-signals.jsonl');
   const outRoot = resolvePath(cwd, options.outDir);
   const sessionDir = path.join(outRoot, sessionId);
   const summaryOutPath = options.out

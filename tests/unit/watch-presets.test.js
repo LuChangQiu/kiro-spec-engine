@@ -26,14 +26,14 @@ describe('Watch Presets', () => {
       const preset = getPreset('prompt-regen');
       expect(preset).toBeDefined();
       expect(preset.name).toBe('prompt-regen');
-      expect(preset.patterns).toContain('**/.kiro/specs/*/requirements.md');
+      expect(preset.patterns).toContain('**/.sce/specs/*/requirements.md');
     });
     
     it('should return context-export preset', () => {
       const preset = getPreset('context-export');
       expect(preset).toBeDefined();
       expect(preset.name).toBe('context-export');
-      expect(preset.patterns).toContain('**/.kiro/specs/*/.complete');
+      expect(preset.patterns).toContain('**/.sce/specs/*/.complete');
     });
     
     it('should return test-runner preset', () => {
@@ -186,7 +186,7 @@ describe('Watch Presets', () => {
     
     it('context-export preset should have correct structure', () => {
       expect(contextExportPreset.name).toBe('context-export');
-      expect(contextExportPreset.patterns).toContain('**/.kiro/specs/*/.complete');
+      expect(contextExportPreset.patterns).toContain('**/.sce/specs/*/.complete');
     });
     
     it('test-runner preset should have correct structure', () => {

@@ -77,7 +77,7 @@ describe('ComplianceErrorReporter', () => {
       const message = reporter.formatError(violations);
 
       expect(message).toContain('Fix Suggestions:');
-      expect(message).toContain('.kiro/specs/{spec-name}/reports/');
+      expect(message).toContain('.sce/specs/{spec-name}/reports/');
       expect(message).toContain('docs/');
       expect(message).toContain('Delete temporary files');
     });

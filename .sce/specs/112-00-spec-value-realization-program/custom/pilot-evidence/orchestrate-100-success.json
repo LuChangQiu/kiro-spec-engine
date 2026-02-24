@@ -1,0 +1,24 @@
+{
+  "status": "completed",
+  "plan": {
+    "specs": [
+      "100-00-moqui-screen-endpoint-expansion"
+    ],
+    "batches": [
+      [
+        "100-00-moqui-screen-endpoint-expansion"
+      ]
+    ],
+    "dependencies": {
+      "100-00-moqui-screen-endpoint-expansion": []
+    },
+    "hasCycle": false,
+    "cyclePath": null
+  },
+  "completed": [
+    "100-00-moqui-screen-endpoint-expansion"
+  ],
+  "failed": [],
+  "skipped": [],
+  "error": null
+}

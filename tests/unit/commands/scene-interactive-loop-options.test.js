@@ -12,15 +12,15 @@ describe('scene interactive-loop option helpers', () => {
       runtimeMode: ' OPS-FIX ',
       runtimeEnvironment: ' STAGING ',
       runtimePolicy: ' docs/interactive-customization/runtime-mode-policy-baseline.json ',
-      runtimeOut: ' .kiro/reports/runtime.json ',
+      runtimeOut: ' .sce/reports/runtime.json ',
       authorizationTierPolicy: ' docs/interactive-customization/authorization-tier-policy-baseline.json ',
-      authorizationTierOut: ' .kiro/reports/authorization-tier.json ',
+      authorizationTierOut: ' .sce/reports/authorization-tier.json ',
       dialoguePolicy: ' docs/interactive-customization/dialogue-governance-policy-baseline.json ',
       dialogueProfile: ' SYSTEM-MAINTAINER ',
       uiMode: ' OPS-CONSOLE ',
       contextContract: ' docs/interactive-customization/moqui-copilot-context-contract.json ',
-      workOrderOut: ' .kiro/reports/work-order.json ',
-      workOrderMarkdownOut: ' .kiro/reports/work-order.md ',
+      workOrderOut: ' .sce/reports/work-order.json ',
+      workOrderMarkdownOut: ' .sce/reports/work-order.md ',
       approvalActorRole: ' Product-Owner ',
       approverActorRole: ' Security-Admin ',
       approvalRolePolicy: ' docs/interactive-customization/approval-role-policy-baseline.json ',
@@ -39,15 +39,15 @@ describe('scene interactive-loop option helpers', () => {
     expect(normalized.runtimeMode).toBe('ops-fix');
     expect(normalized.runtimeEnvironment).toBe('staging');
     expect(normalized.runtimePolicy).toBe('docs/interactive-customization/runtime-mode-policy-baseline.json');
-    expect(normalized.runtimeOut).toBe('.kiro/reports/runtime.json');
+    expect(normalized.runtimeOut).toBe('.sce/reports/runtime.json');
     expect(normalized.authorizationTierPolicy).toBe('docs/interactive-customization/authorization-tier-policy-baseline.json');
-    expect(normalized.authorizationTierOut).toBe('.kiro/reports/authorization-tier.json');
+    expect(normalized.authorizationTierOut).toBe('.sce/reports/authorization-tier.json');
     expect(normalized.dialoguePolicy).toBe('docs/interactive-customization/dialogue-governance-policy-baseline.json');
     expect(normalized.dialogueProfile).toBe('system-maintainer');
     expect(normalized.uiMode).toBe('ops-console');
     expect(normalized.contextContract).toBe('docs/interactive-customization/moqui-copilot-context-contract.json');
-    expect(normalized.workOrderOut).toBe('.kiro/reports/work-order.json');
-    expect(normalized.workOrderMarkdownOut).toBe('.kiro/reports/work-order.md');
+    expect(normalized.workOrderOut).toBe('.sce/reports/work-order.json');
+    expect(normalized.workOrderMarkdownOut).toBe('.sce/reports/work-order.md');
     expect(normalized.approvalActorRole).toBe('product-owner');
     expect(normalized.approverActorRole).toBe('security-admin');
     expect(normalized.approvalRolePolicy).toBe('docs/interactive-customization/approval-role-policy-baseline.json');

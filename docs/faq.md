@@ -155,13 +155,13 @@ sce context export 01-00-user-login
 3. **Copy to clipboard:**
 ```bash
 # macOS
-cat .kiro/specs/01-00-user-login/context-export.md | pbcopy
+cat .sce/specs/01-00-user-login/context-export.md | pbcopy
 
 # Windows
-type .kiro\specs\01-00-user-login\context-export.md | clip
+type .sce\specs\01-00-user-login\context-export.md | clip
 
 # Linux
-cat .kiro/specs/01-00-user-login/context-export.md | xclip -selection clipboard
+cat .sce/specs/01-00-user-login/context-export.md | xclip -selection clipboard
 ```
 
 4. **Paste into Claude:**
@@ -187,8 +187,8 @@ sce context export 01-00-user-login
 
 **Approach 2: File references**
 ```javascript
-// See requirements: .kiro/specs/01-00-user-login/requirements.md
-// See design: .kiro/specs/01-00-user-login/design.md
+// See requirements: .sce/specs/01-00-user-login/requirements.md
+// See design: .sce/specs/01-00-user-login/design.md
 
 class AuthController {
   // Copilot reads nearby files and suggests code
@@ -301,7 +301,7 @@ See [Integration Modes Guide](integration-modes.md) for details.
 
 ```bash
 # Edit any Spec file
-vim .kiro/specs/01-00-user-login/design.md
+vim .sce/specs/01-00-user-login/design.md
 
 # If using watch mode, context auto-updates
 # If using manual export, re-export:
@@ -438,16 +438,16 @@ sce spec bootstrap --name 02-00-refactor-auth-module --non-interactive
 
 ### Can I customize Spec templates?
 
-**Yes!** sce uses templates from `.kiro/templates/`:
+**Yes!** sce uses templates from `.sce/templates/`:
 
 ```bash
 # View current templates
-ls .kiro/templates/
+ls .sce/templates/
 
 # Edit templates
-vim .kiro/templates/requirements.md
-vim .kiro/templates/design.md
-vim .kiro/templates/tasks.md
+vim .sce/templates/requirements.md
+vim .sce/templates/design.md
+vim .sce/templates/tasks.md
 ```
 
 **Example custom template:**
@@ -486,7 +486,7 @@ sce spec bootstrap --name 01-00-feature-b --non-interactive
 ```
 
 **Each project has:**
-- Own `.kiro/` directory
+- Own `.sce/` directory
 - Own `sce.json` config
 - Own Specs
 - Own templates
@@ -499,7 +499,7 @@ sce spec bootstrap --name 01-00-feature-b --non-interactive
 
 **Via git:**
 ```bash
-git add .kiro/specs/01-00-user-login/
+git add .sce/specs/01-00-user-login/
 git commit -m "Add user login Spec"
 git push
 ```

@@ -1,7 +1,7 @@
 {
   "mode": "moqui-template-baseline",
   "generated_at": "2026-02-17T15:29:22.909Z",
-  "template_root": ".kiro\\templates\\scene-packages",
+  "template_root": ".sce\\templates\\scene-packages",
   "filter": {
     "include_all": false,
     "match": "(moqui|erp)"
@@ -22,8 +22,8 @@
   "templates": [
     {
       "template_id": "sce.scene--erp-inventory-reserve-adjust--0.1.0",
-      "template_path": ".kiro\\templates\\scene-packages\\sce.scene--erp-inventory-reserve-adjust--0.1.0",
-      "contract_path": ".kiro\\templates\\scene-packages\\sce.scene--erp-inventory-reserve-adjust--0.1.0\\scene-package.json",
+      "template_path": ".sce\\templates\\scene-packages\\sce.scene--erp-inventory-reserve-adjust--0.1.0",
+      "contract_path": ".sce\\templates\\scene-packages\\sce.scene--erp-inventory-reserve-adjust--0.1.0\\scene-package.json",
       "ontology": {
         "valid": true,
         "error_count": 0
@@ -66,8 +66,8 @@
     },
     {
       "template_id": "sce.scene--erp-order-fulfillment-workflow--0.1.0",
-      "template_path": ".kiro\\templates\\scene-packages\\sce.scene--erp-order-fulfillment-workflow--0.1.0",
-      "contract_path": ".kiro\\templates\\scene-packages\\sce.scene--erp-order-fulfillment-workflow--0.1.0\\scene-package.json",
+      "template_path": ".sce\\templates\\scene-packages\\sce.scene--erp-order-fulfillment-workflow--0.1.0",
+      "contract_path": ".sce\\templates\\scene-packages\\sce.scene--erp-order-fulfillment-workflow--0.1.0\\scene-package.json",
       "ontology": {
         "valid": true,
         "error_count": 0
@@ -110,8 +110,8 @@
     },
     {
       "template_id": "sce.scene--erp-order-query-read--0.1.0",
-      "template_path": ".kiro\\templates\\scene-packages\\sce.scene--erp-order-query-read--0.1.0",
-      "contract_path": ".kiro\\templates\\scene-packages\\sce.scene--erp-order-query-read--0.1.0\\scene-package.json",
+      "template_path": ".sce\\templates\\scene-packages\\sce.scene--erp-order-query-read--0.1.0",
+      "contract_path": ".sce\\templates\\scene-packages\\sce.scene--erp-order-query-read--0.1.0\\scene-package.json",
       "ontology": {
         "valid": true,
         "error_count": 0

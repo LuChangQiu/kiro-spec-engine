@@ -19,11 +19,11 @@ const {
   DEFAULT_PHASE_COOLDOWN_SECONDS
 } = require('./moqui-matrix-remediation-queue');
 
-const DEFAULT_HIGH_GOALS = '.kiro/auto/matrix-remediation.goals.high.json';
-const DEFAULT_MEDIUM_GOALS = '.kiro/auto/matrix-remediation.goals.medium.json';
-const DEFAULT_HIGH_LINES = '.kiro/auto/matrix-remediation.high.lines';
-const DEFAULT_MEDIUM_LINES = '.kiro/auto/matrix-remediation.medium.lines';
-const DEFAULT_CLUSTER_GOALS = '.kiro/auto/matrix-remediation.capability-clusters.json';
+const DEFAULT_HIGH_GOALS = '.sce/auto/matrix-remediation.goals.high.json';
+const DEFAULT_MEDIUM_GOALS = '.sce/auto/matrix-remediation.goals.medium.json';
+const DEFAULT_HIGH_LINES = '.sce/auto/matrix-remediation.high.lines';
+const DEFAULT_MEDIUM_LINES = '.sce/auto/matrix-remediation.medium.lines';
+const DEFAULT_CLUSTER_GOALS = '.sce/auto/matrix-remediation.capability-clusters.json';
 const DEFAULT_HIGH_RETRY_MAX_ROUNDS = 3;
 const DEFAULT_MEDIUM_RETRY_MAX_ROUNDS = 2;
 const DEFAULT_PHASE_RECOVERY_ATTEMPTS = 2;

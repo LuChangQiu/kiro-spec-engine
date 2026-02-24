@@ -8,9 +8,9 @@ const {
   evaluateOntologySemanticQuality
 } = require('../lib/scene-runtime/scene-ontology');
 
-const DEFAULT_TEMPLATE_DIR = '.kiro/templates/scene-packages';
-const DEFAULT_OUT = '.kiro/reports/moqui-template-baseline.json';
-const DEFAULT_MARKDOWN_OUT = '.kiro/reports/moqui-template-baseline.md';
+const DEFAULT_TEMPLATE_DIR = '.sce/templates/scene-packages';
+const DEFAULT_OUT = '.sce/reports/moqui-template-baseline.json';
+const DEFAULT_MARKDOWN_OUT = '.sce/reports/moqui-template-baseline.md';
 const DEFAULT_MATCH = '(moqui|erp|suite|playbook|runbook|decision|action|governance)';
 const DEFAULT_MIN_SCORE = 70;
 const DEFAULT_MIN_VALID_RATE = 100;

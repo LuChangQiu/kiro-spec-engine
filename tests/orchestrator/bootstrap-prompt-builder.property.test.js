@@ -2,7 +2,7 @@
  * Property 2: Bootstrap Prompt 包含所有必要上下文
  *
  * *对于任何* Spec 名称，BootstrapPromptBuilder 生成的 prompt 应同时包含：
- * 该 Spec 的路径（`.kiro/specs/{specName}/`）、sce 项目规范/steering 上下文引用、
+ * 该 Spec 的路径（`.sce/specs/{specName}/`）、sce 项目规范/steering 上下文引用、
  * 以及任务执行指令。
  *
  * **Validates: Requirements 2.1, 2.2, 2.3**
@@ -37,7 +37,7 @@ function createTempDir() {
 }
 
 function createSteeringFiles(tempDir) {
-  const steeringDir = path.join(tempDir, '.kiro', 'steering');
+  const steeringDir = path.join(tempDir, '.sce', 'steering');
   fs.mkdirSync(steeringDir, { recursive: true });
   fs.writeFileSync(path.join(steeringDir, 'CORE_PRINCIPLES.md'), 'Core principles content');
   fs.writeFileSync(path.join(steeringDir, 'ENVIRONMENT.md'), 'Environment content');
@@ -59,7 +59,7 @@ describe('Property 2: Bootstrap Prompt 完整性 (Bootstrap Prompt Completeness)
           const builder = new BootstrapPromptBuilder(tempDir, config);
 
           const prompt = await builder.buildPrompt(specName);
-          const expectedPath = `.kiro/specs/${specName}/`;
+          const expectedPath = `.sce/specs/${specName}/`;
 
           expect(prompt).toContain(expectedPath);
         } finally {
@@ -132,7 +132,7 @@ describe('Property 2: Bootstrap Prompt 完整性 (Bootstrap Prompt Completeness)
 
           // All three must be present simultaneously:
           // 1. Spec path (Req 2.1)
-          const hasSpecPath = prompt.includes(`.kiro/specs/${specName}/`);
+          const hasSpecPath = prompt.includes(`.sce/specs/${specName}/`);
           // 2. Steering context (Req 2.2)
           const hasSteeringContext = prompt.includes('Steering Context') &&
             prompt.includes('CORE_PRINCIPLES.md');

@@ -11,7 +11,7 @@ Use this checklist before each integration batch.
   - `custom/scene.yaml`
   - `custom/scene-package.json`
 - Exported template folder:
-  - `.kiro/templates/exports/<template-name>/`
+  - `.sce/templates/exports/<template-name>/`
 - Handoff package:
   - `docs/handoffs/handoff-manifest.json`
   - ontology validation evidence in the same batch window
@@ -42,21 +42,21 @@ npx sce auto handoff run --manifest ../331-poc/docs/handoffs/handoff-manifest.js
 npx sce auto handoff template-diff --manifest ../331-poc/docs/handoffs/handoff-manifest.json --json
 npx sce auto handoff regression --session-id latest --json
 npx sce auto handoff capability-matrix --manifest ../331-poc/docs/handoffs/handoff-manifest.json --fail-on-gap --json
-npx sce scene moqui-baseline --compare-with .kiro/reports/release-evidence/moqui-template-baseline-prev.json --fail-on-portfolio-fail --json
+npx sce scene moqui-baseline --compare-with .sce/reports/release-evidence/moqui-template-baseline-prev.json --fail-on-portfolio-fail --json
 node scripts/moqui-lexicon-audit.js --manifest ../331-poc/docs/handoffs/handoff-manifest.json --fail-on-gap --json
 node scripts/moqui-release-summary.js --fail-on-gate-fail --json
 node scripts/release-ops-weekly-summary.js --json
 node scripts/release-weekly-ops-gate.js
-node scripts/release-risk-remediation-bundle.js --gate-report .kiro/reports/release-evidence/release-gate.json --json
+node scripts/release-risk-remediation-bundle.js --gate-report .sce/reports/release-evidence/release-gate.json --json
 node scripts/release-asset-integrity-check.js
 ```
 
 ## Scene Package Gate Commands
 
 ```bash
-npx sce scene package-registry --template-dir .kiro/templates/scene-packages --strict --json
-npx sce scene package-gate-template --out .kiro/templates/scene-package-gate-policy.json --profile three-layer --force --json
-npx sce scene package-gate --registry .kiro/templates/scene-packages/registry.json --policy .kiro/templates/scene-package-gate-policy.json --strict --json
+npx sce scene package-registry --template-dir .sce/templates/scene-packages --strict --json
+npx sce scene package-gate-template --out .sce/templates/scene-package-gate-policy.json --profile three-layer --force --json
+npx sce scene package-gate --registry .sce/templates/scene-packages/registry.json --policy .sce/templates/scene-package-gate-policy.json --strict --json
 ```
 
 ## Batch Exit Criteria

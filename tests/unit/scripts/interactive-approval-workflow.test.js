@@ -123,8 +123,8 @@ describe('interactive-approval-workflow script', () => {
       expect(payload.state.status).toBe(expectedStatus);
     }
 
-    const stateFile = path.join(workspace, '.kiro', 'reports', 'interactive-approval-state.json');
-    const auditFile = path.join(workspace, '.kiro', 'reports', 'interactive-approval-events.jsonl');
+    const stateFile = path.join(workspace, '.sce', 'reports', 'interactive-approval-state.json');
+    const auditFile = path.join(workspace, '.sce', 'reports', 'interactive-approval-events.jsonl');
     expect(await fs.pathExists(stateFile)).toBe(true);
     expect(await fs.pathExists(auditFile)).toBe(true);
     const auditLines = (await fs.readFile(auditFile, 'utf8'))

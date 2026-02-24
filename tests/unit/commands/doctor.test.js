@@ -87,7 +87,7 @@ describe('Doctor Command', () => {
   describe('Basic doctor command (without --docs flag)', () => {
     test('should run successfully with compliant project', async () => {
       // Setup: Create compliant project structure
-      await fs.ensureDir(path.join(testDir, '.kiro/specs'));
+      await fs.ensureDir(path.join(testDir, '.sce/specs'));
       await fs.writeFile(path.join(testDir, 'README.md'), '# Test Project');
       
       // Execute
@@ -104,7 +104,7 @@ describe('Doctor Command', () => {
     
     test('should show brief compliance status when violations exist', async () => {
       // Setup: Create project with violations
-      await fs.ensureDir(path.join(testDir, '.kiro/specs'));
+      await fs.ensureDir(path.join(testDir, '.sce/specs'));
       await fs.writeFile(path.join(testDir, 'README.md'), '# Test');
       await fs.writeFile(path.join(testDir, 'TEMP-FILE.md'), 'temporary');
       
@@ -117,8 +117,8 @@ describe('Doctor Command', () => {
       expect(output).toContain('sce doctor --docs');
     });
     
-    test('should handle missing .kiro directory gracefully', async () => {
-      // Setup: No .kiro directory
+    test('should handle missing .sce directory gracefully', async () => {
+      // Setup: No .sce directory
       await fs.writeFile(path.join(testDir, 'README.md'), '# Test');
       
       // Execute
@@ -132,11 +132,11 @@ describe('Doctor Command', () => {
   describe('Doctor command with --docs flag', () => {
     test('should show detailed diagnostics for compliant project', async () => {
       // Setup: Create compliant project
-      await fs.ensureDir(path.join(testDir, '.kiro/specs/test-spec'));
+      await fs.ensureDir(path.join(testDir, '.sce/specs/test-spec'));
       await fs.writeFile(path.join(testDir, 'README.md'), '# Test');
-      await fs.writeFile(path.join(testDir, '.kiro/specs/test-spec/requirements.md'), '# Requirements');
-      await fs.writeFile(path.join(testDir, '.kiro/specs/test-spec/design.md'), '# Design');
-      await fs.writeFile(path.join(testDir, '.kiro/specs/test-spec/tasks.md'), '# Tasks');
+      await fs.writeFile(path.join(testDir, '.sce/specs/test-spec/requirements.md'), '# Requirements');
+      await fs.writeFile(path.join(testDir, '.sce/specs/test-spec/design.md'), '# Design');
+      await fs.writeFile(path.join(testDir, '.sce/specs/test-spec/tasks.md'), '# Tasks');
       
       // Execute
       await doctorCommand({ docs: true });
@@ -149,7 +149,7 @@ describe('Doctor Command', () => {
     
     test('should show detailed violations when they exist', async () => {
       // Setup: Create project with violations
-      await fs.ensureDir(path.join(testDir, '.kiro/specs/test-spec'));
+      await fs.ensureDir(path.join(testDir, '.sce/specs/test-spec'));
       await fs.writeFile(path.join(testDir, 'README.md'), '# Test');
       await fs.writeFile(path.join(testDir, 'TEMP-FILE.md'), 'temporary');
       await fs.writeFile(path.join(testDir, 'SESSION-NOTES.md'), 'notes');
@@ -167,12 +167,12 @@ describe('Doctor Command', () => {
     
     test('should show recommendations for fixing violations', async () => {
       // Setup: Create project with misplaced artifacts
-      await fs.ensureDir(path.join(testDir, '.kiro/specs/test-spec'));
+      await fs.ensureDir(path.join(testDir, '.sce/specs/test-spec'));
       await fs.writeFile(path.join(testDir, 'README.md'), '# Test');
-      await fs.writeFile(path.join(testDir, '.kiro/specs/test-spec/requirements.md'), '# Requirements');
-      await fs.writeFile(path.join(testDir, '.kiro/specs/test-spec/design.md'), '# Design');
-      await fs.writeFile(path.join(testDir, '.kiro/specs/test-spec/tasks.md'), '# Tasks');
-      await fs.writeFile(path.join(testDir, '.kiro/specs/test-spec/report.md'), 'report');
+      await fs.writeFile(path.join(testDir, '.sce/specs/test-spec/requirements.md'), '# Requirements');
+      await fs.writeFile(path.join(testDir, '.sce/specs/test-spec/design.md'), '# Design');
+      await fs.writeFile(path.join(testDir, '.sce/specs/test-spec/tasks.md'), '# Tasks');
+      await fs.writeFile(path.join(testDir, '.sce/specs/test-spec/report.md'), 'report');
       
       // Execute
       await doctorCommand({ docs: true });
@@ -185,13 +185,13 @@ describe('Doctor Command', () => {
     
     test('should group violations by type', async () => {
       // Setup: Create project with multiple violation types
-      await fs.ensureDir(path.join(testDir, '.kiro/specs/test-spec'));
+      await fs.ensureDir(path.join(testDir, '.sce/specs/test-spec'));
       await fs.writeFile(path.join(testDir, 'README.md'), '# Test');
       await fs.writeFile(path.join(testDir, 'TEMP-FILE.md'), 'temporary'); // root violation
-      await fs.writeFile(path.join(testDir, '.kiro/specs/test-spec/requirements.md'), '# Requirements');
-      await fs.writeFile(path.join(testDir, '.kiro/specs/test-spec/design.md'), '# Design');
-      await fs.writeFile(path.join(testDir, '.kiro/specs/test-spec/tasks.md'), '# Tasks');
-      await fs.writeFile(path.join(testDir, '.kiro/specs/test-spec/artifact.js'), 'code'); // misplaced artifact
+      await fs.writeFile(path.join(testDir, '.sce/specs/test-spec/requirements.md'), '# Requirements');
+      await fs.writeFile(path.join(testDir, '.sce/specs/test-spec/design.md'), '# Design');
+      await fs.writeFile(path.join(testDir, '.sce/specs/test-spec/tasks.md'), '# Tasks');
+      await fs.writeFile(path.join(testDir, '.sce/specs/test-spec/artifact.js'), 'code'); // misplaced artifact
       
       // Execute
       await doctorCommand({ docs: true });
@@ -206,7 +206,7 @@ describe('Doctor Command', () => {
   describe('Integration with existing doctor checks', () => {
     test('should maintain existing formatting style', async () => {
       // Setup: Create compliant project
-      await fs.ensureDir(path.join(testDir, '.kiro/specs'));
+      await fs.ensureDir(path.join(testDir, '.sce/specs'));
       await fs.writeFile(path.join(testDir, 'README.md'), '# Test');
       
       // Execute
@@ -224,7 +224,7 @@ describe('Doctor Command', () => {
     
     test('should include document compliance between system checks and summary', async () => {
       // Setup
-      await fs.ensureDir(path.join(testDir, '.kiro/specs'));
+      await fs.ensureDir(path.join(testDir, '.sce/specs'));
       await fs.writeFile(path.join(testDir, 'README.md'), '# Test');
       
       // Execute
@@ -290,14 +290,14 @@ describe('Doctor Command', () => {
   describe('Configuration integration', () => {
     test('should use custom configuration if available', async () => {
       // Setup: Create custom configuration
-      await fs.ensureDir(path.join(testDir, '.kiro/config'));
-      await fs.writeJson(path.join(testDir, '.kiro/config/docs.json'), {
+      await fs.ensureDir(path.join(testDir, '.sce/config'));
+      await fs.writeJson(path.join(testDir, '.sce/config/docs.json'), {
         rootAllowedFiles: ['README.md', 'CUSTOM.md'],
         specSubdirs: ['reports', 'scripts', 'tests', 'results', 'docs'],
         temporaryPatterns: ['*-SUMMARY.md', 'SESSION-*.md']
       });
       
-      await fs.ensureDir(path.join(testDir, '.kiro/specs'));
+      await fs.ensureDir(path.join(testDir, '.sce/specs'));
       await fs.writeFile(path.join(testDir, 'README.md'), '# Test');
       await fs.writeFile(path.join(testDir, 'CUSTOM.md'), '# Custom');
       
@@ -311,7 +311,7 @@ describe('Doctor Command', () => {
     
     test('should use default configuration if config file missing', async () => {
       // Setup: No config file
-      await fs.ensureDir(path.join(testDir, '.kiro/specs'));
+      await fs.ensureDir(path.join(testDir, '.sce/specs'));
       await fs.writeFile(path.join(testDir, 'README.md'), '# Test');
       
       // Execute
@@ -327,23 +327,23 @@ describe('Doctor Command', () => {
   describe('Output formatting', () => {
     test('should use relative paths in violation output', async () => {
       // Setup: Create violation in subdirectory
-      await fs.ensureDir(path.join(testDir, '.kiro/specs/test-spec'));
+      await fs.ensureDir(path.join(testDir, '.sce/specs/test-spec'));
       await fs.writeFile(path.join(testDir, 'README.md'), '# Test');
-      await fs.writeFile(path.join(testDir, '.kiro/specs/test-spec/TEMP-FILE.md'), 'temp');
+      await fs.writeFile(path.join(testDir, '.sce/specs/test-spec/TEMP-FILE.md'), 'temp');
       
       // Execute
       await doctorCommand({ docs: true });
       
       // Verify: Should show relative path
       const output = consoleLogSpy.mock.calls.map(call => call.join(' ')).join('\n');
-      expect(output).toContain('.kiro');
+      expect(output).toContain('.sce');
       expect(output).toContain('test-spec');
       expect(output).toContain('TEMP-FILE.md');
     });
     
     test('should format violation types in human-readable format', async () => {
       // Setup: Create various violations
-      await fs.ensureDir(path.join(testDir, '.kiro/specs/test-spec'));
+      await fs.ensureDir(path.join(testDir, '.sce/specs/test-spec'));
       await fs.writeFile(path.join(testDir, 'README.md'), '# Test');
       await fs.writeFile(path.join(testDir, 'TEMP-FILE.md'), 'temp');
       

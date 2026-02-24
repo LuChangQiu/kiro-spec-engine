@@ -34,15 +34,15 @@ describe('WorkspaceContextResolver', () => {
     registryPath = path.join(testDir, 'workspaces.json');
     configPath = path.join(testDir, 'config.json');
 
-    // Create test workspace directories with complete .kiro structure
+    // Create test workspace directories with complete .sce structure
     workspace1Dir = path.join(testDir, 'workspace-1');
     workspace2Dir = path.join(testDir, 'workspace-2');
     workspace3Dir = path.join(testDir, 'workspace-3');
 
-    // Create .kiro and .kiro/specs directories for each workspace
-    await fs.ensureDir(path.join(workspace1Dir, '.kiro', 'specs'));
-    await fs.ensureDir(path.join(workspace2Dir, '.kiro', 'specs'));
-    await fs.ensureDir(path.join(workspace3Dir, '.kiro', 'specs'));
+    // Create .sce and .sce/specs directories for each workspace
+    await fs.ensureDir(path.join(workspace1Dir, '.sce', 'specs'));
+    await fs.ensureDir(path.join(workspace2Dir, '.sce', 'specs'));
+    await fs.ensureDir(path.join(workspace3Dir, '.sce', 'specs'));
 
     // Initialize registry and config FIRST
     registry = new WorkspaceRegistry(registryPath);
@@ -159,7 +159,7 @@ describe('WorkspaceContextResolver', () => {
       expect(isValid).toBe(true);
     });
 
-    test('should return false for directory without .kiro', async () => {
+    test('should return false for directory without .sce', async () => {
       const nonKseDir = path.join(testDir, 'non-kse');
       await fs.ensureDir(nonKseDir);
       
@@ -255,7 +255,7 @@ describe('WorkspaceContextResolver', () => {
   describe('shouldPromptForRegistration', () => {
     test('should return true for unregistered sce directory', async () => {
       const newKseDir = path.join(testDir, 'new-kse');
-      await fs.ensureDir(path.join(newKseDir, '.kiro'));
+      await fs.ensureDir(path.join(newKseDir, '.sce'));
       
       const shouldPrompt = await resolver.shouldPromptForRegistration(newKseDir);
       
@@ -290,7 +290,7 @@ describe('WorkspaceContextResolver', () => {
 
     test('should throw helpful error for unregistered sce directory', async () => {
       const newKseDir = path.join(testDir, 'new-kse');
-      await fs.ensureDir(path.join(newKseDir, '.kiro'));
+      await fs.ensureDir(path.join(newKseDir, '.sce'));
       
       await expect(async () => {
         await resolver.resolveWorkspaceOrError(null, newKseDir);

@@ -83,9 +83,9 @@ console.log(analysis.mode); // 'fresh', 'partial', or 'full'
 Implements different adoption modes for various project states.
 
 **Strategies**:
-- `FreshAdoption`: Creates complete .kiro/ structure from scratch
-- `PartialAdoption`: Adds missing components to existing .kiro/
-- `FullAdoption`: Upgrades existing complete .kiro/ to current version
+- `FreshAdoption`: Creates complete .sce/ structure from scratch
+- `PartialAdoption`: Adds missing components to existing .sce/
+- `FullAdoption`: Upgrades existing complete .sce/ to current version
 
 **Usage Example**:
 ```javascript
@@ -270,7 +270,7 @@ module.exports = {
     const changes = [];
     
     // Add new steering file
-    const steeringDir = path.join(projectPath, '.kiro', 'steering');
+    const steeringDir = path.join(projectPath, '.sce', 'steering');
     const envFile = path.join(steeringDir, 'ENVIRONMENT.md');
     
     if (!fs.existsSync(envFile)) {
@@ -282,7 +282,7 @@ module.exports = {
     }
     
     // Update version.json structure
-    const versionFile = path.join(projectPath, '.kiro', 'version.json');
+    const versionFile = path.join(projectPath, '.sce', 'version.json');
     const versionData = await fs.readJson(versionFile);
     
     if (!versionData.upgradeHistory) {
@@ -303,13 +303,13 @@ module.exports = {
     const errors = [];
     
     // Check ENVIRONMENT.md exists
-    const envFile = path.join(projectPath, '.kiro', 'steering', 'ENVIRONMENT.md');
+    const envFile = path.join(projectPath, '.sce', 'steering', 'ENVIRONMENT.md');
     if (!fs.existsSync(envFile)) {
       errors.push('ENVIRONMENT.md not found');
     }
     
     // Check version.json structure
-    const versionFile = path.join(projectPath, '.kiro', 'version.json');
+    const versionFile = path.join(projectPath, '.sce', 'version.json');
     const versionData = await fs.readJson(versionFile);
     if (!versionData.upgradeHistory) {
       errors.push('version.json missing upgradeHistory field');
@@ -609,7 +609,7 @@ test: add property tests for backup system
 
 - [User Adoption Guide](./adoption-guide.md)
 - [User Upgrade Guide](./upgrade-guide.md)
-- [Spec Workflow Guide](../.kiro/specs/SPEC_WORKFLOW_GUIDE.md)
+- [Spec Workflow Guide](../.sce/specs/SPEC_WORKFLOW_GUIDE.md)
 - [GitHub Repository](https://github.com/heguangyong/scene-capability-engine)
 - [Issue Tracker](https://github.com/heguangyong/scene-capability-engine/issues)
 

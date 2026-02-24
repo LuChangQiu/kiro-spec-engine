@@ -11,7 +11,7 @@ describe('LockFile', () => {
 
   beforeEach(async () => {
     tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-lock-file-'));
-    specsDir = path.join(tempRoot, '.kiro', 'specs');
+    specsDir = path.join(tempRoot, '.sce', 'specs');
     lockFile = new LockFile(specsDir);
     await fs.ensureDir(path.join(specsDir, 'spec-a'));
     await fs.ensureDir(path.join(specsDir, 'spec-b'));

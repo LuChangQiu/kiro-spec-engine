@@ -4,12 +4,12 @@
 const path = require('path');
 const fs = require('fs-extra');
 
-const DEFAULT_EVIDENCE = '.kiro/reports/release-evidence/handoff-runs.json';
-const DEFAULT_GATE_HISTORY = '.kiro/reports/release-evidence/release-gate-history.json';
-const DEFAULT_INTERACTIVE_GOVERNANCE = '.kiro/reports/interactive-governance-report.json';
-const DEFAULT_MATRIX_SIGNALS = '.kiro/reports/interactive-matrix-signals.jsonl';
-const DEFAULT_OUT = '.kiro/reports/release-evidence/weekly-ops-summary.json';
-const DEFAULT_MARKDOWN_OUT = '.kiro/reports/release-evidence/weekly-ops-summary.md';
+const DEFAULT_EVIDENCE = '.sce/reports/release-evidence/handoff-runs.json';
+const DEFAULT_GATE_HISTORY = '.sce/reports/release-evidence/release-gate-history.json';
+const DEFAULT_INTERACTIVE_GOVERNANCE = '.sce/reports/interactive-governance-report.json';
+const DEFAULT_MATRIX_SIGNALS = '.sce/reports/interactive-matrix-signals.jsonl';
+const DEFAULT_OUT = '.sce/reports/release-evidence/weekly-ops-summary.json';
+const DEFAULT_MARKDOWN_OUT = '.sce/reports/release-evidence/weekly-ops-summary.md';
 
 function parseArgs(argv) {
   const options = {
@@ -650,7 +650,7 @@ function buildHealth(snapshots, warnings) {
   if (history.total_entries === 0) {
     risk = promoteRisk(risk, 'medium');
     pushConcern('release gate history has no entries in current window');
-    pushRecommendation('Refresh release gate history index: `npx sce auto handoff gate-index --dir .kiro/reports/release-evidence --out .kiro/reports/release-evidence/release-gate-history.json --json`.');
+    pushRecommendation('Refresh release gate history index: `npx sce auto handoff gate-index --dir .sce/reports/release-evidence --out .sce/reports/release-evidence/release-gate-history.json --json`.');
   }
   if (Number.isFinite(history.gate_pass_rate_percent) && history.gate_pass_rate_percent < 90) {
     risk = promoteRisk(risk, history.gate_pass_rate_percent < 75 ? 'high' : 'medium');

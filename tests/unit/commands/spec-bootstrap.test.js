@@ -12,7 +12,7 @@ describe('spec-bootstrap command', () => {
 
   beforeEach(async () => {
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-spec-bootstrap-'));
-    await fs.ensureDir(path.join(tempDir, '.kiro', 'specs'));
+    await fs.ensureDir(path.join(tempDir, '.sce', 'specs'));
 
     originalCwd = process.cwd;
     process.cwd = jest.fn(() => tempDir);
@@ -49,7 +49,7 @@ describe('spec-bootstrap command', () => {
     expect(result.trace.profile).toBe('backend-api');
     expect(result.preview.requirements).toContain('Requirement 1');
 
-    const generatedPath = path.join(tempDir, '.kiro', 'specs', '109-01-bootstrap-dry-run');
+    const generatedPath = path.join(tempDir, '.sce', 'specs', '109-01-bootstrap-dry-run');
     expect(await fs.pathExists(generatedPath)).toBe(false);
 
     const output = logOutput.join('\n');
@@ -69,7 +69,7 @@ describe('spec-bootstrap command', () => {
     expect(result.success).toBe(true);
     expect(result.dryRun).toBe(false);
 
-    const specDir = path.join(tempDir, '.kiro', 'specs', specName);
+    const specDir = path.join(tempDir, '.sce', 'specs', specName);
     const requirementsPath = path.join(specDir, 'requirements.md');
     const designPath = path.join(specDir, 'design.md');
     const tasksPath = path.join(specDir, 'tasks.md');

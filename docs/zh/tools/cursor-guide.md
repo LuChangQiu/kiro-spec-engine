@@ -58,10 +58,10 @@
 此项目使用 sce (Scene Capability Engine) 进行规范驱动开发。
 
 ## Spec 位置
-所有 Spec 都在 `.kiro/specs/` 目录中。
+所有 Spec 都在 `.sce/specs/` 目录中。
 
 ## 实现功能前
-1. 检查 `.kiro/specs/` 中是否存在 Spec
+1. 检查 `.sce/specs/` 中是否存在 Spec
 2. 阅读 requirements.md、design.md 和 tasks.md
 3. 严格遵循设计架构
 4. 完成任务时更新 tasks.md
@@ -73,9 +73,9 @@
 
 ## 示例
 对于用户登录功能：
-- Spec：`.kiro/specs/01-00-user-login/`
-- 设计：`.kiro/specs/01-00-user-login/design.md`
-- 任务：`.kiro/specs/01-00-user-login/tasks.md`
+- Spec：`.sce/specs/01-00-user-login/`
+- 设计：`.sce/specs/01-00-user-login/design.md`
+- 任务：`.sce/specs/01-00-user-login/tasks.md`
 
 ## 代码标准
 [在此添加项目特定的编码标准]
@@ -102,7 +102,7 @@
 
 3. **提供上下文：**
    ```
-   我已在 .kiro/specs/01-00-user-login/ 中创建了用户登录功能的完整 Spec。
+   我已在 .sce/specs/01-00-user-login/ 中创建了用户登录功能的完整 Spec。
    
    请阅读：
    - requirements.md（需求）
@@ -155,7 +155,7 @@
 1. **在文件顶部添加上下文注释：**
    ```javascript
    // 任务 1.1：设置项目依赖
-   // Spec：.kiro/specs/01-00-user-login/
+   // Spec：.sce/specs/01-00-user-login/
    // 设计：参见 design.md 中的 AuthController
    
    // 实现 AuthController 类...
@@ -181,7 +181,7 @@ sce spec bootstrap --name 01-00-user-login --non-interactive
 sce context export 01-00-user-login
 
 # 4. 在 Cursor Composer 中（Cmd+K）：
-"请实现 .kiro/specs/01-00-user-login/ 中的任务 1.1"
+"请实现 .sce/specs/01-00-user-login/ 中的任务 1.1"
 
 # 5. 审查并接受更改
 
@@ -226,7 +226,7 @@ sce prompt generate 01-00-user-login 1.1
 
 在 Composer 中，使用 `@` 引用特定文件：
 ```
-@.kiro/specs/01-00-user-login/design.md 
+@.sce/specs/01-00-user-login/design.md 
 请实现 AuthController，如设计文档中所述
 ```
 
@@ -253,9 +253,9 @@ sce prompt generate 01-00-user-login 1.1
 ### 问题：Cursor 看不到我的 Spec 文件
 
 **解决方案：**
-1. 确保文件在 `.kiro/specs/` 中
+1. 确保文件在 `.sce/specs/` 中
 2. 在 Composer 中使用 @-mentions
-3. 检查 `.cursorignore` 是否排除了 `.kiro/`
+3. 检查 `.cursorignore` 是否排除了 `.sce/`
 
 ---
 

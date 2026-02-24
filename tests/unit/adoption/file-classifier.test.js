@@ -39,12 +39,12 @@ describe('FileClassifier', () => {
       expect(classifier.normalizePath('steering\\CORE_PRINCIPLES.md'))
         .toBe('steering/CORE_PRINCIPLES.md');
       
-      // Remove leading .kiro/
-      expect(classifier.normalizePath('.kiro/steering/CORE_PRINCIPLES.md'))
+      // Remove leading .sce/
+      expect(classifier.normalizePath('.sce/steering/CORE_PRINCIPLES.md'))
         .toBe('steering/CORE_PRINCIPLES.md');
       
       // Mixed slashes
-      expect(classifier.normalizePath('.kiro\\steering/CORE_PRINCIPLES.md'))
+      expect(classifier.normalizePath('.sce\\steering/CORE_PRINCIPLES.md'))
         .toBe('steering/CORE_PRINCIPLES.md');
     });
 
@@ -65,7 +65,7 @@ describe('FileClassifier', () => {
     });
 
     test('should handle template files with different path formats', () => {
-      expect(classifier.classifyFile('.kiro/steering/CORE_PRINCIPLES.md')).toBe(FileCategory.TEMPLATE);
+      expect(classifier.classifyFile('.sce/steering/CORE_PRINCIPLES.md')).toBe(FileCategory.TEMPLATE);
       expect(classifier.classifyFile('steering\\CORE_PRINCIPLES.md')).toBe(FileCategory.TEMPLATE);
     });
   });
@@ -208,7 +208,7 @@ describe('FileClassifier', () => {
     test('should always preserve CURRENT_CONTEXT.md', () => {
       const paths = [
         'steering/CURRENT_CONTEXT.md',
-        '.kiro/steering/CURRENT_CONTEXT.md',
+        '.sce/steering/CURRENT_CONTEXT.md',
         'steering\\CURRENT_CONTEXT.md'
       ];
 

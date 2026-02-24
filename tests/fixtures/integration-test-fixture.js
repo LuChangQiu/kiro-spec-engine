@@ -3,15 +3,15 @@ const path = require('path');
 
 /**
  * IntegrationTestFixture - Provides consistent test environment setup and teardown
- * for integration tests. Creates isolated test directories with .kiro structure.
+ * for integration tests. Creates isolated test directories with .sce structure.
  */
 class IntegrationTestFixture {
   constructor(testName) {
     this.testName = testName;
     this.testDir = path.join(__dirname, 'integration-test', testName);
-    this.kiroDir = path.join(this.testDir, '.kiro');
-    this.specsDir = path.join(this.kiroDir, 'specs');
-    this.configFile = path.join(this.kiroDir, 'config.json');
+    this.sceDir = path.join(this.testDir, '.sce');
+    this.specsDir = path.join(this.sceDir, 'specs');
+    this.configFile = path.join(this.sceDir, 'config.json');
   }
 
   /**
@@ -20,7 +20,7 @@ class IntegrationTestFixture {
    */
   async setup() {
     await fs.ensureDir(this.testDir);
-    await fs.ensureDir(this.kiroDir);
+    await fs.ensureDir(this.sceDir);
     await fs.ensureDir(this.specsDir);
     await this.createDefaultConfig();
   }
@@ -38,7 +38,7 @@ class IntegrationTestFixture {
   }
 
   /**
-   * Create default .kiro/config.json
+   * Create default .sce/config.json
    */
   async createDefaultConfig() {
     const config = {

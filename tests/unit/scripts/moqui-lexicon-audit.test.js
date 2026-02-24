@@ -38,7 +38,7 @@ describe('moqui-lexicon-audit script', () => {
         '--manifest',
         'docs/handoffs/handoff-manifest.json',
         '--template-dir',
-        '.kiro/templates/scene-packages',
+        '.sce/templates/scene-packages',
         '--lexicon',
         path.join(projectRoot, 'lib', 'data', 'moqui-capability-lexicon.json'),
         '--out',
@@ -78,7 +78,7 @@ describe('moqui-lexicon-audit script', () => {
     const scriptPath = path.join(projectRoot, 'scripts', 'moqui-lexicon-audit.js');
     const workspace = path.join(tempDir, 'workspace');
     const manifestFile = path.join(workspace, 'docs', 'handoffs', 'handoff-manifest.json');
-    const templateRoot = path.join(workspace, '.kiro', 'templates', 'scene-packages');
+    const templateRoot = path.join(workspace, '.sce', 'templates', 'scene-packages');
     const targetTemplateDir = path.join(templateRoot, 'kse.scene--erp-order-query-read--0.1.0');
     const noiseTemplateDir = path.join(templateRoot, 'kse.scene--scene-package-contract-declaration--0.2.0');
     const outFile = path.join(tempDir, 'moqui-lexicon-audit-scoped.json');
@@ -111,7 +111,7 @@ describe('moqui-lexicon-audit script', () => {
         '--manifest',
         'docs/handoffs/handoff-manifest.json',
         '--template-dir',
-        '.kiro/templates/scene-packages',
+        '.sce/templates/scene-packages',
         '--lexicon',
         path.join(projectRoot, 'lib', 'data', 'moqui-capability-lexicon.json'),
         '--out',
@@ -144,7 +144,7 @@ describe('moqui-lexicon-audit script', () => {
     const scriptPath = path.join(projectRoot, 'scripts', 'moqui-lexicon-audit.js');
     const workspace = path.join(tempDir, 'workspace');
     const manifestFile = path.join(workspace, 'docs', 'handoffs', 'handoff-manifest.json');
-    const templateRoot = path.join(workspace, '.kiro', 'templates', 'scene-packages');
+    const templateRoot = path.join(workspace, '.sce', 'templates', 'scene-packages');
     const templateDir = path.join(templateRoot, 'sce.scene--erp-order-query-read--0.1.0');
     const outFile = path.join(tempDir, 'moqui-lexicon-audit-infer.json');
 
@@ -170,7 +170,7 @@ describe('moqui-lexicon-audit script', () => {
         '--manifest',
         'docs/handoffs/handoff-manifest.json',
         '--template-dir',
-        '.kiro/templates/scene-packages',
+        '.sce/templates/scene-packages',
         '--lexicon',
         path.join(projectRoot, 'lib', 'data', 'moqui-capability-lexicon.json'),
         '--out',
@@ -203,7 +203,7 @@ describe('moqui-lexicon-audit script', () => {
     const scriptPath = path.join(projectRoot, 'scripts', 'moqui-lexicon-audit.js');
     const workspace = path.join(tempDir, 'workspace');
     const manifestFile = path.join(workspace, 'docs', 'handoffs', 'handoff-manifest.json');
-    const templateDir = path.join(workspace, '.kiro', 'templates', 'scene-packages', 'tpl-a');
+    const templateDir = path.join(workspace, '.sce', 'templates', 'scene-packages', 'tpl-a');
     const outFile = path.join(tempDir, 'moqui-lexicon-audit-gap.json');
 
     await fs.ensureDir(path.dirname(manifestFile));
@@ -228,7 +228,7 @@ describe('moqui-lexicon-audit script', () => {
         '--manifest',
         'docs/handoffs/handoff-manifest.json',
         '--template-dir',
-        '.kiro/templates/scene-packages',
+        '.sce/templates/scene-packages',
         '--lexicon',
         path.join(projectRoot, 'lib', 'data', 'moqui-capability-lexicon.json'),
         '--out',

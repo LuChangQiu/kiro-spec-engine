@@ -20,7 +20,7 @@ describe('Workspace Integration', () => {
   // Helper function to create a valid sce project directory
   async function createValidWorkspaceDir(relativePath) {
     const workspacePath = fixture.getAbsolutePath(relativePath);
-    await fs.ensureDir(path.join(workspacePath, '.kiro'));
+    await fs.ensureDir(path.join(workspacePath, '.sce'));
     return workspacePath;
   }
 
@@ -30,7 +30,7 @@ describe('Workspace Integration', () => {
     helper = new CommandTestHelper(fixture);
     
     // Create unique state file for this test
-    stateFilePath = path.join(fixture.kiroDir, 'workspace-state.json');
+    stateFilePath = path.join(fixture.sceDir, 'workspace-state.json');
     
     // Create new state manager with test-specific state file
     stateManager = new WorkspaceStateManager(stateFilePath);
@@ -245,24 +245,24 @@ describe('Workspace Integration', () => {
         tasks: '# Tasks\n\n- [ ] Task 1'
       });
 
-      // Verify .kiro directory structure exists
-      expect(await fixture.fileExists('.kiro')).toBe(true);
-      expect(await fixture.fileExists('.kiro/specs')).toBe(true);
-      expect(await fixture.fileExists('.kiro/config.json')).toBe(true);
+      // Verify .sce directory structure exists
+      expect(await fixture.fileExists('.sce')).toBe(true);
+      expect(await fixture.fileExists('.sce/specs')).toBe(true);
+      expect(await fixture.fileExists('.sce/config.json')).toBe(true);
     });
 
     test('should identify missing directories', async () => {
       // Remove specs directory
-      const specsPath = fixture.getAbsolutePath('.kiro/specs');
+      const specsPath = fixture.getAbsolutePath('.sce/specs');
       await fs.remove(specsPath);
 
       // Verify directory is missing
-      expect(await fixture.fileExists('.kiro/specs')).toBe(false);
+      expect(await fixture.fileExists('.sce/specs')).toBe(false);
     });
 
     test('should identify invalid configuration', async () => {
       // Write invalid JSON to config file
-      await fixture.writeFile('.kiro/config.json', 'invalid json {');
+      await fixture.writeFile('.sce/config.json', 'invalid json {');
 
       // Attempt to read config should fail
       await expect(

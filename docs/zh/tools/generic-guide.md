@@ -88,7 +88,7 @@ sce spec bootstrap --name 01-00-my-feature --non-interactive
 sce context export 01-00-my-feature
 
 # 复制到剪贴板
-cat .kiro/specs/01-00-my-feature/context-export.md | pbcopy
+cat .sce/specs/01-00-my-feature/context-export.md | pbcopy
 
 # 粘贴到 AI 工具并请求实现
 ```
@@ -110,8 +110,8 @@ cat .kiro/specs/01-00-my-feature/context-export.md | pbcopy
 sce watch start
 
 # 配置自动导出
-sce watch add --pattern ".kiro/specs/*/requirements.md" --action "sce context export {spec}"
-sce watch add --pattern ".kiro/specs/*/design.md" --action "sce context export {spec}"
+sce watch add --pattern ".sce/specs/*/requirements.md" --action "sce context export {spec}"
+sce watch add --pattern ".sce/specs/*/design.md" --action "sce context export {spec}"
 ```
 
 **使用：**
@@ -217,7 +217,7 @@ Spec 包括：
 /**
  * Task 1.1: 设置项目依赖
  * 
- * Spec: .kiro/specs/01-00-my-feature/
+ * Spec: .sce/specs/01-00-my-feature/
  * Requirements: FR-1, FR-2, NFR-1
  * Design: 参见 design.md 中的 ComponentName
  * 
@@ -231,10 +231,10 @@ Spec 包括：
 **命令模板：**
 ```bash
 # 使用 Aider
-aider --message "使用 .kiro/specs/01-00-my-feature/ 中的 spec 实现任务 1.1"
+aider --message "使用 .sce/specs/01-00-my-feature/ 中的 spec 实现任务 1.1"
 
 # 使用 Cline
-cline "检查 .kiro/specs/01-00-my-feature/ 并实现任务 1.1"
+cline "检查 .sce/specs/01-00-my-feature/ 并实现任务 1.1"
 ```
 
 ---
@@ -299,7 +299,7 @@ sce spec bootstrap --name 01-00-user-login --non-interactive
 sce context export 01-00-user-login
 
 # 3. 复制到剪贴板
-cat .kiro/specs/01-00-user-login/context-export.md | pbcopy
+cat .sce/specs/01-00-user-login/context-export.md | pbcopy
 
 # 4. 在 Claude 中：
 # - 粘贴上下文
@@ -360,7 +360,7 @@ sce spec bootstrap --name 01-00-user-login --non-interactive
 # 3. 添加 Spec 引用注释
 /**
  * Task 1.1: 设置项目依赖
- * Spec: .kiro/specs/01-00-user-login/
+ * Spec: .sce/specs/01-00-user-login/
  * Design: 参见 design.md 中的 AuthController
  */
 
@@ -435,7 +435,7 @@ sce context export $SPEC
 sce prompt generate $SPEC $TASK
 
 # 复制到剪贴板
-cat .kiro/specs/$SPEC/context-export.md | pbcopy
+cat .sce/specs/$SPEC/context-export.md | pbcopy
 
 echo "✅ 上下文已复制到剪贴板"
 echo "现在粘贴到你的 AI 工具并请求实现"
@@ -445,7 +445,7 @@ echo "现在粘贴到你的 AI 工具并请求实现"
 
 为 AI 行为添加项目特定规则：
 ```bash
-# 编辑 .kiro/steering/CORE_PRINCIPLES.md
+# 编辑 .sce/steering/CORE_PRINCIPLES.md
 # 添加你的编码标准、约定等
 
 # 使用 steering 导出
@@ -457,13 +457,13 @@ sce context export 01-00-my-feature --steering
 为常见模式创建 Spec 模板：
 ```bash
 # 创建模板目录
-mkdir .kiro/templates
+mkdir .sce/templates
 
 # 创建模板 Spec
-cp -r .kiro/specs/01-00-user-login .kiro/templates/api-feature-template
+cp -r .sce/specs/01-00-user-login .sce/templates/api-feature-template
 
 # 对于新功能，从模板复制
-cp -r .kiro/templates/api-feature-template .kiro/specs/02-00-new-feature
+cp -r .sce/templates/api-feature-template .sce/specs/02-00-new-feature
 ```
 
 ---

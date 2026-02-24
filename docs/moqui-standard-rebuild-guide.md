@@ -41,20 +41,20 @@ node scripts/moqui-metadata-extract.js \
 
 `moqui-metadata-extract` now performs multi-source catalog extraction by default:
 - Moqui XML (`entity/service/screen/form/rule/decision`)
-- `scene-package.json` contracts in `.kiro/specs/**/docs/`
+- `scene-package.json` contracts in `.sce/specs/**/docs/`
 - `docs/handoffs/handoff-manifest.json`
 - `docs/handoffs/capability-matrix.md`
 - `docs/handoffs/evidence/**/*.json`
-- `.kiro/recovery/salvage/**/*.json` (if present)
+- `.sce/recovery/salvage/**/*.json` (if present)
 
 ## Step 2: Build Rebuild Bundle
 
 ```bash
 node scripts/moqui-standard-rebuild.js \
   --metadata docs/moqui/metadata-catalog.json \
-  --out .kiro/reports/recovery/moqui-standard-rebuild.json \
-  --markdown-out .kiro/reports/recovery/moqui-standard-rebuild.md \
-  --bundle-out .kiro/reports/recovery/moqui-standard-bundle \
+  --out .sce/reports/recovery/moqui-standard-rebuild.json \
+  --markdown-out .sce/reports/recovery/moqui-standard-rebuild.md \
+  --bundle-out .sce/reports/recovery/moqui-standard-bundle \
   --json
 ```
 
@@ -63,9 +63,9 @@ node scripts/moqui-standard-rebuild.js \
 ```bash
 node scripts/moqui-rebuild-gate.js \
   --metadata docs/moqui/metadata-catalog.json \
-  --out .kiro/reports/recovery/moqui-standard-rebuild.json \
-  --markdown-out .kiro/reports/recovery/moqui-standard-rebuild.md \
-  --bundle-out .kiro/reports/recovery/moqui-standard-bundle
+  --out .sce/reports/recovery/moqui-standard-rebuild.json \
+  --markdown-out .sce/reports/recovery/moqui-standard-rebuild.md \
+  --bundle-out .sce/reports/recovery/moqui-standard-bundle
 ```
 
 Defaults: `ready>=6`, `partial<=0`, `gap<=0`.

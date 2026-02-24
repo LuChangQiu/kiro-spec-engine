@@ -78,23 +78,23 @@ sce spec bootstrap --name 01-00-user-login --non-interactive
 sce context export 01-00-user-login
 ```
 
-This creates `.kiro/specs/01-00-user-login/context-export.md`
+This creates `.sce/specs/01-00-user-login/context-export.md`
 
 ### Step 3: Copy Context
 
 **macOS:**
 ```bash
-cat .kiro/specs/01-00-user-login/context-export.md | pbcopy
+cat .sce/specs/01-00-user-login/context-export.md | pbcopy
 ```
 
 **Windows:**
 ```bash
-type .kiro\specs\01-00-user-login\context-export.md | clip
+type .sce\specs\01-00-user-login\context-export.md | clip
 ```
 
 **Linux:**
 ```bash
-cat .kiro/specs/01-00-user-login/context-export.md | xclip -selection clipboard
+cat .sce/specs/01-00-user-login/context-export.md | xclip -selection clipboard
 ```
 
 **Or manually:**
@@ -168,7 +168,7 @@ Edit `tasks.md`:
 **Example:**
 ```javascript
 /**
- * Spec: .kiro/specs/01-00-user-login/
+ * Spec: .sce/specs/01-00-user-login/
  * Task: 2.1 - Implement AuthController
  * 
  * Requirements:
@@ -190,10 +190,10 @@ class AuthController {
 sce context export 01-00-user-login
 
 # Provide to CLI tool
-your-ai-tool --context .kiro/specs/01-00-user-login/context-export.md
+your-ai-tool --context .sce/specs/01-00-user-login/context-export.md
 
 # Or pipe it
-cat .kiro/specs/01-00-user-login/context-export.md | your-ai-tool
+cat .sce/specs/01-00-user-login/context-export.md | your-ai-tool
 ```
 
 ### API-Based Tools
@@ -201,7 +201,7 @@ cat .kiro/specs/01-00-user-login/context-export.md | your-ai-tool
 **Workflow:**
 ```javascript
 const fs = require('fs');
-const context = fs.readFileSync('.kiro/specs/01-00-user-login/context-export.md', 'utf8');
+const context = fs.readFileSync('.sce/specs/01-00-user-login/context-export.md', 'utf8');
 
 // Call your AI API
 const response = await aiAPI.generate({
@@ -378,7 +378,7 @@ What's wrong and how do I fix it?
 If you're building an AI coding tool, consider:
 
 **1. Native sce Support**
-- Read `.kiro/specs/` directory
+- Read `.sce/specs/` directory
 - Parse requirements.md, design.md, tasks.md
 - Update tasks.md automatically
 

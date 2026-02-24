@@ -65,17 +65,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Release-ready starter kit + security baseline docs**: Added `docs/starter-kit/*` and `docs/security-governance-default-baseline.md`, and wired checklist/index docs so external projects can onboard with default manifest/workflow/safety policy.
 - **Capability lexicon hard gate end-to-end defaultization**: `sce auto handoff run` and `sce auto handoff capability-matrix` now enforce unknown Moqui capability alias blocking by default (expected/provided), emit lexicon gate telemetry into release evidence, and promote those signals into governance risk/concern/recommendation/close-loop block decisions.
 - **Moqui release summary report helper**: Added `node scripts/moqui-release-summary.js` (and npm alias `npm run report:moqui-summary`) to consolidate handoff evidence + baseline + lexicon + capability-matrix into a single release-gate verdict (`passed|failed|incomplete`) with remediation commands.
-- **Moqui release summary interactive-governance signal merge**: `moqui-release-summary` now ingests interactive governance report input by default (`.kiro/reports/interactive-governance-report.json`) and surfaces alert-state remediation hints in release summary output.
+- **Moqui release summary interactive-governance signal merge**: `moqui-release-summary` now ingests interactive governance report input by default (`.sce/reports/interactive-governance-report.json`) and surfaces alert-state remediation hints in release summary output.
 - **Interactive customization baseline contracts + gate**: Added `116-00-interactive-business-customization-platform` spec set, interactive change contract artifacts, and `node scripts/interactive-change-plan-gate.js` (npm alias `npm run gate:interactive-plan`) to enforce secure-by-default plan review (`allow|review-required|deny`) before execution.
 - **Interactive read-only intent bridge**: Added `node scripts/interactive-intent-build.js` (npm alias `npm run report:interactive-intent`) to generate masked page-context explain output, structured `Change_Intent`, and append audit JSONL events for stage-A UI copilot integration.
 - **Interactive plan generation bridge**: Added `node scripts/interactive-plan-build.js` (npm alias `npm run report:interactive-plan`) to convert `Change_Intent` into structured `Change_Plan` with action candidates, risk inference, verification checks, rollback blueprint, and approval defaults before gate evaluation.
 - **Interactive one-command loop orchestrator**: Added `node scripts/interactive-customization-loop.js` (npm alias `npm run run:interactive-loop`) to run `intent -> plan -> gate -> approval` in one command and optionally auto-trigger low-risk apply through the Moqui adapter when gate/risk conditions are satisfied; loop now supports direct feedback capture (`--feedback-score/--feedback-comment/--feedback-tags`) into session-scoped feedback JSONL for governance ingestion.
-- **Interactive loop CLI + governance routing hardening**: Added `sce scene interactive-loop` as first-class CLI entry, updated loop feedback flow to write both session-scoped and global governance streams (`.kiro/reports/interactive-user-feedback.jsonl`), and introduced CI smoke gate (`test:interactive-loop-smoke`) wired into `test.yml`/`release.yml` test jobs.
+- **Interactive loop CLI + governance routing hardening**: Added `sce scene interactive-loop` as first-class CLI entry, updated loop feedback flow to write both session-scoped and global governance streams (`.sce/reports/interactive-user-feedback.jsonl`), and introduced CI smoke gate (`test:interactive-loop-smoke`) wired into `test.yml`/`release.yml` test jobs.
 - **Interactive context-contract hardening for Moqui workbench UI**: `interactive-intent-build` and `sce scene interactive-loop` now support `--context-contract` and strict validation by default (required fields, payload-size budget, forbidden keys), with upgraded page-context schema/sample for `scene_workspace` + `assistant_panel` payloads matching the Screen Explorer + AI assistant layout.
 - **Moqui provider-to-context bridge command**: Added `scripts/interactive-context-bridge.js` and `sce scene context-bridge` to normalize raw Moqui workbench payloads into standard interactive `page-context` artifacts with default contract validation (`--no-strict-contract` for diagnostics), plus sample payload and unit coverage for provider mapping.
 - **Interactive full-flow one-command entry**: Added `scripts/interactive-flow.js` and `sce scene interactive-flow` to execute `context-bridge -> interactive-loop` in one pipeline, with unified artifact session output and passthrough guardrail/approval/feedback options for Moqui workbench embedding.
 - **Interactive flow smoke gate in CI**: Added `scripts/interactive-flow-smoke.js` (npm alias `test:interactive-flow-smoke`) and wired it into `test.yml` / `release.yml` test jobs alongside interactive-loop smoke.
-- **Interactive matrix signal closed-loop defaultization**: `interactive-flow` now runs a default matrix snapshot stage (`moqui-template-baseline-report`) after loop execution, persists session matrix artifacts, appends `.kiro/reports/interactive-matrix-signals.jsonl`, and exposes matrix controls (`--no-matrix`, thresholds, compare baseline, signal path, fail-on-portfolio/regression/error) in both script and `sce scene interactive-flow`.
+- **Interactive matrix signal closed-loop defaultization**: `interactive-flow` now runs a default matrix snapshot stage (`moqui-template-baseline-report`) after loop execution, persists session matrix artifacts, appends `.sce/reports/interactive-matrix-signals.jsonl`, and exposes matrix controls (`--no-matrix`, thresholds, compare baseline, signal path, fail-on-portfolio/regression/error) in both script and `sce scene interactive-flow`.
 - **Interactive approval workflow state machine**: Added `node scripts/interactive-approval-workflow.js` (status alias `npm run report:interactive-approval-status`) covering `draft/submitted/approved/rejected/executed/verified/archived` transitions, with high-risk execute blocking and append-only approval event audit JSONL.
 - **Interactive Moqui adapter stage-C baseline**: Added `lib/interactive-customization/moqui-interactive-adapter.js` plus `node scripts/interactive-moqui-adapter.js` (alias `npm run report:interactive-adapter-capabilities`) to implement unified adapter contract `capabilities/plan/validate/apply/rollback`, low-risk one-click apply (`low-risk-apply`), policy-aware controlled execution, and append-only execution records with validation snapshot + rollback reference.
 - **Interactive template matrix stage-D baseline**: Added `kse.scene--moqui-interactive-customization-loop--0.1.0` scene package assets (scene-package/scene manifest/template manifest), plus template sedimentation playbook, adapter extension contract schema/sample, and Domain_Pack extension flow docs for cross-stack replication.
@@ -92,7 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Matrix remediation default burst policy tightened**: queue/phased defaults now use `medium parallel=1`, `medium agent-budget=2`, and `cooldown=30s` to minimize `429 Too Many Requests` pressure under multi-agent load.
 - **Matrix remediation template/capability prioritization matrix**: `moqui-matrix-remediation-queue` now outputs `template_priority_matrix` and `capability_clusters` to surface cross-regression repair order (which templates first, which capabilities to close first) for Moqui template hardening.
 - **Release summary prioritization awareness**: `moqui-release-summary` now reads `matrix-remediation-plan` by default and injects template/capability priority order into recommendations and markdown summary when matrix regressions block release.
-- **Capability-cluster executable remediation goals**: `moqui-matrix-remediation-queue` now emits `.kiro/auto/matrix-remediation.capability-clusters.json` and release summary recommends cluster-prioritized batch execution by default.
+- **Capability-cluster executable remediation goals**: `moqui-matrix-remediation-queue` now emits `.sce/auto/matrix-remediation.capability-clusters.json` and release summary recommends cluster-prioritized batch execution by default.
 - **Capability-cluster default recommendation wiring**: `auto handoff regression/run/governance` and release-summary remediation hints now include cluster-prioritized execution commands plus npm alias `run:matrix-remediation-clusters`.
 - **Capability-cluster phased one-shot runner mode**: `moqui-matrix-remediation-phased-runner` now supports `--cluster-goals` to derive high/medium phase goals from cluster payloads and execute anti-429 phased remediation in one flow (`run:matrix-remediation-clusters-phased`).
 - **Cluster-first recommendation ordering**: Moqui regression recovery recommendations now prioritize `run:matrix-remediation-clusters-phased` before baseline phased remediation to reduce manual sequencing decisions under pressure.
@@ -105,7 +105,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Release workflow Moqui summary alignment**: `release.yml` now explicitly generates and publishes `moqui-release-summary.{json,md}` from baseline + interactive governance + evidence inputs, with optional hard-gate flag `KSE_MOQUI_RELEASE_SUMMARY_ENFORCE`.
 - **Release governance snapshot standalone assets**: Added `scripts/release-governance-snapshot-export.js` and wired `release.yml` to publish `governance-snapshot-<tag>.json|.md` as independent governance audit artifacts (with unavailable placeholders when evidence summary is missing).
 - **331-poc integration checklist baseline**: Added `docs/interactive-customization/331-poc-sce-integration-checklist.md` to define minimal runtime contract, default commands, gate defaults, and pass criteria for Moqui + SCE deployment.
-- **Interactive feedback ingestion helper**: Added `node scripts/interactive-feedback-log.js` (alias `npm run log:interactive-feedback`) to append structured business-user feedback events into `.kiro/reports/interactive-user-feedback.jsonl` for governance sample coverage and trend stability.
+- **Interactive feedback ingestion helper**: Added `node scripts/interactive-feedback-log.js` (alias `npm run log:interactive-feedback`) to append structured business-user feedback events into `.sce/reports/interactive-user-feedback.jsonl` for governance sample coverage and trend stability.
 - **Interactive governance gate defaultization in CI/release**: `test.yml`, `release.yml`, and `prepublishOnly` now execute `interactive-governance-report --period weekly --fail-on-alert` so publish and release flows enforce medium/high governance breaches by default, with `min_intent_samples` low-sample warning behavior to avoid false-positive hard blocks.
 - **Interactive acceptance and replication handoff pack**: Added phase acceptance evidence (`phase-acceptance-evidence.md`), non-technical usability report, and cross-industry replication guide to close stage-A/B/C/D verification and provide domain expansion boundaries.
 - **Moqui page-level copilot integration contract**: Added stage-A integration contract and guide for context injection and masking boundaries (`moqui-copilot-context-contract.json`, `moqui-copilot-integration-guide.md`) to support safe UI embedding of the read-only Business Copilot.
@@ -120,7 +120,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Scene ontology impact/path analysis commands**: Added `sce scene ontology impact` (reverse dependency blast-radius analysis with `--relation` and `--max-depth`) and `sce scene ontology path` (shortest relation path between refs with optional `--undirected`) to improve ontology-driven change planning and explainability.
 - **Close-loop quantitative DoD gates**: Added `--dod-max-risk-level`, `--dod-kpi-min-completion-rate`, `--dod-max-success-rate-drop`, and `--dod-baseline-window` so autonomous closure can enforce explicit risk/KPI/baseline thresholds beyond binary checks.
 - **Close-loop conflict/ontology execution planning**: Added lease-conflict scheduling governance and scene ontology scheduling guidance with opt-out controls (`--no-conflict-governance`, `--no-ontology-guidance`), and surfaced planning telemetry in `portfolio.execution_plan` plus agent sync plan output.
-- **Close-loop strategy memory feedback loop**: Added persisted strategy memory (`.kiro/auto/close-loop-strategy-memory.json`) to reuse prior goal-level policy hints and track-level feedback bias during decomposition, with run telemetry under `strategy_memory`.
+- **Close-loop strategy memory feedback loop**: Added persisted strategy memory (`.sce/auto/close-loop-strategy-memory.json`) to reuse prior goal-level policy hints and track-level feedback bias during decomposition, with run telemetry under `strategy_memory`.
 - **Unified autonomous observability snapshot**: Added `sce auto observability snapshot` to aggregate close-loop, batch, controller, governance, and KPI-trend telemetry into one machine-readable payload.
 - **Agent-facing spec JSON interfaces**: Added `sce auto spec status <spec-name> --json` and `sce auto spec instructions <spec-name> --json` for structured status/instruction retrieval in master-sub agent workflows.
 - **Autonomous archive schema compatibility tooling**: Added `sce auto schema check` and `sce auto schema migrate` (dry-run by default, `--apply` to persist) to audit and migrate `schema_version` across autonomous archives.
@@ -128,7 +128,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Governance close-loop post-run retention hook**: Added `--governance-session-keep` and `--governance-session-older-than-days` to `sce auto governance close-loop` for automatic governance session archive pruning after each run, with current session protection and telemetry in `governance_session_prune`.
 - **Governance resume drift guardrails**: `sce auto governance close-loop --governance-resume` now reuses persisted target/advisory policy defaults by default and blocks explicit policy drift unless `--governance-resume-allow-drift` is set, reducing accidental resume misconfiguration.
 - **Governance session maintenance commands**: Added `sce auto governance session list|stats|prune` for persisted governance close-loop session observability and retention management, including status/day filters, convergence/risk telemetry, and archive cleanup controls (`--keep`, `--older-than-days`, `--dry-run`).
-- **Governance close-loop session persistence and resume**: Added default governance loop session archiving (`.kiro/auto/governance-close-loop-sessions`) with controls `--governance-session-id`, `--no-governance-session`, and `--governance-resume <session|latest|file>` so interrupted governance rounds can be resumed without restarting from round 1.
+- **Governance close-loop session persistence and resume**: Added default governance loop session archiving (`.sce/auto/governance-close-loop-sessions`) with controls `--governance-session-id`, `--no-governance-session`, and `--governance-resume <session|latest|file>` so interrupted governance rounds can be resumed without restarting from round 1.
 - **Governance close-loop advisory execution**: Added optional advisory action execution to `sce auto governance close-loop` via `--execute-advisory`, including bounded controls `--advisory-recover-max-rounds` and `--advisory-controller-max-cycles`, with per-round advisory telemetry (`advisory_actions`, advisory action counts) and top-level advisory policy/summary output. Advisory source selection is now autonomous (latest recoverable batch summary / latest controller session with pending goals) and emits `skipped` instead of hard-failing when no actionable advisory source exists.
 - **Governance close-loop rounds command**: Added `sce auto governance close-loop` to run bounded governance-maintenance rounds toward a target risk (`--target-risk`) with convergence telemetry (`rounds`, `initial_assessment`, `final_assessment`, `stop_reason`, `converged`) and non-mutating planning support (`--plan-only`, `--dry-run`).
 - **Governance maintenance close-loop command**: Added `sce auto governance maintain` to combine governance assessment and optional maintenance execution (`--apply`) across session/batch/controller archives and recovery memory, with policy knobs (`--session-keep`, `--batch-session-keep`, `--controller-session-keep`, `--recovery-memory-older-than-days`), dry-run support, and before/after telemetry.
@@ -140,7 +140,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Spec protection source expansion**: `spec-session prune` now protects specs referenced by recent/incomplete controller sessions (via nested batch summary references), reducing accidental cleanup during controller-driven autonomous runs.
 - **Controller session maintenance commands**: Added `sce auto controller-session list` / `sce auto controller-session prune` (retention + age filters + dry-run/json) for persisted close-loop-controller summary archives.
 - **Controller-aware autonomous KPI trend mode**: `sce auto kpi trend` now supports `--mode controller` and includes persisted controller session telemetry in trend aggregation (including nested program sub-spec/spec-growth rollups when available).
-- **Controller checkpoint resume**: `close-loop-controller` now supports `--controller-resume <latest|id|file>` plus persisted controller session snapshots (`.kiro/auto/close-loop-controller-sessions`) with retention controls (`--controller-session-id`, `--controller-session-keep`, `--controller-session-older-than-days`, `--no-controller-session`).
+- **Controller checkpoint resume**: `close-loop-controller` now supports `--controller-resume <latest|id|file>` plus persisted controller session snapshots (`.sce/auto/close-loop-controller-sessions`) with retention controls (`--controller-session-id`, `--controller-session-keep`, `--controller-session-older-than-days`, `--no-controller-session`).
 - **Controller concurrency lease lock**: Added queue lease lock controls (`--controller-lock-file`, `--controller-lock-ttl-seconds`, `--no-controller-lock`) to prevent concurrent queue corruption and allow stale-lock takeover under bounded TTL.
 - **Persistent close-loop queue controller**: Added `sce auto close-loop-controller [queue-file]` with queue drain/poll runtime (`--queue-format`, `--dequeue-limit`, `--wait-on-empty`, `--poll-seconds`, runtime budgets, done/failed archives) so broad goals can be continuously executed through `close-loop-program` without manual re-invocation.
 - **KPI sample generator command**: Added `sce value metrics sample` to generate a ready-to-use KPI input JSON scaffold (`kpi-input.json`) for first-time observability runs.
@@ -153,15 +153,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Test governance scripts**: Added `test:smoke`, `test:full`, `test:handles`, `test:skip-audit`, plus `scripts/check-skip-allowlist.js` and `tests/skip-allowlist.txt` for skip-test regression guardrails.
 - **Autonomous close-loop command**: Added `sce auto close-loop "<goal>"` to perform one-command goal decomposition (master/sub specs), collaboration bootstrap, and orchestration until terminal state.
 - **Definition-of-Done gates for close-loop**: Added configurable completion gates for `sce auto close-loop` (`--dod-tests`, `--dod-tasks-closed`, `--no-dod*`) so autonomous runs only report success when required evidence checks pass.
-- **DoD evidence archive for close-loop**: Added automatic DoD report persistence to `.kiro/specs/<master>/custom/dod-report.json` with CLI controls (`--dod-report`, `--no-dod-report`) for audit-ready closure evidence.
-- **Close-loop session resume**: Added session snapshot persistence for `sce auto close-loop` (`.kiro/auto/close-loop-sessions`) plus resume controls (`--resume`, `--session-id`, `--no-session`) to continue interrupted master/sub executions.
+- **DoD evidence archive for close-loop**: Added automatic DoD report persistence to `.sce/specs/<master>/custom/dod-report.json` with CLI controls (`--dod-report`, `--no-dod-report`) for audit-ready closure evidence.
+- **Close-loop session resume**: Added session snapshot persistence for `sce auto close-loop` (`.sce/auto/close-loop-sessions`) plus resume controls (`--resume`, `--session-id`, `--no-session`) to continue interrupted master/sub executions.
 - **Close-loop session hygiene commands**: Added `sce auto session list` and `sce auto session prune` (retention + age filters + dry-run/json) so long-running autonomous programs can maintain session archives without manual file cleanup.
-- **Spec directory retention commands**: Added `sce auto spec-session list|prune` (retention + age filters + dry-run/json) to control `.kiro/specs` growth for continuous autonomous runs.
+- **Spec directory retention commands**: Added `sce auto spec-session list|prune` (retention + age filters + dry-run/json) to control `.sce/specs` growth for continuous autonomous runs.
 - **Active spec protection in retention prune**: `sce auto spec-session prune` now protects active/recently referenced specs by default (`--no-protect-active` to override).
-- **Automatic spec retention policy for program/batch/recover**: Added `--spec-session-keep` / `--spec-session-older-than-days` (`--no-spec-session-protect-active` optional) so autonomous multi-goal runs can auto-prune `.kiro/specs` after execution.
+- **Automatic spec retention policy for program/batch/recover**: Added `--spec-session-keep` / `--spec-session-older-than-days` (`--no-spec-session-protect-active` optional) so autonomous multi-goal runs can auto-prune `.sce/specs` after execution.
 - **Configurable spec protection window**: Added `--spec-session-protect-window-days` (and `spec-session prune --protect-window-days`) so teams can tune recent-reference protection horizon for retention safety.
 - **Spec protection reason observability**: `spec-session prune` now emits `protection_ranking_top` by default and supports `--show-protection-reasons` for per-spec reason detail (`protected_specs[*].reasons`, `protection_ranking`) during retention audits.
-- **Spec directory budget guardrail**: Added `--spec-session-max-total` with optional `--spec-session-budget-hard-fail` for batch/program/recover flows, including `spec_session_budget` telemetry in summaries to prevent uncontrolled `.kiro/specs` growth.
+- **Spec directory budget guardrail**: Added `--spec-session-max-total` with optional `--spec-session-budget-hard-fail` for batch/program/recover flows, including `spec_session_budget` telemetry in summaries to prevent uncontrolled `.sce/specs` growth.
 - **Unified program budget gate**: Added `--program-max-elapsed-minutes`, `--program-max-agent-budget`, and `--program-max-total-sub-specs` so `close-loop-program` convergence gate can enforce time/concurrency/sub-spec budgets together with success/risk policy.
 - **Program/recover gate policy parity + auto-remediation hooks**: `close-loop-recover` now supports the same gate/fallback/budget policy flags as program mode and can emit `program_gate_auto_remediation` (auto patch/prune hints) when gate/budget checks fail.
 - **Spec growth/duplicate guardrails**: Added `--spec-session-max-created`, `--spec-session-max-created-per-goal`, and `--spec-session-max-duplicate-goals` (with hard-fail option) plus summary telemetry (`goal_input_guard`, `spec_session_growth_guard`) to reduce runaway autonomous portfolio expansion.
@@ -177,7 +177,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Close-loop batch priority + aging scheduler controls**: Added `--batch-priority` (`fifo|complex-first|complex-last`) and `--batch-aging-factor` (`0-100`) with `resource_plan` wait/starvation telemetry so autonomous multi-goal runs can tune ordering and fairness without manual intervention.
 - **Close-loop batch program decomposition mode**: Added `--decompose-goal` + `--program-goals` so one broad goal can be auto-split into multiple batch goals and executed as a master batch without manually authoring a goals file.
 - **Close-loop batch automatic retry rounds**: Added `--batch-retry-rounds` + `--batch-retry-strategy` (`adaptive|strict`) with `batch_retry` summary telemetry so failed/stopped goals can be retried in the same autonomous batch run without manual re-invocation.
-- **Close-loop batch session archive + latest resume**: Added automatic batch summary session persistence (`.kiro/auto/close-loop-batch-summaries`) with controls (`--batch-session-id`, `--batch-session-keep`, `--no-batch-session`) and support for `--resume-from-summary latest`.
+- **Close-loop batch session archive + latest resume**: Added automatic batch summary session persistence (`.sce/auto/close-loop-batch-summaries`) with controls (`--batch-session-id`, `--batch-session-keep`, `--no-batch-session`) and support for `--resume-from-summary latest`.
 - **Close-loop batch session maintenance commands**: Added `sce auto batch-session list` / `sce auto batch-session prune` plus age-based retention control (`--batch-session-older-than-days`) for persisted batch summary archives.
 - **Close-loop batch until-complete retry mode**: Added `--batch-retry-until-complete` + `--batch-retry-max-rounds` so multi-goal runs can auto-drain failed/stopped goals to completion within one command invocation under bounded retry policy.
 - **Close-loop batch autonomous policy mode**: Added `--batch-autonomous` to apply closed-loop defaults automatically (continue-on-error, adaptive parallelism, complexity-first scheduling, aging boost, retry-until-complete) for hands-off program execution.
@@ -202,7 +202,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Scoped recovery memory maintenance**: `sce auto recovery-memory show|prune` now support `--scope <scope>` for targeted inspection and cleanup.
 - **Program gate fallback observability**: Program outputs now include `program_gate_fallbacks` and `program_gate_effective` fields for full fallback decision traceability.
 - **Program-level auto recovery loop**: `sce auto close-loop-program` now auto-enters bounded recovery rounds by default (`--program-recover-max-rounds`, `--no-program-auto-recover`) so one command can drive program execution to closure without manual follow-up.
-- **Recovery strategy memory**: Added persisted recovery memory (`.kiro/auto/close-loop-recovery-memory.json`) so `close-loop-recover` and program auto-recovery can reuse previously successful remediation actions when `--use-action` is omitted.
+- **Recovery strategy memory**: Added persisted recovery memory (`.sce/auto/close-loop-recovery-memory.json`) so `close-loop-recover` and program auto-recovery can reuse previously successful remediation actions when `--use-action` is omitted.
 - **Program coordination telemetry**: Added `program_coordination` output (master/sub topology, unresolved goals, scheduler snapshot) for multi-spec orchestration observability in both program and recover summaries.
 - **Close-loop batch KPI summary**: Added aggregate `metrics` in batch output (success rate, status breakdown, average sub-spec count, average replan cycles) for portfolio-level observability.
 - **Close-loop auto session retention policy**: Added `--session-keep` and `--session-older-than-days` to `sce auto close-loop` so each autonomous run can prune stale session snapshots automatically.
@@ -290,7 +290,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Regression tests**: added unit tests for undefined/empty prompt guardrails, Windows agentId filename sanitization, and codex→npx command fallback path.
-- **Codex orchestration docs**: added recommended Codex-only orchestrator configuration examples in README, README.zh, `.kiro/README.md`, and command reference.
+- **Codex orchestration docs**: added recommended Codex-only orchestrator configuration examples in README, README.zh, `.sce/README.md`, and command reference.
 
 ## [1.45.12] - 2026-02-13
 
@@ -389,16 +389,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.43.1] - 2026-02-11
 
 ### Changed
-- **Agent Onboarding Document** (`template/.kiro/README.md`, `.kiro/README.md`): Comprehensive rewrite of "sce Capabilities" section listing all commands and features (Core, Task, Spec Locking, Workspace, Environment, Multi-Repo, Collab, Multi-Agent Coordination, Autonomous Control, Scene Runtime, Document Governance, DevOps, Knowledge Management)
-- **CORE_PRINCIPLES Principle 9**: Strengthened version sync and steering refresh principle — `.kiro/README.md` is now the authoritative agent onboarding entry point for understanding all sce capabilities
+- **Agent Onboarding Document** (`template/.sce/README.md`, `.sce/README.md`): Comprehensive rewrite of "sce Capabilities" section listing all commands and features (Core, Task, Spec Locking, Workspace, Environment, Multi-Repo, Collab, Multi-Agent Coordination, Autonomous Control, Scene Runtime, Document Governance, DevOps, Knowledge Management)
+- **CORE_PRINCIPLES Principle 9**: Strengthened version sync and steering refresh principle — `.sce/README.md` is now the authoritative agent onboarding entry point for understanding all sce capabilities
 
 ## [1.43.0] - 2026-02-11
 
 ### Added
 - **Multi-Agent Parallel Coordination**: Infrastructure for multiple AI agents working on the same project simultaneously
-  - **MultiAgentConfig** (`lib/collab/multi-agent-config.js`): Configuration management for multi-agent mode via `.kiro/config/multi-agent.json`
+  - **MultiAgentConfig** (`lib/collab/multi-agent-config.js`): Configuration management for multi-agent mode via `.sce/config/multi-agent.json`
   - **AgentRegistry** (`lib/collab/agent-registry.js`): Agent lifecycle management with MachineIdentifier-based ID generation, heartbeat monitoring, and inactive agent cleanup
-  - **TaskLockManager** (`lib/lock/task-lock-manager.js`): File-based task locking with atomic lock files (`.kiro/specs/{specName}/locks/{taskId}.lock`), single-agent backward compatibility
+  - **TaskLockManager** (`lib/lock/task-lock-manager.js`): File-based task locking with atomic lock files (`.sce/specs/{specName}/locks/{taskId}.lock`), single-agent backward compatibility
   - **TaskStatusStore** (`lib/task/task-status-store.js`): Concurrent-safe task status updates with file locking, exponential backoff retry, and line-content validation
   - **SteeringFileLock** (`lib/lock/steering-file-lock.js`): Steering file write serialization with pending-file degradation fallback
   - **MergeCoordinator** (`lib/collab/merge-coordinator.js`): Git branch management for agent isolation (`agent/{agentId}/{specName}`), conflict detection, auto-merge
@@ -545,7 +545,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Scene Registry Audit**: Health check for local scene package registry
   - `sce scene audit` scan registry index, verify tarball existence and SHA-256 integrity
-    - `--registry <dir>` custom registry directory (default `.kiro/registry`)
+    - `--registry <dir>` custom registry directory (default `.sce/registry`)
     - `--fix` auto-remove orphaned tarballs and clean missing-tarball index entries
     - `--json` structured JSON output
   - Detects missing tarballs, integrity mismatches, orphaned tarballs, deprecated versions
@@ -690,13 +690,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Post-instantiate hook execution via `post-instantiate` script in scene-package.json
   - Implements Spec 76-00-scene-template-instantiation
 
-- **Default Agent Hooks in Adopt**: `sce adopt` now creates 3 default hooks in `.kiro/hooks/`
-  - `run-tests-on-save.kiro.hook` - Manual trigger to run tests (userTriggered)
-  - `check-spec-on-create.kiro.hook` - Validate spec structure on creation (fileCreated)
-  - `sync-tasks-on-edit.kiro.hook` - Sync workspace on tasks.md edit (fileEdited)
+- **Default Agent Hooks in Adopt**: `sce adopt` now creates 3 default hooks in `.sce/hooks/`
+  - `run-tests-on-save.sce.hook` - Manual trigger to run tests (userTriggered)
+  - `check-spec-on-create.sce.hook` - Validate spec structure on creation (fileCreated)
+  - `sync-tasks-on-edit.sce.hook` - Sync workspace on tasks.md edit (fileEdited)
   - Hooks directory added to all adoption strategies (fresh/partial/full)
 
-- **AI IDE MCP Auto-Configuration**: When AI IDE is detected during `sce adopt`, automatically creates `.kiro/settings/mcp.json` with shell MCP server (`mcp-server-commands`). Skips if config already exists.
+- **AI IDE MCP Auto-Configuration**: When AI IDE is detected during `sce adopt`, automatically creates `.sce/settings/mcp.json` with shell MCP server (`mcp-server-commands`). Skips if config already exists.
 
 ## [1.25.0] - 2026-02-09
 
@@ -785,7 +785,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Documentation**: Complete user guide at `docs/knowledge-management-guide.md`
 
 ### Technical Details
-- Knowledge stored in `.kiro/knowledge/` directory
+- Knowledge stored in `.sce/knowledge/` directory
 - Lightweight index for fast lookups (not auto-loaded into AI context)
 - Modular architecture: EntryManager, IndexManager, TemplateManager, KnowledgeManager
 - Cross-platform support (Windows/Linux/macOS)
@@ -809,14 +809,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Learning System Persistence**: Error recovery learning with historical data
     - Success/failure history tracking across sessions
     - Strategy prioritization based on historical performance
-    - Automatic learning data persistence to `.kiro/auto/learning-data.json`
+    - Automatic learning data persistence to `.sce/auto/learning-data.json`
   - **Estimation Improvement**: Task duration tracking and prediction
     - Historical task duration tracking by task type
     - Weighted average estimation (more weight to recent data)
     - Improved completion time estimates over multiple executions
-    - Historical data persistence to `.kiro/auto/historical-data.json`
+    - Historical data persistence to `.sce/auto/historical-data.json`
   - **CORE_PRINCIPLES Compliance**: Automatic verification of sce project structure
-    - Checks for `.kiro` directory (adoption marker)
+    - Checks for `.sce` directory (adoption marker)
     - Validates `version.json`, `specs/`, `steering/` directories
     - Ensures Spec-driven development workflow compliance
   - **Comprehensive Documentation**:
@@ -887,8 +887,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Decision records
 
 ### Technical Details
-- State stored in `.kiro/auto/state.json` with atomic updates
-- Checkpoints stored in `.kiro/auto/checkpoints/` with metadata
+- State stored in `.sce/auto/state.json` with atomic updates
+- Checkpoints stored in `.sce/auto/checkpoints/` with metadata
 - Configuration hierarchy: global defaults < project config < runtime options
 - Error recovery strategies: syntax fixes, import resolution, null checks, retry
 - Learning system tracks successful/failed strategies for future optimization
@@ -932,8 +932,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Technical Details
 - New collaboration managers: MetadataManager, DependencyManager, ContractManager, IntegrationManager, Visualizer
-- Collaboration metadata stored in `.kiro/specs/{spec-name}/collaboration.json`
-- Interface contracts stored in `.kiro/specs/{spec-name}/interfaces/{interface-name}.json`
+- Collaboration metadata stored in `.sce/specs/{spec-name}/collaboration.json`
+- Interface contracts stored in `.sce/specs/{spec-name}/interfaces/{interface-name}.json`
 - Atomic metadata updates with file locking and retry logic
 - Graph-based dependency analysis with cycle detection
 - Automated interface verification for JavaScript/TypeScript
@@ -958,7 +958,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.21.0] - 2026-02-01
 
 ### Added
-- **Manual Configuration Support**: Users can now manually create and edit `.kiro/project-repos.json` without relying solely on auto-scan
+- **Manual Configuration Support**: Users can now manually create and edit `.sce/project-repos.json` without relying solely on auto-scan
   - Version field is now optional (defaults to "1.0" if omitted)
   - Only `name` and `path` are required for each repository entry
   - All other fields (`remote`, `defaultBranch`, `description`, `tags`, `group`, `parent`) are optional
@@ -1031,7 +1031,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **Nested Scanning Validation**: Fixed three critical validation issues preventing nested repository configuration saves
-  - Repository names starting with dots (`.github`, `.kiro`) now accepted as valid
+  - Repository names starting with dots (`.github`, `.sce`) now accepted as valid
   - Path overlap validation now context-aware: allows overlapping paths in nested mode, rejects in non-nested mode
   - Fixed empty name/path bug for root directory repositories (now normalized to '.')
   - Added `settings.nestedMode` field to track scanning mode in configuration
@@ -1150,7 +1150,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `sce repo status`: View status of all repositories in unified table
   - `sce repo exec`: Execute Git commands across all repositories
   - `sce repo health`: Verify repository configuration and connectivity
-  - Configuration stored in `.kiro/project-repos.json`
+  - Configuration stored in `.sce/project-repos.json`
   - Support for repository groups, tags, and metadata
   - Cross-platform path handling (Windows/Linux/macOS)
   - Comprehensive error handling and validation
@@ -1188,7 +1188,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Version Synchronization Principle**: Added principle #9 to CORE_PRINCIPLES.md
-  - Mandates reading `.kiro/README.md` after version updates or first installation
+  - Mandates reading `.sce/README.md` after version updates or first installation
   - Requires refreshing Steering rules to sync with latest version
   - Prevents AI from using outdated workflows or ignoring new features
   - Ensures consistency between AI behavior and project state
@@ -1325,12 +1325,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **.gitignore Auto-Fix for Team Collaboration**: Automatic detection and fixing of .gitignore configuration
-  - Detects old blanket `.kiro/` exclusion patterns that prevent Spec sharing
+  - Detects old blanket `.sce/` exclusion patterns that prevent Spec sharing
   - Replaces with layered strategy: commit Specs, exclude personal state
   - Integrated into `sce adopt` and `sce upgrade` flows (automatic)
   - Standalone command: `sce doctor --fix-gitignore`
-  - Creates backup before modification (stored in `.kiro/backups/gitignore-{timestamp}`)
-  - Preserves all user rules (non-.kiro patterns)
+  - Creates backup before modification (stored in `.sce/backups/gitignore-{timestamp}`)
+  - Preserves all user rules (non-.sce patterns)
   - Handles different line endings (CRLF/LF) correctly
   - 26 unit tests covering detection, transformation, backup, and integration
 
@@ -1339,7 +1339,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **GitignoreTransformer**: Applies layered exclusion strategy while preserving user rules
 - **GitignoreBackup**: Creates timestamped backups with metadata
 - **GitignoreIntegration**: Coordinates detection → backup → transform → report
-- **Layered Strategy**: Commits `.kiro/specs/` while excluding personal state (CURRENT_CONTEXT.md, environments.json, backups/, logs/)
+- **Layered Strategy**: Commits `.sce/specs/` while excluding personal state (CURRENT_CONTEXT.md, environments.json, backups/, logs/)
 - **Cross-platform**: Preserves original line ending style (CRLF on Windows, LF on Unix)
 
 ### Documentation
@@ -1362,7 +1362,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 66 unit tests covering all core functionality
 
 ### Technical Details
-- **EnvironmentRegistry**: JSON-based persistent storage (`.kiro/environments.json`)
+- **EnvironmentRegistry**: JSON-based persistent storage (`.sce/environments.json`)
 - **EnvironmentManager**: Core logic for environment operations
 - **BackupSystem**: Automatic backup/restore with history management
 - **CLI Integration**: Seamless integration with existing sce commands
@@ -1379,36 +1379,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.13.0] - 2026-01-29
 
 ### Added
-- **Steering Directory Compliance Check with Auto-Fix**: Automatic validation and repair of `.kiro/steering/` directory
+- **Steering Directory Compliance Check with Auto-Fix**: Automatic validation and repair of `.sce/steering/` directory
   - Enforces allowlist of 4 files: CORE_PRINCIPLES.md, ENVIRONMENT.md, CURRENT_CONTEXT.md, RULES_GUIDE.md
   - Prohibits subdirectories to prevent context pollution
   - **Auto-fix feature**: Automatically backs up and removes violations without user confirmation
   - **Multi-user support**: Detects and respects `contexts/` multi-user collaboration setup
-  - Differential backup: Only backs up violating files/directories (not entire .kiro/)
-  - Backup location: `.kiro/backups/steering-cleanup-{timestamp}/`
+  - Differential backup: Only backs up violating files/directories (not entire .sce/)
+  - Backup location: `.sce/backups/steering-cleanup-{timestamp}/`
   - Version-based caching (~/.kse/steering-check-cache.json) to avoid repeated checks
   - Performance target: <50ms per check
   - Clear progress messages during auto-fix
   - Bypass options: `--skip-steering-check` flag and `KSE_SKIP_STEERING_CHECK` environment variable
   - Force check option: `--force-steering-check` flag
-  - Comprehensive documentation in `.kiro/README.md`
+  - Comprehensive documentation in `.sce/README.md`
 
 ### Changed
 - **CLI**: All commands now run steering directory compliance check before execution
 - **Auto-fix behavior**: Violations are automatically fixed (backup + clean) without user confirmation
 - **Multi-user awareness**: Auto-fix shows informational message when multi-user project detected
-- **Documentation**: Added "Steering Directory Compliance" section with multi-user guidance to `.kiro/README.md`
+- **Documentation**: Added "Steering Directory Compliance" section with multi-user guidance to `.sce/README.md`
 
 ### Breaking Changes
 - Commands will automatically fix steering directory violations on first run
-- Violating files/directories are backed up to `.kiro/backups/steering-cleanup-{timestamp}/`
+- Violating files/directories are backed up to `.sce/backups/steering-cleanup-{timestamp}/`
 - Use `--skip-steering-check` flag to bypass if needed during migration
 - Multi-user projects: Personal contexts in `contexts/` are preserved during auto-fix
 
 ## [1.12.3] - 2026-01-29
 
 ### Added
-- **Documentation Enhancement**: Comprehensive `.kiro/README.md` update (v2.0)
+- **Documentation Enhancement**: Comprehensive `.sce/README.md` update (v2.0)
   - Added complete directory structure documentation with purpose explanations
   - Added workspace management section with detailed usage examples
   - Added document governance section with validation commands
@@ -1418,7 +1418,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added key features list for workspace management
 
 ### Changed
-- **Documentation**: Updated `.kiro/README.md` version to 2.0 with comprehensive feature documentation
+- **Documentation**: Updated `.sce/README.md` version to 2.0 with comprehensive feature documentation
 - **Documentation**: Enhanced workspace storage explanation with platform-specific paths
 
 ## [1.12.2] - 2026-01-29
@@ -1507,19 +1507,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **HOTFIX**: Fixed critical bug where AI IDE reads all workspace contexts
 
 **Critical Issue**:
-- Workspace contexts were stored in `.kiro/steering/workspaces/`
+- Workspace contexts were stored in `.sce/steering/workspaces/`
 - AI IDE reads ALL `.md` files in `steering/` directory
 - This caused ALL personal CURRENT_CONTEXT.md files to be read simultaneously
 - Result: Context pollution, confusion, and incorrect AI behavior
 
 **Solution**:
-- Moved workspace contexts to `.kiro/contexts/` (outside steering/)
+- Moved workspace contexts to `.sce/contexts/` (outside steering/)
 - Only active workspace context is copied to `steering/CURRENT_CONTEXT.md`
 - Prevents multiple contexts from being read at once
 
 **New Structure**:
 ```
-.kiro/
+.sce/
 ├── steering/
 │   └── CURRENT_CONTEXT.md  ← Only active context (read by SCE)
 └── contexts/               ← Personal workspaces (NOT read by SCE)
@@ -1539,9 +1539,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 If you have existing workspaces in `steering/workspaces/`:
 ```bash
 # Move to new location
-mkdir -p .kiro/contexts
-mv .kiro/steering/workspaces/* .kiro/contexts/
-rm -rf .kiro/steering/workspaces
+mkdir -p .sce/contexts
+mv .sce/steering/workspaces/* .sce/contexts/
+rm -rf .sce/steering/workspaces
 ```
 
 **Impact**:
@@ -1560,14 +1560,14 @@ rm -rf .kiro/steering/workspaces
 
 **Issues Fixed**:
 - Fixed `workspace-context-resolver.test.js` directory structure issues
-  - Tests now create complete `.kiro/specs` directory structure
+  - Tests now create complete `.sce/specs` directory structure
   - Added existence checks before cleanup operations
 - Fixed `backup-manager.test.js` temp directory cleanup
   - Added error handling for ENOTEMPTY errors on Linux
   - Graceful cleanup with existence checks
 
 **Technical Details**:
-- Changed from creating only `.kiro` to creating `.kiro/specs` subdirectories
+- Changed from creating only `.sce` to creating `.sce/specs` subdirectories
 - Added try-catch error handling for temp directory cleanup
 - Added directory existence checks in afterEach cleanup
 
@@ -1683,9 +1683,9 @@ rm -rf .kiro/steering/workspaces
 
 **Updated Files**:
 - `CHANGELOG.md` - Added Phase 3-4 details to v1.9.0 entry
-- `.gitignore` - Added `.kiro/backups/` to ignore list
-- `.kiro/specs/14-00-adopt-ux-improvement/tasks.md` - Marked all tasks as completed
-- `.kiro/steering/CURRENT_CONTEXT.md` - Simplified after Spec completion
+- `.gitignore` - Added `.sce/backups/` to ignore list
+- `.sce/specs/14-00-adopt-ux-improvement/tasks.md` - Marked all tasks as completed
+- `.sce/steering/CURRENT_CONTEXT.md` - Simplified after Spec completion
 
 **Benefits**:
 - Users have complete documentation for the new adoption system
@@ -1804,7 +1804,7 @@ rm -rf .kiro/steering/workspaces
   - `--force`: Force overwrite with backup
 - **Verbose Logging**: Detailed debugging system
   - 5 log levels (ERROR, WARN, INFO, DEBUG, VERBOSE)
-  - File-based logging (`.kiro/logs/adopt-{timestamp}.log`)
+  - File-based logging (`.sce/logs/adopt-{timestamp}.log`)
   - Timestamps and elapsed time tracking
   - Domain-specific logging methods
   - Buffer management
@@ -1961,7 +1961,7 @@ rm -rf .kiro/steering/workspaces
   - Three strategies: Skip all, Overwrite all, Review each file
   - Per-file review with progress tracking ("Conflict 2 of 5")
   - View file differences before deciding
-- **Selective Backup System**: Only backs up files being overwritten (not entire .kiro/)
+- **Selective Backup System**: Only backs up files being overwritten (not entire .sce/)
   - Efficient backup creation with conflict-specific IDs
   - Selective restore capability
   - Automatic backup before any overwrites
@@ -2028,7 +2028,7 @@ sce adopt --dry-run
 **Benefits**:
 - Full control over which files to keep or overwrite
 - View differences before making decisions
-- Efficient backups (only affected files, not entire .kiro/)
+- Efficient backups (only affected files, not entire .sce/)
 - Safe adoption with automatic rollback support
 - Clear feedback about what changed
 - Suitable for both interactive and automated workflows
@@ -2105,7 +2105,7 @@ sce adopt --dry-run
 - **Cross-platform path handling in SelectiveBackup** 🐛
   - Fixed path construction bug in `lib/backup/selective-backup.js`
   - Changed from string replacement (`this.backupDir.replace('/backups', '')`) to proper path joining
-  - Now uses `path.join(projectPath, '.kiro', filePath)` for consistent cross-platform behavior
+  - Now uses `path.join(projectPath, '.sce', filePath)` for consistent cross-platform behavior
   - Affects both `createSelectiveBackup()` and `restoreSelective()` methods
   - Ensures backup/restore works correctly on Windows (backslash paths) and Unix (forward slash paths)
 
@@ -2123,24 +2123,24 @@ sce adopt --dry-run
 This is a fundamental shift in how sce should be understood and used:
 
 **Before (WRONG approach):**
-- `.kiro/README.md` was a "sce command manual"
+- `.sce/README.md` was a "sce command manual"
 - Taught AI "how to use sce tool"
 - Listed 20+ commands with examples
 - Users had to "learn sce" before using it
 
 **After (CORRECT approach):**
-- `.kiro/README.md` is a "project development guide"
+- `.sce/README.md` is a "project development guide"
 - Explains project follows Spec-driven methodology
 - AI's role: follow the methodology, not learn the tool
 - sce commands are helpers used automatically when needed
 
 **Key insight from user feedback:**
-> "After installing sce, just tell AI to read .kiro/README.md. 
+> "After installing sce, just tell AI to read .sce/README.md. 
 > AI will understand the methodology and naturally use sce commands 
 > to solve problems, rather than memorizing command syntax."
 
 **What changed:**
-- `.kiro/README.md` - Completely rewritten as methodology guide (not tool manual)
+- `.sce/README.md` - Completely rewritten as methodology guide (not tool manual)
 - `sce adopt` completion message - Now says "Tell AI to read README" instead of "Create your first spec"
 - `docs/quick-start.md` - Simplified from 5-minute tool tutorial to 2-minute methodology introduction
 - Removed detailed Spec creation examples (that's AI's job, not user's manual work)
@@ -2153,7 +2153,7 @@ This is a fundamental shift in how sce should be understood and used:
 
 **Migration:**
 - Existing projects: Run `sce adopt --force` to get new README
-- Tell your AI: "Please read .kiro/README.md to understand project methodology"
+- Tell your AI: "Please read .sce/README.md to understand project methodology"
 - AI will automatically understand and follow Spec-driven approach
 
 This aligns sce with its true purpose: **enforcing development methodology**, not being a CLI tool to learn.
@@ -2161,19 +2161,19 @@ This aligns sce with its true purpose: **enforcing development methodology**, no
 ## [1.5.5] - 2026-01-24
 
 ### Added
-- AI-friendly `.kiro/README.md` template explaining sce commands and usage
+- AI-friendly `.sce/README.md` template explaining sce commands and usage
 - Comprehensive sce command reference for AI tools (status, workflows, context export, etc.)
 - AI workflow guide with step-by-step instructions for common tasks
 - Spec structure documentation for AI understanding
 - Best practices section for AI tools using sce
 
 ### Changed
-- Updated `.kiro/README.md` template to focus on sce CLI usage instead of SCE Spec system philosophy
+- Updated `.sce/README.md` template to focus on sce CLI usage instead of SCE Spec system philosophy
 - Simplified template file list in adoption strategy (removed obsolete files)
-- Fixed template path in adoption strategy to point to correct location (`template/.kiro`)
+- Fixed template path in adoption strategy to point to correct location (`template/.sce`)
 
 ### Fixed
-- AI tools can now understand what sce is and how to use it by reading `.kiro/README.md`
+- AI tools can now understand what sce is and how to use it by reading `.sce/README.md`
 - Adoption command now correctly copies README from template
 
 ## [1.5.4] - 2026-01-24
@@ -2519,9 +2519,9 @@ Users are already comfortable with their AI tools. sce enhances their existing w
 
 ### Added
 - **Project Adoption System**: Intelligent project adoption with three modes
-  - Fresh adoption: Create complete .kiro/ structure from scratch
-  - Partial adoption: Add missing components to existing .kiro/
-  - Full adoption: Upgrade existing complete .kiro/ to current version
+  - Fresh adoption: Create complete .sce/ structure from scratch
+  - Partial adoption: Add missing components to existing .sce/
+  - Full adoption: Upgrade existing complete .sce/ to current version
 - **Version Upgrade System**: Smooth version migration with migration scripts
   - Incremental upgrades through intermediate versions
   - Migration script support for breaking changes

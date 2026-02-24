@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs-extra');
 const crypto = require('crypto');
 
-const DEFAULT_FEEDBACK_FILE = '.kiro/reports/interactive-user-feedback.jsonl';
+const DEFAULT_FEEDBACK_FILE = '.sce/reports/interactive-user-feedback.jsonl';
 const ALLOWED_CHANNELS = new Set(['ui', 'cli', 'api', 'other']);
 
 function parseArgs(argv) {

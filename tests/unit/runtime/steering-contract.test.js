@@ -32,15 +32,11 @@ describe('SteeringContract', () => {
     }
   });
 
-  test('ensureContract copies missing layers from legacy .kiro/steering', async () => {
-    const legacyDir = path.join(tempDir, '.kiro/steering');
-    await fs.ensureDir(legacyDir);
-    await fs.writeFile(path.join(legacyDir, 'CORE_PRINCIPLES.md'), 'legacy-core', 'utf8');
-
+  test('ensureContract creates template content for missing layers', async () => {
     const contract = new SteeringContract(tempDir);
     await contract.ensureContract();
     const content = await fs.readFile(path.join(tempDir, '.sce/steering/CORE_PRINCIPLES.md'), 'utf8');
-    expect(content).toBe('legacy-core');
+    expect(content).toContain('Managed by SCE universal steering contract');
   });
 
   test('buildCompilePayload returns codex runtime defaults, source mode, and compatibility', async () => {

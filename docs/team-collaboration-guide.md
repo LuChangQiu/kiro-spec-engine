@@ -16,54 +16,54 @@ sce uses a **layered .gitignore strategy** to balance team collaboration and per
 
 | Path | Purpose | Why Commit |
 |------|---------|-----------|
-| `.kiro/specs/` | Feature specifications | **Core value**: Team needs to see requirements, design, and tasks |
-| `.kiro/steering/CORE_PRINCIPLES.md` | Development principles | Team coding standards |
-| `.kiro/steering/ENVIRONMENT.md` | Project environment | Project setup and configuration |
-| `.kiro/steering/RULES_GUIDE.md` | Rules index | Quick reference for team |
-| `.kiro/tools/` | Shared scripts | Team automation tools |
-| `.kiro/config/` | Project configuration | Document governance, etc. |
-| `.kiro/contexts/` (structure) | Multi-user setup | Directory structure for team contexts |
+| `.sce/specs/` | Feature specifications | **Core value**: Team needs to see requirements, design, and tasks |
+| `.sce/steering/CORE_PRINCIPLES.md` | Development principles | Team coding standards |
+| `.sce/steering/ENVIRONMENT.md` | Project environment | Project setup and configuration |
+| `.sce/steering/RULES_GUIDE.md` | Rules index | Quick reference for team |
+| `.sce/tools/` | Shared scripts | Team automation tools |
+| `.sce/config/` | Project configuration | Document governance, etc. |
+| `.sce/contexts/` (structure) | Multi-user setup | Directory structure for team contexts |
 
 #### ❌ DO NOT Commit (User-Specific)
 
 | Path | Purpose | Why Exclude |
 |------|---------|-------------|
-| `.kiro/steering/CURRENT_CONTEXT.md` | Personal work context | Causes merge conflicts |
-| `.kiro/contexts/*/CURRENT_CONTEXT.md` | Personal contexts | User-specific state |
-| `.kiro/environments.json` | Environment registry | User-specific configurations |
-| `.kiro/env-backups/` | Environment backups | User-specific backups |
-| `.kiro/backups/` | Adoption backups | Temporary backups |
-| `.kiro/logs/` | Operation logs | Runtime logs |
-| `.kiro/reports/` | Compliance reports | Temporary reports |
+| `.sce/steering/CURRENT_CONTEXT.md` | Personal work context | Causes merge conflicts |
+| `.sce/contexts/*/CURRENT_CONTEXT.md` | Personal contexts | User-specific state |
+| `.sce/environments.json` | Environment registry | User-specific configurations |
+| `.sce/env-backups/` | Environment backups | User-specific backups |
+| `.sce/backups/` | Adoption backups | Temporary backups |
+| `.sce/logs/` | Operation logs | Runtime logs |
+| `.sce/reports/` | Compliance reports | Temporary reports |
 
 ### Recommended .gitignore
 
 ```gitignore
 # ========================================
-# .kiro/ Directory - Layered Management
+# .sce/ Directory - Layered Management
 # ========================================
 
 # Personal state files (DO NOT commit)
-.kiro/steering/CURRENT_CONTEXT.md
-.kiro/contexts/.active
-.kiro/contexts/*/CURRENT_CONTEXT.md
+.sce/steering/CURRENT_CONTEXT.md
+.sce/contexts/.active
+.sce/contexts/*/CURRENT_CONTEXT.md
 
 # Environment configuration (DO NOT commit)
-.kiro/environments.json
-.kiro/env-backups/
+.sce/environments.json
+.sce/env-backups/
 
 # Temporary files and backups (DO NOT commit)
-.kiro/backups/
-.kiro/logs/
-.kiro/reports/
+.sce/backups/
+.sce/logs/
+.sce/reports/
 
 # Spec artifacts (COMMIT - but exclude temporary files)
-.kiro/specs/**/SESSION-*.md
-.kiro/specs/**/*-SUMMARY.md
-.kiro/specs/**/*-COMPLETE.md
-.kiro/specs/**/TEMP-*.md
-.kiro/specs/**/WIP-*.md
-.kiro/specs/**/MVP-*.md
+.sce/specs/**/SESSION-*.md
+.sce/specs/**/*-SUMMARY.md
+.sce/specs/**/*-COMPLETE.md
+.sce/specs/**/TEMP-*.md
+.sce/specs/**/WIP-*.md
+.sce/specs/**/MVP-*.md
 ```
 
 ---
@@ -80,28 +80,28 @@ git clone <repo>
 cd project
 npm install -g scene-capability-engine
 sce adopt
-.kiro/create-workspace.bat alice
+.sce/create-workspace.bat alice
 
 # Developer B
 git clone <repo>
 cd project
 npm install -g scene-capability-engine
 sce adopt
-.kiro/create-workspace.bat bob
+.sce/create-workspace.bat bob
 ```
 
 **Daily Workflow**:
 
 ```bash
 # Switch to your personal context
-.kiro/switch-workspace.bat alice
+.sce/switch-workspace.bat alice
 
 # Work on your tasks
 sce status
 # ... make changes ...
 
 # Commit Spec changes (shared)
-git add .kiro/specs/
+git add .sce/specs/
 git commit -m "feat: complete task 3.2 in Spec 15-00"
 
 # Your personal CURRENT_CONTEXT.md is NOT committed (gitignored)
@@ -125,7 +125,7 @@ sce workflows create user-authentication
 # ... work on Spec documents ...
 
 # Commit Spec to share with team
-git add .kiro/specs/21-00-user-authentication/
+git add .sce/specs/21-00-user-authentication/
 git commit -m "spec: add user authentication feature"
 git push
 ```
@@ -140,9 +140,9 @@ git pull
 sce status
 
 # Read Spec documents
-cat .kiro/specs/21-00-user-authentication/requirements.md
-cat .kiro/specs/21-00-user-authentication/design.md
-cat .kiro/specs/21-00-user-authentication/tasks.md
+cat .sce/specs/21-00-user-authentication/requirements.md
+cat .sce/specs/21-00-user-authentication/design.md
+cat .sce/specs/21-00-user-authentication/tasks.md
 
 # Implement according to Spec
 # ... write code ...
@@ -151,7 +151,7 @@ cat .kiro/specs/21-00-user-authentication/tasks.md
 # Edit tasks.md, mark tasks as complete
 
 # Commit implementation + task updates
-git add .kiro/specs/21-00-user-authentication/tasks.md
+git add .sce/specs/21-00-user-authentication/tasks.md
 git add lib/ tests/
 git commit -m "feat: implement user authentication (tasks 1-3)"
 git push
@@ -180,7 +180,7 @@ project-root/
 ├── .env.local                  # Source file for local
 ├── .env.staging                # Source file for staging
 ├── .env.production             # Source file for production
-└── .kiro/
+└── .sce/
     └── environments.json       # NOT committed (user-specific)
 ```
 
@@ -207,7 +207,7 @@ sce env switch local
 **Benefits**:
 - ✅ Environment templates are versioned
 - ✅ Each developer registers their own environments
-- ✅ No conflicts on `.kiro/environments.json`
+- ✅ No conflicts on `.sce/environments.json`
 - ✅ Easy onboarding for new team members
 
 ---
@@ -219,9 +219,9 @@ sce env switch local
 When creating a Spec, commit all three documents:
 
 ```bash
-git add .kiro/specs/22-00-feature-name/requirements.md
-git add .kiro/specs/22-00-feature-name/design.md
-git add .kiro/specs/22-00-feature-name/tasks.md
+git add .sce/specs/22-00-feature-name/requirements.md
+git add .sce/specs/22-00-feature-name/design.md
+git add .sce/specs/22-00-feature-name/tasks.md
 git commit -m "spec: add feature-name specification"
 ```
 
@@ -229,7 +229,7 @@ git commit -m "spec: add feature-name specification"
 
 ```bash
 # After completing tasks
-git add .kiro/specs/22-00-feature-name/tasks.md
+git add .sce/specs/22-00-feature-name/tasks.md
 git commit -m "chore: update task status for feature-name"
 ```
 
@@ -249,10 +249,10 @@ If your Spec generates useful artifacts (scripts, reports, test data):
 
 ```bash
 # Commit useful scripts
-git add .kiro/specs/22-00-feature-name/scripts/migration.js
+git add .sce/specs/22-00-feature-name/scripts/migration.js
 
 # Commit important reports
-git add .kiro/specs/22-00-feature-name/reports/performance-analysis.md
+git add .sce/specs/22-00-feature-name/reports/performance-analysis.md
 
 # But exclude temporary files (already gitignored)
 ```
@@ -270,16 +270,16 @@ git add .kiro/specs/22-00-feature-name/reports/performance-analysis.md
 sce workflows create payment-integration
 
 # 2. Write requirements
-# Edit .kiro/specs/23-00-payment-integration/requirements.md
+# Edit .sce/specs/23-00-payment-integration/requirements.md
 
 # 3. Write design
-# Edit .kiro/specs/23-00-payment-integration/design.md
+# Edit .sce/specs/23-00-payment-integration/design.md
 
 # 4. Break down tasks
-# Edit .kiro/specs/23-00-payment-integration/tasks.md
+# Edit .sce/specs/23-00-payment-integration/tasks.md
 
 # 5. Commit Spec
-git add .kiro/specs/23-00-payment-integration/
+git add .sce/specs/23-00-payment-integration/
 git commit -m "spec: add payment integration feature"
 git push
 
@@ -295,8 +295,8 @@ git pull
 
 # 2. Review Spec
 sce status
-cat .kiro/specs/23-00-payment-integration/requirements.md
-cat .kiro/specs/23-00-payment-integration/design.md
+cat .sce/specs/23-00-payment-integration/requirements.md
+cat .sce/specs/23-00-payment-integration/design.md
 
 # 3. Implement tasks
 # ... write code ...
@@ -305,7 +305,7 @@ cat .kiro/specs/23-00-payment-integration/design.md
 # Edit tasks.md, mark completed tasks
 
 # 5. Commit implementation
-git add .kiro/specs/23-00-payment-integration/tasks.md
+git add .sce/specs/23-00-payment-integration/tasks.md
 git add lib/payment/ tests/payment/
 git commit -m "feat: implement payment integration (tasks 1-5)"
 git push
@@ -320,14 +320,14 @@ git push
 git checkout feature/payment-integration
 
 # 2. Read Spec for context
-cat .kiro/specs/23-00-payment-integration/requirements.md
-cat .kiro/specs/23-00-payment-integration/design.md
+cat .sce/specs/23-00-payment-integration/requirements.md
+cat .sce/specs/23-00-payment-integration/design.md
 
 # 3. Verify implementation matches design
 # Compare code against design document
 
 # 4. Check task completion
-cat .kiro/specs/23-00-payment-integration/tasks.md
+cat .sce/specs/23-00-payment-integration/tasks.md
 
 # 5. Provide feedback
 # Comment on PR with Spec references
@@ -351,7 +351,7 @@ npm install -g scene-capability-engine
 sce adopt
 
 # 2. Create personal workspace
-.kiro/create-workspace.bat john
+.sce/create-workspace.bat john
 
 # 3. Register environments
 sce env register config/env-local.json
@@ -362,7 +362,7 @@ sce status
 # See all features and their status
 
 # 5. Pick a task
-cat .kiro/specs/24-00-feature/tasks.md
+cat .sce/specs/24-00-feature/tasks.md
 # Find unassigned tasks
 
 # 6. Start working
@@ -383,15 +383,15 @@ cat .kiro/specs/24-00-feature/tasks.md
 
 **Problem**: Causes merge conflicts when multiple developers work simultaneously.
 
-**Solution**: Ensure `.kiro/steering/CURRENT_CONTEXT.md` is in .gitignore.
+**Solution**: Ensure `.sce/steering/CURRENT_CONTEXT.md` is in .gitignore.
 
 ```bash
 # Check if gitignored
-git check-ignore .kiro/steering/CURRENT_CONTEXT.md
-# Should output: .kiro/steering/CURRENT_CONTEXT.md
+git check-ignore .sce/steering/CURRENT_CONTEXT.md
+# Should output: .sce/steering/CURRENT_CONTEXT.md
 
 # If not, add to .gitignore
-echo ".kiro/steering/CURRENT_CONTEXT.md" >> .gitignore
+echo ".sce/steering/CURRENT_CONTEXT.md" >> .gitignore
 ```
 
 ### ❌ Pitfall 2: Committing environments.json
@@ -406,7 +406,7 @@ git add config/env-local.json
 git commit -m "chore: add environment templates"
 
 # DO NOT commit registry
-# .kiro/environments.json should be gitignored
+# .sce/environments.json should be gitignored
 ```
 
 ### ❌ Pitfall 3: Not Committing Specs
@@ -417,7 +417,7 @@ git commit -m "chore: add environment templates"
 
 ```bash
 # Commit Specs
-git add .kiro/specs/
+git add .sce/specs/
 git commit -m "spec: add new feature specification"
 ```
 
@@ -428,10 +428,10 @@ git commit -m "spec: add new feature specification"
 **Solution**: Ensure temporary patterns are gitignored.
 
 ```gitignore
-.kiro/specs/**/SESSION-*.md
-.kiro/specs/**/*-SUMMARY.md
-.kiro/specs/**/*-COMPLETE.md
-.kiro/specs/**/TEMP-*.md
+.sce/specs/**/SESSION-*.md
+.sce/specs/**/*-SUMMARY.md
+.sce/specs/**/*-COMPLETE.md
+.sce/specs/**/TEMP-*.md
 ```
 
 ---
@@ -462,4 +462,4 @@ git commit -m "spec: add new feature specification"
 
 **Version**: 1.42.0  
 **Last Updated**: 2026-02-11  
-**Related**: [Environment Management Guide](environment-management-guide.md), [.kiro/README.md](../.kiro/README.md)
+**Related**: [Environment Management Guide](environment-management-guide.md), [.sce/README.md](../.sce/README.md)

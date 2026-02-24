@@ -20,7 +20,7 @@ describe('release-risk-remediation-bundle script', () => {
     const projectRoot = path.resolve(__dirname, '..', '..', '..');
     const scriptPath = path.join(projectRoot, 'scripts', 'release-risk-remediation-bundle.js');
     const workspace = path.join(tempDir, 'workspace');
-    const gateReport = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'release-gate-v3.1.0.json');
+    const gateReport = path.join(workspace, '.sce', 'reports', 'release-evidence', 'release-gate-v3.1.0.json');
     await fs.ensureDir(path.dirname(gateReport));
 
     await fs.writeJson(gateReport, {
@@ -67,8 +67,8 @@ describe('release-risk-remediation-bundle script', () => {
     expect(payload.plan.commands.some(item => item.includes('interactive-authorization-tier-evaluate.js'))).toBe(true);
     expect(payload.plan.reasons).toContain('dialogue-authorization-block-pressure');
     expect(payload.plan.reasons).toContain('authorization-tier-block-pressure');
-    expect(await fs.pathExists(path.join(workspace, '.kiro', 'reports', 'release-evidence', 'release-risk-remediation-bundle.json'))).toBe(true);
-    expect(await fs.pathExists(path.join(workspace, '.kiro', 'reports', 'release-evidence', 'release-risk-remediation-bundle.md'))).toBe(true);
-    expect(await fs.pathExists(path.join(workspace, '.kiro', 'reports', 'release-evidence', 'release-risk-remediation.commands.lines'))).toBe(true);
+    expect(await fs.pathExists(path.join(workspace, '.sce', 'reports', 'release-evidence', 'release-risk-remediation-bundle.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(workspace, '.sce', 'reports', 'release-evidence', 'release-risk-remediation-bundle.md'))).toBe(true);
+    expect(await fs.pathExists(path.join(workspace, '.sce', 'reports', 'release-evidence', 'release-risk-remediation.commands.lines'))).toBe(true);
   });
 });

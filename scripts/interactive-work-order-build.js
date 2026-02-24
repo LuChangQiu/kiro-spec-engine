@@ -5,8 +5,8 @@ const path = require('path');
 const fs = require('fs-extra');
 const crypto = require('crypto');
 
-const DEFAULT_OUT = '.kiro/reports/interactive-work-order.json';
-const DEFAULT_MARKDOWN_OUT = '.kiro/reports/interactive-work-order.md';
+const DEFAULT_OUT = '.sce/reports/interactive-work-order.json';
+const DEFAULT_MARKDOWN_OUT = '.sce/reports/interactive-work-order.md';
 
 function parseArgs(argv) {
   const options = {

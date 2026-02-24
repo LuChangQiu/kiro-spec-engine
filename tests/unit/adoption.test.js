@@ -11,7 +11,7 @@ describe('Adoption System', () => {
     test('should create DetectionEngine instance', () => {
       const engine = new DetectionEngine();
       expect(engine).toBeDefined();
-      expect(engine.kiroDir).toBe('.kiro');
+      expect(engine.sceDir).toBe('.sce');
     });
 
     test('should determine fresh adoption mode', () => {

@@ -80,7 +80,7 @@ describe('docs command', () => {
     });
     
     test('should support spec-specific cleanup', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -112,7 +112,7 @@ describe('docs command', () => {
     });
     
     test('should support --all option', async () => {
-      const spec1Path = path.join(testDir, '.kiro/specs/spec-1');
+      const spec1Path = path.join(testDir, '.sce/specs/spec-1');
       await fs.ensureDir(spec1Path);
       await fs.writeFile(path.join(spec1Path, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(spec1Path, 'design.md'), '# Design');
@@ -124,7 +124,7 @@ describe('docs command', () => {
     });
     
     test('should support --spec option', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -145,7 +145,7 @@ describe('docs command', () => {
     });
     
     test('should archive files in Spec directory', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -159,7 +159,7 @@ describe('docs command', () => {
     });
     
     test('should support dry-run mode', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -258,7 +258,7 @@ describe('docs command', () => {
   describe('configuration', () => {
     test('should load and use configuration', async () => {
       // Create custom config
-      const configPath = path.join(testDir, '.kiro/config');
+      const configPath = path.join(testDir, '.sce/config');
       await fs.ensureDir(configPath);
       await fs.writeJson(path.join(configPath, 'docs.json'), {
         rootAllowedFiles: ['README.md', 'CUSTOM.md'],
@@ -302,7 +302,7 @@ describe('docs command', () => {
       expect(output).toContain('Configuration updated');
       
       // Verify config was saved
-      const configPath = path.join(testDir, '.kiro/config/docs.json');
+      const configPath = path.join(testDir, '.sce/config/docs.json');
       expect(await fs.pathExists(configPath)).toBe(true);
       const config = await fs.readJson(configPath);
       expect(config.rootAllowedFiles).toEqual(['README.md', 'CUSTOM.md']);
@@ -317,7 +317,7 @@ describe('docs command', () => {
       expect(exitCode).toBe(0);
       
       // Verify config was saved
-      const configPath = path.join(testDir, '.kiro/config/docs.json');
+      const configPath = path.join(testDir, '.sce/config/docs.json');
       const config = await fs.readJson(configPath);
       expect(config.specSubdirs).toEqual(['reports', 'scripts', 'custom']);
     });
@@ -331,7 +331,7 @@ describe('docs command', () => {
       expect(exitCode).toBe(0);
       
       // Verify config was saved
-      const configPath = path.join(testDir, '.kiro/config/docs.json');
+      const configPath = path.join(testDir, '.sce/config/docs.json');
       const config = await fs.readJson(configPath);
       expect(config.temporaryPatterns).toEqual(['TEMP-*.md', 'WIP-*.md']);
     });
@@ -400,7 +400,7 @@ describe('docs command', () => {
       expect(output).toContain('Configuration reset to defaults');
       
       // Verify config was reset
-      const configPath = path.join(testDir, '.kiro/config/docs.json');
+      const configPath = path.join(testDir, '.sce/config/docs.json');
       const config = await fs.readJson(configPath);
       expect(config.rootAllowedFiles).toEqual([
         'README.md',
@@ -433,7 +433,7 @@ describe('docs command', () => {
       
       expect(exitCode).toBe(0);
       
-      const configPath = path.join(testDir, '.kiro/config/docs.json');
+      const configPath = path.join(testDir, '.sce/config/docs.json');
       const config = await fs.readJson(configPath);
       expect(config.rootAllowedFiles).toEqual(['README.md', 'CUSTOM.md', 'OTHER.md']);
     });
@@ -446,7 +446,7 @@ describe('docs command', () => {
       
       expect(exitCode).toBe(0);
       
-      const configPath = path.join(testDir, '.kiro/config/docs.json');
+      const configPath = path.join(testDir, '.sce/config/docs.json');
       const config = await fs.readJson(configPath);
       expect(config.rootAllowedFiles).toEqual(['README.md', 'CUSTOM.md']);
     });

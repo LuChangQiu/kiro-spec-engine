@@ -79,7 +79,7 @@ function evaluateReleaseAssetIntegrity(options = {}) {
     : () => new Date().toISOString();
 
   const tag = readValue(env, 'RELEASE_TAG', '');
-  const baseDir = readValue(env, 'RELEASE_ASSET_INTEGRITY_DIR', '.kiro/reports/release-evidence');
+  const baseDir = readValue(env, 'RELEASE_ASSET_INTEGRITY_DIR', '.sce/reports/release-evidence');
   const required = normalizeRequiredFiles(readValue(env, 'RELEASE_ASSET_INTEGRITY_REQUIRED_FILES', ''), tag);
   const enforce = parseBoolean(readValue(env, 'RELEASE_ASSET_INTEGRITY_ENFORCE', ''), true);
   const requireNonEmpty = parseBoolean(readValue(env, 'RELEASE_ASSET_INTEGRITY_REQUIRE_NON_EMPTY', ''), true);

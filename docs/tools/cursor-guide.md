@@ -58,10 +58,10 @@ Create a `.cursorrules` file in your project root:
 This project uses sce (Scene Capability Engine) for spec-driven development.
 
 ## Spec Location
-All Specs are in `.kiro/specs/` directory.
+All Specs are in `.sce/specs/` directory.
 
 ## Before Implementing Features
-1. Check if a Spec exists in `.kiro/specs/`
+1. Check if a Spec exists in `.sce/specs/`
 2. Read the requirements.md, design.md, and tasks.md
 3. Follow the design architecture exactly
 4. Update tasks.md when completing tasks
@@ -73,9 +73,9 @@ All Specs are in `.kiro/specs/` directory.
 
 ## Example
 For user login feature:
-- Spec: `.kiro/specs/01-00-user-login/`
-- Design: `.kiro/specs/01-00-user-login/design.md`
-- Tasks: `.kiro/specs/01-00-user-login/tasks.md`
+- Spec: `.sce/specs/01-00-user-login/`
+- Design: `.sce/specs/01-00-user-login/design.md`
+- Tasks: `.sce/specs/01-00-user-login/tasks.md`
 
 ## Code Standards
 [Add your project-specific coding standards here]
@@ -87,7 +87,7 @@ Add to your `~/.bashrc` or `~/.zshrc`:
 
 ```bash
 # Quick export and copy to clipboard
-alias sce-clip='sce context export $1 && cat .kiro/specs/$1/context-export.md | pbcopy && echo "✅ Context copied to clipboard"'
+alias sce-clip='sce context export $1 && cat .sce/specs/$1/context-export.md | pbcopy && echo "✅ Context copied to clipboard"'
 
 # Generate task-specific prompt
 alias sce-task='sce prompt generate $1 $2 --tool=cursor'
@@ -114,10 +114,10 @@ sce context export 01-00-user-login
 **Step 2: Copy context**
 ```bash
 # macOS
-cat .kiro/specs/01-00-user-login/context-export.md | pbcopy
+cat .sce/specs/01-00-user-login/context-export.md | pbcopy
 
 # Windows
-type .kiro\specs\01-00-user-login\context-export.md | clip
+type .sce\specs\01-00-user-login\context-export.md | clip
 
 # Or use alias
 sce-clip 01-00-user-login
@@ -145,7 +145,7 @@ Follow the design document exactly:
 - Accept or modify as needed
 
 **Step 6: Update task status**
-Edit `.kiro/specs/01-00-user-login/tasks.md`:
+Edit `.sce/specs/01-00-user-login/tasks.md`:
 ```markdown
 - [x] 1.1 Create AuthController class  ← Changed from [ ] to [x]
 ```
@@ -186,7 +186,7 @@ Cursor: [Generates tests]
 **Step 1: Add context in comments**
 ```javascript
 // Task 1.1: Create AuthController class
-// See: .kiro/specs/01-00-user-login/design.md
+// See: .sce/specs/01-00-user-login/design.md
 //
 // Requirements:
 // - POST /api/auth/login endpoint
@@ -314,10 +314,10 @@ What are the security implications?
 /**
  * AuthController handles user authentication
  * 
- * Spec: .kiro/specs/01-00-user-login/design.md
+ * Spec: .sce/specs/01-00-user-login/design.md
  * Requirements: FR-1, FR-2, FR-3
  * 
- * @see .kiro/specs/01-00-user-login/design.md#authcontroller
+ * @see .sce/specs/01-00-user-login/design.md#authcontroller
  */
 class AuthController {
   // ...
@@ -434,7 +434,7 @@ Follow the design document exactly:
 
 **Solution 1:** Be more explicit in your prompt
 ```
-Strictly follow the design document in .kiro/specs/01-00-user-login/design.md
+Strictly follow the design document in .sce/specs/01-00-user-login/design.md
 
 Do not deviate from:
 - The specified API endpoints
@@ -552,7 +552,7 @@ Review the AuthController implementation:
 
 ```bash
 # Commit Spec changes
-git add .kiro/specs/01-00-user-login/
+git add .sce/specs/01-00-user-login/
 git commit -m "Add user login Spec"
 
 # Commit implementation

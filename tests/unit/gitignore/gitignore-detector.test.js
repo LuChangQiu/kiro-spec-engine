@@ -79,8 +79,8 @@ describe('GitignoreDetector', () => {
       });
     });
 
-    test('should identify .kiro-related rules', () => {
-      const content = '.kiro/\nnode_modules/';
+    test('should identify .sce-related rules', () => {
+      const content = '.sce/\nnode_modules/';
       const rules = detector.parseGitignore(content);
       
       expect(rules[0].isKiroRelated).toBe(true);
@@ -100,29 +100,29 @@ describe('GitignoreDetector', () => {
   });
 
   describe('findOldPatterns()', () => {
-    test('should detect .kiro/ pattern', () => {
-      const rules = detector.parseGitignore('.kiro/');
+    test('should detect .sce/ pattern', () => {
+      const rules = detector.parseGitignore('.sce/');
       const oldPatterns = detector.findOldPatterns(rules);
       
-      expect(oldPatterns).toContain('.kiro/');
+      expect(oldPatterns).toContain('.sce/');
     });
 
-    test('should detect .kiro/* pattern', () => {
-      const rules = detector.parseGitignore('.kiro/*');
+    test('should detect .sce/* pattern', () => {
+      const rules = detector.parseGitignore('.sce/*');
       const oldPatterns = detector.findOldPatterns(rules);
       
-      expect(oldPatterns).toContain('.kiro/*');
+      expect(oldPatterns).toContain('.sce/*');
     });
 
-    test('should detect .kiro/** pattern', () => {
-      const rules = detector.parseGitignore('.kiro/**');
+    test('should detect .sce/** pattern', () => {
+      const rules = detector.parseGitignore('.sce/**');
       const oldPatterns = detector.findOldPatterns(rules);
       
-      expect(oldPatterns).toContain('.kiro/**');
+      expect(oldPatterns).toContain('.sce/**');
     });
 
     test('should not detect layered rules as old patterns', () => {
-      const content = '.kiro/backups/\n.kiro/logs/';
+      const content = '.sce/backups/\n.sce/logs/';
       const rules = detector.parseGitignore(content);
       const oldPatterns = detector.findOldPatterns(rules);
       
@@ -136,17 +136,17 @@ describe('GitignoreDetector', () => {
       const missing = detector.findMissingRules(rules);
       
       expect(missing.length).toBeGreaterThan(0);
-      expect(missing).toContain('.kiro/steering/CURRENT_CONTEXT.md');
+      expect(missing).toContain('.sce/steering/CURRENT_CONTEXT.md');
     });
 
     test('should find no missing rules when all present', () => {
       const content = `
-.kiro/steering/CURRENT_CONTEXT.md
-.kiro/contexts/.active
-.kiro/environments.json
-.kiro/backups/
-.kiro/logs/
-.kiro/reports/
+.sce/steering/CURRENT_CONTEXT.md
+.sce/contexts/.active
+.sce/environments.json
+.sce/backups/
+.sce/logs/
+.sce/reports/
       `.trim();
       
       const rules = detector.parseGitignore(content);
@@ -167,19 +167,19 @@ describe('GitignoreDetector', () => {
 
     test('should return old-pattern status when blanket exclusion found', async () => {
       const gitignorePath = path.join(testDir, '.gitignore');
-      await fs.writeFile(gitignorePath, '.kiro/', 'utf8');
+      await fs.writeFile(gitignorePath, '.sce/', 'utf8');
       
       const status = await detector.analyzeGitignore(testDir);
       
       expect(status.exists).toBe(true);
       expect(status.status).toBe('old-pattern');
       expect(status.strategy).toBe('update');
-      expect(status.oldPatterns).toContain('.kiro/');
+      expect(status.oldPatterns).toContain('.sce/');
     });
 
     test('should return incomplete status when some rules missing', async () => {
       const gitignorePath = path.join(testDir, '.gitignore');
-      await fs.writeFile(gitignorePath, '.kiro/backups/', 'utf8');
+      await fs.writeFile(gitignorePath, '.sce/backups/', 'utf8');
       
       const status = await detector.analyzeGitignore(testDir);
       
@@ -191,12 +191,12 @@ describe('GitignoreDetector', () => {
 
     test('should return compliant status when all rules present', async () => {
       const content = `
-.kiro/steering/CURRENT_CONTEXT.md
-.kiro/contexts/.active
-.kiro/environments.json
-.kiro/backups/
-.kiro/logs/
-.kiro/reports/
+.sce/steering/CURRENT_CONTEXT.md
+.sce/contexts/.active
+.sce/environments.json
+.sce/backups/
+.sce/logs/
+.sce/reports/
       `.trim();
       
       const gitignorePath = path.join(testDir, '.gitignore');

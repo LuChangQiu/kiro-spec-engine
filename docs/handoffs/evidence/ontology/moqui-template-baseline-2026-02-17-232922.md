@@ -1,7 +1,7 @@
 # Moqui Template Baseline Report
 
 - Generated at: 2026-02-17T15:29:22.909Z
-- Template root: .kiro\templates\scene-packages
+- Template root: .sce\templates\scene-packages
 - Filter: (moqui|erp)
 - Baseline thresholds: score>=70, valid-rate>=100%
 

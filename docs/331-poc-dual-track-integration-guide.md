@@ -7,7 +7,7 @@
 每一轮从 `E:\workspace\331-poc` 接收以下产物：
 
 1. 完成态 Spec（requirements/design/tasks + `custom/scene.yaml` + `custom/scene-package.json`）。
-2. 模板导出目录：`.kiro/templates/exports/<template-name>/`。
+2. 模板导出目录：`.sce/templates/exports/<template-name>/`。
 3. 交接包：`docs/handoffs/handoff-manifest.json` + 证据文档。
 
 若输入不满足以上三类，sce 侧不进入接入批次。
@@ -56,9 +56,9 @@ npx sce doctor --docs
 
 ```bash
 npx sce scene package-validate --spec <spec-name> --spec-package custom/scene-package.json --strict --json
-npx sce scene ontology validate --package .kiro/specs/<spec-name>/custom --json
-npx sce scene ontology impact --package .kiro/specs/<spec-name>/custom --ref <ref> --max-depth 2 --json
-npx sce scene ontology path --package .kiro/specs/<spec-name>/custom --from <from-ref> --to <to-ref> --json
+npx sce scene ontology validate --package .sce/specs/<spec-name>/custom --json
+npx sce scene ontology impact --package .sce/specs/<spec-name>/custom --ref <ref> --max-depth 2 --json
+npx sce scene ontology path --package .sce/specs/<spec-name>/custom --from <from-ref> --to <to-ref> --json
 ```
 
 ## 2.3 批次 3：模板层接入
@@ -66,10 +66,10 @@ npx sce scene ontology path --package .kiro/specs/<spec-name>/custom --from <fro
 对于 scene package 模板链路（如果本轮包含 scene-package 模板）：
 
 ```bash
-npx sce scene package-publish --spec <spec-name> --out-dir .kiro/templates/scene-packages --json --force
-npx sce scene package-registry --template-dir .kiro/templates/scene-packages --strict --json
-npx sce scene package-gate-template --out .kiro/templates/scene-package-gate-policy.json --profile three-layer --force --json
-npx sce scene package-gate --registry .kiro/templates/scene-packages/registry.json --policy .kiro/templates/scene-package-gate-policy.json --strict --json
+npx sce scene package-publish --spec <spec-name> --out-dir .sce/templates/scene-packages --json --force
+npx sce scene package-registry --template-dir .sce/templates/scene-packages --strict --json
+npx sce scene package-gate-template --out .sce/templates/scene-package-gate-policy.json --profile three-layer --force --json
+npx sce scene package-gate --registry .sce/templates/scene-packages/registry.json --policy .sce/templates/scene-package-gate-policy.json --strict --json
 ```
 
 说明：Spec 模板（`templates create-from-spec` 导出）与 scene package 模板是两条链路，可并行维护，但推荐在同一交接批次一并校验。

@@ -75,7 +75,7 @@ When evaluating runtime policy directly, pass `--ui-mode`:
 
 ```bash
 node scripts/interactive-runtime-policy-evaluate.js \
-  --plan .kiro/reports/interactive-change-plan.generated.json \
+  --plan .sce/reports/interactive-change-plan.generated.json \
   --ui-mode user-app \
   --runtime-mode ops-fix \
   --runtime-environment staging \

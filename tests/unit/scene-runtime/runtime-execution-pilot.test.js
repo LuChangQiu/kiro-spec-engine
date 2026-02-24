@@ -156,7 +156,7 @@ describe('Scene Runtime Execution Pilot', () => {
   });
 
   test('dry_run executes without side effects and returns preview', async () => {
-    const auditFile = path.join(tempRoot, '.kiro', 'audit', 'scene-runtime-events.jsonl');
+    const auditFile = path.join(tempRoot, '.sce', 'audit', 'scene-runtime-events.jsonl');
     const executedNodes = [];
 
     const runtime = new RuntimeExecutor({
@@ -208,7 +208,7 @@ describe('Scene Runtime Execution Pilot', () => {
   });
 
   test('commit loads and executes binding plugin from plugin directory', async () => {
-    const pluginDir = path.join(tempRoot, '.kiro', 'plugins', 'scene-bindings');
+    const pluginDir = path.join(tempRoot, '.sce', 'plugins', 'scene-bindings');
     await fs.ensureDir(pluginDir);
     await fs.writeFile(
       path.join(pluginDir, 'custom-plugin.js'),
@@ -237,8 +237,8 @@ describe('Scene Runtime Execution Pilot', () => {
   });
 
   test('commit applies binding plugin manifest and exposes load metadata', async () => {
-    const pluginDir = path.join(tempRoot, '.kiro', 'plugins', 'scene-bindings');
-    const manifestPath = path.join(tempRoot, '.kiro', 'config', 'runtime-plugin-manifest.json');
+    const pluginDir = path.join(tempRoot, '.sce', 'plugins', 'scene-bindings');
+    const manifestPath = path.join(tempRoot, '.sce', 'config', 'runtime-plugin-manifest.json');
 
     await fs.ensureDir(pluginDir);
     await fs.ensureDir(path.dirname(manifestPath));
@@ -279,8 +279,8 @@ describe('Scene Runtime Execution Pilot', () => {
   });
 
   test('commit reports warning when explicit binding plugin manifest is missing', async () => {
-    const pluginDir = path.join(tempRoot, '.kiro', 'plugins', 'scene-bindings');
-    const missingManifestPath = path.join(tempRoot, '.kiro', 'config', 'missing-plugin-manifest.json');
+    const pluginDir = path.join(tempRoot, '.sce', 'plugins', 'scene-bindings');
+    const missingManifestPath = path.join(tempRoot, '.sce', 'config', 'missing-plugin-manifest.json');
 
     await fs.ensureDir(pluginDir);
     await fs.writeFile(
@@ -310,7 +310,7 @@ describe('Scene Runtime Execution Pilot', () => {
   });
 
   test('commit executes low-risk ERP scene and writes audit trail', async () => {
-    const auditFile = path.join(tempRoot, '.kiro', 'audit', 'scene-runtime-events.jsonl');
+    const auditFile = path.join(tempRoot, '.sce', 'audit', 'scene-runtime-events.jsonl');
     const auditEmitter = new AuditEmitter(tempRoot, { auditFile });
 
     const runtime = new RuntimeExecutor({

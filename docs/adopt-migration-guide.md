@@ -29,16 +29,16 @@ $ sce adopt
 📦 Analyzing project structure...
 
 ⚠️  Conflicts detected:
-    - .kiro/steering/CORE_PRINCIPLES.md
-    - .kiro/steering/ENVIRONMENT.md
+    - .sce/steering/CORE_PRINCIPLES.md
+    - .sce/steering/ENVIRONMENT.md
 
 ? How to handle conflicts?
   > Skip all
     Overwrite all
     Review each
 
-? Overwrite .kiro/steering/CORE_PRINCIPLES.md? (y/N)
-? Overwrite .kiro/steering/ENVIRONMENT.md? (y/N)
+? Overwrite .sce/steering/CORE_PRINCIPLES.md? (y/N)
+? Overwrite .sce/steering/ENVIRONMENT.md? (y/N)
 ...
 ```
 
@@ -71,9 +71,9 @@ Adoption Plan:
 📦 Creating backup... ✅ backup-20260128-143022
 ✓ Validating backup... ✅ 5 files verified
 📝 Updating files...
-  ✅ .kiro/steering/CORE_PRINCIPLES.md
-  ✅ .kiro/steering/ENVIRONMENT.md
-  ⏭️  .kiro/specs/ (preserved)
+  ✅ .sce/steering/CORE_PRINCIPLES.md
+  ✅ .sce/steering/ENVIRONMENT.md
+  ⏭️  .sce/specs/ (preserved)
 ✅ Adoption completed successfully!
 
 📊 Summary:
@@ -277,7 +277,7 @@ $ sce adopt --interactive
 📦 Analyzing project structure...
 
 ⚠️  Conflicts detected:
-    - .kiro/steering/CORE_PRINCIPLES.md
+    - .sce/steering/CORE_PRINCIPLES.md
 
 ? How to handle conflicts?
   > Skip all
@@ -293,7 +293,7 @@ $ sce adopt --interactive
 
 ### Q: Will my existing projects still work?
 
-**A**: Yes! The new system is fully backward compatible. Your existing `.kiro/` directories will be detected and handled correctly.
+**A**: Yes! The new system is fully backward compatible. Your existing `.sce/` directories will be detected and handled correctly.
 
 ---
 
@@ -357,8 +357,8 @@ This will:
 ### Q: What happens to my specs and custom files?
 
 **A**: They are **always preserved**. The smart system never overwrites:
-- `.kiro/specs/` directory
-- `.kiro/steering/CURRENT_CONTEXT.md`
+- `.sce/specs/` directory
+- `.sce/steering/CURRENT_CONTEXT.md`
 - Any custom files you created
 
 ---
@@ -528,7 +528,7 @@ sce adopt
 Don't delete automatic backups immediately:
 ```bash
 # Keep for at least a week
-ls .kiro/backups/
+ls .sce/backups/
 ```
 
 ### 4. Verify Results
@@ -544,7 +544,7 @@ npm test  # If you have tests
 
 If you customize files, document it:
 ```markdown
-# In .kiro/steering/CUSTOM_RULES.md
+# In .sce/steering/CUSTOM_RULES.md
 ## Customizations
 - Modified CORE_PRINCIPLES.md on 2026-01-28
 - Reason: Project-specific requirements

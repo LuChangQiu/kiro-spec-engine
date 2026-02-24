@@ -10,7 +10,7 @@ describe('StatusHandler', () => {
     // Create temporary test directory
     testDir = path.join(__dirname, '..', '..', '..', 'temp', `status-test-${Date.now()}`);
     await fs.mkdir(testDir, { recursive: true });
-    await fs.mkdir(path.join(testDir, '.kiro'), { recursive: true });
+    await fs.mkdir(path.join(testDir, '.sce'), { recursive: true });
 
     handler = new StatusHandler(testDir);
     

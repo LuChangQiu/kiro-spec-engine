@@ -93,7 +93,7 @@ This document provides detailed architecture diagrams and explanations for Scene
                                   ▼
 ┌─────────────────────────────────────────────────────────────────────┐
 │                        File System                                   │
-│                    (.kiro/, backups/, etc.)                         │
+│                    (.sce/, backups/, etc.)                         │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -264,7 +264,7 @@ This document provides detailed architecture diagrams and explanations for Scene
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Project .kiro/                            │
+│                    Project .sce/                            │
 │  ├── specs/                                                  │
 │  ├── steering/                                               │
 │  ├── tools/                                                  │
@@ -284,7 +284,7 @@ This document provides detailed architecture diagrams and explanations for Scene
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              .kiro/backups/backup-{timestamp}/               │
+│              .sce/backups/backup-{timestamp}/               │
 │  ├── specs/                                                  │
 │  ├── steering/                                               │
 │  ├── tools/                                                  │
@@ -310,7 +310,7 @@ This document provides detailed architecture diagrams and explanations for Scene
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    Project .kiro/                            │
+│                    Project .sce/                            │
 │  (Restored to backup state)                                  │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -326,13 +326,13 @@ START
   │
   ▼
 ┌─────────────────────┐
-│ Detect: No .kiro/   │
+│ Detect: No .sce/   │
 │ Mode: Fresh         │
 └──────┬──────────────┘
        │
        ▼
 ┌─────────────────────┐
-│ Create .kiro/       │
+│ Create .sce/       │
 │ directory structure │
 └──────┬──────────────┘
        │
@@ -368,7 +368,7 @@ START
   ▼
 ┌─────────────────────┐
 │ Detect: Partial     │
-│ .kiro/ exists but   │
+│ .sce/ exists but   │
 │ incomplete          │
 └──────┬──────────────┘
        │
@@ -416,7 +416,7 @@ START
   ▼
 ┌─────────────────────┐
 │ Detect: Full        │
-│ .kiro/ complete but │
+│ .sce/ complete but │
 │ old version         │
 └──────┬──────────────┘
        │
@@ -593,7 +593,7 @@ START
   ▼
 ┌─────────────────────┐
 │ Validate source     │
-│ .kiro/ exists       │
+│ .sce/ exists       │
 └──────┬──────────────┘
        │
        ▼
@@ -605,12 +605,12 @@ START
        ▼
 ┌─────────────────────┐
 │ Create backup dir   │
-│ .kiro/backups/...   │
+│ .sce/backups/...   │
 └──────┬──────────────┘
        │
        ▼
 ┌─────────────────────┐
-│ Copy .kiro/ content │
+│ Copy .sce/ content │
 │ recursively         │
 └──────┬──────────────┘
        │
@@ -668,13 +668,13 @@ START
        ▼
 ┌─────────────────────┐
 │ Clear current       │
-│ .kiro/ content      │
+│ .sce/ content      │
 └──────┬──────────────┘
        │
        ▼
 ┌─────────────────────┐
 │ Copy backup content │
-│ to .kiro/           │
+│ to .sce/           │
 └──────┬──────────────┘
        │
        ▼

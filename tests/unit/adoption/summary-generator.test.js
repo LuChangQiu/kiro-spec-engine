@@ -56,7 +56,7 @@ describe('SummaryGenerator', () => {
     it('should set backup information', () => {
       const backup = {
         id: 'backup-20260127-143022',
-        location: '.kiro/backups/adopt-20260127-143022',
+        location: '.sce/backups/adopt-20260127-143022',
         filesCount: 5,
         totalSize: 12345
       };
@@ -69,7 +69,7 @@ describe('SummaryGenerator', () => {
     it('should handle backup with filesBackedUp array', () => {
       const backup = {
         id: 'backup-123',
-        location: '.kiro/backups/backup-123',
+        location: '.sce/backups/backup-123',
         filesBackedUp: ['file1.js', 'file2.js', 'file3.js'],
         totalSize: 5000
       };
@@ -82,7 +82,7 @@ describe('SummaryGenerator', () => {
     it('should default to 0 for missing counts', () => {
       const backup = {
         id: 'backup-123',
-        location: '.kiro/backups/backup-123'
+        location: '.sce/backups/backup-123'
       };
 
       generator.setBackup(backup);
@@ -94,13 +94,13 @@ describe('SummaryGenerator', () => {
 
   describe('addFileChange', () => {
     it('should add created file', () => {
-      generator.addFileChange('create', '.kiro/README.md');
-      expect(generator.summaryData.changes.created).toContain('.kiro/README.md');
+      generator.addFileChange('create', '.sce/README.md');
+      expect(generator.summaryData.changes.created).toContain('.sce/README.md');
     });
 
     it('should add updated file', () => {
-      generator.addFileChange('update', '.kiro/steering/CORE_PRINCIPLES.md');
-      expect(generator.summaryData.changes.updated).toContain('.kiro/steering/CORE_PRINCIPLES.md');
+      generator.addFileChange('update', '.sce/steering/CORE_PRINCIPLES.md');
+      expect(generator.summaryData.changes.updated).toContain('.sce/steering/CORE_PRINCIPLES.md');
     });
 
     it('should add deleted file', () => {
@@ -109,13 +109,13 @@ describe('SummaryGenerator', () => {
     });
 
     it('should add preserved file', () => {
-      generator.addFileChange('preserve', '.kiro/specs/my-spec/requirements.md');
-      expect(generator.summaryData.changes.preserved).toContain('.kiro/specs/my-spec/requirements.md');
+      generator.addFileChange('preserve', '.sce/specs/my-spec/requirements.md');
+      expect(generator.summaryData.changes.preserved).toContain('.sce/specs/my-spec/requirements.md');
     });
 
     it('should normalize Windows paths to forward slashes', () => {
-      generator.addFileChange('create', '.kiro\\steering\\ENVIRONMENT.md');
-      expect(generator.summaryData.changes.created).toContain('.kiro/steering/ENVIRONMENT.md');
+      generator.addFileChange('create', '.sce\\steering\\ENVIRONMENT.md');
+      expect(generator.summaryData.changes.created).toContain('.sce/steering/ENVIRONMENT.md');
     });
 
     it('should not add duplicate files', () => {
@@ -193,7 +193,7 @@ describe('SummaryGenerator', () => {
       generator.setMode('smart-update');
       generator.setBackup({
         id: 'backup-123',
-        location: '.kiro/backups/backup-123',
+        location: '.sce/backups/backup-123',
         filesCount: 3,
         totalSize: 5000
       });
@@ -270,7 +270,7 @@ describe('SummaryGenerator', () => {
       generator.setMode('smart-update');
       generator.setBackup({
         id: 'backup-123',
-        location: '.kiro/backups/backup-123',
+        location: '.sce/backups/backup-123',
         filesCount: 2,
         totalSize: 5000
       });
@@ -377,7 +377,7 @@ describe('SummaryGenerator', () => {
       generator.setMode('fresh');
       const summary = generator.generateSummary();
 
-      expect(summary.nextSteps).toContain('Review the created .kiro/ structure');
+      expect(summary.nextSteps).toContain('Review the created .sce/ structure');
       expect(summary.nextSteps).toContain('Customize CURRENT_CONTEXT.md for your project');
     });
 
@@ -408,7 +408,7 @@ describe('SummaryGenerator', () => {
 
     it('should suggest rollback when errors and backup exist', () => {
       generator.setMode('smart-update');
-      generator.setBackup({ id: 'backup-123', location: '.kiro/backups/backup-123' });
+      generator.setBackup({ id: 'backup-123', location: '.sce/backups/backup-123' });
       generator.addError('Test error');
       const summary = generator.generateSummary();
 
@@ -435,7 +435,7 @@ describe('SummaryGenerator', () => {
     it('should provide rollback command with backup', () => {
       generator.setBackup({
         id: 'backup-456',
-        location: '.kiro/backups/backup-456',
+        location: '.sce/backups/backup-456',
         filesCount: 5,
         totalSize: 10000
       });
@@ -444,7 +444,7 @@ describe('SummaryGenerator', () => {
       expect(summary.rollback.available).toBe(true);
       expect(summary.rollback.command).toBe('sce rollback backup-456');
       expect(summary.rollback.backupId).toBe('backup-456');
-      expect(summary.rollback.backupLocation).toBe('.kiro/backups/backup-456');
+      expect(summary.rollback.backupLocation).toBe('.sce/backups/backup-456');
     });
   });
 
@@ -454,7 +454,7 @@ describe('SummaryGenerator', () => {
       generator.addFileChanges('update', ['file3.js']);
       generator.addFileChanges('delete', ['file4.js']);
       generator.addFileChanges('preserve', ['file5.js', 'file6.js']);
-      generator.setBackup({ id: 'backup-123', location: '.kiro/backups/backup-123' });
+      generator.setBackup({ id: 'backup-123', location: '.sce/backups/backup-123' });
       generator.addWarning('Warning');
 
       const summary = generator.generateSummary();

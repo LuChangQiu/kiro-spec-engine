@@ -1,0 +1,47 @@
+{
+  "evaluated_at": "2026-02-09T09:51:24.157Z",
+  "registry_path": ".sce/specs/70-00-scene-package-gate-policy-and-evaluation/reports/package-registry-input.json",
+  "policy_path": ".sce/specs/70-00-scene-package-gate-policy-and-evaluation/reports/package-gate-policy-baseline.json",
+  "policy": {
+    "apiVersion": "kse.scene.package-gate/v0.1",
+    "profile": "baseline",
+    "rules": {
+      "max_invalid_templates": 0,
+      "min_valid_templates": 1,
+      "required_layers": [],
+      "forbid_unknown_layer": false
+    }
+  },
+  "metrics": {
+    "total_templates": 1,
+    "valid_templates": 1,
+    "invalid_templates": 0,
+    "layer_counts": {
+      "l1_capability": 0,
+      "l2_domain": 1,
+      "l3_instance": 0,
+      "unknown": 0
+    }
+  },
+  "checks": [
+    {
+      "id": "max-invalid-templates",
+      "expected": "<= 0",
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "id": "min-valid-templates",
+      "expected": ">= 1",
+      "actual": 1,
+      "passed": true
+    }
+  ],
+  "summary": {
+    "passed": true,
+    "total_checks": 2,
+    "failed_checks": 0
+  },
+  "output_path": ".sce/specs/70-00-scene-package-gate-policy-and-evaluation/reports/package-gate-eval-baseline.json",
+  "output_abs_path": "E:\\workspace\\kiro-spec-engine\\.sce\\specs\\70-00-scene-package-gate-policy-and-evaluation\\reports\\package-gate-eval-baseline.json"
+}

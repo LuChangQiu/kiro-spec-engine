@@ -18,7 +18,7 @@ describe('TaskClaimer', () => {
   });
 
   async function writeTasks(specName, content) {
-    const specDir = path.join(tempRoot, '.kiro', 'specs', specName);
+    const specDir = path.join(tempRoot, '.sce', 'specs', specName);
     await fs.ensureDir(specDir);
     const tasksPath = path.join(specDir, 'tasks.md');
     await fs.writeFile(tasksPath, content, 'utf8');
@@ -58,7 +58,7 @@ describe('TaskClaimer', () => {
     const released = await claimer.unclaimTask(tempRoot, 'demo-spec', '1.1', 'alice');
     expect(released.success).toBe(true);
 
-    const tasksPath = path.join(tempRoot, '.kiro', 'specs', 'demo-spec', 'tasks.md');
+    const tasksPath = path.join(tempRoot, '.sce', 'specs', 'demo-spec', 'tasks.md');
     const lines = (await fs.readFile(tasksPath, 'utf8')).split('\n');
     const nestedLine = lines.find((line) => line.includes('1.1 Nested task'));
 

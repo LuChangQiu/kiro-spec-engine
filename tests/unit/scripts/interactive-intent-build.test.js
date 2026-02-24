@@ -91,9 +91,9 @@ describe('interactive-intent-build script', () => {
     expect(payload.contract_validation.valid).toBe(true);
     expect(payload.contract_validation.strict).toBe(true);
 
-    const intentFile = path.join(workspace, '.kiro', 'reports', 'interactive-change-intent.json');
-    const explainFile = path.join(workspace, '.kiro', 'reports', 'interactive-page-explain.md');
-    const auditFile = path.join(workspace, '.kiro', 'reports', 'interactive-copilot-audit.jsonl');
+    const intentFile = path.join(workspace, '.sce', 'reports', 'interactive-change-intent.json');
+    const explainFile = path.join(workspace, '.sce', 'reports', 'interactive-page-explain.md');
+    const auditFile = path.join(workspace, '.sce', 'reports', 'interactive-copilot-audit.jsonl');
     expect(await fs.pathExists(intentFile)).toBe(true);
     expect(await fs.pathExists(explainFile)).toBe(true);
     expect(await fs.pathExists(auditFile)).toBe(true);

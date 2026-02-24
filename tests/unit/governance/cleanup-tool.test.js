@@ -77,7 +77,7 @@ describe('CleanupTool', () => {
   
   describe('scanSpecForTemporary', () => {
     test('should identify temporary files in Spec directory', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       
       // Create test files
@@ -97,7 +97,7 @@ describe('CleanupTool', () => {
     });
     
     test('should not delete required files even if they match patterns', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       
       // Create required files (even with names that might match patterns)
@@ -122,8 +122,8 @@ describe('CleanupTool', () => {
   describe('scanAllSpecsForTemporary', () => {
     test('should scan all Spec directories', async () => {
       // Create multiple Specs with temporary files
-      const spec1Path = path.join(testDir, '.kiro/specs/spec-1');
-      const spec2Path = path.join(testDir, '.kiro/specs/spec-2');
+      const spec1Path = path.join(testDir, '.sce/specs/spec-1');
+      const spec2Path = path.join(testDir, '.sce/specs/spec-2');
       await fs.ensureDir(spec1Path);
       await fs.ensureDir(spec2Path);
       
@@ -152,7 +152,7 @@ describe('CleanupTool', () => {
       await fs.writeFile(path.join(testDir, 'TEMP-root.md'), 'content');
       
       // Create Spec temporary file
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'WIP-spec.md'), 'content');
       
@@ -169,8 +169,8 @@ describe('CleanupTool', () => {
       await fs.writeFile(path.join(testDir, 'TEMP-root.md'), 'content');
       
       // Create Spec temporary files
-      const spec1Path = path.join(testDir, '.kiro/specs/spec-1');
-      const spec2Path = path.join(testDir, '.kiro/specs/spec-2');
+      const spec1Path = path.join(testDir, '.sce/specs/spec-1');
+      const spec2Path = path.join(testDir, '.sce/specs/spec-2');
       await fs.ensureDir(spec1Path);
       await fs.ensureDir(spec2Path);
       await fs.writeFile(path.join(spec1Path, 'WIP-spec1.md'), 'content');
@@ -318,8 +318,8 @@ describe('CleanupTool', () => {
   describe('cleanup with spec option', () => {
     test('should only clean specified Spec directory', async () => {
       // Create temporary files in multiple Specs
-      const spec1Path = path.join(testDir, '.kiro/specs/spec-1');
-      const spec2Path = path.join(testDir, '.kiro/specs/spec-2');
+      const spec1Path = path.join(testDir, '.sce/specs/spec-1');
+      const spec2Path = path.join(testDir, '.sce/specs/spec-2');
       await fs.ensureDir(spec1Path);
       await fs.ensureDir(spec2Path);
       
@@ -389,7 +389,7 @@ describe('CleanupTool', () => {
   
   describe('edge cases', () => {
     test('should handle Spec directory with only required files', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), 'content');
       await fs.writeFile(path.join(specPath, 'design.md'), 'content');
@@ -403,7 +403,7 @@ describe('CleanupTool', () => {
     });
     
     test('should handle empty Spec directory', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/empty-spec');
+      const specPath = path.join(testDir, '.sce/specs/empty-spec');
       await fs.ensureDir(specPath);
       
       const tool = new CleanupTool(testDir, config);

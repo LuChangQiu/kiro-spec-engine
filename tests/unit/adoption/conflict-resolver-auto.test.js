@@ -154,14 +154,14 @@ describe('ConflictResolver - Automatic Resolution', () => {
       });
     });
 
-    test('should handle paths with .kiro/ prefix', () => {
+    test('should handle paths with .sce/ prefix', () => {
       const conflicts = [
-        { path: '.kiro/steering/CORE_PRINCIPLES.md' }
+        { path: '.sce/steering/CORE_PRINCIPLES.md' }
       ];
 
       const result = resolver.resolveConflictAutomatic(conflicts);
 
-      expect(result.resolutionMap['.kiro/steering/CORE_PRINCIPLES.md']).toBe('overwrite');
+      expect(result.resolutionMap['.sce/steering/CORE_PRINCIPLES.md']).toBe('overwrite');
       expect(result.summary.update).toBe(1);
     });
 

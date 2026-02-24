@@ -96,7 +96,7 @@ sce adopt
 **预期输出：**
 ```
 ✓ 检测到项目类型：Node.js
-✓ 创建 .kiro/ 目录
+✓ 创建 .sce/ 目录
 ✓ 创建 specs/ 目录
 ✓ 创建 steering/ 目录
 ✓ 生成 CORE_PRINCIPLES.md
@@ -107,13 +107,13 @@ sce adopt
 
 下一步：
   1. 创建你的第一个 Spec：sce spec bootstrap --name 01-00-my-feature --non-interactive
-  2. 阅读指南：.kiro/README.md
+  2. 阅读指南：.sce/README.md
 ```
 
 **创建的内容：**
 ```
 your-project/
-├── .kiro/
+├── .sce/
 │   ├── specs/              # 你的 Spec 将存放在这里
 │   ├── steering/           # AI 行为规则
 │   │   ├── CORE_PRINCIPLES.md
@@ -198,7 +198,7 @@ sce value metrics snapshot --input ./kpi-input.json --json
 
 ### 3.1 编写需求
 
-打开 `.kiro/specs/01-00-user-login/requirements.md` 并编写：
+打开 `.sce/specs/01-00-user-login/requirements.md` 并编写：
 
 ```markdown
 # 用户登录功能
@@ -271,7 +271,7 @@ sce value metrics snapshot --input ./kpi-input.json --json
 
 ### 3.2 编写设计
 
-打开 `.kiro/specs/01-00-user-login/design.md` 并编写：
+打开 `.sce/specs/01-00-user-login/design.md` 并编写：
 
 ```markdown
 # 用户登录 - 设计文档
@@ -430,7 +430,7 @@ graph TD
 
 ### 3.3 编写任务
 
-打开 `.kiro/specs/01-00-user-login/tasks.md` 并编写：
+打开 `.sce/specs/01-00-user-login/tasks.md` 并编写：
 
 ```markdown
 # 用户登录 - 实现任务
@@ -535,13 +535,13 @@ sce context export 01-00-user-login
 
 **预期输出：**
 ```
-✓ 上下文已导出到 .kiro/specs/01-00-user-login/context-export.md
+✓ 上下文已导出到 .sce/specs/01-00-user-login/context-export.md
 ✓ 上下文大小：3.2 KB
 ✓ 准备好与 AI 工具一起使用
 ```
 
 **创建的内容：**
-位于 `.kiro/specs/01-00-user-login/context-export.md` 的文件，包含：
+位于 `.sce/specs/01-00-user-login/context-export.md` 的文件，包含：
 - 所有需求
 - 完整设计
 - 任务列表
@@ -559,13 +559,13 @@ sce context export 01-00-user-login
 1. **打开上下文文件：**
    ```bash
    # macOS
-   cat .kiro/specs/01-00-user-login/context-export.md | pbcopy
+   cat .sce/specs/01-00-user-login/context-export.md | pbcopy
    
    # Windows
-   type .kiro\specs\01-00-user-login\context-export.md | clip
+   type .sce\specs\01-00-user-login\context-export.md | clip
    
    # Linux
-   cat .kiro/specs/01-00-user-login/context-export.md | xclip -selection clipboard
+   cat .sce/specs/01-00-user-login/context-export.md | xclip -selection clipboard
    ```
 
 2. **开始新对话** 与 Claude 或 ChatGPT
@@ -617,7 +617,7 @@ sce context export 01-00-user-login
 2. **添加引用你的 Spec 的注释：**
    ```javascript
    // 任务 1.1：设置项目依赖
-   // 参见：.kiro/specs/01-00-user-login/design.md
+   // 参见：.sce/specs/01-00-user-login/design.md
    // 
    // 安装：express、bcrypt、jsonwebtoken、validator、express-rate-limit
    ```
@@ -633,7 +633,7 @@ sce context export 01-00-user-login
 
 完成任务后，更新任务状态：
 
-**编辑** `.kiro/specs/01-00-user-login/tasks.md`：
+**编辑** `.sce/specs/01-00-user-login/tasks.md`：
 
 ```markdown
 - [x] 1.1 设置项目依赖  ← 从 [ ] 改为 [x]
@@ -724,9 +724,9 @@ sce prompt generate 01-00-user-login 1.1
 ### 问题：找不到我的 Spec 文件
 
 **解决方案：**
-所有 Spec 都在 `.kiro/specs/` 中：
+所有 Spec 都在 `.sce/specs/` 中：
 ```bash
-ls .kiro/specs/
+ls .sce/specs/
 ```
 
 ### 更多帮助

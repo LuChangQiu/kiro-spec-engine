@@ -254,7 +254,7 @@ Response: { ... }
 sce spec bootstrap --name 01-00-user-login --non-interactive
 ```
 
-**2. Write Requirements** (`.kiro/specs/01-00-user-login/requirements.md`):
+**2. Write Requirements** (`.sce/specs/01-00-user-login/requirements.md`):
 ```markdown
 # User Login
 
@@ -266,7 +266,7 @@ sce spec bootstrap --name 01-00-user-login --non-interactive
 - WHEN user enters invalid credentials THEN they see an error
 ```
 
-**3. Write Design** (`.kiro/specs/01-00-user-login/design.md`):
+**3. Write Design** (`.sce/specs/01-00-user-login/design.md`):
 ```markdown
 # User Login - Design
 
@@ -281,7 +281,7 @@ Response: { token } or { error }
 - UserRepository - database access
 ```
 
-**4. Write Tasks** (`.kiro/specs/01-00-user-login/tasks.md`):
+**4. Write Tasks** (`.sce/specs/01-00-user-login/tasks.md`):
 ```markdown
 - [ ] 1.1 Create AuthController
 - [ ] 1.2 Create AuthService

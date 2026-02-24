@@ -38,7 +38,7 @@ cd your-project
 sce adopt
 ```
 
-This creates `.kiro/` directory with:
+This creates `.sce/` directory with:
 - `README.md` - Project development guide
 - `steering/` - Development rules
 - `specs/` - Where Specs will live
@@ -50,7 +50,7 @@ This creates `.kiro/` directory with:
 **In your AI tool (Cursor, Claude, Windsurf, etc.), say:**
 
 ```
-Please read .kiro/README.md to understand how this project works.
+Please read .sce/README.md to understand how this project works.
 ```
 
 **Your AI will learn:**

@@ -71,7 +71,7 @@ sce collab assign session-manager SCE-3
 
 ### 4. Define Interface Contracts
 
-Create an interface contract for a Spec (in `.kiro/specs/{spec-name}/interfaces/`):
+Create an interface contract for a Spec (in `.sce/specs/{spec-name}/interfaces/`):
 
 ```json
 {
@@ -306,7 +306,7 @@ When you need to make breaking changes to an interface:
 
 ### Custom Integration Tests
 
-Create integration tests in `.kiro/specs/{master-spec}/integration-tests/`:
+Create integration tests in `.sce/specs/{master-spec}/integration-tests/`:
 
 ```javascript
 module.exports = {
@@ -332,7 +332,7 @@ module.exports = {
 
 ## Metadata File Format
 
-Collaboration metadata is stored in `.kiro/specs/{spec-name}/collaboration.json`:
+Collaboration metadata is stored in `.sce/specs/{spec-name}/collaboration.json`:
 
 ```json
 {

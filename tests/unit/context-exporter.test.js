@@ -10,7 +10,7 @@ describe('ContextExporter', () => {
   beforeEach(async () => {
     exporter = new ContextExporter();
     testProjectPath = path.join(__dirname, '../fixtures/test-project');
-    testSpecPath = path.join(testProjectPath, '.kiro/specs/test-spec');
+    testSpecPath = path.join(testProjectPath, '.sce/specs/test-spec');
 
     // Clean up any existing test directory first
     try {
@@ -98,7 +98,7 @@ describe('ContextExporter', () => {
       // TODO: Fix file system timing issues or rewrite test to be more robust
       
       // Create steering file
-      const steeringPath = path.join(testProjectPath, '.kiro/steering');
+      const steeringPath = path.join(testProjectPath, '.sce/steering');
       await fs.ensureDir(steeringPath);
       await fs.writeFile(
         path.join(steeringPath, 'CORE_PRINCIPLES.md'),
@@ -169,7 +169,7 @@ describe('ContextExporter', () => {
       // SKIPPED: This test is flaky in CI environment due to file system timing issues
       // TODO: Fix file system timing issues or rewrite test to be more robust
       
-      const steeringPath = path.join(testProjectPath, '.kiro/steering');
+      const steeringPath = path.join(testProjectPath, '.sce/steering');
       await fs.ensureDir(steeringPath);
       await fs.writeFile(
         path.join(steeringPath, 'CORE_PRINCIPLES.md'),

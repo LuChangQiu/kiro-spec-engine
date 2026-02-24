@@ -24,7 +24,7 @@ afterEach(() => {
 
 describe('Watch Preset Commands', () => {
   const testDir = path.join(__dirname, '../fixtures/watch-preset-commands-test');
-  const configPath = path.join(testDir, '.kiro/watch-config.json');
+  const configPath = path.join(testDir, '.sce/watch-config.json');
   const originalCwd = process.cwd();
   
   beforeEach(async () => {
@@ -70,15 +70,15 @@ describe('Watch Preset Commands', () => {
       await installPresetWatch('prompt-regen');
       
       const config = await fs.readJson(configPath);
-      expect(config.patterns).toContain('**/.kiro/specs/*/requirements.md');
-      expect(config.patterns).toContain('**/.kiro/specs/*/design.md');
+      expect(config.patterns).toContain('**/.sce/specs/*/requirements.md');
+      expect(config.patterns).toContain('**/.sce/specs/*/design.md');
     });
     
     it('should install context-export preset', async () => {
       await installPresetWatch('context-export');
       
       const config = await fs.readJson(configPath);
-      expect(config.patterns).toContain('**/.kiro/specs/*/.complete');
+      expect(config.patterns).toContain('**/.sce/specs/*/.complete');
     });
     
     it('should install test-runner preset', async () => {

@@ -11,7 +11,7 @@ describe('PromptGenerator', () => {
   beforeEach(async () => {
     generator = new PromptGenerator();
     testProjectPath = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-prompt-gen-'));
-    testSpecPath = path.join(testProjectPath, '.kiro/specs/test-spec');
+    testSpecPath = path.join(testProjectPath, '.sce/specs/test-spec');
 
     // Create test directory structure
     await fs.ensureDir(testSpecPath);

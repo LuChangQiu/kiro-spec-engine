@@ -23,32 +23,32 @@
 .\setup-project.bat
 ```
 
-这个脚本会初始化 `.kiro` 目录的配置，更新项目名称。
+这个脚本会初始化 `.sce` 目录的配置，更新项目名称。
 
 ### 2. 创建和增强 Spec
 
 ```bash
 # 创建 Spec 目录
-mkdir .kiro\specs\01-00-your-feature-name
+mkdir .sce\specs\01-00-your-feature-name
 
 # 编写基础 requirements.md
 # (手动创建基本需求文档)
 
 # 应用 Ultrawork 增强
-python .kiro\tools\ultrawork_enhancer.py requirements .kiro\specs\01-00-your-feature-name\requirements.md
+python .sce\tools\ultrawork_enhancer.py requirements .sce\specs\01-00-your-feature-name\requirements.md
 ```
 
 ### 3. 完整工作流
 
 ```bash
 # 增强需求文档
-python .kiro\tools\ultrawork_enhancer.py requirements .kiro\specs\spec-name\requirements.md
+python .sce\tools\ultrawork_enhancer.py requirements .sce\specs\spec-name\requirements.md
 
 # 增强设计文档
-python .kiro\tools\ultrawork_enhancer.py design .kiro\specs\spec-name\design.md .kiro\specs\spec-name\requirements.md
+python .sce\tools\ultrawork_enhancer.py design .sce\specs\spec-name\design.md .sce\specs\spec-name\requirements.md
 
 # 检查任务完成情况
-python .kiro\tools\ultrawork_enhancer.py tasks .kiro\specs\spec-name\tasks.md
+python .sce\tools\ultrawork_enhancer.py tasks .sce\specs\spec-name\tasks.md
 ```
 
 ## 📊 质量标准
@@ -68,7 +68,7 @@ python .kiro\tools\ultrawork_enhancer.py tasks .kiro\specs\spec-name\tasks.md
 ## 🛠️ 核心脚本
 
 ### setup-project.bat
-**作用**: 初始化 `.kiro` 目录配置
+**作用**: 初始化 `.sce` 目录配置
 - 更新项目名称
 - 检查工具完整性
 - 提供使用指导
@@ -84,13 +84,13 @@ python .kiro\tools\ultrawork_enhancer.py tasks .kiro\specs\spec-name\tasks.md
 **使用方法**:
 ```bash
 # Requirements 阶段
-python .kiro\tools\ultrawork_enhancer.py requirements <path-to-requirements.md>
+python .sce\tools\ultrawork_enhancer.py requirements <path-to-requirements.md>
 
 # Design 阶段
-python .kiro\tools\ultrawork_enhancer.py design <path-to-design.md> <path-to-requirements.md>
+python .sce\tools\ultrawork_enhancer.py design <path-to-design.md> <path-to-requirements.md>
 
 # Tasks 阶段
-python .kiro\tools\ultrawork_enhancer.py tasks <path-to-tasks.md>
+python .sce\tools\ultrawork_enhancer.py tasks <path-to-tasks.md>
 ```
 
 ## 🔥 Ultrawork 精神
@@ -103,8 +103,8 @@ python .kiro\tools\ultrawork_enhancer.py tasks <path-to-tasks.md>
 
 ## 📚 参考文档
 
-- `.kiro/README.md` - SCE 系统说明
-- `.kiro/steering/CORE_PRINCIPLES.md` - 核心原则（包含 Ultrawork 精神）
+- `.sce/README.md` - SCE 系统说明
+- `.sce/steering/CORE_PRINCIPLES.md` - 核心原则（包含 Ultrawork 精神）
 
 ---
 

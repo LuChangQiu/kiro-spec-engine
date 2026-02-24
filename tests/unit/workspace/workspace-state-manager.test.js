@@ -78,7 +78,7 @@ describe('WorkspaceStateManager', () => {
       
       // Create workspace directory
       const wsPath = path.join(tempDir, 'test-project');
-      await fs.ensureDir(path.join(wsPath, '.kiro'));
+      await fs.ensureDir(path.join(wsPath, '.sce'));
       
       await manager.createWorkspace('test-ws', wsPath);
 
@@ -108,7 +108,7 @@ describe('WorkspaceStateManager', () => {
       await manager.load();
       
       const wsPath = path.join(tempDir, 'test-project');
-      await fs.ensureDir(path.join(wsPath, '.kiro'));
+      await fs.ensureDir(path.join(wsPath, '.sce'));
       
       const workspace = await manager.createWorkspace('test-ws', wsPath);
 
@@ -120,7 +120,7 @@ describe('WorkspaceStateManager', () => {
       await manager.load();
       
       const wsPath = path.join(tempDir, 'test-project');
-      await fs.ensureDir(path.join(wsPath, '.kiro'));
+      await fs.ensureDir(path.join(wsPath, '.sce'));
       
       await manager.createWorkspace('test-ws', wsPath);
 
@@ -151,7 +151,7 @@ describe('WorkspaceStateManager', () => {
       await manager.load();
       
       const wsPath = path.join(tempDir, 'test-project');
-      await fs.ensureDir(path.join(wsPath, '.kiro'));
+      await fs.ensureDir(path.join(wsPath, '.sce'));
       await manager.createWorkspace('test-ws', wsPath);
 
       const workspace = await manager.getWorkspace('test-ws');
@@ -173,8 +173,8 @@ describe('WorkspaceStateManager', () => {
       
       const ws1Path = path.join(tempDir, 'project1');
       const ws2Path = path.join(tempDir, 'project2');
-      await fs.ensureDir(path.join(ws1Path, '.kiro'));
-      await fs.ensureDir(path.join(ws2Path, '.kiro'));
+      await fs.ensureDir(path.join(ws1Path, '.sce'));
+      await fs.ensureDir(path.join(ws2Path, '.sce'));
       
       await manager.createWorkspace('ws1', ws1Path);
       await manager.createWorkspace('ws2', ws2Path);
@@ -196,7 +196,7 @@ describe('WorkspaceStateManager', () => {
       await manager.load();
       
       const wsPath = path.join(tempDir, 'test-project');
-      await fs.ensureDir(path.join(wsPath, '.kiro'));
+      await fs.ensureDir(path.join(wsPath, '.sce'));
       await manager.createWorkspace('test-ws', wsPath);
 
       const removed = await manager.removeWorkspace('test-ws');
@@ -215,7 +215,7 @@ describe('WorkspaceStateManager', () => {
       await manager.load();
       
       const wsPath = path.join(tempDir, 'test-project');
-      await fs.ensureDir(path.join(wsPath, '.kiro'));
+      await fs.ensureDir(path.join(wsPath, '.sce'));
       await manager.createWorkspace('test-ws', wsPath);
       await manager.switchWorkspace('test-ws');
 
@@ -229,7 +229,7 @@ describe('WorkspaceStateManager', () => {
       await manager.load();
       
       const wsPath = path.join(tempDir, 'test-project');
-      await fs.ensureDir(path.join(wsPath, '.kiro'));
+      await fs.ensureDir(path.join(wsPath, '.sce'));
       await manager.createWorkspace('test-ws', wsPath);
 
       await manager.switchWorkspace('test-ws');
@@ -247,7 +247,7 @@ describe('WorkspaceStateManager', () => {
       await manager.load();
       
       const wsPath = path.join(tempDir, 'test-project');
-      await fs.ensureDir(path.join(wsPath, '.kiro'));
+      await fs.ensureDir(path.join(wsPath, '.sce'));
       await manager.createWorkspace('test-ws', wsPath);
 
       const workspace = await manager.getWorkspace('test-ws');
@@ -267,7 +267,7 @@ describe('WorkspaceStateManager', () => {
       await manager.load();
       
       const wsPath = path.join(tempDir, 'test-project');
-      await fs.ensureDir(path.join(wsPath, '.kiro'));
+      await fs.ensureDir(path.join(wsPath, '.sce'));
       await manager.createWorkspace('test-ws', wsPath);
       await manager.switchWorkspace('test-ws');
 
@@ -300,7 +300,7 @@ describe('WorkspaceStateManager', () => {
       await manager.load();
       
       const wsPath = path.join(tempDir, 'test-project');
-      await fs.ensureDir(path.join(wsPath, '.kiro'));
+      await fs.ensureDir(path.join(wsPath, '.sce'));
       await manager.createWorkspace('test-ws', wsPath);
 
       const subPath = path.join(wsPath, 'subfolder', 'file.txt');
@@ -348,7 +348,7 @@ describe('WorkspaceStateManager', () => {
       await manager.load();
       
       const wsPath = path.join(tempDir, 'test-project');
-      await fs.ensureDir(path.join(wsPath, '.kiro'));
+      await fs.ensureDir(path.join(wsPath, '.sce'));
       await manager.createWorkspace('test-ws', wsPath);
 
       expect(await manager.hasWorkspace('test-ws')).toBe(true);
@@ -361,7 +361,7 @@ describe('WorkspaceStateManager', () => {
       expect(await manager.count()).toBe(0);
 
       const wsPath = path.join(tempDir, 'test-project');
-      await fs.ensureDir(path.join(wsPath, '.kiro'));
+      await fs.ensureDir(path.join(wsPath, '.sce'));
       await manager.createWorkspace('test-ws', wsPath);
 
       expect(await manager.count()).toBe(1);
@@ -371,7 +371,7 @@ describe('WorkspaceStateManager', () => {
       await manager.load();
       
       const wsPath = path.join(tempDir, 'test-project');
-      await fs.ensureDir(path.join(wsPath, '.kiro'));
+      await fs.ensureDir(path.join(wsPath, '.sce'));
       await manager.createWorkspace('test-ws', wsPath);
 
       await manager.clear();
@@ -383,7 +383,7 @@ describe('WorkspaceStateManager', () => {
       await manager.load();
       
       const wsPath = path.join(tempDir, 'test-project');
-      await fs.ensureDir(path.join(wsPath, '.kiro'));
+      await fs.ensureDir(path.join(wsPath, '.sce'));
       await manager.createWorkspace('test-ws', wsPath);
       await manager.setPreference('autoDetectWorkspace', false);
 
@@ -402,7 +402,7 @@ describe('WorkspaceStateManager', () => {
       await fs.ensureDir(legacyDir);
 
       const wsPath = path.join(tempDir, 'legacy-project');
-      await fs.ensureDir(path.join(wsPath, '.kiro'));
+      await fs.ensureDir(path.join(wsPath, '.sce'));
 
       const legacyWorkspaces = {
         version: '1.0',
@@ -527,7 +527,7 @@ describe('WorkspaceStateManager', () => {
       await manager.load();
       
       const wsPath = path.join(tempDir, 'test-project');
-      await fs.ensureDir(path.join(wsPath, '.kiro'));
+      await fs.ensureDir(path.join(wsPath, '.sce'));
       
       // Mock fs.rename to verify temp file usage
       const originalRename = fs.rename;

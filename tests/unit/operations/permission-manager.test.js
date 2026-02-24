@@ -267,7 +267,7 @@ describe('PermissionManager', () => {
 
       const configPath = path.join(
         tempDir,
-        '.kiro/specs/test-project/operations/permissions.json'
+        '.sce/specs/test-project/operations/permissions.json'
       );
       expect(await fs.pathExists(configPath)).toBe(true);
 
@@ -285,7 +285,7 @@ describe('PermissionManager', () => {
 
       const configPath = path.join(
         tempDir,
-        '.kiro/specs/new-project/operations/permissions.json'
+        '.sce/specs/new-project/operations/permissions.json'
       );
       expect(await fs.pathExists(configPath)).toBe(true);
     });

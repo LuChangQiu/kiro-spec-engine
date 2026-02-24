@@ -1,0 +1,107 @@
+{
+  "evaluated_at": "2026-02-09T10:05:08.136Z",
+  "registry_path": "E:/workspace/kiro-spec-engine/.sce/specs/70-00-scene-package-gate-policy-and-evaluation/reports/package-registry-input.json",
+  "policy_path": "E:/workspace/kiro-spec-engine/.sce/specs/70-00-scene-package-gate-policy-and-evaluation/reports/package-gate-policy-three-layer.json",
+  "policy": {
+    "apiVersion": "kse.scene.package-gate/v0.1",
+    "profile": "three-layer",
+    "rules": {
+      "max_invalid_templates": 0,
+      "min_valid_templates": 3,
+      "required_layers": [
+        "l1-capability",
+        "l2-domain",
+        "l3-instance"
+      ],
+      "forbid_unknown_layer": true
+    }
+  },
+  "metrics": {
+    "total_templates": 1,
+    "valid_templates": 1,
+    "invalid_templates": 0,
+    "layer_counts": {
+      "l1_capability": 0,
+      "l2_domain": 1,
+      "l3_instance": 0,
+      "unknown": 0
+    }
+  },
+  "checks": [
+    {
+      "id": "max-invalid-templates",
+      "expected": "<= 0",
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "id": "min-valid-templates",
+      "expected": ">= 3",
+      "actual": 1,
+      "passed": false
+    },
+    {
+      "id": "required-layer:l1-capability",
+      "expected": ">= 1",
+      "actual": 0,
+      "passed": false
+    },
+    {
+      "id": "required-layer:l2-domain",
+      "expected": ">= 1",
+      "actual": 1,
+      "passed": true
+    },
+    {
+      "id": "required-layer:l3-instance",
+      "expected": ">= 1",
+      "actual": 0,
+      "passed": false
+    },
+    {
+      "id": "unknown-layer-forbidden",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    }
+  ],
+  "summary": {
+    "passed": false,
+    "total_checks": 6,
+    "failed_checks": 3
+  },
+  "output_path": "E:/workspace/kiro-spec-engine/.sce/specs/71-00-scene-package-gate-task-draft-and-sync/reports/package-gate-sync-output.json",
+  "output_abs_path": "E:\\workspace\\kiro-spec-engine\\.sce\\specs\\71-00-scene-package-gate-task-draft-and-sync\\reports\\package-gate-sync-output.json",
+  "task_draft": {
+    "path": "E:\\workspace\\kiro-spec-engine\\.sce\\specs\\71-00-scene-package-gate-task-draft-and-sync\\reports\\package-gate-task-draft.md",
+    "output_path": "E:/workspace/kiro-spec-engine/.sce/specs/71-00-scene-package-gate-task-draft-and-sync/reports/package-gate-task-draft.md",
+    "failed_checks": 3
+  },
+  "task_sync": {
+    "tasks_path": "E:\\workspace\\kiro-spec-engine\\.sce\\specs\\71-00-scene-package-gate-task-draft-and-sync\\tasks.md",
+    "added_count": 3,
+    "skipped_duplicates": 0,
+    "first_task_id": 1,
+    "last_task_id": 3,
+    "added_tasks": [
+      {
+        "task_id": 1,
+        "title": "Resolve gate check 'min-valid-templates' (actual=1, expected=>= 3)",
+        "priority": "medium",
+        "check_id": "min-valid-templates"
+      },
+      {
+        "task_id": 2,
+        "title": "Resolve gate check 'required-layer:l1-capability' (actual=0, expected=>= 1)",
+        "priority": "medium",
+        "check_id": "required-layer:l1-capability"
+      },
+      {
+        "task_id": 3,
+        "title": "Resolve gate check 'required-layer:l3-instance' (actual=0, expected=>= 1)",
+        "priority": "medium",
+        "check_id": "required-layer:l3-instance"
+      }
+    ]
+  }
+}

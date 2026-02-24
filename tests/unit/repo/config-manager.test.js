@@ -36,7 +36,7 @@ describe('ConfigManager', () => {
 
   describe('getConfigPath', () => {
     test('should return correct config path', () => {
-      const expectedPath = path.join(tempDir, '.kiro', 'project-repos.json');
+      const expectedPath = path.join(tempDir, '.sce', 'project-repos.json');
       expect(configManager.getConfigPath()).toBe(expectedPath);
     });
   });
@@ -305,7 +305,7 @@ describe('ConfigManager', () => {
       expect(savedConfig).toEqual(config);
     });
 
-    test('should create .kiro directory if it does not exist', async () => {
+    test('should create .sce directory if it does not exist', async () => {
       const config = {
         version: '1.0',
         repositories: []
@@ -313,7 +313,7 @@ describe('ConfigManager', () => {
 
       await configManager.saveConfig(config);
 
-      const kiroDir = path.join(tempDir, '.kiro');
+      const kiroDir = path.join(tempDir, '.sce');
       const stats = await fs.stat(kiroDir);
       expect(stats.isDirectory()).toBe(true);
     });

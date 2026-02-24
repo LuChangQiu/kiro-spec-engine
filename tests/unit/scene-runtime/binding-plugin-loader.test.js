@@ -63,7 +63,7 @@ describe('BindingPluginLoader', () => {
   });
 
   test('discovers plugins from default auto-discovery directory', async () => {
-    const pluginDir = path.join(tempRoot, '.kiro', 'plugins', 'scene-bindings');
+    const pluginDir = path.join(tempRoot, '.sce', 'plugins', 'scene-bindings');
     await fs.ensureDir(pluginDir);
     await writePlugin(pluginDir, 'auto-plugin.js', 'auto.plugin', 'spec.auto.');
 
@@ -78,7 +78,7 @@ describe('BindingPluginLoader', () => {
 
   test('applies manifest allow and block rules when loading plugins', async () => {
     const pluginDir = path.join(tempRoot, 'plugins');
-    const manifestPath = path.join(tempRoot, '.kiro', 'config', 'scene-binding-plugins.json');
+    const manifestPath = path.join(tempRoot, '.sce', 'config', 'scene-binding-plugins.json');
 
     await fs.ensureDir(pluginDir);
     await fs.ensureDir(path.dirname(manifestPath));
@@ -106,7 +106,7 @@ describe('BindingPluginLoader', () => {
 
   test('applies manifest strict mode and disabled-by-default policy', async () => {
     const pluginDir = path.join(tempRoot, 'plugins');
-    const manifestPath = path.join(tempRoot, '.kiro', 'config', 'scene-binding-plugins.json');
+    const manifestPath = path.join(tempRoot, '.sce', 'config', 'scene-binding-plugins.json');
 
     await fs.ensureDir(pluginDir);
     await fs.ensureDir(path.dirname(manifestPath));
@@ -136,7 +136,7 @@ describe('BindingPluginLoader', () => {
 
   test('orders loaded plugins by manifest priority', async () => {
     const pluginDir = path.join(tempRoot, 'plugins');
-    const manifestPath = path.join(tempRoot, '.kiro', 'config', 'scene-binding-plugins.json');
+    const manifestPath = path.join(tempRoot, '.sce', 'config', 'scene-binding-plugins.json');
 
     await fs.ensureDir(pluginDir);
     await fs.ensureDir(path.dirname(manifestPath));
@@ -167,7 +167,7 @@ describe('BindingPluginLoader', () => {
 
   test('warns when manifest declares a missing plugin file', async () => {
     const pluginDir = path.join(tempRoot, 'plugins');
-    const manifestPath = path.join(tempRoot, '.kiro', 'config', 'scene-binding-plugins.json');
+    const manifestPath = path.join(tempRoot, '.sce', 'config', 'scene-binding-plugins.json');
 
     await fs.ensureDir(pluginDir);
     await fs.ensureDir(path.dirname(manifestPath));

@@ -70,8 +70,8 @@ describe('interactive-plan-build script', () => {
     expect(payload.plan.approval.status).toBe('not-required');
     expect(payload.plan.authorization.password_required).toBe(false);
 
-    const planFile = path.join(workspace, '.kiro', 'reports', 'interactive-change-plan.generated.json');
-    const markdownFile = path.join(workspace, '.kiro', 'reports', 'interactive-change-plan.generated.md');
+    const planFile = path.join(workspace, '.sce', 'reports', 'interactive-change-plan.generated.json');
+    const markdownFile = path.join(workspace, '.sce', 'reports', 'interactive-change-plan.generated.md');
     expect(await fs.pathExists(planFile)).toBe(true);
     expect(await fs.pathExists(markdownFile)).toBe(true);
   });

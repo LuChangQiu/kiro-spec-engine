@@ -4,17 +4,17 @@
 const path = require('path');
 const fs = require('fs-extra');
 
-const DEFAULT_INTENT_AUDIT = '.kiro/reports/interactive-copilot-audit.jsonl';
-const DEFAULT_APPROVAL_AUDIT = '.kiro/reports/interactive-approval-events.jsonl';
-const DEFAULT_EXECUTION_LEDGER = '.kiro/reports/interactive-execution-ledger.jsonl';
-const DEFAULT_FEEDBACK_FILE = '.kiro/reports/interactive-user-feedback.jsonl';
-const DEFAULT_MATRIX_SIGNALS = '.kiro/reports/interactive-matrix-signals.jsonl';
-const DEFAULT_DIALOGUE_AUTHORIZATION_SIGNALS = '.kiro/reports/interactive-dialogue-authorization-signals.jsonl';
-const DEFAULT_RUNTIME_SIGNALS = '.kiro/reports/interactive-runtime-signals.jsonl';
-const DEFAULT_AUTHORIZATION_TIER_SIGNALS = '.kiro/reports/interactive-authorization-tier-signals.jsonl';
+const DEFAULT_INTENT_AUDIT = '.sce/reports/interactive-copilot-audit.jsonl';
+const DEFAULT_APPROVAL_AUDIT = '.sce/reports/interactive-approval-events.jsonl';
+const DEFAULT_EXECUTION_LEDGER = '.sce/reports/interactive-execution-ledger.jsonl';
+const DEFAULT_FEEDBACK_FILE = '.sce/reports/interactive-user-feedback.jsonl';
+const DEFAULT_MATRIX_SIGNALS = '.sce/reports/interactive-matrix-signals.jsonl';
+const DEFAULT_DIALOGUE_AUTHORIZATION_SIGNALS = '.sce/reports/interactive-dialogue-authorization-signals.jsonl';
+const DEFAULT_RUNTIME_SIGNALS = '.sce/reports/interactive-runtime-signals.jsonl';
+const DEFAULT_AUTHORIZATION_TIER_SIGNALS = '.sce/reports/interactive-authorization-tier-signals.jsonl';
 const DEFAULT_THRESHOLDS = 'docs/interactive-customization/governance-threshold-baseline.json';
-const DEFAULT_OUT = '.kiro/reports/interactive-governance-report.json';
-const DEFAULT_MARKDOWN_OUT = '.kiro/reports/interactive-governance-report.md';
+const DEFAULT_OUT = '.sce/reports/interactive-governance-report.json';
+const DEFAULT_MARKDOWN_OUT = '.sce/reports/interactive-governance-report.md';
 
 function parseArgs(argv) {
   const options = {

@@ -23,7 +23,7 @@ describe('lock commands integration', () => {
     originalExitCode = process.exitCode;
     process.chdir(tempRoot);
 
-    await fs.ensureDir(path.join(tempRoot, '.kiro', 'specs', 'spec-lock'));
+    await fs.ensureDir(path.join(tempRoot, '.sce', 'specs', 'spec-lock'));
 
     logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     delete process.exitCode;
@@ -37,7 +37,7 @@ describe('lock commands integration', () => {
   });
 
   test('acquire and release lock through CLI commands', async () => {
-    const lockPath = path.join(tempRoot, '.kiro', 'specs', 'spec-lock', '.lock');
+    const lockPath = path.join(tempRoot, '.sce', 'specs', 'spec-lock', '.lock');
 
     await runCommand(['lock', 'acquire', 'spec-lock', '--reason', 'integration', '--timeout', '2']);
 
@@ -52,7 +52,7 @@ describe('lock commands integration', () => {
   });
 
   test('cleanup command removes stale locks', async () => {
-    const lockPath = path.join(tempRoot, '.kiro', 'specs', 'spec-lock', '.lock');
+    const lockPath = path.join(tempRoot, '.sce', 'specs', 'spec-lock', '.lock');
     const staleTimestamp = new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString();
 
     await fs.writeJson(lockPath, {

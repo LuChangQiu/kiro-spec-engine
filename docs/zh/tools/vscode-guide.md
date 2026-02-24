@@ -88,7 +88,7 @@
     "prefix": "sce-ref",
     "body": [
       "// Task ${1:1.1}: ${2:Task description}",
-      "// Spec: .kiro/specs/${3:spec-name}/",
+      "// Spec: .sce/specs/${3:spec-name}/",
       "// Design: See ${4:ComponentName} in design.md",
       "// Requirements: ${5:FR-1, FR-2}",
       "//"
@@ -101,7 +101,7 @@
       "/**",
       " * Task ${1:1.1}: ${2:Task description}",
       " * ",
-      " * Spec: .kiro/specs/${3:spec-name}/",
+      " * Spec: .sce/specs/${3:spec-name}/",
       " * Requirements: ${4:FR-1}",
       " * Design: ${5:ComponentName} in design.md",
       " * ",
@@ -131,7 +131,7 @@
    /**
     * Task 1.1: 设置项目依赖
     * 
-    * Spec: .kiro/specs/01-00-user-login/
+    * Spec: .sce/specs/01-00-user-login/
     * Requirements: FR-1, FR-2, NFR-1
     * Design: AuthController in design.md
     * 
@@ -162,7 +162,7 @@
 
 2. **引用你的 Spec：**
    ```
-   我正在实现 .kiro/specs/01-00-user-login/ 中的用户登录功能。
+   我正在实现 .sce/specs/01-00-user-login/ 中的用户登录功能。
    
    请阅读：
    - requirements.md
@@ -193,7 +193,7 @@
 2. **按 Tab** - 片段展开为：
    ```javascript
    // Task 1.1: Task description
-   // Spec: .kiro/specs/spec-name/
+   // Spec: .sce/specs/spec-name/
    // Design: See ComponentName in design.md
    // Requirements: FR-1, FR-2
    //
@@ -242,7 +242,7 @@ sce-ref [Tab]
 
 在每个文件顶部添加 Spec 引用：
 ```javascript
-// Spec: .kiro/specs/01-00-user-login/
+// Spec: .sce/specs/01-00-user-login/
 // Task: 1.1 - 设置项目依赖
 ```
 
@@ -292,7 +292,7 @@ Copilot 读取注释。要具体：
 /**
  * AuthController - 处理认证请求
  * 
- * Spec: .kiro/specs/01-00-user-login/
+ * Spec: .sce/specs/01-00-user-login/
  * Task: 3.1 - 实现 AuthController
  * Design: 参见 design.md 中的 AuthController
  * Requirements: FR-1, FR-2, NFR-1
@@ -338,7 +338,7 @@ async authenticate(email, password) {
 /**
  * AuthService 测试
  * 
- * Spec: .kiro/specs/01-00-user-login/
+ * Spec: .sce/specs/01-00-user-login/
  * Task: 4.1 - 编写全面的测试
  * 
  * 测试场景：
@@ -369,7 +369,7 @@ describe('AuthService', () => {
 
 **解决方案：**
 1. 添加更多上下文到注释
-2. 引用 Spec 文件：`// Spec: .kiro/specs/...`
+2. 引用 Spec 文件：`// Spec: .sce/specs/...`
 3. 要具体："实现 design.md 中的确切 AuthController"
 
 ### 问题：Copilot 看不到我的 Spec 文件
@@ -378,7 +378,7 @@ describe('AuthService', () => {
 1. 确保 Spec 文件在工作区中
 2. 在 VS Code 中打开 Spec 文件
 3. 在注释中使用相对路径
-4. 检查 `.gitignore` 是否排除了 `.kiro/`
+4. 检查 `.gitignore` 是否排除了 `.sce/`
 
 ---
 
@@ -408,7 +408,7 @@ Copilot 使用所有打开文件的上下文。
 /**
  * [ComponentName] - [Description]
  * 
- * Spec: .kiro/specs/[spec-name]/
+ * Spec: .sce/specs/[spec-name]/
  * Task: [task-id] - [task-description]
  * Design: See [ComponentName] in design.md
  * Requirements: [requirements]

@@ -22,7 +22,7 @@ describe('InitHandler', () => {
     // Create temporary test directory
     testDir = path.join(__dirname, '..', '..', '..', 'temp', `init-test-${Date.now()}`);
     await fs.mkdir(testDir, { recursive: true });
-    await fs.mkdir(path.join(testDir, '.kiro'), { recursive: true });
+    await fs.mkdir(path.join(testDir, '.sce'), { recursive: true });
 
     handler = new InitHandler(testDir);
   });
@@ -151,7 +151,7 @@ describe('InitHandler', () => {
 
       expect(discoverSpy).toHaveBeenCalledWith(testDir, {
         maxDepth: 5,
-        exclude: ['.kiro'],
+        exclude: ['.sce'],
         nested: true
       });
     });
@@ -160,11 +160,11 @@ describe('InitHandler', () => {
       const discoverSpy = jest.spyOn(handler.repoManager, 'discoverRepositories')
         .mockResolvedValue([]);
 
-      await handler.execute({ yes: true, exclude: ['.kiro', 'node_modules'] });
+      await handler.execute({ yes: true, exclude: ['.sce', 'node_modules'] });
 
       expect(discoverSpy).toHaveBeenCalledWith(testDir, {
         maxDepth: 3,
-        exclude: ['.kiro', 'node_modules'],
+        exclude: ['.sce', 'node_modules'],
         nested: true
       });
     });

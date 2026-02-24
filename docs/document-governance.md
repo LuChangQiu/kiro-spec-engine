@@ -58,7 +58,7 @@ Root Violations (2)
      → Delete this file (temporary session notes)
 
 Spec Violations (1)
-  ⚠️  /project/.kiro/specs/01-00-user-login/analysis-report.md
+  ⚠️  /project/.sce/specs/01-00-user-login/analysis-report.md
      Artifact not in subdirectory
      → Move to reports/ subdirectory
 
@@ -188,7 +188,7 @@ Would delete 3 file(s):
 
   🗑️  /project/MVP-PLAN.md
   🗑️  /project/SESSION-2024-01-20.md
-  🗑️  /project/.kiro/specs/01-00-user-login/TEMP-notes.md
+  🗑️  /project/.sce/specs/01-00-user-login/TEMP-notes.md
 
 Run without --dry-run to actually delete these files
 ```
@@ -213,7 +213,7 @@ $ sce docs cleanup --spec 01-00-user-login
 🔥 Cleanup Complete
 
 Deleted 1 file(s):
-  🗑️  .kiro/specs/01-00-user-login/TEMP-notes.md
+  🗑️  .sce/specs/01-00-user-login/TEMP-notes.md
 
 ✅ Cleanup completed successfully
 ```
@@ -263,7 +263,7 @@ $ sce docs validate --all
 
 ❌ 2 error(s):
 
-  ❌ .kiro/specs/02-00-api-feature/requirements.md
+  ❌ .sce/specs/02-00-api-feature/requirements.md
      Missing required file: requirements.md
      → Create requirements.md in 02-00-api-feature
 
@@ -273,7 +273,7 @@ $ sce docs validate --all
 
 ⚠️  1 warning(s):
 
-  ⚠️  .kiro/specs/01-00-user-login/script.js
+  ⚠️  .sce/specs/01-00-user-login/script.js
      Artifact not in subdirectory
      → Move to appropriate subdirectory (reports, scripts, tests, results, docs)
 ```
@@ -319,13 +319,13 @@ $ sce docs archive --spec 01-00-user-login --dry-run
 Would move 3 file(s):
 
   📦 analysis-report.md
-     → .kiro/specs/01-00-user-login/reports/analysis-report.md
+     → .sce/specs/01-00-user-login/reports/analysis-report.md
   
   📦 test-script.js
-     → .kiro/specs/01-00-user-login/scripts/test-script.js
+     → .sce/specs/01-00-user-login/scripts/test-script.js
   
   📦 implementation-guide.md
-     → .kiro/specs/01-00-user-login/docs/implementation-guide.md
+     → .sce/specs/01-00-user-login/docs/implementation-guide.md
 
 Run without --dry-run to actually move these files
 ```
@@ -415,7 +415,7 @@ Running document governance validation...
 
 Found 2 violation(s):
   • /project/TEMP-notes.md - Temporary file in root
-  • .kiro/specs/01-00-user-login/script.js - Misplaced artifact
+  • .sce/specs/01-00-user-login/script.js - Misplaced artifact
 
 Fix violations and try again, or use --no-verify to bypass.
 
@@ -475,7 +475,7 @@ Temporary Patterns:
   • WIP-*.md
   • MVP-*.md
 
-Configuration file: .kiro/config/docs.json
+Configuration file: .sce/config/docs.json
 To modify: sce docs config --set <key> <value>
 To reset: sce docs config --reset
 ```
@@ -572,14 +572,14 @@ sce docs report
 - Violations over time
 - Cleanup actions over time
 - Recent executions with details
-- Saved to `.kiro/reports/document-compliance-{date}.md`
+- Saved to `.sce/reports/document-compliance-{date}.md`
 
 **Example:**
 ```bash
 $ sce docs report
 
 ✅ Compliance report generated
-   Saved to: .kiro/reports/document-compliance-2024-01-24.md
+   Saved to: .sce/reports/document-compliance-2024-01-24.md
 ```
 
 **Report contents:**
@@ -761,7 +761,7 @@ sce docs config --set temporary-patterns "*-SUMMARY.md,SESSION-*.md,*-COMPLETE.m
 
 ### Configuration File Location
 
-Configuration is stored in `.kiro/config/docs.json`
+Configuration is stored in `.sce/config/docs.json`
 
 You can also edit this file directly:
 
@@ -784,10 +784,10 @@ See the [Troubleshooting Guide](troubleshooting.md#document-governance-issues) f
 **"Permission denied" errors:**
 ```bash
 # Check file permissions
-ls -la .kiro/
+ls -la .sce/
 
 # Fix if needed
-chmod -R u+w .kiro/
+chmod -R u+w .sce/
 ```
 
 **"Not a git repository" (for hooks):**

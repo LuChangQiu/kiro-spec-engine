@@ -65,8 +65,8 @@ sce value metrics trend --window 6 --json
   "triggered_metrics": [
     "manual_takeover_rate"
   ],
-  "snapshot_path": ".kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/2026-W10.json",
-  "gate_summary_path": ".kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/gate-summary.2026-W10.day-60.json",
+  "snapshot_path": ".sce/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/2026-W10.json",
+  "gate_summary_path": ".sce/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/gate-summary.2026-W10.day-60.json",
   "contract_path": "metric-definition.yaml"
 }
 ```
@@ -96,7 +96,7 @@ sce value metrics trend --window 6 --json
       "target_passed": true
     }
   ],
-  "trend_path": ".kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/trend.latest.json"
+  "trend_path": ".sce/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/trend.latest.json"
 }
 ```
 

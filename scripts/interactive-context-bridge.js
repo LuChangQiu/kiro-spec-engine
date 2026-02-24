@@ -6,8 +6,8 @@ const fs = require('fs-extra');
 
 const DEFAULT_PROVIDER = 'moqui';
 const DEFAULT_CONTEXT_CONTRACT = 'docs/interactive-customization/moqui-copilot-context-contract.json';
-const DEFAULT_OUT_CONTEXT = '.kiro/reports/interactive-page-context.normalized.json';
-const DEFAULT_OUT_REPORT = '.kiro/reports/interactive-context-bridge.json';
+const DEFAULT_OUT_CONTEXT = '.sce/reports/interactive-page-context.normalized.json';
+const DEFAULT_OUT_REPORT = '.sce/reports/interactive-context-bridge.json';
 const SUPPORTED_PROVIDERS = new Set(['moqui', 'generic']);
 const SENSITIVE_NAME_PATTERN = /(password|secret|token|api[_-]?key|credential|email|phone|bank|card)/i;
 const BUILTIN_CONTEXT_CONTRACT = {

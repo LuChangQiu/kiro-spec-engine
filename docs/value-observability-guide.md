@@ -65,8 +65,8 @@ If you do not use the `sample` command, create `kpi-input.json` manually:
   "triggered_metrics": [
     "manual_takeover_rate"
   ],
-  "snapshot_path": ".kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/2026-W10.json",
-  "gate_summary_path": ".kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/gate-summary.2026-W10.day-60.json",
+  "snapshot_path": ".sce/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/2026-W10.json",
+  "gate_summary_path": ".sce/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/gate-summary.2026-W10.day-60.json",
   "contract_path": "metric-definition.yaml"
 }
 ```
@@ -96,7 +96,7 @@ If you do not use the `sample` command, create `kpi-input.json` manually:
       "target_passed": true
     }
   ],
-  "trend_path": ".kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/trend.latest.json"
+  "trend_path": ".sce/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/trend.latest.json"
 }
 ```
 

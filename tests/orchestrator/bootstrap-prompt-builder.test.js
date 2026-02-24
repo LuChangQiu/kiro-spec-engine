@@ -2,7 +2,7 @@
  * BootstrapPromptBuilder Unit Tests
  *
  * Validates: Requirements 2.1-2.4
- * - 2.1: Prompt contains Spec path (.kiro/specs/{specName}/)
+ * - 2.1: Prompt contains Spec path (.sce/specs/{specName}/)
  * - 2.2: Prompt contains sce project norms and steering context
  * - 2.3: Prompt contains task execution instructions
  * - 2.4: Configurable template format via orchestrator.json
@@ -41,15 +41,6 @@ describe('BootstrapPromptBuilder', () => {
 
   /** Create steering files in the temp workspace. */
   function createSteeringFiles(files = {}) {
-    const steeringDir = path.join(tempDir, '.kiro', 'steering');
-    fs.mkdirSync(steeringDir, { recursive: true });
-    for (const [name, content] of Object.entries(files)) {
-      fs.writeFileSync(path.join(steeringDir, name), content);
-    }
-  }
-
-  /** Create steering files under the universal .sce path. */
-  function createSceSteeringFiles(files = {}) {
     const steeringDir = path.join(tempDir, '.sce', 'steering');
     fs.mkdirSync(steeringDir, { recursive: true });
     for (const [name, content] of Object.entries(files)) {
@@ -59,16 +50,16 @@ describe('BootstrapPromptBuilder', () => {
 
   /** Create a Spec directory with optional doc files. */
   function createSpecFiles(specName, docs = {}) {
-    const specDir = path.join(tempDir, '.kiro', 'specs', specName);
+    const specDir = path.join(tempDir, '.sce', 'specs', specName);
     fs.mkdirSync(specDir, { recursive: true });
     for (const [name, content] of Object.entries(docs)) {
       fs.writeFileSync(path.join(specDir, name), content);
     }
   }
 
-  /** Create a README.md in .kiro/ */
+  /** Create a README.md in .sce/ */
   function createReadme(content) {
-    const kiroDir = path.join(tempDir, '.kiro');
+    const kiroDir = path.join(tempDir, '.sce');
     fs.mkdirSync(kiroDir, { recursive: true });
     fs.writeFileSync(path.join(kiroDir, 'README.md'), content);
   }
@@ -127,7 +118,7 @@ describe('BootstrapPromptBuilder', () => {
     test('prompt contains the Spec path', async () => {
       const prompt = await builder.buildPrompt('96-00-agent-orchestrator');
 
-      expect(prompt).toContain('.kiro/specs/96-00-agent-orchestrator/');
+      expect(prompt).toContain('.sce/specs/96-00-agent-orchestrator/');
     });
 
     test('prompt contains the Spec name', async () => {
@@ -210,25 +201,12 @@ describe('BootstrapPromptBuilder', () => {
     });
 
     test('loads steering from .sce/steering when available', async () => {
-      createSceSteeringFiles({
+      createSteeringFiles({
         'CORE_PRINCIPLES.md': 'SCE core policy',
       });
 
       const prompt = await builder.buildPrompt('any-spec');
       expect(prompt).toContain('SCE core policy');
-    });
-
-    test('prefers .sce steering over legacy .kiro steering', async () => {
-      createSteeringFiles({
-        'CORE_PRINCIPLES.md': 'Legacy core policy',
-      });
-      createSceSteeringFiles({
-        'CORE_PRINCIPLES.md': 'Universal core policy',
-      });
-
-      const prompt = await builder.buildPrompt('any-spec');
-      expect(prompt).toContain('Universal core policy');
-      expect(prompt).not.toContain('Legacy core policy');
     });
   });
 
@@ -262,7 +240,7 @@ describe('BootstrapPromptBuilder', () => {
     test('references the correct tasks.md path', async () => {
       const prompt = await builder.buildPrompt('96-00-agent-orchestrator');
 
-      expect(prompt).toContain('.kiro/specs/96-00-agent-orchestrator/tasks.md');
+      expect(prompt).toContain('.sce/specs/96-00-agent-orchestrator/tasks.md');
     });
   });
 
@@ -280,7 +258,7 @@ describe('BootstrapPromptBuilder', () => {
       const prompt = await builder.buildPrompt('custom-spec');
 
       expect(prompt).toContain('Spec: custom-spec');
-      expect(prompt).toContain('Path: .kiro/specs/custom-spec/');
+      expect(prompt).toContain('Path: .sce/specs/custom-spec/');
       expect(prompt).toContain('Steering:');
       expect(prompt).toContain('My principles');
       expect(prompt).toContain('Instructions:');
@@ -305,7 +283,7 @@ describe('BootstrapPromptBuilder', () => {
 
     test('falls back to default template when custom template file is missing', async () => {
       // Configure a template path that doesn't exist
-      const configDir = path.join(tempDir, '.kiro', 'config');
+      const configDir = path.join(tempDir, '.sce', 'config');
       fs.mkdirSync(configDir, { recursive: true });
       fs.writeJsonSync(path.join(configDir, 'orchestrator.json'), {
         bootstrapTemplate: 'nonexistent-template.md',
@@ -328,7 +306,7 @@ describe('BootstrapPromptBuilder', () => {
       const prompt = await builder.buildPrompt('isolated-spec');
 
       // Custom template only renders the 4 placeholders
-      expect(prompt).toBe('Only: isolated-spec at .kiro/specs/isolated-spec/');
+      expect(prompt).toBe('Only: isolated-spec at .sce/specs/isolated-spec/');
       expect(prompt).not.toContain('SECRET_REQ');
       expect(prompt).not.toContain('SECRET_README');
     });
@@ -342,7 +320,7 @@ describe('BootstrapPromptBuilder', () => {
     test('handles Spec name with special characters', async () => {
       const prompt = await builder.buildPrompt('01-00-my-feature');
 
-      expect(prompt).toContain('.kiro/specs/01-00-my-feature/');
+      expect(prompt).toContain('.sce/specs/01-00-my-feature/');
       expect(prompt).toContain('"01-00-my-feature"');
     });
 

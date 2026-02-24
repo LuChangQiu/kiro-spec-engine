@@ -28,8 +28,8 @@ describe('Multi-Workspace Commands', () => {
     // Create test workspace directory
     testWorkspacePath = path.join(testDir, 'test-workspace');
     await fs.ensureDir(testWorkspacePath);
-    await fs.ensureDir(path.join(testWorkspacePath, '.kiro'));
-    await fs.ensureDir(path.join(testWorkspacePath, '.kiro', 'specs'));
+    await fs.ensureDir(path.join(testWorkspacePath, '.sce'));
+    await fs.ensureDir(path.join(testWorkspacePath, '.sce', 'specs'));
 
     // Mock console methods
     consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});

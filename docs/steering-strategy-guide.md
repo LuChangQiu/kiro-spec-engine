@@ -2,11 +2,11 @@
 
 ## Overview
 
-When adopting scene-capability-engine (sce) into a project that already has steering files in `.kiro/steering/`, you must choose a steering strategy. This is because AI IDE loads all files in the steering directory, and having both sce steering rules and your project's custom steering rules can cause conflicts.
+When adopting scene-capability-engine (sce) into a project that already has steering files in `.sce/steering/`, you must choose a steering strategy. This is because AI IDE loads all files in the steering directory, and having both sce steering rules and your project's custom steering rules can cause conflicts.
 
 ## Why Steering Exclusivity?
 
-AI IDE automatically loads all Markdown files in `.kiro/steering/` as AI behavior rules. If you have both sce steering files and your project's custom steering files, the AI will try to follow both sets of rules, which can lead to:
+AI IDE automatically loads all Markdown files in `.sce/steering/` as AI behavior rules. If you have both sce steering files and your project's custom steering files, the AI will try to follow both sets of rules, which can lead to:
 
 - Conflicting instructions
 - Unpredictable AI behavior
@@ -24,9 +24,9 @@ Therefore, you must choose **one** set of steering rules to use.
 - You want the full sce experience with optimized AI behavior
 
 **What happens:**
-1. Your existing steering files are backed up to `.kiro/backups/steering-{timestamp}/`
-2. sce steering template files are installed to `.kiro/steering/`
-3. The backup ID is saved in `.kiro/adoption-config.json`
+1. Your existing steering files are backed up to `.sce/backups/steering-{timestamp}/`
+2. sce steering template files are installed to `.sce/steering/`
+3. The backup ID is saved in `.sce/adoption-config.json`
 4. You can rollback if needed
 
 **Files installed:**
@@ -45,7 +45,7 @@ Therefore, you must choose **one** set of steering rules to use.
 **What happens:**
 1. Your existing steering files are preserved
 2. sce steering files are **not** installed
-3. The choice is documented in `.kiro/adoption-config.json`
+3. The choice is documented in `.sce/adoption-config.json`
 4. You can manually integrate sce steering concepts if desired
 
 **Trade-offs:**
@@ -81,20 +81,20 @@ sce rollback --list
 sce rollback {backup-id}
 ```
 
-Or manually restore from `.kiro/backups/steering-{timestamp}/`.
+Or manually restore from `.sce/backups/steering-{timestamp}/`.
 
 ## Manual Integration
 
 If you chose "use-project" but want to incorporate sce steering concepts:
 
-1. Review sce steering templates in `template/.kiro/steering/`
+1. Review sce steering templates in `template/.sce/steering/`
 2. Identify useful concepts (Spec workflow, Ultrawork principles, etc.)
 3. Manually merge relevant sections into your steering files
 4. Test with a sample Spec to ensure compatibility
 
 ## Configuration File
 
-Your steering strategy choice is saved in `.kiro/adoption-config.json`:
+Your steering strategy choice is saved in `.sce/adoption-config.json`:
 
 ```json
 {
@@ -137,7 +137,7 @@ Your steering strategy choice is saved in `.kiro/adoption-config.json`:
 ### Problem: AI behavior is inconsistent after adoption
 
 **Solution:**
-- Check which steering strategy you chose: `cat .kiro/adoption-config.json`
+- Check which steering strategy you chose: `cat .sce/adoption-config.json`
 - If "use-kse", verify sce steering files are present
 - If "use-project", ensure your steering files are compatible with sce
 
@@ -151,13 +151,13 @@ Your steering strategy choice is saved in `.kiro/adoption-config.json`:
 
 2. If currently "use-project":
    - Manually backup your steering files
-   - Copy sce templates from `template/.kiro/steering/`
-   - Update `.kiro/adoption-config.json`
+   - Copy sce templates from `template/.sce/steering/`
+   - Update `.sce/adoption-config.json`
 
 ### Problem: Lost steering backup
 
 **Solution:**
-- Check `.kiro/backups/` for steering backups
+- Check `.sce/backups/` for steering backups
 - Backups are named `steering-{timestamp}`
 - If no backup exists, you'll need to recreate your steering files
 
@@ -186,8 +186,8 @@ A: Yes, but you'll need to manually manage the steering files and update the con
 ## Related Documentation
 
 - [Adoption Guide](./adoption-guide.md) - Complete adoption workflow
-- [Spec Workflow Guide](../.kiro/specs/SPEC_WORKFLOW_GUIDE.md) - How to use Specs
-- [Steering Files](../.kiro/steering/) - sce steering templates
+- [Spec Workflow Guide](../.sce/specs/SPEC_WORKFLOW_GUIDE.md) - How to use Specs
+- [Steering Files](../.sce/steering/) - sce steering templates
 
 ---
 

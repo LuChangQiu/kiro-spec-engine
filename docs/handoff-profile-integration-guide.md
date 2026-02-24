@@ -61,9 +61,9 @@ External handoff projects should provide:
 
 Recommended evidence files before `handoff run`:
 
-- `.kiro/reports/release-evidence/moqui-template-baseline.json`
-- `.kiro/reports/handoff-capability-matrix.json` or `.md`
-- `.kiro/reports/release-evidence/moqui-lexicon-audit.json`
+- `.sce/reports/release-evidence/moqui-template-baseline.json`
+- `.sce/reports/handoff-capability-matrix.json` or `.md`
+- `.sce/reports/release-evidence/moqui-lexicon-audit.json`
 
 ## Override Rules
 

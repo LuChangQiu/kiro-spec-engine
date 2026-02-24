@@ -24,7 +24,7 @@ afterEach(() => {
 
 describe('Watch Commands', () => {
   const testDir = path.join(__dirname, '../fixtures/watch-commands-test');
-  const configPath = path.join(testDir, '.kiro/watch-config.json');
+  const configPath = path.join(testDir, '.sce/watch-config.json');
   const originalCwd = process.cwd();
   
   beforeEach(async () => {
@@ -126,7 +126,7 @@ describe('Watch Commands', () => {
     });
 
     it('should display existing logs from execution log file', async () => {
-      const logDir = path.join(testDir, '.kiro/watch/logs');
+      const logDir = path.join(testDir, '.sce/watch/logs');
       const logPath = path.join(logDir, 'execution.log');
 
       await fs.ensureDir(logDir);
@@ -152,7 +152,7 @@ describe('Watch Commands', () => {
     });
 
     it('should follow and print appended logs', async () => {
-      const logDir = path.join(testDir, '.kiro/watch/logs');
+      const logDir = path.join(testDir, '.sce/watch/logs');
       const logPath = path.join(logDir, 'execution.log');
 
       await fs.ensureDir(logDir);

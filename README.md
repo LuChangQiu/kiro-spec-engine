@@ -94,7 +94,7 @@ Install sce and use it to manage this project with Spec-driven development.
 **Your AI will:**
 1. Install sce globally (`npm install -g scene-capability-engine`)
 2. Adopt it in your project (`sce adopt`)
-3. Read the methodology guide (`.kiro/README.md`)
+3. Read the methodology guide (`.sce/README.md`)
 4. Start working according to Spec-driven approach
 
 **That's it!** Your AI handles everything. No manual steps needed.
@@ -126,7 +126,7 @@ cd your-project
 sce adopt
 ```
 
-This creates a `.kiro/` directory with:
+This creates a `.sce/` directory with:
 - `README.md` - Project development guide for AI
 - `specs/` - Where your Specs live
 - `steering/` - Development rules (optional)
@@ -136,7 +136,7 @@ This creates a `.kiro/` directory with:
 **In your AI tool (Cursor, Claude, Windsurf, etc.), say:**
 
 ```
-Please read .kiro/README.md to understand how this project works.
+Please read .sce/README.md to understand how this project works.
 ```
 
 **Your AI will learn:**
@@ -393,7 +393,7 @@ Structure your work with Requirements → Design → Tasks workflow
 - **Retry Mechanism**: Configurable automatic retry for failed Specs
 - **Real-Time Monitoring**: Track per-Spec status and overall orchestration progress
 - **Graceful Termination**: Stop all sub-agents cleanly (SIGTERM → SIGKILL)
-- **Configurable**: Codex command, args, parallelism, timeout, retries via `.kiro/config/orchestrator.json`
+- **Configurable**: Codex command, args, parallelism, timeout, retries via `.sce/config/orchestrator.json`
 
 **Quick Start**:
 ```bash
@@ -409,7 +409,7 @@ sce orchestrate stop
 
 Tip: `sce spec bootstrap|pipeline run|gate run --specs ...` now defaults to this orchestrate mode automatically.
 
-**Recommended Codex-Orchestrator config (`.kiro/config/orchestrator.json`)**:
+**Recommended Codex-Orchestrator config (`.sce/config/orchestrator.json`)**:
 ```json
 {
   "agentBackend": "codex",
@@ -548,7 +548,7 @@ sce auto close-loop continue       # Shorthand: continue latest interrupted clos
 sce auto continue                  # Shortcut command: continue latest interrupted close-loop session
 sce auto close-loop "<goal>" --dry-run --json  # Preview decomposition plan only
 sce auto close-loop-program "<goal>" --program-govern-until-stable --program-govern-use-action 1 --json # Program-level recovery + governance with remediation action execution
-sce auto close-loop-controller .kiro/auto/program-queue.lines --wait-on-empty --dequeue-limit 2 --json # Queue-driven autonomous controller for broad-goal backlogs
+sce auto close-loop-controller .sce/auto/program-queue.lines --wait-on-empty --dequeue-limit 2 --json # Queue-driven autonomous controller for broad-goal backlogs
 sce auto close-loop-controller --controller-resume latest --json # Resume autonomous controller from latest persisted checkpoint
 sce auto controller-session list --limit 50 --json # Inspect persisted close-loop-controller summary sessions
 sce auto controller-session prune --keep 20 --older-than-days 14 --dry-run --json # Prune old controller summaries by retention policy

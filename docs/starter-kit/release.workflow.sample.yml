@@ -25,7 +25,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          NOTES_DIR=".kiro/reports/release-evidence"
+          NOTES_DIR=".sce/reports/release-evidence"
           mkdir -p "${NOTES_DIR}"
 
           node scripts/release-ops-weekly-summary.js \

@@ -5,9 +5,9 @@ const path = require('path');
 const fs = require('fs-extra');
 const crypto = require('crypto');
 
-const DEFAULT_OUT_INTENT = '.kiro/reports/interactive-change-intent.json';
-const DEFAULT_OUT_EXPLAIN = '.kiro/reports/interactive-page-explain.md';
-const DEFAULT_AUDIT_FILE = '.kiro/reports/interactive-copilot-audit.jsonl';
+const DEFAULT_OUT_INTENT = '.sce/reports/interactive-change-intent.json';
+const DEFAULT_OUT_EXPLAIN = '.sce/reports/interactive-page-explain.md';
+const DEFAULT_AUDIT_FILE = '.sce/reports/interactive-copilot-audit.jsonl';
 const DEFAULT_CONTEXT_CONTRACT = 'docs/interactive-customization/moqui-copilot-context-contract.json';
 const DEFAULT_MASK_KEYWORDS = [
   'password',

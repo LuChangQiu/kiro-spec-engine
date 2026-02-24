@@ -67,7 +67,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          NOTES_DIR=".kiro/reports/release-evidence"
+          NOTES_DIR=".sce/reports/release-evidence"
           GOVERNANCE_JSON="${NOTES_DIR}/interactive-governance-${TAG}.json"
           GOVERNANCE_MD="${NOTES_DIR}/interactive-governance-${TAG}.md"
           GOVERNANCE_STDOUT="${NOTES_DIR}/interactive-governance-${TAG}.stdout.json"
@@ -90,8 +90,8 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          NOTES_DIR=".kiro/reports/release-evidence"
-          SIGNAL_SOURCE=".kiro/reports/interactive-matrix-signals.jsonl"
+          NOTES_DIR=".sce/reports/release-evidence"
+          SIGNAL_SOURCE=".sce/reports/interactive-matrix-signals.jsonl"
           SIGNAL_RELEASE_FILE="${NOTES_DIR}/interactive-matrix-signals-${TAG}.jsonl"
 
           mkdir -p "${NOTES_DIR}"
@@ -113,7 +113,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          NOTES_DIR=".kiro/reports/release-evidence"
+          NOTES_DIR=".sce/reports/release-evidence"
           LATEST_RELEASE_FILE="${NOTES_DIR}/latest-release-${TAG}.json"
           PREVIOUS_BASELINE_FILE="${NOTES_DIR}/moqui-template-baseline-prev-${TAG}.json"
           LATEST_RELEASE_API="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/latest"
@@ -148,7 +148,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          NOTES_DIR=".kiro/reports/release-evidence"
+          NOTES_DIR=".sce/reports/release-evidence"
           BASELINE_JSON="${NOTES_DIR}/moqui-template-baseline.json"
           BASELINE_MD="${NOTES_DIR}/moqui-template-baseline.md"
           BASELINE_STDOUT="${NOTES_DIR}/moqui-template-baseline-${TAG}.stdout.json"
@@ -194,7 +194,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          NOTES_DIR=".kiro/reports/release-evidence"
+          NOTES_DIR=".sce/reports/release-evidence"
           GATE_JSON="${NOTES_DIR}/matrix-regression-gate-${TAG}.json"
 
           ENFORCE_RAW="${MATRIX_REGRESSION_GATE_ENFORCE:-false}"
@@ -223,7 +223,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          NOTES_DIR=".kiro/reports/release-evidence"
+          NOTES_DIR=".sce/reports/release-evidence"
           REMEDIATION_JSON="${NOTES_DIR}/matrix-remediation-plan-${TAG}.json"
           REMEDIATION_MD="${NOTES_DIR}/matrix-remediation-plan-${TAG}.md"
           REMEDIATION_LINES="${NOTES_DIR}/matrix-remediation-${TAG}.lines"
@@ -288,7 +288,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          NOTES_DIR=".kiro/reports/release-evidence"
+          NOTES_DIR=".sce/reports/release-evidence"
           SUMMARY_JSON="${NOTES_DIR}/moqui-release-summary.json"
           SUMMARY_MD="${NOTES_DIR}/moqui-release-summary.md"
           SUMMARY_STDOUT="${NOTES_DIR}/moqui-release-summary-${TAG}.stdout.json"
@@ -306,7 +306,7 @@ jobs:
           node scripts/moqui-release-summary.js \
             --evidence "${NOTES_DIR}/handoff-runs.json" \
             --baseline "${{ steps.moqui_baseline.outputs.json_file }}" \
-            --capability-matrix .kiro/reports/handoff-capability-matrix.json \
+            --capability-matrix .sce/reports/handoff-capability-matrix.json \
             --interactive-governance "${{ steps.interactive_governance.outputs.json_file }}" \
             --out "${SUMMARY_JSON}" \
             --markdown-out "${SUMMARY_MD}" \
@@ -324,7 +324,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          NOTES_DIR=".kiro/reports/release-evidence"
+          NOTES_DIR=".sce/reports/release-evidence"
           REGRESSION_JSON="${NOTES_DIR}/moqui-core-regression-suite-${TAG}.json"
           REGRESSION_MD="${NOTES_DIR}/moqui-core-regression-suite-${TAG}.md"
           REGRESSION_STDOUT="${NOTES_DIR}/moqui-core-regression-suite-${TAG}.stdout.json"
@@ -346,7 +346,7 @@ jobs:
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
           RELEASE_DATE="$(date -u +%F)"
-          NOTES_DIR=".kiro/reports/release-evidence"
+          NOTES_DIR=".sce/reports/release-evidence"
           EVIDENCE_FILE="${NOTES_DIR}/handoff-runs.json"
           REVIEW_FILE="${NOTES_DIR}/handoff-evidence-review-${TAG}.md"
           DRAFT_FILE="${NOTES_DIR}/release-notes-${TAG}.md"
@@ -709,7 +709,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          NOTES_DIR=".kiro/reports/release-evidence"
+          NOTES_DIR=".sce/reports/release-evidence"
           SNAPSHOT_JSON="${NOTES_DIR}/governance-snapshot-${TAG}.json"
           SNAPSHOT_MD="${NOTES_DIR}/governance-snapshot-${TAG}.md"
 
@@ -727,7 +727,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          NOTES_DIR=".kiro/reports/release-evidence"
+          NOTES_DIR=".sce/reports/release-evidence"
           SUMMARY_JSON="${NOTES_DIR}/weekly-ops-summary-${TAG}.json"
           SUMMARY_MD="${NOTES_DIR}/weekly-ops-summary-${TAG}.md"
 
@@ -764,7 +764,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          NOTES_DIR=".kiro/reports/release-evidence"
+          NOTES_DIR=".sce/reports/release-evidence"
           HISTORY_FILE="${NOTES_DIR}/release-gate-history.json"
           HISTORY_SUMMARY_FILE="${NOTES_DIR}/release-gate-history-${TAG}.json"
           HISTORY_CARD_FILE="${NOTES_DIR}/release-gate-history-${TAG}.md"
@@ -827,7 +827,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          NOTES_DIR=".kiro/reports/release-evidence"
+          NOTES_DIR=".sce/reports/release-evidence"
           HISTORY_SUMMARY_FILE="${NOTES_DIR}/release-gate-history-${TAG}.json"
 
           if [[ -f "${RELEASE_BODY_FILE}" && -f "${HISTORY_SUMMARY_FILE}" ]]; then
@@ -1057,7 +1057,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          HISTORY_SUMMARY_FILE=".kiro/reports/release-evidence/release-gate-history-${TAG}.json"
+          HISTORY_SUMMARY_FILE=".sce/reports/release-evidence/release-gate-history-${TAG}.json"
           RELEASE_DRIFT_HISTORY_FILE="${HISTORY_SUMMARY_FILE}" \
             node ./scripts/release-drift-evaluate.js
 
@@ -1066,7 +1066,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          NOTES_DIR=".kiro/reports/release-evidence"
+          NOTES_DIR=".sce/reports/release-evidence"
           GATE_FILE="${NOTES_DIR}/release-gate-${TAG}.json"
           HISTORY_FILE="${NOTES_DIR}/release-gate-history.json"
           HISTORY_SUMMARY_FILE="${NOTES_DIR}/release-gate-history-${TAG}.json"
@@ -1092,7 +1092,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          NOTES_DIR=".kiro/reports/release-evidence"
+          NOTES_DIR=".sce/reports/release-evidence"
           HISTORY_FILE="${NOTES_DIR}/release-gate-history.json"
           PREFLIGHT_JSON="${NOTES_DIR}/handoff-preflight-${TAG}.json"
           PREFLIGHT_ENFORCE_RAW="${RELEASE_HANDOFF_PREFLIGHT_ENFORCE:-true}"
@@ -1114,7 +1114,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          NOTES_DIR=".kiro/reports/release-evidence"
+          NOTES_DIR=".sce/reports/release-evidence"
           BUNDLE_JSON="${NOTES_DIR}/release-risk-remediation-${TAG}.json"
           BUNDLE_MD="${NOTES_DIR}/release-risk-remediation-${TAG}.md"
           BUNDLE_LINES="${NOTES_DIR}/release-risk-remediation-${TAG}.lines"
@@ -1147,7 +1147,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          NOTES_DIR=".kiro/reports/release-evidence"
+          NOTES_DIR=".sce/reports/release-evidence"
           INTEGRITY_JSON="${NOTES_DIR}/release-asset-integrity-${TAG}.json"
           INTEGRITY_MD="${NOTES_DIR}/release-asset-integrity-${TAG}.md"
 

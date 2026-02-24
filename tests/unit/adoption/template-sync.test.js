@@ -24,7 +24,7 @@ describe('TemplateSync', () => {
     
     await fs.ensureDir(projectPath);
     await fs.ensureDir(templatePath);
-    await fs.ensureDir(path.join(projectPath, '.kiro'));
+    await fs.ensureDir(path.join(projectPath, '.sce'));
   });
 
   afterEach(async () => {
@@ -51,14 +51,14 @@ describe('TemplateSync', () => {
     test('should detect different files', async () => {
       // Create template and project files with different content
       await fs.ensureDir(path.join(templatePath, 'steering'));
-      await fs.ensureDir(path.join(projectPath, '.kiro/steering'));
+      await fs.ensureDir(path.join(projectPath, '.sce/steering'));
       
       await fs.writeFile(
         path.join(templatePath, 'steering/CORE_PRINCIPLES.md'),
         'Template content'
       );
       await fs.writeFile(
-        path.join(projectPath, '.kiro/steering/CORE_PRINCIPLES.md'),
+        path.join(projectPath, '.sce/steering/CORE_PRINCIPLES.md'),
         'Project content'
       );
 
@@ -73,14 +73,14 @@ describe('TemplateSync', () => {
       // Create template and project files with identical content
       const content = 'Identical content';
       await fs.ensureDir(path.join(templatePath, 'steering'));
-      await fs.ensureDir(path.join(projectPath, '.kiro/steering'));
+      await fs.ensureDir(path.join(projectPath, '.sce/steering'));
       
       await fs.writeFile(
         path.join(templatePath, 'steering/CORE_PRINCIPLES.md'),
         content
       );
       await fs.writeFile(
-        path.join(projectPath, '.kiro/steering/CORE_PRINCIPLES.md'),
+        path.join(projectPath, '.sce/steering/CORE_PRINCIPLES.md'),
         content
       );
 
@@ -97,14 +97,14 @@ describe('TemplateSync', () => {
       
       // Create CURRENT_CONTEXT.md in both locations
       await fs.ensureDir(path.join(templatePath, 'steering'));
-      await fs.ensureDir(path.join(projectPath, '.kiro/steering'));
+      await fs.ensureDir(path.join(projectPath, '.sce/steering'));
       
       await fs.writeFile(
         path.join(templatePath, 'steering/CURRENT_CONTEXT.md'),
         'Template context'
       );
       await fs.writeFile(
-        path.join(projectPath, '.kiro/steering/CURRENT_CONTEXT.md'),
+        path.join(projectPath, '.sce/steering/CURRENT_CONTEXT.md'),
         'User context'
       );
 
@@ -131,7 +131,7 @@ describe('TemplateSync', () => {
     test('should provide accurate summary', async () => {
       // Create mix of scenarios
       await fs.ensureDir(path.join(templatePath, 'steering'));
-      await fs.ensureDir(path.join(projectPath, '.kiro/steering'));
+      await fs.ensureDir(path.join(projectPath, '.sce/steering'));
       
       // Missing file
       await fs.writeFile(
@@ -145,7 +145,7 @@ describe('TemplateSync', () => {
         'Template principles'
       );
       await fs.writeFile(
-        path.join(projectPath, '.kiro/steering/CORE_PRINCIPLES.md'),
+        path.join(projectPath, '.sce/steering/CORE_PRINCIPLES.md'),
         'Project principles'
       );
       
@@ -156,7 +156,7 @@ describe('TemplateSync', () => {
         rulesContent
       );
       await fs.writeFile(
-        path.join(projectPath, '.kiro/steering/RULES_GUIDE.md'),
+        path.join(projectPath, '.sce/steering/RULES_GUIDE.md'),
         rulesContent
       );
 
@@ -278,7 +278,7 @@ describe('TemplateSync', () => {
       expect(result.synced[0].action).toBe('created');
       
       // Verify file was created
-      const projectFile = path.join(projectPath, '.kiro/steering/CORE_PRINCIPLES.md');
+      const projectFile = path.join(projectPath, '.sce/steering/CORE_PRINCIPLES.md');
       const exists = await fs.pathExists(projectFile);
       expect(exists).toBe(true);
       
@@ -289,14 +289,14 @@ describe('TemplateSync', () => {
     test('should update different files', async () => {
       // Create template and project files with different content
       await fs.ensureDir(path.join(templatePath, 'steering'));
-      await fs.ensureDir(path.join(projectPath, '.kiro/steering'));
+      await fs.ensureDir(path.join(projectPath, '.sce/steering'));
       
       await fs.writeFile(
         path.join(templatePath, 'steering/CORE_PRINCIPLES.md'),
         'New content'
       );
       await fs.writeFile(
-        path.join(projectPath, '.kiro/steering/CORE_PRINCIPLES.md'),
+        path.join(projectPath, '.sce/steering/CORE_PRINCIPLES.md'),
         'Old content'
       );
 
@@ -307,7 +307,7 @@ describe('TemplateSync', () => {
       expect(result.synced[0].action).toBe('updated');
       
       // Verify file was updated
-      const projectFile = path.join(projectPath, '.kiro/steering/CORE_PRINCIPLES.md');
+      const projectFile = path.join(projectPath, '.sce/steering/CORE_PRINCIPLES.md');
       const content = await fs.readFile(projectFile, 'utf8');
       expect(content).toBe('New content');
     });
@@ -316,14 +316,14 @@ describe('TemplateSync', () => {
       // Create identical files
       const content = 'Same content';
       await fs.ensureDir(path.join(templatePath, 'steering'));
-      await fs.ensureDir(path.join(projectPath, '.kiro/steering'));
+      await fs.ensureDir(path.join(projectPath, '.sce/steering'));
       
       await fs.writeFile(
         path.join(templatePath, 'steering/CORE_PRINCIPLES.md'),
         content
       );
       await fs.writeFile(
-        path.join(projectPath, '.kiro/steering/CORE_PRINCIPLES.md'),
+        path.join(projectPath, '.sce/steering/CORE_PRINCIPLES.md'),
         content
       );
 
@@ -336,14 +336,14 @@ describe('TemplateSync', () => {
     test('should preserve CURRENT_CONTEXT.md', async () => {
       // Create CURRENT_CONTEXT.md in both locations
       await fs.ensureDir(path.join(templatePath, 'steering'));
-      await fs.ensureDir(path.join(projectPath, '.kiro/steering'));
+      await fs.ensureDir(path.join(projectPath, '.sce/steering'));
       
       await fs.writeFile(
         path.join(templatePath, 'steering/CURRENT_CONTEXT.md'),
         'Template context'
       );
       await fs.writeFile(
-        path.join(projectPath, '.kiro/steering/CURRENT_CONTEXT.md'),
+        path.join(projectPath, '.sce/steering/CURRENT_CONTEXT.md'),
         'User context'
       );
 
@@ -353,7 +353,7 @@ describe('TemplateSync', () => {
       expect(result.synced.find(s => s.path === 'steering/CURRENT_CONTEXT.md')).toBeUndefined();
       
       // Verify user content was preserved
-      const projectFile = path.join(projectPath, '.kiro/steering/CURRENT_CONTEXT.md');
+      const projectFile = path.join(projectPath, '.sce/steering/CURRENT_CONTEXT.md');
       const content = await fs.readFile(projectFile, 'utf8');
       expect(content).toBe('User context');
     });
@@ -373,7 +373,7 @@ describe('TemplateSync', () => {
       expect(result.report.summary.needsSync).toBe(1);
       
       // Verify file was NOT created
-      const projectFile = path.join(projectPath, '.kiro/steering/CORE_PRINCIPLES.md');
+      const projectFile = path.join(projectPath, '.sce/steering/CORE_PRINCIPLES.md');
       const exists = await fs.pathExists(projectFile);
       expect(exists).toBe(false);
     });

@@ -20,11 +20,11 @@ describe('moqui-release-summary script', () => {
     const projectRoot = path.resolve(__dirname, '..', '..', '..');
     const scriptPath = path.join(projectRoot, 'scripts', 'moqui-release-summary.js');
     const workspace = path.join(tempDir, 'workspace');
-    const evidenceFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
-    const baselineFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'moqui-template-baseline.json');
-    const lexiconFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'moqui-lexicon-audit.json');
-    const capabilityMatrixFile = path.join(workspace, '.kiro', 'reports', 'handoff-capability-matrix.json');
-    const matrixRemediationPlanFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'matrix-remediation-plan.json');
+    const evidenceFile = path.join(workspace, '.sce', 'reports', 'release-evidence', 'handoff-runs.json');
+    const baselineFile = path.join(workspace, '.sce', 'reports', 'release-evidence', 'moqui-template-baseline.json');
+    const lexiconFile = path.join(workspace, '.sce', 'reports', 'release-evidence', 'moqui-lexicon-audit.json');
+    const capabilityMatrixFile = path.join(workspace, '.sce', 'reports', 'handoff-capability-matrix.json');
+    const matrixRemediationPlanFile = path.join(workspace, '.sce', 'reports', 'release-evidence', 'matrix-remediation-plan.json');
 
     await fs.ensureDir(path.dirname(evidenceFile));
     await fs.ensureDir(path.dirname(capabilityMatrixFile));
@@ -165,19 +165,19 @@ describe('moqui-release-summary script', () => {
     }));
     expect(payload.lexicon.passed).toBe(true);
     expect(payload.capability_coverage.passed).toBe(true);
-    expect(await fs.pathExists(path.join(workspace, '.kiro', 'reports', 'release-evidence', 'moqui-release-summary.json'))).toBe(true);
-    expect(await fs.pathExists(path.join(workspace, '.kiro', 'reports', 'release-evidence', 'moqui-release-summary.md'))).toBe(true);
+    expect(await fs.pathExists(path.join(workspace, '.sce', 'reports', 'release-evidence', 'moqui-release-summary.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(workspace, '.sce', 'reports', 'release-evidence', 'moqui-release-summary.md'))).toBe(true);
   });
 
   test('returns exit code 2 when gate fails with --fail-on-gate-fail', async () => {
     const projectRoot = path.resolve(__dirname, '..', '..', '..');
     const scriptPath = path.join(projectRoot, 'scripts', 'moqui-release-summary.js');
     const workspace = path.join(tempDir, 'workspace');
-    const evidenceFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
-    const baselineFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'moqui-template-baseline.json');
-    const lexiconFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'moqui-lexicon-audit.json');
-    const capabilityMatrixFile = path.join(workspace, '.kiro', 'reports', 'handoff-capability-matrix.json');
-    const matrixRemediationPlanFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'matrix-remediation-plan.json');
+    const evidenceFile = path.join(workspace, '.sce', 'reports', 'release-evidence', 'handoff-runs.json');
+    const baselineFile = path.join(workspace, '.sce', 'reports', 'release-evidence', 'moqui-template-baseline.json');
+    const lexiconFile = path.join(workspace, '.sce', 'reports', 'release-evidence', 'moqui-lexicon-audit.json');
+    const capabilityMatrixFile = path.join(workspace, '.sce', 'reports', 'handoff-capability-matrix.json');
+    const matrixRemediationPlanFile = path.join(workspace, '.sce', 'reports', 'release-evidence', 'matrix-remediation-plan.json');
 
     await fs.ensureDir(path.dirname(evidenceFile));
     await fs.ensureDir(path.dirname(capabilityMatrixFile));
@@ -353,11 +353,11 @@ describe('moqui-release-summary script', () => {
     const projectRoot = path.resolve(__dirname, '..', '..', '..');
     const scriptPath = path.join(projectRoot, 'scripts', 'moqui-release-summary.js');
     const workspace = path.join(tempDir, 'workspace');
-    const evidenceFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'handoff-runs.json');
-    const baselineFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'moqui-template-baseline.json');
-    const lexiconFile = path.join(workspace, '.kiro', 'reports', 'release-evidence', 'moqui-lexicon-audit.json');
-    const capabilityMatrixFile = path.join(workspace, '.kiro', 'reports', 'handoff-capability-matrix.json');
-    const governanceFile = path.join(workspace, '.kiro', 'reports', 'interactive-governance-report.json');
+    const evidenceFile = path.join(workspace, '.sce', 'reports', 'release-evidence', 'handoff-runs.json');
+    const baselineFile = path.join(workspace, '.sce', 'reports', 'release-evidence', 'moqui-template-baseline.json');
+    const lexiconFile = path.join(workspace, '.sce', 'reports', 'release-evidence', 'moqui-lexicon-audit.json');
+    const capabilityMatrixFile = path.join(workspace, '.sce', 'reports', 'handoff-capability-matrix.json');
+    const governanceFile = path.join(workspace, '.sce', 'reports', 'interactive-governance-report.json');
 
     await fs.ensureDir(path.dirname(evidenceFile));
     await fs.ensureDir(path.dirname(capabilityMatrixFile));

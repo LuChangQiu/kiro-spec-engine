@@ -74,7 +74,7 @@ This document defines the testing strategy for sce (Scene Capability Engine) to 
 
 **Key Finding**: Critical path coverage gap - 0% of 32 critical paths covered by integration tests
 
-For detailed analysis, see `.kiro/specs/17-00-test-suite-optimization/results/`
+For detailed analysis, see `.sce/specs/17-00-test-suite-optimization/results/`
 
 ### Spec 18-00: Integration Test Expansion
 
@@ -93,7 +93,7 @@ For detailed analysis, see `.kiro/specs/17-00-test-suite-optimization/results/`
 - **status** (3 tests): Spec reporting, empty state, counting
 - **doctor** (3 tests): Health checks, missing directories, invalid config
 
-For detailed progress, see `.kiro/specs/18-00-integration-test-expansion/PROGRESS.md`
+For detailed progress, see `.sce/specs/18-00-integration-test-expansion/PROGRESS.md`
 
 ### Current State (After Both Specs)
 - **Total Tests**: 1,353 (1,324 unit + 29 integration)

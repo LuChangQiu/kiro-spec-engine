@@ -261,9 +261,9 @@ describe('FileScanner', () => {
   describe('findSpecDirectories', () => {
     it('should find all Spec directories', async () => {
       // Create Spec directories
-      await fs.ensureDir(path.join(tempDir, '.kiro/specs/01-00-feature-a'));
-      await fs.ensureDir(path.join(tempDir, '.kiro/specs/02-00-feature-b'));
-      await fs.ensureDir(path.join(tempDir, '.kiro/specs/03-00-feature-c'));
+      await fs.ensureDir(path.join(tempDir, '.sce/specs/01-00-feature-a'));
+      await fs.ensureDir(path.join(tempDir, '.sce/specs/02-00-feature-b'));
+      await fs.ensureDir(path.join(tempDir, '.sce/specs/03-00-feature-c'));
       
       const specs = await scanner.findSpecDirectories();
       
@@ -274,8 +274,8 @@ describe('FileScanner', () => {
     });
     
     it('should exclude hidden directories', async () => {
-      await fs.ensureDir(path.join(tempDir, '.kiro/specs/01-00-feature-a'));
-      await fs.ensureDir(path.join(tempDir, '.kiro/specs/.hidden'));
+      await fs.ensureDir(path.join(tempDir, '.sce/specs/01-00-feature-a'));
+      await fs.ensureDir(path.join(tempDir, '.sce/specs/.hidden'));
       
       const specs = await scanner.findSpecDirectories();
       
@@ -284,14 +284,14 @@ describe('FileScanner', () => {
       expect(specs.some(s => s.includes('.hidden'))).toBe(false);
     });
     
-    it('should return empty array when .kiro/specs does not exist', async () => {
+    it('should return empty array when .sce/specs does not exist', async () => {
       const specs = await scanner.findSpecDirectories();
       
       expect(specs).toEqual([]);
     });
     
-    it('should return empty array when .kiro/specs is empty', async () => {
-      await fs.ensureDir(path.join(tempDir, '.kiro/specs'));
+    it('should return empty array when .sce/specs is empty', async () => {
+      await fs.ensureDir(path.join(tempDir, '.sce/specs'));
       
       const specs = await scanner.findSpecDirectories();
       
@@ -299,7 +299,7 @@ describe('FileScanner', () => {
     });
     
     it('should return absolute paths', async () => {
-      await fs.ensureDir(path.join(tempDir, '.kiro/specs/01-00-feature-a'));
+      await fs.ensureDir(path.join(tempDir, '.sce/specs/01-00-feature-a'));
       
       const specs = await scanner.findSpecDirectories();
       
@@ -311,7 +311,7 @@ describe('FileScanner', () => {
     it('should return correct Spec directory path', () => {
       const specPath = scanner.getSpecDirectory('01-00-feature-a');
       
-      expect(specPath).toBe(path.join(tempDir, '.kiro/specs/01-00-feature-a'));
+      expect(specPath).toBe(path.join(tempDir, '.sce/specs/01-00-feature-a'));
     });
     
     it('should handle different Spec names', () => {
@@ -595,7 +595,7 @@ describe('FileScanner', () => {
     
     it('should support Spec directory scanning workflow', async () => {
       // Create Spec structure
-      const specPath = path.join(tempDir, '.kiro/specs/01-00-test');
+      const specPath = path.join(tempDir, '.sce/specs/01-00-test');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');

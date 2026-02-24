@@ -9,7 +9,7 @@ describe('EnvironmentManager', () => {
   beforeEach(async () => {
     tempDir = path.join(__dirname, '../../temp', `env-manager-${Date.now()}`);
     await fs.ensureDir(tempDir);
-    await fs.ensureDir(path.join(tempDir, '.kiro'));
+    await fs.ensureDir(path.join(tempDir, '.sce'));
     manager = new EnvironmentManager(tempDir);
   });
 
@@ -24,7 +24,7 @@ describe('EnvironmentManager', () => {
     });
 
     it('should resolve project-level registry path', () => {
-      const expectedPath = path.join(tempDir, '.kiro', 'environments.json');
+      const expectedPath = path.join(tempDir, '.sce', 'environments.json');
       expect(manager.registryPath).toBe(expectedPath);
     });
 
@@ -32,7 +32,7 @@ describe('EnvironmentManager', () => {
       const wsManager = new EnvironmentManager(tempDir, 'my-workspace');
       const expectedPath = path.join(
         tempDir,
-        '.kiro',
+        '.sce',
         'workspaces',
         'my-workspace',
         'environments.json'

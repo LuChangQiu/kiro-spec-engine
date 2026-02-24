@@ -325,11 +325,11 @@ Completely transforming waterfall documents from "human high-cost burden" to "AI
 
 #### Natural Implementation of High Cohesion, Low Coupling
 
-Each feature has an independent `.kiro/specs/<name>/` folder, with the three-piece set isolated very cleanly, with coupling forcibly reduced to the minimum by design principles.
+Each feature has an independent `.sce/specs/<name>/` folder, with the three-piece set isolated very cleanly, with coupling forcibly reduced to the minimum by design principles.
 
 #### Leverage Point for Principle-Driven Agents
 
-The `.kiro/steering/` directory + steering rules are exactly what you called the "**use experience to set principles to drive agents**" implementation. AI is no longer free-wheeling but guided by rules, much more robust than simple prompt engineering.
+The `.sce/steering/` directory + steering rules are exactly what you called the "**use experience to set principles to drive agents**" implementation. AI is no longer free-wheeling but guided by rules, much more robust than simple prompt engineering.
 
 #### Ultrawork Spirit + Sisyphus Metaphor
 
@@ -380,7 +380,7 @@ Thank you for Guangyong's generous sharing! Haha, regarding "plagiarism"—I pre
 
 #### Response and Expansion on Steering Rules
 
-Your description is very precise: steering constructs a set of "regions," isolating and storing core principles, project environment, and context separately, driving operations through unified indexing. This highly aligns with the project's actual structure—from my analysis of the repository (based on the latest README and directory layout), `.kiro/steering/` is precisely this "principle level" core container, optional but powerful, used to store development rules (like coding conventions, standards, and workflow enforcement), guiding AI Agent behavioral consistency.
+Your description is very precise: steering constructs a set of "regions," isolating and storing core principles, project environment, and context separately, driving operations through unified indexing. This highly aligns with the project's actual structure—from my analysis of the repository (based on the latest README and directory layout), `.sce/steering/` is precisely this "principle level" core container, optional but powerful, used to store development rules (like coding conventions, standards, and workflow enforcement), guiding AI Agent behavioral consistency.
 
 **Regional Division and Timeliness**: This embodies the philosophical beauty of cyclical properties.
 

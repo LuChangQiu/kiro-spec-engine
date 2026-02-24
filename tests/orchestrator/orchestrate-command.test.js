@@ -240,7 +240,7 @@ describe('orchestrate status', () => {
 
   test('displays persisted status data', async () => {
     // Write a status file
-    const statusDir = path.join(tempDir, '.kiro', 'config');
+    const statusDir = path.join(tempDir, '.sce', 'config');
     fs.mkdirSync(statusDir, { recursive: true });
     const statusData = {
       status: 'completed',
@@ -274,7 +274,7 @@ describe('orchestrate status', () => {
     const now = Date.now();
     const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(now);
 
-    const statusDir = path.join(tempDir, '.kiro', 'config');
+    const statusDir = path.join(tempDir, '.sce', 'config');
     fs.mkdirSync(statusDir, { recursive: true });
     const statusData = {
       status: 'running',
@@ -304,7 +304,7 @@ describe('orchestrate status', () => {
     const now = Date.now();
     const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(now);
 
-    const statusDir = path.join(tempDir, '.kiro', 'config');
+    const statusDir = path.join(tempDir, '.sce', 'config');
     fs.mkdirSync(statusDir, { recursive: true });
     const statusData = {
       status: 'running',
@@ -336,7 +336,7 @@ describe('orchestrate status', () => {
   });
 
   test('displays persisted status in JSON mode', async () => {
-    const statusDir = path.join(tempDir, '.kiro', 'config');
+    const statusDir = path.join(tempDir, '.sce', 'config');
     fs.mkdirSync(statusDir, { recursive: true });
     const statusData = {
       status: 'running',
@@ -397,7 +397,7 @@ describe('orchestrate stop', () => {
 
   test('sends stop signal when orchestration is running', async () => {
     // Write a running status
-    const statusDir = path.join(tempDir, '.kiro', 'config');
+    const statusDir = path.join(tempDir, '.sce', 'config');
     fs.mkdirSync(statusDir, { recursive: true });
     const statusPath = path.join(statusDir, 'orchestration-status.json');
     fs.writeJsonSync(statusPath, { status: 'running', totalSpecs: 2 });
@@ -419,7 +419,7 @@ describe('orchestrate stop', () => {
   });
 
   test('shows message when orchestration already completed', async () => {
-    const statusDir = path.join(tempDir, '.kiro', 'config');
+    const statusDir = path.join(tempDir, '.sce', 'config');
     fs.mkdirSync(statusDir, { recursive: true });
     fs.writeJsonSync(
       path.join(statusDir, 'orchestration-status.json'),

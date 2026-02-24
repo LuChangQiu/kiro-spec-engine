@@ -5,8 +5,8 @@ const path = require('path');
 const fs = require('fs-extra');
 const crypto = require('crypto');
 
-const DEFAULT_OUT_PLAN = '.kiro/reports/interactive-change-plan.generated.json';
-const DEFAULT_OUT_MARKDOWN = '.kiro/reports/interactive-change-plan.generated.md';
+const DEFAULT_OUT_PLAN = '.sce/reports/interactive-change-plan.generated.json';
+const DEFAULT_OUT_MARKDOWN = '.sce/reports/interactive-change-plan.generated.md';
 const DEFAULT_AUTH_PASSWORD_HASH_ENV = 'SCE_INTERACTIVE_AUTH_PASSWORD_SHA256';
 const DEFAULT_AUTH_PASSWORD_TTL_SECONDS = 600;
 

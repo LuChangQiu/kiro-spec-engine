@@ -1,0 +1,36 @@
+apiVersion: kse.scene/v0.2
+kind: scene
+metadata:
+  obj_id: scene.erp.73-00-scene-package-gate-remediation-task-bridge
+  obj_version: 0.2.0
+  title: Scene Package Gate Remediation Task Bridge
+spec:
+  domain: erp
+  intent:
+    goal: Bridge remediation actions to executable task artifacts for deterministic gate closure
+  model_scope:
+    read:
+      - kse.SceneTemplateGateRemediation.actionId
+      - kse.SceneTemplateGateRemediation.priority
+      - kse.SceneTemplateGateRemediation.sourceCheckIds
+    write:
+      - kse.SceneTemplateGateTask.taskId
+      - kse.SceneTemplateGateTask.actionId
+      - kse.SceneTemplateGateTask.status
+  capability_contract:
+    bindings:
+      - type: query
+        ref: spec.erp.scene-template-gate-remediation.query
+        timeout_ms: 2000
+        retry: 0
+      - type: command
+        ref: spec.erp.scene-template-gate-task-bridge.sync
+        timeout_ms: 2500
+        retry: 0
+  governance_contract:
+    risk_level: low
+    approval:
+      required: false
+    idempotency:
+      required: true
+      key: sceneTemplateGateTaskBridgeRequestId

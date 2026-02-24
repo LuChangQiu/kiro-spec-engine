@@ -70,17 +70,17 @@ Use this command during template iteration before full handoff execution:
 sce auto handoff capability-matrix \
   --manifest docs/handoffs/handoff-manifest.json \
   --format markdown \
-  --out .kiro/reports/handoff-capability-matrix.md \
+  --out .sce/reports/handoff-capability-matrix.md \
   --fail-on-gap \
   --json
 ```
 
 `capability-matrix` now checks both capability coverage and semantic completeness (ontology entities/relations + governance business rules/decision logic) by default.
 
-When gaps exist, sce writes remediation queue lines (default `.kiro/auto/moqui-remediation.lines`) that can be fed directly into:
+When gaps exist, sce writes remediation queue lines (default `.sce/auto/moqui-remediation.lines`) that can be fed directly into:
 
 ```bash
-sce auto close-loop-batch .kiro/auto/moqui-remediation.lines --format lines --json
+sce auto close-loop-batch .sce/auto/moqui-remediation.lines --format lines --json
 ```
 
 ## Definition Of Done

@@ -134,7 +134,7 @@ threshold_policy:
       projectPath: tempDir
     });
 
-    expect(result.snapshot_path).toBe('.kiro/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/2026-W10.json');
+    expect(result.snapshot_path).toBe('.sce/specs/114-00-kpi-automation-and-observability/custom/weekly-metrics/2026-W10.json');
     expect(await fs.pathExists(path.join(tempDir, result.snapshot_path))).toBe(true);
   });
 

@@ -88,7 +88,7 @@ describe('AdoptionLogger', () => {
 
       logger.initialize(tempDir, adoptionId);
 
-      const logFilePath = path.join(tempDir, '.kiro', 'logs', `adopt-${adoptionId}.log`);
+      const logFilePath = path.join(tempDir, '.sce', 'logs', `adopt-${adoptionId}.log`);
       expect(fs.existsSync(logFilePath)).toBe(true);
 
       const content = fs.readFileSync(logFilePath, 'utf8');
@@ -103,7 +103,7 @@ describe('AdoptionLogger', () => {
 
       logger.initialize(tempDir, adoptionId);
 
-      const logsDir = path.join(tempDir, '.kiro', 'logs');
+      const logsDir = path.join(tempDir, '.sce', 'logs');
       expect(fs.existsSync(logsDir)).toBe(true);
     });
 
@@ -113,7 +113,7 @@ describe('AdoptionLogger', () => {
 
       logger.initialize(tempDir, adoptionId);
 
-      const logFilePath = path.join(tempDir, '.kiro', 'logs', `adopt-${adoptionId}.log`);
+      const logFilePath = path.join(tempDir, '.sce', 'logs', `adopt-${adoptionId}.log`);
       expect(fs.existsSync(logFilePath)).toBe(false);
     });
 
@@ -466,7 +466,7 @@ describe('AdoptionLogger', () => {
       logger.info('Test message 1');
       logger.info('Test message 2');
 
-      const logFilePath = path.join(tempDir, '.kiro', 'logs', `adopt-${adoptionId}.log`);
+      const logFilePath = path.join(tempDir, '.sce', 'logs', `adopt-${adoptionId}.log`);
       const content = fs.readFileSync(logFilePath, 'utf8');
 
       expect(content).toContain('Test message 1');
@@ -485,7 +485,7 @@ describe('AdoptionLogger', () => {
 
       logger.info('Test message');
 
-      const logFilePath = path.join(tempDir, '.kiro', 'logs', `adopt-${adoptionId}.log`);
+      const logFilePath = path.join(tempDir, '.sce', 'logs', `adopt-${adoptionId}.log`);
       const content = fs.readFileSync(logFilePath, 'utf8');
 
       expect(content).toMatch(/\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
@@ -503,7 +503,7 @@ describe('AdoptionLogger', () => {
 
       logger.info('Test message');
 
-      const logFilePath = path.join(tempDir, '.kiro', 'logs', `adopt-${adoptionId}.log`);
+      const logFilePath = path.join(tempDir, '.sce', 'logs', `adopt-${adoptionId}.log`);
       const content = fs.readFileSync(logFilePath, 'utf8');
 
       expect(content).toMatch(/\[\+\d+ms\]/);
@@ -538,7 +538,7 @@ describe('AdoptionLogger', () => {
       logger.info('Test message');
       logger.flush();
 
-      const logFilePath = path.join(tempDir, '.kiro', 'logs', `adopt-${adoptionId}.log`);
+      const logFilePath = path.join(tempDir, '.sce', 'logs', `adopt-${adoptionId}.log`);
       const content = fs.readFileSync(logFilePath, 'utf8');
 
       expect(content).toContain('End Time:');

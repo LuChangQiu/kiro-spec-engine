@@ -4,10 +4,10 @@
 const path = require('path');
 const fs = require('fs-extra');
 
-const DEFAULT_GATE_REPORT = '.kiro/reports/release-evidence/release-gate.json';
-const DEFAULT_OUT = '.kiro/reports/release-evidence/release-risk-remediation-bundle.json';
-const DEFAULT_MARKDOWN_OUT = '.kiro/reports/release-evidence/release-risk-remediation-bundle.md';
-const DEFAULT_LINES_OUT = '.kiro/reports/release-evidence/release-risk-remediation.commands.lines';
+const DEFAULT_GATE_REPORT = '.sce/reports/release-evidence/release-gate.json';
+const DEFAULT_OUT = '.sce/reports/release-evidence/release-risk-remediation-bundle.json';
+const DEFAULT_MARKDOWN_OUT = '.sce/reports/release-evidence/release-risk-remediation-bundle.md';
+const DEFAULT_LINES_OUT = '.sce/reports/release-evidence/release-risk-remediation.commands.lines';
 
 function parseArgs(argv) {
   const options = {
@@ -135,7 +135,7 @@ function buildRemediationPlan(gatePayload) {
     weeklyViolations.forEach(item => addReason(item));
     addCommand('node scripts/release-ops-weekly-summary.js --json');
     addCommand('node scripts/release-weekly-ops-gate.js');
-    addCommand('npx sce auto handoff evidence --file .kiro/reports/release-evidence/handoff-runs.json --json');
+    addCommand('npx sce auto handoff evidence --file .sce/reports/release-evidence/handoff-runs.json --json');
     addCommand('npx sce auto handoff regression --session-id latest --json');
     addRecommendation('Resolve weekly risk drivers first (handoff quality, governance breach, matrix regression trend).');
   }
@@ -183,7 +183,7 @@ function buildRemediationPlan(gatePayload) {
   if (driftAlerts.length > 0 || driftBlocked) {
     addReason('release-drift-alerts');
     driftAlerts.forEach(item => addReason(item));
-    addCommand('npx sce auto handoff gate-index --dir .kiro/reports/release-evidence --out .kiro/reports/release-evidence/release-gate-history.json --json');
+    addCommand('npx sce auto handoff gate-index --dir .sce/reports/release-evidence --out .sce/reports/release-evidence/release-gate-history.json --json');
     addCommand('node scripts/release-drift-evaluate.js');
     addCommand('node scripts/release-ops-weekly-summary.js --json');
     addRecommendation('Review drift trend before release and remediate consecutive failures/high-risk share spikes.');

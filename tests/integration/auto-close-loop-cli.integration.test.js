@@ -224,7 +224,7 @@ describe('auto close-loop CLI integration', () => {
   });
 
   test('supports spec-session list and prune lifecycle through CLI', async () => {
-    const specsDir = path.join(tempDir, '.kiro', 'specs');
+    const specsDir = path.join(tempDir, '.sce', 'specs');
     const oldSpec = path.join(specsDir, '121-00-old');
     const newSpec = path.join(specsDir, '122-00-new');
     await fs.ensureDir(oldSpec);
@@ -265,7 +265,7 @@ describe('auto close-loop CLI integration', () => {
   });
 
   test('exposes protection reason details for spec-session prune through CLI', async () => {
-    const specsDir = path.join(tempDir, '.kiro', 'specs');
+    const specsDir = path.join(tempDir, '.sce', 'specs');
     const activeSpec = path.join(specsDir, '121-00-active');
     const staleSpec = path.join(specsDir, '121-01-stale');
     await fs.ensureDir(activeSpec);
@@ -308,7 +308,7 @@ describe('auto close-loop CLI integration', () => {
   });
 
   test('protects controller-referenced specs in spec-session prune through CLI', async () => {
-    const specsDir = path.join(tempDir, '.kiro', 'specs');
+    const specsDir = path.join(tempDir, '.sce', 'specs');
     const activeSpec = path.join(specsDir, '121-00-controller-active');
     const staleSpec = path.join(specsDir, '121-01-stale');
     await fs.ensureDir(activeSpec);
@@ -316,7 +316,7 @@ describe('auto close-loop CLI integration', () => {
     await fs.utimes(activeSpec, new Date('2020-01-01T00:00:00.000Z'), new Date('2020-01-01T00:00:00.000Z'));
     await fs.utimes(staleSpec, new Date('2020-01-01T00:00:00.000Z'), new Date('2020-01-01T00:00:00.000Z'));
 
-    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const batchSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
     await fs.ensureDir(batchSessionDir);
     const nestedBatchSummary = path.join(batchSessionDir, 'controller-protected-summary.json');
     await fs.writeJson(nestedBatchSummary, {
@@ -332,7 +332,7 @@ describe('auto close-loop CLI integration', () => {
       ]
     }, { spaces: 2 });
 
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(controllerSessionDir);
     const controllerSessionFile = path.join(controllerSessionDir, 'controller-protected-session.json');
     await fs.writeJson(controllerSessionFile, {
@@ -377,7 +377,7 @@ describe('auto close-loop CLI integration', () => {
   });
 
   test('applies automatic spec-session retention policy in close-loop-batch CLI', async () => {
-    const specsDir = path.join(tempDir, '.kiro', 'specs');
+    const specsDir = path.join(tempDir, '.sce', 'specs');
     const oldSpec = path.join(specsDir, '121-00-old');
     const newSpec = path.join(specsDir, '122-00-new');
     await fs.ensureDir(oldSpec);
@@ -417,7 +417,7 @@ describe('auto close-loop CLI integration', () => {
   });
 
   test('fails close-loop-batch when spec-session budget hard-fail threshold is exceeded', async () => {
-    const specsDir = path.join(tempDir, '.kiro', 'specs');
+    const specsDir = path.join(tempDir, '.sce', 'specs');
     await fs.ensureDir(path.join(specsDir, '121-00-existing-a'));
     await fs.ensureDir(path.join(specsDir, '121-01-existing-b'));
 
@@ -741,7 +741,7 @@ describe('auto close-loop CLI integration', () => {
   test('supports close-loop-controller --controller-resume latest through CLI', async () => {
     const queueFile = path.join(tempDir, 'controller-resume-goals.lines');
     await fs.writeFile(queueFile, 'deliver autonomous resumed controller goal\n', 'utf8');
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(controllerSessionDir);
     const controllerSessionFile = path.join(controllerSessionDir, 'controller-resume.json');
     await fs.writeJson(controllerSessionFile, {
@@ -783,8 +783,8 @@ describe('auto close-loop CLI integration', () => {
   });
 
   test('supports auto kpi trend controller mode through CLI', async () => {
-    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const batchSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(batchSessionDir);
     await fs.ensureDir(controllerSessionDir);
 
@@ -1491,7 +1491,7 @@ describe('auto close-loop CLI integration', () => {
   });
 
   test('aggregates autonomous KPI trend through CLI', async () => {
-    const summaryDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const summaryDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
     await fs.ensureDir(summaryDir);
     const fileA = path.join(summaryDir, 'trend-a.json');
     const fileB = path.join(summaryDir, 'trend-b.json');
@@ -1539,7 +1539,7 @@ describe('auto close-loop CLI integration', () => {
   });
 
   test('supports daily KPI trend csv output through CLI', async () => {
-    const summaryDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
+    const summaryDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
     await fs.ensureDir(summaryDir);
     const outputPath = path.join(tempDir, 'kpi-trend.csv');
     const fileA = path.join(summaryDir, 'trend-day-a.json');
@@ -1669,7 +1669,7 @@ describe('auto close-loop CLI integration', () => {
   });
 
   test('supports controller-session list and prune lifecycle through CLI', async () => {
-    const sessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const sessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(sessionDir);
     const oldSession = path.join(sessionDir, 'old-controller-session.json');
     const newSession = path.join(sessionDir, 'new-controller-session.json');
@@ -1761,9 +1761,9 @@ describe('auto close-loop CLI integration', () => {
   });
 
   test('aggregates governance stats across archives through CLI', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
-    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.ensureDir(batchSessionDir);
     await fs.ensureDir(controllerSessionDir);
@@ -1803,7 +1803,7 @@ describe('auto close-loop CLI integration', () => {
       }
     }, { spaces: 2 });
 
-    const recoveryMemoryFile = path.join(tempDir, '.kiro', 'auto', 'close-loop-recovery-memory.json');
+    const recoveryMemoryFile = path.join(tempDir, '.sce', 'auto', 'close-loop-recovery-memory.json');
     await fs.ensureDir(path.dirname(recoveryMemoryFile));
     await fs.writeJson(recoveryMemoryFile, {
       version: 1,
@@ -1854,9 +1854,9 @@ describe('auto close-loop CLI integration', () => {
   });
 
   test('applies governance maintenance actions through CLI', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
-    const batchSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-batch-summaries');
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
+    const batchSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-batch-summaries');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.ensureDir(batchSessionDir);
     await fs.ensureDir(controllerSessionDir);
@@ -1917,7 +1917,7 @@ describe('auto close-loop CLI integration', () => {
     await fs.utimes(batchNew, now, now);
     await fs.utimes(controllerNew, now, now);
 
-    const recoveryMemoryFile = path.join(tempDir, '.kiro', 'auto', 'close-loop-recovery-memory.json');
+    const recoveryMemoryFile = path.join(tempDir, '.sce', 'auto', 'close-loop-recovery-memory.json');
     await fs.ensureDir(path.dirname(recoveryMemoryFile));
     await fs.writeJson(recoveryMemoryFile, {
       version: 1,
@@ -1977,7 +1977,7 @@ describe('auto close-loop CLI integration', () => {
   });
 
   test('runs governance close-loop in plan-only mode through CLI', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
     await fs.ensureDir(closeLoopSessionDir);
     const failedSession = path.join(closeLoopSessionDir, 'integration-governance-close-loop-plan-failed.json');
     await fs.writeJson(failedSession, {
@@ -2009,9 +2009,9 @@ describe('auto close-loop CLI integration', () => {
   });
 
   test('runs governance close-loop with advisory execution through CLI', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
-    const controllerSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-controller-sessions');
-    const controllerQueueFile = path.join(tempDir, '.kiro', 'auto', 'integration-governance-controller-queue.lines');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
+    const controllerSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-controller-sessions');
+    const controllerQueueFile = path.join(tempDir, '.sce', 'auto', 'integration-governance-controller-queue.lines');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.ensureDir(controllerSessionDir);
     await fs.ensureDir(path.dirname(controllerQueueFile));
@@ -2078,7 +2078,7 @@ describe('auto close-loop CLI integration', () => {
   });
 
   test('persists and resumes governance close-loop session through CLI', async () => {
-    const closeLoopSessionDir = path.join(tempDir, '.kiro', 'auto', 'close-loop-sessions');
+    const closeLoopSessionDir = path.join(tempDir, '.sce', 'auto', 'close-loop-sessions');
     await fs.ensureDir(closeLoopSessionDir);
     await fs.writeJson(path.join(closeLoopSessionDir, 'integration-governance-resume-failed-session.json'), {
       session_id: 'integration-governance-resume-failed-session',
@@ -2184,7 +2184,7 @@ describe('auto close-loop CLI integration', () => {
   });
 
   test('applies governance session retention policy through CLI', async () => {
-    const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
+    const governanceSessionDir = path.join(tempDir, '.sce', 'auto', 'governance-close-loop-sessions');
     await fs.ensureDir(governanceSessionDir);
     const staleFile = path.join(governanceSessionDir, 'integration-governance-retention-stale.json');
     await fs.writeJson(staleFile, {
@@ -2225,7 +2225,7 @@ describe('auto close-loop CLI integration', () => {
   });
 
   test('supports governance session list/stats/prune lifecycle through CLI', async () => {
-    const governanceSessionDir = path.join(tempDir, '.kiro', 'auto', 'governance-close-loop-sessions');
+    const governanceSessionDir = path.join(tempDir, '.sce', 'auto', 'governance-close-loop-sessions');
     await fs.ensureDir(governanceSessionDir);
 
     const oldSession = path.join(governanceSessionDir, 'integration-governance-session-old.json');

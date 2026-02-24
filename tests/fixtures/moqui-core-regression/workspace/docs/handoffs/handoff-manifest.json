@@ -5,8 +5,8 @@
     {
       "id": "60-10-moqui-core-order-query",
       "status": "completed",
-      "scene_package": ".kiro/specs/60-10-moqui-core-order-query/custom/scene-package.json",
-      "scene_manifest": ".kiro/specs/60-10-moqui-core-order-query/custom/scene.yaml"
+      "scene_package": ".sce/specs/60-10-moqui-core-order-query/custom/scene-package.json",
+      "scene_manifest": ".sce/specs/60-10-moqui-core-order-query/custom/scene.yaml"
     }
   ],
   "templates": [

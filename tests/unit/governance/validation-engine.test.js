@@ -69,7 +69,7 @@ describe('ValidationEngine', () => {
   
   describe('validateSpec', () => {
     test('should pass when Spec has all required files', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -82,7 +82,7 @@ describe('ValidationEngine', () => {
     });
     
     test('should detect missing required files', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       // Missing design.md and tasks.md
@@ -105,7 +105,7 @@ describe('ValidationEngine', () => {
     });
     
     test('should warn about misplaced artifacts', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -121,7 +121,7 @@ describe('ValidationEngine', () => {
     });
     
     test('should warn about non-standard subdirectories', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -137,7 +137,7 @@ describe('ValidationEngine', () => {
     });
     
     test('should not warn about hidden subdirectories', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -151,7 +151,7 @@ describe('ValidationEngine', () => {
     });
     
     test('should validate standard subdirectories as compliant', async () => {
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -170,8 +170,8 @@ describe('ValidationEngine', () => {
   describe('validateAllSpecs', () => {
     test('should validate multiple Specs', async () => {
       // Create two Specs
-      const spec1Path = path.join(testDir, '.kiro/specs/spec-1');
-      const spec2Path = path.join(testDir, '.kiro/specs/spec-2');
+      const spec1Path = path.join(testDir, '.sce/specs/spec-1');
+      const spec2Path = path.join(testDir, '.sce/specs/spec-2');
       
       await fs.ensureDir(spec1Path);
       await fs.writeFile(path.join(spec1Path, 'requirements.md'), '# Requirements');
@@ -189,8 +189,8 @@ describe('ValidationEngine', () => {
     });
     
     test('should pass when all Specs are compliant', async () => {
-      const spec1Path = path.join(testDir, '.kiro/specs/spec-1');
-      const spec2Path = path.join(testDir, '.kiro/specs/spec-2');
+      const spec1Path = path.join(testDir, '.sce/specs/spec-1');
+      const spec2Path = path.join(testDir, '.sce/specs/spec-2');
       
       await fs.ensureDir(spec1Path);
       await fs.writeFile(path.join(spec1Path, 'requirements.md'), '# Requirements');
@@ -213,7 +213,7 @@ describe('ValidationEngine', () => {
     test('should include summary statistics', async () => {
       await fs.writeFile(path.join(testDir, 'TEMP-1.md'), '# Temp');
       
-      const specPath = path.join(testDir, '.kiro/specs/test-spec');
+      const specPath = path.join(testDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       // Missing design.md and tasks.md

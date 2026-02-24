@@ -36,7 +36,7 @@ const LEGACY_PATTERNS = [
 ];
 
 const EXCLUDE_PREFIXES = [
-  '.kiro/',
+  '.sce/',
   'tests/fixtures/',
   'node_modules/'
 ];

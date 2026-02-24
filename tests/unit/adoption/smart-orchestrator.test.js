@@ -69,7 +69,7 @@ describe('SmartOrchestrator', () => {
   });
 
   describe('Mode Selection', () => {
-    test('should select fresh mode when no .kiro/ directory exists', async () => {
+    test('should select fresh mode when no .sce/ directory exists', async () => {
       mockDetectionEngine.analyze.mockResolvedValue({
         hasKiroDir: false,
         hasVersionFile: false,
@@ -97,7 +97,7 @@ describe('SmartOrchestrator', () => {
 
       mockStrategy.execute.mockResolvedValue({
         success: true,
-        filesCreated: ['.kiro/', '.kiro/specs/'],
+        filesCreated: ['.sce/', '.sce/specs/'],
         filesUpdated: [],
         filesSkipped: [],
         errors: [],
@@ -110,7 +110,7 @@ describe('SmartOrchestrator', () => {
       expect(result.mode).toBe('fresh');
     });
 
-    test('should select smart-adopt mode when .kiro/ exists but no version file', async () => {
+    test('should select smart-adopt mode when .sce/ exists but no version file', async () => {
       mockDetectionEngine.analyze.mockResolvedValue({
         hasKiroDir: true,
         hasVersionFile: false,
@@ -278,7 +278,7 @@ describe('SmartOrchestrator', () => {
 
       mockBackupManager.createMandatoryBackup.mockResolvedValue({
         id: 'backup-20260127-143022',
-        location: '/test/project/.kiro/backups/backup-20260127-143022',
+        location: '/test/project/.sce/backups/backup-20260127-143022',
         filesCount: 1,
         totalSize: 1024,
         timestamp: new Date(),
@@ -432,7 +432,7 @@ describe('SmartOrchestrator', () => {
 
       const backupResult = {
         id: 'backup-20260127-143022',
-        location: '/test/project/.kiro/backups/backup-20260127-143022',
+        location: '/test/project/.sce/backups/backup-20260127-143022',
         filesCount: 1,
         timestamp: new Date()
       };
@@ -485,7 +485,7 @@ describe('SmartOrchestrator', () => {
 
       mockStrategy.execute.mockResolvedValue({
         success: true,
-        filesCreated: ['.kiro/', '.kiro/specs/', 'steering/CORE_PRINCIPLES.md'],
+        filesCreated: ['.sce/', '.sce/specs/', 'steering/CORE_PRINCIPLES.md'],
         filesUpdated: [],
         filesSkipped: [],
         errors: [],
@@ -500,7 +500,7 @@ describe('SmartOrchestrator', () => {
 
       expect(result.success).toBe(true);
       expect(result.mode).toBe('fresh');
-      expect(result.changes.created).toContain('.kiro/');
+      expect(result.changes.created).toContain('.sce/');
       expect(mockStrategy.execute).toHaveBeenCalledWith(
         '/test/project',
         'fresh',
@@ -538,7 +538,7 @@ describe('SmartOrchestrator', () => {
 
       mockBackupManager.createMandatoryBackup.mockResolvedValue({
         id: 'backup-20260127-143022',
-        location: '/test/project/.kiro/backups/backup-20260127-143022',
+        location: '/test/project/.sce/backups/backup-20260127-143022',
         filesCount: 1,
         totalSize: 1024,
         timestamp: new Date(),
@@ -667,7 +667,7 @@ describe('SmartOrchestrator', () => {
         mode: 'smart-update',
         backup: {
           id: 'backup-20260127-143022',
-          location: '/test/project/.kiro/backups/backup-20260127-143022',
+          location: '/test/project/.sce/backups/backup-20260127-143022',
           filesCount: 3
         },
         changes: {
@@ -698,7 +698,7 @@ describe('SmartOrchestrator', () => {
         backup: null,
         changes: {
           updated: [],
-          created: ['.kiro/'],
+          created: ['.sce/'],
           deleted: [],
           preserved: []
         },

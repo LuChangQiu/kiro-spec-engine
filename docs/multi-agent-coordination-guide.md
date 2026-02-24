@@ -33,7 +33,7 @@ All components are **zero overhead in single-agent mode** — they become no-ops
 
 ### 1. Enable Multi-Agent Mode
 
-Create the configuration file `.kiro/config/multi-agent.json`:
+Create the configuration file `.sce/config/multi-agent.json`:
 
 ```json
 {
@@ -104,7 +104,7 @@ await registry.deregister(agentId);
 │          │  Manager │  Store   │            │        │
 ├──────────┴──────────┴──────────┴────────────┴────────┤
 │              MultiAgentConfig                        │
-│         .kiro/config/multi-agent.json                │
+│         .sce/config/multi-agent.json                │
 ├──────────────────────────────────────────────────────┤
 │  v1.44.0: Spec-Level Steering & Context Sync        │
 │  SpecSteering │ SteeringLoader │ ContextSyncManager  │
@@ -121,7 +121,7 @@ await registry.deregister(agentId);
 Manages agent lifecycle with heartbeat-based health monitoring.
 
 **File**: `lib/collab/agent-registry.js`  
-**Storage**: `.kiro/config/agent-registry.json`
+**Storage**: `.sce/config/agent-registry.json`
 
 ```javascript
 const { AgentRegistry } = require('scene-capability-engine/lib/collab');
@@ -154,7 +154,7 @@ await registry.deregister(agentId);
 File-based mutual exclusion for task ownership.
 
 **File**: `lib/lock/task-lock-manager.js`  
-**Lock files**: `.kiro/specs/{specName}/locks/{taskId}.lock`
+**Lock files**: `.sce/specs/{specName}/locks/{taskId}.lock`
 
 ```javascript
 const { TaskLockManager } = require('scene-capability-engine/lib/lock');
@@ -218,7 +218,7 @@ await store.unclaimTask(specName, taskId, agentId, username);
 
 ### Steering File Lock
 
-Write serialization for steering files (`.kiro/steering/*.md`).
+Write serialization for steering files (`.sce/steering/*.md`).
 
 **File**: `lib/lock/steering-file-lock.js`
 
@@ -239,7 +239,7 @@ await steeringLock.releaseLock('CURRENT_CONTEXT.md', lockId);
 
 // Degraded write (when lock cannot be acquired)
 await steeringLock.writePending('CURRENT_CONTEXT.md', content, agentId);
-// Creates: .kiro/steering/CURRENT_CONTEXT.md.pending.{agentId}
+// Creates: .sce/steering/CURRENT_CONTEXT.md.pending.{agentId}
 ```
 
 ### Merge Coordinator
@@ -274,7 +274,7 @@ await merger.cleanupBranch(branchName);
 When `coordinator: true` in config, provides intelligent task assignment based on dependency analysis.
 
 **File**: `lib/collab/coordinator.js`  
-**Log**: `.kiro/config/coordination-log.json`
+**Log**: `.sce/config/coordination-log.json`
 
 ```javascript
 const { Coordinator } = require('scene-capability-engine/lib/collab');
@@ -300,7 +300,7 @@ const { specs, agents } = await coordinator.getProgress();
 Per-Spec `steering.md` providing independent constraints, notes, and decisions for each Spec. Eliminates cross-agent write conflicts on global steering files.
 
 **File**: `lib/steering/spec-steering.js`  
-**Storage**: `.kiro/specs/{spec-name}/steering.md`
+**Storage**: `.sce/specs/{spec-name}/steering.md`
 
 ```javascript
 const { SpecSteering } = require('scene-capability-engine/lib/steering');
@@ -377,7 +377,7 @@ await syncManager.writeContext(newContext);
 State machine managing Spec lifecycle transitions with auto-completion detection.
 
 **File**: `lib/collab/spec-lifecycle-manager.js`  
-**Storage**: `.kiro/specs/{spec-name}/lifecycle.json`
+**Storage**: `.sce/specs/{spec-name}/lifecycle.json`
 
 Valid transitions: `planned → assigned → in-progress → completed → released`
 
@@ -499,7 +499,7 @@ All components check `MultiAgentConfig.isEnabled()` before doing anything:
 
 ## Configuration Reference
 
-### `.kiro/config/multi-agent.json`
+### `.sce/config/multi-agent.json`
 
 ```json
 {
@@ -514,15 +514,15 @@ All components check `MultiAgentConfig.isEnabled()` before doing anything:
 
 | File | Purpose |
 |------|---------|
-| `.kiro/config/multi-agent.json` | Multi-agent configuration |
-| `.kiro/config/agent-registry.json` | Active agent registry |
-| `.kiro/config/coordination-log.json` | Coordinator assignment log |
-| `.kiro/specs/{spec}/locks/{taskId}.lock` | Task lock files |
-| `.kiro/specs/{spec}/tasks.md.lock` | tasks.md file lock |
-| `.kiro/specs/{spec}/steering.md` | Spec-level steering (L4) |
-| `.kiro/specs/{spec}/lifecycle.json` | Spec lifecycle state |
-| `.kiro/steering/{file}.lock` | Steering file locks |
-| `.kiro/steering/{file}.pending.{agentId}` | Pending steering writes |
+| `.sce/config/multi-agent.json` | Multi-agent configuration |
+| `.sce/config/agent-registry.json` | Active agent registry |
+| `.sce/config/coordination-log.json` | Coordinator assignment log |
+| `.sce/specs/{spec}/locks/{taskId}.lock` | Task lock files |
+| `.sce/specs/{spec}/tasks.md.lock` | tasks.md file lock |
+| `.sce/specs/{spec}/steering.md` | Spec-level steering (L4) |
+| `.sce/specs/{spec}/lifecycle.json` | Spec lifecycle state |
+| `.sce/steering/{file}.lock` | Steering file locks |
+| `.sce/steering/{file}.pending.{agentId}` | Pending steering writes |
 
 ---
 

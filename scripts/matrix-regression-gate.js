@@ -4,8 +4,8 @@
 const path = require('path');
 const fs = require('fs-extra');
 
-const DEFAULT_BASELINE = '.kiro/reports/release-evidence/moqui-template-baseline.json';
-const DEFAULT_OUT = '.kiro/reports/release-evidence/matrix-regression-gate.json';
+const DEFAULT_BASELINE = '.sce/reports/release-evidence/moqui-template-baseline.json';
+const DEFAULT_OUT = '.sce/reports/release-evidence/matrix-regression-gate.json';
 
 function parseArgs(argv) {
   const options = {

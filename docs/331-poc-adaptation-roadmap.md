@@ -15,7 +15,7 @@
    - 一条命令串行执行 `plan -> queue -> close-loop-batch -> observability`。
    - 支持 `--dry-run` 与失败自动中断。
 7. 新增 handoff 结果归档：
-   - 默认输出 `.kiro/reports/handoff-runs/<session>.json`。
+   - 默认输出 `.sce/reports/handoff-runs/<session>.json`。
    - 汇总每个 spec 的执行状态与阻塞项。
 8. 新增 handoff 门禁策略：
    - `--min-spec-success-rate`
@@ -33,7 +33,7 @@
    - `sce auto handoff run --continue-from <session|latest|file>`。
    - 支持 `--continue-strategy auto|pending|failed-only`。
 13. 新增 release evidence 自动归并：
-   - `handoff run` 结束后自动将批次结果合并到 `.kiro/reports/release-evidence/handoff-runs.json`。
+   - `handoff run` 结束后自动将批次结果合并到 `.sce/reports/release-evidence/handoff-runs.json`。
    - 按 `session_id` 去重更新，失败时写 warning 不阻塞主流程。
 14. 新增回归可视化报表增强：
    - `handoff regression` 输出增加 `risk_layers` 风险分层视图（low/medium/high/unknown）。
@@ -142,7 +142,7 @@
    - `release.yml` 的 Evaluate drift 步骤改为直接调用脚本，消除大段内联 heredoc，降低语法错误与维护成本。
    - 新增 `tests/unit/scripts/release-drift-evaluate.test.js` 覆盖 advisory/enforce/missing history/gate report 写回四类场景。
 2. handoff 质量指标接入 governance 默认评估闭环：
-   - `sce auto governance stats` 默认聚合 `.kiro/reports/release-evidence/handoff-runs.json`，输出 `health.handoff_quality` 快照。
+   - `sce auto governance stats` 默认聚合 `.sce/reports/release-evidence/handoff-runs.json`，输出 `health.handoff_quality` 快照。
    - `risk/concerns/recommendations` 自动纳入 handoff 最新状态、gate、ontology、capability、preflight 阻断等信号。
    - `sce auto governance close-loop` 的阻断判断纳入 handoff 严重质量信号，统一通过 `stop_reason=release-gate-blocked` 回传处置语义。
    - `sce auto governance maintain` 在 handoff 质量阻断时新增 `release-gate-handoff-remediate` 建议动作。

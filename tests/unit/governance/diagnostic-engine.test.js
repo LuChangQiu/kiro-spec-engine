@@ -106,7 +106,7 @@ describe('DiagnosticEngine', () => {
     
     beforeEach(async () => {
       // Create Spec directory structure
-      specPath = path.join(tempDir, '.kiro/specs/test-spec');
+      specPath = path.join(tempDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
     });
     
@@ -244,8 +244,8 @@ describe('DiagnosticEngine', () => {
   describe('scanSpecDirectories', () => {
     it('should scan all Spec directories', async () => {
       // Create multiple Spec directories
-      const spec1Path = path.join(tempDir, '.kiro/specs/spec-1');
-      const spec2Path = path.join(tempDir, '.kiro/specs/spec-2');
+      const spec1Path = path.join(tempDir, '.sce/specs/spec-1');
+      const spec2Path = path.join(tempDir, '.sce/specs/spec-2');
       
       await fs.ensureDir(spec1Path);
       await fs.ensureDir(spec2Path);
@@ -271,7 +271,7 @@ describe('DiagnosticEngine', () => {
       await fs.writeFile(path.join(tempDir, 'EXTRA.md'), '# EXTRA');
       
       // Create Spec with missing files
-      const specPath = path.join(tempDir, '.kiro/specs/test-spec');
+      const specPath = path.join(tempDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       
       const engine = new DiagnosticEngine(tempDir, config);
@@ -378,7 +378,7 @@ describe('DiagnosticEngine', () => {
       await fs.writeFile(path.join(tempDir, 'EXTRA.md'), '# EXTRA');
       await fs.writeFile(path.join(tempDir, 'TEMP-FILE.md'), '# TEMP');
       
-      const specPath = path.join(tempDir, '.kiro/specs/test-spec');
+      const specPath = path.join(tempDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       
       const engine = new DiagnosticEngine(tempDir, config);
@@ -423,7 +423,7 @@ describe('DiagnosticEngine', () => {
     });
     
     it('should recommend archive for misplaced artifacts', async () => {
-      const specPath = path.join(tempDir, '.kiro/specs/test-spec');
+      const specPath = path.join(tempDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       await fs.writeFile(path.join(specPath, 'design.md'), '# Design');
@@ -463,7 +463,7 @@ describe('DiagnosticEngine', () => {
   
   describe('edge cases', () => {
     it('should handle Spec with only some required files', async () => {
-      const specPath = path.join(tempDir, '.kiro/specs/test-spec');
+      const specPath = path.join(tempDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements');
       
@@ -475,7 +475,7 @@ describe('DiagnosticEngine', () => {
     });
     
     it('should handle mixed violations in Spec', async () => {
-      const specPath = path.join(tempDir, '.kiro/specs/test-spec');
+      const specPath = path.join(tempDir, '.sce/specs/test-spec');
       await fs.ensureDir(specPath);
       
       // Missing required files (will create 3 violations)

@@ -12,7 +12,7 @@ The Knowledge Management system allows you to build and maintain a personal know
 sce knowledge init
 ```
 
-This creates `.kiro/knowledge/` directory with:
+This creates `.sce/knowledge/` directory with:
 - `patterns/` - Design patterns and solutions
 - `lessons/` - Lessons learned
 - `workflows/` - Custom workflows
@@ -168,7 +168,7 @@ Use consistent, descriptive tags:
 
 ### Custom Templates
 
-Create custom templates in `.kiro/knowledge/.templates/`:
+Create custom templates in `.sce/knowledge/.templates/`:
 
 ```markdown
 ---
@@ -233,7 +233,7 @@ Error: Failed to load index
 **Solution**: Rebuild index:
 ```bash
 # Delete index.json
-rm .kiro/knowledge/index.json
+rm .sce/knowledge/index.json
 
 # Reinitialize
 sce knowledge init
@@ -242,16 +242,16 @@ sce knowledge init
 ## FAQ
 
 **Q: Where is knowledge stored?**  
-A: In `.kiro/knowledge/` directory, organized by type.
+A: In `.sce/knowledge/` directory, organized by type.
 
 **Q: Can I edit entries manually?**  
 A: Yes, they're just Markdown files with YAML frontmatter.
 
 **Q: How do I share knowledge with team?**  
-A: Commit `.kiro/knowledge/` to git (except `.backups/`).
+A: Commit `.sce/knowledge/` to git (except `.backups/`).
 
 **Q: Can I use custom entry types?**  
-A: Yes, create custom templates in `.kiro/knowledge/.templates/`.
+A: Yes, create custom templates in `.sce/knowledge/.templates/`.
 
 **Q: How do I backup my knowledge?**  
 A: Use `sce knowledge export` or commit to git.

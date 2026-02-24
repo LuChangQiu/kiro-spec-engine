@@ -30,7 +30,7 @@ sce status
 # If issues are detected, run diagnostics
 sce doctor
 
-# Adopt the project (creates .kiro/ directory)
+# Adopt the project (creates .sce/ directory)
 sce adopt
 
 # sce is now managing your project autonomously
@@ -161,7 +161,7 @@ Run a command in the context of the current environment. Ensures the active envi
 The backup system automatically:
 - Creates timestamped backups before each environment switch
 - Maintains up to 10 backups per target file
-- Stores backups in `.kiro/env-backups/`
+- Stores backups in `.sce/env-backups/`
 - Automatically cleans up old backups
 
 ## Best Practices
@@ -169,11 +169,11 @@ The backup system automatically:
 1. **Adopt projects with sce**: Run `sce adopt` to let sce manage your project autonomously, enabling faster AI-assisted development without constant confirmations
 2. **Use descriptive names**: Choose clear, descriptive names for your environments
 3. **Keep source files in version control**: Store all environment-specific configuration files in your repository
-4. **Selective .kiro/ version control**: Use layered .gitignore strategy:
-   - ✅ **DO commit**: `.kiro/specs/` (Spec documents), `.kiro/steering/CORE_PRINCIPLES.md`, `.kiro/steering/ENVIRONMENT.md`, `.kiro/steering/RULES_GUIDE.md`, `.kiro/tools/`, `.kiro/config/`
-   - ❌ **DO NOT commit**: `.kiro/steering/CURRENT_CONTEXT.md` (personal context), `.kiro/environments.json` (user-specific), `.kiro/backups/`, `.kiro/logs/`, `.kiro/reports/`
+4. **Selective .sce/ version control**: Use layered .gitignore strategy:
+   - ✅ **DO commit**: `.sce/specs/` (Spec documents), `.sce/steering/CORE_PRINCIPLES.md`, `.sce/steering/ENVIRONMENT.md`, `.sce/steering/RULES_GUIDE.md`, `.sce/tools/`, `.sce/config/`
+   - ❌ **DO NOT commit**: `.sce/steering/CURRENT_CONTEXT.md` (personal context), `.sce/environments.json` (user-specific), `.sce/backups/`, `.sce/logs/`, `.sce/reports/`
    - **Why**: Share Spec documents and team rules, but avoid conflicts from personal state and user-specific configurations
-5. **Share environment templates**: Commit environment configuration JSON files (e.g., `env-local.json`, `env-production.json`) to your repository root or a `config/` directory, not in `.kiro/`
+5. **Share environment templates**: Commit environment configuration JSON files (e.g., `env-local.json`, `env-production.json`) to your repository root or a `config/` directory, not in `.sce/`
 6. **Test switches**: Test environment switches in a safe environment before using in production
 7. **Regular backups**: The system creates automatic backups, but consider additional backup strategies for critical configurations
 8. **Document verification**: Add verification rules to catch configuration errors early

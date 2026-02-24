@@ -63,7 +63,7 @@ Run matrix regression gate in release pipeline (configurable):
 
 ```bash
 node scripts/matrix-regression-gate.js \
-  --baseline .kiro/reports/release-evidence/moqui-template-baseline.json \
+  --baseline .sce/reports/release-evidence/moqui-template-baseline.json \
   --max-regressions 0 \
   --enforce \
   --json
@@ -82,20 +82,20 @@ Security baseline:
 
 ## 5. Evidence Artifacts (Must Keep)
 
-- `.kiro/reports/interactive-governance-report.json`
-- `.kiro/reports/interactive-governance-report.md`
-- `.kiro/reports/interactive-matrix-signals.jsonl`
-- `.kiro/reports/release-evidence/moqui-template-baseline.json`
-- `.kiro/reports/release-evidence/matrix-regression-gate-<tag>.json`
-- `.kiro/reports/release-evidence/matrix-remediation-plan-<tag>.json`
-- `.kiro/reports/release-evidence/matrix-remediation-<tag>.lines`
-- `.kiro/reports/release-evidence/matrix-remediation-high-<tag>.lines`
-- `.kiro/reports/release-evidence/matrix-remediation-medium-<tag>.lines`
-- `.kiro/reports/release-evidence/matrix-remediation-goals-high-<tag>.json`
-- `.kiro/reports/release-evidence/matrix-remediation-goals-medium-<tag>.json`
-- `.kiro/reports/release-evidence/matrix-remediation-phased-plan-<tag>.json`
-- `.kiro/reports/release-evidence/weekly-ops-summary-<tag>.json`
-- `.kiro/reports/release-evidence/weekly-ops-summary-<tag>.md`
+- `.sce/reports/interactive-governance-report.json`
+- `.sce/reports/interactive-governance-report.md`
+- `.sce/reports/interactive-matrix-signals.jsonl`
+- `.sce/reports/release-evidence/moqui-template-baseline.json`
+- `.sce/reports/release-evidence/matrix-regression-gate-<tag>.json`
+- `.sce/reports/release-evidence/matrix-remediation-plan-<tag>.json`
+- `.sce/reports/release-evidence/matrix-remediation-<tag>.lines`
+- `.sce/reports/release-evidence/matrix-remediation-high-<tag>.lines`
+- `.sce/reports/release-evidence/matrix-remediation-medium-<tag>.lines`
+- `.sce/reports/release-evidence/matrix-remediation-goals-high-<tag>.json`
+- `.sce/reports/release-evidence/matrix-remediation-goals-medium-<tag>.json`
+- `.sce/reports/release-evidence/matrix-remediation-phased-plan-<tag>.json`
+- `.sce/reports/release-evidence/weekly-ops-summary-<tag>.json`
+- `.sce/reports/release-evidence/weekly-ops-summary-<tag>.md`
 
 ## 6. Pass Criteria
 
@@ -110,14 +110,14 @@ When matrix regressions are detected:
 
 ```bash
 node scripts/moqui-matrix-remediation-queue.js \
-  --baseline .kiro/reports/release-evidence/moqui-template-baseline.json \
-  --lines-out .kiro/auto/matrix-remediation.lines \
-  --batch-json-out .kiro/auto/matrix-remediation.goals.json \
-  --commands-out .kiro/reports/release-evidence/matrix-remediation-commands.md \
+  --baseline .sce/reports/release-evidence/moqui-template-baseline.json \
+  --lines-out .sce/auto/matrix-remediation.lines \
+  --batch-json-out .sce/auto/matrix-remediation.goals.json \
+  --commands-out .sce/reports/release-evidence/matrix-remediation-commands.md \
   --json
 
 # anti-429 phased mode (recommended default)
-sce auto close-loop-batch .kiro/auto/matrix-remediation.goals.high.json \
+sce auto close-loop-batch .sce/auto/matrix-remediation.goals.high.json \
   --format json \
   --batch-parallel 1 \
   --batch-agent-budget 2 \
@@ -125,7 +125,7 @@ sce auto close-loop-batch .kiro/auto/matrix-remediation.goals.high.json \
   --batch-retry-max-rounds 3 \
   --json
 sleep 30
-sce auto close-loop-batch .kiro/auto/matrix-remediation.goals.medium.json \
+sce auto close-loop-batch .sce/auto/matrix-remediation.goals.medium.json \
   --format json \
   --batch-parallel 1 \
   --batch-agent-budget 2 \
@@ -138,11 +138,11 @@ npm run run:matrix-remediation-phased -- --json
 
 # zero-prep one-shot (prepare from baseline + run phased)
 node scripts/moqui-matrix-remediation-phased-runner.js \
-  --baseline .kiro/reports/release-evidence/moqui-template-baseline.json \
+  --baseline .sce/reports/release-evidence/moqui-template-baseline.json \
   --json
 npm run run:matrix-remediation-from-baseline -- --json
 
 # fallback
-sce auto close-loop-batch .kiro/auto/matrix-remediation.lines --json
-sce auto close-loop-batch .kiro/auto/matrix-remediation.goals.json --format json --json
+sce auto close-loop-batch .sce/auto/matrix-remediation.lines --json
+sce auto close-loop-batch .sce/auto/matrix-remediation.goals.json --format json --json
 ```

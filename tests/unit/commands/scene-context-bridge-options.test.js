@@ -8,8 +8,8 @@ describe('scene context-bridge option helpers', () => {
     const normalized = normalizeSceneContextBridgeOptions({
       input: ' data/moqui-payload.json ',
       provider: ' MOQUI ',
-      outContext: ' .kiro/reports/context.json ',
-      outReport: ' .kiro/reports/context-report.json ',
+      outContext: ' .sce/reports/context.json ',
+      outReport: ' .sce/reports/context-report.json ',
       contextContract: ' docs/interactive-customization/moqui-copilot-context-contract.json ',
       strictContract: false,
       json: true
@@ -17,8 +17,8 @@ describe('scene context-bridge option helpers', () => {
 
     expect(normalized.input).toBe('data/moqui-payload.json');
     expect(normalized.provider).toBe('moqui');
-    expect(normalized.outContext).toBe('.kiro/reports/context.json');
-    expect(normalized.outReport).toBe('.kiro/reports/context-report.json');
+    expect(normalized.outContext).toBe('.sce/reports/context.json');
+    expect(normalized.outReport).toBe('.sce/reports/context-report.json');
     expect(normalized.contextContract).toBe('docs/interactive-customization/moqui-copilot-context-contract.json');
     expect(normalized.strictContract).toBe(false);
     expect(normalized.json).toBe(true);

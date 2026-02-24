@@ -147,8 +147,8 @@ program
       projectName = answers.projectName;
     }
 
-    // 检查是否已存在 .kiro 目录
-    const kiroDir = path.join(process.cwd(), '.kiro');
+    // 检查是否已存在 .sce 目录
+    const kiroDir = path.join(process.cwd(), '.sce');
     if (fs.existsSync(kiroDir) && !options.force) {
       console.log(chalk.yellow(t('cli.commands.init.alreadyExists')));
       const { overwrite } = await inquirer.prompt([
@@ -197,7 +197,7 @@ program
     console.log(chalk.red('🔥') + ` Starting ${stage} stage Ultrawork enhancement...`);
     
     // 检查 Python 和工具是否可用
-    const toolPath = path.join(process.cwd(), '.kiro/tools/ultrawork_enhancer.py');
+    const toolPath = path.join(process.cwd(), '.sce/tools/ultrawork_enhancer.py');
     if (!fs.existsSync(toolPath)) {
       console.error(chalk.red('❌ Ultrawork tool not found. Please run: sce init'));
       process.exit(1);
@@ -236,7 +236,7 @@ program
   .option('-t, --template <template-id>', 'Use a template from the library')
   .option('-f, --force', 'Overwrite existing spec directory')
   .action(async (specName, options) => {
-    const specPath = path.join(process.cwd(), '.kiro/specs', specName);
+    const specPath = path.join(process.cwd(), '.sce/specs', specName);
     
     try {
       // Check if using template
@@ -759,8 +759,8 @@ templatesCmd
 
 // 更新项目配置的辅助函数
 async function updateProjectConfig(projectName) {
-  const envPath = path.join(process.cwd(), '.kiro/steering/ENVIRONMENT.md');
-  const contextPath = path.join(process.cwd(), '.kiro/steering/CURRENT_CONTEXT.md');
+  const envPath = path.join(process.cwd(), '.sce/steering/ENVIRONMENT.md');
+  const contextPath = path.join(process.cwd(), '.sce/steering/CURRENT_CONTEXT.md');
 
   // 更新 ENVIRONMENT.md
   if (fs.existsSync(envPath)) {

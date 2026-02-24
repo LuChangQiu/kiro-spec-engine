@@ -5,10 +5,10 @@ const path = require('path');
 const fs = require('fs-extra');
 
 const DEFAULT_MANIFEST = 'docs/handoffs/handoff-manifest.json';
-const DEFAULT_TEMPLATE_DIR = '.kiro/templates/scene-packages';
+const DEFAULT_TEMPLATE_DIR = '.sce/templates/scene-packages';
 const DEFAULT_LEXICON = 'lib/data/moqui-capability-lexicon.json';
-const DEFAULT_OUT = '.kiro/reports/release-evidence/moqui-lexicon-audit.json';
-const DEFAULT_MARKDOWN_OUT = '.kiro/reports/release-evidence/moqui-lexicon-audit.md';
+const DEFAULT_OUT = '.sce/reports/release-evidence/moqui-lexicon-audit.json';
+const DEFAULT_MARKDOWN_OUT = '.sce/reports/release-evidence/moqui-lexicon-audit.md';
 
 function parseArgs(argv) {
   const options = {

@@ -34,7 +34,7 @@ describe('OperationsManager', () => {
       const projectName = 'test-project';
       const operationsPath = await manager.createOperationsSpec(projectName);
       
-      expect(operationsPath).toBe(path.join(testRoot, '.kiro/specs', projectName, 'operations'));
+      expect(operationsPath).toBe(path.join(testRoot, '.sce/specs', projectName, 'operations'));
       
       // Check directory exists
       const exists = await fs.pathExists(operationsPath);
@@ -75,7 +75,7 @@ describe('OperationsManager', () => {
       
       await manager.createOperationsSpec(projectName, version);
       
-      const metadataPath = path.join(testRoot, '.kiro/specs', projectName, 'operations/.metadata.json');
+      const metadataPath = path.join(testRoot, '.sce/specs', projectName, 'operations/.metadata.json');
       const metadataExists = await fs.pathExists(metadataPath);
       expect(metadataExists).toBe(true);
       
@@ -113,7 +113,7 @@ describe('OperationsManager', () => {
       const spec = await manager.loadOperationsSpec(projectName);
       
       expect(spec.project).toBe(projectName);
-      expect(spec.path).toBe(path.join(testRoot, '.kiro/specs', projectName, 'operations'));
+      expect(spec.path).toBe(path.join(testRoot, '.sce/specs', projectName, 'operations'));
       expect(spec.metadata).toBeTruthy();
       expect(spec.metadata.project).toBe(projectName);
       expect(spec.metadata.version).toBe('1.0.0');
@@ -126,7 +126,7 @@ describe('OperationsManager', () => {
     
     test('should load spec without metadata file', async () => {
       const projectName = 'test-project';
-      const operationsPath = path.join(testRoot, '.kiro/specs', projectName, 'operations');
+      const operationsPath = path.join(testRoot, '.sce/specs', projectName, 'operations');
       
       // Create directory without metadata
       await fs.ensureDir(operationsPath);
@@ -167,7 +167,7 @@ describe('OperationsManager', () => {
     
     test('should detect missing documents', async () => {
       const projectName = 'test-project';
-      const operationsPath = path.join(testRoot, '.kiro/specs', projectName, 'operations');
+      const operationsPath = path.join(testRoot, '.sce/specs', projectName, 'operations');
       
       // Create incomplete spec (missing some documents)
       await fs.ensureDir(operationsPath);
@@ -213,7 +213,7 @@ describe('OperationsManager', () => {
       await manager.createOperationsSpec('project-1');
       
       // Create a spec directory without operations subdirectory
-      const specsPath = path.join(testRoot, '.kiro/specs');
+      const specsPath = path.join(testRoot, '.sce/specs');
       await fs.ensureDir(path.join(specsPath, 'project-2'));
       await fs.writeFile(path.join(specsPath, 'project-2/requirements.md'), '# Requirements');
       
@@ -241,7 +241,7 @@ describe('OperationsManager', () => {
     
     test('should handle corrupted metadata file', async () => {
       const projectName = 'test-project';
-      const operationsPath = path.join(testRoot, '.kiro/specs', projectName, 'operations');
+      const operationsPath = path.join(testRoot, '.sce/specs', projectName, 'operations');
       
       // Create directory with corrupted metadata
       await fs.ensureDir(operationsPath);

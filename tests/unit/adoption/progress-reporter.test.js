@@ -132,10 +132,10 @@ describe('ProgressReporter', () => {
   describe('reportFileOperation()', () => {
     test('should report file creation', () => {
       const reporter = new ProgressReporter();
-      reporter.reportFileOperation('create', '.kiro/steering/CORE_PRINCIPLES.md');
+      reporter.reportFileOperation('create', '.sce/steering/CORE_PRINCIPLES.md');
       
       expect(consoleOutput.length).toBeGreaterThan(0);
-      expect(consoleOutput[0]).toContain('.kiro/steering/CORE_PRINCIPLES.md');
+      expect(consoleOutput[0]).toContain('.sce/steering/CORE_PRINCIPLES.md');
       expect(consoleOutput[0]).toContain('➕');
       expect(reporter.fileOperations.created).toBe(1);
       expect(reporter.fileOperations.processed).toBe(1);
@@ -143,9 +143,9 @@ describe('ProgressReporter', () => {
 
     test('should report file update', () => {
       const reporter = new ProgressReporter();
-      reporter.reportFileOperation('update', '.kiro/steering/ENVIRONMENT.md');
+      reporter.reportFileOperation('update', '.sce/steering/ENVIRONMENT.md');
       
-      expect(consoleOutput[0]).toContain('.kiro/steering/ENVIRONMENT.md');
+      expect(consoleOutput[0]).toContain('.sce/steering/ENVIRONMENT.md');
       expect(consoleOutput[0]).toContain('📝');
       expect(reporter.fileOperations.updated).toBe(1);
     });
@@ -161,9 +161,9 @@ describe('ProgressReporter', () => {
 
     test('should report file preservation', () => {
       const reporter = new ProgressReporter();
-      reporter.reportFileOperation('preserve', '.kiro/specs/');
+      reporter.reportFileOperation('preserve', '.sce/specs/');
       
-      expect(consoleOutput[0]).toContain('.kiro/specs/');
+      expect(consoleOutput[0]).toContain('.sce/specs/');
       expect(consoleOutput[0]).toContain('💾');
       expect(reporter.fileOperations.preserved).toBe(1);
     });

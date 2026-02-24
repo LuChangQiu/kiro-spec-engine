@@ -19,7 +19,7 @@ describe('BackupSystem', () => {
   describe('constructor', () => {
     it('should create backup system with project root', () => {
       expect(backupSystem.projectRoot).toBe(tempDir);
-      expect(backupSystem.backupDir).toBe(path.join(tempDir, '.kiro', 'env-backups'));
+      expect(backupSystem.backupDir).toBe(path.join(tempDir, '.sce', 'env-backups'));
     });
   });
 
@@ -267,7 +267,7 @@ describe('BackupSystem', () => {
   describe('getBackupDirectory', () => {
     it('should return backup directory path', () => {
       const dir = backupSystem.getBackupDirectory();
-      expect(dir).toBe(path.join(tempDir, '.kiro', 'env-backups'));
+      expect(dir).toBe(path.join(tempDir, '.sce', 'env-backups'));
     });
   });
 });

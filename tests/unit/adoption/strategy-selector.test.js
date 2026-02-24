@@ -77,7 +77,7 @@ describe('StrategySelector', () => {
   });
 
   describe('detectProjectState', () => {
-    test('should detect fresh project (no .kiro/ directory)', async () => {
+    test('should detect fresh project (no .sce/ directory)', async () => {
       mockFs.pathExists.mockResolvedValue(false);
 
       const state = await selector.detectProjectState('/test/project');
@@ -92,9 +92,9 @@ describe('StrategySelector', () => {
       expect(state.targetVersion).toBeDefined();
     });
 
-    test('should detect existing .kiro/ without version file', async () => {
+    test('should detect existing .sce/ without version file', async () => {
       mockFs.pathExists.mockImplementation(async (path) => {
-        if (path.includes('.kiro') && !path.includes('version.json')) {
+        if (path.includes('.sce') && !path.includes('version.json')) {
           return true;
         }
         return false;
@@ -108,7 +108,7 @@ describe('StrategySelector', () => {
       expect(state.versionComparison).toBeNull();
     });
 
-    test('should detect existing .kiro/ with version file', async () => {
+    test('should detect existing .sce/ with version file', async () => {
       mockFs.pathExists.mockResolvedValue(true);
       mockVersionManager.readVersion.mockResolvedValue({
         'sce-version': '1.0.0'
@@ -125,7 +125,7 @@ describe('StrategySelector', () => {
 
     test('should detect specs directory', async () => {
       mockFs.pathExists.mockImplementation(async (path) => {
-        return path.includes('.kiro');
+        return path.includes('.sce');
       });
 
       const state = await selector.detectProjectState('/test/project');
@@ -137,7 +137,7 @@ describe('StrategySelector', () => {
 
     test('should detect conflicts (existing template files)', async () => {
       mockFs.pathExists.mockImplementation(async (path) => {
-        if (path.includes('.kiro')) {
+        if (path.includes('.sce')) {
           return true;
         }
         return false;
@@ -179,7 +179,7 @@ describe('StrategySelector', () => {
   });
 
   describe('selectMode', () => {
-    test('should select FRESH mode when no .kiro/ directory', () => {
+    test('should select FRESH mode when no .sce/ directory', () => {
       const state = new ProjectState({
         hasKiroDir: false
       });
@@ -189,7 +189,7 @@ describe('StrategySelector', () => {
       expect(mode).toBe(AdoptionMode.FRESH);
     });
 
-    test('should select SMART_ADOPT mode when .kiro/ exists but no version file', () => {
+    test('should select SMART_ADOPT mode when .sce/ exists but no version file', () => {
       const state = new ProjectState({
         hasKiroDir: true,
         hasVersionFile: false
@@ -493,11 +493,11 @@ describe('StrategySelector', () => {
 
     test('should handle complete smart adopt scenario', async () => {
       mockFs.pathExists.mockImplementation(async (path) => {
-        // .kiro/ exists but version.json doesn't
+        // .sce/ exists but version.json doesn't
         if (path.includes('version.json')) {
           return false;
         }
-        return path.includes('.kiro');
+        return path.includes('.sce');
       });
 
       const { state, mode } = await selector.detectAndSelect('/test/project');

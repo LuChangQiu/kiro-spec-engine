@@ -23,7 +23,7 @@ Located in `tests/fixtures/integration-test-fixture.js`
 
 Provides test environment setup and teardown:
 - Creates isolated test directories
-- Manages .kiro directory structure
+- Manages .sce directory structure
 - Provides helper methods for common operations
 - Ensures proper cleanup after tests
 
@@ -92,7 +92,7 @@ describe('Feature Integration', () => {
 
     // Assert: Verify results
     expect(result.exitCode).toBe(0);
-    expect(await fixture.fileExists('.kiro/output.txt')).toBe(true);
+    expect(await fixture.fileExists('.sce/output.txt')).toBe(true);
   });
 });
 ```
@@ -262,8 +262,8 @@ When adding tests for new commands:
 ## References
 
 - [Testing Strategy](../../docs/testing-strategy.md)
-- [Spec 17-00: Test Suite Optimization](../../.kiro/specs/17-00-test-suite-optimization/)
-- [Spec 18-00: Integration Test Expansion](../../.kiro/specs/18-00-integration-test-expansion/)
+- [Spec 17-00: Test Suite Optimization](../../.sce/specs/17-00-test-suite-optimization/)
+- [Spec 18-00: Integration Test Expansion](../../.sce/specs/18-00-integration-test-expansion/)
 - [Jest Documentation](https://jestjs.io/docs/getting-started)
 
 ---

@@ -5,8 +5,8 @@ const path = require('path');
 const fs = require('fs-extra');
 const crypto = require('crypto');
 
-const DEFAULT_STATE_FILE = '.kiro/reports/interactive-approval-state.json';
-const DEFAULT_AUDIT_FILE = '.kiro/reports/interactive-approval-events.jsonl';
+const DEFAULT_STATE_FILE = '.sce/reports/interactive-approval-state.json';
+const DEFAULT_AUDIT_FILE = '.sce/reports/interactive-approval-events.jsonl';
 const DEFAULT_PASSWORD_HASH_ENV = 'SCE_INTERACTIVE_AUTH_PASSWORD_SHA256';
 const DEFAULT_PASSWORD_TTL_SECONDS = 600;
 const PASSWORD_SCOPES = new Set(['approve', 'execute']);

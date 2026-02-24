@@ -46,52 +46,52 @@ ENV/
 
 # Test
 test-project/
-.kiro-test/
+.sce-test/
 
 # ========================================
-# .kiro/ Directory - Layered Management
+# .sce/ Directory - Layered Management
 # ========================================
 
 # Personal state files (DO NOT commit - user-specific)
-.kiro/steering/CURRENT_CONTEXT.md
-.kiro/contexts/.active
-.kiro/contexts/*/CURRENT_CONTEXT.md
+.sce/steering/CURRENT_CONTEXT.md
+.sce/contexts/.active
+.sce/contexts/*/CURRENT_CONTEXT.md
 
 # Machine identifier (DO NOT commit - user-specific)
-.kiro/config/machine-id.json
+.sce/config/machine-id.json
 
 # Environment configuration (DO NOT commit - user-specific)
-.kiro/environments.json
-.kiro/env-backups/
+.sce/environments.json
+.sce/env-backups/
 
 # Temporary files and backups (DO NOT commit)
-.kiro/backups/
-.kiro/logs/
-.kiro/reports/
-.kiro/auto/
-.kiro/incoming/
+.sce/backups/
+.sce/logs/
+.sce/reports/
+.sce/auto/
+.sce/incoming/
 
 # Spec artifacts (COMMIT - team shared)
 # specs/ directory is committed by default, but exclude temporary files
-.kiro/specs/**/SESSION-*.md
-.kiro/specs/**/*-SUMMARY.md
-.kiro/specs/**/*-COMPLETE.md
-.kiro/specs/**/TEMP-*.md
-.kiro/specs/**/WIP-*.md
-.kiro/specs/**/MVP-*.md
+.sce/specs/**/SESSION-*.md
+.sce/specs/**/*-SUMMARY.md
+.sce/specs/**/*-COMPLETE.md
+.sce/specs/**/TEMP-*.md
+.sce/specs/**/WIP-*.md
+.sce/specs/**/MVP-*.md
 
 # Spec lock files (DO NOT commit - local machine state)
-.kiro/specs/**/.lock
+.sce/specs/**/.lock
 
 # Core rules (COMMIT - team shared)
 # CORE_PRINCIPLES.md, ENVIRONMENT.md, RULES_GUIDE.md are committed
 # Only CURRENT_CONTEXT.md is excluded (already excluded above)
 
 # Tools and config (COMMIT - team shared)
-# .kiro/tools/, .kiro/config/ are committed by default
+# .sce/tools/, .sce/config/ are committed by default
 # Runtime state files in config (DO NOT commit - machine/session specific)
-.kiro/config/agent-registry.json
-.kiro/config/orchestration-status.json
+.sce/config/agent-registry.json
+.sce/config/orchestration-status.json
 
 # Temporary files
 *.tmp
@@ -104,8 +104,8 @@ scene-capability-engine-*.tgz
 
 # Test runtime artifacts
 tests/fixtures/moqui-core-regression/workspace/.SCE/
-tests/fixtures/moqui-core-regression/workspace/.kiro/auto/
-tests/fixtures/moqui-core-regression/workspace/.kiro/reports/
+tests/fixtures/moqui-core-regression/workspace/.sce/auto/
+tests/fixtures/moqui-core-regression/workspace/.sce/reports/
 
 # Credentials (NEVER commit!)
 .credentials.txt

@@ -35,8 +35,8 @@ function exportReleaseGovernanceSnapshot(options = {}) {
     : () => new Date().toISOString();
 
   const summaryFile = `${env.RELEASE_EVIDENCE_SUMMARY_FILE || ''}`.trim();
-  const outputJson = `${env.RELEASE_GOVERNANCE_SNAPSHOT_JSON || '.kiro/reports/release-evidence/governance-snapshot.json'}`.trim();
-  const outputMarkdown = `${env.RELEASE_GOVERNANCE_SNAPSHOT_MD || '.kiro/reports/release-evidence/governance-snapshot.md'}`.trim();
+  const outputJson = `${env.RELEASE_GOVERNANCE_SNAPSHOT_JSON || '.sce/reports/release-evidence/governance-snapshot.json'}`.trim();
+  const outputMarkdown = `${env.RELEASE_GOVERNANCE_SNAPSHOT_MD || '.sce/reports/release-evidence/governance-snapshot.md'}`.trim();
   const releaseTag = `${env.RELEASE_TAG || ''}`.trim();
   const summaryPath = env.GITHUB_STEP_SUMMARY;
 

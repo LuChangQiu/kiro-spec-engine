@@ -7,10 +7,10 @@ const crypto = require('crypto');
 const { spawnSync } = require('child_process');
 
 const DEFAULT_PROVIDER = 'moqui';
-const DEFAULT_OUT_DIR = '.kiro/reports/interactive-flow';
+const DEFAULT_OUT_DIR = '.sce/reports/interactive-flow';
 const DEFAULT_USER_ID = 'anonymous-user';
 const DEFAULT_FEEDBACK_CHANNEL = 'ui';
-const DEFAULT_MATRIX_SIGNALS = '.kiro/reports/interactive-matrix-signals.jsonl';
+const DEFAULT_MATRIX_SIGNALS = '.sce/reports/interactive-matrix-signals.jsonl';
 const DEFAULT_MATRIX_MIN_SCORE = 70;
 const DEFAULT_MATRIX_MIN_VALID_RATE = 100;
 const DEFAULT_AUTH_PASSWORD_HASH_ENV = 'SCE_INTERACTIVE_AUTH_PASSWORD_SHA256';

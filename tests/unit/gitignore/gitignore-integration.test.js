@@ -41,26 +41,26 @@ describe('GitignoreIntegration', () => {
 
       // Verify content has layered rules
       const content = await fs.readFile(gitignorePath, 'utf8');
-      expect(content).toContain('.kiro/steering/CURRENT_CONTEXT.md');
-      expect(content).toContain('.kiro/environments.json');
+      expect(content).toContain('.sce/steering/CURRENT_CONTEXT.md');
+      expect(content).toContain('.sce/environments.json');
     });
 
     test('should update .gitignore when old pattern exists', async () => {
       // Create .gitignore with old pattern
       const gitignorePath = path.join(testDir, '.gitignore');
-      await fs.writeFile(gitignorePath, '.kiro/\nnode_modules/\n');
+      await fs.writeFile(gitignorePath, '.sce/\nnode_modules/\n');
 
       const result = await integration.integrateWithAdopt(testDir);
 
       expect(result.success).toBe(true);
       expect(result.action).toBe('updated');
-      expect(result.removed).toContain('.kiro/');
+      expect(result.removed).toContain('.sce/');
 
       // Verify old pattern was removed
       const content = await fs.readFile(gitignorePath, 'utf8');
-      expect(content).not.toContain('.kiro/\n');
+      expect(content).not.toContain('.sce/\n');
       expect(content).toContain('node_modules/');
-      expect(content).toContain('.kiro/steering/CURRENT_CONTEXT.md');
+      expect(content).toContain('.sce/steering/CURRENT_CONTEXT.md');
     });
 
     test('should skip when .gitignore is already compliant', async () => {
@@ -68,26 +68,26 @@ describe('GitignoreIntegration', () => {
       const gitignorePath = path.join(testDir, '.gitignore');
       const compliantContent = `
 # Personal state files (DO NOT commit)
-.kiro/steering/CURRENT_CONTEXT.md
-.kiro/contexts/.active
-.kiro/contexts/*/CURRENT_CONTEXT.md
+.sce/steering/CURRENT_CONTEXT.md
+.sce/contexts/.active
+.sce/contexts/*/CURRENT_CONTEXT.md
 
 # Environment configuration (DO NOT commit)
-.kiro/environments.json
-.kiro/env-backups/
+.sce/environments.json
+.sce/env-backups/
 
 # Temporary files and backups (DO NOT commit)
-.kiro/backups/
-.kiro/logs/
-.kiro/reports/
+.sce/backups/
+.sce/logs/
+.sce/reports/
 
 # Spec artifacts (COMMIT - but exclude temporary files)
-.kiro/specs/**/SESSION-*.md
-.kiro/specs/**/*-SUMMARY.md
-.kiro/specs/**/*-COMPLETE.md
-.kiro/specs/**/TEMP-*.md
-.kiro/specs/**/WIP-*.md
-.kiro/specs/**/MVP-*.md
+.sce/specs/**/SESSION-*.md
+.sce/specs/**/*-SUMMARY.md
+.sce/specs/**/*-COMPLETE.md
+.sce/specs/**/TEMP-*.md
+.sce/specs/**/WIP-*.md
+.sce/specs/**/MVP-*.md
 `;
       await fs.writeFile(gitignorePath, compliantContent);
 
@@ -102,13 +102,13 @@ describe('GitignoreIntegration', () => {
     test('should fix .gitignore during upgrade', async () => {
       // Create .gitignore with old pattern
       const gitignorePath = path.join(testDir, '.gitignore');
-      await fs.writeFile(gitignorePath, '.kiro/*\n');
+      await fs.writeFile(gitignorePath, '.sce/*\n');
 
       const result = await integration.integrateWithUpgrade(testDir);
 
       expect(result.success).toBe(true);
       expect(result.action).toBe('updated');
-      expect(result.removed).toContain('.kiro/*');
+      expect(result.removed).toContain('.sce/*');
     });
   });
 
@@ -116,7 +116,7 @@ describe('GitignoreIntegration', () => {
     test('should provide detailed output for doctor command', async () => {
       // Create .gitignore with old pattern
       const gitignorePath = path.join(testDir, '.gitignore');
-      await fs.writeFile(gitignorePath, '.kiro/\n');
+      await fs.writeFile(gitignorePath, '.sce/\n');
 
       const result = await integration.runDoctor(testDir);
 
@@ -130,7 +130,7 @@ describe('GitignoreIntegration', () => {
     test('should create backup before modification', async () => {
       // Create .gitignore with old pattern
       const gitignorePath = path.join(testDir, '.gitignore');
-      await fs.writeFile(gitignorePath, '.kiro/\nnode_modules/\n');
+      await fs.writeFile(gitignorePath, '.sce/\nnode_modules/\n');
 
       const result = await integration.checkAndFix(testDir);
 
@@ -138,7 +138,7 @@ describe('GitignoreIntegration', () => {
       expect(result.backupId).toBeTruthy();
 
       // Verify backup was created
-      const backupPath = path.join(testDir, '.kiro', 'backups', result.backupId);
+      const backupPath = path.join(testDir, '.sce', 'backups', result.backupId);
       const backupExists = await fs.pathExists(backupPath);
       expect(backupExists).toBe(true);
     });
@@ -147,7 +147,7 @@ describe('GitignoreIntegration', () => {
       // Create .gitignore with old pattern and user rules
       const gitignorePath = path.join(testDir, '.gitignore');
       const originalContent = `
-.kiro/
+.sce/
 node_modules/
 *.log
 dist/

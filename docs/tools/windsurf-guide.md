@@ -47,7 +47,7 @@ You: "Implement the user login feature using sce"
 
 Windsurf:
   [Executes] sce context export 01-00-user-login
-  [Reads] .kiro/specs/01-00-user-login/context-export.md
+  [Reads] .sce/specs/01-00-user-login/context-export.md
   [Implements] Code according to design
   [Updates] tasks.md with completed tasks
 ```
@@ -98,9 +98,9 @@ This project uses sce (Scene Capability Engine) for spec-driven development.
 
 When user asks to implement a feature:
 1. Run `sce context export <spec-name>`
-2. Read `.kiro/specs/<spec-name>/context-export.md`
+2. Read `.sce/specs/<spec-name>/context-export.md`
 3. Implement according to design
-4. Update `.kiro/specs/<spec-name>/tasks.md` (change [ ] to [x])
+4. Update `.sce/specs/<spec-name>/tasks.md` (change [ ] to [x])
 
 ## Example
 
@@ -140,7 +140,7 @@ Windsurf:
   [Executes] sce context export 01-00-user-login
   [Output] Context exported to context-export.md
   
-  [Reads] .kiro/specs/01-00-user-login/context-export.md
+  [Reads] .sce/specs/01-00-user-login/context-export.md
   
   [Analyzes] Requirements, Design, Tasks
   
@@ -208,7 +208,7 @@ sce spec bootstrap --name 01-00-user-login --non-interactive
 
 **2. Tell Windsurf**
 ```
-You: "I've created a Spec for user login at .kiro/specs/01-00-user-login/
+You: "I've created a Spec for user login at .sce/specs/01-00-user-login/
 
 Please:
 1. Use sce to export the context
@@ -337,7 +337,7 @@ sce watch start
 
 **Solution:** Be explicit:
 ```
-"After completing task 1.1, edit .kiro/specs/01-00-user-login/tasks.md and change:
+"After completing task 1.1, edit .sce/specs/01-00-user-login/tasks.md and change:
 - [ ] 1.1 Task name
 to:
 - [x] 1.1 Task name"

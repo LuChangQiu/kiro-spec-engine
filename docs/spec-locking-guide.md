@@ -174,7 +174,7 @@ sce lock acquire quick-fix --timeout 2  # 2 hours
 
 ### Machine ID Storage
 
-Machine IDs are stored in `.kiro/config/machine-id.json` and are automatically generated on first use.
+Machine IDs are stored in `.sce/config/machine-id.json` and are automatically generated on first use.
 
 ## Troubleshooting
 
@@ -202,7 +202,7 @@ Consider adding this to your CI/CD pipeline or team workflow.
 
 ## File Format
 
-Lock files are stored as `.kiro/specs/<spec-name>/.lock` with JSON format:
+Lock files are stored as `.sce/specs/<spec-name>/.lock` with JSON format:
 
 ```json
 {

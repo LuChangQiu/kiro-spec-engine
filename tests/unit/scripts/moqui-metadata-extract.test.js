@@ -91,7 +91,7 @@ describe('moqui-metadata-extract script', () => {
     const mockProjectDir = path.join(tempDir, 'mock-331');
     const scenePackagePath = path.join(
       mockProjectDir,
-      '.kiro',
+      '.sce',
       'specs',
       '70-00-demo',
       'docs',
@@ -151,11 +151,11 @@ describe('moqui-metadata-extract script', () => {
         {
           id: '70-00-demo',
           status: 'completed',
-          scene_package: '.kiro/specs/70-00-demo/docs/scene-package.json'
+          scene_package: '.sce/specs/70-00-demo/docs/scene-package.json'
         }
       ],
       templates: [
-        '.kiro/templates/exports/order-management',
+        '.sce/templates/exports/order-management',
         'kse.scene--moqui-page-copilot-dialog--0.1.0'
       ],
       capabilities: [

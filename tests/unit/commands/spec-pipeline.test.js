@@ -10,8 +10,8 @@ describe('spec-pipeline command', () => {
 
   beforeEach(async () => {
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-spec-pipeline-'));
-    await fs.ensureDir(path.join(tempDir, '.kiro', 'specs', '110-01-pipeline-test'));
-    await fs.ensureDir(path.join(tempDir, '.kiro', 'specs', '110-02-pipeline-test'));
+    await fs.ensureDir(path.join(tempDir, '.sce', 'specs', '110-01-pipeline-test'));
+    await fs.ensureDir(path.join(tempDir, '.sce', 'specs', '110-02-pipeline-test'));
 
     originalLog = console.log;
     console.log = jest.fn();

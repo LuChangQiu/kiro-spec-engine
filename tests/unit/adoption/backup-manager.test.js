@@ -18,7 +18,7 @@ describe('BackupManager', () => {
     // Create temporary test directory
     testProjectPath = path.join(os.tmpdir(), `sce-test-${Date.now()}`);
     await fs.ensureDir(testProjectPath);
-    await fs.ensureDir(path.join(testProjectPath, '.kiro'));
+    await fs.ensureDir(path.join(testProjectPath, '.sce'));
 
     // Create mock SelectiveBackup
     mockSelectiveBackup = {
@@ -49,7 +49,7 @@ describe('BackupManager', () => {
       const filesToModify = ['steering/CORE_PRINCIPLES.md', 'steering/ENVIRONMENT.md'];
       const mockBackup = {
         id: 'adopt-smart-2026-01-27-143022',
-        path: path.join(testProjectPath, '.kiro', 'backups', 'adopt-smart-2026-01-27-143022'),
+        path: path.join(testProjectPath, '.sce', 'backups', 'adopt-smart-2026-01-27-143022'),
         fileCount: 2,
         totalSize: 1024,
         created: new Date().toISOString(),
@@ -133,7 +133,7 @@ describe('BackupManager', () => {
       const filesToModify = ['steering/CORE_PRINCIPLES.md'];
       const mockBackup = {
         id: 'test-backup',
-        path: path.join(testProjectPath, '.kiro', 'backups', 'test-backup'),
+        path: path.join(testProjectPath, '.sce', 'backups', 'test-backup'),
         fileCount: 1,
         totalSize: 512,
         created: new Date().toISOString(),
@@ -155,7 +155,7 @@ describe('BackupManager', () => {
       const filesToModify = ['file.txt'];
       const mockBackup = {
         id: 'custom-type-123',
-        path: path.join(testProjectPath, '.kiro', 'backups', 'custom-type-123'),
+        path: path.join(testProjectPath, '.sce', 'backups', 'custom-type-123'),
         fileCount: 1,
         totalSize: 100,
         created: new Date().toISOString(),
@@ -189,7 +189,7 @@ describe('BackupManager', () => {
     test('should validate backup successfully', async () => {
       // Setup
       const backupId = 'test-backup-123';
-      const backupPath = path.join(testProjectPath, '.kiro', 'backups', backupId);
+      const backupPath = path.join(testProjectPath, '.sce', 'backups', backupId);
       const files = ['steering/CORE_PRINCIPLES.md', 'steering/ENVIRONMENT.md'];
 
       // Create backup structure
@@ -247,7 +247,7 @@ describe('BackupManager', () => {
       // Setup
       const backup = {
         id: 'nonexistent',
-        location: path.join(testProjectPath, '.kiro', 'backups', 'nonexistent'),
+        location: path.join(testProjectPath, '.sce', 'backups', 'nonexistent'),
         filesCount: 1,
         files: ['file.txt']
       };
@@ -262,7 +262,7 @@ describe('BackupManager', () => {
 
     test('should fail when files directory does not exist', async () => {
       // Setup
-      const backupPath = path.join(testProjectPath, '.kiro', 'backups', 'test');
+      const backupPath = path.join(testProjectPath, '.sce', 'backups', 'test');
       await fs.ensureDir(backupPath);
 
       const backup = {
@@ -282,7 +282,7 @@ describe('BackupManager', () => {
 
     test('should fail when file count mismatch', async () => {
       // Setup
-      const backupPath = path.join(testProjectPath, '.kiro', 'backups', 'test');
+      const backupPath = path.join(testProjectPath, '.sce', 'backups', 'test');
       await fs.ensureDir(path.join(backupPath, 'files'));
 
       const backup = {
@@ -302,7 +302,7 @@ describe('BackupManager', () => {
 
     test('should fail when file is missing from backup', async () => {
       // Setup
-      const backupPath = path.join(testProjectPath, '.kiro', 'backups', 'test');
+      const backupPath = path.join(testProjectPath, '.sce', 'backups', 'test');
       await fs.ensureDir(path.join(backupPath, 'files'));
 
       const backup = {
@@ -322,12 +322,12 @@ describe('BackupManager', () => {
 
     test('should validate content when requested', async () => {
       // Setup
-      const backupPath = path.join(testProjectPath, '.kiro', 'backups', 'test');
+      const backupPath = path.join(testProjectPath, '.sce', 'backups', 'test');
       const files = ['steering/CORE_PRINCIPLES.md'];
       const content = 'test content for validation';
 
       // Create original file
-      const originalPath = path.join(testProjectPath, '.kiro', files[0]);
+      const originalPath = path.join(testProjectPath, '.sce', files[0]);
       await fs.ensureDir(path.dirname(originalPath));
       await fs.writeFile(originalPath, content);
 
@@ -357,11 +357,11 @@ describe('BackupManager', () => {
 
     test('should fail content validation on size mismatch', async () => {
       // Setup
-      const backupPath = path.join(testProjectPath, '.kiro', 'backups', 'test');
+      const backupPath = path.join(testProjectPath, '.sce', 'backups', 'test');
       const files = ['file.txt'];
 
       // Create original file
-      const originalPath = path.join(testProjectPath, '.kiro', files[0]);
+      const originalPath = path.join(testProjectPath, '.sce', files[0]);
       await fs.ensureDir(path.dirname(originalPath));
       await fs.writeFile(originalPath, 'original content');
 
@@ -390,11 +390,11 @@ describe('BackupManager', () => {
 
     test('should fail content validation on hash mismatch for critical files', async () => {
       // Setup
-      const backupPath = path.join(testProjectPath, '.kiro', 'backups', 'test');
+      const backupPath = path.join(testProjectPath, '.sce', 'backups', 'test');
       const files = ['steering/CORE_PRINCIPLES.md']; // Critical file
 
       // Create original file
-      const originalPath = path.join(testProjectPath, '.kiro', files[0]);
+      const originalPath = path.join(testProjectPath, '.sce', files[0]);
       await fs.ensureDir(path.dirname(originalPath));
       await fs.writeFile(originalPath, 'original');
 
@@ -426,7 +426,7 @@ describe('BackupManager', () => {
     test('should retrieve backup information', async () => {
       // Setup
       const backupId = 'test-backup-456';
-      const backupPath = path.join(testProjectPath, '.kiro', 'backups', backupId);
+      const backupPath = path.join(testProjectPath, '.sce', 'backups', backupId);
       const metadata = {
         id: backupId,
         type: 'adopt-smart',
@@ -461,7 +461,7 @@ describe('BackupManager', () => {
     test('should throw error when metadata is missing', async () => {
       // Setup
       const backupId = 'no-metadata';
-      const backupPath = path.join(testProjectPath, '.kiro', 'backups', backupId);
+      const backupPath = path.join(testProjectPath, '.sce', 'backups', backupId);
       await fs.ensureDir(backupPath);
 
       // Execute & Verify
@@ -474,7 +474,7 @@ describe('BackupManager', () => {
   describe('edge cases', () => {
     test('should handle empty files array', async () => {
       // Setup
-      const backupPath = path.join(testProjectPath, '.kiro', 'backups', 'empty');
+      const backupPath = path.join(testProjectPath, '.sce', 'backups', 'empty');
       await fs.ensureDir(path.join(backupPath, 'files'));
 
       const backup = {
@@ -494,7 +494,7 @@ describe('BackupManager', () => {
 
     test('should handle backup with missing original files during content validation', async () => {
       // Setup
-      const backupPath = path.join(testProjectPath, '.kiro', 'backups', 'test');
+      const backupPath = path.join(testProjectPath, '.sce', 'backups', 'test');
       const files = ['deleted-file.txt'];
 
       // Create backup file but not original
@@ -522,11 +522,11 @@ describe('BackupManager', () => {
 
     test('should handle non-critical files without hash validation', async () => {
       // Setup
-      const backupPath = path.join(testProjectPath, '.kiro', 'backups', 'test');
+      const backupPath = path.join(testProjectPath, '.sce', 'backups', 'test');
       const files = ['custom/non-critical.txt']; // Non-critical file
 
       // Create files with same size but different content
-      const originalPath = path.join(testProjectPath, '.kiro', files[0]);
+      const originalPath = path.join(testProjectPath, '.sce', files[0]);
       await fs.ensureDir(path.dirname(originalPath));
       await fs.writeFile(originalPath, 'original');
 

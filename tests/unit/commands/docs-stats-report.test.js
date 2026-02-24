@@ -20,10 +20,10 @@ describe('Document Governance - Stats and Report', () => {
     originalCwd = process.cwd();
     process.chdir(testDir);
     
-    // Create .kiro directory structure
-    await fs.ensureDir(path.join(testDir, '.kiro', 'logs'));
-    await fs.ensureDir(path.join(testDir, '.kiro', 'reports'));
-    await fs.ensureDir(path.join(testDir, '.kiro', 'config'));
+    // Create .sce directory structure
+    await fs.ensureDir(path.join(testDir, '.sce', 'logs'));
+    await fs.ensureDir(path.join(testDir, '.sce', 'reports'));
+    await fs.ensureDir(path.join(testDir, '.sce', 'config'));
   });
   
   afterEach(async () => {
@@ -137,7 +137,7 @@ describe('Document Governance - Stats and Report', () => {
       expect(exitCode).toBe(0);
       
       // Verify report file was created
-      const reportsDir = path.join(testDir, '.kiro', 'reports');
+      const reportsDir = path.join(testDir, '.sce', 'reports');
       const files = await fs.readdir(reportsDir);
       
       const reportFiles = files.filter(f => f.startsWith('document-compliance-'));
@@ -171,7 +171,7 @@ describe('Document Governance - Stats and Report', () => {
       expect(exitCode).toBe(0);
       
       // Read report
-      const reportsDir = path.join(testDir, '.kiro', 'reports');
+      const reportsDir = path.join(testDir, '.sce', 'reports');
       const files = await fs.readdir(reportsDir);
       const reportPath = path.join(reportsDir, files[0]);
       const reportContent = await fs.readFile(reportPath, 'utf8');
@@ -206,7 +206,7 @@ describe('Document Governance - Stats and Report', () => {
       expect(exitCode).toBe(0);
       
       // Read report
-      const reportsDir = path.join(testDir, '.kiro', 'reports');
+      const reportsDir = path.join(testDir, '.sce', 'reports');
       const files = await fs.readdir(reportsDir);
       const reportPath = path.join(reportsDir, files[0]);
       const reportContent = await fs.readFile(reportPath, 'utf8');
@@ -230,7 +230,7 @@ describe('Document Governance - Stats and Report', () => {
       expect(exitCode).toBe(0);
       
       // Read report
-      const reportsDir = path.join(testDir, '.kiro', 'reports');
+      const reportsDir = path.join(testDir, '.sce', 'reports');
       const files = await fs.readdir(reportsDir);
       const reportPath = path.join(reportsDir, files[0]);
       const reportContent = await fs.readFile(reportPath, 'utf8');
@@ -260,7 +260,7 @@ describe('Document Governance - Stats and Report', () => {
       expect(exitCode).toBe(0);
       
       // Read report
-      const reportsDir = path.join(testDir, '.kiro', 'reports');
+      const reportsDir = path.join(testDir, '.sce', 'reports');
       const files = await fs.readdir(reportsDir);
       const reportPath = path.join(reportsDir, files[0]);
       const reportContent = await fs.readFile(reportPath, 'utf8');
@@ -283,7 +283,7 @@ describe('Document Governance - Stats and Report', () => {
       expect(exitCode).toBe(0);
       
       // Verify filename format
-      const reportsDir = path.join(testDir, '.kiro', 'reports');
+      const reportsDir = path.join(testDir, '.sce', 'reports');
       const files = await fs.readdir(reportsDir);
       
       expect(files.length).toBe(1);

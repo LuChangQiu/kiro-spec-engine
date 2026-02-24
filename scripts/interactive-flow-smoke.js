@@ -14,7 +14,7 @@ const DEFAULT_APPROVAL_ROLE_POLICY = 'docs/interactive-customization/approval-ro
 const DEFAULT_APPROVAL_ACTOR_ROLE = 'workflow-operator';
 const DEFAULT_APPROVER_ACTOR_ROLE = 'workflow-operator';
 const DEFAULT_DIALOGUE_PROFILE = 'system-maintainer';
-const DEFAULT_OUT = '.kiro/reports/interactive-flow-smoke/interactive-flow-smoke.summary.json';
+const DEFAULT_OUT = '.sce/reports/interactive-flow-smoke/interactive-flow-smoke.summary.json';
 
 function parseArgs(argv) {
   const options = {

@@ -1,0 +1,17 @@
+{
+  "valid": true,
+  "input": {
+    "spec": "67-00-scene-package-contract-declaration",
+    "path": "E:\\workspace\\kiro-spec-engine\\.sce\\specs\\67-00-scene-package-contract-declaration\\custom\\scene-package.json",
+    "spec_package": "custom/scene-package.json"
+  },
+  "summary": {
+    "coordinate": "kse.scene/scene-package-contract-declaration@0.2.0",
+    "kind": "scene-domain-profile",
+    "parameter_count": 2,
+    "provides_count": 1,
+    "requires_count": 2
+  },
+  "errors": [],
+  "warnings": []
+}

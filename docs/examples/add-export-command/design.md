@@ -165,7 +165,7 @@ program
 
 ```javascript
 // Spec not found
-throw new Error(`Spec "${specName}" not found in .kiro/specs/`);
+throw new Error(`Spec "${specName}" not found in .sce/specs/`);
 
 // Invalid format
 throw new Error(`Invalid format "${format}". Use: json, md, or html`);

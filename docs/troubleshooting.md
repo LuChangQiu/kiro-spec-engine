@@ -192,11 +192,11 @@ sce upgrade
 **If you want to start fresh:**
 ```bash
 # Backup existing Specs
-cp -r .kiro .kiro.backup
+cp -r .sce .sce.backup
 
 # Remove sce
 rm sce.json
-rm -rf .kiro
+rm -rf .sce
 
 # Re-adopt
 sce adopt
@@ -204,12 +204,12 @@ sce adopt
 
 ---
 
-### Error: "Permission denied creating .kiro directory"
+### Error: "Permission denied creating .sce directory"
 
 **Symptoms:**
 ```bash
 $ sce adopt
-Error: EACCES: permission denied, mkdir '.kiro'
+Error: EACCES: permission denied, mkdir '.sce'
 ```
 
 **Cause:** Insufficient permissions in project directory
@@ -240,7 +240,7 @@ sce adopt
 **Symptoms:**
 ```bash
 $ sce status
-No Specs found in .kiro/specs/
+No Specs found in .sce/specs/
 ```
 
 **Cause:** No Specs have been created yet
@@ -254,7 +254,7 @@ sce spec bootstrap --name 01-00-my-feature --non-interactive
 
 **Or check if Specs exist:**
 ```bash
-ls -la .kiro/specs/
+ls -la .sce/specs/
 ```
 
 ---
@@ -299,7 +299,7 @@ Error: Failed to export context
 **1. Spec doesn't exist:**
 ```bash
 # Check Spec exists
-ls .kiro/specs/01-00-user-login/
+ls .sce/specs/01-00-user-login/
 
 # If not, create it
 sce spec bootstrap --name 01-00-user-login --non-interactive
@@ -308,19 +308,19 @@ sce spec bootstrap --name 01-00-user-login --non-interactive
 **2. Missing Spec files:**
 ```bash
 # Spec needs at least requirements.md
-ls .kiro/specs/01-00-user-login/requirements.md
+ls .sce/specs/01-00-user-login/requirements.md
 
 # Create if missing
-touch .kiro/specs/01-00-user-login/requirements.md
+touch .sce/specs/01-00-user-login/requirements.md
 ```
 
 **3. File permission issues:**
 ```bash
 # Check permissions
-ls -la .kiro/specs/01-00-user-login/
+ls -la .sce/specs/01-00-user-login/
 
 # Fix if needed
-chmod 644 .kiro/specs/01-00-user-login/*.md
+chmod 644 .sce/specs/01-00-user-login/*.md
 ```
 
 ---
@@ -339,7 +339,7 @@ Error: Task 1.1 not found in tasks.md
 
 **Check tasks.md:**
 ```bash
-cat .kiro/specs/01-00-user-login/tasks.md
+cat .sce/specs/01-00-user-login/tasks.md
 ```
 
 **Verify task ID format:**
@@ -377,7 +377,7 @@ attention to the API design and error handling sections."
 **2. Verify context was provided:**
 ```bash
 # Check context file exists and has content
-cat .kiro/specs/01-00-user-login/context-export.md
+cat .sce/specs/01-00-user-login/context-export.md
 
 # Should contain requirements, design, and tasks
 ```
@@ -740,7 +740,7 @@ $ sce docs validate --spec my-spec
 **1. File in wrong location:**
 ```bash
 # Check exact path
-ls -la .kiro/specs/my-spec/requirements.md
+ls -la .sce/specs/my-spec/requirements.md
 
 # Should be directly in Spec directory, not in subdirectory
 ```
@@ -748,7 +748,7 @@ ls -la .kiro/specs/my-spec/requirements.md
 **2. Wrong Spec name:**
 ```bash
 # Check Spec directory name
-ls .kiro/specs/
+ls .sce/specs/
 
 # Use exact name
 sce docs validate --spec 01-00-my-feature
@@ -780,7 +780,7 @@ $ sce docs diagnose
 **1. Verify configuration was saved:**
 ```bash
 # Check config file
-cat .kiro/config/docs.json
+cat .sce/config/docs.json
 
 # Should show your changes
 ```
@@ -872,7 +872,7 @@ sce docs stats
 **Symptoms:**
 ```bash
 $ sce docs report
-Error: ENOENT: no such file or directory, open '.kiro/reports/...'
+Error: ENOENT: no such file or directory, open '.sce/reports/...'
 ```
 
 **Cause:** Reports directory doesn't exist
@@ -881,7 +881,7 @@ Error: ENOENT: no such file or directory, open '.kiro/reports/...'
 
 **Create reports directory:**
 ```bash
-mkdir -p .kiro/reports
+mkdir -p .sce/reports
 
 # Try again
 sce docs report
@@ -922,10 +922,10 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 **Solution:**
 ```bash
 # ❌ Wrong on Windows
-sce context export .kiro/specs/01-00-user-login
+sce context export .sce/specs/01-00-user-login
 
 # ✅ Correct on Windows
-sce context export .kiro\specs\01-00-user-login
+sce context export .sce\specs\01-00-user-login
 
 # ✅ Or use forward slashes (sce handles both)
 sce context export 01-00-user-login
@@ -1024,7 +1024,7 @@ uname -a  # macOS/Linux
 ver       # Windows
 
 # Current directory structure
-ls -la .kiro/
+ls -la .sce/
 ```
 
 ### Where to Get Help
@@ -1114,7 +1114,7 @@ sce watch stop && sce watch start
 sce --version
 
 # Check Spec structure
-ls -la .kiro/specs/
+ls -la .sce/specs/
 
 # Test context export
 sce context export spec-name

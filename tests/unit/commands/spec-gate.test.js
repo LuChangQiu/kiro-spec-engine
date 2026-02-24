@@ -14,10 +14,10 @@ describe('spec-gate command', () => {
 
   beforeEach(async () => {
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-spec-gate-'));
-    await fs.ensureDir(path.join(tempDir, '.kiro', 'config'));
+    await fs.ensureDir(path.join(tempDir, '.sce', 'config'));
 
-    const specPath = path.join(tempDir, '.kiro', 'specs', '111-01-gate-contract-test');
-    const specPath2 = path.join(tempDir, '.kiro', 'specs', '111-02-gate-contract-test');
+    const specPath = path.join(tempDir, '.sce', 'specs', '111-01-gate-contract-test');
+    const specPath2 = path.join(tempDir, '.sce', 'specs', '111-02-gate-contract-test');
     await fs.ensureDir(specPath);
     await fs.ensureDir(specPath2);
 

@@ -36,5 +36,5 @@ This document defines the minimal adapter contract used by interactive customiza
 
 ## Artifacts
 
-- Latest execution record: `.kiro/reports/interactive-execution-record.latest.json`
-- Execution ledger (JSONL): `.kiro/reports/interactive-execution-ledger.jsonl`
+- Latest execution record: `.sce/reports/interactive-execution-record.latest.json`
+- Execution ledger (JSONL): `.sce/reports/interactive-execution-ledger.jsonl`

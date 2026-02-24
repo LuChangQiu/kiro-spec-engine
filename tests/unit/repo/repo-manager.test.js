@@ -92,16 +92,16 @@ describe('RepoManager', () => {
       });
     });
 
-    it('should exclude .kiro directory from scanning', async () => {
-      // Mock root directory scan - returns .kiro and repo1
+    it('should exclude .sce directory from scanning', async () => {
+      // Mock root directory scan - returns .sce and repo1
       fs.readdir.mockResolvedValue([
-        { name: '.kiro', isDirectory: () => true },
+        { name: '.sce', isDirectory: () => true },
         { name: 'repo1', isDirectory: () => true }
       ]);
 
       // isGitRepo is called for:
       // 1. root directory (not a repo)
-      // 2. .kiro is skipped due to exclusion
+      // 2. .sce is skipped due to exclusion
       // 3. repo1 (is a repo)
       mockGitOps.isGitRepo
         .mockResolvedValueOnce(false) // root is not a repo
@@ -113,11 +113,11 @@ describe('RepoManager', () => {
 
       const result = await repoManager.discoverRepositories(projectRoot);
 
-      // .kiro should be excluded, only repo1 should be found
+      // .sce should be excluded, only repo1 should be found
       expect(result).toHaveLength(1);
       expect(result[0].name).toBe('repo1');
       
-      // Verify .kiro was never checked as a Git repo (excluded before check)
+      // Verify .sce was never checked as a Git repo (excluded before check)
       // Note: With nested scanning, we check root, then repo1, then subdirs of repo1
       expect(mockGitOps.isGitRepo).toHaveBeenCalled();
     });
@@ -220,7 +220,7 @@ describe('RepoManager', () => {
       mockPathResolver.toRelative.mockReturnValue('repo1');
 
       const result = await repoManager.discoverRepositories(projectRoot, {
-        exclude: ['.kiro', 'node_modules']
+        exclude: ['.sce', 'node_modules']
       });
 
       expect(result).toHaveLength(1);

@@ -37,7 +37,7 @@ Keep your workspace synchronized with task progress across multiple users or too
 ### Prerequisites
 - Project adopted with scene-capability-engine
 - Active spec with tasks.md file
-- Write access to .kiro/specs/ directory
+- Write access to .sce/specs/ directory
 
 ### Step-by-Step Instructions
 
@@ -169,7 +169,7 @@ sce context export my-feature --include-steering --steering-files CORE_PRINCIPLE
 #### 3. Locate Export File
 The export is saved to:
 ```
-.kiro/specs/<spec-name>/context-export.md
+.sce/specs/<spec-name>/context-export.md
 ```
 
 **Time:** ~5 seconds
@@ -227,7 +227,7 @@ Generate AI prompts for specific tasks with relevant context.
 #### 1. Identify Task
 Review tasks.md and note the task ID:
 ```bash
-cat .kiro/specs/<spec-name>/tasks.md
+cat .sce/specs/<spec-name>/tasks.md
 ```
 
 **Example task ID:** `1.2` or `3.1.1`
@@ -257,7 +257,7 @@ sce prompt generate my-feature 1.2 --target vscode
 #### 3. Locate Generated Prompt
 The prompt is saved to:
 ```
-.kiro/specs/<spec-name>/prompts/task-<task-id>.md
+.sce/specs/<spec-name>/prompts/task-<task-id>.md
 ```
 
 **Time:** ~5 seconds

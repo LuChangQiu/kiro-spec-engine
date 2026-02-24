@@ -7,7 +7,7 @@ function createTempWorkspace() {
     os.tmpdir(),
     `sce-test-orch-status-events-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
   );
-  fs.mkdirpSync(path.join(workspaceRoot, '.kiro', 'specs', 'spec-a'));
+  fs.mkdirpSync(path.join(workspaceRoot, '.sce', 'specs', 'spec-a'));
   return workspaceRoot;
 }
 
@@ -130,7 +130,7 @@ describe('runOrchestration status persistence events', () => {
     expect(onStatus).toHaveBeenCalledTimes(4);
 
     const persisted = await fs.readJson(
-      path.join(workspaceRoot, '.kiro', 'config', 'orchestration-status.json')
+      path.join(workspaceRoot, '.sce', 'config', 'orchestration-status.json')
     );
     expect(persisted.marker).toBe(4);
   });

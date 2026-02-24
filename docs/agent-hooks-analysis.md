@@ -137,7 +137,7 @@ Hooks can perform two types of actions:
   "name": "Auto-generate prompts",
   "when": {
     "type": "fileEdited",
-    "patterns": ["**/.kiro/specs/*/requirements.md", "**/.kiro/specs/*/design.md"]
+    "patterns": ["**/.sce/specs/*/requirements.md", "**/.sce/specs/*/design.md"]
   },
   "then": {
     "type": "askAgent",
@@ -306,7 +306,7 @@ Hooks can perform two types of actions:
 **Goal**: Basic hook support in sce
 
 **Tasks**:
-1. Add hook configuration to `.kiro/hooks/` directory
+1. Add hook configuration to `.sce/hooks/` directory
 2. Create hook templates for common use cases
 3. Add `sce hooks` command group:
    - `sce hooks list` - List all hooks
@@ -400,7 +400,7 @@ Hooks can perform two types of actions:
 ### Hook Storage
 
 ```
-.kiro/
+.sce/
 ├── hooks/
 │   ├── auto-sync.json
 │   ├── quality-gate.json
@@ -555,7 +555,7 @@ Watch mode provides automation for developers not using AI IDE. It monitors file
                ▼
 ┌─────────────────────────────────────┐
 │     Execution Logger                │
-│  (.kiro/watch/execution.log)        │
+│  (.sce/watch/execution.log)        │
 └─────────────────────────────────────┘
 ```
 
@@ -580,15 +580,15 @@ sce watch stop
 
 ### Configuration
 
-Watch mode uses `.kiro/watch-config.json`:
+Watch mode uses `.sce/watch-config.json`:
 
 ```json
 {
   "enabled": true,
   "patterns": [
     "**/tasks.md",
-    "**/.kiro/specs/*/requirements.md",
-    "**/.kiro/specs/*/design.md"
+    "**/.sce/specs/*/requirements.md",
+    "**/.sce/specs/*/design.md"
   ],
   "actions": {
     "**/tasks.md": {
@@ -639,7 +639,7 @@ Watch mode uses `.kiro/watch-config.json`:
 **Without Automation**:
 ```bash
 # 1. Edit tasks.md
-vim .kiro/specs/my-spec/tasks.md
+vim .sce/specs/my-spec/tasks.md
 
 # 2. Save file
 
@@ -662,7 +662,7 @@ sce workspace sync
 sce context export my-spec
 
 # 3. Copy to other tool
-cat .kiro/specs/my-spec/context-export.md
+cat .sce/specs/my-spec/context-export.md
 ```
 
 **Time**: ~1 minute per export
@@ -762,7 +762,7 @@ Start with Phase 1 (foundation) to validate the approach, then expand to Phase 2
   "enabled": true,
   "when": {
     "type": "fileEdited",
-    "patterns": ["**/.kiro/specs/*/tasks.md"]
+    "patterns": ["**/.sce/specs/*/tasks.md"]
   },
   "then": {
     "type": "askAgent",

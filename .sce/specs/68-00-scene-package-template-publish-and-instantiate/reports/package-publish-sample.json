@@ -1,0 +1,23 @@
+{
+  "published": true,
+  "overwritten": true,
+  "source": {
+    "spec": "67-00-scene-package-contract-declaration",
+    "package_path": "custom/scene-package.json",
+    "scene_manifest_path": "custom/scene.yaml"
+  },
+  "template": {
+    "id": "kse.scene--scene-package-contract-declaration--0.2.0",
+    "coordinate": "kse.scene/scene-package-contract-declaration@0.2.0",
+    "kind": "scene-domain-profile",
+    "output_dir": ".sce/templates/scene-packages/kse.scene--scene-package-contract-declaration--0.2.0",
+    "manifest_path": ".sce/templates/scene-packages/kse.scene--scene-package-contract-declaration--0.2.0/template.manifest.json",
+    "package_contract_path": ".sce/templates/scene-packages/kse.scene--scene-package-contract-declaration--0.2.0/scene-package.json",
+    "scene_template_path": ".sce/templates/scene-packages/kse.scene--scene-package-contract-declaration--0.2.0/scene.template.yaml"
+  },
+  "summary": {
+    "parameter_count": 2,
+    "provides_count": 1,
+    "requires_count": 2
+  }
+}

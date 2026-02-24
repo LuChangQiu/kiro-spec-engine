@@ -33,11 +33,11 @@ describe('moqui-matrix-remediation-phased-runner script', () => {
 
   test('plans high and medium phases from goals json in dry-run mode', async () => {
     const workspace = path.join(tempDir, 'workspace-dry-run');
-    await fs.ensureDir(path.join(workspace, '.kiro', 'auto'));
-    await fs.writeJson(path.join(workspace, '.kiro', 'auto', 'matrix-remediation.goals.high.json'), {
+    await fs.ensureDir(path.join(workspace, '.sce', 'auto'));
+    await fs.writeJson(path.join(workspace, '.sce', 'auto', 'matrix-remediation.goals.high.json'), {
       goals: ['Recover metric A']
     }, { spaces: 2 });
-    await fs.writeJson(path.join(workspace, '.kiro', 'auto', 'matrix-remediation.goals.medium.json'), {
+    await fs.writeJson(path.join(workspace, '.sce', 'auto', 'matrix-remediation.goals.medium.json'), {
       goals: ['Recover metric B']
     }, { spaces: 2 });
 
@@ -60,9 +60,9 @@ describe('moqui-matrix-remediation-phased-runner script', () => {
 
   test('falls back to lines when goals json is unavailable', async () => {
     const workspace = path.join(tempDir, 'workspace-fallback-lines');
-    await fs.ensureDir(path.join(workspace, '.kiro', 'auto'));
+    await fs.ensureDir(path.join(workspace, '.sce', 'auto'));
     await fs.writeFile(
-      path.join(workspace, '.kiro', 'auto', 'matrix-remediation.high.lines'),
+      path.join(workspace, '.sce', 'auto', 'matrix-remediation.high.lines'),
       'Recover metric A from lines\n',
       'utf8'
     );
@@ -132,14 +132,14 @@ describe('moqui-matrix-remediation-phased-runner script', () => {
     expect(payload.phases[0].status).toBe('planned');
     expect(payload.phases[0].selected_input.source).toBe('goals-json');
     expect(payload.phases[1].status).toBe('planned');
-    expect(await fs.pathExists(path.join(workspace, '.kiro', 'auto', 'matrix-remediation.goals.high.json'))).toBe(true);
-    expect(await fs.pathExists(path.join(workspace, '.kiro', 'auto', 'matrix-remediation.goals.medium.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(workspace, '.sce', 'auto', 'matrix-remediation.goals.high.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(workspace, '.sce', 'auto', 'matrix-remediation.goals.medium.json'))).toBe(true);
   });
 
   test('supports capability-cluster goals mode and derives phased goals before planning', async () => {
     const workspace = path.join(tempDir, 'workspace-cluster-goals');
-    await fs.ensureDir(path.join(workspace, '.kiro', 'auto'));
-    const clusterFile = path.join(workspace, '.kiro', 'auto', 'matrix-remediation.capability-clusters.json');
+    await fs.ensureDir(path.join(workspace, '.sce', 'auto'));
+    const clusterFile = path.join(workspace, '.sce', 'auto', 'matrix-remediation.capability-clusters.json');
     await fs.writeJson(clusterFile, {
       mode: 'moqui-matrix-capability-cluster-goals',
       clusters: [
@@ -174,8 +174,8 @@ describe('moqui-matrix-remediation-phased-runner script', () => {
     expect(payload.phases[0].selected_input.source).toBe('goals-json');
     expect(payload.phases[1].selected_input.source).toBe('goals-json');
 
-    const highGoals = await fs.readJson(path.join(workspace, '.kiro', 'auto', 'matrix-remediation.capability-clusters.high.json'));
-    const mediumGoals = await fs.readJson(path.join(workspace, '.kiro', 'auto', 'matrix-remediation.capability-clusters.medium.json'));
+    const highGoals = await fs.readJson(path.join(workspace, '.sce', 'auto', 'matrix-remediation.capability-clusters.high.json'));
+    const mediumGoals = await fs.readJson(path.join(workspace, '.sce', 'auto', 'matrix-remediation.capability-clusters.medium.json'));
     expect(highGoals.goals).toEqual(['Recover approval routing A']);
     expect(mediumGoals.goals).toEqual(expect.arrayContaining([
       'Recover decision governance B',

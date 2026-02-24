@@ -5,9 +5,9 @@ const path = require('path');
 const fs = require('fs-extra');
 
 const DEFAULT_METADATA = 'docs/moqui/metadata-catalog.json';
-const DEFAULT_OUT = '.kiro/reports/recovery/moqui-standard-rebuild.json';
-const DEFAULT_MARKDOWN_OUT = '.kiro/reports/recovery/moqui-standard-rebuild.md';
-const DEFAULT_BUNDLE_OUT = '.kiro/reports/recovery/moqui-standard-bundle';
+const DEFAULT_OUT = '.sce/reports/recovery/moqui-standard-rebuild.json';
+const DEFAULT_MARKDOWN_OUT = '.sce/reports/recovery/moqui-standard-rebuild.md';
+const DEFAULT_BUNDLE_OUT = '.sce/reports/recovery/moqui-standard-bundle';
 
 function parseArgs(argv) {
   const options = {
@@ -981,7 +981,7 @@ function buildRemediationPlanMarkdown(plan) {
 }
 
 function buildSourceIssueSummary(issues, limit = 20) {
-  const preferredSourcePattern = /^\.kiro\/specs\/[^/]+\/docs\/scene-package\.json$/i;
+  const preferredSourcePattern = /^\.sce\/specs\/[^/]+\/docs\/scene-package\.json$/i;
   const allIssues = Array.isArray(issues) ? issues : [];
   const preferredIssues = allIssues.filter((issue) => {
     const sourceFile = normalizeText(issue && issue.source_file);

@@ -48,6 +48,15 @@ describe('BootstrapPromptBuilder', () => {
     }
   }
 
+  /** Create steering files under the universal .sce path. */
+  function createSceSteeringFiles(files = {}) {
+    const steeringDir = path.join(tempDir, '.sce', 'steering');
+    fs.mkdirSync(steeringDir, { recursive: true });
+    for (const [name, content] of Object.entries(files)) {
+      fs.writeFileSync(path.join(steeringDir, name), content);
+    }
+  }
+
   /** Create a Spec directory with optional doc files. */
   function createSpecFiles(specName, docs = {}) {
     const specDir = path.join(tempDir, '.kiro', 'specs', specName);
@@ -198,6 +207,28 @@ describe('BootstrapPromptBuilder', () => {
 
       // Should still produce a valid prompt
       expect(prompt).toContain('## Steering Context');
+    });
+
+    test('loads steering from .sce/steering when available', async () => {
+      createSceSteeringFiles({
+        'CORE_PRINCIPLES.md': 'SCE core policy',
+      });
+
+      const prompt = await builder.buildPrompt('any-spec');
+      expect(prompt).toContain('SCE core policy');
+    });
+
+    test('prefers .sce steering over legacy .kiro steering', async () => {
+      createSteeringFiles({
+        'CORE_PRINCIPLES.md': 'Legacy core policy',
+      });
+      createSceSteeringFiles({
+        'CORE_PRINCIPLES.md': 'Universal core policy',
+      });
+
+      const prompt = await builder.buildPrompt('any-spec');
+      expect(prompt).toContain('Universal core policy');
+      expect(prompt).not.toContain('Legacy core policy');
     });
   });
 

@@ -14,6 +14,8 @@ const rollbackCommand = require('../lib/commands/rollback');
 const watchCommands = require('../lib/commands/watch');
 const workflowsCommand = require('../lib/commands/workflows');
 const registerCollabCommands = require('../lib/commands/collab');
+const { registerSessionCommands } = require('../lib/commands/session');
+const { registerSteeringCommands } = require('../lib/commands/steering');
 const { registerSpecBootstrapCommand } = require('../lib/commands/spec-bootstrap');
 const { registerSpecPipelineCommand } = require('../lib/commands/spec-pipeline');
 const { registerSpecGateCommand } = require('../lib/commands/spec-gate');
@@ -638,6 +640,10 @@ repoCmd
 
 // Spec-level collaboration commands
 registerCollabCommands(program);
+
+// Universal steering and runtime session commands
+registerSteeringCommands(program);
+registerSessionCommands(program);
 
 // Autonomous control commands
 const { registerAutoCommands } = require('../lib/commands/auto');

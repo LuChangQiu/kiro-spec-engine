@@ -135,6 +135,23 @@ sce prompt generate <spec-name> <task-id>
 sce prompt generate <spec-name> <task-id> --tool=claude-code
 ```
 
+### Universal Steering & Session
+
+```bash
+# Initialize universal steering contract (.sce/steering + .kiro compatibility fallback)
+sce steering init
+
+# Compile steering package for a specific agent tool
+sce steering compile --tool codex --agent-version 1.2.3 --format json --json
+sce steering compile --tool claude --agent-version 0.9.0
+
+# Start/resume/snapshot cross-agent runtime sessions
+sce session start "ship order workflow hardening" --tool codex --agent-version 1.2.3 --id release-20260224
+sce session resume release-20260224 --status active
+sce session snapshot release-20260224 --summary "post-gate checkpoint" --payload '{"tests_passed":42}' --json
+sce session show release-20260224 --json
+```
+
 ### Watch Mode
 
 ```bash

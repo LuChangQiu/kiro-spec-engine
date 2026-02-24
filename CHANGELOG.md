@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.11] - 2026-02-24
+
+### Added
+- Workspace tracking audit for deterministic `.sce` fixture governance:
+  - New command: `sce workspace tracking-audit` (`--json`, `--no-strict`)
+  - New CI script: `node scripts/check-sce-tracking.js`
+  - New npm alias: `npm run test:sce-tracking`
+  - New audit helper: `lib/workspace/sce-tracking-audit.js`
+  - New unit coverage: `tests/unit/workspace/sce-tracking-audit.test.js`
+
+### Changed
+- `sce workspace legacy-migrate` now requires explicit `--confirm` for non-dry-run execution.
+- `prepublishOnly` now includes `test:sce-tracking` to prevent missing tracked `.sce` fixture assets before publish.
+
+### Fixed
+- Added integration coverage to ensure legacy migration remains a strictly manual two-step flow (`--dry-run` then `--confirm`).
+
 ## [3.3.10] - 2026-02-24
 
 ### Fixed

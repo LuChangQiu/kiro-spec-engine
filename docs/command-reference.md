@@ -225,11 +225,16 @@ sce workspace legacy-scan
 sce workspace legacy-scan --max-depth 8 --json
 
 # Migrate legacy .kiro directories to .sce (safe merge when .sce already exists)
-sce workspace legacy-migrate
+# Non-dry-run migration now requires explicit manual confirmation.
+sce workspace legacy-migrate --confirm
 sce workspace legacy-migrate --dry-run --json
 # Recommended: always run dry-run first, then execute manual migration
 # sce workspace legacy-migrate --dry-run
-# sce workspace legacy-migrate
+# sce workspace legacy-migrate --confirm
+
+# Audit tracked .sce assets required for deterministic CI/release behavior
+sce workspace tracking-audit
+sce workspace tracking-audit --json
 
 # Safety guardrail (default):
 # If legacy .kiro directories exist, sce blocks non-migration commands

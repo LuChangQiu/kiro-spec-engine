@@ -25,6 +25,7 @@ const {
   findLegacyKiroDirectories,
   migrateLegacyKiroDirectories,
 } = require('../lib/workspace/legacy-kiro-migrator');
+const { auditSceTracking } = require('../lib/workspace/sce-tracking-audit');
 
 const i18n = getI18n();
 const t = (key, params) => i18n.t(key, params);
@@ -656,9 +657,28 @@ workspaceCmd
   .command('legacy-migrate')
   .description('Migrate legacy .kiro directories to .sce')
   .option('--dry-run', 'Preview migration actions without writing changes')
+  .option('--confirm', 'Confirm manual migration execution (required for non-dry-run migration)')
   .option('--max-depth <n>', 'Maximum recursive scan depth', parseInt)
   .option('--json', 'Output in JSON format')
   .action(async (options) => {
+    if (!options.dryRun && options.confirm !== true) {
+      const message = 'Manual confirmation required: rerun with --confirm (or use --dry-run first).';
+      if (options.json) {
+        console.log(JSON.stringify({
+          success: false,
+          mode: 'workspace-legacy-migrate',
+          error: message,
+          hint: 'sce workspace legacy-migrate --dry-run --json'
+        }, null, 2));
+      } else {
+        console.error(chalk.red(message));
+        console.error(chalk.gray('Preview first:  sce workspace legacy-migrate --dry-run'));
+        console.error(chalk.gray('Apply manually: sce workspace legacy-migrate --confirm'));
+      }
+      process.exitCode = 2;
+      return;
+    }
+
     const workspaceRoot = process.cwd();
     const report = await migrateLegacyKiroDirectories(workspaceRoot, {
       dryRun: options.dryRun === true,
@@ -684,6 +704,41 @@ workspaceCmd
     console.log(chalk.gray(`Moved files: ${report.moved_files}`));
     console.log(chalk.gray(`Deduped files: ${report.deduped_files}`));
     console.log(chalk.gray(`Conflict files: ${report.conflict_files}`));
+  });
+
+workspaceCmd
+  .command('tracking-audit')
+  .description('Audit tracked .sce assets required for deterministic CI/release behavior')
+  .option('--json', 'Output in JSON format')
+  .option('--no-strict', 'Do not fail process when audit reports violations')
+  .action(async (options) => {
+    const report = auditSceTracking(process.cwd());
+
+    if (options.json) {
+      console.log(JSON.stringify(report, null, 2));
+    } else if (report.passed) {
+      console.log(chalk.green('✓ SCE tracking audit passed.'));
+      console.log(chalk.gray(`Fixture tracked specs: ${report.summary.fixture_spec_files}`));
+      console.log(chalk.gray(`Fixture tracked templates: ${report.summary.fixture_template_files}`));
+    } else {
+      console.log(chalk.red('✖ SCE tracking audit failed.'));
+      if (report.missing_required_files.length > 0) {
+        console.log(chalk.yellow('Missing required tracked files:'));
+        for (const filePath of report.missing_required_files) {
+          console.log(chalk.gray(`  - ${filePath}`));
+        }
+      }
+      if (report.fixture.disallowed_tracked_files.length > 0) {
+        console.log(chalk.yellow('Disallowed tracked fixture runtime files:'));
+        for (const filePath of report.fixture.disallowed_tracked_files) {
+          console.log(chalk.gray(`  - ${filePath}`));
+        }
+      }
+    }
+
+    if (!report.passed && options.strict !== false) {
+      process.exitCode = 1;
+    }
   });
 
 // Environment configuration management commands
@@ -900,7 +955,7 @@ async function updateProjectConfig(projectName) {
       ));
       console.error(chalk.yellow('SCE blocks all non-migration commands until migration is completed.'));
       console.error(chalk.gray('Review first:  sce workspace legacy-migrate --dry-run'));
-      console.error(chalk.gray('Apply manually: sce workspace legacy-migrate'));
+      console.error(chalk.gray('Apply manually: sce workspace legacy-migrate --confirm'));
       process.exit(2);
     }
   }

@@ -88,7 +88,14 @@ describe('legacy migration guard CLI integration', () => {
     const scanPayload = JSON.parse(`${scanResult.stdout}`.trim());
     expect(scanPayload.count).toBe(1);
 
-    const migrateResult = await runCli(['workspace', 'legacy-migrate', '--json'], { cwd: tempDir });
+    const blockedMigrate = await runCli(['workspace', 'legacy-migrate', '--json'], { cwd: tempDir });
+    expect(blockedMigrate.exitCode).toBe(2);
+    const blockedPayload = JSON.parse(`${blockedMigrate.stdout}`.trim());
+    expect(blockedPayload.success).toBe(false);
+    expect(blockedPayload.error).toContain('--confirm');
+    expect(await fs.pathExists(path.join(tempDir, '.kiro'))).toBe(true);
+
+    const migrateResult = await runCli(['workspace', 'legacy-migrate', '--confirm', '--json'], { cwd: tempDir });
     expect(migrateResult.exitCode).toBe(0);
     const migratePayload = JSON.parse(`${migrateResult.stdout}`.trim());
     expect(migratePayload.scanned).toBe(1);
@@ -97,4 +104,3 @@ describe('legacy migration guard CLI integration', () => {
     expect(await fs.pathExists(path.join(tempDir, '.sce/steering/ENVIRONMENT.md'))).toBe(true);
   });
 });
-

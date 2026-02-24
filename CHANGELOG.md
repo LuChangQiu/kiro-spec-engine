@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.9] - 2026-02-24
+
+### Fixed
+- Stabilized Moqui regression script tests in CI by replacing implicit `.sce` fixture dependency with explicit temp workspace bootstrap:
+  - `tests/unit/scripts/moqui-lexicon-audit.test.js` now provisions full fixture workspace at runtime.
+  - `tests/unit/scripts/moqui-core-regression-suite.test.js` now provisions full fixture workspace at runtime.
+  - Added shared builder `tests/helpers/moqui-core-regression-workspace-fixture.js` to ensure deterministic manifest/template/spec/script setup across environments.
+
 ## [3.3.8] - 2026-02-24
 
 ### Added

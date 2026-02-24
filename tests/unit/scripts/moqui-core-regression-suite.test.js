@@ -2,6 +2,9 @@ const fs = require('fs-extra');
 const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const {
+  createMoquiCoreRegressionWorkspace
+} = require('../../helpers/moqui-core-regression-workspace-fixture');
 
 describe('moqui-core-regression-suite script', () => {
   let tempDir;
@@ -9,14 +12,8 @@ describe('moqui-core-regression-suite script', () => {
 
   beforeEach(async () => {
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-moqui-core-regression-'));
-    const projectRoot = path.resolve(__dirname, '..', '..', '..');
-    fixtureWorkspace = path.join(
-      projectRoot,
-      'tests',
-      'fixtures',
-      'moqui-core-regression',
-      'workspace'
-    );
+    fixtureWorkspace = path.join(tempDir, 'fixture-workspace');
+    await createMoquiCoreRegressionWorkspace(fixtureWorkspace);
   });
 
   afterEach(async () => {

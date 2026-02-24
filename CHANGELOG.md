@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.7] - 2026-02-24
+
+### Changed
+- Legacy workspace migration is now a strict manual gate:
+  - when legacy `.kiro` directories are detected, `sce` blocks non-migration commands by default
+  - users must run `sce workspace legacy-migrate` manually before continuing
+  - only migration-safe entrypoints are allowed pre-migration (`workspace legacy-scan`, `workspace legacy-migrate`, help/version)
+
+### Added
+- Integration test coverage for legacy migration command guard behavior:
+  - `tests/integration/legacy-migration-guard-cli.integration.test.js`
+
 ## [3.3.6] - 2026-02-24
 
 ### Added

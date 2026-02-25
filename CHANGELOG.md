@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.13] - 2026-02-25
+
+### Changed
+- Strengthened steering defect-repair governance with post-fix cleanup hard rule:
+  - After bug fixes are validated, temporary debug logs, ad-hoc probes, one-off scripts, and temporary debug switches must be removed.
+  - Any retained diagnostic logging must be converted to configurable observability controls and default to disabled.
+- Synced the same steering hard rule to both runtime and template steering baselines:
+  - `.sce/steering/CORE_PRINCIPLES.md`
+  - `template/.sce/steering/CORE_PRINCIPLES.md`
+
 ## [3.3.12] - 2026-02-25
 
 ### Changed

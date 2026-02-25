@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.12] - 2026-02-25
+
+### Changed
+- Strengthened steering baseline for root-cause defect handling:
+  - Added explicit rule: bug fixing must prioritize root-cause remediation, not workaround-style bypass.
+  - Added explicit complex-issue debugging method: prefer debug logs and observability signals (inputs/outputs/branches/stack/context) to reconstruct execution path before conclusion.
+- Standardized ontology analysis baseline in steering as a unified "four layers + one chain" model:
+  - Entity model
+  - Relation graph
+  - Business rule
+  - Decision logic
+  - Action/lineage execution chain
+- Synced the same steering enhancements to both runtime project steering and template steering:
+  - `.sce/steering/CORE_PRINCIPLES.md`
+  - `template/.sce/steering/CORE_PRINCIPLES.md`
+
 ## [3.3.11] - 2026-02-24
 
 ### Added

@@ -9,7 +9,9 @@ const {
   runErrorbookListCommand,
   runErrorbookShowCommand,
   runErrorbookFindCommand,
-  runErrorbookPromoteCommand
+  runErrorbookPromoteCommand,
+  runErrorbookDeprecateCommand,
+  runErrorbookRequalifyCommand
 } = require('../../../lib/commands/errorbook');
 
 describe('errorbook command workflow', () => {
@@ -261,6 +263,96 @@ describe('errorbook command workflow', () => {
     expect(shown.mode).toBe('errorbook-show');
     expect(shown.entry.id).toBe(recorded.entry.id);
     expect(shown.entry.title).toBe('Shipment webhook duplicate delivery');
+  });
+
+  test('deprecate marks entry as deprecated with reason', async () => {
+    const recorded = await runErrorbookRecordCommand({
+      title: 'Legacy cache flush mismatch',
+      symptom: 'Cache flush endpoint no longer aligns with new routing policy.',
+      rootCause: 'Legacy endpoint path kept old prefix after router refactor.',
+      fixAction: ['Use new endpoint route and remove legacy alias'],
+      verification: ['Endpoint contract tests passed'],
+      tags: 'cache',
+      ontology: 'execution_flow',
+      status: 'verified',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    const deprecated = await runErrorbookDeprecateCommand({
+      id: recorded.entry.id,
+      reason: 'Superseded by scene-runtime routing baseline',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(deprecated.mode).toBe('errorbook-deprecate');
+    expect(deprecated.deprecated).toBe(true);
+    expect(deprecated.entry.status).toBe('deprecated');
+    expect(deprecated.entry.deprecation.reason).toContain('Superseded');
+  });
+
+  test('requalify restores deprecated entry to verified when evidence exists', async () => {
+    const recorded = await runErrorbookRecordCommand({
+      title: 'Order reindex stale cursor',
+      symptom: 'Reindex skipped latest order updates under concurrent writes.',
+      rootCause: 'Cursor snapshot mode was stale under lock retries.',
+      fixAction: ['Switch to monotonic cursor checkpoint'],
+      verification: ['Reindex replay test passed'],
+      tags: 'order,index',
+      ontology: 'entity,relation',
+      status: 'verified',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    await runErrorbookDeprecateCommand({
+      id: recorded.entry.id,
+      reason: 'Temporarily deprecated for policy rewrite',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    const requalified = await runErrorbookRequalifyCommand({
+      id: recorded.entry.id,
+      status: 'verified',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(requalified.mode).toBe('errorbook-requalify');
+    expect(requalified.requalified).toBe(true);
+    expect(requalified.entry.status).toBe('verified');
+    expect(requalified.entry.deprecation).toBeUndefined();
+  });
+
+  test('requalify rejects invalid status transitions', async () => {
+    const recorded = await runErrorbookRecordCommand({
+      title: 'Temp fixture quality sample',
+      symptom: 'Fixture sample for transition validation.',
+      rootCause: 'Test transition guard coverage.',
+      fixAction: ['Guard transition in command'],
+      verification: ['unit test'],
+      tags: 'test',
+      ontology: 'entity',
+      status: 'verified',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    await expect(runErrorbookRequalifyCommand({
+      id: recorded.entry.id,
+      status: 'promoted',
+      json: true
+    }, {
+      projectPath: tempDir
+    })).rejects.toThrow('does not accept status=promoted');
   });
 
   test('normalizes ontology aliases into canonical tags', () => {

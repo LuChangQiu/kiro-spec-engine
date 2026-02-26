@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `sce errorbook show <id>`
   - `sce errorbook find --query <text>`
   - `sce errorbook promote <id>`
+  - `sce errorbook deprecate <id> --reason <text>`
+  - `sce errorbook requalify <id> --status <candidate|verified>`
 
 ### Changed
 - Added strict curation/promotion policy to command reference (`宁缺毋滥，优胜略汰`):

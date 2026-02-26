@@ -341,6 +341,12 @@ sce errorbook find --query "approve order timeout" --limit 10 --json
 
 # Promote only after strict gate checks pass
 sce errorbook promote <entry-id> --json
+
+# Eliminate obsolete/low-value entries (curation)
+sce errorbook deprecate <entry-id> --reason "superseded by v2 policy" --json
+
+# Requalify deprecated entry after remediation review
+sce errorbook requalify <entry-id> --status verified --json
 ```
 
 Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
@@ -352,6 +358,8 @@ Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
   - `verification_evidence` non-empty
   - `ontology_tags` non-empty
   - `quality_score >= 75`
+- `deprecate` requires explicit `--reason` to preserve elimination traceability.
+- `requalify` only accepts `candidate|verified`; `promoted` must still go through `promote` gate.
 
 ### Studio Workflow
 

@@ -441,7 +441,7 @@ Reads version.json from project.
 ```javascript
 {
   version: '1.2.0',
-  kseVersion: '1.2.0',
+  sceVersion: '1.2.0',
   createdAt: '2026-01-23T00:00:00.000Z',
   updatedAt: '2026-01-23T00:00:00.000Z',
   upgradeHistory: []

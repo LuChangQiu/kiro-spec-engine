@@ -227,7 +227,7 @@ This document provides detailed architecture diagrams and explanations for Scene
 │                    version.json                              │
 │  {                                                           │
 │    "version": "1.2.0",                                       │
-│    "kseVersion": "1.2.0",                                    │
+│    "sceVersion": "1.2.0",                                    │
 │    "createdAt": "2026-01-23T00:00:00.000Z",                 │
 │    "updatedAt": "2026-01-23T00:00:00.000Z",                 │
 │    "upgradeHistory": [                                       │
@@ -235,7 +235,7 @@ This document provides detailed architecture diagrams and explanations for Scene
 │        "from": "1.0.0",                                      │
 │        "to": "1.1.0",                                        │
 │        "timestamp": "2026-01-23T00:00:00.000Z",             │
-│        "kseVersion": "1.1.0"                                 │
+│        "sceVersion": "1.1.0"                                 │
 │      }                                                       │
 │    ]                                                         │
 │  }                                                           │

@@ -24,12 +24,19 @@ describe('TemplateManager', () => {
         {
           id: 'web/basic-spec',
           name: 'Basic Spec Scaffold',
+          template_type: 'spec-scaffold',
           category: 'web-features',
           description: 'Scaffold template',
           difficulty: 'beginner',
           tags: ['spec'],
           applicable_scenarios: ['feature-development'],
-          files: ['requirements.md', 'design.md', 'tasks.md']
+          files: ['requirements.md', 'design.md', 'tasks.md'],
+          min_sce_version: '3.3.0',
+          risk_level: 'low',
+          rollback_contract: {
+            supported: true,
+            strategy: 'git-revert'
+          }
         },
         {
           id: 'moqui/order-capability',
@@ -43,7 +50,15 @@ describe('TemplateManager', () => {
           files: ['capability.yaml'],
           min_sce_version: '3.3.0',
           max_sce_version: '3.3.99',
-          risk_level: 'medium'
+          ontology_scope: {
+            domains: ['erp'],
+            entities: ['OrderHeader']
+          },
+          risk_level: 'medium',
+          rollback_contract: {
+            supported: true,
+            strategy: 'compensating-action'
+          }
         },
         {
           id: 'moqui/runtime-playbook',
@@ -56,7 +71,11 @@ describe('TemplateManager', () => {
           applicable_scenarios: ['ops'],
           files: ['runbook.md'],
           min_sce_version: '3.4.0',
-          risk_level: 'high'
+          risk_level: 'high',
+          rollback_contract: {
+            supported: true,
+            strategy: 'runbook-revert'
+          }
         }
       ]
     }, { spaces: 2 });

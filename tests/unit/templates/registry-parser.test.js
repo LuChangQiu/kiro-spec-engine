@@ -67,7 +67,40 @@ describe('RegistryParser', () => {
           difficulty: 'beginner',
           tags: ['spec'],
           applicable_scenarios: ['feature-development'],
-          files: ['requirements.md', 'tasks.md']
+          files: ['requirements.md', 'tasks.md'],
+          min_sce_version: '3.3.13',
+          risk_level: 'low',
+          rollback_contract: {
+            supported: true,
+            strategy: 'git-revert'
+          }
+        }
+      ]
+    };
+
+    expect(() => parser.validateRegistrySchema(registry)).toThrow(ValidationError);
+  });
+
+  test('rejects capability-template missing ontology scope', () => {
+    const registry = {
+      version: '2.0.0',
+      templates: [
+        {
+          id: 'moqui/order-capability',
+          name: 'Order Capability Template',
+          template_type: 'capability-template',
+          category: 'moqui',
+          description: 'Capability template',
+          difficulty: 'advanced',
+          tags: ['moqui', 'order'],
+          applicable_scenarios: ['order-management'],
+          files: ['capability.yaml'],
+          min_sce_version: '3.3.13',
+          risk_level: 'medium',
+          rollback_contract: {
+            supported: true,
+            strategy: 'compensating-action'
+          }
         }
       ]
     };

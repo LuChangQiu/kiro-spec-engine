@@ -45,6 +45,10 @@ describe('OrchestratorConfig', () => {
         rateLimitCooldownMs: 45000,
         rateLimitLaunchBudgetPerMinute: 8,
         rateLimitLaunchBudgetWindowMs: 60000,
+        rateLimitSignalWindowMs: 30000,
+        rateLimitSignalThreshold: 3,
+        rateLimitSignalExtraHoldMs: 3000,
+        rateLimitDynamicBudgetFloor: 1,
         apiKeyEnvVar: 'CODEX_API_KEY',
         bootstrapTemplate: null,
         codexArgs: [],
@@ -64,6 +68,8 @@ describe('OrchestratorConfig', () => {
         'maxRetries', 'rateLimitMaxRetries', 'rateLimitBackoffBaseMs', 'rateLimitBackoffMaxMs',
         'rateLimitAdaptiveParallel', 'rateLimitParallelFloor', 'rateLimitCooldownMs',
         'rateLimitLaunchBudgetPerMinute', 'rateLimitLaunchBudgetWindowMs',
+        'rateLimitSignalWindowMs', 'rateLimitSignalThreshold', 'rateLimitSignalExtraHoldMs',
+        'rateLimitDynamicBudgetFloor',
         'apiKeyEnvVar', 'bootstrapTemplate', 'codexArgs',
         'codexCommand',
       ];
@@ -109,6 +115,10 @@ describe('OrchestratorConfig', () => {
       expect(result.rateLimitCooldownMs).toBe(45000);
       expect(result.rateLimitLaunchBudgetPerMinute).toBe(8);
       expect(result.rateLimitLaunchBudgetWindowMs).toBe(60000);
+      expect(result.rateLimitSignalWindowMs).toBe(30000);
+      expect(result.rateLimitSignalThreshold).toBe(3);
+      expect(result.rateLimitSignalExtraHoldMs).toBe(3000);
+      expect(result.rateLimitDynamicBudgetFloor).toBe(1);
       expect(result.apiKeyEnvVar).toBe('CODEX_API_KEY');
       expect(result.bootstrapTemplate).toBeNull();
       expect(result.codexArgs).toEqual([]);
@@ -130,6 +140,10 @@ describe('OrchestratorConfig', () => {
         rateLimitCooldownMs: 120000,
         rateLimitLaunchBudgetPerMinute: 20,
         rateLimitLaunchBudgetWindowMs: 90000,
+        rateLimitSignalWindowMs: 45000,
+        rateLimitSignalThreshold: 4,
+        rateLimitSignalExtraHoldMs: 5000,
+        rateLimitDynamicBudgetFloor: 2,
         apiKeyEnvVar: 'CLAUDE_API_KEY',
         bootstrapTemplate: 'templates/custom.md',
         codexArgs: ['--model', 'gpt-4'],

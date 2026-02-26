@@ -449,13 +449,13 @@ describe('OrchestrationEngine', () => {
     test('throttled launch budget recovers after cooldown and quiet window', () => {
       let now = 0;
       engine._now = () => now;
-      engine._rateLimitSignalWindowMs = 200;
       engine._applyRetryPolicyConfig({
         rateLimitAdaptiveParallel: true,
         rateLimitParallelFloor: 1,
         rateLimitCooldownMs: 100,
         rateLimitLaunchBudgetPerMinute: 4,
         rateLimitLaunchBudgetWindowMs: 1000,
+        rateLimitSignalWindowMs: 200,
       });
       engine._initializeAdaptiveParallel(4);
 
@@ -481,6 +481,33 @@ describe('OrchestrationEngine', () => {
           budgetPerMinute: 4,
         })
       );
+    });
+
+    test('spike config knobs control hold extension and dynamic budget floor', () => {
+      let now = 0;
+      engine._now = () => now;
+      engine._applyRetryPolicyConfig({
+        rateLimitAdaptiveParallel: true,
+        rateLimitParallelFloor: 1,
+        rateLimitCooldownMs: 1000,
+        rateLimitLaunchBudgetPerMinute: 8,
+        rateLimitLaunchBudgetWindowMs: 60000,
+        rateLimitSignalThreshold: 2,
+        rateLimitSignalExtraHoldMs: 2500,
+        rateLimitDynamicBudgetFloor: 3,
+      });
+      engine._initializeAdaptiveParallel(8);
+
+      engine._onRateLimitSignal(1000);
+      expect(engine._getRateLimitLaunchHoldRemainingMs()).toBe(1000);
+      engine._onRateLimitSignal(1000);
+
+      expect(engine._getRateLimitLaunchHoldRemainingMs()).toBe(2500);
+      expect(engine._getLaunchBudgetConfig().budgetPerMinute).toBe(4);
+
+      engine._onRateLimitSignal(1000);
+      expect(engine._getLaunchBudgetConfig().budgetPerMinute).toBe(3);
+      expect(engine._getRateLimitLaunchHoldRemainingMs()).toBe(5000);
     });
   });
 

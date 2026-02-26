@@ -1335,13 +1335,23 @@ Recommended `.sce/config/orchestrator.json`:
   "rateLimitCooldownMs": 45000,
   "rateLimitLaunchBudgetPerMinute": 8,
   "rateLimitLaunchBudgetWindowMs": 60000,
+  "rateLimitSignalWindowMs": 30000,
+  "rateLimitSignalThreshold": 3,
+  "rateLimitSignalExtraHoldMs": 3000,
+  "rateLimitDynamicBudgetFloor": 1,
   "apiKeyEnvVar": "CODEX_API_KEY",
   "codexArgs": ["--skip-git-repo-check"],
   "codexCommand": "npx @openai/codex"
 }
 ```
 
-`rateLimit*` settings provide dedicated retry/backoff and adaptive parallel throttling when providers return 429 / too-many-requests errors. Engine retry honors `Retry-After` / `try again in ...` hints from provider error messages and clamps final retry waits by `rateLimitBackoffMaxMs` to avoid unbounded pause windows. During active backoff windows, new pending spec launches are paused to reduce request bursts (launch hold remains active even if adaptive parallel throttling is disabled). `orchestrate stop` now interrupts pending retry waits immediately so long backoff does not look like a deadlock.
+`rateLimit*` settings provide dedicated retry/backoff and adaptive throttling when providers return 429 / too-many-requests errors. Engine retry honors `Retry-After` / `try again in ...` hints from provider error messages and clamps final retry waits by `rateLimitBackoffMaxMs` to avoid unbounded pause windows. During active backoff windows, new pending spec launches are paused to reduce request bursts (launch hold remains active even if adaptive parallel throttling is disabled). Sustained 429 spikes are additionally controlled by:
+- `rateLimitSignalWindowMs`: rolling signal window for spike detection
+- `rateLimitSignalThreshold`: signals required inside window before escalation
+- `rateLimitSignalExtraHoldMs`: extra launch hold per escalation unit
+- `rateLimitDynamicBudgetFloor`: lowest dynamic launch budget allowed during sustained pressure
+
+`orchestrate stop` interrupts pending retry waits immediately so long backoff windows do not look like deadlocks.
 
 Codex sub-agent permission defaults:
 - `--sandbox danger-full-access` is always injected by orchestrator runtime.

@@ -18,6 +18,7 @@ const {
   ensureStudioAuthorization,
   buildReleaseGateSteps
 } = require('../../../lib/commands/studio');
+const { resolveErrorbookPaths } = require('../../../lib/commands/errorbook');
 
 describe('studio command workflow', () => {
   let tempDir;
@@ -195,6 +196,13 @@ describe('studio command workflow', () => {
     const job = await fs.readJson(path.join(paths.jobsDir, `${planned.job_id}.json`));
     expect(job.status).toBe('verify_failed');
     expect(job.stages.verify.status).toBe('failed');
+
+    const errorbookPaths = resolveErrorbookPaths(tempDir);
+    const errorbookIndex = await fs.readJson(errorbookPaths.indexFile);
+    expect(errorbookIndex.total_entries).toBeGreaterThanOrEqual(1);
+    const entry = await fs.readJson(path.join(errorbookPaths.entriesDir, `${errorbookIndex.entries[0].id}.json`));
+    expect(entry.status).toBe('candidate');
+    expect(entry.tags).toEqual(expect.arrayContaining(['release-blocker', 'stage-verify']));
   });
 
   test('enforces stage order constraints', async () => {
@@ -474,6 +482,10 @@ describe('studio command workflow', () => {
     const paths = resolveStudioPaths(tempDir);
     const job = await fs.readJson(path.join(paths.jobsDir, `${planned.job_id}.json`));
     expect(job.status).toBe('release_failed');
+
+    const errorbookPaths = resolveErrorbookPaths(tempDir);
+    const errorbookIndex = await fs.readJson(errorbookPaths.indexFile);
+    expect(errorbookIndex.total_entries).toBeGreaterThanOrEqual(1);
   });
 
   test('release gate includes ontology and capability matrix checks when handoff manifest exists', async () => {
@@ -483,6 +495,13 @@ describe('studio command workflow', () => {
       project: 'studio-release-gate-fixture',
       entries: []
     }, { spaces: 2 });
+    const scriptsDir = path.join(tempDir, 'scripts');
+    await fs.ensureDir(scriptsDir);
+    await fs.writeFile(
+      path.join(scriptsDir, 'errorbook-release-gate.js'),
+      "console.log(JSON.stringify({ mode: 'errorbook-release-gate', passed: true }));\n",
+      'utf8'
+    );
 
     const steps = await buildReleaseGateSteps({
       profile: 'standard'
@@ -492,6 +511,10 @@ describe('studio command workflow', () => {
     });
 
     const byId = new Map(steps.map((item) => [item.id, item]));
+    expect(byId.get('errorbook-release-gate')).toEqual(expect.objectContaining({
+      enabled: true,
+      required: true
+    }));
     expect(byId.get('scene-package-publish-batch-dry-run')).toEqual(expect.objectContaining({
       enabled: true,
       required: true

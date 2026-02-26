@@ -347,6 +347,9 @@ sce errorbook deprecate <entry-id> --reason "superseded by v2 policy" --json
 
 # Requalify deprecated entry after remediation review
 sce errorbook requalify <entry-id> --status verified --json
+
+# Release hard gate (default in prepublish and studio release preflight)
+sce errorbook release-gate --min-risk high --fail-on-block --json
 ```
 
 Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
@@ -360,6 +363,7 @@ Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
   - `quality_score >= 75`
 - `deprecate` requires explicit `--reason` to preserve elimination traceability.
 - `requalify` only accepts `candidate|verified`; `promoted` must still go through `promote` gate.
+- `release-gate` blocks release when unresolved high-risk `candidate` entries remain.
 
 ### Studio Workflow
 
@@ -402,8 +406,9 @@ Stage guardrails are enforced by default:
 
 Studio gate execution defaults:
 - `verify --profile standard` runs executable gates (unit test script when available, interactive governance report when present, scene package publish-batch dry-run when handoff manifest exists)
-- `release --profile standard` runs executable release preflight (npm pack dry-run, weekly ops gate when summary exists, release asset integrity when evidence directory exists, scene package publish-batch ontology gate, handoff capability matrix gate)
+- `release --profile standard` runs executable release preflight (npm pack dry-run, errorbook release gate, weekly ops gate when summary exists, release asset integrity when evidence directory exists, scene package publish-batch ontology gate, handoff capability matrix gate)
 - `verify/release --profile strict` fails when any required gate step is skipped (for example missing manifest/evidence/scripts)
+- Required gate failures are auto-recorded into `.sce/errorbook` as `candidate` entries (tagged `release-blocker`) for follow-up triage.
 
 Authorization model (optional, policy-driven):
 - Enable policy: `SCE_STUDIO_REQUIRE_AUTH=1`

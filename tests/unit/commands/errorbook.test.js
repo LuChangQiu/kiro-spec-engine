@@ -10,6 +10,7 @@ const {
   runErrorbookShowCommand,
   runErrorbookFindCommand,
   runErrorbookPromoteCommand,
+  runErrorbookReleaseGateCommand,
   runErrorbookDeprecateCommand,
   runErrorbookRequalifyCommand
 } = require('../../../lib/commands/errorbook');
@@ -353,6 +354,75 @@ describe('errorbook command workflow', () => {
     }, {
       projectPath: tempDir
     })).rejects.toThrow('does not accept status=promoted');
+  });
+
+  test('release gate blocks unresolved high-risk candidate entries', async () => {
+    await runErrorbookRecordCommand({
+      title: 'Critical release gate failure',
+      symptom: 'Required release preflight step failed during deployment pipeline.',
+      rootCause: 'Pending root-cause analysis for release blocker.',
+      fixAction: ['Investigate failing release preflight command'],
+      tags: 'release-blocker,security',
+      ontology: 'execution_flow,decision_policy',
+      status: 'candidate',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    const gate = await runErrorbookReleaseGateCommand({
+      minRisk: 'high',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(gate.mode).toBe('errorbook-release-gate');
+    expect(gate.passed).toBe(false);
+    expect(gate.blocked_count).toBe(1);
+    expect(gate.blocked_entries[0].risk).toBe('high');
+
+    await expect(runErrorbookReleaseGateCommand({
+      minRisk: 'high',
+      failOnBlock: true,
+      json: true
+    }, {
+      projectPath: tempDir
+    })).rejects.toThrow('release gate blocked');
+  });
+
+  test('release gate passes after candidate is deprecated', async () => {
+    const recorded = await runErrorbookRecordCommand({
+      title: 'Legacy blocker sample',
+      symptom: 'Legacy release gate blocker sample for deprecate path.',
+      rootCause: 'Known obsolete blocker sample.',
+      fixAction: ['Mark as deprecated'],
+      tags: 'release-blocker',
+      ontology: 'execution_flow',
+      status: 'candidate',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    await runErrorbookDeprecateCommand({
+      id: recorded.entry.id,
+      reason: 'obsolete sample',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    const gate = await runErrorbookReleaseGateCommand({
+      minRisk: 'high',
+      failOnBlock: true,
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(gate.passed).toBe(true);
+    expect(gate.blocked_count).toBe(0);
   });
 
   test('normalizes ontology aliases into canonical tags', () => {

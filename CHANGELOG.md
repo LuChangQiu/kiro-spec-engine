@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Errorbook release gate command and script:
+  - `sce errorbook release-gate --min-risk <low|medium|high> [--include-verified] [--fail-on-block]`
+  - `node scripts/errorbook-release-gate.js --fail-on-block`
+- `package.json` script alias:
+  - `npm run gate:errorbook-release`
+
+### Changed
+- `prepublishOnly` now enforces errorbook release gate before interactive governance checks.
+- Studio gate failures are now auto-recorded into `.sce/errorbook` as `candidate` entries (tagged `release-blocker`) to avoid manual reminders.
+- Studio release preflight now includes `errorbook-release-gate` as a required gate step when script is available.
+
 ## [3.3.18] - 2026-02-26
 
 ### Added

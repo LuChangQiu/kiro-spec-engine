@@ -12,7 +12,13 @@ const fc = require('fast-check');
 const fs = require('fs-extra');
 const path = require('path');
 const os = require('os');
-const { OrchestratorConfig, DEFAULT_CONFIG, KNOWN_KEYS } = require('../../lib/orchestrator/orchestrator-config');
+const {
+  OrchestratorConfig,
+  DEFAULT_CONFIG,
+  KNOWN_KEYS,
+  buildRateLimitProfileConfig,
+  resolveRateLimitProfileName
+} = require('../../lib/orchestrator/orchestrator-config');
 
 // --- Arbitraries ---
 
@@ -64,6 +70,31 @@ function writeConfigFile(tempDir, data) {
   fs.writeJsonSync(path.join(configDir, 'orchestrator.json'), data);
 }
 
+function pickKnownFields(configObj) {
+  const known = {};
+  for (const key of KNOWN_KEYS) {
+    if (Object.prototype.hasOwnProperty.call(configObj, key)) {
+      known[key] = configObj[key];
+    }
+  }
+  return known;
+}
+
+function buildExpectedConfig(configObj) {
+  const known = pickKnownFields(configObj);
+  const resolvedProfile = resolveRateLimitProfileName(
+    known.rateLimitProfile,
+    DEFAULT_CONFIG.rateLimitProfile
+  );
+  const profileDefaults = buildRateLimitProfileConfig(resolvedProfile);
+  return {
+    ...DEFAULT_CONFIG,
+    ...profileDefaults,
+    ...known,
+    rateLimitProfile: resolvedProfile,
+  };
+}
+
 // --- Property Tests ---
 
 describe('Property 10: 配置解析健壮性 (Config Parsing Robustness)', () => {
@@ -84,11 +115,16 @@ describe('Property 10: 配置解析健壮性 (Config Parsing Robustness)', () =>
           writeConfigFile(tempDir, configObj);
           const oc = new OrchestratorConfig(tempDir);
           const result = await oc.getConfig();
+          const expected = buildExpectedConfig(configObj);
 
           // For each known key present in the input, the result should carry that value
           for (const key of KNOWN_KEYS) {
             if (key in configObj) {
-              expect(result[key]).toEqual(configObj[key]);
+              if (key === 'rateLimitProfile') {
+                expect(result[key]).toEqual(expected[key]);
+              } else {
+                expect(result[key]).toEqual(configObj[key]);
+              }
             }
           }
         } finally {
@@ -128,11 +164,13 @@ describe('Property 10: 配置解析健壮性 (Config Parsing Robustness)', () =>
           writeConfigFile(tempDir, configObj);
           const oc = new OrchestratorConfig(tempDir);
           const result = await oc.getConfig();
+          const expected = buildExpectedConfig(configObj);
 
-          // Every known key that was NOT in the input should equal the default
+          // Every known key that was NOT in the input should equal merged defaults
+          // (base defaults + selected rate-limit profile defaults)
           for (const key of KNOWN_KEYS) {
             if (!(key in configObj)) {
-              expect(result[key]).toEqual(DEFAULT_CONFIG[key]);
+              expect(result[key]).toEqual(expected[key]);
             }
           }
         } finally {

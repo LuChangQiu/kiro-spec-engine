@@ -295,6 +295,9 @@ sce repo health [--json]
 # Start orchestration for multiple specs
 sce orchestrate run --specs "spec-a,spec-b,spec-c" --max-parallel 3
 
+# One-shot anti-429 profile override (without editing orchestrator.json)
+sce orchestrate run --specs "spec-a,spec-b,spec-c" --rate-limit-profile conservative
+
 # Show orchestration status
 sce orchestrate status [--json]
 
@@ -303,6 +306,11 @@ sce orchestrate stop
 ```
 
 When you pass `--specs` to `sce spec bootstrap|pipeline run|gate run`, sce now defaults to this orchestrate mode automatically.
+
+Rate-limit profiles:
+- `conservative`: strongest anti-429 throttling (recommended for unstable quota windows)
+- `balanced`: default profile for normal multi-agent runs
+- `aggressive`: higher throughput with lower protection margins
 
 ### Studio Workflow
 
@@ -1327,6 +1335,7 @@ Recommended `.sce/config/orchestrator.json`:
   "maxParallel": 3,
   "timeoutSeconds": 900,
   "maxRetries": 2,
+  "rateLimitProfile": "balanced",
   "rateLimitMaxRetries": 8,
   "rateLimitBackoffBaseMs": 1500,
   "rateLimitBackoffMaxMs": 60000,
@@ -1344,6 +1353,8 @@ Recommended `.sce/config/orchestrator.json`:
   "codexCommand": "npx @openai/codex"
 }
 ```
+
+`rateLimitProfile` applies preset anti-429 behavior (`conservative|balanced|aggressive`). Any explicit `rateLimit*` field in `orchestrator.json` overrides the selected profile value.
 
 `rateLimit*` settings provide dedicated retry/backoff and adaptive throttling when providers return 429 / too-many-requests errors. Engine retry honors `Retry-After` / `try again in ...` hints from provider error messages and clamps final retry waits by `rateLimitBackoffMaxMs` to avoid unbounded pause windows. During active backoff windows, new pending spec launches are paused to reduce request bursts (launch hold remains active even if adaptive parallel throttling is disabled). Sustained 429 spikes are additionally controlled by:
 - `rateLimitSignalWindowMs`: rolling signal window for spike detection

@@ -67,7 +67,7 @@ describe('registerOrchestrateCommands', () => {
     expect(specsOpt.mandatory).toBe(true);
   });
 
-  test('run subcommand has --max-parallel and --json options', () => {
+  test('run subcommand has --max-parallel, --rate-limit-profile and --json options', () => {
     const program = new Command();
     program.exitOverride();
     registerOrchestrateCommands(program);
@@ -77,6 +77,9 @@ describe('registerOrchestrateCommands', () => {
 
     const maxParOpt = run.options.find(o => o.long === '--max-parallel');
     expect(maxParOpt).toBeDefined();
+
+    const profileOpt = run.options.find(o => o.long === '--rate-limit-profile');
+    expect(profileOpt).toBeDefined();
 
     const jsonOpt = run.options.find(o => o.long === '--json');
     expect(jsonOpt).toBeDefined();
@@ -188,6 +191,28 @@ describe('orchestrate run — parameter validation', () => {
     expect(exitSpy).toHaveBeenCalledWith(1);
     const jsonOutput = logSpy.mock.calls.map(c => c.join(' ')).join(' ');
     expect(jsonOutput).toContain('missing-spec');
+  });
+
+  test('rejects invalid rate-limit profile', async () => {
+    const specDir = path.join(tempDir, '.sce', 'specs', 'spec-a');
+    fs.mkdirSync(specDir, { recursive: true });
+
+    const { registerOrchestrateCommands } = require('../../lib/commands/orchestrate');
+    const program = new Command();
+    program.exitOverride();
+    registerOrchestrateCommands(program);
+
+    await expect(
+      program.parseAsync([
+        'node', 'sce', 'orchestrate', 'run',
+        '--specs', 'spec-a',
+        '--rate-limit-profile', 'ultra'
+      ])
+    ).rejects.toThrow();
+
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    const errorOutput = errorSpy.mock.calls.map(c => c.join(' ')).join(' ');
+    expect(errorOutput).toContain('--rate-limit-profile must be one of');
   });
 });
 

@@ -12,7 +12,14 @@
 const fs = require('fs-extra');
 const path = require('path');
 const os = require('os');
-const { OrchestratorConfig, DEFAULT_CONFIG, KNOWN_KEYS } = require('../../lib/orchestrator/orchestrator-config');
+const {
+  OrchestratorConfig,
+  DEFAULT_CONFIG,
+  KNOWN_KEYS,
+  RATE_LIMIT_PROFILE_PRESETS,
+  buildRateLimitProfileConfig,
+  resolveRateLimitProfileName
+} = require('../../lib/orchestrator/orchestrator-config');
 
 describe('OrchestratorConfig', () => {
   let tempDir;
@@ -37,6 +44,7 @@ describe('OrchestratorConfig', () => {
         maxParallel: 3,
         timeoutSeconds: 600,
         maxRetries: 2,
+        rateLimitProfile: 'balanced',
         rateLimitMaxRetries: 8,
         rateLimitBackoffBaseMs: 1500,
         rateLimitBackoffMaxMs: 60000,
@@ -65,7 +73,7 @@ describe('OrchestratorConfig', () => {
     test('contains all expected config keys', () => {
       const expected = [
         'agentBackend', 'maxParallel', 'timeoutSeconds',
-        'maxRetries', 'rateLimitMaxRetries', 'rateLimitBackoffBaseMs', 'rateLimitBackoffMaxMs',
+        'maxRetries', 'rateLimitProfile', 'rateLimitMaxRetries', 'rateLimitBackoffBaseMs', 'rateLimitBackoffMaxMs',
         'rateLimitAdaptiveParallel', 'rateLimitParallelFloor', 'rateLimitCooldownMs',
         'rateLimitLaunchBudgetPerMinute', 'rateLimitLaunchBudgetWindowMs',
         'rateLimitSignalWindowMs', 'rateLimitSignalThreshold', 'rateLimitSignalExtraHoldMs',
@@ -107,6 +115,7 @@ describe('OrchestratorConfig', () => {
       // Other fields should be defaults
       expect(result.agentBackend).toBe('codex');
       expect(result.maxRetries).toBe(2);
+      expect(result.rateLimitProfile).toBe('balanced');
       expect(result.rateLimitMaxRetries).toBe(8);
       expect(result.rateLimitBackoffBaseMs).toBe(1500);
       expect(result.rateLimitBackoffMaxMs).toBe(60000);
@@ -132,6 +141,7 @@ describe('OrchestratorConfig', () => {
         maxParallel: 8,
         timeoutSeconds: 300,
         maxRetries: 5,
+        rateLimitProfile: 'aggressive',
         rateLimitMaxRetries: 9,
         rateLimitBackoffBaseMs: 1500,
         rateLimitBackoffMaxMs: 45000,
@@ -153,6 +163,40 @@ describe('OrchestratorConfig', () => {
 
       const result = await config.getConfig();
       expect(result).toEqual(customConfig);
+    });
+
+    test('applies conservative profile defaults when no explicit rate-limit overrides are provided', async () => {
+      const configDir = path.join(tempDir, '.sce', 'config');
+      fs.mkdirSync(configDir, { recursive: true });
+      fs.writeJsonSync(path.join(configDir, 'orchestrator.json'), {
+        rateLimitProfile: 'conservative'
+      });
+
+      const result = await config.getConfig();
+      expect(result.rateLimitProfile).toBe('conservative');
+      expect(result.rateLimitMaxRetries).toBe(RATE_LIMIT_PROFILE_PRESETS.conservative.rateLimitMaxRetries);
+      expect(result.rateLimitLaunchBudgetPerMinute).toBe(
+        RATE_LIMIT_PROFILE_PRESETS.conservative.rateLimitLaunchBudgetPerMinute
+      );
+      expect(result.rateLimitSignalThreshold).toBe(
+        RATE_LIMIT_PROFILE_PRESETS.conservative.rateLimitSignalThreshold
+      );
+    });
+
+    test('explicit rate-limit fields override profile defaults', async () => {
+      const configDir = path.join(tempDir, '.sce', 'config');
+      fs.mkdirSync(configDir, { recursive: true });
+      fs.writeJsonSync(path.join(configDir, 'orchestrator.json'), {
+        rateLimitProfile: 'conservative',
+        rateLimitLaunchBudgetPerMinute: 9
+      });
+
+      const result = await config.getConfig();
+      expect(result.rateLimitProfile).toBe('conservative');
+      expect(result.rateLimitLaunchBudgetPerMinute).toBe(9);
+      expect(result.rateLimitSignalThreshold).toBe(
+        RATE_LIMIT_PROFILE_PRESETS.conservative.rateLimitSignalThreshold
+      );
     });
 
     test('falls back to defaults on invalid JSON (Req 7.4)', async () => {
@@ -311,5 +355,19 @@ describe('OrchestratorConfig', () => {
       const expected = path.join(tempDir, '.sce', 'config', 'orchestrator.json');
       expect(config.configPath).toBe(expected);
     });
+  });
+});
+
+describe('rate-limit profile helpers', () => {
+  test('resolveRateLimitProfileName falls back to balanced for unknown profile', () => {
+    expect(resolveRateLimitProfileName('unknown-profile')).toBe('balanced');
+  });
+
+  test('buildRateLimitProfileConfig returns preset with normalized profile name', () => {
+    const result = buildRateLimitProfileConfig('AGGRESSIVE');
+    expect(result.rateLimitProfile).toBe('aggressive');
+    expect(result.rateLimitLaunchBudgetPerMinute).toBe(
+      RATE_LIMIT_PROFILE_PRESETS.aggressive.rateLimitLaunchBudgetPerMinute
+    );
   });
 });

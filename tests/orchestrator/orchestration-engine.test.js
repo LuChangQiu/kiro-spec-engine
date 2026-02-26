@@ -509,6 +509,32 @@ describe('OrchestrationEngine', () => {
       expect(engine._getLaunchBudgetConfig().budgetPerMinute).toBe(3);
       expect(engine._getRateLimitLaunchHoldRemainingMs()).toBe(5000);
     });
+
+    test('start applies runtime configOverrides without mutating persisted config', async () => {
+      mockDependencyManager.buildDependencyGraph.mockResolvedValue({
+        nodes: ['spec-a'],
+        edges: [],
+      });
+      mockConfig.getConfig.mockResolvedValue({
+        maxParallel: 3,
+        maxRetries: 2,
+        timeoutSeconds: 600,
+        rateLimitLaunchBudgetPerMinute: 8,
+        rateLimitSignalThreshold: 3,
+      });
+
+      const result = await engine.start(['spec-a'], {
+        configOverrides: {
+          rateLimitLaunchBudgetPerMinute: 2,
+          rateLimitSignalThreshold: 2,
+        }
+      });
+
+      expect(result.status).toBe('completed');
+      expect(engine._rateLimitLaunchBudgetPerMinute).toBe(2);
+      expect(engine._rateLimitSignalThreshold).toBe(2);
+      expect(mockConfig.getConfig).toHaveBeenCalledTimes(1);
+    });
   });
 
   // -------------------------------------------------------------------------

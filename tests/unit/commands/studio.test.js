@@ -498,6 +498,11 @@ describe('studio command workflow', () => {
     const scriptsDir = path.join(tempDir, 'scripts');
     await fs.ensureDir(scriptsDir);
     await fs.writeFile(
+      path.join(scriptsDir, 'git-managed-gate.js'),
+      "console.log(JSON.stringify({ mode: 'git-managed-gate', passed: true }));\n",
+      'utf8'
+    );
+    await fs.writeFile(
       path.join(scriptsDir, 'errorbook-release-gate.js'),
       "console.log(JSON.stringify({ mode: 'errorbook-release-gate', passed: true }));\n",
       'utf8'
@@ -511,6 +516,10 @@ describe('studio command workflow', () => {
     });
 
     const byId = new Map(steps.map((item) => [item.id, item]));
+    expect(byId.get('git-managed-gate')).toEqual(expect.objectContaining({
+      enabled: true,
+      required: true
+    }));
     expect(byId.get('errorbook-release-gate')).toEqual(expect.objectContaining({
       enabled: true,
       required: true

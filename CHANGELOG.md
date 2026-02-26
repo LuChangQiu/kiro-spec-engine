@@ -13,11 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `node scripts/errorbook-release-gate.js --fail-on-block`
 - `package.json` script alias:
   - `npm run gate:errorbook-release`
+- Git managed release gate script and alias:
+  - `node scripts/git-managed-gate.js --fail-on-violation`
+  - `npm run gate:git-managed`
 
 ### Changed
-- `prepublishOnly` now enforces errorbook release gate before interactive governance checks.
+- `prepublishOnly` now enforces git-managed gate + errorbook release gate before interactive governance checks.
 - Studio gate failures are now auto-recorded into `.sce/errorbook` as `candidate` entries (tagged `release-blocker`) to avoid manual reminders.
-- Studio release preflight now includes `errorbook-release-gate` as a required gate step when script is available.
+- Studio release preflight now includes `git-managed-gate` and `errorbook-release-gate` as required gate steps when scripts are available.
 
 ## [3.3.18] - 2026-02-26
 

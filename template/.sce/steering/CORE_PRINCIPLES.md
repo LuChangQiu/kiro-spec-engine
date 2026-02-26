@@ -102,6 +102,19 @@
 
 **后果**: 违反导致用户困惑、功能难发现、门槛高、维护成本增
 
+### 8.1 Git 托管强制门禁原则 🔐
+
+**核心**: 新增或修改代码必须进入 Git 托管管理链路，禁止“本地改完未推送”进入发布流程
+
+**默认强制**: 若仓库配置了 GitHub/GitLab 远端，发布前必须满足：
+1) 工作区干净（无未提交变更）  
+2) 当前分支已配置 upstream  
+3) 与 upstream 完全同步（ahead=0, behind=0）
+
+**豁免条件**: 仅当客户环境确实没有 GitHub/GitLab 托管时允许放行（策略控制），并需在交付记录中声明原因
+
+**落地门禁**: `scripts/git-managed-gate.js`（`prepublishOnly` 与 release preflight 默认执行）
+
 ### 9. 版本同步和 Steering 刷新原则
 
 **核心**: 版本更新或首次安装后，必须阅读 `.sce/README.md` 并刷新 Steering

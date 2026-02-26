@@ -80,12 +80,17 @@ rg -n "github.com/scene-capability-engine/sce" README.md README.zh.md docs START
 ```bash
 git status -sb
 git log --oneline -n 15
+
+# 强制托管门禁（prepublish/release preflight 默认执行）
+node scripts/git-managed-gate.js --fail-on-violation --json
 ```
 
 确认：
 
 - 工作区干净；
 - 提交分组清晰、提交信息可直接用于发布记录。
+- 若配置了 GitHub/GitLab 远端：当前分支必须已设置 upstream 且与远端完全同步（ahead=0, behind=0）。
+- 若客户确实没有 GitHub/GitLab：可通过策略放行（`SCE_GIT_MANAGEMENT_ALLOW_NO_REMOTE=1`，默认开启）。
 
 ---
 

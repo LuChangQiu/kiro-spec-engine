@@ -350,6 +350,9 @@ sce errorbook requalify <entry-id> --status verified --json
 
 # Release hard gate (default in prepublish and studio release preflight)
 sce errorbook release-gate --min-risk high --fail-on-block --json
+
+# Git managed hard gate (default in prepublish and studio release preflight)
+node scripts/git-managed-gate.js --fail-on-violation --json
 ```
 
 Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
@@ -364,6 +367,12 @@ Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
 - `deprecate` requires explicit `--reason` to preserve elimination traceability.
 - `requalify` only accepts `candidate|verified`; `promoted` must still go through `promote` gate.
 - `release-gate` blocks release when unresolved high-risk `candidate` entries remain.
+- `git-managed-gate` blocks release when:
+  - worktree has uncommitted changes
+  - branch has no upstream
+  - branch is ahead/behind upstream
+  - upstream is not a GitHub/GitLab remote (when such remotes exist)
+- If project has no GitHub/GitLab remote, gate passes by default (can hard-enforce with `--no-allow-no-remote` or `SCE_GIT_MANAGEMENT_ALLOW_NO_REMOTE=0`).
 
 ### Studio Workflow
 
@@ -406,7 +415,7 @@ Stage guardrails are enforced by default:
 
 Studio gate execution defaults:
 - `verify --profile standard` runs executable gates (unit test script when available, interactive governance report when present, scene package publish-batch dry-run when handoff manifest exists)
-- `release --profile standard` runs executable release preflight (npm pack dry-run, errorbook release gate, weekly ops gate when summary exists, release asset integrity when evidence directory exists, scene package publish-batch ontology gate, handoff capability matrix gate)
+- `release --profile standard` runs executable release preflight (npm pack dry-run, git managed gate, errorbook release gate, weekly ops gate when summary exists, release asset integrity when evidence directory exists, scene package publish-batch ontology gate, handoff capability matrix gate)
 - `verify/release --profile strict` fails when any required gate step is skipped (for example missing manifest/evidence/scripts)
 - Required gate failures are auto-recorded into `.sce/errorbook` as `candidate` entries (tagged `release-blocker`) for follow-up triage.
 

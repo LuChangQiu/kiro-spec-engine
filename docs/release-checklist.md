@@ -95,12 +95,17 @@ rg -n "github.com/scene-capability-engine/sce" README.md README.zh.md docs START
 ```bash
 git status -sb
 git log --oneline -n 15
+
+# Mandatory managed-repo gate (default in prepublish/release preflight)
+node scripts/git-managed-gate.js --fail-on-violation --json
 ```
 
 Verify:
 
 - Working tree is clean.
 - Commits are logically grouped and messages are release-ready.
+- If GitHub/GitLab remote exists, current branch is upstream-tracked and fully synced (ahead=0, behind=0).
+- If customer has no GitHub/GitLab, gate can be bypassed by policy (`SCE_GIT_MANAGEMENT_ALLOW_NO_REMOTE=1`, default).
 
 ---
 

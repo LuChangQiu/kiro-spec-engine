@@ -11,6 +11,6 @@
   },
   "then": {
     "type": "askAgent",
-    "prompt": "The tasks.md file has been updated. Please review the changes and update the workspace status if needed. Run `kse workspace sync` to synchronize."
+    "prompt": "The tasks.md file has been updated. Please review the changes and update workspace status if needed. Run `sce workspace sync` to synchronize."
   }
 }

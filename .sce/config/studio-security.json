@@ -1,0 +1,9 @@
+{
+  "enabled": false,
+  "require_auth_for": [
+    "apply",
+    "release",
+    "rollback"
+  ],
+  "password_env": "SCE_STUDIO_AUTH_PASSWORD"
+}

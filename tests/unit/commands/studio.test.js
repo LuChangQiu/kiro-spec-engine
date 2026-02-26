@@ -13,7 +13,9 @@ const {
   runStudioReleaseCommand,
   runStudioRollbackCommand,
   runStudioEventsCommand,
-  runStudioResumeCommand
+  runStudioResumeCommand,
+  loadStudioSecurityPolicy,
+  ensureStudioAuthorization
 } = require('../../../lib/commands/studio');
 
 describe('studio command workflow', () => {
@@ -338,5 +340,54 @@ describe('studio command workflow', () => {
       env: secureEnv
     });
     expect(rolledBack.status).toBe('rolled_back');
+  });
+
+  test('loads studio security policy from .sce/config and supports env override', async () => {
+    const policyPath = path.join(tempDir, '.sce', 'config', 'studio-security.json');
+    await fs.ensureDir(path.dirname(policyPath));
+    await fs.writeJson(policyPath, {
+      enabled: true,
+      require_auth_for: ['apply'],
+      password_env: 'SCE_STUDIO_AUTH_PASSWORD_LOCAL'
+    }, { spaces: 2 });
+
+    const policy = await loadStudioSecurityPolicy(tempDir, fs, {
+      SCE_STUDIO_PASSWORD_ENV: 'SCE_STUDIO_AUTH_PASSWORD_OVERRIDE'
+    });
+
+    expect(policy.enabled).toBe(true);
+    expect(policy.require_auth_for).toEqual(['apply']);
+    expect(policy.password_env).toBe('SCE_STUDIO_AUTH_PASSWORD_OVERRIDE');
+  });
+
+  test('ensureStudioAuthorization honors policy file configuration', async () => {
+    const policyPath = path.join(tempDir, '.sce', 'config', 'studio-security.json');
+    await fs.ensureDir(path.dirname(policyPath));
+    await fs.writeJson(policyPath, {
+      enabled: true,
+      require_auth_for: ['release'],
+      password_env: 'SCE_STUDIO_AUTH_PASSWORD_LOCAL'
+    }, { spaces: 2 });
+
+    await expect(ensureStudioAuthorization('release', {}, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: {
+        SCE_STUDIO_AUTH_PASSWORD_LOCAL: 'secret'
+      }
+    })).rejects.toThrow('Authorization required for studio release');
+
+    const result = await ensureStudioAuthorization('release', {
+      authPassword: 'secret'
+    }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: {
+        SCE_STUDIO_AUTH_PASSWORD_LOCAL: 'secret'
+      }
+    });
+
+    expect(result.required).toBe(true);
+    expect(result.password_env).toBe('SCE_STUDIO_AUTH_PASSWORD_LOCAL');
   });
 });

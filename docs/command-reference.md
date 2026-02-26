@@ -351,6 +351,16 @@ Authorization model (optional, policy-driven):
 - Protected actions: `apply`, `release`, `rollback`
 - Per-command hard requirement: add `--require-auth`
 
+Default policy file (recommended to commit): `.sce/config/studio-security.json`
+
+```json
+{
+  "enabled": false,
+  "require_auth_for": ["apply", "release", "rollback"],
+  "password_env": "SCE_STUDIO_AUTH_PASSWORD"
+}
+```
+
 ### Capability Matrix Utilities
 
 ```bash

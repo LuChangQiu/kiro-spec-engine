@@ -84,6 +84,7 @@ describe('FileClassifier', () => {
     test('should classify config files correctly', () => {
       expect(classifier.classifyFile('version.json')).toBe(FileCategory.CONFIG);
       expect(classifier.classifyFile('adoption-config.json')).toBe(FileCategory.CONFIG);
+      expect(classifier.classifyFile('config/studio-security.json')).toBe(FileCategory.CONFIG);
     });
 
     test('should classify generated files correctly', () => {

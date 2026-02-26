@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Curated `errorbook` command set for high-signal failure remediation knowledge:
+  - `sce errorbook record`
+  - `sce errorbook list`
+  - `sce errorbook show <id>`
+  - `sce errorbook find --query <text>`
+  - `sce errorbook promote <id>`
+
+### Changed
+- Added strict curation/promotion policy to command reference (`宁缺毋滥，优胜略汰`):
+  - fingerprint-based deduplication on record
+  - promotion gate requires validated root cause, fix actions, verification evidence, ontology tags, and minimum quality score
+
 ## [3.3.17] - 2026-02-26
 
 ### Added

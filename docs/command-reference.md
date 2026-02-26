@@ -318,6 +318,41 @@ Rate-limit profiles:
 - `balanced`: default profile for normal multi-agent runs
 - `aggressive`: higher throughput with lower protection margins
 
+### Errorbook (Curated Failure Knowledge)
+
+```bash
+# Record curated remediation entry
+sce errorbook record \
+  --title "Order approval queue saturation" \
+  --symptom "Approval queue backlog exceeded SLA" \
+  --root-cause "Worker pool under-provisioned and retries amplified load" \
+  --fix-action "Increase workers from 4 to 8" \
+  --fix-action "Reduce retry burst window" \
+  --verification "Load test confirms p95 < SLA threshold" \
+  --ontology "entity,relation,decision_policy" \
+  --tags "moqui,order,performance" \
+  --status verified \
+  --json
+
+# List/show/find entries
+sce errorbook list --status promoted --min-quality 75 --json
+sce errorbook show <entry-id> --json
+sce errorbook find --query "approve order timeout" --limit 10 --json
+
+# Promote only after strict gate checks pass
+sce errorbook promote <entry-id> --json
+```
+
+Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
+- `record` requires: `title`, `symptom`, `root_cause`, and at least one `fix_action`.
+- Fingerprint dedup is automatic; repeated records merge evidence and increment occurrence count.
+- `promote` enforces strict gate:
+  - `root_cause` present
+  - `fix_actions` non-empty
+  - `verification_evidence` non-empty
+  - `ontology_tags` non-empty
+  - `quality_score >= 75`
+
 ### Studio Workflow
 
 ```bash

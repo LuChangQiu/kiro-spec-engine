@@ -320,7 +320,7 @@ sce studio apply --patch-bundle patch-scene.customer-order-inventory-<timestamp>
 sce studio verify --profile standard --json
 
 # Record release event
-sce studio release --channel dev --json
+sce studio release --channel dev --profile standard --json
 
 # Resume from latest or explicit job
 sce studio resume --job <job-id> --json
@@ -337,6 +337,10 @@ Stage guardrails are enforced by default:
 - `apply` requires `generate`
 - `verify` requires `apply`
 - `release` requires `verify`
+
+Studio gate execution defaults:
+- `verify --profile standard` runs executable gates (unit test script when available, interactive governance report when present, scene package publish-batch dry-run when handoff manifest exists)
+- `release --profile standard` runs executable release preflight (npm pack dry-run, weekly ops gate when summary exists, release asset integrity when evidence directory exists)
 
 ### Capability Matrix Utilities
 

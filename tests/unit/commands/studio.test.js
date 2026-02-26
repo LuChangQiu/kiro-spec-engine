@@ -19,11 +19,18 @@ const {
 describe('studio command workflow', () => {
   let tempDir;
   let originalLog;
+  let successRunner;
 
   beforeEach(async () => {
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-studio-cmd-'));
     originalLog = console.log;
     console.log = jest.fn();
+    successRunner = jest.fn(async () => ({
+      status: 0,
+      stdout: 'ok',
+      stderr: '',
+      duration_ms: 1
+    }));
   });
 
   afterEach(async () => {
@@ -85,7 +92,8 @@ describe('studio command workflow', () => {
       profile: 'standard',
       json: true
     }, {
-      projectPath: tempDir
+      projectPath: tempDir,
+      commandRunner: successRunner
     });
     expect(verified.status).toBe('verified');
     expect(verified.artifacts.verify_report).toContain(`verify-${planned.job_id}.json`);
@@ -94,7 +102,8 @@ describe('studio command workflow', () => {
       channel: 'prod',
       json: true
     }, {
-      projectPath: tempDir
+      projectPath: tempDir,
+      commandRunner: successRunner
     });
     expect(released.status).toBe('released');
     expect(released.next_action).toBe('complete');
@@ -132,6 +141,57 @@ describe('studio command workflow', () => {
     }, {
       projectPath: tempDir
     })).rejects.toThrow('Invalid --channel');
+  });
+
+  test('fails verify when required gate command fails', async () => {
+    const packageJsonPath = path.join(tempDir, 'package.json');
+    await fs.writeJson(packageJsonPath, {
+      name: 'studio-verify-fixture',
+      version: '1.0.0',
+      scripts: {
+        'test:unit': 'echo test'
+      }
+    }, { spaces: 2 });
+
+    const planned = await runStudioPlanCommand({
+      fromChat: 'session-006',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+    await runStudioGenerateCommand({
+      job: planned.job_id,
+      scene: 'scene.verify-fail',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+    await runStudioApplyCommand({
+      job: planned.job_id,
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    const failRunner = jest.fn(async () => ({
+      status: 2,
+      stdout: '',
+      stderr: 'boom',
+      duration_ms: 3
+    }));
+
+    await expect(runStudioVerifyCommand({
+      job: planned.job_id,
+      json: true
+    }, {
+      projectPath: tempDir,
+      commandRunner: failRunner
+    })).rejects.toThrow('studio verify failed');
+
+    const paths = resolveStudioPaths(tempDir);
+    const job = await fs.readJson(path.join(paths.jobsDir, `${planned.job_id}.json`));
+    expect(job.status).toBe('verify_failed');
+    expect(job.stages.verify.status).toBe('failed');
   });
 
   test('enforces stage order constraints', async () => {

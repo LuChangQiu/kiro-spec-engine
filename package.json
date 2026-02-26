@@ -1,6 +1,6 @@
 {
   "name": "scene-capability-engine",
-  "version": "3.3.16",
+  "version": "3.3.17",
   "description": "SCE (Scene Capability Engine) - A CLI tool and npm package for spec-driven development with AI coding assistants.",
   "main": "index.js",
   "bin": {
@@ -30,6 +30,7 @@
     "test:unit": "npx jest tests/unit",
     "test:integration": "npx jest tests/integration",
     "test:properties": "npx jest tests/properties",
+    "test:orchestrator-429": "npx jest tests/orchestrator/orchestration-engine.test.js tests/orchestrator/orchestrate-command.status-events.test.js --runInBand",
     "test:handles": "npx jest --config=jest.config.js --runInBand --detectOpenHandles",
     "test:interactive-loop-smoke": "node scripts/interactive-loop-smoke.js --json",
     "test:interactive-flow-smoke": "node scripts/interactive-flow-smoke.js --json",

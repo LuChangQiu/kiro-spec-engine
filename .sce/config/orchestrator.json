@@ -1,0 +1,24 @@
+{
+  "agentBackend": "codex",
+  "maxParallel": 3,
+  "timeoutSeconds": 900,
+  "maxRetries": 2,
+  "rateLimitProfile": "balanced",
+  "rateLimitMaxRetries": 8,
+  "rateLimitBackoffBaseMs": 1500,
+  "rateLimitBackoffMaxMs": 60000,
+  "rateLimitAdaptiveParallel": true,
+  "rateLimitParallelFloor": 1,
+  "rateLimitCooldownMs": 45000,
+  "rateLimitLaunchBudgetPerMinute": 8,
+  "rateLimitLaunchBudgetWindowMs": 60000,
+  "rateLimitSignalWindowMs": 30000,
+  "rateLimitSignalThreshold": 3,
+  "rateLimitSignalExtraHoldMs": 3000,
+  "rateLimitDynamicBudgetFloor": 1,
+  "apiKeyEnvVar": "CODEX_API_KEY",
+  "codexArgs": [
+    "--skip-git-repo-check"
+  ],
+  "codexCommand": "npx @openai/codex"
+}

@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.17] - 2026-02-26
+
+### Added
+- Orchestrator rate-limit profile management commands:
+  - `sce orchestrate profile list`
+  - `sce orchestrate profile show`
+  - `sce orchestrate profile set <conservative|balanced|aggressive> [--reset-overrides]`
+- Runtime one-shot profile override:
+  - `sce orchestrate run --rate-limit-profile <profile>`
+- New anti-429 regression shortcut:
+  - `npm run test:orchestrator-429`
+- Added default orchestrator baseline config files:
+  - `.sce/config/orchestrator.json`
+  - `template/.sce/config/orchestrator.json`
+- Added profile runbook:
+  - `docs/agent-runtime/orchestrator-rate-limit-profiles.md`
+
+### Changed
+- Orchestration engine now supports runtime config overrides for one execution without mutating persisted config.
+- Command reference updated with profile workflow and recommended anti-429 usage.
+
 ## [3.3.16] - 2026-02-26
 
 ### Added

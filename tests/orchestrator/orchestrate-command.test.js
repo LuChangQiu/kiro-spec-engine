@@ -38,7 +38,7 @@ afterEach(() => {
 describe('registerOrchestrateCommands', () => {
   const { registerOrchestrateCommands } = require('../../lib/commands/orchestrate');
 
-  test('registers orchestrate command with run, status, stop subcommands', () => {
+  test('registers orchestrate command with run, status, stop, profile subcommands', () => {
     const program = new Command();
     program.exitOverride(); // prevent process.exit in tests
     registerOrchestrateCommands(program);
@@ -51,6 +51,7 @@ describe('registerOrchestrateCommands', () => {
     expect(subNames).toContain('run');
     expect(subNames).toContain('status');
     expect(subNames).toContain('stop');
+    expect(subNames).toContain('profile');
   });
 
   test('run subcommand has --specs as required option', () => {
@@ -213,6 +214,111 @@ describe('orchestrate run — parameter validation', () => {
     expect(exitSpy).toHaveBeenCalledWith(1);
     const errorOutput = errorSpy.mock.calls.map(c => c.join(' ')).join(' ');
     expect(errorOutput).toContain('--rate-limit-profile must be one of');
+  });
+});
+
+describe('orchestrate profile commands', () => {
+  let exitSpy;
+  let errorSpy;
+  let logSpy;
+  let cwdSpy;
+
+  beforeEach(() => {
+    exitSpy = jest.spyOn(process, 'exit').mockImplementation(() => {
+      throw new Error('process.exit called');
+    });
+    errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    cwdSpy = jest.spyOn(process, 'cwd').mockReturnValue(tempDir);
+  });
+
+  afterEach(() => {
+    exitSpy.mockRestore();
+    errorSpy.mockRestore();
+    logSpy.mockRestore();
+    cwdSpy.mockRestore();
+  });
+
+  test('profile list returns available profiles in json mode', async () => {
+    const { registerOrchestrateCommands } = require('../../lib/commands/orchestrate');
+    const program = new Command();
+    program.exitOverride();
+    registerOrchestrateCommands(program);
+
+    await program.parseAsync(['node', 'sce', 'orchestrate', 'profile', 'list', '--json']);
+    const output = logSpy.mock.calls.map(c => c.join(' ')).join(' ');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.profiles).toEqual(
+      expect.arrayContaining(['conservative', 'balanced', 'aggressive'])
+    );
+  });
+
+  test('profile set persists rateLimitProfile only by default', async () => {
+    const configDir = path.join(tempDir, '.sce', 'config');
+    fs.mkdirSync(configDir, { recursive: true });
+    fs.writeJsonSync(path.join(configDir, 'orchestrator.json'), {
+      rateLimitLaunchBudgetPerMinute: 99
+    });
+
+    const { registerOrchestrateCommands } = require('../../lib/commands/orchestrate');
+    const program = new Command();
+    program.exitOverride();
+    registerOrchestrateCommands(program);
+
+    await program.parseAsync(['node', 'sce', 'orchestrate', 'profile', 'set', 'conservative']);
+
+    const saved = fs.readJsonSync(path.join(configDir, 'orchestrator.json'));
+    expect(saved.rateLimitProfile).toBe('conservative');
+    expect(saved.rateLimitLaunchBudgetPerMinute).toBe(99);
+  });
+
+  test('profile set with --reset-overrides writes preset values', async () => {
+    const configDir = path.join(tempDir, '.sce', 'config');
+    fs.mkdirSync(configDir, { recursive: true });
+    fs.writeJsonSync(path.join(configDir, 'orchestrator.json'), {
+      rateLimitLaunchBudgetPerMinute: 99
+    });
+
+    const { registerOrchestrateCommands } = require('../../lib/commands/orchestrate');
+    const program = new Command();
+    program.exitOverride();
+    registerOrchestrateCommands(program);
+
+    await program.parseAsync([
+      'node',
+      'sce',
+      'orchestrate',
+      'profile',
+      'set',
+      'aggressive',
+      '--reset-overrides'
+    ]);
+
+    const saved = fs.readJsonSync(path.join(configDir, 'orchestrator.json'));
+    expect(saved.rateLimitProfile).toBe('aggressive');
+    expect(saved.rateLimitLaunchBudgetPerMinute).toBe(16);
+    expect(saved.rateLimitSignalThreshold).toBe(4);
+  });
+
+  test('profile show reports active profile and override keys', async () => {
+    const configDir = path.join(tempDir, '.sce', 'config');
+    fs.mkdirSync(configDir, { recursive: true });
+    fs.writeJsonSync(path.join(configDir, 'orchestrator.json'), {
+      rateLimitProfile: 'conservative',
+      rateLimitLaunchBudgetPerMinute: 9
+    });
+
+    const { registerOrchestrateCommands } = require('../../lib/commands/orchestrate');
+    const program = new Command();
+    program.exitOverride();
+    registerOrchestrateCommands(program);
+
+    await program.parseAsync(['node', 'sce', 'orchestrate', 'profile', 'show', '--json']);
+    const output = logSpy.mock.calls.map(c => c.join(' ')).join(' ');
+    const parsed = JSON.parse(output.trim());
+    expect(parsed.profile).toBe('conservative');
+    expect(parsed.explicit_overrides).toContain('rateLimitLaunchBudgetPerMinute');
+    expect(parsed.effective.rateLimitLaunchBudgetPerMinute).toBe(9);
   });
 });
 

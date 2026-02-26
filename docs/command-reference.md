@@ -303,6 +303,12 @@ sce orchestrate status [--json]
 
 # Stop all running sub-agents
 sce orchestrate stop
+
+# List/show/set persistent rate-limit profile
+sce orchestrate profile list
+sce orchestrate profile show --json
+sce orchestrate profile set conservative
+sce orchestrate profile set balanced --reset-overrides
 ```
 
 When you pass `--specs` to `sce spec bootstrap|pipeline run|gate run`, sce now defaults to this orchestrate mode automatically.
@@ -416,6 +422,7 @@ Contract/baseline files:
 - `docs/agent-runtime/capability-mapping-report.schema.json`
 - `docs/agent-runtime/agent-result-summary-contract.schema.json`
 - `docs/agent-runtime/multi-agent-coordination-policy-baseline.json`
+- `docs/agent-runtime/orchestrator-rate-limit-profiles.md`
 
 Multi-agent merge governance default:
 - `sce orchestrate run` loads `docs/agent-runtime/multi-agent-coordination-policy-baseline.json`.

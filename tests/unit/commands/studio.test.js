@@ -5,11 +5,14 @@ const path = require('path');
 const {
   resolveStudioPaths,
   readLatestJob,
+  readStudioEvents,
   runStudioPlanCommand,
   runStudioGenerateCommand,
   runStudioApplyCommand,
   runStudioVerifyCommand,
   runStudioReleaseCommand,
+  runStudioRollbackCommand,
+  runStudioEventsCommand,
   runStudioResumeCommand
 } = require('../../../lib/commands/studio');
 
@@ -129,5 +132,91 @@ describe('studio command workflow', () => {
     }, {
       projectPath: tempDir
     })).rejects.toThrow('Invalid --channel');
+  });
+
+  test('enforces stage order constraints', async () => {
+    const planned = await runStudioPlanCommand({
+      fromChat: 'session-004',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    await expect(runStudioApplyCommand({
+      job: planned.job_id,
+      json: true
+    }, {
+      projectPath: tempDir
+    })).rejects.toThrow('stage "generate" is not completed');
+
+    await runStudioGenerateCommand({
+      job: planned.job_id,
+      scene: 'scene.order',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    await expect(runStudioReleaseCommand({
+      job: planned.job_id,
+      channel: 'dev',
+      json: true
+    }, {
+      projectPath: tempDir
+    })).rejects.toThrow('stage "verify" is not completed');
+  });
+
+  test('records studio events and supports rollback', async () => {
+    const planned = await runStudioPlanCommand({
+      fromChat: 'session-005',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    await runStudioGenerateCommand({
+      job: planned.job_id,
+      scene: 'scene.inventory',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+    await runStudioApplyCommand({
+      job: planned.job_id,
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    const rolledBack = await runStudioRollbackCommand({
+      job: planned.job_id,
+      reason: 'manual-check-failed',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+    expect(rolledBack.status).toBe('rolled_back');
+    expect(rolledBack.next_action).toContain('sce studio plan');
+
+    const eventsPayload = await runStudioEventsCommand({
+      job: planned.job_id,
+      limit: '10',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+    expect(eventsPayload.events.length).toBeGreaterThanOrEqual(4);
+    expect(eventsPayload.events[eventsPayload.events.length - 1].event_type).toBe('job.rolled_back');
+
+    const paths = resolveStudioPaths(tempDir);
+    const rawEvents = await readStudioEvents(paths, planned.job_id, { limit: 100 });
+    expect(rawEvents.some((event) => event.event_type === 'stage.apply.completed')).toBe(true);
+
+    await expect(runStudioVerifyCommand({
+      job: planned.job_id,
+      json: true
+    }, {
+      projectPath: tempDir
+    })).rejects.toThrow('is rolled back');
   });
 });

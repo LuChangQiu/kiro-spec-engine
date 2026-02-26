@@ -324,7 +324,19 @@ sce studio release --channel dev --json
 
 # Resume from latest or explicit job
 sce studio resume --job <job-id> --json
+
+# Inspect recent stage events
+sce studio events --job <job-id> --limit 50 --json
+
+# Rollback a job after apply/release
+sce studio rollback --job <job-id> --reason "manual-check-failed" --json
 ```
+
+Stage guardrails are enforced by default:
+- `generate` requires `plan`
+- `apply` requires `generate`
+- `verify` requires `apply`
+- `release` requires `verify`
 
 ### Capability Matrix Utilities
 

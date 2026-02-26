@@ -3,6 +3,7 @@ const os = require('os');
 const path = require('path');
 
 const { runSpecPipeline, _parseSpecTargets } = require('../../../lib/commands/spec-pipeline');
+const { SessionStore } = require('../../../lib/runtime/session-store');
 
 describe('spec-pipeline command', () => {
   let tempDir;
@@ -15,6 +16,12 @@ describe('spec-pipeline command', () => {
 
     originalLog = console.log;
     console.log = jest.fn();
+
+    const sessionStore = new SessionStore(tempDir);
+    await sessionStore.beginSceneSession({
+      sceneId: 'scene.test-default',
+      objective: 'default scene for spec-pipeline tests'
+    });
   });
 
   afterEach(async () => {
@@ -150,5 +157,63 @@ describe('spec-pipeline command', () => {
     });
 
     expect(targets).toEqual(['110-01-pipeline-test', '110-02-pipeline-test']);
+  });
+
+  test('binds pipeline spec as a child session when scene primary session is active', async () => {
+    const sessionStore = new SessionStore(tempDir);
+    const sceneSession = await sessionStore.beginSceneSession({
+      sceneId: 'scene.pipeline-integration',
+      objective: 'pipeline scene'
+    });
+
+    const adapters = {
+      requirements: jest.fn(async () => ({ success: true })),
+      design: jest.fn(async () => ({ success: true })),
+      tasks: jest.fn(async () => ({ success: true })),
+      gate: jest.fn(async () => ({ success: true }))
+    };
+
+    const result = await runSpecPipeline({
+      spec: '110-01-pipeline-test',
+      scene: 'scene.pipeline-integration',
+      json: true
+    }, {
+      projectPath: tempDir,
+      adapters,
+      sessionStore
+    });
+
+    expect(result.scene_session).toEqual(expect.objectContaining({
+      bound: true,
+      scene_id: 'scene.pipeline-integration',
+      scene_session_id: sceneSession.session.session_id
+    }));
+    expect(result.scene_session.spec_session_id).toBeTruthy();
+
+    const parent = await sessionStore.getSession(sceneSession.session.session_id);
+    expect(parent.children.spec_sessions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        spec_id: '110-01-pipeline-test',
+        status: 'completed'
+      })
+    ]));
+  });
+
+  test('fails when no active scene primary session exists', async () => {
+    const isolated = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-spec-pipeline-no-scene-'));
+    const specId = '110-09-pipeline-no-scene';
+    await fs.ensureDir(path.join(isolated, '.sce', 'specs', specId));
+    await fs.writeFile(path.join(isolated, '.sce', 'specs', specId, 'requirements.md'), '# Requirements\n', 'utf8');
+    await fs.writeFile(path.join(isolated, '.sce', 'specs', specId, 'design.md'), '# Design\n## Requirement Mapping\n', 'utf8');
+    await fs.writeFile(path.join(isolated, '.sce', 'specs', specId, 'tasks.md'), '- [ ] 1. Test task\n', 'utf8');
+
+    await expect(runSpecPipeline({
+      spec: specId,
+      json: true
+    }, {
+      projectPath: isolated
+    })).rejects.toThrow('No active scene session found');
+
+    await fs.remove(isolated);
   });
 });

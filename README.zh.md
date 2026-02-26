@@ -67,13 +67,16 @@ graph LR
 # 1) 在当前仓库启用 sce
 sce adopt
 
-# 2) 生成 Spec 工作流草稿
-sce spec bootstrap --name 01-00-demo-feature --non-interactive
+# 2) 打开主场景会话
+sce studio plan --scene scene.demo --from-chat session-demo --goal "demo workflow bootstrap" --json
 
-# 3) 生成 KPI 输入样例
+# 3) 生成 Spec 工作流草稿
+sce spec bootstrap --name 01-00-demo-feature --scene scene.demo --non-interactive
+
+# 4) 生成 KPI 输入样例
 sce value metrics sample --out ./kpi-input.json --json
 
-# 4) 产出机器可读 KPI 快照
+# 5) 产出机器可读 KPI 快照
 sce value metrics snapshot --input ./kpi-input.json --json
 ```
 
@@ -473,12 +476,17 @@ sce auto schema check --json # 检查自治归档 schema 兼容性
 sce auto schema migrate --apply --json # 回填/迁移自治归档 schema_version
 
 # Spec 工作流（推荐）
-sce spec bootstrap --name <spec> --non-interactive          # 生成 requirements/design/tasks 初稿
-sce spec pipeline run --spec <spec>                         # 对单个 Spec 执行分阶段流程
-sce spec gate run --spec <spec> --json                      # 执行标准化 Spec 闸口检查
+sce spec bootstrap --name <spec> --scene <scene-id> --non-interactive # 生成初稿并绑定 scene 子会话
+sce spec pipeline run --spec <spec> --scene <scene-id>                 # 执行分阶段流程并自动归档子会话
+sce spec gate run --spec <spec> --scene <scene-id> --json              # 执行闸口并自动归档子会话
 sce spec bootstrap --specs "<spec-a,spec-b>" --max-parallel <N>  # 多 Spec 默认转 orchestrate
 sce spec pipeline run --specs "<spec-a,spec-b>" --max-parallel <N> # 多 Spec 默认转 orchestrate
 sce spec gate run --specs "<spec-a,spec-b>" --max-parallel <N>     # 多 Spec 默认转 orchestrate
+
+# Spec 会话治理默认规则
+# - spec bootstrap|pipeline run|gate run 必须绑定活动中的 scene 主会话
+# - 当存在多个活动 scene 时，必须显式传入 --scene <scene-id>
+# - 多 Spec orchestrate 回退路径同样按 scene 绑定并写入每个 spec 的子会话归档
 
 # 上下文管理
 sce context export <spec-name>     # 为 AI 工具导出上下文
@@ -546,7 +554,8 @@ sce orchestrate run --specs "<spec列表>" --max-parallel <N>  # 启动多 Agent
 sce orchestrate status                         # 查看编排进度
 sce orchestrate stop                           # 停止所有子 Agent
 
-# 说明：当使用 --specs 调用 sce spec bootstrap/pipeline run/gate run 时，会默认转到 orchestrate 模式
+# 说明：当使用 --specs 调用 sce spec bootstrap/pipeline run/gate run 时，会默认转到 orchestrate 模式，
+# 且仍要求绑定活动 scene 主会话（多活动 scene 时必须显式 --scene）
 
 # 发布基线（CI 默认）
 sce auto handoff preflight-check --require-pass --json  # 硬门禁：preflight 不通过则阻断发布
@@ -631,7 +640,8 @@ MIT 许可证 - 详见 [LICENSE](LICENSE) 文件。
 ```bash
 npm install -g scene-capability-engine
 sce adopt
-sce spec bootstrap --name 01-00-my-first-feature --non-interactive
+sce studio plan --scene scene.demo --from-chat session-demo --goal "bootstrap first feature" --json
+sce spec bootstrap --name 01-00-my-first-feature --scene scene.demo --non-interactive
 ```
 
 ---

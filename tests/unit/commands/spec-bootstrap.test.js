@@ -3,6 +3,7 @@ const os = require('os');
 const path = require('path');
 
 const { runSpecBootstrap } = require('../../../lib/commands/spec-bootstrap');
+const { SessionStore } = require('../../../lib/runtime/session-store');
 
 describe('spec-bootstrap command', () => {
   let tempDir;
@@ -21,6 +22,12 @@ describe('spec-bootstrap command', () => {
     logOutput = [];
     console.log = jest.fn((...args) => {
       logOutput.push(args.join(' '));
+    });
+
+    const sessionStore = new SessionStore(tempDir);
+    await sessionStore.beginSceneSession({
+      sceneId: 'scene.test-default',
+      objective: 'default scene for spec-bootstrap tests'
     });
   });
 
@@ -121,5 +128,53 @@ describe('spec-bootstrap command', () => {
     expect(result.mode).toBe('orchestrate');
     expect(result.status).toBe('completed');
     expect(result.spec_ids).toEqual(['109-10-bootstrap-a', '109-11-bootstrap-b']);
+  });
+
+  test('binds bootstrap spec as a child session when scene primary session is active', async () => {
+    const sessionStore = new SessionStore(tempDir);
+    const sceneSession = await sessionStore.beginSceneSession({
+      sceneId: 'scene.bootstrap-integration',
+      objective: 'bootstrap scene'
+    });
+
+    const result = await runSpecBootstrap({
+      name: '109-20-bootstrap-scene-bind',
+      profile: 'general',
+      scene: 'scene.bootstrap-integration',
+      nonInteractive: true,
+      json: true
+    }, {
+      projectPath: tempDir,
+      sessionStore
+    });
+
+    expect(result.scene_session).toEqual(expect.objectContaining({
+      bound: true,
+      scene_id: 'scene.bootstrap-integration',
+      scene_session_id: sceneSession.session.session_id
+    }));
+    expect(result.scene_session.spec_session_id).toBeTruthy();
+
+    const parent = await sessionStore.getSession(sceneSession.session.session_id);
+    expect(parent.children.spec_sessions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        spec_id: '109-20-bootstrap-scene-bind',
+        status: 'completed'
+      })
+    ]));
+  });
+
+  test('fails when no active scene primary session exists', async () => {
+    const isolated = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-spec-bootstrap-no-scene-'));
+    await fs.ensureDir(path.join(isolated, '.sce', 'specs'));
+    await expect(runSpecBootstrap({
+      name: '109-30-bootstrap-no-scene',
+      nonInteractive: true,
+      dryRun: true,
+      json: true
+    }, {
+      projectPath: isolated
+    })).rejects.toThrow('No active scene session found');
+    await fs.remove(isolated);
   });
 });

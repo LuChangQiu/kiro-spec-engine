@@ -69,13 +69,16 @@ graph LR
 # 1) Adopt sce in current repo
 sce adopt
 
-# 2) Generate Spec workflow draft
-sce spec bootstrap --name 01-00-demo-feature --non-interactive
+# 2) Open primary scene session
+sce studio plan --scene scene.demo --from-chat session-demo --goal "demo workflow bootstrap" --json
 
-# 3) Generate KPI input sample
+# 3) Generate Spec workflow draft
+sce spec bootstrap --name 01-00-demo-feature --scene scene.demo --non-interactive
+
+# 4) Generate KPI input sample
 sce value metrics sample --out ./kpi-input.json --json
 
-# 4) Produce machine-readable KPI snapshot
+# 5) Produce machine-readable KPI snapshot
 sce value metrics snapshot --input ./kpi-input.json --json
 ```
 
@@ -559,12 +562,17 @@ sce auto schema check --json # Check autonomous archive schema compatibility
 sce auto schema migrate --apply --json # Backfill/migrate schema_version for autonomous archives
 
 # Spec workflow (recommended)
-sce spec bootstrap --name <spec> --non-interactive         # Generate requirements/design/tasks draft
-sce spec pipeline run --spec <spec>                         # Run staged workflow for one Spec
-sce spec gate run --spec <spec> --json                      # Run standardized Spec gate checks
+sce spec bootstrap --name <spec> --scene <scene-id> --non-interactive # Generate draft and bind as scene child session
+sce spec pipeline run --spec <spec> --scene <scene-id>                 # Run pipeline and auto-archive spec child session
+sce spec gate run --spec <spec> --scene <scene-id> --json  # Run gate and auto-archive spec child session
 sce spec bootstrap --specs "<spec-a,spec-b>" --max-parallel <N>  # Multi-Spec defaults to orchestrate
 sce spec pipeline run --specs "<spec-a,spec-b>" --max-parallel <N> # Multi-Spec defaults to orchestrate
 sce spec gate run --specs "<spec-a,spec-b>" --max-parallel <N>     # Multi-Spec defaults to orchestrate
+
+# Spec session governance default
+# - spec bootstrap|pipeline run|gate run must bind to an active scene primary session.
+# - Use --scene <scene-id> explicitly when multiple active scenes exist.
+# - Multi-Spec orchestrate fallback (--specs ...) keeps the same scene binding and archives per-spec child sessions.
 
 # Context management
 sce context export <spec-name>     # Export context for AI tools
@@ -739,7 +747,8 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ```bash
 npm install -g scene-capability-engine
 sce adopt
-sce spec bootstrap --name 01-00-my-first-feature --non-interactive
+sce studio plan --scene scene.demo --from-chat session-demo --goal "bootstrap first feature" --json
+sce spec bootstrap --name 01-00-my-first-feature --scene scene.demo --non-interactive
 ```
 
 ---

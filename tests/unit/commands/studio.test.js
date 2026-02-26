@@ -46,6 +46,7 @@ describe('studio command workflow', () => {
 
   test('creates a plan job and writes latest pointer', async () => {
     const payload = await runStudioPlanCommand({
+      scene: 'scene.customer-order-inventory',
       fromChat: 'session-001',
       goal: 'Build customer-order-inventory demo',
       json: true
@@ -68,6 +69,7 @@ describe('studio command workflow', () => {
 
   test('supports end-to-end stage flow from generate to release', async () => {
     const planned = await runStudioPlanCommand({
+      scene: 'scene.customer-order-inventory',
       fromChat: 'session-002',
       json: true
     }, {
@@ -133,6 +135,7 @@ describe('studio command workflow', () => {
 
   test('fails release on invalid channel', async () => {
     await runStudioPlanCommand({
+      scene: 'scene.release-channel-check',
       fromChat: 'session-003',
       json: true
     }, {
@@ -158,6 +161,7 @@ describe('studio command workflow', () => {
     }, { spaces: 2 });
 
     const planned = await runStudioPlanCommand({
+      scene: 'scene.verify-fail',
       fromChat: 'session-006',
       json: true
     }, {
@@ -207,6 +211,7 @@ describe('studio command workflow', () => {
 
   test('enforces stage order constraints', async () => {
     const planned = await runStudioPlanCommand({
+      scene: 'scene.order',
       fromChat: 'session-004',
       json: true
     }, {
@@ -239,6 +244,7 @@ describe('studio command workflow', () => {
 
   test('records studio events and supports rollback', async () => {
     const planned = await runStudioPlanCommand({
+      scene: 'scene.inventory',
       fromChat: 'session-005',
       json: true
     }, {
@@ -299,6 +305,7 @@ describe('studio command workflow', () => {
     };
 
     const planned = await runStudioPlanCommand({
+      scene: 'scene.secure',
       fromChat: 'session-007',
       json: true
     }, {
@@ -402,6 +409,7 @@ describe('studio command workflow', () => {
 
   test('strict verify fails when required gates are unavailable', async () => {
     const planned = await runStudioPlanCommand({
+      scene: 'scene.strict-verify',
       fromChat: 'session-008',
       json: true
     }, {
@@ -439,6 +447,7 @@ describe('studio command workflow', () => {
 
   test('strict release fails when required release evidence gates are unavailable', async () => {
     const planned = await runStudioPlanCommand({
+      scene: 'scene.strict-release',
       fromChat: 'session-009',
       json: true
     }, {

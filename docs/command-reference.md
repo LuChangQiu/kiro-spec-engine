@@ -49,17 +49,20 @@ sce doctor
 ### Spec Management
 
 ```bash
+# Ensure an active scene primary session exists first
+sce studio plan --scene scene.customer-order-inventory --from-chat session-20260226 --goal "spec delivery cycle" --json
+
 # Legacy low-level: create spec directory only
 sce create-spec 01-00-feature-name
 
 # Bootstrap full Spec draft (requirements/design/tasks)
-sce spec bootstrap --name 01-00-feature-name --non-interactive
+sce spec bootstrap --name 01-00-feature-name --scene scene.customer-order-inventory --non-interactive
 
 # Run pipeline for one Spec
-sce spec pipeline run --spec 01-00-feature-name
+sce spec pipeline run --spec 01-00-feature-name --scene scene.customer-order-inventory
 
 # Run gate for one Spec
-sce spec gate run --spec 01-00-feature-name --json
+sce spec gate run --spec 01-00-feature-name --scene scene.customer-order-inventory --json
 
 # Multi-Spec mode defaults to orchestrate routing
 sce spec bootstrap --specs "spec-a,spec-b" --max-parallel 3
@@ -69,6 +72,11 @@ sce spec gate run --specs "spec-a,spec-b" --max-parallel 3
 # Show Spec progress
 sce status --verbose
 ```
+
+Spec session governance:
+- `spec bootstrap|pipeline run|gate run` must bind to an active scene primary session (`--scene <scene-id>` or implicit binding from latest/unique active scene).
+- When multiple active scenes exist, you must pass `--scene` explicitly.
+- Multi-Spec orchestrate fallback (`--specs ...`) follows the same scene binding and writes per-spec child-session archive records.
 
 ### Value Metrics
 
@@ -151,6 +159,11 @@ sce session resume release-20260224 --status active
 sce session snapshot release-20260224 --summary "post-gate checkpoint" --payload '{"tests_passed":42}' --json
 sce session show release-20260224 --json
 ```
+
+Session governance defaults:
+- `1 scene = 1 primary session` (managed by `studio plan --scene ...`)
+- `spec` runs can bind as child sessions (`spec bootstrap|pipeline --scene <scene-id>`)
+- successful `studio release` auto-archives current scene session and opens next cycle session
 
 ### Watch Mode
 
@@ -377,10 +390,12 @@ Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
 ### Studio Workflow
 
 ```bash
-# Build a plan from chat/session context
-sce studio plan --from-chat session-20260226 --goal "customer+order+inventory demo" --json
+# Build a plan from chat/session context (scene is mandatory and becomes the primary session anchor)
+sce studio plan --scene scene.customer-order-inventory --from-chat session-20260226 --goal "customer+order+inventory demo" --json
 
-# Generate patch bundle metadata for a target scene
+# Generate patch bundle metadata (scene is inherited from plan)
+sce studio generate --target 331 --json
+# Optional explicit scene check (must match planned scene)
 sce studio generate --scene scene.customer-order-inventory --target 331 --json
 
 # Apply generated patch metadata
@@ -408,6 +423,8 @@ SCE_STUDIO_REQUIRE_AUTH=1 SCE_STUDIO_AUTH_PASSWORD=top-secret sce studio apply -
 ```
 
 Stage guardrails are enforced by default:
+- `plan` requires `--scene`; SCE binds one active primary session per scene
+- successful `release` auto-archives current scene session and auto-opens the next scene cycle session
 - `generate` requires `plan`
 - `apply` requires `generate`
 - `verify` requires `apply`
@@ -1676,18 +1693,24 @@ sce --version
 ### Starting a New Feature
 
 ```bash
+# 0. Open a scene primary session
+sce studio plan --scene scene.customer-order-inventory --from-chat session-20260226 --goal "new feature delivery" --json
+
 # 1. Bootstrap spec draft
-sce spec bootstrap --name 01-00-my-feature --non-interactive
+sce spec bootstrap --name 01-00-my-feature --scene scene.customer-order-inventory --non-interactive
 
 # 2. Run spec pipeline
-sce spec pipeline run --spec 01-00-my-feature
+sce spec pipeline run --spec 01-00-my-feature --scene scene.customer-order-inventory
 
-# 3. Export context
+# 3. Run spec gate
+sce spec gate run --spec 01-00-my-feature --scene scene.customer-order-inventory --json
+
+# 4. Export context
 sce context export 01-00-my-feature
 
-# 4. Work on tasks...
+# 5. Work on tasks...
 
-# 5. Sync progress
+# 6. Sync progress
 sce workspace sync
 ```
 

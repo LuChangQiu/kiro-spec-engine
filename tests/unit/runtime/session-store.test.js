@@ -75,4 +75,42 @@ describe('SessionStore', () => {
     const latest = await store.getSession('latest');
     expect(latest.session_id).toBe('second');
   });
+
+  test('beginSceneSession binds one active primary session per scene', async () => {
+    const first = await store.beginSceneSession({
+      sceneId: 'scene.customer-order',
+      objective: 'cycle one'
+    });
+    expect(first.created_new).toBe(true);
+    expect(first.scene_cycle).toBe(1);
+    expect(first.session.scene.id).toBe('scene.customer-order');
+    expect(first.session.scene.role).toBe('primary');
+
+    const second = await store.beginSceneSession({
+      sceneId: 'scene.customer-order',
+      objective: 'cycle one retry'
+    });
+    expect(second.created_new).toBe(false);
+    expect(second.session.session_id).toBe(first.session.session_id);
+    expect(second.scene_cycle).toBe(1);
+  });
+
+  test('completeSceneSession archives current cycle and auto starts next cycle', async () => {
+    const current = await store.beginSceneSession({
+      sceneId: 'scene.fulfillment',
+      objective: 'fulfillment cycle'
+    });
+
+    const completion = await store.completeSceneSession('scene.fulfillment', current.session.session_id, {
+      summary: 'release completed'
+    });
+
+    expect(completion.completed_session.status).toBe('completed');
+    expect(completion.completed_session.scene.state).toBe('completed');
+    expect(completion.next_session).toBeDefined();
+    expect(completion.next_session.scene.id).toBe('scene.fulfillment');
+    expect(completion.next_session.scene.role).toBe('primary');
+    expect(completion.next_scene_cycle).toBe(2);
+    expect(completion.next_session.session_id).not.toBe(current.session.session_id);
+  });
 });

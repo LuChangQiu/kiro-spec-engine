@@ -7,6 +7,7 @@ const {
   generateSpecGatePolicyTemplate,
   _parseSpecTargets
 } = require('../../../lib/commands/spec-gate');
+const { SessionStore } = require('../../../lib/runtime/session-store');
 
 describe('spec-gate command', () => {
   let tempDir;
@@ -30,6 +31,12 @@ describe('spec-gate command', () => {
 
     originalLog = console.log;
     console.log = jest.fn();
+
+    const sessionStore = new SessionStore(tempDir);
+    await sessionStore.beginSceneSession({
+      sceneId: 'scene.test-default',
+      objective: 'default scene for spec-gate tests'
+    });
   });
 
   afterEach(async () => {
@@ -112,5 +119,55 @@ describe('spec-gate command', () => {
     });
 
     expect(targets).toEqual(['111-01-gate-contract-test', '111-02-gate-contract-test']);
+  });
+
+  test('binds gate run as a child session when scene primary session is active', async () => {
+    const sessionStore = new SessionStore(tempDir);
+    const sceneSession = await sessionStore.beginSceneSession({
+      sceneId: 'scene.gate-integration',
+      objective: 'gate scene'
+    });
+
+    const result = await runSpecGate({
+      spec: '111-01-gate-contract-test',
+      scene: 'scene.gate-integration',
+      json: true
+    }, {
+      projectPath: tempDir,
+      sessionStore
+    });
+
+    expect(result.scene_session).toEqual(expect.objectContaining({
+      bound: true,
+      scene_id: 'scene.gate-integration',
+      scene_session_id: sceneSession.session.session_id
+    }));
+    expect(result.scene_session.spec_session_id).toBeTruthy();
+
+    const parent = await sessionStore.getSession(sceneSession.session.session_id);
+    expect(parent.children.spec_sessions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        spec_id: '111-01-gate-contract-test'
+      })
+    ]));
+  });
+
+  test('fails when no active scene primary session exists', async () => {
+    const isolated = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-spec-gate-no-scene-'));
+    const specId = '111-09-gate-no-scene';
+    const specPath = path.join(isolated, '.sce', 'specs', specId);
+    await fs.ensureDir(specPath);
+    await fs.writeFile(path.join(specPath, 'requirements.md'), '# Requirements\n', 'utf8');
+    await fs.writeFile(path.join(specPath, 'design.md'), '# Design\n## Requirement Mapping\n', 'utf8');
+    await fs.writeFile(path.join(specPath, 'tasks.md'), '- [ ] 1. Test task\n', 'utf8');
+
+    await expect(runSpecGate({
+      spec: specId,
+      json: true
+    }, {
+      projectPath: isolated
+    })).rejects.toThrow('No active scene session found');
+
+    await fs.remove(isolated);
   });
 });

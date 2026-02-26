@@ -21,7 +21,7 @@ sce templates show other/spec-template-library
 ### 3. Create a New Spec from This Template
 
 ```bash
-kse spec create my-new-feature --template other/spec-template-library
+sce spec create my-new-feature --template other/spec-template-library
 ```
 
 This will create a new Spec at `.sce/specs/XX-00-my-new-feature/` with:
@@ -47,7 +47,7 @@ Template for Spec Template Library
 
 ## Prerequisites
 
-- kse version 1.16.0 or higher
+- sce version 3.3.14 or higher
 - Basic understanding of Spec-driven development
 
 ## Tags
@@ -61,7 +61,6 @@ After applying this template, you'll have a complete Spec structure ready to cus
 ## Questions?
 
 If you have questions about using this template:
-- Check the kse documentation
+- Check the sce documentation
 - Review the generated Spec files
-- Open an issue in the kse-spec-templates repository
-
+- Open an issue in the sce-spec-templates repository

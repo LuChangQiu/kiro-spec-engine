@@ -2,7 +2,7 @@
 
 ## Template: spec-template-library
 
-Congratulations! Your template has been generated successfully. Follow these steps to submit it to the kse-spec-templates repository.
+Congratulations! Your template has been generated successfully. Follow these steps to submit it to the sce-spec-templates repository.
 
 ## Next Steps
 
@@ -18,7 +18,7 @@ Test your template locally before submitting:
 
 ```bash
 # Apply the template to create a new Spec
-kse spec create test-spec --template spec-template-library
+sce spec create test-spec --template spec-template-library
 
 # Verify the generated Spec is correct
 cd .sce/specs/test-spec
@@ -30,10 +30,10 @@ cd .sce/specs/test-spec
 **Option A: Fork + Pull Request (Recommended)**
 
 ```bash
-# 1. Fork the kse-spec-templates repository on GitHub
+# 1. Fork the sce-spec-templates repository on GitHub
 # 2. Clone your fork
-git clone https://github.com/YOUR_USERNAME/kse-spec-templates.git
-cd kse-spec-templates
+git clone https://github.com/YOUR_USERNAME/sce-spec-templates.git
+cd sce-spec-templates
 
 # 3. Create a branch
 git checkout -b add-spec-template-library
@@ -58,7 +58,7 @@ git push origin add-spec-template-library
 
 If you're not familiar with Git:
 
-1. Go to https://github.com/heguangyong/kse-spec-templates/issues
+1. Go to https://github.com/heguangyong/sce-spec-templates/issues
 2. Create a new issue with title: `[Template Submission] spec-template-library`
 3. Attach the template files or paste their contents
 4. A maintainer will review and add your template
@@ -78,9 +78,8 @@ If you're not familiar with Git:
 ## Questions?
 
 If you have questions about the submission process, please:
-- Check the kse-spec-templates repository README
+- Check the sce-spec-templates repository README
 - Open an issue in the repository
 - Contact the maintainers
 
-Thank you for contributing to the kse template library!
-
+Thank you for contributing to the sce template library!

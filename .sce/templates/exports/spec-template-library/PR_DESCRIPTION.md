@@ -23,7 +23,7 @@ Template for Spec Template Library
 
 - [ ] Template files include valid YAML frontmatter
 - [ ] All project-specific content replaced with template variables
-- [ ] Template tested locally with `kse spec create`
+- [ ] Template tested locally with `sce spec create`
 - [ ] Template follows naming conventions (kebab-case)
 - [ ] Description is clear and concise
 - [ ] Tags are relevant and searchable
@@ -34,10 +34,9 @@ Template for Spec Template Library
 Tested locally by applying the template:
 
 ```bash
-kse spec create test-spec --template spec-template-library
+sce spec create test-spec --template spec-template-library
 ```
 
 ## Additional Notes
 
 (Add any additional context or notes here)
-

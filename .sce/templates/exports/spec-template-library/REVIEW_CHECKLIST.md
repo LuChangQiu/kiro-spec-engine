@@ -40,7 +40,7 @@
 
 ### Testing
 
-- [ ] Template applied successfully with `kse spec create`
+- [ ] Template applied successfully with `sce spec create`
 - [ ] Variables replaced correctly in generated Spec
 - [ ] Generated Spec is usable and makes sense
 - [ ] No errors during template application
@@ -64,4 +64,3 @@
 2. Complete the manual review checklist
 3. Test the template locally
 4. Follow the submission guide in SUBMISSION_GUIDE.md
-

@@ -7,24 +7,24 @@ author: FallingAKS
 created_at: '2026-01-30'
 updated_at: '2026-01-30'
 version: 1.0.0
-min_sce_version: 1.16.0
+min_sce_version: 3.3.14
 ---
 
 # Requirements Document
 
 ## Introduction
 
-This document specifies the requirements for the {{SPEC_NAME_TITLE}} feature, which establishes an independent GitHub repository (kse-spec-templates) for storing and sharing high-quality Spec templates. The feature enables users to quickly create well-structured, high-quality Spec documents by providing pre-built templates for common development scenarios.
+This document specifies the requirements for the {{SPEC_NAME_TITLE}} feature, which establishes an independent GitHub repository (sce-spec-templates) for storing and sharing high-quality Spec templates. The feature enables users to quickly create well-structured, high-quality Spec documents by providing pre-built templates for common development scenarios.
 
 The system consists of two main components:
-1. A standalone template repository (kse-spec-templates) containing categorized templates
-2. Template management functionality integrated into kse CLI for downloading, updating, and using templates
+1. A standalone template repository (sce-spec-templates) containing categorized templates
+2. Template management functionality integrated into sce CLI for downloading, updating, and using templates
 
 ## Glossary
 
-- **Template_Library**: The standalone GitHub repository (kse-spec-templates) containing all official Spec templates
+- **Template_Library**: The standalone GitHub repository (sce-spec-templates) containing all official Spec templates
 - **Template**: A pre-built Spec structure including requirements.md, design.md, and tasks.md frameworks with guidance
-- **Template_Manager**: The kse component responsible for managing template operations (download, update, use)
+- **Template_Manager**: The sce component responsible for managing template operations (download, update, use)
 - **Template_Registry**: A JSON file (template-registry.json) containing metadata and index of all available templates
 - **Template_Category**: A classification grouping for templates (e.g., web-features, backend-features, infrastructure)
 - **Template_Metadata**: YAML frontmatter in template files containing description, scenarios, difficulty, and tags
@@ -87,7 +87,7 @@ The system consists of two main components:
 
 #### Acceptance Criteria
 
-1. WHEN a user runs `kse spec create <name> --template <category>/<template-name>`, THE Template_Manager SHALL copy the template files to .sce/specs/<name>/
+1. WHEN a user runs `sce spec create <name> --template <category>/<template-name>`, THE Template_Manager SHALL copy the template files to .sce/specs/<name>/
 2. WHEN copying template files, THE Template_Manager SHALL remove YAML frontmatter from the final Spec documents
 3. WHEN a template is applied, THE Template_Manager SHALL replace placeholder variables (e.g., {{SPEC_NAME}}, {{DATE}}) with actual values
 4. WHEN the target Spec directory already exists, THE Template_Manager SHALL prompt the user for confirmation before overwriting
@@ -213,3 +213,14 @@ The system consists of two main components:
 4. THE Template_Library SHALL include a docs/ directory with detailed guides for template creation and best practices
 5. WHEN a user runs `sce templates guide`, THE Template_Manager SHALL display or open the template usage guide
 
+### Requirement 16: Capability Fabric and Ontology Collaboration
+
+**User Story:** As a solution architect, I want each template to declare capability and ontology contracts, so that the template can be composed in SCE's scene capability graph and validated by ontology gates.
+
+#### Acceptance Criteria
+
+1. WHEN a template is registered, THE Template_Registry SHALL include `template_type`, `min_sce_version`, `risk_level`, and `rollback_contract`
+2. WHEN a template targets scene-package generation, THE Template_Registry SHALL include `ontology_scope` with `domains`, `entities`, `relations`, `business_rules`, and `decisions` where applicable
+3. THE Template_Manager SHALL support filtering templates by capability metadata (`template_type`, `compatible_with`, `risk_level`)
+4. WHEN a scene package is generated from template, THE contract SHALL emit `compatibility.min_sce_version` and SHALL NOT emit `compatibility.kse_version`
+5. THE Template_Manager SHALL provide machine-readable outputs that can be consumed by scene package ontology gates and capability coverage scorecards

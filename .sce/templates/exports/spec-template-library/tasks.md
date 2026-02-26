@@ -7,7 +7,7 @@ author: FallingAKS
 created_at: '2026-01-30'
 updated_at: '2026-01-30'
 version: 1.0.0
-min_sce_version: 1.16.0
+min_sce_version: 3.3.14
 ---
 
 # Implementation Plan: {{SPEC_NAME_TITLE}}
@@ -246,7 +246,7 @@ This implementation plan breaks down the {{SPEC_NAME_TITLE}} feature into discre
     - _Requirements: 4.3, 9.3_
   
   - [x] 12.4 Integrate template usage into spec create
-    - Modify `kse spec create` to accept --template option
+    - Modify `sce spec create` to accept --template option
     - Add template path parsing
     - Integrate TemplateManager.applyTemplate
     - _Requirements: 5.1, 5.2, 5.3_
@@ -272,7 +272,7 @@ This implementation plan breaks down the {{SPEC_NAME_TITLE}} feature into discre
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 15. Create Official Template Repository Structure
-  - [ ] 15.1 Set up kse-spec-templates repository
+  - [ ] 15.1 Set up sce-spec-templates repository
     - Create repository structure with category directories
     - Add template-registry.json
     - Create README.md and CONTRIBUTING.md
@@ -332,6 +332,22 @@ This implementation plan breaks down the {{SPEC_NAME_TITLE}} feature into discre
 - [ ] 18. Final checkpoint - Ensure everything works perfectly
   - Ensure all tests pass, ask the user if questions arise.
 
+- [ ] 19. Align templates with capability fabric and ontology gates
+  - [ ] 19.1 Enforce typed template metadata
+    - Require `template_type`, `min_sce_version`, `risk_level`, `rollback_contract` in registry validation
+    - Ensure CLI filter support for type/compatibility/risk remains covered by tests
+    - _Requirements: 16.1, 16.3_
+
+  - [ ] 19.2 Enforce ontology scope declarations for scene-capability templates
+    - Add validation guidance for `ontology_scope.domains/entities/relations/business_rules/decisions`
+    - Ensure scene template packages emit ontology metadata consumable by gates
+    - _Requirements: 16.2, 16.5_
+
+  - [ ] 19.3 Remove legacy compatibility fields from template contracts
+    - Ensure generated scene package contracts only emit `compatibility.min_sce_version`
+    - Verify no `compatibility.kse_version` remains in exported templates or fixtures
+    - _Requirements: 16.4_
+
 ## Notes
 
 - Tasks marked with `*` are optional and can be skipped for faster MVP
@@ -343,4 +359,3 @@ This implementation plan breaks down the {{SPEC_NAME_TITLE}} feature into discre
 - The implementation follows a bottom-up approach: utilities → components → integration → CLI
 - Template repository creation (Task 15) can be done in parallel with CLI implementation
 - Cross-platform testing (Task 17.2) should be done on actual platforms, not just simulated
-

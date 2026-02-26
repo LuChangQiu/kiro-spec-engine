@@ -7,7 +7,7 @@ author: FallingAKS
 created_at: '2026-01-30'
 updated_at: '2026-01-30'
 version: 1.0.0
-min_sce_version: 1.16.0
+min_sce_version: 3.3.14
 ---
 
 # Design Document
@@ -16,10 +16,19 @@ min_sce_version: 1.16.0
 
 The {{SPEC_NAME_TITLE}} feature consists of two main components:
 
-1. **kse-spec-templates Repository**: A standalone GitHub repository containing categorized, high-quality Spec templates with metadata and examples
-2. **Template Manager Module**: Integrated into kse CLI, responsible for template discovery, download, caching, and application
+1. **sce-spec-templates Repository**: A standalone GitHub repository containing categorized, high-quality Spec templates with metadata and examples
+2. **Template Manager Module**: Integrated into sce CLI, responsible for template discovery, download, caching, and application
 
 The design follows a distributed architecture where templates are stored in Git repositories (official and custom sources) and cached locally for offline use. The Template Manager provides a seamless CLI experience for browsing, downloading, and applying templates to new Spec creation.
+
+## SCE Strategic Alignment
+
+This template system is aligned to SCE's long-term architecture:
+
+1. **Cognitive Kernel**: template metadata enables planning and strategy selection (`template_type`, `risk_level`, `rollback_contract`)
+2. **Capability Fabric**: templates are discoverable and composable by compatibility constraints (`min_sce_version`, `max_sce_version`)
+3. **Ontology Universe**: scene-oriented templates declare ontology scope (`domains`, `entities`, `relations`, `business_rules`, `decisions`)
+4. **Execution Layer**: template outputs are machine-readable and verifiable by scene package gates and ontology scorecards
 
 ## Architecture
 
@@ -27,7 +36,7 @@ The design follows a distributed architecture where templates are stored in Git 
 
 ```mermaid
 graph TB
-    CLI[kse CLI] --> TM[Template Manager]
+    CLI[sce CLI] --> TM[Template Manager]
     TM --> LC[Local Cache<br/>~/.sce/templates/]
     TM --> GH[GitHub Repositories]
     
@@ -35,7 +44,7 @@ graph TB
     LC --> CUST[custom-source-1/]
     LC --> CUST2[custom-source-2/]
     
-    GH --> REPO1[kse-spec-templates<br/>Official Repo]
+    GH --> REPO1[sce-spec-templates<br/>Official Repo]
     GH --> REPO2[Custom Repos]
     
     TM --> REG[Template Registry<br/>Parser]
@@ -56,7 +65,7 @@ sequenceDiagram
     participant Cache as Local Cache
     participant Git as Git Repository
     
-    User->>CLI: kse spec create my-feature --template web-features/rest-api
+    User->>CLI: sce spec create my-feature --template web-features/rest-api
     CLI->>TM: createFromTemplate(name, template)
     
     alt Cache exists
@@ -140,15 +149,30 @@ class RegistryParser {
 **Registry Schema**:
 ```json
 {
-  "version": "1.0.0",
+  "version": "2.0.0",
   "templates": [
     {
       "id": "web-features/rest-api",
       "name": "REST API Feature",
+      "template_type": "spec-scaffold",
       "category": "web-features",
       "description": "Template for RESTful API endpoints",
       "difficulty": "intermediate",
       "tags": ["api", "rest", "backend", "http"],
+      "min_sce_version": "3.3.14",
+      "max_sce_version": null,
+      "risk_level": "medium",
+      "rollback_contract": {
+        "supported": true,
+        "strategy": "revert-artifacts"
+      },
+      "ontology_scope": {
+        "domains": ["enterprise"],
+        "entities": ["OrderHeader"],
+        "relations": ["order-customer"],
+        "business_rules": ["order-approval"],
+        "decisions": ["fulfillment-routing"]
+      },
       "applicable_scenarios": [
         "Creating new API endpoints",
         "Implementing CRUD operations",
@@ -159,7 +183,7 @@ class RegistryParser {
         "design.md",
         "tasks.md"
       ],
-      "author": "kse-team",
+      "author": "sce-team",
       "created_at": "2025-01-15",
       "updated_at": "2025-01-20"
     }
@@ -290,7 +314,7 @@ class CacheManager {
 - Expose template operations via CLI
 - Handle command-line arguments and options
 - Provide user-friendly output and error messages
-- Integrate with existing kse CLI structure
+- Integrate with existing sce CLI structure
 
 **Commands**:
 ```javascript
@@ -322,7 +346,7 @@ sce templates cache [--clear] [--source <source>]
 sce templates guide
 
 // Create Spec from template
-kse spec create <name> --template <template-path> [--force]
+sce spec create <name> --template <template-path> [--force]
 ```
 
 ## Data Models
@@ -346,7 +370,7 @@ applicable_scenarios:
   - Implementing CRUD operations
   - Building microservices
   - Adding authentication to APIs
-author: kse-team
+author: sce-team
 created_at: 2025-01-15
 updated_at: 2025-01-20
 version: 1.0.0
@@ -365,7 +389,7 @@ interface TemplateEntry {
   tags: string[];                // ["api", "rest", "backend"]
   applicable_scenarios: string[]; // Use case descriptions
   files: string[];               // ["requirements.md", "design.md", "tasks.md"]
-  author: string;                // "kse-team"
+  author: string;                // "sce-team"
   created_at: string;            // ISO date
   updated_at: string;            // ISO date
   version?: string;              // Template version
@@ -861,4 +885,3 @@ describe('Integration Tests', () => {
 5. **Interactive Template Creation**: Wizard for creating new templates
 6. **Template Testing**: Automated testing of templates
 7. **Template Marketplace**: Web interface for browsing templates
-

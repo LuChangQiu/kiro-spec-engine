@@ -1353,7 +1353,6 @@ sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json -
 
 Compatibility contract note:
 - Scene package compatibility uses `compatibility.min_sce_version` as canonical field.
-- Legacy `compatibility.kse_version` remains readable but is deprecated.
 
 ### Scene Package Ontology Backfill Batch
 

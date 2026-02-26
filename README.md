@@ -6,7 +6,7 @@
 > **⚠️ Important Clarification**: `scene-capability-engine` (`sce`) is an **npm package and CLI tool** for spec-driven development.  
 > Primary command is `sce`. Compatibility aliases are preserved for migration.
 
-**A context provider for AI coding tools** - Structure your project requirements, design, and tasks so AI assistants can help you build better software.
+**SCE (Scene Capability Engine) is an ontology-aware scene orchestration engine for AI agents** across plan, generate, patch, verify, and release workflows.
 
 **🚀 NEW: Autonomous Control** - Let AI independently manage entire development workflows from requirements to delivery.
 
@@ -16,7 +16,7 @@ English | [简体中文](README.zh.md)
 
 ## What is sce?
 
-**SCE (Scene Capability Engine) is a context management system for AI-assisted development.** It helps you organize project information into structured "Specs" (Requirements → Design → Tasks) that AI tools can understand and use effectively.
+**SCE (Scene Capability Engine) is an ontology-aware scene orchestration engine for AI-assisted development.** It organizes project information into structured "Specs" (Requirements → Design → Tasks) and routes execution through plan → generate → patch → verify → release workflows.
 
 Think of sce as a **librarian for your AI assistant** - it organizes and presents project context so your AI tool knows exactly what you're building, why, and how.
 

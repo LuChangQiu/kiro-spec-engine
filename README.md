@@ -775,6 +775,6 @@ A deep conversation about AI development trends, Neo-Confucian philosophy, and s
 
 ---
 
-**Version**: 3.3.13  
+**Version**: 3.3.14  
 **Last Updated**: 2026-02-26
 

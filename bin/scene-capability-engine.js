@@ -817,6 +817,10 @@ registerLockCommands(program);
 const { registerKnowledgeCommands } = require('../lib/commands/knowledge');
 registerKnowledgeCommands(program);
 
+// Studio orchestration commands
+const { registerStudioCommands } = require('../lib/commands/studio');
+registerStudioCommands(program);
+
 // Orchestration commands
 const { registerOrchestrateCommands } = require('../lib/commands/orchestrate');
 registerOrchestrateCommands(program);

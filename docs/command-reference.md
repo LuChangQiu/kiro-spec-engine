@@ -3,7 +3,7 @@
 > Quick reference for all `sce` commands
 
 **Version**: 2.0.0
-**Last Updated**: 2026-02-18
+**Last Updated**: 2026-02-26
 
 ---
 
@@ -303,6 +303,28 @@ sce orchestrate stop
 ```
 
 When you pass `--specs` to `sce spec bootstrap|pipeline run|gate run`, sce now defaults to this orchestrate mode automatically.
+
+### Studio Workflow
+
+```bash
+# Build a plan from chat/session context
+sce studio plan --from-chat session-20260226 --goal "customer+order+inventory demo" --json
+
+# Generate patch bundle metadata for a target scene
+sce studio generate --scene scene.customer-order-inventory --target 331 --json
+
+# Apply generated patch metadata
+sce studio apply --patch-bundle patch-scene.customer-order-inventory-<timestamp> --json
+
+# Record verification result
+sce studio verify --profile standard --json
+
+# Record release event
+sce studio release --channel dev --json
+
+# Resume from latest or explicit job
+sce studio resume --job <job-id> --json
+```
 
 ### Capability Matrix Utilities
 

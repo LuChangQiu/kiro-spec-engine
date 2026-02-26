@@ -9,7 +9,7 @@
     "description": "Template package for Moqui interactive customization: intent -> plan -> gate -> approval -> low-risk apply -> rollback audit."
   },
   "compatibility": {
-    "kse_version": ">=3.0.8",
+    "min_sce_version": ">=3.0.8",
     "scene_api_version": "kse.scene/v0.2",
     "moqui_model_version": "3.x",
     "adapter_api_version": "v1"
@@ -343,3 +343,4 @@
     "rollback_strategy": "Replay rollback record generation from execution ledger and keep immutable audit trail."
   }
 }
+

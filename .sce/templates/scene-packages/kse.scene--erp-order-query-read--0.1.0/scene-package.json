@@ -9,7 +9,7 @@
     "description": "Query-focused domain profile for order read flows with ontology, lineage, and decision strategy."
   },
   "compatibility": {
-    "kse_version": ">=1.47.15",
+    "min_sce_version": ">=1.47.15",
     "scene_api_version": "kse.scene/v0.2",
     "moqui_model_version": "3.x",
     "adapter_api_version": "v1"
@@ -247,3 +247,4 @@
     "rollback_strategy": "Retry query with reduced filter set and preserve previous projection cache"
   }
 }
+

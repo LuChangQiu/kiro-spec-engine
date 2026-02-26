@@ -19,7 +19,7 @@ function buildContract({
       summary: `Fixture template for ${templateName}`
     },
     compatibility: {
-      kse_version: '>=1.24.0',
+      min_sce_version: '>=1.24.0',
       scene_api_version: 'sce.scene/v0.2',
       moqui_model_version: '3.x',
       adapter_api_version: 'v1'
@@ -392,3 +392,4 @@ describe('moqui-template-baseline-report script', () => {
     expect(markdown).toContain('decision-closed:-50%');
   });
 });
+

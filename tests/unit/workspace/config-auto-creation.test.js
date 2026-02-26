@@ -108,9 +108,9 @@ describe('Configuration Directory Auto-Creation', () => {
   });
 
   describe('Default paths', () => {
-    it('WorkspaceStateManager should use ~/.kse/workspace-state.json by default', () => {
+    it('WorkspaceStateManager should use ~/.sce/workspace-state.json by default', () => {
       const stateManager = new WorkspaceStateManager();
-      const expectedPath = path.join(os.homedir(), '.kse', 'workspace-state.json');
+      const expectedPath = path.join(os.homedir(), '.sce', 'workspace-state.json');
       expect(stateManager.statePath).toBe(expectedPath);
     });
   });

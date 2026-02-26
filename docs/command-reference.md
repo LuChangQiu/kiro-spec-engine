@@ -1291,6 +1291,12 @@ Codex sub-agent permission defaults:
 ### Scene Template Engine
 
 ```bash
+# Template registry (typed templates + compatibility filters)
+sce templates list --type <spec-scaffold|capability-template|runtime-playbook> --compatible-with <semver> --risk <low|medium|high|critical>
+sce templates search <keyword> --type <spec-scaffold|capability-template|runtime-playbook> --compatible-with <semver>
+sce templates show <template-path>
+sce templates update [--source <name>]
+
 # Validate template variable schema in a scene package
 sce scene template-validate --package <path>
 sce scene template-validate --package ./my-package --json
@@ -1344,6 +1350,10 @@ sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json -
 # Export ontology remediation queue lines (directly consumable by close-loop-batch)
 sce scene package-publish-batch --manifest docs/handoffs/handoff-manifest.json --dry-run --ontology-task-queue-out .sce/auto/ontology-remediation.lines --json
 ```
+
+Compatibility contract note:
+- Scene package compatibility uses `compatibility.min_sce_version` as canonical field.
+- Legacy `compatibility.kse_version` remains readable but is deprecated.
 
 ### Scene Package Ontology Backfill Batch
 

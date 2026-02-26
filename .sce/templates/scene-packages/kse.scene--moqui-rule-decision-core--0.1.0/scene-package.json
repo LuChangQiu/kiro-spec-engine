@@ -9,7 +9,7 @@
                      "description":  "Recover Moqui business rules and decision strategy."
                  },
     "compatibility":  {
-                          "kse_version":  "\u003e=3.0.6",
+                          "min_sce_version":  "\u003e=3.0.6",
                           "scene_api_version":  "kse.scene/v0.2",
                           "moqui_model_version":  "3.x",
                           "adapter_api_version":  "v1"
@@ -169,3 +169,4 @@
                         "rollback_strategy":  "Switch to advisory mode and preserve source artifacts."
                     }
 }
+

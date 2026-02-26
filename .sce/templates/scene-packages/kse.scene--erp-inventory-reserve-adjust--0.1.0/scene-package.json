@@ -9,7 +9,7 @@
     "description": "Inventory-focused domain profile for reserve and adjustment decisions with ontology-driven governance."
   },
   "compatibility": {
-    "kse_version": ">=1.47.15",
+    "min_sce_version": ">=1.47.15",
     "scene_api_version": "kse.scene/v0.2",
     "moqui_model_version": "3.x",
     "adapter_api_version": "v1"
@@ -263,3 +263,4 @@
     "rollback_strategy": "Release reservation and restore snapshot when adjustment branch fails"
   }
 }
+

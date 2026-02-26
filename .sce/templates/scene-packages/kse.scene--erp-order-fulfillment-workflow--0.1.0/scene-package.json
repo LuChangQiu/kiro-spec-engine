@@ -9,7 +9,7 @@
     "description": "Workflow domain profile for reservation, payment, release, and status transition with ontology-aware gates."
   },
   "compatibility": {
-    "kse_version": ">=1.47.15",
+    "min_sce_version": ">=1.47.15",
     "scene_api_version": "kse.scene/v0.2",
     "moqui_model_version": "3.x",
     "adapter_api_version": "v1"
@@ -294,3 +294,4 @@
     "rollback_strategy": "Compensate reservations and revert order status when downstream steps fail"
   }
 }
+

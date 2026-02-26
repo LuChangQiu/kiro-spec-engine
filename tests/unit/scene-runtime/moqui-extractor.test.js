@@ -1749,7 +1749,7 @@ describe('MoquiExtractor', () => {
 
       const contract = generatePackageContract(match);
 
-      expect(contract.compatibility.kse_version).toBe('>=1.39.0');
+      expect(contract.compatibility.min_sce_version).toBe('>=1.39.0');
       expect(contract.compatibility.scene_api_version).toBe('sce.scene/v0.2');
     });
 
@@ -3188,3 +3188,4 @@ describe('MoquiExtractor', () => {
     });
   });
 });
+

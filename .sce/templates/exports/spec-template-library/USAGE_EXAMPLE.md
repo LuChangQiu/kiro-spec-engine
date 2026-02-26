@@ -9,13 +9,13 @@ Template for Spec Template Library
 ### 1. List Available Templates
 
 ```bash
-kse templates list
+sce templates list
 ```
 
 ### 2. View Template Details
 
 ```bash
-kse templates show other/spec-template-library
+sce templates show other/spec-template-library
 ```
 
 ### 3. Create a New Spec from This Template
@@ -64,3 +64,4 @@ If you have questions about using this template:
 - Check the kse documentation
 - Review the generated Spec files
 - Open an issue in the kse-spec-templates repository
+

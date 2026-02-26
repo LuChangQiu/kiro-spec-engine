@@ -311,7 +311,6 @@ program
         console.log(chalk.yellow('💡 Tip:'));
         console.log('  Use a template: ' + chalk.cyan(`sce spec create ${specName} --template <template-id>`));
         console.log('  Browse templates: ' + chalk.cyan('sce templates list'));
-        console.log('  Legacy alias (still works): ' + chalk.cyan('kse templates list')); 
       }
     } catch (error) {
       console.error(chalk.red('❌ Error creating spec:'), error.message);
@@ -830,13 +829,16 @@ const templatesCommand = require('../lib/commands/templates');
 
 const templatesCmd = program
   .command('templates')
-  .description('Manage Spec templates from official and custom sources');
+  .description('Manage SCE templates from official and custom sources');
 
 templatesCmd
   .command('list')
   .description('List all available templates')
   .option('--category <category>', 'Filter by category')
   .option('--source <source>', 'Filter by source')
+  .option('--type <template-type>', 'Filter by template type (spec-scaffold|capability-template|runtime-playbook)')
+  .option('--compatible-with <version>', 'Filter templates compatible with target SCE version (semver)')
+  .option('--risk <risk-level>', 'Filter by risk level (low|medium|high|critical)')
   .action(async (options) => {
     await templatesCommand.listTemplates(options);
   });
@@ -845,6 +847,10 @@ templatesCmd
   .command('search <keyword>')
   .description('Search templates by keyword')
   .option('--category <category>', 'Filter by category')
+  .option('--source <source>', 'Filter by source')
+  .option('--type <template-type>', 'Filter by template type (spec-scaffold|capability-template|runtime-playbook)')
+  .option('--compatible-with <version>', 'Filter templates compatible with target SCE version (semver)')
+  .option('--risk <risk-level>', 'Filter by risk level (low|medium|high|critical)')
   .action(async (keyword, options) => {
     await templatesCommand.searchTemplates(keyword, options);
   });

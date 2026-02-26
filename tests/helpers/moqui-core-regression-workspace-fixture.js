@@ -13,7 +13,7 @@ const TEMPLATE_CONTRACT = {
     summary: 'Published fixture template for Moqui core regression suite.'
   },
   compatibility: {
-    kse_version: '>=1.24.0',
+    min_sce_version: '>=1.24.0',
     scene_api_version: 'sce.scene/v0.2',
     moqui_model_version: '3.x',
     adapter_api_version: 'v1'
@@ -182,3 +182,4 @@ async function createMoquiCoreRegressionWorkspace(workspacePath) {
 module.exports = {
   createMoquiCoreRegressionWorkspace
 };
+

@@ -11,7 +11,7 @@ Template for Spec Template Library
 - **Tags**: 
 - **Author**: FallingAKS
 - **Version**: 1.0.0
-- **Minimum KSE Version**: 1.16.0
+- **Minimum SCE Version**: 1.16.0
 
 ## Files Included
 
@@ -40,3 +40,4 @@ kse spec create test-spec --template spec-template-library
 ## Additional Notes
 
 (Add any additional context or notes here)
+

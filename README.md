@@ -341,7 +341,7 @@ Structure your work with Requirements → Design → Tasks workflow
 ### Multi-Workspace Management 🚀
 - **Workspace Registry**: Manage multiple sce projects from a single location
 - **Quick Switching**: Switch between projects without directory navigation
-- **Data Atomicity**: Single source of truth (`~/.kse/workspace-state.json`)
+- **Data Atomicity**: Single source of truth (`~/.sce/workspace-state.json`)
 - **Cross-Platform**: Consistent path handling across Windows/Linux/macOS
 - **Auto Migration**: Seamless upgrade from legacy workspace format
 
@@ -570,6 +570,12 @@ sce spec gate run --specs "<spec-a,spec-b>" --max-parallel <N>     # Multi-Spec 
 sce context export <spec-name>     # Export context for AI tools
 sce prompt generate <spec> <task>  # Generate task-specific prompt
 
+# Template registry
+sce templates list --type <spec-scaffold|capability-template|runtime-playbook> --compatible-with <semver> --risk <low|medium|high|critical>
+sce templates search <keyword> --type <spec-scaffold|capability-template|runtime-playbook> --compatible-with <semver>
+sce templates show <template-path>  # Show template metadata and compatibility contract
+sce templates update [--source <name>]
+
 # KPI automation and observability
 sce value metrics sample --out <path> --json               # Generate sample KPI input JSON
 sce value metrics snapshot --input <path> --json          # Generate weekly KPI snapshot + gate summary
@@ -769,6 +775,6 @@ A deep conversation about AI development trends, Neo-Confucian philosophy, and s
 
 ---
 
-**Version**: 3.3.1  
-**Last Updated**: 2026-02-22
+**Version**: 3.3.13  
+**Last Updated**: 2026-02-26
 

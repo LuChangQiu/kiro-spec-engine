@@ -2915,7 +2915,7 @@ Trace: doctor-trace-erp
         version: '0.2.0'
       },
       compatibility: {
-        kse_version: '>=1.24.0',
+        min_sce_version: '>=1.24.0',
         scene_api_version: 'sce.scene/v0.2'
       },
       capabilities: {
@@ -2988,7 +2988,7 @@ Trace: doctor-trace-erp
         version: '0.2.0'
       },
       compatibility: {
-        kse_version: '>=1.24.0',
+        min_sce_version: '>=1.24.0',
         scene_api_version: 'sce.scene/v0.2'
       },
       capabilities: {
@@ -3058,7 +3058,7 @@ Trace: doctor-trace-erp
         version: '0.2.0'
       },
       compatibility: {
-        kse_version: '>=1.24.0',
+        min_sce_version: '>=1.24.0',
         scene_api_version: 'sce.scene/v0.2'
       },
       capabilities: {
@@ -3127,7 +3127,7 @@ Trace: doctor-trace-erp
         version: '0.2.0'
       },
       compatibility: {
-        kse_version: '>=1.24.0',
+        min_sce_version: '>=1.24.0',
         scene_api_version: 'sce.scene/v0.2'
       },
       capabilities: {
@@ -3192,7 +3192,7 @@ Trace: doctor-trace-erp
         version: '0.2.0'
       },
       compatibility: {
-        kse_version: '>=1.24.0',
+        min_sce_version: '>=1.24.0',
         scene_api_version: 'sce.scene/v0.2'
       },
       capabilities: {
@@ -3251,7 +3251,7 @@ Trace: doctor-trace-erp
         version: '0.2.0'
       },
       compatibility: {
-        kse_version: '>=1.24.0',
+        min_sce_version: '>=1.24.0',
         scene_api_version: 'sce.scene/v0.2'
       },
       capabilities: {
@@ -3901,7 +3901,7 @@ Trace: doctor-trace-erp
       apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: { group: 'sce.scene', name: 'master-data-deepening', version: '1.0.0' },
-      compatibility: { kse_version: '>=1.47.0', scene_api_version: 'sce.scene/v0.2' },
+      compatibility: { min_sce_version: '>=1.47.0', scene_api_version: 'sce.scene/v0.2' },
       capabilities: {
         provides: ['scene.master.data.deepening.completed-capability'],
         requires: ['binding:http', 'profile:erp']
@@ -3994,7 +3994,7 @@ Trace: doctor-trace-erp
       apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: { group: 'sce.scene', name: 'sales-lifecycle-enhancement', version: '1.0.0' },
-      compatibility: { kse_version: '>=1.47.0', scene_api_version: 'sce.scene/v0.2' },
+      compatibility: { min_sce_version: '>=1.47.0', scene_api_version: 'sce.scene/v0.2' },
       capabilities: {
         provides: ['scene.sales.lifecycle.enhancement.completed-capability'],
         requires: ['binding:http']
@@ -4094,7 +4094,7 @@ Trace: doctor-trace-erp
             apiVersion: 'sce.scene.package/v0.1',
             kind: 'scene-template',
             metadata: { group: 'sce.scene', name: 'production-planning-mrp', version: '1.0.0' },
-            compatibility: { kse_version: '>=1.47.0', scene_api_version: 'sce.scene/v0.2' },
+            compatibility: { min_sce_version: '>=1.47.0', scene_api_version: 'sce.scene/v0.2' },
             capabilities: { provides: ['scene.production.planning.mrp'], requires: ['binding:http'] },
             parameters: [{ id: 'entity_name', type: 'string', required: true }],
             artifacts: { entry_scene: 'scene.yaml', generates: ['scene.yaml', 'scene-package.json'] },
@@ -4140,7 +4140,7 @@ Trace: doctor-trace-erp
         version: '0.2.0'
       },
       compatibility: {
-        kse_version: '>=1.24.0',
+        min_sce_version: '>=1.24.0',
         scene_api_version: 'sce.scene/v0.2'
       },
       capabilities: {
@@ -4245,7 +4245,7 @@ Trace: doctor-trace-erp
         version: '0.2.0'
       },
       compatibility: {
-        kse_version: '>=1.24.0',
+        min_sce_version: '>=1.24.0',
         scene_api_version: 'sce.scene/v0.2'
       },
       capabilities: {
@@ -4331,7 +4331,7 @@ Trace: doctor-trace-erp
         version: '0.2.0'
       },
       compatibility: {
-        kse_version: '>=1.24.0',
+        min_sce_version: '>=1.24.0',
         scene_api_version: 'sce.scene/v0.2'
       },
       capabilities: {
@@ -5345,7 +5345,7 @@ spec:
         description: 'A test package'
       },
       compatibility: {
-        kse_version: '>=1.0.0',
+        min_sce_version: '>=1.0.0',
         scene_api_version: 'v0.1'
       },
       capabilities: {
@@ -5423,7 +5423,7 @@ spec:
         description: 'A test package'
       },
       compatibility: {
-        kse_version: '>=1.0.0',
+        min_sce_version: '>=1.0.0',
         scene_api_version: 'v0.1'
       },
       capabilities: {
@@ -5464,7 +5464,7 @@ spec:
         description: 'A test package'
       },
       compatibility: {
-        kse_version: '>=1.0.0',
+        min_sce_version: '>=1.0.0',
         scene_api_version: 'v0.1'
       },
       capabilities: {
@@ -5507,7 +5507,7 @@ spec:
         description: 'A test package'
       },
       compatibility: {
-        kse_version: '>=1.0.0',
+        min_sce_version: '>=1.0.0',
         scene_api_version: 'v0.1'
       },
       capabilities: {
@@ -5552,7 +5552,7 @@ spec:
         description: 'A test package'
       },
       compatibility: {
-        kse_version: '>=1.0.0',
+        min_sce_version: '>=1.0.0',
         scene_api_version: 'v0.1'
       },
       capabilities: {
@@ -5596,7 +5596,7 @@ spec:
         description: 'A test package'
       },
       compatibility: {
-        kse_version: '>=1.0.0',
+        min_sce_version: '>=1.0.0',
         scene_api_version: 'v0.1'
       },
       capabilities: {
@@ -5647,7 +5647,7 @@ spec:
         description: 'A test package'
       },
       compatibility: {
-        kse_version: '>=1.0.0',
+        min_sce_version: '>=1.0.0',
         scene_api_version: 'v0.1'
       },
       capabilities: {
@@ -6247,7 +6247,7 @@ spec:
       apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: { name: 'test-pkg', group: 'sce.scene', version: '1.0.0', description: 'Test' },
-      compatibility: { kse_version: '>=1.0.0', scene_api_version: 'sce.scene/v0.2' },
+      compatibility: { min_sce_version: '>=1.0.0', scene_api_version: 'sce.scene/v0.2' },
       capabilities: { provides: ['test-cap'], requires: [] },
       artifacts: { entry_scene: 'scene.yaml', generates: ['template.yaml'] },
       governance: { risk_level: 'low', approval_required: false, rollback_supported: true },
@@ -6285,7 +6285,7 @@ spec:
       apiVersion: 'sce.scene.package/v0.1',
       kind: 'scene-template',
       metadata: { name: 'my-pkg', group: 'sce.scene', version: '2.0.0', description: 'My package' },
-      compatibility: { kse_version: '>=1.0.0', scene_api_version: 'sce.scene/v0.2' },
+      compatibility: { min_sce_version: '>=1.0.0', scene_api_version: 'sce.scene/v0.2' },
       capabilities: { provides: ['my-cap'], requires: [] },
       artifacts: { entry_scene: 'scene.yaml', generates: ['output.yaml'] },
       governance: { risk_level: 'low', approval_required: false, rollback_supported: true },
@@ -7266,3 +7266,4 @@ describe('Scene Ontology CLI', () => {
     spy.mockRestore();
   });
 });
+

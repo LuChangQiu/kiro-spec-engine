@@ -7,7 +7,7 @@ author: FallingAKS
 created_at: '2026-01-30'
 updated_at: '2026-01-30'
 version: 1.0.0
-kse_version: 1.16.0
+min_sce_version: 1.16.0
 ---
 
 # Implementation Plan: {{SPEC_NAME_TITLE}}
@@ -227,20 +227,20 @@ This implementation plan breaks down the {{SPEC_NAME_TITLE}} feature into discre
 
 - [x] 12. Implement CLI Commands Integration
   - [x] 12.1 Create templates command group
-    - Add `kse templates list` command
-    - Add `kse templates search` command
-    - Add `kse templates show` command
+    - Add `sce templates list` command
+    - Add `sce templates search` command
+    - Add `sce templates show` command
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
   
   - [x] 12.2 Add template management commands
-    - Add `kse templates update` command
-    - Add `kse templates add-source` command
-    - Add `kse templates remove-source` command
-    - Add `kse templates sources` command
+    - Add `sce templates update` command
+    - Add `sce templates add-source` command
+    - Add `sce templates remove-source` command
+    - Add `sce templates sources` command
     - _Requirements: 6.1, 7.1, 7.4_
   
   - [x] 12.3 Add cache management commands
-    - Add `kse templates cache` command
+    - Add `sce templates cache` command
     - Add cache status display
     - Add cache clearing functionality
     - _Requirements: 4.3, 9.3_
@@ -343,3 +343,4 @@ This implementation plan breaks down the {{SPEC_NAME_TITLE}} feature into discre
 - The implementation follows a bottom-up approach: utilities → components → integration → CLI
 - Template repository creation (Task 15) can be done in parallel with CLI implementation
 - Cross-platform testing (Task 17.2) should be done on actual platforms, not just simulated
+

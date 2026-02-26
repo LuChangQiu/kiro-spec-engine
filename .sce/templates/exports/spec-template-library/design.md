@@ -7,7 +7,7 @@ author: FallingAKS
 created_at: '2026-01-30'
 updated_at: '2026-01-30'
 version: 1.0.0
-kse_version: 1.16.0
+min_sce_version: 1.16.0
 ---
 
 # Design Document
@@ -28,7 +28,7 @@ The design follows a distributed architecture where templates are stored in Git 
 ```mermaid
 graph TB
     CLI[kse CLI] --> TM[Template Manager]
-    TM --> LC[Local Cache<br/>~/.kse/templates/]
+    TM --> LC[Local Cache<br/>~/.sce/templates/]
     TM --> GH[GitHub Repositories]
     
     LC --> OFF[official/]
@@ -264,7 +264,7 @@ class CacheManager {
 
 **Cache Structure**:
 ```
-~/.kse/templates/
+~/.sce/templates/
 ├── official/                    # Official template library
 │   ├── .git/
 │   ├── template-registry.json
@@ -295,31 +295,31 @@ class CacheManager {
 **Commands**:
 ```javascript
 // List all templates
-kse templates list [--category <category>] [--source <source>]
+sce templates list [--category <category>] [--source <source>]
 
 // Search templates
-kse templates search <keyword> [--category <category>]
+sce templates search <keyword> [--category <category>]
 
 // Show template details
-kse templates show <template-path>
+sce templates show <template-path>
 
 // Update templates
-kse templates update [--source <source>] [--version <version>]
+sce templates update [--source <source>] [--version <version>]
 
 // Add custom source
-kse templates add-source <name> <git-url>
+sce templates add-source <name> <git-url>
 
 // Remove custom source
-kse templates remove-source <name>
+sce templates remove-source <name>
 
 // List configured sources
-kse templates sources
+sce templates sources
 
 // Show cache status
-kse templates cache [--clear] [--source <source>]
+sce templates cache [--clear] [--source <source>]
 
 // Display template guide
-kse templates guide
+sce templates guide
 
 // Create Spec from template
 kse spec create <name> --template <template-path> [--force]
@@ -861,3 +861,4 @@ describe('Integration Tests', () => {
 5. **Interactive Template Creation**: Wizard for creating new templates
 6. **Template Testing**: Automated testing of templates
 7. **Template Marketplace**: Web interface for browsing templates
+

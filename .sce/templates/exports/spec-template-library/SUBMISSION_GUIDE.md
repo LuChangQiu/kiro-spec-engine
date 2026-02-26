@@ -83,3 +83,4 @@ If you have questions about the submission process, please:
 - Contact the maintainers
 
 Thank you for contributing to the kse template library!
+

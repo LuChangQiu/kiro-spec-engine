@@ -31,7 +31,7 @@ describe('WorkspaceStateManager', () => {
 
     it('should use default path when not provided', () => {
       const defaultManager = new WorkspaceStateManager();
-      const expectedPath = path.join(os.homedir(), '.kse', 'workspace-state.json');
+      const expectedPath = path.join(os.homedir(), '.sce', 'workspace-state.json');
       expect(defaultManager.statePath).toBe(expectedPath);
     });
   });
@@ -396,6 +396,33 @@ describe('WorkspaceStateManager', () => {
   });
 
   describe('Legacy Migration', () => {
+    it('should migrate legacy single-file workspace state into .sce directory', async () => {
+      const newStatePath = path.join(tempDir, '.sce', 'workspace-state.json');
+      const legacyStatePath = path.join(tempDir, '.kse', 'workspace-state.json');
+      await fs.ensureDir(path.dirname(legacyStatePath));
+
+      const legacyState = {
+        version: '1.0',
+        activeWorkspace: 'legacy-single',
+        workspaces: [],
+        preferences: {
+          autoDetectWorkspace: true,
+          confirmDestructiveOperations: false
+        }
+      };
+      await fs.writeFile(legacyStatePath, JSON.stringify(legacyState), 'utf8');
+
+      const migrationManager = new WorkspaceStateManager(newStatePath);
+      migrationManager.isDefaultStatePath = () => true;
+      migrationManager.getLegacyStatePath = () => legacyStatePath;
+
+      await migrationManager.load();
+
+      expect(await fs.pathExists(newStatePath)).toBe(true);
+      expect(migrationManager.state.activeWorkspace).toBe('legacy-single');
+      expect(migrationManager.state.preferences.confirmDestructiveOperations).toBe(false);
+    });
+
     it('should migrate from legacy format', async () => {
       // Create legacy files in temp directory
       const legacyDir = tempDir;

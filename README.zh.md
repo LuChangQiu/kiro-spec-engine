@@ -307,7 +307,7 @@ sequenceDiagram
 ### 多工作区管理 🚀
 - **工作区注册表**：从单一位置管理多个 sce 项目
 - **快速切换**：无需目录导航即可在项目间切换
-- **数据原子性**：单一数据源（`~/.kse/workspace-state.json`）
+- **数据原子性**：单一数据源（`~/.sce/workspace-state.json`）
 - **跨平台**：Windows/Linux/macOS 一致的路径处理
 - **自动迁移**：从旧版工作区格式无缝升级
 
@@ -484,6 +484,12 @@ sce spec gate run --specs "<spec-a,spec-b>" --max-parallel <N>     # 多 Spec �
 sce context export <spec-name>     # 为 AI 工具导出上下文
 sce prompt generate <spec> <task>  # 生成任务特定提示
 
+# 模板注册表
+sce templates list --type <spec-scaffold|capability-template|runtime-playbook> --compatible-with <semver> --risk <low|medium|high|critical>
+sce templates search <keyword> --type <spec-scaffold|capability-template|runtime-playbook> --compatible-with <semver>
+sce templates show <template-path>  # 查看模板元数据与兼容契约
+sce templates update [--source <name>]
+
 # KPI 自动化与可观测
 sce value metrics sample --out <path> --json               # 生成 KPI 输入样例 JSON
 sce value metrics snapshot --input <path> --json          # 生成周度 KPI 快照 + gate 摘要
@@ -630,7 +636,7 @@ sce spec bootstrap --name 01-00-my-first-feature --non-interactive
 
 ---
 
-**版本**：3.3.1  
-**最后更新**：2026-02-22
+**版本**：3.3.13  
+**最后更新**：2026-02-26
 
 

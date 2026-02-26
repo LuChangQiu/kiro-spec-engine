@@ -9,7 +9,7 @@
     "description": "Domain profile template for scene package metadata governance, ontology mapping, and compatibility decision strategy."
   },
   "compatibility": {
-    "kse_version": ">=1.24.0",
+    "min_sce_version": ">=1.24.0",
     "scene_api_version": "kse.scene/v0.2",
     "moqui_model_version": "3.x",
     "adapter_api_version": "v1"
@@ -223,3 +223,4 @@
     "rollback_strategy": "Re-run compatibility check and keep previous metadata projection."
   }
 }
+

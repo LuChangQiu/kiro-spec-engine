@@ -5,7 +5,7 @@
   "tags": [],
   "author": "FallingAKS",
   "version": "1.0.0",
-  "kse_version": "1.16.0",
+  "min_sce_version": "1.16.0",
   "created_at": "2026-01-30",
   "updated_at": "2026-01-30",
   "path": "other/spec-template-library"

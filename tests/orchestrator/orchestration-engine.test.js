@@ -417,6 +417,71 @@ describe('OrchestrationEngine', () => {
       executeSpy.mockRestore();
       sleepSpy.mockRestore();
     });
+
+    test('rate-limit spike throttles launch budget and extends launch hold', () => {
+      let now = 0;
+      engine._now = () => now;
+      engine._applyRetryPolicyConfig({
+        rateLimitAdaptiveParallel: true,
+        rateLimitParallelFloor: 1,
+        rateLimitCooldownMs: 1000,
+        rateLimitLaunchBudgetPerMinute: 8,
+        rateLimitLaunchBudgetWindowMs: 60000,
+      });
+      engine._initializeAdaptiveParallel(8);
+
+      engine._onRateLimitSignal(1000);
+      expect(engine._getRateLimitLaunchHoldRemainingMs()).toBe(1000);
+      engine._onRateLimitSignal(1000);
+      expect(engine._getRateLimitLaunchHoldRemainingMs()).toBe(1000);
+      engine._onRateLimitSignal(1000);
+
+      expect(engine._getRateLimitLaunchHoldRemainingMs()).toBe(3000);
+      expect(engine._getLaunchBudgetConfig().budgetPerMinute).toBe(4);
+      expect(mockStatusMonitor.updateLaunchBudgetTelemetry).toHaveBeenCalledWith(
+        expect.objectContaining({
+          event: 'throttled',
+          budgetPerMinute: 4,
+        })
+      );
+    });
+
+    test('throttled launch budget recovers after cooldown and quiet window', () => {
+      let now = 0;
+      engine._now = () => now;
+      engine._rateLimitSignalWindowMs = 200;
+      engine._applyRetryPolicyConfig({
+        rateLimitAdaptiveParallel: true,
+        rateLimitParallelFloor: 1,
+        rateLimitCooldownMs: 100,
+        rateLimitLaunchBudgetPerMinute: 4,
+        rateLimitLaunchBudgetWindowMs: 1000,
+      });
+      engine._initializeAdaptiveParallel(4);
+
+      engine._onRateLimitSignal(50);
+      engine._onRateLimitSignal(50);
+      engine._onRateLimitSignal(50);
+      expect(engine._getLaunchBudgetConfig().budgetPerMinute).toBe(2);
+
+      now = 150;
+      engine._getEffectiveMaxParallel(4);
+      expect(engine._getLaunchBudgetConfig().budgetPerMinute).toBe(2);
+
+      now = 250;
+      engine._getEffectiveMaxParallel(4);
+      expect(engine._getLaunchBudgetConfig().budgetPerMinute).toBe(3);
+
+      now = 500;
+      engine._getEffectiveMaxParallel(4);
+      expect(engine._getLaunchBudgetConfig().budgetPerMinute).toBe(4);
+      expect(mockStatusMonitor.updateLaunchBudgetTelemetry).toHaveBeenCalledWith(
+        expect.objectContaining({
+          event: 'recovered',
+          budgetPerMinute: 4,
+        })
+      );
+    });
   });
 
   // -------------------------------------------------------------------------

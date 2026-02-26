@@ -15,7 +15,8 @@ const {
   runStudioEventsCommand,
   runStudioResumeCommand,
   loadStudioSecurityPolicy,
-  ensureStudioAuthorization
+  ensureStudioAuthorization,
+  buildReleaseGateSteps
 } = require('../../../lib/commands/studio');
 
 describe('studio command workflow', () => {
@@ -389,5 +390,115 @@ describe('studio command workflow', () => {
 
     expect(result.required).toBe(true);
     expect(result.password_env).toBe('SCE_STUDIO_AUTH_PASSWORD_LOCAL');
+  });
+
+  test('strict verify fails when required gates are unavailable', async () => {
+    const planned = await runStudioPlanCommand({
+      fromChat: 'session-008',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    await runStudioGenerateCommand({
+      job: planned.job_id,
+      scene: 'scene.strict-verify',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    await runStudioApplyCommand({
+      job: planned.job_id,
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    await expect(runStudioVerifyCommand({
+      job: planned.job_id,
+      profile: 'strict',
+      json: true
+    }, {
+      projectPath: tempDir,
+      commandRunner: successRunner
+    })).rejects.toThrow('studio verify failed');
+
+    const paths = resolveStudioPaths(tempDir);
+    const job = await fs.readJson(path.join(paths.jobsDir, `${planned.job_id}.json`));
+    expect(job.status).toBe('verify_failed');
+  });
+
+  test('strict release fails when required release evidence gates are unavailable', async () => {
+    const planned = await runStudioPlanCommand({
+      fromChat: 'session-009',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    await runStudioGenerateCommand({
+      job: planned.job_id,
+      scene: 'scene.strict-release',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    await runStudioApplyCommand({
+      job: planned.job_id,
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    await runStudioVerifyCommand({
+      job: planned.job_id,
+      profile: 'standard',
+      json: true
+    }, {
+      projectPath: tempDir,
+      commandRunner: successRunner
+    });
+
+    await expect(runStudioReleaseCommand({
+      job: planned.job_id,
+      profile: 'strict',
+      channel: 'dev',
+      json: true
+    }, {
+      projectPath: tempDir,
+      commandRunner: successRunner
+    })).rejects.toThrow('studio release failed');
+
+    const paths = resolveStudioPaths(tempDir);
+    const job = await fs.readJson(path.join(paths.jobsDir, `${planned.job_id}.json`));
+    expect(job.status).toBe('release_failed');
+  });
+
+  test('release gate includes ontology and capability matrix checks when handoff manifest exists', async () => {
+    const handoffDir = path.join(tempDir, 'docs', 'handoffs');
+    await fs.ensureDir(handoffDir);
+    await fs.writeJson(path.join(handoffDir, 'handoff-manifest.json'), {
+      project: 'studio-release-gate-fixture',
+      entries: []
+    }, { spaces: 2 });
+
+    const steps = await buildReleaseGateSteps({
+      profile: 'standard'
+    }, {
+      projectPath: tempDir,
+      fileSystem: fs
+    });
+
+    const byId = new Map(steps.map((item) => [item.id, item]));
+    expect(byId.get('scene-package-publish-batch-dry-run')).toEqual(expect.objectContaining({
+      enabled: true,
+      required: true
+    }));
+    expect(byId.get('handoff-capability-matrix-gate')).toEqual(expect.objectContaining({
+      enabled: true,
+      required: true
+    }));
   });
 });

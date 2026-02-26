@@ -279,4 +279,64 @@ describe('studio command workflow', () => {
       projectPath: tempDir
     })).rejects.toThrow('is rolled back');
   });
+
+  test('requires authorization for protected actions when policy is enabled', async () => {
+    const secureEnv = {
+      ...process.env,
+      SCE_STUDIO_REQUIRE_AUTH: '1',
+      SCE_STUDIO_AUTH_PASSWORD: 'top-secret'
+    };
+
+    const planned = await runStudioPlanCommand({
+      fromChat: 'session-007',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    await runStudioGenerateCommand({
+      job: planned.job_id,
+      scene: 'scene.secure',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    await expect(runStudioApplyCommand({
+      job: planned.job_id,
+      json: true
+    }, {
+      projectPath: tempDir,
+      env: secureEnv
+    })).rejects.toThrow('Authorization required for studio apply');
+
+    const applied = await runStudioApplyCommand({
+      job: planned.job_id,
+      authPassword: 'top-secret',
+      json: true
+    }, {
+      projectPath: tempDir,
+      env: secureEnv
+    });
+    expect(applied.status).toBe('applied');
+
+    await expect(runStudioRollbackCommand({
+      job: planned.job_id,
+      json: true
+    }, {
+      projectPath: tempDir,
+      env: secureEnv
+    })).rejects.toThrow('Authorization required for studio rollback');
+
+    const rolledBack = await runStudioRollbackCommand({
+      job: planned.job_id,
+      authPassword: 'top-secret',
+      reason: 'auth-test',
+      json: true
+    }, {
+      projectPath: tempDir,
+      env: secureEnv
+    });
+    expect(rolledBack.status).toBe('rolled_back');
+  });
 });

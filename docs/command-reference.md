@@ -330,6 +330,9 @@ sce studio events --job <job-id> --limit 50 --json
 
 # Rollback a job after apply/release
 sce studio rollback --job <job-id> --reason "manual-check-failed" --json
+
+# Enforce authorization for a protected action
+SCE_STUDIO_REQUIRE_AUTH=1 SCE_STUDIO_AUTH_PASSWORD=top-secret sce studio apply --job <job-id> --auth-password top-secret --json
 ```
 
 Stage guardrails are enforced by default:
@@ -341,6 +344,12 @@ Stage guardrails are enforced by default:
 Studio gate execution defaults:
 - `verify --profile standard` runs executable gates (unit test script when available, interactive governance report when present, scene package publish-batch dry-run when handoff manifest exists)
 - `release --profile standard` runs executable release preflight (npm pack dry-run, weekly ops gate when summary exists, release asset integrity when evidence directory exists)
+
+Authorization model (optional, policy-driven):
+- Enable policy: `SCE_STUDIO_REQUIRE_AUTH=1`
+- Secret env key: `SCE_STUDIO_AUTH_PASSWORD` (or override key name with `SCE_STUDIO_PASSWORD_ENV`)
+- Protected actions: `apply`, `release`, `rollback`
+- Per-command hard requirement: add `--require-auth`
 
 ### Capability Matrix Utilities
 

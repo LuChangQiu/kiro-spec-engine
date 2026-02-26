@@ -636,7 +636,7 @@ sce spec bootstrap --name 01-00-my-first-feature --non-interactive
 
 ---
 
-**版本**：3.3.15  
+**版本**：3.3.16  
 **最后更新**：2026-02-26
 
 

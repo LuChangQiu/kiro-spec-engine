@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.16] - 2026-02-26
+
+### Added
+- Studio strict gate profiles:
+  - `sce studio verify --profile strict`
+  - `sce studio release --profile strict`
+- Release preflight default gates now include:
+  - `scene package-publish-batch --dry-run` ontology thresholds (`average >= 70`, `valid-rate >= 100`)
+  - `auto handoff capability-matrix --fail-on-gap`
+
+### Changed
+- Strict profiles now fail when any required gate step is skipped.
+- Orchestration rate-limit handling now adapts launch budget under sustained `429` spikes and recovers budget gradually after cooldown.
+- Command reference updated for strict Studio profiles and required gate behavior.
+
 ## [3.3.13] - 2026-02-25
 
 ### Changed

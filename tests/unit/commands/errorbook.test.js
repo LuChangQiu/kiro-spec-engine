@@ -381,7 +381,58 @@ describe('errorbook command workflow', () => {
     expect(result.include_registry).toBe(true);
     expect(result.total_results).toBeGreaterThanOrEqual(1);
     expect(result.source_breakdown.registry_results).toBeGreaterThanOrEqual(1);
-    expect(result.entries.some((item) => item.entry_source === 'registry')).toBe(true);
+    expect(result.entries.some((item) => item.entry_source === 'registry-cache')).toBe(true);
+  });
+
+  test('find supports remote indexed registry search without local full sync', async () => {
+    const shardPath = path.join(tempDir, 'registry', 'shards', 'order.json');
+    const indexPath = path.join(tempDir, 'registry', 'errorbook-registry.index.json');
+    await fs.ensureDir(path.dirname(shardPath));
+    await fs.writeJson(shardPath, {
+      api_version: 'sce.errorbook.registry/v0.1',
+      entries: [{
+        id: 'reg-remote-1',
+        fingerprint: 'fp-reg-remote-1',
+        title: 'Remote approve order lock timeout',
+        symptom: 'Approve order API timed out under concurrent lock contention.',
+        root_cause: 'Lock sequence deadlock in approval transaction.',
+        fix_actions: ['Reorder lock sequence'],
+        verification_evidence: ['approve-order-lock test passed'],
+        tags: ['order'],
+        ontology_tags: ['entity', 'decision_policy'],
+        status: 'promoted',
+        quality_score: 95,
+        updated_at: '2026-02-27T00:00:00Z'
+      }]
+    }, { spaces: 2 });
+    await fs.writeJson(indexPath, {
+      api_version: 'sce.errorbook.registry-index/v0.1',
+      min_token_length: 2,
+      token_to_bucket: {
+        approve: 'order',
+        order: 'order'
+      },
+      buckets: {
+        order: shardPath
+      }
+    }, { spaces: 2 });
+
+    const result = await runErrorbookFindCommand({
+      query: 'approve order timeout',
+      includeRegistry: true,
+      registryMode: 'remote',
+      registrySource: path.join(tempDir, 'registry', 'errorbook-registry.json'),
+      registryIndex: indexPath,
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(result.include_registry).toBe(true);
+    expect(result.source_breakdown.registry_remote_results).toBeGreaterThanOrEqual(1);
+    expect(result.source_breakdown.registry_cache_results).toBe(0);
+    expect(result.entries.some((item) => item.entry_source === 'registry-remote')).toBe(true);
+    expect(result.warnings).toEqual([]);
   });
 
   test('show supports id prefix resolution', async () => {

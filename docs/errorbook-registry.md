@@ -33,6 +33,36 @@ sce-errorbook-registry/
 }
 ```
 
+For large registries, add an index + shard layout:
+
+```text
+registry/
+  errorbook-registry.index.json
+  shards/
+    order.json
+    payment.json
+    auth.json
+```
+
+Example `registry/errorbook-registry.index.json`:
+
+```json
+{
+  "api_version": "sce.errorbook.registry-index/v0.1",
+  "generated_at": "2026-02-27T00:00:00.000Z",
+  "min_token_length": 2,
+  "token_to_bucket": {
+    "order": "order",
+    "approve": "order",
+    "payment": "payment"
+  },
+  "buckets": {
+    "order": "https://raw.githubusercontent.com/<your-org>/sce-errorbook-registry/main/registry/shards/order.json",
+    "payment": "https://raw.githubusercontent.com/<your-org>/sce-errorbook-registry/main/registry/shards/payment.json"
+  }
+}
+```
+
 ## 3) Project-Side Configuration
 
 Create `.sce/config/errorbook-registry.json`:
@@ -40,12 +70,14 @@ Create `.sce/config/errorbook-registry.json`:
 ```json
 {
   "enabled": true,
+  "search_mode": "remote",
   "cache_file": ".sce/errorbook/registry-cache.json",
   "sources": [
     {
       "name": "central",
       "enabled": true,
-      "url": "https://raw.githubusercontent.com/<your-org>/sce-errorbook-registry/main/registry/errorbook-registry.json"
+      "url": "https://raw.githubusercontent.com/<your-org>/sce-errorbook-registry/main/registry/errorbook-registry.json",
+      "index_url": "https://raw.githubusercontent.com/<your-org>/sce-errorbook-registry/main/registry/errorbook-registry.index.json"
     }
   ]
 }
@@ -53,7 +85,8 @@ Create `.sce/config/errorbook-registry.json`:
 
 Notes:
 - `url` must be a raw JSON URL (`raw.githubusercontent.com`) or use a local file path.
-- Local cache file is used by `sce errorbook find --include-registry`.
+- `search_mode` supports `cache|remote|hybrid` (recommended: `remote` for very large registries).
+- Local cache file is used by cache/hybrid mode.
 
 ## 4) Daily Workflow
 
@@ -72,6 +105,7 @@ sce errorbook sync-registry --source https://raw.githubusercontent.com/<your-org
 4. Search local + shared entries:
 ```bash
 sce errorbook find --query "approve order timeout" --include-registry --json
+sce errorbook find --query "approve order timeout" --include-registry --registry-mode remote --json
 ```
 
 ## 5) Governance Rules

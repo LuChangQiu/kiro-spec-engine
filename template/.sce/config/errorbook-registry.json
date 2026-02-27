@@ -1,11 +1,13 @@
 {
   "enabled": false,
+  "search_mode": "remote",
   "cache_file": ".sce/errorbook/registry-cache.json",
   "sources": [
     {
       "name": "central",
       "enabled": false,
-      "url": "https://raw.githubusercontent.com/<your-org>/sce-errorbook-registry/main/registry/errorbook-registry.json"
+      "url": "https://raw.githubusercontent.com/<your-org>/sce-errorbook-registry/main/registry/errorbook-registry.json",
+      "index_url": "https://raw.githubusercontent.com/<your-org>/sce-errorbook-registry/main/registry/errorbook-registry.index.json"
     }
   ]
 }

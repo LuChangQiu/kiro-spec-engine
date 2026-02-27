@@ -352,6 +352,9 @@ sce errorbook list --status promoted --min-quality 75 --json
 sce errorbook show <entry-id> --json
 sce errorbook find --query "approve order timeout" --limit 10 --json
 sce errorbook find --query "approve order timeout" --include-registry --json
+# Prefer remote indexed search for large registry
+sce errorbook find --query "approve order timeout" --include-registry --registry-mode remote --json
+sce errorbook find --query "approve order timeout" --include-registry --registry-mode hybrid --json
 
 # Export curated local entries for central registry publication
 sce errorbook export --status promoted --min-quality 75 --out .sce/errorbook/exports/registry.json --json
@@ -409,6 +412,8 @@ Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
   - expired mitigation deadline
 - `export` outputs a machine-readable registry bundle from curated local entries (recommended default: `promoted`, `quality>=75`).
 - `sync-registry` pulls external registry JSON into local cache (`.sce/errorbook/registry-cache.json`) for unified `find` retrieval.
+- `find --include-registry --registry-mode remote` supports direct remote query for large registries (no full local sync required).
+- Recommended for large registries: maintain a remote index file (`registry/errorbook-registry.index.json`) and shard files, then provide `index_url` in registry config.
 - `git-managed-gate` blocks release when:
   - worktree has uncommitted changes
   - branch has no upstream

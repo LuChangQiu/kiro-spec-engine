@@ -78,4 +78,35 @@ describe('errorbook-release-gate script', () => {
     expect(result.blocked_count).toBe(1);
     expect(result.exit_code).toBe(2);
   });
+
+  test('blocks when temporary mitigation policy is expired', async () => {
+    await runErrorbookRecordCommand({
+      title: 'Expired mitigation gate fixture',
+      symptom: 'Temporary mitigation stayed active beyond cleanup deadline.',
+      rootCause: 'Fallback cleanup task was not completed on schedule.',
+      fixAction: ['Complete cleanup task and remove fallback'],
+      tags: 'ops',
+      ontology: 'execution_flow',
+      status: 'candidate',
+      temporaryMitigation: true,
+      mitigationReason: 'Emergency fallback for incident isolation',
+      mitigationExit: 'Primary flow restored and validated',
+      mitigationCleanup: 'spec/remove-emergency-fallback',
+      mitigationDeadline: '2020-01-01T00:00:00Z',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    const result = await runErrorbookReleaseGateScript({
+      projectPath: tempDir,
+      minRisk: 'high',
+      failOnBlock: true,
+      json: true
+    });
+
+    expect(result.passed).toBe(false);
+    expect(result.mitigation_blocked_count).toBe(1);
+    expect(result.exit_code).toBe(2);
+  });
 });

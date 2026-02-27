@@ -114,6 +114,19 @@ describe('errorbook command workflow', () => {
     })).rejects.toThrow('verification_evidence');
   });
 
+  test('record rejects temporary mitigation without governance metadata', async () => {
+    await expect(runErrorbookRecordCommand({
+      title: 'Temporary fallback without governance metadata',
+      symptom: 'Fallback path was enabled to bypass transient failures.',
+      rootCause: 'Primary root cause is identified but not yet removed from critical path.',
+      fixAction: ['Restore primary path after root cause fix'],
+      temporaryMitigation: true,
+      json: true
+    }, {
+      projectPath: tempDir
+    })).rejects.toThrow('--mitigation-exit');
+  });
+
   test('promotes verified high-quality entry', async () => {
     const recorded = await runErrorbookRecordCommand({
       title: 'Order approval queue saturation',
@@ -423,6 +436,103 @@ describe('errorbook command workflow', () => {
 
     expect(gate.passed).toBe(true);
     expect(gate.blocked_count).toBe(0);
+  });
+
+  test('release gate blocks expired temporary mitigation policy violations', async () => {
+    await runErrorbookRecordCommand({
+      title: 'Expired temporary fallback for order approval',
+      symptom: 'Temporary fallback route remains active in order approval path.',
+      rootCause: 'Primary approval lock sequencing fix was delayed.',
+      fixAction: ['Ship lock sequencing patch and remove fallback route'],
+      tags: 'order',
+      ontology: 'decision_policy,execution_flow',
+      status: 'candidate',
+      temporaryMitigation: true,
+      mitigationReason: 'Emergency stop-bleeding fallback',
+      mitigationExit: 'Primary lock sequencing patch is deployed and verified',
+      mitigationCleanup: 'spec/cleanup-order-approval-fallback',
+      mitigationDeadline: '2020-01-01T00:00:00Z',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    const gate = await runErrorbookReleaseGateCommand({
+      minRisk: 'high',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(gate.passed).toBe(false);
+    expect(gate.mitigation_blocked_count).toBe(1);
+    expect(gate.blocked_entries[0].policy_violations).toEqual(
+      expect.arrayContaining(['temporary_mitigation.deadline_at:expired'])
+    );
+  });
+
+  test('release gate allows active temporary mitigation with valid governance metadata', async () => {
+    const futureDeadline = new Date(Date.now() + (7 * 24 * 60 * 60 * 1000)).toISOString();
+    await runErrorbookRecordCommand({
+      title: 'Bounded temporary mitigation for low-risk docs command',
+      symptom: 'Temporary fallback branch keeps docs command alive during refactor.',
+      rootCause: 'Refactor split requires phased migration before deleting fallback path.',
+      fixAction: ['Complete refactor and remove fallback branch'],
+      tags: 'docs',
+      ontology: 'execution_flow',
+      status: 'candidate',
+      temporaryMitigation: true,
+      mitigationReason: 'Short-lived migration safeguard',
+      mitigationExit: 'Refactor migration tests pass on new path',
+      mitigationCleanup: 'spec/cleanup-docs-fallback',
+      mitigationDeadline: futureDeadline,
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    const gate = await runErrorbookReleaseGateCommand({
+      minRisk: 'high',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(gate.passed).toBe(true);
+    expect(gate.mitigation_blocked_count).toBe(0);
+  });
+
+  test('promote resolves active temporary mitigation metadata', async () => {
+    const futureDeadline = new Date(Date.now() + (14 * 24 * 60 * 60 * 1000)).toISOString();
+    const recorded = await runErrorbookRecordCommand({
+      title: 'Approval fallback cleanup promotion sample',
+      symptom: 'Approval fallback path was used during incident handling.',
+      rootCause: 'Approval lock contention on primary path.',
+      fixAction: ['Fix lock ordering', 'Delete fallback path'],
+      verification: ['Approval lock regression suite passed'],
+      tags: 'order,release-blocker',
+      ontology: 'entity,decision_policy,execution_flow',
+      status: 'verified',
+      temporaryMitigation: true,
+      mitigationReason: 'Incident containment fallback',
+      mitigationExit: 'Primary path validated under concurrency test',
+      mitigationCleanup: 'spec/remove-approval-fallback',
+      mitigationDeadline: futureDeadline,
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    const promoted = await runErrorbookPromoteCommand({
+      id: recorded.entry.id,
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(promoted.entry.status).toBe('promoted');
+    expect(promoted.entry.temporary_mitigation.enabled).toBe(true);
+    expect(promoted.entry.temporary_mitigation.resolved_at).toBeTruthy();
   });
 
   test('normalizes ontology aliases into canonical tags', () => {

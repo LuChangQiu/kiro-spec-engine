@@ -361,6 +361,19 @@ sce errorbook deprecate <entry-id> --reason "superseded by v2 policy" --json
 # Requalify deprecated entry after remediation review
 sce errorbook requalify <entry-id> --status verified --json
 
+# Record controlled temporary mitigation (stop-bleeding only, must include governance fields)
+sce errorbook record \
+  --title "Temporary fallback for order approval lock contention" \
+  --symptom "Fallback path enabled to keep approval flow available" \
+  --root-cause "Primary lock ordering fix is in progress" \
+  --fix-action "Ship lock ordering fix and remove fallback path" \
+  --temporary-mitigation \
+  --mitigation-reason "Emergency stop-bleeding in production" \
+  --mitigation-exit "Primary path concurrency tests are green" \
+  --mitigation-cleanup "spec/remove-order-approval-fallback" \
+  --mitigation-deadline 2026-03-15T00:00:00Z \
+  --json
+
 # Release hard gate (default in prepublish and studio release preflight)
 sce errorbook release-gate --min-risk high --fail-on-block --json
 
@@ -380,6 +393,13 @@ Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
 - `deprecate` requires explicit `--reason` to preserve elimination traceability.
 - `requalify` only accepts `candidate|verified`; `promoted` must still go through `promote` gate.
 - `release-gate` blocks release when unresolved high-risk `candidate` entries remain.
+- Temporary mitigation is allowed only as stop-bleeding and must include:
+  - `mitigation_exit` (exit criteria)
+  - `mitigation_cleanup` (cleanup task/spec)
+  - `mitigation_deadline` (deadline)
+- `release-gate` also blocks when temporary mitigation policy is violated:
+  - missing exit/cleanup/deadline metadata
+  - expired mitigation deadline
 - `git-managed-gate` blocks release when:
   - worktree has uncommitted changes
   - branch has no upstream

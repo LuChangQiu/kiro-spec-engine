@@ -43,7 +43,8 @@ function printHelp() {
     '',
     'Options:',
     '  --min-risk <level>      Risk threshold to block release (low|medium|high, default: high)',
-    '  --include-verified      Also inspect verified (non-promoted) entries',
+    '  --include-verified      Also inspect verified (non-promoted) entries for risk threshold',
+    '                          (temporary mitigation policy is always enforced for active entries)',
     '  --fail-on-block         Exit with code 2 when gate is blocked',
     '  --project-path <path>   Override project path (default: cwd)',
     '  --json                  Print JSON payload',
@@ -70,9 +71,15 @@ async function runErrorbookReleaseGateScript(options = {}) {
     process.stdout.write(
       `[errorbook-release-gate] inspected=${payload.inspected_count} blocked=${payload.blocked_count} min-risk=${payload.gate.min_risk}\n`
     );
+    process.stdout.write(
+      `[errorbook-release-gate] risk-blocked=${payload.risk_blocked_count || 0} mitigation-blocked=${payload.mitigation_blocked_count || 0}\n`
+    );
     payload.blocked_entries.slice(0, 20).forEach((item) => {
+      const policy = Array.isArray(item.policy_violations) && item.policy_violations.length > 0
+        ? ` policy=${item.policy_violations.join('|')}`
+        : '';
       process.stdout.write(
-        `[errorbook-release-gate] entry=${item.id} risk=${item.risk} status=${item.status} quality=${item.quality_score}\n`
+        `[errorbook-release-gate] entry=${item.id} risk=${item.risk} status=${item.status} quality=${item.quality_score}${policy}\n`
       );
     });
   }

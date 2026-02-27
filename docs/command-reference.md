@@ -401,6 +401,8 @@ SCE_REGISTRY_HEALTH_STRICT=1 node scripts/errorbook-registry-health-gate.js --js
 Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
 - `record` requires: `title`, `symptom`, `root_cause`, and at least one `fix_action`.
 - Fingerprint dedup is automatic; repeated records merge evidence and increment occurrence count.
+- Repeated-failure hard rule: from attempt `#3` of the same fingerprint (two failed rounds already happened), record must include debug evidence.
+  Recommended forms: `--verification "debug: ..."` or tag `debug-evidence` or debug trace/log file references.
 - `promote` enforces strict gate:
   - `root_cause` present
   - `fix_actions` non-empty

@@ -97,6 +97,67 @@ describe('errorbook command workflow', () => {
     expect(second.entry.ontology_tags).toEqual(expect.arrayContaining(['entity', 'relation']));
   });
 
+  test('enforces debug evidence from third repeated fix attempt onward', async () => {
+    await runErrorbookRecordCommand({
+      title: 'Order lock contention unresolved',
+      symptom: 'Order approve call times out under lock contention.',
+      rootCause: 'Lock order conflict between approval and reservation.',
+      fixAction: ['Adjust lock order'],
+      tags: 'order',
+      ontology: 'entity,relation',
+      status: 'candidate',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    await runErrorbookRecordCommand({
+      title: 'Order lock contention unresolved',
+      symptom: 'Order approve call times out under lock contention.',
+      rootCause: 'Lock order conflict between approval and reservation.',
+      fixAction: ['Tune lock timeout'],
+      tags: 'order',
+      ontology: 'entity,relation',
+      status: 'candidate',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    await expect(runErrorbookRecordCommand({
+      title: 'Order lock contention unresolved',
+      symptom: 'Order approve call times out under lock contention.',
+      rootCause: 'Lock order conflict between approval and reservation.',
+      fixAction: ['Retry queue fallback'],
+      tags: 'order',
+      ontology: 'entity,relation',
+      status: 'candidate',
+      json: true
+    }, {
+      projectPath: tempDir
+    })).rejects.toThrow('two failed fix rounds detected');
+
+    const withDebugEvidence = await runErrorbookRecordCommand({
+      title: 'Order lock contention unresolved',
+      symptom: 'Order approve call times out under lock contention.',
+      rootCause: 'Lock order conflict between approval and reservation.',
+      fixAction: ['Apply lock graph rewrite'],
+      verification: ['debug: captured lock wait graph and deadlock trace id=dl-001'],
+      tags: 'order,debug-evidence',
+      ontology: 'entity,relation,decision_policy',
+      status: 'candidate',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(withDebugEvidence.created).toBe(false);
+    expect(withDebugEvidence.deduplicated).toBe(true);
+    expect(withDebugEvidence.entry.occurrences).toBe(3);
+    expect(withDebugEvidence.entry.tags).toEqual(expect.arrayContaining(['debug-evidence']));
+    expect(withDebugEvidence.entry.verification_evidence.some((item) => item.startsWith('debug:'))).toBe(true);
+  });
+
   test('promote gate rejects entries without verification evidence', async () => {
     const recorded = await runErrorbookRecordCommand({
       title: 'Payment callback signature mismatch',

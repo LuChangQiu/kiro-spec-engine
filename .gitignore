@@ -70,6 +70,7 @@ test-project/
 .sce/reports/
 .sce/auto/
 .sce/incoming/
+.sce/errorbook/
 
 # Spec artifacts (COMMIT - team shared)
 # specs/ directory is committed by default, but exclude temporary files

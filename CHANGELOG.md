@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.21] - 2026-02-27
+
+### Fixed
+- `git-managed-gate` now supports CI tag/detached-HEAD release workflows by default:
+  - In CI context (`CI=1` or `GITHUB_ACTIONS=1`), branch/upstream sync checks are relaxed to avoid false blocking.
+  - Local release checks remain strict (clean worktree + branch/upstream sync).
+  - Added strict CI override: `SCE_GIT_MANAGEMENT_STRICT_CI=1` (or `--strict-ci`) for full enforcement in CI.
+
+### Changed
+- Added CI-aware flags for `git-managed-gate`:
+  - `--ci-context` / `--no-ci-context`
+  - `--strict-ci` / `--no-strict-ci`
+- Updated release and command documentation to clarify local-vs-CI gate behavior.
+
 ## [3.3.19] - 2026-02-26
 
 ### Added

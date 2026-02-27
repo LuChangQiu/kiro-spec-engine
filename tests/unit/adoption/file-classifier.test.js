@@ -85,6 +85,8 @@ describe('FileClassifier', () => {
       expect(classifier.classifyFile('version.json')).toBe(FileCategory.CONFIG);
       expect(classifier.classifyFile('adoption-config.json')).toBe(FileCategory.CONFIG);
       expect(classifier.classifyFile('config/studio-security.json')).toBe(FileCategory.CONFIG);
+      expect(classifier.classifyFile('config/orchestrator.json')).toBe(FileCategory.CONFIG);
+      expect(classifier.classifyFile('config/errorbook-registry.json')).toBe(FileCategory.CONFIG);
     });
 
     test('should classify generated files correctly', () => {

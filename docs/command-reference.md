@@ -360,7 +360,7 @@ sce errorbook find --query "approve order timeout" --include-registry --registry
 sce errorbook export --status promoted --min-quality 75 --out .sce/errorbook/exports/registry.json --json
 
 # Sync central registry (GitHub raw URL or local file) to local cache
-sce errorbook sync-registry --source https://raw.githubusercontent.com/<org>/<repo>/main/registry/errorbook-registry.json --json
+sce errorbook sync-registry --source https://raw.githubusercontent.com/heguangyong/sce-errorbook-registry/main/registry/errorbook-registry.json --json
 
 # Promote only after strict gate checks pass
 sce errorbook promote <entry-id> --json

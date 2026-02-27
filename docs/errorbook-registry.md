@@ -57,8 +57,8 @@ Example `registry/errorbook-registry.index.json`:
     "payment": "payment"
   },
   "buckets": {
-    "order": "https://raw.githubusercontent.com/<your-org>/sce-errorbook-registry/main/registry/shards/order.json",
-    "payment": "https://raw.githubusercontent.com/<your-org>/sce-errorbook-registry/main/registry/shards/payment.json"
+    "order": "https://raw.githubusercontent.com/heguangyong/sce-errorbook-registry/main/registry/shards/order.json",
+    "payment": "https://raw.githubusercontent.com/heguangyong/sce-errorbook-registry/main/registry/shards/payment.json"
   }
 }
 ```
@@ -76,8 +76,8 @@ Create `.sce/config/errorbook-registry.json`:
     {
       "name": "central",
       "enabled": true,
-      "url": "https://raw.githubusercontent.com/<your-org>/sce-errorbook-registry/main/registry/errorbook-registry.json",
-      "index_url": "https://raw.githubusercontent.com/<your-org>/sce-errorbook-registry/main/registry/errorbook-registry.index.json"
+      "url": "https://raw.githubusercontent.com/heguangyong/sce-errorbook-registry/main/registry/errorbook-registry.json",
+      "index_url": "https://raw.githubusercontent.com/heguangyong/sce-errorbook-registry/main/registry/errorbook-registry.index.json"
     }
   ]
 }
@@ -99,7 +99,7 @@ sce errorbook export --status promoted --min-quality 75 --out .sce/errorbook/exp
 
 3. Sync central registry into local cache:
 ```bash
-sce errorbook sync-registry --source https://raw.githubusercontent.com/<your-org>/sce-errorbook-registry/main/registry/errorbook-registry.json --json
+sce errorbook sync-registry --source https://raw.githubusercontent.com/heguangyong/sce-errorbook-registry/main/registry/errorbook-registry.json --json
 ```
 
 4. Search local + shared entries:

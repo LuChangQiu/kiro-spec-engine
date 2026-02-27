@@ -26,6 +26,7 @@ function parseBoolean(value, fallback = false) {
 }
 
 function parseArgs(argv = [], env = process.env) {
+  const ciDetected = parseBoolean(env.GITHUB_ACTIONS, false) || parseBoolean(env.CI, false);
   const options = {
     projectPath: process.cwd(),
     failOnViolation: false,
@@ -34,6 +35,8 @@ function parseArgs(argv = [], env = process.env) {
       .split(',')
       .map((item) => normalizeText(item).toLowerCase())
       .filter(Boolean),
+    ciContext: ciDetected,
+    strictCi: parseBoolean(env.SCE_GIT_MANAGEMENT_STRICT_CI, false),
     json: false,
     help: false
   };
@@ -57,6 +60,14 @@ function parseArgs(argv = [], env = process.env) {
         .map((item) => normalizeText(item).toLowerCase())
         .filter(Boolean);
       index += 1;
+    } else if (token === '--ci-context') {
+      options.ciContext = true;
+    } else if (token === '--no-ci-context') {
+      options.ciContext = false;
+    } else if (token === '--strict-ci') {
+      options.strictCi = true;
+    } else if (token === '--no-strict-ci') {
+      options.strictCi = false;
     } else if (token === '--json') {
       options.json = true;
     } else if (token === '--help' || token === '-h') {
@@ -80,6 +91,10 @@ function printHelp() {
     '  --allow-no-remote         Allow pass when no GitHub/GitLab remote is configured',
     '  --no-allow-no-remote      Fail when no GitHub/GitLab remote is configured',
     '  --target-hosts <csv>      Remote host match list (default: github.com,gitlab.com)',
+    '  --ci-context              Treat current run as CI context (default from CI/GITHUB_ACTIONS env)',
+    '  --no-ci-context           Force local mode even if CI env exists',
+    '  --strict-ci               In CI, enforce local-level branch/upstream sync checks',
+    '  --no-strict-ci            In CI, relax detached/upstream sync checks (default)',
     '  --json                    Print JSON payload',
     '  -h, --help                Show help'
   ];
@@ -148,12 +163,18 @@ function evaluateGitManagedGate(options = {}) {
   const projectPath = options.projectPath || process.cwd();
   const targetHosts = Array.isArray(options.targetHosts) ? options.targetHosts : ['github.com', 'gitlab.com'];
   const allowNoRemote = options.allowNoRemote !== false;
+  const ciContext = options.ciContext === true;
+  const strictCi = options.strictCi === true;
+  const relaxForCi = ciContext && !strictCi;
 
   const violations = [];
   const warnings = [];
   const details = {
     project_path: projectPath,
     target_hosts: targetHosts,
+    ci_context: ciContext,
+    strict_ci: strictCi,
+    relaxed_ci: relaxForCi,
     remotes: [],
     target_remotes: [],
     branch: null,
@@ -225,41 +246,45 @@ function evaluateGitManagedGate(options = {}) {
     }
   }
 
-  const branchResult = runGit(projectPath, ['rev-parse', '--abbrev-ref', 'HEAD']);
-  if (branchResult.status !== 0) {
-    violations.push(`failed to resolve branch: ${branchResult.stderr || 'unknown error'}`);
+  if (relaxForCi) {
+    warnings.push('ci context detected; branch/upstream sync checks skipped');
   } else {
-    details.branch = branchResult.stdout;
-    if (details.branch === 'HEAD') {
-      violations.push('detached HEAD is not allowed for managed release');
-    }
-  }
-
-  const upstreamResult = runGit(projectPath, ['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}']);
-  if (upstreamResult.status !== 0) {
-    violations.push('current branch has no upstream tracking branch');
-  } else {
-    details.upstream = upstreamResult.stdout;
-    const upstreamRemote = normalizeText(upstreamResult.stdout.split('/')[0]);
-    const upstreamIsTarget = remoteInfo.targetRemotes.some((item) => item.name === upstreamRemote);
-    if (!upstreamIsTarget) {
-      violations.push(`upstream remote "${upstreamRemote}" is not GitHub/GitLab target`);
+    const branchResult = runGit(projectPath, ['rev-parse', '--abbrev-ref', 'HEAD']);
+    if (branchResult.status !== 0) {
+      violations.push(`failed to resolve branch: ${branchResult.stderr || 'unknown error'}`);
     } else {
-      const aheadBehindResult = runGit(projectPath, ['rev-list', '--left-right', '--count', 'HEAD...@{u}']);
-      if (aheadBehindResult.status !== 0) {
-        violations.push(`failed to compare with upstream: ${aheadBehindResult.stderr || 'unknown error'}`);
+      details.branch = branchResult.stdout;
+      if (details.branch === 'HEAD') {
+        violations.push('detached HEAD is not allowed for managed release');
+      }
+    }
+
+    const upstreamResult = runGit(projectPath, ['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}']);
+    if (upstreamResult.status !== 0) {
+      violations.push('current branch has no upstream tracking branch');
+    } else {
+      details.upstream = upstreamResult.stdout;
+      const upstreamRemote = normalizeText(upstreamResult.stdout.split('/')[0]);
+      const upstreamIsTarget = remoteInfo.targetRemotes.some((item) => item.name === upstreamRemote);
+      if (!upstreamIsTarget) {
+        violations.push(`upstream remote "${upstreamRemote}" is not GitHub/GitLab target`);
       } else {
-        const { ahead, behind } = parseAheadBehind(aheadBehindResult.stdout);
-        details.ahead = ahead;
-        details.behind = behind;
-        if (!Number.isFinite(ahead) || !Number.isFinite(behind)) {
-          violations.push('failed to parse ahead/behind status');
+        const aheadBehindResult = runGit(projectPath, ['rev-list', '--left-right', '--count', 'HEAD...@{u}']);
+        if (aheadBehindResult.status !== 0) {
+          violations.push(`failed to compare with upstream: ${aheadBehindResult.stderr || 'unknown error'}`);
         } else {
-          if (ahead > 0) {
-            violations.push(`branch is ahead of upstream by ${ahead} commit(s); push required`);
-          }
-          if (behind > 0) {
-            violations.push(`branch is behind upstream by ${behind} commit(s); sync required`);
+          const { ahead, behind } = parseAheadBehind(aheadBehindResult.stdout);
+          details.ahead = ahead;
+          details.behind = behind;
+          if (!Number.isFinite(ahead) || !Number.isFinite(behind)) {
+            violations.push('failed to parse ahead/behind status');
+          } else {
+            if (ahead > 0) {
+              violations.push(`branch is ahead of upstream by ${ahead} commit(s); push required`);
+            }
+            if (behind > 0) {
+              violations.push(`branch is behind upstream by ${behind} commit(s); sync required`);
+            }
           }
         }
       }

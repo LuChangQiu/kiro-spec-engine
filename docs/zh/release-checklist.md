@@ -91,6 +91,7 @@ node scripts/git-managed-gate.js --fail-on-violation --json
 - 提交分组清晰、提交信息可直接用于发布记录。
 - 若配置了 GitHub/GitLab 远端：当前分支必须已设置 upstream 且与远端完全同步（ahead=0, behind=0）。
 - 若客户确实没有 GitHub/GitLab：可通过策略放行（`SCE_GIT_MANAGEMENT_ALLOW_NO_REMOTE=1`，默认开启）。
+- 在 CI/tag 的 detached HEAD 场景下，默认放宽分支/upstream 同步检查；如需强制严格校验，设置 `SCE_GIT_MANAGEMENT_STRICT_CI=1`。
 
 ---
 

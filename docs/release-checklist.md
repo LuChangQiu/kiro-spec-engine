@@ -106,6 +106,7 @@ Verify:
 - Commits are logically grouped and messages are release-ready.
 - If GitHub/GitLab remote exists, current branch is upstream-tracked and fully synced (ahead=0, behind=0).
 - If customer has no GitHub/GitLab, gate can be bypassed by policy (`SCE_GIT_MANAGEMENT_ALLOW_NO_REMOTE=1`, default).
+- In CI/tag detached-HEAD contexts, branch/upstream sync checks are relaxed by default; enforce strict mode with `SCE_GIT_MANAGEMENT_STRICT_CI=1` when needed.
 
 ---
 

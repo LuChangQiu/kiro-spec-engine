@@ -386,6 +386,8 @@ Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
   - branch is ahead/behind upstream
   - upstream is not a GitHub/GitLab remote (when such remotes exist)
 - If project has no GitHub/GitLab remote, gate passes by default (can hard-enforce with `--no-allow-no-remote` or `SCE_GIT_MANAGEMENT_ALLOW_NO_REMOTE=0`).
+- In CI/tag detached-HEAD context (`CI=1` or `GITHUB_ACTIONS=1`), branch/upstream sync checks are relaxed by default.
+  Use `SCE_GIT_MANAGEMENT_STRICT_CI=1` (or `--strict-ci`) to enforce full local-level branch checks in CI.
 
 ### Studio Workflow
 

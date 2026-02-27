@@ -68,6 +68,8 @@ describe('git-managed-gate script', () => {
       '--fail-on-violation',
       '--no-allow-no-remote',
       '--target-hosts', 'github.com,gitlab.com',
+      '--ci-context',
+      '--strict-ci',
       '--json'
     ]);
 
@@ -75,7 +77,19 @@ describe('git-managed-gate script', () => {
     expect(parsed.failOnViolation).toBe(true);
     expect(parsed.allowNoRemote).toBe(false);
     expect(parsed.targetHosts).toEqual(['github.com', 'gitlab.com']);
+    expect(parsed.ciContext).toBe(true);
+    expect(parsed.strictCi).toBe(true);
     expect(parsed.json).toBe(true);
+  });
+
+  test('parseArgs auto-detects CI context from environment', () => {
+    const parsed = parseArgs([], {
+      CI: 'true',
+      SCE_GIT_MANAGEMENT_STRICT_CI: '1'
+    });
+
+    expect(parsed.ciContext).toBe(true);
+    expect(parsed.strictCi).toBe(true);
   });
 
   test('passes with warning when no github/gitlab remote and allowNoRemote is true', () => {
@@ -141,5 +155,40 @@ describe('git-managed-gate script', () => {
 
     expect(payload.passed).toBe(false);
     expect(payload.exit_code).toBe(2);
+  });
+
+  test('passes in CI mode when detached HEAD is expected', () => {
+    const { repoPath } = initManagedRepo(tempDir);
+    runGit(repoPath, ['checkout', '--detach', 'HEAD']);
+
+    const payload = evaluateGitManagedGate({
+      projectPath: repoPath,
+      allowNoRemote: false,
+      targetHosts: ['github.com', 'gitlab.com'],
+      ciContext: true,
+      strictCi: false
+    });
+
+    expect(payload.passed).toBe(true);
+    expect(payload.warnings.some((item) => item.includes('ci context detected'))).toBe(true);
+  });
+
+  test('fails in strict CI mode when detached HEAD has no upstream', () => {
+    const { repoPath } = initManagedRepo(tempDir);
+    runGit(repoPath, ['checkout', '--detach', 'HEAD']);
+
+    const payload = evaluateGitManagedGate({
+      projectPath: repoPath,
+      allowNoRemote: false,
+      targetHosts: ['github.com', 'gitlab.com'],
+      ciContext: true,
+      strictCi: true
+    });
+
+    expect(payload.passed).toBe(false);
+    expect(payload.violations).toEqual(expect.arrayContaining([
+      'detached HEAD is not allowed for managed release',
+      'current branch has no upstream tracking branch'
+    ]));
   });
 });

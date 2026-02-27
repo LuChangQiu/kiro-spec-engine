@@ -87,6 +87,7 @@ Notes:
 - `url` must be a raw JSON URL (`raw.githubusercontent.com`) or use a local file path.
 - `search_mode` supports `cache|remote|hybrid` (recommended: `remote` for very large registries).
 - Local cache file is used by cache/hybrid mode.
+- Since `v3.3.23`, `sce init` / `sce adopt` template baselines include this config by default (central source enabled).
 
 ## 4) Daily Workflow
 
@@ -114,3 +115,6 @@ sce errorbook find --query "approve order timeout" --include-registry --registry
 - Do not publish sensitive tenant/customer data.
 - Temporary mitigation entries must remain bounded and governed (exit criteria, cleanup task, deadline).
 - Keep central registry append-only by PR review; deprecate low-value entries through normal curation.
+- Recommended central repo gates:
+  - `node scripts/validate-registry.js`
+  - `node scripts/check-index-coverage.js --min-coverage 85`

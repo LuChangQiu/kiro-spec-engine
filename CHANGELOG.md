@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.23] - 2026-02-27
+
+### Added
+- Adoption/default template coverage now includes central registry and orchestrator configs across init/adopt/upgrade flows:
+  - `.sce/config/errorbook-registry.json`
+  - `.sce/config/orchestrator.json`
+- Adoption config classification and backup critical-file handling now include:
+  - `config/errorbook-registry.json`
+  - `config/orchestrator.json`
+
+### Changed
+- Errorbook registry template defaults are now enabled out of the box:
+  - `enabled: true`
+  - `sources[central].enabled: true`
+- Central registry defaults point to the official shared registry:
+  - `https://raw.githubusercontent.com/heguangyong/sce-errorbook-registry/main/registry/errorbook-registry.json`
+  - `https://raw.githubusercontent.com/heguangyong/sce-errorbook-registry/main/registry/errorbook-registry.index.json`
+
 ## [3.3.22] - 2026-02-27
 
 ### Added

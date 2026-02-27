@@ -2,8 +2,8 @@
 
 > Quick reference for all `sce` commands
 
-**Version**: 2.0.0
-**Last Updated**: 2026-02-26
+**Version**: 3.3.23
+**Last Updated**: 2026-02-27
 
 ---
 
@@ -414,6 +414,7 @@ Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
 - `sync-registry` pulls external registry JSON into local cache (`.sce/errorbook/registry-cache.json`) for unified `find` retrieval.
 - `find --include-registry --registry-mode remote` supports direct remote query for large registries (no full local sync required).
 - Recommended for large registries: maintain a remote index file (`registry/errorbook-registry.index.json`) and shard files, then provide `index_url` in registry config.
+- Since `v3.3.23`, `sce init` / `sce adopt` default baseline includes enabled central registry config in `.sce/config/errorbook-registry.json`.
 - `git-managed-gate` blocks release when:
   - worktree has uncommitted changes
   - branch has no upstream

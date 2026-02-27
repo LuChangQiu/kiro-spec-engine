@@ -562,8 +562,16 @@ your-project/
 │   │   ├── ENVIRONMENT.md
 │   │   ├── CURRENT_CONTEXT.md
 │   │   └── RULES_GUIDE.md
+│   ├── config/                     # Runtime/adoption baseline configs
+│   │   ├── studio-security.json
+│   │   ├── orchestrator.json
+│   │   └── errorbook-registry.json
 │   ├── tools/                      # Ultrawork tools
 │   │   └── ultrawork_enhancer.py
+│   ├── hooks/                      # Default hooks
+│   │   ├── check-spec-on-create.sce.hook
+│   │   ├── run-tests-on-save.sce.hook
+│   │   └── sync-tasks-on-edit.sce.hook
 │   ├── backups/                    # Automatic backups
 │   │   └── adopt-{timestamp}/
 │   └── README.md

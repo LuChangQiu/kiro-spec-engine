@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.22] - 2026-02-27
+
+### Added
+- Errorbook now supports governed temporary mitigation records (stop-bleeding only):
+  - `--temporary-mitigation`
+  - `--mitigation-reason`
+  - `--mitigation-exit`
+  - `--mitigation-cleanup`
+  - `--mitigation-deadline`
+
+### Changed
+- `errorbook release-gate` now blocks release on temporary mitigation policy violations in addition to risk threshold violations:
+  - missing exit criteria / cleanup task / deadline
+  - expired mitigation deadline
+- Steering baseline strengthened with explicit anti-workaround rules:
+  - core-path fail-fast (no silent swallow-and-continue)
+  - temporary fallback must be governed and time-bounded
+  - release must be blocked until fallback cleanup is completed
+- Command reference and release checklists updated (EN/ZH) for temporary mitigation governance.
+
 ## [3.3.21] - 2026-02-27
 
 ### Fixed

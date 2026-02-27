@@ -351,6 +351,13 @@ sce errorbook record \
 sce errorbook list --status promoted --min-quality 75 --json
 sce errorbook show <entry-id> --json
 sce errorbook find --query "approve order timeout" --limit 10 --json
+sce errorbook find --query "approve order timeout" --include-registry --json
+
+# Export curated local entries for central registry publication
+sce errorbook export --status promoted --min-quality 75 --out .sce/errorbook/exports/registry.json --json
+
+# Sync central registry (GitHub raw URL or local file) to local cache
+sce errorbook sync-registry --source https://raw.githubusercontent.com/<org>/<repo>/main/registry/errorbook-registry.json --json
 
 # Promote only after strict gate checks pass
 sce errorbook promote <entry-id> --json
@@ -400,6 +407,8 @@ Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
 - `release-gate` also blocks when temporary mitigation policy is violated:
   - missing exit/cleanup/deadline metadata
   - expired mitigation deadline
+- `export` outputs a machine-readable registry bundle from curated local entries (recommended default: `promoted`, `quality>=75`).
+- `sync-registry` pulls external registry JSON into local cache (`.sce/errorbook/registry-cache.json`) for unified `find` retrieval.
 - `git-managed-gate` blocks release when:
   - worktree has uncommitted changes
   - branch has no upstream
@@ -2036,6 +2045,7 @@ Overall Health: 2 healthy, 1 unhealthy
 - [Cross-Tool Guide](./cross-tool-guide.md)
 - [Adoption Guide](./adoption-guide.md)
 - [Developer Guide](./developer-guide.md)
+- [Errorbook Registry Guide](./errorbook-registry.md)
 
 ---
 

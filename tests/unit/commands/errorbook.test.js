@@ -4,8 +4,11 @@ const path = require('path');
 
 const {
   resolveErrorbookPaths,
+  DEFAULT_ERRORBOOK_REGISTRY_CACHE,
   normalizeOntologyTags,
   runErrorbookRecordCommand,
+  runErrorbookExportCommand,
+  runErrorbookSyncRegistryCommand,
   runErrorbookListCommand,
   runErrorbookShowCommand,
   runErrorbookFindCommand,
@@ -249,6 +252,136 @@ describe('errorbook command workflow', () => {
     expect(found.total_results).toBe(2);
     expect(found.entries[0].status).toBe('promoted');
     expect(found.entries[0].match_score).toBeGreaterThan(found.entries[1].match_score);
+  });
+
+  test('exports promoted entries for external registry', async () => {
+    const promoted = await runErrorbookRecordCommand({
+      title: 'Exportable promoted entry',
+      symptom: 'Approved order flow timeout under high concurrency.',
+      rootCause: 'Lock ordering issue in approval + inventory transaction.',
+      fixAction: ['Reorder lock acquisition'],
+      verification: ['Concurrency regression suite passed'],
+      tags: 'order',
+      ontology: 'entity,relation,decision_policy',
+      status: 'verified',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+    await runErrorbookPromoteCommand({
+      id: promoted.entry.id,
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    await runErrorbookRecordCommand({
+      title: 'Candidate only entry',
+      symptom: 'Low priority docs mismatch sample.',
+      rootCause: 'Draft documentation not updated.',
+      fixAction: ['Update docs'],
+      tags: 'docs',
+      ontology: 'execution_flow',
+      status: 'candidate',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    const outPath = path.join(tempDir, '.sce', 'errorbook', 'exports', 'registry.json');
+    const result = await runErrorbookExportCommand({
+      out: outPath,
+      status: 'promoted',
+      minQuality: 75,
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(result.mode).toBe('errorbook-export');
+    expect(result.total_entries).toBe(1);
+    const payload = await fs.readJson(outPath);
+    expect(payload.api_version).toBe('sce.errorbook.registry/v0.1');
+    expect(payload.total_entries).toBe(1);
+    expect(payload.entries[0].status).toBe('promoted');
+  });
+
+  test('syncs external registry from local json source', async () => {
+    const sourcePath = path.join(tempDir, 'registry-source.json');
+    await fs.writeJson(sourcePath, {
+      api_version: 'sce.errorbook.registry/v0.1',
+      entries: [{
+        id: 'rg-001',
+        title: 'Registry sample entry',
+        symptom: 'Order approve fails with stale lock.',
+        root_cause: 'Transaction lock wait timeout too low.',
+        fix_actions: ['Increase lock timeout'],
+        verification_evidence: ['Lock test passed'],
+        tags: ['order'],
+        ontology_tags: ['entity', 'decision_policy'],
+        status: 'promoted',
+        quality_score: 90,
+        updated_at: '2026-02-27T00:00:00Z'
+      }]
+    }, { spaces: 2 });
+
+    const cachePath = path.join(tempDir, '.sce', 'errorbook', 'registry-cache.json');
+    const result = await runErrorbookSyncRegistryCommand({
+      source: sourcePath,
+      sourceName: 'central-registry',
+      cache: cachePath,
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(result.mode).toBe('errorbook-sync-registry');
+    expect(result.total_entries).toBe(1);
+    const cachePayload = await fs.readJson(cachePath);
+    expect(cachePayload.api_version).toBe('sce.errorbook.registry-cache/v0.1');
+    expect(cachePayload.total_entries).toBe(1);
+    expect(cachePayload.entries[0].entry_source).toBe('registry');
+  });
+
+  test('find supports include-registry with cached external entries', async () => {
+    const cachePath = path.join(tempDir, DEFAULT_ERRORBOOK_REGISTRY_CACHE);
+    await fs.ensureDir(path.dirname(cachePath));
+    await fs.writeJson(cachePath, {
+      api_version: 'sce.errorbook.registry-cache/v0.1',
+      synced_at: new Date().toISOString(),
+      source: {
+        name: 'central',
+        uri: 'local-fixture'
+      },
+      entries: [{
+        id: 'reg-approve-1',
+        fingerprint: 'fp-reg-approve-1',
+        title: 'Registry approve order timeout',
+        symptom: 'Approve order request timed out under lock contention.',
+        root_cause: 'Approval lock sequence caused deadlock.',
+        fix_actions: ['Reorder lock sequence'],
+        verification_evidence: ['Approve lock test passed'],
+        tags: ['order'],
+        ontology_tags: ['entity', 'decision_policy'],
+        status: 'promoted',
+        quality_score: 92,
+        updated_at: '2026-02-27T00:00:00Z'
+      }]
+    }, { spaces: 2 });
+
+    const result = await runErrorbookFindCommand({
+      query: 'approve order timeout',
+      includeRegistry: true,
+      registryCache: cachePath,
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(result.include_registry).toBe(true);
+    expect(result.total_results).toBeGreaterThanOrEqual(1);
+    expect(result.source_breakdown.registry_results).toBeGreaterThanOrEqual(1);
+    expect(result.entries.some((item) => item.entry_source === 'registry')).toBe(true);
   });
 
   test('show supports id prefix resolution', async () => {

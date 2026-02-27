@@ -362,6 +362,9 @@ sce errorbook export --status promoted --min-quality 75 --out .sce/errorbook/exp
 # Sync central registry (GitHub raw URL or local file) to local cache
 sce errorbook sync-registry --source https://raw.githubusercontent.com/heguangyong/sce-errorbook-registry/main/registry/errorbook-registry.json --json
 
+# Validate registry config/source/index health
+sce errorbook health-registry --json
+
 # Promote only after strict gate checks pass
 sce errorbook promote <entry-id> --json
 
@@ -389,6 +392,10 @@ sce errorbook release-gate --min-risk high --fail-on-block --json
 
 # Git managed hard gate (default in prepublish and studio release preflight)
 node scripts/git-managed-gate.js --fail-on-violation --json
+
+# Registry health gate (advisory by default; strict when env enabled)
+node scripts/errorbook-registry-health-gate.js --json
+SCE_REGISTRY_HEALTH_STRICT=1 node scripts/errorbook-registry-health-gate.js --json
 ```
 
 Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
@@ -415,6 +422,9 @@ Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
 - `find --include-registry --registry-mode remote` supports direct remote query for large registries (no full local sync required).
 - Recommended for large registries: maintain a remote index file (`registry/errorbook-registry.index.json`) and shard files, then provide `index_url` in registry config.
 - Since `v3.3.23`, `sce init` / `sce adopt` default baseline includes enabled central registry config in `.sce/config/errorbook-registry.json`.
+- `health-registry` validates config readability, source/index accessibility, and index-to-shard resolution before release.
+- `gate:errorbook-registry-health` runs in advisory mode by default during `prepublishOnly`.
+  Set `SCE_REGISTRY_HEALTH_STRICT=1` to fail release when registry health reports errors.
 - `git-managed-gate` blocks release when:
   - worktree has uncommitted changes
   - branch has no upstream

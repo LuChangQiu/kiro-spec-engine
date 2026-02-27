@@ -9,6 +9,7 @@ const {
   runErrorbookRecordCommand,
   runErrorbookExportCommand,
   runErrorbookSyncRegistryCommand,
+  runErrorbookRegistryHealthCommand,
   runErrorbookListCommand,
   runErrorbookShowCommand,
   runErrorbookFindCommand,
@@ -382,6 +383,119 @@ describe('errorbook command workflow', () => {
     expect(result.total_results).toBeGreaterThanOrEqual(1);
     expect(result.source_breakdown.registry_results).toBeGreaterThanOrEqual(1);
     expect(result.entries.some((item) => item.entry_source === 'registry-cache')).toBe(true);
+  });
+
+  test('health-registry validates local source and index successfully', async () => {
+    const shardPath = path.join(tempDir, 'registry', 'shards', 'order.json');
+    const sourcePath = path.join(tempDir, 'registry', 'errorbook-registry.json');
+    const indexPath = path.join(tempDir, 'registry', 'errorbook-registry.index.json');
+    const configPath = path.join(tempDir, '.sce', 'config', 'errorbook-registry.json');
+
+    await fs.ensureDir(path.dirname(shardPath));
+    await fs.ensureDir(path.dirname(configPath));
+
+    await fs.writeJson(shardPath, {
+      api_version: 'sce.errorbook.registry/v0.1',
+      entries: [{
+        id: 'reg-health-1',
+        fingerprint: 'fp-reg-health-1',
+        title: 'Health check fixture entry',
+        symptom: 'Order approve timeout due to lock contention.',
+        root_cause: 'Approval transaction lock ordering issue.',
+        fix_actions: ['Reorder lock sequence'],
+        verification_evidence: ['lock regression suite passed'],
+        tags: ['order'],
+        ontology_tags: ['entity', 'decision_policy'],
+        status: 'promoted',
+        quality_score: 95,
+        updated_at: '2026-02-27T00:00:00Z'
+      }]
+    }, { spaces: 2 });
+
+    await fs.writeJson(sourcePath, {
+      api_version: 'sce.errorbook.registry/v0.1',
+      entries: [{
+        id: 'reg-health-summary-1',
+        fingerprint: 'fp-reg-health-summary-1',
+        title: 'Registry summary fixture',
+        symptom: 'Summary entry for registry source validation.',
+        root_cause: 'Fixture payload for health check command.',
+        fix_actions: ['Use deterministic fixture'],
+        verification_evidence: ['unit test fixture validated'],
+        tags: ['fixture'],
+        ontology_tags: ['execution_flow'],
+        status: 'promoted',
+        quality_score: 90,
+        updated_at: '2026-02-27T00:00:00Z'
+      }]
+    }, { spaces: 2 });
+
+    await fs.writeJson(indexPath, {
+      api_version: 'sce.errorbook.registry-index/v0.1',
+      min_token_length: 2,
+      token_to_bucket: {
+        order: 'order',
+        approve: 'order'
+      },
+      buckets: {
+        order: shardPath
+      }
+    }, { spaces: 2 });
+
+    await fs.writeJson(configPath, {
+      enabled: true,
+      search_mode: 'remote',
+      cache_file: '.sce/errorbook/registry-cache.json',
+      sources: [{
+        name: 'central-fixture',
+        enabled: true,
+        url: sourcePath,
+        index_url: indexPath
+      }]
+    }, { spaces: 2 });
+
+    const result = await runErrorbookRegistryHealthCommand({
+      config: configPath,
+      maxShards: 4,
+      shardSample: 2,
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(result.mode).toBe('errorbook-health-registry');
+    expect(result.passed).toBe(true);
+    expect(result.error_count).toBe(0);
+    expect(result.config.source_count).toBe(1);
+    expect(result.sources[0].source_ok).toBe(true);
+    expect(result.sources[0].index_ok).toBe(true);
+    expect(result.sources[0].source_entries).toBeGreaterThan(0);
+  });
+
+  test('health-registry reports failure for broken source path', async () => {
+    const configPath = path.join(tempDir, '.sce', 'config', 'errorbook-registry.json');
+    await fs.ensureDir(path.dirname(configPath));
+    await fs.writeJson(configPath, {
+      enabled: true,
+      search_mode: 'remote',
+      sources: [{
+        name: 'broken-source',
+        enabled: true,
+        url: path.join(tempDir, 'registry', 'missing.json')
+      }]
+    }, { spaces: 2 });
+
+    const result = await runErrorbookRegistryHealthCommand({
+      config: configPath,
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(result.mode).toBe('errorbook-health-registry');
+    expect(result.passed).toBe(false);
+    expect(result.error_count).toBeGreaterThan(0);
+    expect(result.errors.some((item) => item.includes('failed to load source'))).toBe(true);
   });
 
   test('find supports remote indexed registry search without local full sync', async () => {

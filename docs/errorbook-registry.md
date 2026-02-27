@@ -107,6 +107,11 @@ sce errorbook sync-registry --source https://raw.githubusercontent.com/heguangyo
 ```bash
 sce errorbook find --query "approve order timeout" --include-registry --json
 sce errorbook find --query "approve order timeout" --include-registry --registry-mode remote --json
+
+# Validate central registry health (config/source/index/shard)
+sce errorbook health-registry --json
+# Optional strict gate in CI/release
+SCE_REGISTRY_HEALTH_STRICT=1 node scripts/errorbook-registry-health-gate.js --json
 ```
 
 ## 5) Governance Rules
@@ -118,3 +123,6 @@ sce errorbook find --query "approve order timeout" --include-registry --registry
 - Recommended central repo gates:
   - `node scripts/validate-registry.js`
   - `node scripts/check-index-coverage.js --min-coverage 85`
+- Recommended project-side release gates:
+  - `npm run gate:errorbook-registry-health` (advisory default)
+  - `SCE_REGISTRY_HEALTH_STRICT=1 npm run gate:errorbook-registry-health` (strict)

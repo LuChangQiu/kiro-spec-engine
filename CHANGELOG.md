@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Errorbook registry health command for centralized registry governance:
+  - `sce errorbook health-registry`
+  - validates registry config readability, source/index reachability, and index bucket-to-shard resolution
+- New script gate:
+  - `node scripts/errorbook-registry-health-gate.js`
+  - supports strict mode via `SCE_REGISTRY_HEALTH_STRICT=1`
+
+### Changed
+- `prepublishOnly` now runs `gate:errorbook-registry-health` in advisory mode before `errorbook-release` gate.
+
 ## [3.3.23] - 2026-02-27
 
 ### Added

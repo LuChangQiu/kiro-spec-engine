@@ -455,6 +455,8 @@ Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
 ```bash
 # Build a plan from chat/session context (scene is mandatory and becomes the primary session anchor)
 sce studio plan --scene scene.customer-order-inventory --from-chat session-20260226 --goal "customer+order+inventory demo" --json
+# Recommended: bind spec explicitly so Studio can ingest problem-domain-chain deterministically
+sce studio plan --scene scene.customer-order-inventory --spec 01-00-customer-order-inventory --from-chat session-20260226 --goal "customer+order+inventory demo" --json
 
 # Generate patch bundle metadata (scene is inherited from plan)
 sce studio generate --target 331 --json
@@ -487,8 +489,11 @@ SCE_STUDIO_REQUIRE_AUTH=1 SCE_STUDIO_AUTH_PASSWORD=top-secret sce studio apply -
 
 Stage guardrails are enforced by default:
 - `plan` requires `--scene`; SCE binds one active primary session per scene
+- `plan --spec <id>` (recommended) ingests `.sce/specs/<spec>/custom/problem-domain-chain.json` into studio job context
+- when `--spec` is omitted, `plan` auto-resolves the latest matching spec chain by `scene_id` when available
 - successful `release` auto-archives current scene session and auto-opens the next scene cycle session
 - `generate` requires `plan`
+- `generate` consumes the plan-stage domain-chain context and writes chain-aware metadata/report (`.sce/reports/studio/generate-<job-id>.json`)
 - `apply` requires `generate`
 - `verify` requires `apply`
 - `release` requires `verify`

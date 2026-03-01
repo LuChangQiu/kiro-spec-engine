@@ -18,6 +18,7 @@ const {
   ensureStudioAuthorization,
   buildReleaseGateSteps
 } = require('../../../lib/commands/studio');
+const { ensureSpecDomainArtifacts } = require('../../../lib/spec/domain-modeling');
 const { resolveErrorbookPaths } = require('../../../lib/commands/errorbook');
 
 describe('studio command workflow', () => {
@@ -65,6 +66,82 @@ describe('studio command workflow', () => {
 
     const jobPath = path.join(paths.jobsDir, `${payload.job_id}.json`);
     expect(await fs.pathExists(jobPath)).toBe(true);
+  });
+
+  test('plan with --spec ingests domain-chain and generate writes chain-aware metadata/report', async () => {
+    const specId = '01-00-domain-aware';
+    const specRoot = path.join(tempDir, '.sce', 'specs', specId);
+    await fs.ensureDir(specRoot);
+    await ensureSpecDomainArtifacts(tempDir, specId, {
+      fileSystem: fs,
+      sceneId: 'scene.customer-order-inventory',
+      problemStatement: 'Customer-order-inventory flow has reconciliation drift',
+      primaryFlow: 'Customer order should reserve inventory before confirmation',
+      verificationPlan: 'Run order+inventory consistency checks'
+    });
+
+    const planned = await runStudioPlanCommand({
+      scene: 'scene.customer-order-inventory',
+      spec: specId,
+      fromChat: 'session-domain-001',
+      goal: 'stabilize customer order inventory lifecycle',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    const paths = resolveStudioPaths(tempDir);
+    const plannedJob = await fs.readJson(path.join(paths.jobsDir, `${planned.job_id}.json`));
+    expect(plannedJob.source.spec_id).toBe(specId);
+    expect(plannedJob.source.domain_chain).toEqual(expect.objectContaining({
+      resolved: true,
+      source: 'explicit-spec',
+      spec_id: specId
+    }));
+    expect(plannedJob.stages.plan.metadata.domain_chain_resolved).toBe(true);
+
+    await runStudioGenerateCommand({
+      job: planned.job_id,
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    const generatedJob = await fs.readJson(path.join(paths.jobsDir, `${planned.job_id}.json`));
+    expect(generatedJob.stages.generate.metadata.domain_chain).toEqual(expect.objectContaining({
+      resolved: true,
+      source: 'explicit-spec',
+      spec_id: specId
+    }));
+    expect(generatedJob.artifacts.generate_report).toContain(`generate-${planned.job_id}.json`);
+  });
+
+  test('plan without --spec auto-binds latest scene domain-chain candidate', async () => {
+    const specId = '01-01-domain-auto';
+    const specRoot = path.join(tempDir, '.sce', 'specs', specId);
+    await fs.ensureDir(specRoot);
+    await ensureSpecDomainArtifacts(tempDir, specId, {
+      fileSystem: fs,
+      sceneId: 'scene.auto-bind',
+      problemStatement: 'Auto bind domain chain for scene',
+      verificationPlan: 'Smoke checks'
+    });
+
+    const planned = await runStudioPlanCommand({
+      scene: 'scene.auto-bind',
+      fromChat: 'session-domain-002',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    const paths = resolveStudioPaths(tempDir);
+    const plannedJob = await fs.readJson(path.join(paths.jobsDir, `${planned.job_id}.json`));
+    expect(plannedJob.source.domain_chain).toEqual(expect.objectContaining({
+      resolved: true,
+      source: 'scene-auto-single',
+      spec_id: specId
+    }));
   });
 
   test('supports end-to-end stage flow from generate to release', async () => {

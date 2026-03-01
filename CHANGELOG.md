@@ -32,6 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `sce spec-domain init --spec <id>`
   - `sce spec-domain validate --spec <id> [--fail-on-error]`
   - `sce spec-domain refresh --spec <id>`
+- Studio plan/generate now consume domain modeling context for correction guidance:
+  - `sce studio plan` supports `--spec <id>` to ingest `.sce/specs/<spec>/custom/problem-domain-chain.json` deterministically
+  - when `--spec` is omitted, `plan` auto-selects the latest scene-matching chain (`scene_id`)
+  - `sce studio generate` writes chain-aware metadata and `generate` stage report at `.sce/reports/studio/generate-<job-id>.json`
 
 ## [3.3.23] - 2026-02-27
 

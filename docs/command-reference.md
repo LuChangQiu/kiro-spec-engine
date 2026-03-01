@@ -577,6 +577,7 @@ Multi-agent merge governance default:
 ```bash
 # One-command close-loop execution:
 # goal -> auto master/sub decomposition -> collab metadata -> orchestration -> terminal result
+# default behavior is enforced autonomous progression (no per-step confirmation pauses)
 sce auto close-loop "build autonomous close-loop and master/sub orchestration"
 # default sub-spec count is auto-selected by goal complexity (typically 3-5)
 

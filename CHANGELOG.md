@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - `prepublishOnly` now runs `gate:errorbook-registry-health` in advisory mode before `errorbook-release` gate.
+- Autonomous execution defaults are now hard-set to autonomous progression:
+  - `lib/auto/config-schema.js` default mode changed to `aggressive`
+  - default checkpoints now skip phase/final review pauses (`phaseCompletion=false`, `finalReview=false`)
+  - default safety confirmations for production/external/destructive are disabled in autonomous mode baseline
+  - `sce auto run/create` CLI defaults now use `--mode aggressive`
 - Steering hard rule strengthened: when the same issue fails target validation for 2 consecutive fix rounds, the 3rd round must switch to debug-log-driven diagnosis first (no blind patching without evidence).
 - `errorbook record` now enforces the same policy operationally:
   - from the 3rd repeated record attempt of the same fingerprint, debug evidence becomes mandatory

@@ -433,7 +433,7 @@ sce auto stop
 
 ## Execution Modes
 
-### Conservative Mode (Default)
+### Conservative Mode
 
 **Best for**: Production features, critical systems, first-time users
 
@@ -479,7 +479,7 @@ sce auto stop
 }
 ```
 
-### Aggressive Mode
+### Aggressive Mode (Default)
 
 **Best for**: Rapid prototyping, experimental features, experienced users
 
@@ -511,13 +511,13 @@ Location: `.sce/auto/config.json`
 ```json
 {
   "version": "1.0.0",
-  "mode": "balanced",
+  "mode": "aggressive",
   "checkpoints": {
     "requirementsReview": false,
     "designReview": false,
     "tasksReview": false,
-    "phaseCompletion": true,
-    "finalReview": true,
+    "phaseCompletion": false,
+    "finalReview": false,
     "errorThreshold": 3
   },
   "errorRecovery": {
@@ -527,9 +527,9 @@ Location: `.sce/auto/config.json`
     "learningEnabled": true
   },
   "safety": {
-    "requireProductionConfirmation": true,
-    "requireExternalResourceConfirmation": true,
-    "requireDestructiveOperationConfirmation": true,
+    "requireProductionConfirmation": false,
+    "requireExternalResourceConfirmation": false,
+    "requireDestructiveOperationConfirmation": false,
     "allowedOperations": [],
     "blockedOperations": []
   },

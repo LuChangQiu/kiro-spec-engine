@@ -21,6 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `errorbook record` now enforces the same policy operationally:
   - from the 3rd repeated record attempt of the same fingerprint, debug evidence becomes mandatory
   - accepted signals include `--verification "debug: ..."`, `debug-evidence` tag, or debug trace/log references
+- Spec workflow now enforces domain-first scene modeling:
+  - `spec bootstrap` auto-generates mandatory artifacts:
+    - `.sce/specs/<spec>/custom/problem-domain-map.md`
+    - `.sce/specs/<spec>/custom/scene-spec.md`
+  - `spec gate` adds hard-fail rule `domain_scene_modeling` to block missing or structurally incomplete artifacts.
 
 ## [3.3.23] - 2026-02-27
 

@@ -203,6 +203,20 @@
 
 **目标**: 保证跨 Agent 连续性、可追溯历史、上下文可控，避免因 Agent session 长短差异导致上下文漂移
 
+### 15. 问题域思维导图 + 场景化 Spec 强制原则 🧠
+
+**核心**: Spec 推进必须先完成“问题域思维导图”与“场景化 Spec 契约”，再进入实现与修复闭环
+
+**硬规则**:
+1) 每个 Spec 必须具备：
+   - `.sce/specs/<spec>/custom/problem-domain-map.md`
+   - `.sce/specs/<spec>/custom/scene-spec.md`
+2) `problem-domain-map` 必须包含：Root Problem、Mind Map、Layered Exploration Chain、Correction Loop
+3) `scene-spec` 必须包含：Scene Definition、Ontology Coverage、Decision & Execution Path、Acceptance & Gate
+4) 默认门禁强制校验上述结构，缺失即 `no-go`
+
+**目标**: 用全局问题域视角 + 场景契约约束，减少方向性错误与盲改，提升纠偏效率
+
 ---
 
-v20.0 | 2026-02-27 | 新增两轮失败后强制 debug 定位规则
+v21.0 | 2026-02-27 | 新增问题域思维导图 + 场景化 Spec 强制推进原则

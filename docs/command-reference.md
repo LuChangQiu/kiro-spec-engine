@@ -57,6 +57,9 @@ sce create-spec 01-00-feature-name
 
 # Bootstrap full Spec draft (requirements/design/tasks)
 sce spec bootstrap --name 01-00-feature-name --scene scene.customer-order-inventory --non-interactive
+# Bootstrap now also generates mandatory scene artifacts:
+# - .sce/specs/<spec>/custom/problem-domain-map.md
+# - .sce/specs/<spec>/custom/scene-spec.md
 
 # Run pipeline for one Spec
 sce spec pipeline run --spec 01-00-feature-name --scene scene.customer-order-inventory
@@ -77,6 +80,10 @@ Spec session governance:
 - `spec bootstrap|pipeline run|gate run` must bind to an active scene primary session (`--scene <scene-id>` or implicit binding from latest/unique active scene).
 - When multiple active scenes exist, you must pass `--scene` explicitly.
 - Multi-Spec orchestrate fallback (`--specs ...`) follows the same scene binding and writes per-spec child-session archive records.
+- `spec bootstrap` always generates problem-domain and scene-spec artifacts to force domain-first exploration.
+- `spec gate` now hard-fails when either of the following is missing or structurally incomplete:
+  - `.sce/specs/<spec>/custom/problem-domain-map.md`
+  - `.sce/specs/<spec>/custom/scene-spec.md`
 
 ### Value Metrics
 

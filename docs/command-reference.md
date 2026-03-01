@@ -68,6 +68,11 @@ sce spec pipeline run --spec 01-00-feature-name --scene scene.customer-order-inv
 # Run gate for one Spec
 sce spec gate run --spec 01-00-feature-name --scene scene.customer-order-inventory --json
 
+# Maintain domain modeling artifacts explicitly
+sce spec domain init --spec 01-00-feature-name --scene scene.customer-order-inventory --json
+sce spec domain validate --spec 01-00-feature-name --fail-on-error --json
+sce spec domain refresh --spec 01-00-feature-name --scene scene.customer-order-inventory --json
+
 # Multi-Spec mode defaults to orchestrate routing
 sce spec bootstrap --specs "spec-a,spec-b" --max-parallel 3
 sce spec pipeline run --specs "spec-a,spec-b" --max-parallel 3

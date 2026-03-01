@@ -28,6 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `.sce/specs/<spec>/custom/problem-domain-chain.json`
   - `spec gate` hard-fail rule `domain_scene_modeling` now validates both markdown structure and machine-readable chain payload:
     - `problem/ontology/hypotheses/risks/decision_execution_path/correction_loop/verification`
+- Added explicit domain modeling command set (also available via `sce spec domain ...` route):
+  - `sce spec-domain init --spec <id>`
+  - `sce spec-domain validate --spec <id> [--fail-on-error]`
+  - `sce spec-domain refresh --spec <id>`
 
 ## [3.3.23] - 2026-02-27
 

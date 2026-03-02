@@ -26,6 +26,7 @@ SCE 面向希望让 AI Agent 端到端推进交付、同时保持治理可控的
 | 能力 | SCE 提供什么 | 结果 |
 | --- | --- | --- |
 | Scene + Spec 模型 | 场景主会话治理 + Spec 生命周期（需求/设计/任务） | 长周期 AI 上下文稳定 |
+| 自动 intake + Spec 治理 | 目标意图识别、自动绑定/创建 spec、按 scene 组合治理 | 场景需求自动纳管，spec 增长可控 |
 | Studio 工作流 | `studio plan -> generate -> apply -> verify -> release` | 对话到发布路径结构化 |
 | 自动闭环交付 | `auto close-loop`、`close-loop-program`、`close-loop-controller` | 无人值守有界收敛 |
 | 多 Agent 编排 | DAG 调度、重试、429 自适应并行 | 并行执行稳定可控 |
@@ -106,6 +107,7 @@ SCE 默认按“问题域闭环”推进诊断与修复：
 默认硬规则：
 - 同一问题指纹失败两轮后，后续尝试必须补充 debug 证据。
 - 当 spec 绑定时，`studio verify/release` 默认执行 `problem-closure-gate`。
+- `studio plan` 默认执行目标 intake（自动绑定已有 spec 或新建 spec），并自动写入 scene 维度的 spec 治理快照。
 
 ---
 

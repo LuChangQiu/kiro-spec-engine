@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Studio automatic intake + spec governance baseline:
+  - new policy: `.sce/config/studio-intake-policy.json` (template/adopt/takeover managed)
+  - `studio plan` now auto-detects goal intent and resolves spec by bind/create strategy
+  - new commands:
+    - `sce studio intake`
+    - `sce studio portfolio`
+  - plan stage now auto-writes scene portfolio governance artifacts:
+    - `.sce/spec-governance/scene-portfolio.latest.json`
+    - `.sce/spec-governance/scene-index.json`
+- New intake/governance module:
+  - `lib/studio/spec-intake-governor.js`
+  - scene-level duplicate/overflow/stale spec governance summary for portfolio management
+
+### Changed
+- Takeover/adoption managed config baseline now includes `config/studio-intake-policy.json` by default.
+- README/README.zh/command reference updated for auto intake and scene-organized spec governance workflow.
+
 ## [3.4.6] - 2026-03-02
 
 ### Added

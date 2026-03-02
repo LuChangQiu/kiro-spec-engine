@@ -26,6 +26,7 @@ SCE is designed for teams that want AI agents to deliver software end-to-end wit
 | Capability | What SCE Provides | Outcome |
 | --- | --- | --- |
 | Scene + Spec model | Scene-governed sessions and Spec lifecycle (`requirements/design/tasks`) | Stable context across long AI runs |
+| Auto intake + Spec governance | Goal intent detection, auto spec bind/create, scene portfolio governance | Automatic scene-to-spec tracking with bounded spec growth |
 | Studio workflow | `studio plan -> generate -> apply -> verify -> release` | Structured chat-to-release execution |
 | Autonomous delivery | `auto close-loop`, `close-loop-program`, `close-loop-controller` | Unattended bounded convergence |
 | Multi-agent orchestration | DAG scheduling, retries, 429 adaptive parallel control | Reliable parallel execution at scale |
@@ -106,6 +107,7 @@ SCE now enforces a domain-closed diagnosis and repair route by default:
 Hard rule defaults:
 - After two failed rounds on the same problem fingerprint, debug evidence is required in subsequent attempts.
 - `studio verify/release` run `problem-closure-gate` by default when a spec is bound.
+- `studio plan` auto-runs goal intake (`bind existing spec` or `create spec`) and writes scene portfolio governance snapshots by default.
 
 ---
 

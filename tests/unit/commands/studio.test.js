@@ -7,12 +7,14 @@ const {
   readLatestJob,
   readStudioEvents,
   runStudioPlanCommand,
+  runStudioIntakeCommand,
   runStudioGenerateCommand,
   runStudioApplyCommand,
   runStudioVerifyCommand,
   runStudioReleaseCommand,
   runStudioRollbackCommand,
   runStudioEventsCommand,
+  runStudioPortfolioCommand,
   runStudioResumeCommand,
   loadStudioSecurityPolicy,
   ensureStudioAuthorization,
@@ -66,6 +68,90 @@ describe('studio command workflow', () => {
 
     const jobPath = path.join(paths.jobsDir, `${payload.job_id}.json`);
     expect(await fs.pathExists(jobPath)).toBe(true);
+  });
+
+  test('plan auto-intake creates and binds spec when scene has no matching spec', async () => {
+    const payload = await runStudioPlanCommand({
+      scene: 'scene.auto-intake',
+      fromChat: 'session-auto-intake-001',
+      goal: 'Implement order approval retry workflow',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    const paths = resolveStudioPaths(tempDir);
+    const job = await fs.readJson(path.join(paths.jobsDir, `${payload.job_id}.json`));
+    const specId = `${job.source.spec_id || ''}`.trim();
+
+    expect(specId).toBeTruthy();
+    expect(job.source.intake).toEqual(expect.objectContaining({
+      enabled: true,
+      decision: expect.objectContaining({
+        action: 'create_spec'
+      }),
+      selected_spec_id: specId
+    }));
+    expect(job.scene.spec_id).toBe(specId);
+    expect(await fs.pathExists(path.join(tempDir, '.sce', 'specs', specId, 'requirements.md'))).toBe(true);
+    expect(await fs.pathExists(path.join(tempDir, '.sce', 'specs', specId, 'custom', 'problem-domain-chain.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(tempDir, '.sce', 'spec-governance', 'scene-portfolio.latest.json'))).toBe(true);
+  });
+
+  test('studio intake supports dry decision without materializing spec', async () => {
+    const intake = await runStudioIntakeCommand({
+      scene: 'scene.intake-preview',
+      fromChat: 'session-intake-preview-001',
+      goal: 'Build warehouse anomaly reconciliation feature',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(intake.mode).toBe('studio-auto-intake');
+    expect(intake.decision.action).toBe('create_spec');
+    expect(intake.selected_spec_id).toBeTruthy();
+    expect(intake.created_spec).toBeNull();
+    expect(await fs.pathExists(path.join(tempDir, '.sce', 'specs', intake.selected_spec_id))).toBe(false);
+  });
+
+  test('studio portfolio groups specs by scene and emits governance summary', async () => {
+    const specA = 'auto-scene-order-a';
+    const specB = 'auto-scene-order-b';
+    const specARoot = path.join(tempDir, '.sce', 'specs', specA);
+    const specBRoot = path.join(tempDir, '.sce', 'specs', specB);
+    await fs.ensureDir(specARoot);
+    await fs.ensureDir(specBRoot);
+    await fs.writeFile(path.join(specARoot, 'tasks.md'), '- [ ] task a\n', 'utf8');
+    await fs.writeFile(path.join(specBRoot, 'tasks.md'), '- [ ] task b\n', 'utf8');
+    await ensureSpecDomainArtifacts(tempDir, specA, {
+      fileSystem: fs,
+      force: true,
+      sceneId: 'scene.order-governance',
+      problemStatement: 'Order approval retry policy mismatch in checkout flow',
+      verificationPlan: 'Run checkout approval regression tests'
+    });
+    await ensureSpecDomainArtifacts(tempDir, specB, {
+      fileSystem: fs,
+      force: true,
+      sceneId: 'scene.order-governance',
+      problemStatement: 'Order approval retry policy mismatch for checkout process',
+      verificationPlan: 'Run checkout approval regression tests'
+    });
+
+    const portfolio = await runStudioPortfolioCommand({
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(portfolio.mode).toBe('studio-spec-governance');
+    expect(portfolio.summary.scene_count).toBeGreaterThanOrEqual(1);
+    expect(portfolio.summary.total_specs).toBeGreaterThanOrEqual(2);
+    expect(portfolio.summary.duplicate_pairs).toBeGreaterThanOrEqual(1);
+    expect(portfolio.report_file).toBe('.sce/spec-governance/scene-portfolio.latest.json');
+    expect(await fs.pathExists(path.join(tempDir, '.sce', 'spec-governance', 'scene-portfolio.latest.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(tempDir, '.sce', 'spec-governance', 'scene-index.json'))).toBe(true);
   });
 
   test('plan with --spec ingests domain-chain and carries it through generate/verify/release reports', async () => {

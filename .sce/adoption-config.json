@@ -31,7 +31,94 @@
     "spec_domain_policy": {
       "closed_loop_research_required": true,
       "coverage_validation_required": true,
-      "fail_on_gap_default": true
+      "fail_on_gap_default": true,
+      "problem_contract_required": true,
+      "ontology_axes_required": [
+        "entity",
+        "relation",
+        "business_rule",
+        "decision_policy",
+        "execution_flow"
+      ]
+    },
+    "problem_evaluation": {
+      "enabled": true,
+      "mode": "required",
+      "enforce_on_stages": [
+        "plan",
+        "generate",
+        "apply",
+        "verify",
+        "release"
+      ],
+      "block_on_stages": [
+        "apply",
+        "release"
+      ],
+      "problem_contract_required_stages": [
+        "plan",
+        "generate",
+        "apply",
+        "verify",
+        "release"
+      ],
+      "problem_contract_block_stages": [
+        "plan",
+        "apply",
+        "release"
+      ],
+      "ontology_alignment_required_stages": [
+        "plan",
+        "generate",
+        "apply",
+        "verify",
+        "release"
+      ],
+      "ontology_alignment_block_stages": [
+        "apply",
+        "release"
+      ],
+      "convergence_required_stages": [
+        "verify",
+        "release"
+      ],
+      "convergence_block_stages": [
+        "release"
+      ],
+      "max_failed_rounds_before_debug": 2
+    },
+    "problem_closure": {
+      "enabled": true,
+      "governance_report_path": ".sce/reports/interactive-governance-report.json",
+      "verify": {
+        "require_problem_contract": true,
+        "require_domain_validation": true,
+        "require_domain_coverage": true
+      },
+      "release": {
+        "require_problem_contract": true,
+        "require_domain_validation": true,
+        "require_domain_coverage": true,
+        "require_verify_report": true,
+        "require_governance_report": false,
+        "block_on_high_governance_alerts": true
+      }
+    },
+    "studio_intake": {
+      "enabled": true,
+      "auto_create_spec": true,
+      "force_spec_for_studio_plan": true,
+      "prefer_existing_scene_spec": true,
+      "related_spec_min_score": 45,
+      "allow_new_spec_when_goal_diverges": true,
+      "divergence_similarity_threshold": 0.2,
+      "goal_missing_strategy": "create_for_tracking",
+      "governance": {
+        "auto_run_on_plan": true,
+        "max_active_specs_per_scene": 3,
+        "stale_days": 14,
+        "duplicate_similarity_threshold": 0.66
+      }
     },
     "debug_policy": {
       "prioritize_root_cause_fix": true,

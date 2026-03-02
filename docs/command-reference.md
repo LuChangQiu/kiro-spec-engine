@@ -523,6 +523,13 @@ Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
 sce studio plan --scene scene.customer-order-inventory --from-chat session-20260226 --goal "customer+order+inventory demo" --json
 # Recommended: bind spec explicitly so Studio can ingest problem-domain-chain deterministically
 sce studio plan --scene scene.customer-order-inventory --spec 01-00-customer-order-inventory --from-chat session-20260226 --goal "customer+order+inventory demo" --json
+# Disable auto intake for emergency/manual mode
+sce studio plan --scene scene.customer-order-inventory --from-chat session-20260226 --goal "customer+order+inventory demo" --manual-spec --json
+
+# Analyze intake decision only (no write by default)
+sce studio intake --scene scene.customer-order-inventory --from-chat session-20260226 --goal "optimize checkout retry flow" --json
+# Apply intake and create spec when decision is create_spec
+sce studio intake --scene scene.customer-order-inventory --from-chat session-20260226 --goal "optimize checkout retry flow" --apply --json
 
 # Generate patch bundle metadata (scene is inherited from plan)
 sce studio generate --target 331 --json
@@ -549,15 +556,26 @@ sce studio events --job <job-id> --limit 50 --json
 # Rollback a job after apply/release
 sce studio rollback --job <job-id> --reason "manual-check-failed" --json
 
+# Build scene-organized spec governance portfolio
+sce studio portfolio --json
+sce studio portfolio --scene scene.customer-order-inventory --strict --json
+
 # Enforce authorization for a protected action
 SCE_STUDIO_REQUIRE_AUTH=1 SCE_STUDIO_AUTH_PASSWORD=top-secret sce studio apply --job <job-id> --auth-password top-secret --json
 ```
 
 Stage guardrails are enforced by default:
 - `plan` requires `--scene`; SCE binds one active primary session per scene
+- `plan` runs auto intake by default (`.sce/config/studio-intake-policy.json`):
+  - detect goal intent (`change_request` vs `analysis_only`)
+  - resolve spec via explicit binding / scene latest / related specs / auto-create
+  - auto-create spec artifacts when no suitable spec is found and policy requires tracking
 - `plan --spec <id>` (recommended) ingests `.sce/specs/<spec>/custom/problem-domain-chain.json` into studio job context
 - when `--spec` is omitted, `plan` auto-resolves the latest matching spec chain by `scene_id` when available
 - `plan` auto-searches related historical specs by `scene + goal` and writes top candidates into job metadata (`source.related_specs`)
+- `plan` auto-runs scene spec governance snapshot and writes:
+  - `.sce/spec-governance/scene-portfolio.latest.json`
+  - `.sce/spec-governance/scene-index.json`
 - successful `release` auto-archives current scene session and auto-opens the next scene cycle session
 - `generate` requires `plan`
 - `generate` consumes the plan-stage domain-chain context and writes chain-aware metadata/report (`.sce/reports/studio/generate-<job-id>.json`)
@@ -629,6 +647,24 @@ Default policy file (recommended to commit): `.sce/config/studio-security.json`
   "enabled": false,
   "require_auth_for": ["apply", "release", "rollback"],
   "password_env": "SCE_STUDIO_AUTH_PASSWORD"
+}
+```
+
+Studio intake policy file (default, recommended to commit): `.sce/config/studio-intake-policy.json`
+
+```json
+{
+  "enabled": true,
+  "auto_create_spec": true,
+  "force_spec_for_studio_plan": true,
+  "prefer_existing_scene_spec": true,
+  "related_spec_min_score": 45,
+  "governance": {
+    "auto_run_on_plan": true,
+    "max_active_specs_per_scene": 3,
+    "stale_days": 14,
+    "duplicate_similarity_threshold": 0.66
+  }
 }
 ```
 

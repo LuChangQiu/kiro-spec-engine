@@ -1,0 +1,6 @@
+{
+  "schema_version": "1.0",
+  "closed_loop_research_required": true,
+  "coverage_validation_required": true,
+  "fail_on_gap_default": true
+}

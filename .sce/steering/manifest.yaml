@@ -1,0 +1,17 @@
+schema_version: '1.0'
+engine: sce
+profile: default
+description: SCE universal steering contract for cross-agent orchestration
+layers:
+  core_principles: CORE_PRINCIPLES.md
+  environment: ENVIRONMENT.md
+  current_context: CURRENT_CONTEXT.md
+  rules_guide: RULES_GUIDE.md
+compatibility:
+  codex: '>=0.0.0'
+  claude: '>=0.0.0'
+  cursor: '>=0.0.0'
+  generic: '*'
+session:
+  root: .sce/sessions
+  default_status: active

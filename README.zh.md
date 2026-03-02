@@ -1,4 +1,4 @@
-﻿# SCE - Scene Capability Engine
+# SCE - Scene Capability Engine
 
 [![npm version](https://badge.fury.io/js/scene-capability-engine.svg)](https://badge.fury.io/js/scene-capability-engine)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -100,6 +100,10 @@ SCE 对工具无锁定，可接入 Codex、Claude Code、Cursor、Windsurf、VS 
 - 运行时上下文统一由 `.sce/` 管理（不依赖特定 IDE 隐藏目录）。
 - 会话治理默认场景优先：`1 scene = 1 primary session`。
 - Spec 执行作为子会话自动归档，支持跨轮次追踪。
+- 启动时会自动识别已接管项目并对齐接管基线默认配置。
+- 也可显式审计/修正接管基线：
+  - `sce workspace takeover-audit --json`
+  - `sce workspace takeover-apply --json`
 
 ---
 
@@ -140,5 +144,5 @@ MIT，见 [LICENSE](LICENSE)。
 
 ---
 
-**版本**：3.3.26  
+**版本**：3.4.1  
 **最后更新**：2026-03-02

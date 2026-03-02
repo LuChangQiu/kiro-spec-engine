@@ -29,6 +29,7 @@ const {
   migrateLegacyKiroDirectories,
 } = require('../lib/workspace/legacy-kiro-migrator');
 const { auditSceTracking } = require('../lib/workspace/sce-tracking-audit');
+const { applyTakeoverBaseline } = require('../lib/workspace/takeover-baseline');
 
 const i18n = getI18n();
 const t = (key, params) => i18n.t(key, params);
@@ -165,6 +166,31 @@ function isLegacyMigrationAllowlistedCommand(args) {
   }
 
   return false;
+}
+
+/**
+ * Commands that should inspect drift before auto-takeover mutates state.
+ *
+ * @param {string[]} args
+ * @returns {boolean}
+ */
+function isTakeoverAutoApplySkippedCommand(args) {
+  if (!Array.isArray(args) || args.length === 0) {
+    return false;
+  }
+
+  const commandIndex = findCommandIndex(args);
+  if (commandIndex < 0) {
+    return false;
+  }
+
+  const command = args[commandIndex];
+  if (command !== 'workspace') {
+    return false;
+  }
+
+  const subcommand = args[commandIndex + 1];
+  return subcommand === 'takeover-audit';
 }
 
 // 版本和基本信息
@@ -761,6 +787,70 @@ workspaceCmd
     }
   });
 
+workspaceCmd
+  .command('takeover-audit')
+  .description('Audit whether project takeover baseline is aligned with current SCE defaults')
+  .option('--json', 'Output in JSON format')
+  .option('--strict', 'Exit non-zero when takeover drift is detected')
+  .action(async (options) => {
+    const report = await applyTakeoverBaseline(process.cwd(), {
+      apply: false,
+      writeReport: false,
+      sceVersion: packageJson.version
+    });
+
+    if (options.json) {
+      console.log(JSON.stringify(report, null, 2));
+    } else if (!report.detected_project) {
+      console.log(chalk.gray(report.message || 'No .sce project detected.'));
+    } else if (report.passed) {
+      console.log(chalk.green('✓ Takeover baseline audit passed.'));
+      console.log(chalk.gray(`Aligned files: ${report.summary.unchanged}`));
+    } else {
+      console.log(chalk.yellow('⚠ Takeover baseline drift detected.'));
+      console.log(chalk.gray(`Pending fixes: ${report.summary.pending}`));
+      report.files
+        .filter((item) => item.status === 'pending')
+        .forEach((item) => {
+          console.log(chalk.gray(`  - ${item.path}`));
+        });
+    }
+
+    if (report.detected_project && options.strict && !report.passed) {
+      process.exitCode = 1;
+    }
+  });
+
+workspaceCmd
+  .command('takeover-apply')
+  .description('Apply takeover baseline defaults for current SCE operating mode')
+  .option('--json', 'Output in JSON format')
+  .action(async (options) => {
+    const report = await applyTakeoverBaseline(process.cwd(), {
+      apply: true,
+      writeReport: true,
+      sceVersion: packageJson.version
+    });
+
+    if (options.json) {
+      console.log(JSON.stringify(report, null, 2));
+      return;
+    }
+
+    if (!report.detected_project) {
+      console.log(chalk.gray(report.message || 'No .sce project detected.'));
+      return;
+    }
+
+    console.log(chalk.green('✓ Takeover baseline applied.'));
+    console.log(chalk.gray(`Created: ${report.summary.created}`));
+    console.log(chalk.gray(`Updated: ${report.summary.updated}`));
+    console.log(chalk.gray(`Unchanged: ${report.summary.unchanged}`));
+    if (report.report_file) {
+      console.log(chalk.gray(`Report: ${report.report_file}`));
+    }
+  });
+
 // Environment configuration management commands
 const envCommand = require('../lib/commands/env');
 
@@ -979,6 +1069,7 @@ async function updateProjectConfig(projectName) {
   // Parse startup flags and guardrails
   const args = process.argv.slice(2);
   const isLegacyAllowlistedCommand = isLegacyMigrationAllowlistedCommand(args);
+  const skipAutoTakeover = isTakeoverAutoApplySkippedCommand(args);
   const skipCheck = args.includes('--skip-steering-check') || 
                     process.env.KSE_SKIP_STEERING_CHECK === '1';
   const forceCheck = args.includes('--force-steering-check');
@@ -993,6 +1084,18 @@ async function updateProjectConfig(projectName) {
       console.error(chalk.gray('Review first:  sce workspace legacy-migrate --dry-run'));
       console.error(chalk.gray('Apply manually: sce workspace legacy-migrate --confirm'));
       process.exit(2);
+    }
+  }
+
+  if (!isLegacyAllowlistedCommand && !skipAutoTakeover) {
+    try {
+      await applyTakeoverBaseline(process.cwd(), {
+        apply: true,
+        writeReport: true,
+        sceVersion: packageJson.version
+      });
+    } catch (_error) {
+      // Startup auto-takeover is best effort and should not block commands.
     }
   }
   

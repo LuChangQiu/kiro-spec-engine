@@ -2,7 +2,7 @@
 
 > Quick reference for all `sce` commands
 
-**Version**: 3.3.26
+**Version**: 3.4.1
 **Last Updated**: 2026-03-02
 
 ---
@@ -305,9 +305,20 @@ sce workspace legacy-migrate --dry-run --json
 sce workspace tracking-audit
 sce workspace tracking-audit --json
 
+# Audit takeover baseline drift (non-mutating)
+sce workspace takeover-audit
+sce workspace takeover-audit --json
+sce workspace takeover-audit --strict
+
+# Apply takeover baseline defaults explicitly
+sce workspace takeover-apply
+sce workspace takeover-apply --json
+
 # Safety guardrail (default):
 # If legacy .kiro directories exist, sce blocks non-migration commands
 # until manual migration is completed.
+# For adopted projects, startup auto-runs takeover baseline alignment
+# before command execution (best effort, non-blocking).
 
 # Legacy commands (still supported)
 sce workspace sync

@@ -1,4 +1,4 @@
-﻿# SCE - Scene Capability Engine
+# SCE - Scene Capability Engine
 
 [![npm version](https://badge.fury.io/js/scene-capability-engine.svg)](https://badge.fury.io/js/scene-capability-engine)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -100,6 +100,10 @@ SCE is tool-agnostic and works with Codex, Claude Code, Cursor, Windsurf, VS Cod
 - Runtime context is managed by `.sce/` (not IDE-specific hidden folders).
 - Session governance is scene-first: `1 scene = 1 primary session`.
 - Spec work is attached as child sessions and auto-archived.
+- Startup now auto-detects adopted projects and aligns takeover baseline defaults automatically.
+- You can inspect or force-align baseline explicitly:
+  - `sce workspace takeover-audit --json`
+  - `sce workspace takeover-apply --json`
 
 ---
 
@@ -140,5 +144,5 @@ MIT. See [LICENSE](LICENSE).
 
 ---
 
-**Version**: 3.3.26  
+**Version**: 3.4.1  
 **Last Updated**: 2026-03-02

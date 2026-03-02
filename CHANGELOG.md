@@ -59,6 +59,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `sce studio plan` now auto-loads related historical specs into job metadata (`source.related_specs`)
 - SCE now captures timeline checkpoints by default on `studio`/`session` key operations, and performs interval auto-check in the same checkpoint pipeline to reduce local history-loss risk.
 
+## [3.4.1] - 2026-03-02
+
+### Added
+- Project takeover baseline automation:
+  - new workspace commands:
+    - `sce workspace takeover-audit [--json] [--strict]`
+    - `sce workspace takeover-apply [--json]`
+  - new baseline reconciler: `lib/workspace/takeover-baseline.js`
+  - startup now auto-detects adopted projects and best-effort aligns baseline defaults
+  - baseline report output: `.sce/reports/takeover-baseline-latest.json`
+  - baseline managed config files:
+    - `.sce/adoption-config.json`
+    - `.sce/auto/config.json`
+    - `.sce/config/takeover-baseline.json`
+    - `.sce/config/session-governance.json`
+    - `.sce/config/spec-domain-policy.json`
+
+### Changed
+- `sce adopt` and `sce upgrade` now enforce takeover baseline alignment automatically on success.
+
 ## [3.3.23] - 2026-02-27
 
 ### Added

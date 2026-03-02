@@ -1,0 +1,8 @@
+{
+  "schema_version": "1.0",
+  "scene_primary_session_required": true,
+  "one_scene_one_primary_session": true,
+  "spec_runs_bind_child_session": true,
+  "scene_completion_auto_rollover": true,
+  "auto_archive_spec_sessions": true
+}

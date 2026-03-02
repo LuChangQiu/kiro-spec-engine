@@ -130,6 +130,7 @@ SCE 对工具无锁定，可接入 Codex、Claude Code、Cursor、Windsurf、VS 
 
 ## 重要版本变更
 
+- `3.5.0`：新增 Studio 目标自动 intake + 场景 spec 组合治理（`sce studio intake`、`sce studio portfolio`），并默认启用 intake 策略基线与治理快照产物，控制场景内 spec 无序增长。
 - `3.4.6`：新增默认 `problem-closure-gate` + `problem-contract` 基线，并强化问题评估强制维度（`problem_contract`/`ontology_alignment`/`convergence`），提升 verify/release 收敛控制。
 - `3.4.5`：`git-managed-gate` 在默认 CI 放宽模式下（`CI/GITHUB_ACTIONS` 且非 strict）对工作区变更改为告警，不再误阻断发布。
 - `3.4.4`：新增 `SCE_GIT_MANAGEMENT_ALLOW_UNTRACKED=1` / `--allow-untracked`；发布工作流在 npm publish 前生成证据资产时可放行未跟踪文件。
@@ -176,5 +177,5 @@ MIT，见 [LICENSE](LICENSE)。
 
 ---
 
-**版本**：3.4.6  
+**版本**：3.5.0  
 **最后更新**：2026-03-02

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.0] - 2026-03-02
+
 ### Added
 - Studio automatic intake + spec governance baseline:
   - new policy: `.sce/config/studio-intake-policy.json` (template/adopt/takeover managed)

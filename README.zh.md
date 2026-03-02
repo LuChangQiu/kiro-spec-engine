@@ -3,7 +3,7 @@
 [![npm version](https://badge.fury.io/js/scene-capability-engine.svg)](https://badge.fury.io/js/scene-capability-engine)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**SCE 是面向 AI 原生软件交付的场景能力编排引擎。**  
+**SCE 是面向 AI 原生软件交付的场景能力引擎。**  
 它提供从 `goal -> scene -> spec -> patch -> verify -> release` 的可控闭环。
 
 [English](README.md) | 简体中文
@@ -30,6 +30,7 @@ SCE 面向希望让 AI Agent 端到端推进交付、同时保持治理可控的
 | 自动闭环交付 | `auto close-loop`、`close-loop-program`、`close-loop-controller` | 无人值守有界收敛 |
 | 多 Agent 编排 | DAG 调度、重试、429 自适应并行 | 并行执行稳定可控 |
 | 领域/本体治理 | problem-domain chain + scene template + gate 校验 | 降低语义回归 |
+| 问题评估路由 | 分阶段风险/证据/就绪度评分 + 强制策略 | `apply/release` 可控阻断，执行路径自适应 |
 | 本地时间线安全 | `timeline save/auto/list/show/restore/push` + 关键节点自动打点 | 本地历史可回放可恢复 |
 | Errorbook 修复体系 | 本地 + 注册表错题库 + 发布门禁 | 定位更快、修复更稳 |
 | 发布治理 | git 管理门禁、errorbook 门禁、handoff preflight、tag 发布链路 | 可审计、可复现发布 |
@@ -101,6 +102,7 @@ SCE 对工具无锁定，可接入 Codex、Claude Code、Cursor、Windsurf、VS 
 - 会话治理默认场景优先：`1 scene = 1 primary session`。
 - Spec 执行作为子会话自动归档，支持跨轮次追踪。
 - 启动时会自动识别已接管项目并对齐接管基线默认配置。
+- 问题评估策略默认启用（`.sce/config/problem-eval-policy.json`），Studio 各阶段都会执行评估。
 - 错误处理默认进入完整 incident 闭环：每次记录先落到 staging 试错链路，verified/promoted 后自动收束归档。
 - 也可显式审计/修正接管基线：
   - `sce workspace takeover-audit --json`
@@ -145,5 +147,5 @@ MIT，见 [LICENSE](LICENSE)。
 
 ---
 
-**版本**：3.4.2  
+**版本**：3.4.3  
 **最后更新**：2026-03-02

@@ -30,6 +30,7 @@ SCE is designed for teams that want AI agents to deliver software end-to-end wit
 | Autonomous delivery | `auto close-loop`, `close-loop-program`, `close-loop-controller` | Unattended bounded convergence |
 | Multi-agent orchestration | DAG scheduling, retries, 429 adaptive parallel control | Reliable parallel execution at scale |
 | Domain/ontology governance | problem-domain chain + scene template + gate validation | Fewer semantic regressions |
+| Problem evaluation routing | Stage-level risk/evidence/readiness scoring with mandatory policy | Adaptive execution strategy with guarded apply/release |
 | Local timeline safety | `timeline save/auto/list/show/restore/push` + key-event auto checkpoints | Recoverable local history |
 | Errorbook-driven repair | Local + registry-backed error patterns and release gates | Faster diagnosis and safer fixes |
 | Release governance | Git-managed gate, errorbook gate, handoff preflight, tag pipeline | Auditable, reproducible releases |
@@ -101,6 +102,7 @@ SCE is tool-agnostic and works with Codex, Claude Code, Cursor, Windsurf, VS Cod
 - Session governance is scene-first: `1 scene = 1 primary session`.
 - Spec work is attached as child sessions and auto-archived.
 - Startup now auto-detects adopted projects and aligns takeover baseline defaults automatically.
+- Problem evaluation policy is enabled by default (`.sce/config/problem-eval-policy.json`) and evaluates every Studio stage.
 - Error handling now follows a full incident loop by default: every record attempt is staged first and auto-closed on verified/promoted outcomes.
 - You can inspect or force-align baseline explicitly:
   - `sce workspace takeover-audit --json`
@@ -145,5 +147,5 @@ MIT. See [LICENSE](LICENSE).
 
 ---
 
-**Version**: 3.4.2  
+**Version**: 3.4.3  
 **Last Updated**: 2026-03-02

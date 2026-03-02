@@ -2,7 +2,7 @@
 
 > Quick reference for all `sce` commands
 
-**Version**: 3.4.2
+**Version**: 3.4.3
 **Last Updated**: 2026-03-02
 
 ---
@@ -560,6 +560,22 @@ Stage guardrails are enforced by default:
 - `verify` requires `apply`
 - `release` requires `verify`
 - `verify` / `release` reports and failure auto-records inherit `spec_id + domain-chain` context for better root-cause traceability
+
+Problem evaluation mode (default required):
+- Studio now runs problem evaluation on every stage: `plan`, `generate`, `apply`, `verify`, `release`.
+- Default policy file: `.sce/config/problem-eval-policy.json` (also provisioned by template/adopt/takeover baseline).
+- Default hard-block stages: `apply`, `release`.
+- Evaluation combines risk/evidence/readiness and emits adaptive strategy:
+  - `direct-execution`
+  - `controlled-execution`
+  - `evidence-first`
+  - `explore-and-validate`
+  - `debug-first`
+- Evaluation report artifact is written to `.sce/reports/problem-eval/<job-id>-<stage>.json`.
+- Stage metadata and event payload now include `problem_evaluation` summary plus artifact pointer.
+- Environment overrides:
+  - `SCE_PROBLEM_EVAL_MODE=off|advisory|required`
+  - `SCE_PROBLEM_EVAL_DISABLED=1`
 
 Studio gate execution defaults:
 - `verify --profile standard` runs executable gates (unit test script when available, interactive governance report when present, scene package publish-batch dry-run when handoff manifest exists)

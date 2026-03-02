@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "enabled": true,
+  "mode": "required",
+  "enforce_on_stages": [
+    "plan",
+    "generate",
+    "apply",
+    "verify",
+    "release"
+  ],
+  "block_on_stages": [
+    "apply",
+    "release"
+  ],
+  "min_confidence_by_stage": {
+    "plan": 20,
+    "generate": 25,
+    "apply": 30,
+    "verify": 35,
+    "release": 40
+  },
+  "high_risk_requires_debug_evidence": true,
+  "high_risk_keywords": [
+    "auth",
+    "payment",
+    "security",
+    "delete",
+    "rollback",
+    "production",
+    "migrate",
+    "compliance",
+    "data-loss"
+  ],
+  "recommendation_limit": 6
+}

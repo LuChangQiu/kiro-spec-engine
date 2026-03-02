@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.3] - 2026-03-02
+
 ### Added
 - Errorbook registry health command for centralized registry governance:
   - `sce errorbook health-registry`
@@ -25,6 +27,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `problem-domain-chain.json` now includes `research_coverage` contract
   - new command: `sce spec domain coverage --spec <id> [--fail-on-gap]`
   - `sce spec domain validate` now reports coverage summary and supports `--fail-on-gap`
+- Mandatory problem evaluation policy baseline:
+  - new policy file: `.sce/config/problem-eval-policy.json`
+  - template baseline now ships the same policy at `template/.sce/config/problem-eval-policy.json`
+  - new evaluator module: `lib/problem/problem-evaluator.js`
+  - evaluation reports are persisted to `.sce/reports/problem-eval/<job-id>-<stage>.json`
 
 ### Changed
 - `prepublishOnly` now runs `gate:errorbook-registry-health` in advisory mode before `errorbook-release` gate.
@@ -58,6 +65,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - supports query/scene/spec-seeded lookup and relevance ranking
   - `sce studio plan` now auto-loads related historical specs into job metadata (`source.related_specs`)
 - SCE now captures timeline checkpoints by default on `studio`/`session` key operations, and performs interval auto-check in the same checkpoint pipeline to reduce local history-loss risk.
+- `studio` stage flow now enforces problem evaluation on every stage (`plan/generate/apply/verify/release`) and writes `problem_evaluation` summaries into stage metadata/events.
+- `apply` and `release` now support policy-based hard block by default when evaluation blockers are present; advisory/disabled behavior is controlled by `SCE_PROBLEM_EVAL_MODE` / `SCE_PROBLEM_EVAL_DISABLED`.
+- Takeover/adoption defaults and file classification now include `config/problem-eval-policy.json` as managed config.
 
 ## [3.4.2] - 2026-03-02
 

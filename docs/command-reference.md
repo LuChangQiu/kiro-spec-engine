@@ -550,6 +550,8 @@ sce studio resume --job <job-id> --json
 
 # Inspect recent stage events
 sce studio events --job <job-id> --limit 50 --json
+# Map OpenHands raw events into the same task-stream contract
+sce studio events --job <job-id> --openhands-events ./openhands-events.json --json
 
 # Rollback a job after apply/release
 sce studio rollback --job <job-id> --reason "manual-check-failed" --json
@@ -566,6 +568,16 @@ sce studio backfill-spec-scenes --scene scene.unassigned --limit 20 --apply --js
 # Enforce authorization for a protected action
 SCE_STUDIO_REQUIRE_AUTH=1 SCE_STUDIO_AUTH_PASSWORD=top-secret sce studio apply --job <job-id> --auth-password top-secret --json
 ```
+
+Studio JSON output now includes a stable UI-oriented task stream contract (in addition to existing `job_*` fields):
+- root IDs: `sessionId`, `sceneId`, `specId`, `taskId`, `eventId`
+- `task.goal`, `task.status`, `task.summary` (fixed 3-line summary), `task.handoff`, `task.next_action`
+- `task.file_changes[]`: `path`, `line`, `diffRef`
+- `task.commands[]`: `cmd`, `exit_code`, `stdout`, `stderr`, `log_path`
+- `task.errors[]`: `message`, `error_bundle` (copy-ready diagnostic bundle)
+- `task.evidence[]`: structured evidence references
+- `event[]`: raw audit event stream (`studio events` also keeps legacy `events[]` for compatibility)
+- `studio events --openhands-events <path>` switches `source_stream=openhands` and maps OpenHands raw events to the same task contract fields.
 
 Stage guardrails are enforced by default:
 - `plan` requires `--scene`; SCE binds one active primary session per scene

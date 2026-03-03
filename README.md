@@ -128,6 +128,16 @@ SCE is tool-agnostic and works with Codex, Claude Code, Cursor, Windsurf, VS Cod
   - `sce workspace takeover-audit --json`
   - `sce workspace takeover-apply --json`
 
+Studio task-stream output contract (default):
+- IDs: `sessionId`, `sceneId`, `specId`, `taskId`, `eventId`
+- Task: `task.goal`, `task.status`, `task.summary` (3-line), `task.handoff`, `task.next_action`
+- File refs: `task.file_changes[]` with `path`, `line`, `diffRef`
+- Command logs: `task.commands[]` with `cmd`, `exit_code`, `stdout`, `stderr`, `log_path`
+- Errors: `task.errors[]` with `message`, `error_bundle` (copy-ready)
+- Evidence: `task.evidence[]`
+- Raw audit stream: `event[]` (and `studio events` keeps `events[]` compatibility field)
+- OpenHands bridge: `sce studio events --openhands-events <path>` maps OpenHands raw events into the same task contract (`source_stream=openhands`)
+
 ---
 
 ## Important Version Changes

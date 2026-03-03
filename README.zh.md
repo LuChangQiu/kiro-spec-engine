@@ -128,6 +128,16 @@ SCE 对工具无锁定，可接入 Codex、Claude Code、Cursor、Windsurf、VS 
   - `sce workspace takeover-audit --json`
   - `sce workspace takeover-apply --json`
 
+Studio 任务流输出契约（默认）：
+- ID 字段：`sessionId`、`sceneId`、`specId`、`taskId`、`eventId`
+- 任务主体：`task.goal`、`task.status`、`task.summary`（固定三行）、`task.handoff`、`task.next_action`
+- 文件引用：`task.file_changes[]`（`path`、`line`、`diffRef`）
+- 命令执行：`task.commands[]`（`cmd`、`exit_code`、`stdout`、`stderr`、`log_path`）
+- 错误复制：`task.errors[]`（`message`、`error_bundle`，可直接复制给 AI 修复）
+- 证据引用：`task.evidence[]`
+- 原始审计流：`event[]`（`studio events` 同时保留 `events[]` 兼容字段）
+- OpenHands 桥接：`sce studio events --openhands-events <path>` 可将 OpenHands 原始事件映射为同一 task 契约（`source_stream=openhands`）
+
 ---
 
 ## 重要版本变更

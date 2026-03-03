@@ -62,6 +62,25 @@ describe('studio command workflow', () => {
     expect(payload.status).toBe('planned');
     expect(payload.job_id).toContain('studio-');
     expect(payload.next_action).toContain('sce studio generate');
+    expect(payload.sceneId).toBe('scene.customer-order-inventory');
+    expect(payload.sessionId).toBeTruthy();
+    expect(payload.specId).toBeTruthy();
+    expect(payload.taskId).toBe(`${payload.job_id}:plan`);
+    expect(payload.eventId).toMatch(/^evt-/);
+    expect(payload.task).toEqual(expect.objectContaining({
+      goal: 'Build customer-order-inventory demo',
+      status: 'completed',
+      next_action: expect.stringContaining('sce studio generate')
+    }));
+    expect(Array.isArray(payload.task.summary)).toBe(true);
+    expect(payload.task.summary).toHaveLength(3);
+    expect(Array.isArray(payload.task.file_changes)).toBe(true);
+    expect(Array.isArray(payload.task.commands)).toBe(true);
+    expect(Array.isArray(payload.task.errors)).toBe(true);
+    expect(Array.isArray(payload.task.evidence)).toBe(true);
+    expect(Array.isArray(payload.event)).toBe(true);
+    expect(payload.event).toHaveLength(1);
+    expect(payload.event[0].event_id).toBe(payload.eventId);
 
     const paths = resolveStudioPaths(tempDir);
     const latestJobId = await readLatestJob(paths);
@@ -391,6 +410,9 @@ describe('studio command workflow', () => {
     });
     expect(verified.status).toBe('verified');
     expect(verified.artifacts.verify_report).toContain(`verify-${planned.job_id}.json`);
+    expect(verified.taskId).toBe(`${planned.job_id}:verify`);
+    expect(Array.isArray(verified.task.commands)).toBe(true);
+    expect(verified.task.commands.length).toBeGreaterThan(0);
 
     const released = await runStudioReleaseCommand({
       channel: 'prod',
@@ -570,6 +592,14 @@ describe('studio command workflow', () => {
     }, {
       projectPath: tempDir
     });
+    expect(eventsPayload.sceneId).toBe('scene.inventory');
+    expect(eventsPayload.taskId).toBe(`${planned.job_id}:rollback`);
+    expect(Array.isArray(eventsPayload.event)).toBe(true);
+    expect(eventsPayload.event).toHaveLength(eventsPayload.events.length);
+    expect(eventsPayload.eventId).toBe(eventsPayload.events[eventsPayload.events.length - 1].event_id);
+    expect(eventsPayload.task.handoff).toEqual(expect.objectContaining({
+      stage: 'rollback'
+    }));
     expect(eventsPayload.events.length).toBeGreaterThanOrEqual(4);
     expect(eventsPayload.events[eventsPayload.events.length - 1].event_type).toBe('job.rolled_back');
 
@@ -583,6 +613,75 @@ describe('studio command workflow', () => {
     }, {
       projectPath: tempDir
     })).rejects.toThrow('is rolled back');
+  });
+
+  test('maps OpenHands raw events into task-stream contract for UI consumption', async () => {
+    const planned = await runStudioPlanCommand({
+      scene: 'scene.openhands-ui',
+      fromChat: 'session-openhands-001',
+      goal: 'repair flaky orchestration suite',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    const openhandsEventsPath = path.join(tempDir, 'openhands-events.json');
+    await fs.writeJson(openhandsEventsPath, [
+      {
+        id: 'oh-1',
+        type: 'tool_call',
+        timestamp: '2026-03-03T00:00:00.000Z',
+        tool_name: 'run_command',
+        arguments: {
+          command: 'npm run test:full'
+        }
+      },
+      {
+        id: 'oh-2',
+        type: 'tool_result',
+        timestamp: '2026-03-03T00:00:02.000Z',
+        command: 'npm run test:full',
+        exit_code: 1,
+        stderr: 'Jest worker encountered 4 child process exceptions',
+        changed_files: ['lib/commands/studio.js']
+      },
+      {
+        id: 'oh-3',
+        type: 'file_edit',
+        timestamp: '2026-03-03T00:00:05.000Z',
+        file: {
+          path: 'lib/commands/studio.js',
+          line: 640
+        },
+        diff: '+++ b/lib/commands/studio.js\n@@'
+      }
+    ], { spaces: 2 });
+
+    const payload = await runStudioEventsCommand({
+      job: planned.job_id,
+      openhandsEvents: openhandsEventsPath,
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(payload.source_stream).toBe('openhands');
+    expect(payload.openhands_events_file).toBe('openhands-events.json');
+    expect(payload.sceneId).toBe('scene.openhands-ui');
+    expect(payload.specId).toBeTruthy();
+    expect(payload.taskId).toBe(`${planned.job_id}:plan`);
+    expect(payload.eventId).toBe('oh-3');
+    expect(payload.event).toHaveLength(3);
+    expect(payload.events).toHaveLength(3);
+    expect(payload.task.summary).toHaveLength(3);
+    expect(payload.task.handoff).toEqual(expect.objectContaining({
+      source_stream: 'openhands',
+      openhands_event_count: 3
+    }));
+    expect(payload.task.commands.length).toBeGreaterThanOrEqual(1);
+    expect(payload.task.file_changes.some((item) => item.path === 'lib/commands/studio.js')).toBe(true);
+    expect(payload.task.errors.length).toBeGreaterThanOrEqual(1);
+    expect(payload.task.errors[0].error_bundle).toContain('exit_code: 1');
   });
 
   test('requires authorization for protected actions when policy is enabled', async () => {

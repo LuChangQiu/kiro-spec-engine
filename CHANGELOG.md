@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Studio task-stream contract in command JSON payloads:
+  - root IDs: `sessionId`, `sceneId`, `specId`, `taskId`, `eventId`
+  - normalized task payload: `task.goal`, `task.status`, `task.summary`, `task.handoff`, `task.next_action`
+  - UI-ready arrays: `task.file_changes[]`, `task.commands[]`, `task.errors[]`, `task.evidence[]`
+  - raw audit passthrough: `event[]` (with `studio events` keeping `events[]` compatibility)
+- OpenHands bridge for task stream:
+  - `sce studio events --openhands-events <path>`
+  - supports `.json`/`.jsonl` raw OpenHands events ingestion and maps to SCE task contract fields
+
+### Changed
+- `studio verify/release` now persist `gate_steps` in stage metadata so command execution details can be surfaced in `task.commands[]` and `task.errors[]`.
+
 ## [3.5.1] - 2026-03-03
 
 ### Added

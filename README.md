@@ -142,6 +142,7 @@ Studio task-stream output contract (default):
 
 ## Important Version Changes
 
+- `3.5.2`: Introduced task-stream output contract for Studio commands (`sessionId/sceneId/specId/taskId/eventId`, structured `task.*` fields, `event[]` audit stream) and added OpenHands raw-event bridge via `sce studio events --openhands-events <path>`.
 - `3.5.1`: Enforced stricter Studio intake defaults (`--manual-spec` and `--no-spec-governance` blocked unless policy override), added historical spec scene backfill command (`sce studio backfill-spec-scenes`) and persisted override mapping (`.sce/spec-governance/spec-scene-overrides.json`) for portfolio/related-spec alignment.
 - `3.5.0`: Added Studio automatic goal intake + scene spec portfolio governance (`sce studio intake`, `sce studio portfolio`), including default intake policy baseline and governance artifacts for bounded scene spec growth.
 - `3.4.6`: Added default `problem-closure-gate` + `problem-contract` baseline and strengthened mandatory problem evaluation dimensions (`problem_contract`/`ontology_alignment`/`convergence`) for verify/release convergence control.
@@ -190,5 +191,5 @@ MIT. See [LICENSE](LICENSE).
 
 ---
 
-**Version**: 3.5.1  
+**Version**: 3.5.2  
 **Last Updated**: 2026-03-03

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.2] - 2026-03-03
+
 ### Added
 - Studio task-stream contract in command JSON payloads:
   - root IDs: `sessionId`, `sceneId`, `specId`, `taskId`, `eventId`

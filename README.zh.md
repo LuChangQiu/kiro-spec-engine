@@ -142,6 +142,7 @@ Studio 任务流输出契约（默认）：
 
 ## 重要版本变更
 
+- `3.5.2`：新增 Studio 任务流输出契约（`sessionId/sceneId/specId/taskId/eventId`、结构化 `task.*` 字段、`event[]` 审计流），并新增 OpenHands 原始事件桥接能力：`sce studio events --openhands-events <path>`。
 - `3.5.1`：默认强化 Studio intake 治理（`--manual-spec`、`--no-spec-governance` 在未显式放开策略时会被阻断），新增历史 spec 场景回填命令 `sce studio backfill-spec-scenes`，并写入 `.sce/spec-governance/spec-scene-overrides.json` 以统一 portfolio 与 related-spec 的场景映射。
 - `3.5.0`：新增 Studio 目标自动 intake + 场景 spec 组合治理（`sce studio intake`、`sce studio portfolio`），并默认启用 intake 策略基线与治理快照产物，控制场景内 spec 无序增长。
 - `3.4.6`：新增默认 `problem-closure-gate` + `problem-contract` 基线，并强化问题评估强制维度（`problem_contract`/`ontology_alignment`/`convergence`），提升 verify/release 收敛控制。
@@ -190,5 +191,5 @@ MIT，见 [LICENSE](LICENSE)。
 
 ---
 
-**版本**：3.5.1  
+**版本**：3.5.2  
 **最后更新**：2026-03-03

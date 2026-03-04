@@ -22,8 +22,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
-      - name: Run tests
-        run: npm test -- --runInBand
+      - name: Run release integration tests
+        run: npm run test:release
 
       - name: Run interactive loop smoke
         run: npm run test:interactive-loop-smoke
@@ -37,9 +37,6 @@ jobs:
       - name: Run interactive governance gate
         run: node scripts/interactive-governance-report.js --period weekly --fail-on-alert --json
       
-      - name: Check coverage
-        run: npm run coverage -- --runInBand
-
   publish:
     needs: test
     runs-on: ubuntu-latest

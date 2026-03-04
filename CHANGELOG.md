@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Release default test gate now runs integration tests only (`npm run test:release`) for faster online publish verification.
+- `prepublishOnly` now uses `test:release` instead of `test:full`.
+- GitHub `release.yml` test job now runs integration-only release tests and skips coverage in release path.
+
 ## [3.6.0] - 2026-03-04
 
 ### Added

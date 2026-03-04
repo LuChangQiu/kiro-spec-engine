@@ -7,10 +7,10 @@
 ## 1. 功能验证
 
 ```bash
-# 快速 CI 冒烟（integration 为主）
-npm run test:smoke
+# 默认发布测试门禁（仅 integration）
+npm run test:release
 
-# 全量回归（unit + integration + properties）
+# 可选全量回归（unit + integration + properties）
 npm run test:full
 
 # 防回归：禁止新增 .skip 测试

@@ -7,10 +7,10 @@
 ## 1. Functional Verification
 
 ```bash
-# Fast CI smoke suite (integration-focused)
-npm run test:smoke
+# Default release test gate (integration-only)
+npm run test:release
 
-# Full regression suite (unit + integration + properties)
+# Optional full regression suite (unit + integration + properties)
 npm run test:full
 
 # Guardrail: fail on newly introduced .skip tests

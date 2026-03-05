@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.7] - 2026-03-05
+
+### Fixed
+- `state-migration-reconciliation-gate` now treats `blocking` checks as advisory by default and only fails when `--fail-on-blocking` is explicitly set.
+- Release workflow reconciliation step now adds `--fail-on-blocking` only in enforce mode, preventing advisory mode from failing npm publish.
+
 ## [3.6.6] - 2026-03-05
 
 ### Added

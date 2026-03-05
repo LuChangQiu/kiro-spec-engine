@@ -8,6 +8,7 @@ function parseArgs(argv = []) {
   const options = {
     projectPath: process.cwd(),
     json: false,
+    failOnBlocking: false,
     failOnAlert: false,
     failOnPending: false
   };
@@ -24,6 +25,10 @@ function parseArgs(argv = []) {
     }
     if (token === '--json') {
       options.json = true;
+      continue;
+    }
+    if (token === '--fail-on-blocking') {
+      options.failOnBlocking = true;
       continue;
     }
     if (token === '--fail-on-alert') {
@@ -57,7 +62,7 @@ async function main() {
   const alerts = Array.isArray(doctor.alerts) ? doctor.alerts : [];
 
   const reasons = [];
-  if (blocking.length > 0) {
+  if (options.failOnBlocking && blocking.length > 0) {
     reasons.push(...blocking.map((item) => `blocking:${item}`));
   }
   if (options.failOnAlert && alerts.length > 0) {
@@ -73,6 +78,7 @@ async function main() {
     success: passed,
     passed,
     workspace: path.relative(process.cwd(), options.projectPath).replace(/\\/g, '/'),
+    fail_on_blocking: options.failOnBlocking,
     fail_on_alert: options.failOnAlert,
     fail_on_pending: options.failOnPending,
     blocking,

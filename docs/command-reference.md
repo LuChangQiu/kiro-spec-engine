@@ -727,7 +727,7 @@ sce state export --out .sce/reports/state-migration/state-export.latest.json --j
 
 # reconciliation gate (non-blocking by default; choose strict flags as needed)
 npm run gate:state-migration-reconciliation
-node scripts/state-migration-reconciliation-gate.js --fail-on-alert --fail-on-pending --json
+node scripts/state-migration-reconciliation-gate.js --fail-on-blocking --fail-on-alert --fail-on-pending --json
 ```
 
 Current migratable components:

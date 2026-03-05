@@ -29,6 +29,7 @@ describe('state-migration-reconciliation-gate script', () => {
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.mode).toBe('state-migration-reconciliation-gate');
     expect(payload.passed).toBe(true);
+    expect(payload.fail_on_blocking).toBe(false);
   });
 
   test('fails on pending migration when --fail-on-pending is set', async () => {
@@ -66,6 +67,7 @@ describe('state-migration-reconciliation-gate script', () => {
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.mode).toBe('state-migration-reconciliation-gate');
     expect(payload.passed).toBe(false);
+    expect(payload.fail_on_blocking).toBe(false);
     expect(payload.pending_components).toEqual(expect.arrayContaining(['collab.agent-registry']));
   });
 });

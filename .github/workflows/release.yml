@@ -1178,7 +1178,7 @@ jobs:
           CMD=(node scripts/state-migration-reconciliation-gate.js --json)
 
           if [[ "${ENFORCE_NORMALIZED}" == "1" || "${ENFORCE_NORMALIZED}" == "true" || "${ENFORCE_NORMALIZED}" == "yes" || "${ENFORCE_NORMALIZED}" == "y" || "${ENFORCE_NORMALIZED}" == "on" ]]; then
-            CMD+=(--fail-on-pending)
+            CMD+=(--fail-on-blocking --fail-on-pending)
             echo "[state-migration-reconciliation] mode=enforce"
           else
             echo "[state-migration-reconciliation] mode=advisory"

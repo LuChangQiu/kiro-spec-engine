@@ -1,0 +1,8 @@
+{
+  "schema_version": "1.0",
+  "min_quality_score": 70,
+  "require_acceptance_criteria": true,
+  "allow_needs_split": false,
+  "auto_suggest_acceptance": true,
+  "max_sub_goals": 3
+}

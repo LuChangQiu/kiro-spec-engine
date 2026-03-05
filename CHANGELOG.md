@@ -25,6 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `sce task consolidate`
   - `sce task score`
   - `sce task promote`
+- Task quality policy support:
+  - `.sce/config/task-quality-policy.json`
+  - policy overrides via `--policy <path>`
 
 ## [3.6.9] - 2026-03-05
 

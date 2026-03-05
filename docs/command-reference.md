@@ -217,6 +217,10 @@ sce task score --draft <draft-id> --json
 sce task promote --draft <draft-id> --spec 02-00-checkout-optimization --json
 ```
 
+Policy file:
+- `.sce/config/task-quality-policy.json`
+- Fields: `min_quality_score`, `require_acceptance_criteria`, `allow_needs_split`, `auto_suggest_acceptance`, `max_sub_goals`
+
 ### Context & Prompts
 
 ```bash

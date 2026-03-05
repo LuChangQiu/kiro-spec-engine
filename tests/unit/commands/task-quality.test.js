@@ -62,6 +62,7 @@ describe('task quality governance', () => {
     const store = await fs.readJson(path.join(tempDir, '.sce', 'task-governance', 'drafts.json'));
     expect(store.drafts.length).toBe(1);
     expect(store.drafts[0].status).toBe('consolidated');
+    expect(store.drafts[0].acceptance_suggestions.length).toBeGreaterThan(0);
   });
 
   test('scores and promotes draft to tasks.md', async () => {

@@ -193,3 +193,109 @@ sce task promote --spec <specPath>
 - 点击“Promote”：`sce task promote`
 
 ---
+## 12. 示例 UI 结构（JSON/DSL）
+
+```json
+{
+  "type": "TaskCard",
+  "props": {
+    "taskRef": "01.02.03",
+    "titleNorm": "生成客户-订单-库存演示数据流程",
+    "rawRequest": "帮我做一个客户订单库存的demo",
+    "status": "NeedsSplit",
+    "score": 62,
+    "missingItems": ["acceptance_criteria", "split_required"],
+    "nextAction": "split"
+  },
+  "children": [
+    {
+      "type": "QualityScorePanel",
+      "props": {
+        "score": 62,
+        "minScore": 70,
+        "missingItems": ["acceptance_criteria", "split_required"],
+        "nextAction": "split"
+      }
+    },
+    {
+      "type": "TaskDetails",
+      "props": {
+        "goal": "生成可运行的客户-订单-库存演示流程",
+        "subGoals": ["定义实体关系", "生成测试数据", "配置页面展示"],
+        "acceptanceCriteria": [],
+        "handoff": "needs_split=true, acceptance_criteria empty"
+      }
+    },
+    {
+      "type": "EventStream",
+      "props": {
+        "events": [
+          {"ts": "23:59:01", "level": "error", "message": "auto-fix blocked", "copyable": true},
+          {"ts": "23:59:02", "level": "info", "message": "Task completed"}
+        ]
+      }
+    },
+    {
+      "type": "FileChanges",
+      "props": {
+        "files": [
+          {"path": "src/app.ts", "diffRef": "diff:123", "reason": "adjust task acceptance"}
+        ]
+      }
+    }
+  ]
+}
+```
+
+## 13. 前端 API 封装建议（CLI -> HTTP）
+
+建议 Magicball 在后端封装 SCE CLI，前端统一调用 HTTP。
+
+### 13.1 路由定义
+
+- `POST /api/sce/task/draft`
+- `POST /api/sce/task/consolidate`
+- `POST /api/sce/task/score`
+- `POST /api/sce/task/promote`
+
+### 13.2 请求体
+
+```json
+{
+  "specPath": "scenes/01/specs/02/spec.md",
+  "input": "帮我做一个客户订单库存的demo",
+  "policyPath": ".sce/config/task-quality-policy.json"
+}
+```
+
+### 13.3 响应体（统一包裹）
+
+```json
+{
+  "success": true,
+  "data": {
+    "task_ref": "01.02.03",
+    "title_norm": "生成客户-订单-库存演示数据流程",
+    "raw_request": "帮我做一个客户订单库存的demo",
+    "goal": "生成可运行的客户-订单-库存演示流程",
+    "sub_goals": ["定义实体关系", "生成测试数据", "配置页面展示"],
+    "acceptance_criteria": ["前端能展示客户列表"],
+    "needs_split": false,
+    "confidence": 0.81,
+    "score": 78,
+    "missing_items": [],
+    "next_action": "promote",
+    "handoff": "ready"
+  },
+  "errors": []
+}
+```
+
+### 13.4 前端调用顺序（建议）
+
+1. `draft` -> 渲染草案 + 评分卡
+2. `consolidate` -> 合并多轮输入（可选）
+3. `score` -> 质量评分
+4. `promote` -> 写入 tasks.md
+
+---

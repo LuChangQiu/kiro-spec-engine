@@ -71,6 +71,7 @@
     "gate:release-ops-weekly": "node scripts/release-weekly-ops-gate.js",
     "gate:errorbook-release": "node scripts/errorbook-release-gate.js --fail-on-block",
     "gate:errorbook-registry-health": "node scripts/errorbook-registry-health-gate.js",
+    "gate:state-migration-reconciliation": "node scripts/state-migration-reconciliation-gate.js --json",
     "gate:git-managed": "node scripts/git-managed-gate.js --fail-on-violation",
     "gate:release-asset-integrity": "node scripts/release-asset-integrity-check.js",
     "report:release-risk-remediation": "node scripts/release-risk-remediation-bundle.js --json",

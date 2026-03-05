@@ -113,4 +113,20 @@ describe('SessionStore', () => {
     expect(completion.next_scene_cycle).toBe(2);
     expect(completion.next_session.session_id).not.toBe(current.session.session_id);
   });
+
+  test('listSceneRecords can read from sqlite index when scene-index file is missing', async () => {
+    await store.beginSceneSession({
+      sceneId: 'scene.sqlite-fallback',
+      objective: 'sqlite fallback'
+    });
+
+    await fs.remove(path.join(tempDir, '.sce', 'session-governance', 'scene-index.json'));
+
+    const records = await store.listSceneRecords();
+    expect(records.length).toBeGreaterThanOrEqual(1);
+    expect(records[0]).toEqual(expect.objectContaining({
+      scene_id: 'scene.sqlite-fallback'
+    }));
+    expect(Array.isArray(records[0].cycles)).toBe(true);
+  });
 });

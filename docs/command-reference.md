@@ -720,6 +720,10 @@ sce state migrate --component collab.agent-registry --component runtime.timeline
 
 # export sqlite migration tables for audit/debug
 sce state export --out .sce/reports/state-migration/state-export.latest.json --json
+
+# reconciliation gate (non-blocking by default; choose strict flags as needed)
+npm run gate:state-migration-reconciliation
+node scripts/state-migration-reconciliation-gate.js --fail-on-alert --fail-on-pending --json
 ```
 
 Current migratable components:
@@ -732,6 +736,10 @@ SQLite index tables introduced for gradual migration:
 - `timeline_snapshot_registry`
 - `scene_session_cycle_registry`
 - `state_migration_registry`
+
+Runtime read preference:
+- timeline/session runtime views now prefer SQLite indexes when indexed rows exist.
+- file artifacts remain source-of-truth for content payload and recovery operations.
 
 Write lease model (optional, policy-driven, SQLite-backed):
 - Policy file: `.sce/config/authorization-policy.json`

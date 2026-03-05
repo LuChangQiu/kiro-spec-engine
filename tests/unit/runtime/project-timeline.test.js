@@ -5,7 +5,8 @@ const path = require('path');
 const {
   ProjectTimelineStore,
   TIMELINE_CONFIG_RELATIVE_PATH,
-  TIMELINE_DIR
+  TIMELINE_DIR,
+  TIMELINE_INDEX_FILE
 } = require('../../../lib/runtime/project-timeline');
 
 describe('ProjectTimelineStore', () => {
@@ -103,5 +104,23 @@ describe('ProjectTimelineStore', () => {
 
     const timelinePath = path.join(tempDir, TIMELINE_DIR);
     expect(timelinePath).toContain(path.join('.sce', 'timeline'));
+  });
+
+  test('listSnapshots can read indexed entries from sqlite when file index is missing', async () => {
+    const saved = await store.saveSnapshot({
+      trigger: 'manual',
+      event: 'test.sqlite-read',
+      summary: 'sqlite-indexed'
+    });
+    expect(saved.snapshot_id).toBeTruthy();
+
+    await fs.remove(path.join(tempDir, TIMELINE_DIR, TIMELINE_INDEX_FILE));
+
+    const listed = await store.listSnapshots({ limit: 10 });
+    expect(listed.total).toBeGreaterThanOrEqual(1);
+    expect(listed.snapshots[0]).toEqual(expect.objectContaining({
+      snapshot_id: saved.snapshot_id,
+      summary: 'sqlite-indexed'
+    }));
   });
 });

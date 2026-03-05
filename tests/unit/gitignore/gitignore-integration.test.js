@@ -80,6 +80,7 @@ describe('GitignoreIntegration', () => {
 .sce/backups/
 .sce/logs/
 .sce/reports/
+.sce/state/
 
 # Spec artifacts (COMMIT - but exclude temporary files)
 .sce/specs/**/SESSION-*.md

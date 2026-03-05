@@ -104,6 +104,65 @@ describe('state-migration-manager', () => {
         }
       }
     }, { spaces: 2 });
+
+    await fs.ensureDir(path.join(tempDir, '.sce', 'errorbook'));
+    await fs.writeJson(path.join(tempDir, '.sce', 'errorbook', 'index.json'), {
+      api_version: 'sce.errorbook.index/v0.1',
+      updated_at: '2026-03-05T00:40:00.000Z',
+      total_entries: 2,
+      entries: [
+        {
+          id: 'eb-1',
+          fingerprint: 'fp-1',
+          title: 'order approval timeout',
+          status: 'verified',
+          quality_score: 82,
+          tags: ['approval', 'timeout'],
+          ontology_tags: ['business_rule'],
+          temporary_mitigation_active: false,
+          temporary_mitigation_deadline_at: '',
+          occurrences: 3,
+          created_at: '2026-03-05T00:10:00.000Z',
+          updated_at: '2026-03-05T00:20:00.000Z'
+        },
+        {
+          id: 'eb-2',
+          fingerprint: 'fp-2',
+          title: 'inventory drift mismatch',
+          status: 'candidate',
+          quality_score: 68,
+          tags: ['inventory'],
+          ontology_tags: ['entity'],
+          temporary_mitigation_active: true,
+          temporary_mitigation_deadline_at: '2026-03-08T00:00:00.000Z',
+          occurrences: 1,
+          created_at: '2026-03-05T00:15:00.000Z',
+          updated_at: '2026-03-05T00:30:00.000Z'
+        }
+      ]
+    }, { spaces: 2 });
+
+    await fs.ensureDir(path.join(tempDir, '.sce', 'errorbook', 'staging'));
+    await fs.writeJson(path.join(tempDir, '.sce', 'errorbook', 'staging', 'index.json'), {
+      api_version: 'sce.errorbook.incident-index/v0.1',
+      updated_at: '2026-03-05T00:45:00.000Z',
+      total_incidents: 1,
+      incidents: [
+        {
+          id: 'ebi-1',
+          fingerprint: 'fp-2',
+          title: 'inventory drift mismatch',
+          symptom: 'stock negative in checkout',
+          state: 'open',
+          attempt_count: 2,
+          created_at: '2026-03-05T00:25:00.000Z',
+          updated_at: '2026-03-05T00:44:00.000Z',
+          last_attempt_at: '2026-03-05T00:44:00.000Z',
+          resolved_at: '',
+          linked_entry_id: ''
+        }
+      ]
+    }, { spaces: 2 });
   }
 
   test('builds migration plan from file-based state artifacts', async () => {
@@ -116,7 +175,7 @@ describe('state-migration-manager', () => {
     });
 
     expect(plan.mode).toBe('state-plan');
-    expect(plan.components).toHaveLength(3);
+    expect(plan.components).toHaveLength(5);
     expect(plan.components.find((item) => item.id === 'collab.agent-registry')).toEqual(expect.objectContaining({
       source_record_count: 2,
       status: 'ready'
@@ -127,6 +186,14 @@ describe('state-migration-manager', () => {
     }));
     expect(plan.components.find((item) => item.id === 'runtime.scene-session-index')).toEqual(expect.objectContaining({
       source_record_count: 2,
+      status: 'ready'
+    }));
+    expect(plan.components.find((item) => item.id === 'errorbook.entry-index')).toEqual(expect.objectContaining({
+      source_record_count: 2,
+      status: 'ready'
+    }));
+    expect(plan.components.find((item) => item.id === 'errorbook.incident-index')).toEqual(expect.objectContaining({
+      source_record_count: 1,
       status: 'ready'
     }));
   });
@@ -163,8 +230,8 @@ describe('state-migration-manager', () => {
       stateStore
     });
     expect(applied.success).toBe(true);
-    expect(applied.summary.migrated_components).toBe(3);
-    expect(applied.summary.migrated_records).toBe(5);
+    expect(applied.summary.migrated_components).toBe(5);
+    expect(applied.summary.migrated_records).toBe(8);
 
     const doctor = await runStateDoctor({}, {
       projectPath: tempDir,
@@ -175,10 +242,10 @@ describe('state-migration-manager', () => {
     expect(doctor.mode).toBe('state-doctor');
     expect(doctor.checks.every((item) => item.sync_status === 'synced')).toBe(true);
     expect(doctor.summary).toEqual(expect.objectContaining({
-      total_components: 3,
+      total_components: 5,
       pending_components: 0,
-      total_source_records: 5,
-      total_sqlite_records: 5
+      total_source_records: 8,
+      total_sqlite_records: 8
     }));
     expect(doctor.runtime).toEqual(expect.objectContaining({
       timeline: expect.objectContaining({
@@ -207,6 +274,8 @@ describe('state-migration-manager', () => {
     expect(exportPayload.summary.agent_runtime_registry).toBe(2);
     expect(exportPayload.summary.timeline_snapshot_registry).toBe(1);
     expect(exportPayload.summary.scene_session_cycle_registry).toBe(2);
+    expect(exportPayload.summary.errorbook_entry_index_registry).toBe(2);
+    expect(exportPayload.summary.errorbook_incident_index_registry).toBe(1);
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'reports', 'state-migration', 'export.json'))).toBe(true);
   });
 });

@@ -68,6 +68,7 @@ test-project/
 .sce/backups/
 .sce/logs/
 .sce/reports/
+.sce/state/
 .sce/auto/
 .sce/incoming/
 .sce/errorbook/

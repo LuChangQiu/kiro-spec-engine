@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Stage-2 SQLite migration components for Errorbook indexes:
+  - `errorbook.entry-index` (`.sce/errorbook/index.json`)
+  - `errorbook.incident-index` (`.sce/errorbook/staging/index.json`)
+- New SQLite index tables in state store:
+  - `errorbook_entry_index_registry`
+  - `errorbook_incident_index_registry`
+- New `SceStateStore` APIs:
+  - `upsert/listErrorbookEntryIndexRecords`
+  - `upsert/listErrorbookIncidentIndexRecords`
+
+### Changed
+- `sce state plan/doctor/migrate/export` now include Errorbook staged index components in migration scope and parity summaries.
+- State export payload now includes Errorbook index tables for audit/debug snapshots.
+
 ## [3.6.4] - 2026-03-05
 
 ### Added

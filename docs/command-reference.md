@@ -734,11 +734,15 @@ Current migratable components:
 - `collab.agent-registry` (`.sce/config/agent-registry.json`)
 - `runtime.timeline-index` (`.sce/timeline/index.json`)
 - `runtime.scene-session-index` (`.sce/session-governance/scene-index.json`)
+- `errorbook.entry-index` (`.sce/errorbook/index.json`)
+- `errorbook.incident-index` (`.sce/errorbook/staging/index.json`)
 
 SQLite index tables introduced for gradual migration:
 - `agent_runtime_registry`
 - `timeline_snapshot_registry`
 - `scene_session_cycle_registry`
+- `errorbook_entry_index_registry`
+- `errorbook_incident_index_registry`
 - `state_migration_registry`
 
 Runtime read preference:

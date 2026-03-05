@@ -147,6 +147,7 @@ describe('GitignoreDetector', () => {
 .sce/backups/
 .sce/logs/
 .sce/reports/
+.sce/state/
       `.trim();
       
       const rules = detector.parseGitignore(content);
@@ -197,6 +198,7 @@ describe('GitignoreDetector', () => {
 .sce/backups/
 .sce/logs/
 .sce/reports/
+.sce/state/
       `.trim();
       
       const gitignorePath = path.join(testDir, '.gitignore');

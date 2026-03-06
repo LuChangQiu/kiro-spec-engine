@@ -192,3 +192,10 @@ sce capability register --input <template.json> --json
 - 发布页直接消费 `release_readiness.ready`
 - 若为 `false`，展示 `blockers[].reason`、`blockers[].missing`、`blockers[].remediation`
 - 默认阻断文案：`能力模板未达到发布条件`
+
+## 10. 默认排序
+
+- 先显示 `release_readiness_ui.publish_ready = false` 的 scene
+- 再按 triad 缺口优先级排序：`decision_strategy` -> `business_rules` -> `entity_relation`
+- 再按 `score_preview.value_score` 降序
+- 最后按 `scene_id` 升序

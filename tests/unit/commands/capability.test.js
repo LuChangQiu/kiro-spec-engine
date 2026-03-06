@@ -9,7 +9,8 @@ const {
   runCapabilityRegisterCommand,
   runCapabilityInventoryCommand,
   enrichCapabilityTemplateForUi,
-  filterCapabilityCatalogEntries
+  filterCapabilityCatalogEntries,
+  sortCapabilityInventoryEntries
 } = require('../../../lib/commands/capability');
 
 describe('capability commands', () => {
@@ -230,6 +231,10 @@ describe('capability commands', () => {
     });
     expect(inventory.mode).toBe('capability-inventory');
     expect(inventory.scene_count).toBe(2);
+    expect(inventory.sort).toEqual(expect.objectContaining({
+      strategy: 'publish_ready -> missing_triad_priority -> value_score_desc -> scene_id'
+    }));
+    expect(inventory.scenes.map((item) => item.scene_id)).toEqual(['scene.partial', 'scene.demo']);
     expect(inventory.scenes.find((item) => item.scene_id === 'scene.demo')).toEqual(expect.objectContaining({
       ontology_core_ui: expect.objectContaining({ ready: true }),
       release_readiness_ui: expect.objectContaining({ publish_ready: true })
@@ -238,6 +243,15 @@ describe('capability commands', () => {
       ontology_core_ui: expect.objectContaining({ ready: false }),
       release_readiness_ui: expect.objectContaining({ publish_ready: false })
     }));
+  });
+
+  test('sorts capability inventory entries by readiness, triad priority, and value score', () => {
+    const sorted = sortCapabilityInventoryEntries([
+      { scene_id: 'scene.ready-low', release_readiness_ui: { publish_ready: true, blocking_missing: [] }, score_preview: { value_score: 10 } },
+      { scene_id: 'scene.blocked-business', release_readiness_ui: { publish_ready: false, blocking_missing: ['business_rules'] }, score_preview: { value_score: 90 } },
+      { scene_id: 'scene.blocked-decision', release_readiness_ui: { publish_ready: false, blocking_missing: ['decision_strategy'] }, score_preview: { value_score: 20 } }
+    ]);
+    expect(sorted.map((item) => item.scene_id)).toEqual(['scene.blocked-decision', 'scene.blocked-business', 'scene.ready-low']);
   });
 
   test('filters capability inventory entries by publish readiness and missing triad', async () => {

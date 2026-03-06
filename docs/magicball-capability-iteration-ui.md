@@ -98,7 +98,13 @@
 
 ## 4. SCE 接口参数（CLI 可封装）
 
-### 4.1 提取候选能力
+### 4.1 Scene 盘点首页聚合
+```bash
+sce capability inventory --json
+sce capability inventory --release-ready false --missing-triad decision_strategy --json
+```
+
+### 4.2 提取候选能力
 ```bash
 sce capability extract --scene <sceneId> --json
 ```

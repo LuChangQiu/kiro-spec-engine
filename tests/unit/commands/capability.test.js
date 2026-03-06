@@ -7,6 +7,7 @@ const {
   runCapabilityScoreCommand,
   runCapabilityMapCommand,
   runCapabilityRegisterCommand,
+  runCapabilityInventoryCommand,
   enrichCapabilityTemplateForUi,
   filterCapabilityCatalogEntries
 } = require('../../../lib/commands/capability');
@@ -18,12 +19,31 @@ describe('capability commands', () => {
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-capability-'));
     await fs.ensureDir(path.join(tempDir, '.sce', 'spec-governance'));
     await fs.ensureDir(path.join(tempDir, '.sce', 'specs', '01-00-demo'));
+    await fs.ensureDir(path.join(tempDir, '.sce', 'specs', '02-00-partial'));
 
     await fs.writeJson(path.join(tempDir, '.sce', 'spec-governance', 'scene-index.json'), {
       schema_version: '1.0',
       generated_at: new Date().toISOString(),
       scene_filter: null,
       scenes: {
+        'scene.demo': {
+          total_specs: 1,
+          active_specs: 1,
+          completed_specs: 0,
+          stale_specs: 0,
+          spec_ids: ['01-00-demo'],
+          active_spec_ids: ['01-00-demo'],
+          stale_spec_ids: []
+        },
+        'scene.partial': {
+          total_specs: 1,
+          active_specs: 1,
+          completed_specs: 0,
+          stale_specs: 0,
+          spec_ids: ['02-00-partial'],
+          active_spec_ids: ['02-00-partial'],
+          stale_spec_ids: []
+        },
         'scene.demo': {
           total_specs: 1,
           active_specs: 1,
@@ -56,6 +76,27 @@ describe('capability commands', () => {
         relation: ['Order->Customer'],
         business_rule: ['OrderApproval'],
         decision_policy: ['RiskPolicy']
+      }
+    }, { spaces: 2 });
+
+    await fs.writeFile(
+      path.join(tempDir, '.sce', 'specs', '02-00-partial', 'tasks.md'),
+      [
+        '- [ ] 1. Draft incomplete flow'
+      ].join('\n'),
+      'utf8'
+    );
+
+    await fs.ensureDir(path.join(tempDir, '.sce', 'specs', '02-00-partial', 'custom'));
+    await fs.writeJson(path.join(tempDir, '.sce', 'specs', '02-00-partial', 'custom', 'problem-domain-chain.json'), {
+      api_version: 'sce.problem-domain-chain/v0.1',
+      scene_id: 'scene.partial',
+      spec_id: '02-00-partial',
+      ontology: {
+        entity: ['DraftOrder'],
+        relation: ['DraftOrder->Customer'],
+        business_rule: [],
+        decision_policy: []
       }
     }, { spaces: 2 });
   });
@@ -180,6 +221,35 @@ describe('capability commands', () => {
       blocking_ids: expect.arrayContaining(['ontology-core-triads']),
       blocking_missing: expect.arrayContaining(['business_rules', 'decision_strategy'])
     }));
+  });
+
+  test('builds scene-level capability inventory with triad readiness', async () => {
+    const inventory = await runCapabilityInventoryCommand({ json: true }, {
+      projectPath: tempDir,
+      fileSystem: fs
+    });
+    expect(inventory.mode).toBe('capability-inventory');
+    expect(inventory.scene_count).toBe(2);
+    expect(inventory.scenes.find((item) => item.scene_id === 'scene.demo')).toEqual(expect.objectContaining({
+      ontology_core_ui: expect.objectContaining({ ready: true }),
+      release_readiness_ui: expect.objectContaining({ publish_ready: true })
+    }));
+    expect(inventory.scenes.find((item) => item.scene_id === 'scene.partial')).toEqual(expect.objectContaining({
+      ontology_core_ui: expect.objectContaining({ ready: false }),
+      release_readiness_ui: expect.objectContaining({ publish_ready: false })
+    }));
+  });
+
+  test('filters capability inventory entries by publish readiness and missing triad', async () => {
+    const inventory = await runCapabilityInventoryCommand({
+      releaseReady: 'false',
+      missingTriad: 'decision_strategy',
+      json: true
+    }, {
+      projectPath: tempDir,
+      fileSystem: fs
+    });
+    expect(inventory.scenes.map((item) => item.scene_id)).toEqual(['scene.partial']);
   });
 
   test('filters capability catalog entries by publish readiness and missing triad', () => {

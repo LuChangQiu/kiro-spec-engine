@@ -15,7 +15,31 @@
 
 ## 2. 建议 API 列表
 
-### 2.1 Extract
+### 2.1 Inventory
+
+```
+POST /api/capability/inventory
+```
+
+请求：
+```json
+{
+  "release_ready": false,
+  "missing_triad": "decision_strategy"
+}
+```
+
+执行 CLI：
+```bash
+sce capability inventory --release-ready false --missing-triad decision_strategy --json
+```
+
+响应：
+- 返回 `capability-inventory` payload，重点消费 `scenes[].ontology_core_ui` 与 `scenes[].release_readiness_ui`
+
+---
+
+### 2.2 Extract
 
 ```
 POST /api/capability/extract
@@ -40,7 +64,7 @@ sce capability extract --scene <scene_id> --specs <specs> --sample-limit <n> --j
 
 ---
 
-### 2.2 Score
+### 2.3 Score
 
 ```
 POST /api/capability/score
@@ -63,7 +87,7 @@ sce capability score --input <candidate_file> --json
 
 ---
 
-### 2.3 Map
+### 2.4 Map
 
 ```
 POST /api/capability/map
@@ -91,7 +115,7 @@ sce capability map --input <candidate_file> --mapping <ontology_file> \
 
 ---
 
-### 2.4 Register
+### 2.5 Register
 
 ```
 POST /api/capability/register
@@ -147,8 +171,9 @@ sce capability register --input <template_file> --risk-level <level> --difficult
 
 ## 5. 推荐顺序
 
-1. `/api/capability/extract`
-2. `/api/capability/score`
-3. `/api/capability/map`
-4. `/api/capability/register`
+1. `/api/capability/inventory`
+2. `/api/capability/extract`
+3. `/api/capability/score`
+4. `/api/capability/map`
+5. `/api/capability/register`
 

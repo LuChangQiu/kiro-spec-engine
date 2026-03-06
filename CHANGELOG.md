@@ -7,9 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.22] - 2026-03-06
+
+### Added
+- New `sce capability inventory` command provides scene-level triad/readiness aggregation for homepage views.
+- Magicball capability iteration docs now define homepage inventory API and triage usage.
+
 ## [3.6.21] - 2026-03-06
 
 ### Added
+- New `sce capability inventory` command provides scene-level triad/readiness aggregation for homepage views.
 - Capability catalog list/search now supports `--release-ready` and `--missing-triad` filters for pre-publish triage.
 - Magicball capability library docs now show list-level triage filter examples.
 

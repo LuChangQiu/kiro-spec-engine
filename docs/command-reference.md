@@ -1869,6 +1869,13 @@ sce scene template-render --package scene-erp --values '{"entity_name":"Order"}'
 
 ### Capability Iteration (scene -> template -> ontology)
 
+```bash
+# 0) Build scene-level homepage inventory
+sce capability inventory --json
+sce capability inventory --release-ready false --missing-triad decision_strategy --json
+```
+
+
 Capability candidates are now evaluated against the ontology core triad by default:
 - entity + relation
 - business rule

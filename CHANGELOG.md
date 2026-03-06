@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.27] - 2026-03-06
+
+### Added
+- Studio task payloads now expose `task.feedback_model` for human-facing task cards.
+- Timeline list/show payloads now expose `view_model` for Magicball timeline panels.
+- Added `docs/magicball-task-feedback-timeline-guide.md`.
+
 ## [3.6.26] - 2026-03-06
 
 ### Added

@@ -56,6 +56,15 @@ describe('timeline commands', () => {
     expect(listed.consistency).toEqual(expect.objectContaining({
       status: expect.any(String)
     }));
+    expect(listed.view_model.summary).toEqual(expect.objectContaining({
+      total: 1,
+      latest_snapshot_id: saved.snapshot.snapshot_id
+    }));
+    expect(listed.view_model.entries[0]).toEqual(expect.objectContaining({
+      snapshot_id: saved.snapshot.snapshot_id,
+      show_command: expect.stringContaining(saved.snapshot.snapshot_id),
+      restore_command: expect.stringContaining(saved.snapshot.snapshot_id)
+    }));
 
     const shown = await runTimelineShowCommand(saved.snapshot.snapshot_id, {
       json: true
@@ -70,6 +79,11 @@ describe('timeline commands', () => {
     }));
     expect(shown.snapshot.summary).toBe('first save');
     expect(shown.files.file_count).toBeGreaterThanOrEqual(2);
+    expect(shown.view_model.snapshot).toEqual(expect.objectContaining({
+      snapshot_id: saved.snapshot.snapshot_id,
+      title: 'first save'
+    }));
+    expect(shown.view_model.file_total).toBeGreaterThanOrEqual(2);
   });
 
   test('auto snapshot skips when interval not reached', async () => {

@@ -638,6 +638,12 @@ describe('studio command workflow', () => {
     expect(eventsPayload.task.handoff).toEqual(expect.objectContaining({
       stage: 'rollback'
     }));
+    expect(eventsPayload.task.feedback_model).toEqual(expect.objectContaining({
+      version: '1.0',
+      problem: expect.objectContaining({ action: 'rollback' }),
+      execution: expect.objectContaining({ stage: 'rollback' }),
+      next_step: expect.objectContaining({ next_action: expect.any(String) })
+    }));
     expect(eventsPayload.events.length).toBeGreaterThanOrEqual(4);
     expect(eventsPayload.events[eventsPayload.events.length - 1].event_type).toBe('job.rolled_back');
 
@@ -721,6 +727,11 @@ describe('studio command workflow', () => {
     expect(payload.task.file_changes.some((item) => item.path === 'lib/commands/studio.js')).toBe(true);
     expect(payload.task.errors.length).toBeGreaterThanOrEqual(1);
     expect(payload.task.errors[0].error_bundle).toContain('exit_code: 1');
+    expect(payload.task.feedback_model).toEqual(expect.objectContaining({
+      diagnosis: expect.objectContaining({ chain_checkpoint: 'command-execution' }),
+      evidence: expect.objectContaining({ error_count: expect.any(Number), file_count: expect.any(Number) }),
+      next_step: expect.objectContaining({ recommended_action: '处理阻断后重试' })
+    }));
   });
 
   test('requires authorization for protected actions when policy is enabled', async () => {

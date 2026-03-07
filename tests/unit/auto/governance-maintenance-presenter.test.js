@@ -20,7 +20,7 @@ describe('auto governance maintenance presenter', () => {
     }, true);
 
     expect(plan.map((item) => item.id)).toEqual(expect.arrayContaining([
-      'release-gate-review',
+      'release-gate-evidence-review',
       'session-prune',
       'batch-session-prune',
       'controller-session-prune',
@@ -49,3 +49,4 @@ describe('auto governance maintenance presenter', () => {
     });
   });
 });
+

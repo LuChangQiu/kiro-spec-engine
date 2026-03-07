@@ -1,4 +1,4 @@
-# Auto Refactor Index
+﻿# Auto Refactor Index
 
 ## Goal
 
@@ -111,25 +111,31 @@ Integration guardrails:
 - Shared result payload builders for session list/stats.
 - Verified via all session list/stats commands and governance archive integration coverage.
 
-6. `governance-signals`
+6. `governance-signals` [completed]
 - Shared release gate / weekly ops normalization.
-- Must verify: `auto governance stats`, `maintain`, `close-loop`.
+- Verified via auto governance stats/maintain/close-loop integration coverage.
 
-7. `program-diagnostics`
+7. `program-diagnostics` [completed]
 - Shared close-loop program failure clustering and remediation advice.
-- Must verify: `close-loop-program`, `close-loop-recover`, KPI/audit outputs.
+- Verified via close-loop-program/close-loop-recover/KPI/audit integration coverage.
 
-8. `governance-session-presenter`
+8. `governance-session-presenter` [completed]
 - Shared governance session list payload builder.
-- Must verify: `auto governance session list`.
+- Verified via auto governance session list integration coverage.
 
-9. `governance-stats-presenter`
+9. `governance-stats-presenter` [completed]
 - Shared governance stats payload builder.
-- Must verify: `auto governance stats`.
+- Verified via auto governance stats integration coverage.
 
-10. `governance-maintenance-presenter`
+10. `governance-maintenance-presenter` [completed]
 - Shared maintenance plan/result summary.
-- Must verify: `auto governance maintain` and `auto governance close-loop`.
+- Verified via auto governance maintain/close-loop integration coverage.
+
+## Phase Status
+
+- Phase 1 mainline cutover is complete for the planned `auto.js` shadow modules.
+- Governance summary logic is also extracted into `lib/auto/governance-summary.js`.
+- Next phase should focus on service-layer extraction for session/archive/governance orchestration.
 
 ## Current Policy
 

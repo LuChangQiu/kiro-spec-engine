@@ -139,6 +139,7 @@ Integration guardrails:
 - Next phase should focus on service-layer extraction for session/archive/governance orchestration.
 - Phase 2 now includes `lib/auto/governance-close-loop-service.js` alongside governance maintenance orchestration.
 
+- Phase 2 now also includes `lib/auto/governance-stats-service.js` for governance archive aggregation and health synthesis.
 ## Current Policy
 
 - Shadow modules may be added freely if they are pure and unit-tested.

@@ -200,6 +200,7 @@ Integration guardrails:
 - Controller orchestration shadow service exists in `lib/auto/close-loop-controller-service.js` and is unit-validated, but not yet cut over to mainline.
 - Controller groundwork is prepared via `lib/auto/controller-queue-service.js`, `lib/auto/controller-lock-service.js`, and `lib/auto/controller-output.js` before the next controller orchestration cutover.
 ## Current Policy
+- Controller queue/lock/output groundwork is now wired into mainline helper calls; the remaining controller cutover is the orchestration wrapper itself.
 
 - Mainline cutover and service extraction proceed one focused boundary at a time.
 - Every boundary extraction requires:

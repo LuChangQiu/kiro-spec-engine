@@ -197,6 +197,7 @@ Integration guardrails:
 - `lib/auto/archive-schema-service.js`
 - Remaining work is concentrated in final orchestration slimming, runtime side-effect governance, and documentation/release closure.
 
+- Controller groundwork is prepared via `lib/auto/controller-queue-service.js`, `lib/auto/controller-lock-service.js`, and `lib/auto/controller-output.js` before the next controller orchestration cutover.
 ## Current Policy
 
 - Mainline cutover and service extraction proceed one focused boundary at a time.

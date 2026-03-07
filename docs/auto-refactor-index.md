@@ -91,13 +91,13 @@ Integration guardrails:
 
 ## Safe Mainline Cutover Order
 
-1. `session-metrics`
+1. `session-metrics` [completed]
 - Low-level counters only.
-- Must verify: `auto session`, `batch-session`, `controller-session`, `governance stats`.
+- Verified via auto session/batch-session/controller-session/governance stats integration coverage.
 
-2. `archive-summary`
+2. `archive-summary` [completed]
 - Shared status classification and percent calculation.
-- Must verify: all session list/stats commands.
+- Verified via all session list/stats and governance archive integration coverage.
 
 3. `retention-policy`
 - Shared retention/prune argument normalization.
@@ -146,3 +146,4 @@ Integration guardrails:
 ## Stop Condition
 
 Do not continue cutover if any single-cluster change causes broad `auto-close-loop` integration failures. Revert that cutover and keep only the shadow module + unit tests.
+

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.33] - 2026-03-08
+
 ### Added
 - Added 'docs/auto-refactor-index.md' to track safe 'auto.js' extraction boundaries, cutover status, and validation gates.
 

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.34] - 2026-03-08
+
+### Added
+- Added 'docs/refactor-completion-roadmap.md' and 'docs/zh/refactor-completion-roadmap.md' to capture the completed refactor scope and next roadmap.
+- Added 'lib/auto/handoff-capability-matrix-service.js' for handoff capability matrix policy/recommendation/build orchestration.
+- Added 'lib/auto/handoff-release-evidence-service.js' for handoff release-evidence load/merge/report persistence.
+- Added 'lib/auto/handoff-evidence-review-service.js' for evidence snapshots, review-report assembly, and release-draft context resolution.
+- Added 'lib/auto/handoff-release-gate-history-service.js' for release gate history index assembly and markdown rendering.
+
+### Changed
+- Completed a coherent 'auto-handoff' refactor round across capability matrix, release evidence, evidence review, and release gate history subdomains.
+- Updated README/docs hub version markers to '3.6.34'.
+
 ## [3.6.33] - 2026-03-08
 
 ### Added

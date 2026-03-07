@@ -145,6 +145,7 @@ Integration guardrails:
 
 - Phase 2 now also includes `lib/auto/session-query-service.js` for close-loop/controller/governance session list/stats orchestration.
 - Shadow modules may be added freely if they are pure and unit-tested.
+- Phase 2 now also includes `lib/auto/session-prune-service.js` for close-loop/batch/controller session prune orchestration.
 - Mainline cutover is allowed only one cluster at a time.
 - Every cutover requires:
   1. `node --check lib/commands/auto.js`

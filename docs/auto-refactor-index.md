@@ -2,9 +2,9 @@
 
 ## Goal
 
-Reduce `lib/commands/auto.js` by extracting pure helper and presenter logic into stable modules before any mainline cutover.
+Reduce `lib/commands/auto.js` by extracting pure helper, presenter, summary, service, and storage logic into stable modules before final command-layer slimming.
 
-## Current Shadow Modules
+## Current Modules
 
 1. `lib/auto/session-metrics.js`
 - `buildStatusCounts`
@@ -12,22 +12,7 @@ Reduce `lib/commands/auto.js` by extracting pure helper and presenter logic into
 - `buildMasterSpecCounts`
 - `buildTopCountEntries`
 
-2. `lib/auto/program-diagnostics.js`
-- `buildProgramFailureClusters`
-- `buildProgramRemediationActions`
-- `buildProgramDiagnostics`
-
-3. `lib/auto/spec-protection.js`
-- `collectSpecNamesFromBatchSummary`
-- `collectSpecNamesFromCloseLoopSessionPayload`
-- `collectSpecNamesFromBatchSummaryPayload`
-- `createProtectionReasonRecord`
-- `ensureProtectionReasonRecord`
-- `incrementProtectionReason`
-- `buildProtectionRanking`
-- `buildSpecProtectionReasonPayload`
-
-4. `lib/auto/archive-summary.js`
+2. `lib/auto/archive-summary.js`
 - `normalizeStatusToken`
 - `isCompletedStatus`
 - `isFailedStatus`
@@ -36,7 +21,7 @@ Reduce `lib/commands/auto.js` by extracting pure helper and presenter logic into
 - `filterGovernanceEntriesByResumeMode`
 - `calculatePercent`
 
-5. `lib/auto/retention-policy.js`
+3. `lib/auto/retention-policy.js`
 - `normalizeKeep`
 - `normalizeSpecKeep`
 - `normalizeOlderThanDays`
@@ -46,12 +31,22 @@ Reduce `lib/commands/auto.js` by extracting pure helper and presenter logic into
 - `normalizeSpecSessionMaxCreatedPerGoal`
 - `normalizeSpecSessionMaxDuplicateGoals`
 
-6. `lib/auto/session-presenter.js`
+4. `lib/auto/spec-protection.js`
+- `collectSpecNamesFromBatchSummary`
+- `collectSpecNamesFromCloseLoopSessionPayload`
+- `collectSpecNamesFromBatchSummaryPayload`
+- `createProtectionReasonRecord`
+- `ensureProtectionReasonRecord`
+- `incrementProtectionReason`
+- `buildProtectionRanking`
+- `buildSpecProtectionReasonPayload`
+
+5. `lib/auto/session-presenter.js`
 - `presentCloseLoopSessionList`
 - `presentCloseLoopSessionStats`
 - `presentControllerSessionList`
 
-7. `lib/auto/governance-signals.js`
+6. `lib/auto/governance-signals.js`
 - `normalizeHandoffText`
 - `parseAutoHandoffGateBoolean`
 - `normalizeAutoHandoffGateRiskLevel`
@@ -59,15 +54,80 @@ Reduce `lib/commands/auto.js` by extracting pure helper and presenter logic into
 - `normalizeGovernanceReleaseGateSnapshot`
 - `normalizeGovernanceWeeklyOpsStopDetail`
 
-8. `lib/auto/governance-session-presenter.js`
+7. `lib/auto/governance-session-presenter.js`
 - `presentGovernanceSessionList`
 
-9. `lib/auto/governance-stats-presenter.js`
+8. `lib/auto/governance-stats-presenter.js`
 - `presentGovernanceSessionStats`
 
-10. `lib/auto/governance-maintenance-presenter.js`
+9. `lib/auto/governance-maintenance-presenter.js`
 - `buildAutoGovernanceMaintenancePlan`
 - `summarizeGovernanceMaintenanceExecution`
+
+10. `lib/auto/governance-summary.js`
+- `deriveGovernanceRiskLevel`
+- `buildGovernanceConcerns`
+- `buildGovernanceRecommendations`
+
+11. `lib/auto/program-diagnostics.js`
+- `buildProgramFailureClusters`
+- `buildProgramRemediationActions`
+- `buildProgramDiagnostics`
+
+12. `lib/auto/governance-maintenance-service.js`
+- `runAutoGovernanceMaintenance`
+
+13. `lib/auto/governance-close-loop-service.js`
+- `runAutoGovernanceCloseLoop`
+
+14. `lib/auto/governance-stats-service.js`
+- `buildAutoGovernanceStats`
+
+15. `lib/auto/governance-advisory-service.js`
+- `resolveLatestRecoverableBatchSummary`
+- `resolveLatestPendingControllerSession`
+- `executeGovernanceAdvisoryRecover`
+- `executeGovernanceAdvisoryControllerResume`
+
+16. `lib/auto/session-query-service.js`
+- `listCloseLoopSessions`
+- `statsCloseLoopSessions`
+- `listGovernanceCloseLoopSessions`
+- `statsGovernanceCloseLoopSessions`
+- `listCloseLoopControllerSessions`
+- `statsCloseLoopControllerSessions`
+
+17. `lib/auto/session-prune-service.js`
+- `pruneCloseLoopBatchSummarySessions`
+- `pruneCloseLoopControllerSessions`
+- `pruneCloseLoopSessions`
+- `pruneCloseLoopBatchSummarySessionsCli`
+- `pruneCloseLoopControllerSessionsCli`
+
+18. `lib/auto/session-persistence-service.js`
+- `maybePersistCloseLoopControllerSummary`
+- `maybePersistCloseLoopBatchSummary`
+
+19. `lib/auto/governance-session-storage-service.js`
+- `readGovernanceCloseLoopSessionEntries`
+- `resolveGovernanceCloseLoopSessionFile`
+- `loadGovernanceCloseLoopSessionPayload`
+- `persistGovernanceCloseLoopSession`
+
+20. `lib/auto/controller-session-storage-service.js`
+- `readCloseLoopControllerSessionEntries`
+- `resolveCloseLoopControllerSessionFile`
+- `loadCloseLoopControllerSessionPayload`
+
+21. `lib/auto/batch-summary-storage-service.js`
+- `getCloseLoopBatchSummaryDir`
+- `readCloseLoopBatchSummaryEntries`
+- `resolveCloseLoopBatchSummaryFile`
+- `loadCloseLoopBatchSummaryPayload`
+
+22. `lib/auto/close-loop-session-storage-service.js`
+- `getCloseLoopSessionDir`
+- `readCloseLoopSessionEntries`
 
 ## Validation Coverage
 
@@ -82,6 +142,17 @@ Unit tests:
 - `tests/unit/auto/governance-stats-presenter.test.js`
 - `tests/unit/auto/governance-maintenance-presenter.test.js`
 - `tests/unit/auto/governance-summary.test.js`
+- `tests/unit/auto/governance-maintenance-service.test.js`
+- `tests/unit/auto/governance-close-loop-service.test.js`
+- `tests/unit/auto/governance-stats-service.test.js`
+- `tests/unit/auto/governance-advisory-service.test.js`
+- `tests/unit/auto/session-query-service.test.js`
+- `tests/unit/auto/session-prune-service.test.js`
+- `tests/unit/auto/session-persistence-service.test.js`
+- `tests/unit/auto/governance-session-storage-service.test.js`
+- `tests/unit/auto/controller-session-storage-service.test.js`
+- `tests/unit/auto/batch-summary-storage-service.test.js`
+- `tests/unit/auto/close-loop-session-storage-service.test.js`
 
 Integration guardrails:
 - `tests/integration/auto-close-loop-cli.integration.test.js`
@@ -89,77 +160,36 @@ Integration guardrails:
 - `tests/integration/legacy-migration-guard-cli.integration.test.js`
 - `tests/integration/takeover-baseline-cli.integration.test.js`
 
-## Safe Mainline Cutover Order
-
-1. `session-metrics` [completed]
-- Low-level counters only.
-- Verified via auto session/batch-session/controller-session/governance stats integration coverage.
-
-2. `archive-summary` [completed]
-- Shared status classification and percent calculation.
-- Verified via all session list/stats and governance archive integration coverage.
-
-3. `retention-policy` [completed]
-- Shared retention/prune argument normalization.
-- Verified via session/spec-session/batch-session/controller-session/governance-session prune integration coverage.
-
-4. `spec-protection` [completed]
-- Shared spec protection and reason ranking.
-- Verified via spec-session prune protection ranking and close-loop-batch budget-guard integration coverage.
-
-5. `session-presenter` [completed]
-- Shared result payload builders for session list/stats.
-- Verified via all session list/stats commands and governance archive integration coverage.
-
-6. `governance-signals` [completed]
-- Shared release gate / weekly ops normalization.
-- Verified via auto governance stats/maintain/close-loop integration coverage.
-
-7. `program-diagnostics` [completed]
-- Shared close-loop program failure clustering and remediation advice.
-- Verified via close-loop-program/close-loop-recover/KPI/audit integration coverage.
-
-8. `governance-session-presenter` [completed]
-- Shared governance session list payload builder.
-- Verified via auto governance session list integration coverage.
-
-9. `governance-stats-presenter` [completed]
-- Shared governance stats payload builder.
-- Verified via auto governance stats integration coverage.
-
-10. `governance-maintenance-presenter` [completed]
-- Shared maintenance plan/result summary.
-- Verified via auto governance maintain/close-loop integration coverage.
-
 ## Phase Status
 
-- Phase 1 mainline cutover is complete for the planned `auto.js` shadow modules.
-- Governance summary logic is also extracted into `lib/auto/governance-summary.js`.
-- Phase 2 has started with `lib/auto/governance-maintenance-service.js` as the first orchestration service extraction.
-- Next phase should focus on service-layer extraction for session/archive/governance orchestration.
-- Phase 2 now includes `lib/auto/governance-close-loop-service.js` alongside governance maintenance orchestration.
+- Phase 1 mainline cutover is complete for the planned `auto.js` helper/presenter/policy modules.
+- Governance summary logic is extracted into `lib/auto/governance-summary.js`.
+- Phase 2 service-layer extraction is active and currently includes:
+- `lib/auto/governance-maintenance-service.js`
+- `lib/auto/governance-close-loop-service.js`
+- `lib/auto/governance-stats-service.js`
+- `lib/auto/governance-advisory-service.js`
+- `lib/auto/session-query-service.js`
+- `lib/auto/session-prune-service.js`
+- `lib/auto/session-persistence-service.js`
+- `lib/auto/governance-session-storage-service.js`
+- `lib/auto/controller-session-storage-service.js`
+- `lib/auto/batch-summary-storage-service.js`
+- `lib/auto/close-loop-session-storage-service.js`
+- Next phase should focus on archive schema normalization, remaining recovery/storage boundaries, and final `auto.js` slimming.
 
-- Phase 2 now also includes `lib/auto/governance-stats-service.js` for governance archive aggregation and health synthesis.
 ## Current Policy
-- Phase 2 now also includes `lib/auto/governance-advisory-service.js` for recovery/controller advisory execution and latest-source selection.
 
-- Phase 2 now also includes `lib/auto/session-query-service.js` for close-loop/controller/governance session list/stats orchestration.
-- Shadow modules may be added freely if they are pure and unit-tested.
-- Phase 2 now also includes `lib/auto/session-prune-service.js` for close-loop/batch/controller session prune orchestration.
-- Mainline cutover is allowed only one cluster at a time.
-- Phase 2 now also includes `lib/auto/session-persistence-service.js` for batch/controller session persistence and retention-trigger orchestration.
-- Every cutover requires:
-- Phase 2 now also includes `lib/auto/governance-session-storage-service.js` for governance session read/load/persist storage boundaries.
-  1. `node --check lib/commands/auto.js`
-- Phase 2 now also includes `lib/auto/controller-session-storage-service.js` for controller session read/resolve/load storage boundaries.
-  2. `npx jest tests/integration/auto-close-loop-cli.integration.test.js --runInBand`
-- Phase 2 now also includes `lib/auto/batch-summary-storage-service.js` for batch summary read/resolve/load storage boundaries.
-  3. If startup behavior is touched, also run:
-- Phase 2 now also includes `lib/auto/close-loop-session-storage-service.js` for close-loop session read storage boundaries.
-     - `tests/integration/version-cli.integration.test.js`
-     - `tests/integration/legacy-migration-guard-cli.integration.test.js`
-     - `tests/integration/takeover-baseline-cli.integration.test.js`
+- Mainline cutover and service extraction proceed one focused boundary at a time.
+- Every boundary extraction requires:
+1. `node --check lib/commands/auto.js`
+2. targeted `tests/unit/auto/*`
+3. `tests/integration/auto-close-loop-cli.integration.test.js --runInBand`
+4. if startup behavior is touched, also run:
+- `tests/integration/version-cli.integration.test.js`
+- `tests/integration/legacy-migration-guard-cli.integration.test.js`
+- `tests/integration/takeover-baseline-cli.integration.test.js`
 
 ## Stop Condition
 
-Do not continue cutover if any single-cluster change causes broad `auto-close-loop` integration failures. Revert that cutover and keep only the shadow module + unit tests.
+Do not continue a boundary extraction if it causes broad `auto-close-loop` integration failures. Revert that boundary to the last stable service/storage split, then debug from there.

@@ -204,6 +204,11 @@ Reduce `lib/commands/auto.js` by extracting helper, presenter, policy, service, 
 - `maybeWriteOutput`
 - `maybeWriteTextOutput`
 
+40. `lib/auto/handoff-capability-matrix-service.js`
+- `buildAutoHandoffCapabilityMatrixPolicy`
+- `buildAutoHandoffCapabilityMatrixRecommendations`
+- `buildAutoHandoffCapabilityMatrix`
+
 ## Validation Coverage
 
 Unit tests:
@@ -220,6 +225,7 @@ Unit tests:
 - `tests/unit/auto/program-governance-loop-service.test.js`
 - `tests/unit/auto/program-auto-remediation-service.test.js`
 - `tests/unit/auto/output-writer.test.js`
+- `tests/unit/auto/handoff-capability-matrix-service.test.js`
 - `tests/unit/auto/close-loop-controller-service.test.js`
 - `tests/unit/auto/close-loop-recovery-service.test.js`
 - `tests/unit/auto/controller-lock-service.test.js`
@@ -266,9 +272,10 @@ Integration guardrails:
 - Program governance replay/recover orchestration now delegates to `lib/auto/program-governance-loop-service.js`.
 - Program gate auto-remediation and spec-prune side effects now delegate to `lib/auto/program-auto-remediation-service.js`.
 - Shared JSON/text output writers now delegate to `lib/auto/output-writer.js`.
+- Handoff capability matrix policy/recommendation/build flow now delegates to `lib/auto/handoff-capability-matrix-service.js`.
 - Controller queue, lock, and output helpers are extracted and wired into the controller service and command wrapper.
 - Dead duplicate controller queue helper definitions were removed from `lib/commands/auto.js` after cutover.
-- Remaining heavy boundaries are now concentrated in final documentation/release closure and any low-value residual utility cleanup after controller, batch, observability, program, program-summary, program-output, batch-output, program-governance-helpers, program-governance-loop, program-auto-remediation, and shared output-writer cutover stabilized.
+- Remaining heavy boundaries are now concentrated in deeper auto-handoff evidence/history services and final release closure after controller, batch, observability, program, governance, output, and handoff capability-matrix cutover stabilized.
 
 ## Working Rules
 

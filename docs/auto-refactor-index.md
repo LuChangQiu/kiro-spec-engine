@@ -1,4 +1,5 @@
 ﻿# Auto Refactor Index
+- Phase 2 now also includes `lib/auto/archive-schema-service.js` for archive schema compatibility, inspection, and migration orchestration.
 
 ## Goal
 

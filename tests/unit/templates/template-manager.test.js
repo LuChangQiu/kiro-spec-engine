@@ -52,7 +52,10 @@ describe('TemplateManager', () => {
           max_sce_version: '3.3.99',
           ontology_scope: {
             domains: ['erp'],
-            entities: ['OrderHeader']
+            entities: ['OrderHeader'],
+            relations: ['OrderHeader->Customer'],
+            business_rules: ['order-total-required'],
+            decisions: ['order-risk-routing']
           },
           risk_level: 'medium',
           rollback_contract: {

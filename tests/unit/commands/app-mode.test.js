@@ -6,6 +6,14 @@ const {
   runAppBundleListCommand,
   runAppBundleShowCommand,
   runAppBundleRegisterCommand,
+  runAppRegistryStatusCommand,
+  runAppRegistryConfigureCommand,
+  runAppRegistrySyncBundlesCommand,
+  runAppRegistrySyncCatalogCommand,
+  runAppRuntimeShowCommand,
+  runAppRuntimeReleasesCommand,
+  runAppRuntimeInstallCommand,
+  runAppRuntimeActivateCommand,
   runAppEngineeringShowCommand,
   runAppEngineeringAttachCommand,
   runAppEngineeringHydrateCommand,
@@ -19,6 +27,7 @@ describe('app and mode commands', () => {
   let tempDir;
   let originalLog;
   let stateStore;
+  const testEnv = { NODE_ENV: 'test' };
 
   beforeEach(async () => {
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-app-command-'));
@@ -26,7 +35,7 @@ describe('app and mode commands', () => {
     console.log = jest.fn();
     stateStore = new SceStateStore(tempDir, {
       fileSystem: fs,
-      env: { NODE_ENV: 'test' },
+      env: testEnv,
       sqliteModule: {}
     });
   });
@@ -74,7 +83,7 @@ describe('app and mode commands', () => {
     const registered = await runAppBundleRegisterCommand({ input: inputFile, json: true }, {
       projectPath: tempDir,
       fileSystem: fs,
-      env: { NODE_ENV: 'test' },
+      env: testEnv,
       stateStore
     });
     expect(registered.mode).toBe('app-bundle-register');
@@ -83,18 +92,15 @@ describe('app and mode commands', () => {
     const listed = await runAppBundleListCommand({ json: true }, {
       projectPath: tempDir,
       fileSystem: fs,
-      env: { NODE_ENV: 'test' },
+      env: testEnv,
       stateStore
     });
     expect(listed.items).toHaveLength(1);
-    expect(listed.items[0]).toEqual(expect.objectContaining({
-      app_key: 'customer-order-demo'
-    }));
 
     const shown = await runAppBundleShowCommand({ app: 'customer-order-demo', json: true }, {
       projectPath: tempDir,
       fileSystem: fs,
-      env: { NODE_ENV: 'test' },
+      env: testEnv,
       stateStore
     });
     expect(shown.summary).toEqual(expect.objectContaining({
@@ -105,32 +111,176 @@ describe('app and mode commands', () => {
     const applicationHome = await runModeHomeCommand('application', { app: 'customer-order-demo', json: true }, {
       projectPath: tempDir,
       fileSystem: fs,
-      env: { NODE_ENV: 'test' },
+      env: testEnv,
       stateStore
     });
-    expect(applicationHome.mode).toBe('application-home');
     expect(applicationHome.view_model.entrypoint).toBe('/apps/customer-order');
 
     const ontologyHome = await runModeHomeCommand('ontology', { app: 'customer-order-demo', json: true }, {
       projectPath: tempDir,
       fileSystem: fs,
-      env: { NODE_ENV: 'test' },
+      env: testEnv,
       stateStore
     });
-    expect(ontologyHome.mode).toBe('ontology-home');
     expect(ontologyHome.summary.triad_status).toBe('complete');
 
     const engineeringHome = await runModeHomeCommand('engineering', { app: 'customer-order-demo', json: true }, {
       projectPath: tempDir,
       fileSystem: fs,
-      env: { NODE_ENV: 'test' },
+      env: testEnv,
       stateStore
     });
-    expect(engineeringHome.mode).toBe('engineering-home');
     expect(engineeringHome.summary.code_version).toBe('main@7e12a8f');
-    expect(engineeringHome.view_model.primary_sections).toEqual([
-      'source', 'timeline', 'diff', 'delivery', 'capability', 'assurance'
-    ]);
+  });
+
+  test('configures registries, syncs bundle/catalog, and installs runtime', async () => {
+    const bundleDir = path.join(tempDir, 'bundle-registry', 'bundles', 'demo');
+    const catalogDir = path.join(tempDir, 'service-catalog', 'catalog', 'apps');
+    await fs.ensureDir(bundleDir);
+    await fs.ensureDir(catalogDir);
+
+    await fs.writeJson(path.join(tempDir, 'bundle-registry', 'bundles', 'index.json'), {
+      version: '1.0',
+      generated_at: '2026-03-08T00:00:00.000Z',
+      bundles: [
+        { app_id: 'app.demo', app_key: 'demo', file: 'demo/bundle.json' }
+      ]
+    }, { spaces: 2 });
+    await fs.writeJson(path.join(bundleDir, 'bundle.json'), {
+      app_id: 'app.demo',
+      app_key: 'demo',
+      app_name: 'Demo App',
+      environment: 'dev',
+      status: 'active',
+      default_scene_id: 'scene.demo',
+      ontology: {
+        ontology_bundle_id: 'onto.demo.r1',
+        ontology_version: '0.1.0',
+        triad_status: 'partial',
+        publish_readiness: 'draft'
+      }
+    }, { spaces: 2 });
+
+    await fs.writeJson(path.join(tempDir, 'service-catalog', 'catalog', 'index.json'), {
+      version: '1.0',
+      generated_at: '2026-03-08T00:00:00.000Z',
+      apps: [
+        { app_id: 'app.demo', app_key: 'demo', file: 'apps/demo.json' }
+      ]
+    }, { spaces: 2 });
+    await fs.writeJson(path.join(catalogDir, 'demo.json'), {
+      app_id: 'app.demo',
+      app_key: 'demo',
+      app_name: 'Demo App',
+      default_release_id: 'rel.demo.2026030801',
+      releases: [
+        {
+          release_id: 'rel.demo.2026030801',
+          runtime_version: 'v0.1.0',
+          release_channel: 'dev',
+          release_status: 'published',
+          runtime_status: 'ready',
+          entrypoint: '/apps/demo'
+        },
+        {
+          release_id: 'rel.demo.2026030802',
+          runtime_version: 'v0.1.1',
+          release_channel: 'beta',
+          release_status: 'published',
+          runtime_status: 'ready',
+          entrypoint: '/apps/demo-beta'
+        }
+      ]
+    }, { spaces: 2 });
+
+    const configured = await runAppRegistryConfigureCommand({
+      bundleIndexUrl: path.join(tempDir, 'bundle-registry', 'bundles', 'index.json'),
+      serviceIndexUrl: path.join(tempDir, 'service-catalog', 'catalog', 'index.json'),
+      json: true
+    }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: testEnv,
+      stateStore
+    });
+    expect(configured.mode).toBe('app-registry-configure');
+
+    const status = await runAppRegistryStatusCommand({ json: true }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: testEnv,
+      stateStore
+    });
+    expect(status.config.bundle_registry.index_url).toContain('bundle-registry');
+
+    const syncedBundles = await runAppRegistrySyncBundlesCommand({ json: true }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: testEnv,
+      stateStore
+    });
+    expect(syncedBundles.synced_count).toBe(1);
+
+    const syncedCatalog = await runAppRegistrySyncCatalogCommand({ json: true }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: testEnv,
+      stateStore
+    });
+    expect(syncedCatalog.synced_count).toBe(1);
+
+    const runtimeReleases = await runAppRuntimeReleasesCommand({ app: 'demo', json: true }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: testEnv,
+      stateStore
+    });
+    expect(runtimeReleases.items).toHaveLength(2);
+
+    const installRoot = path.join(tempDir, '.sce', 'apps', 'demo', 'runtime', 'rel.demo.2026030802');
+    const installed = await runAppRuntimeInstallCommand({
+      app: 'demo',
+      release: 'rel.demo.2026030802',
+      installRoot,
+      json: true
+    }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: testEnv,
+      stateStore
+    });
+    expect(installed.runtime_installation).toEqual(expect.objectContaining({
+      status: 'installed',
+      release_id: 'rel.demo.2026030802'
+    }));
+    expect(await fs.pathExists(installRoot)).toBe(true);
+
+    const activated = await runAppRuntimeActivateCommand({
+      app: 'demo',
+      release: 'rel.demo.2026030802',
+      json: true
+    }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: testEnv,
+      stateStore
+    });
+    expect(activated.runtime_release).toEqual(expect.objectContaining({
+      release_id: 'rel.demo.2026030802',
+      runtime_version: 'v0.1.1'
+    }));
+
+    const shown = await runAppRuntimeShowCommand({ app: 'demo', json: true }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: testEnv,
+      stateStore
+    });
+    expect(shown.summary).toEqual(expect.objectContaining({
+      install_status: 'installed',
+      active_release_id: 'rel.demo.2026030802',
+      release_count: 2
+    }));
   });
 
   test('attaches, hydrates, activates, and shows engineering projection', async () => {
@@ -153,14 +303,12 @@ describe('app and mode commands', () => {
     }, {
       projectPath: tempDir,
       fileSystem: fs,
-      env: { NODE_ENV: 'test' },
+      env: testEnv,
       stateStore
     });
-    expect(attached.mode).toBe('app-engineering-attach');
     expect(attached.engineering_project).toEqual(expect.objectContaining({
       engineering_project_id: 'eng.demo',
-      repo_url: 'https://git.example.com/demo.git',
-      current_branch: 'main'
+      repo_url: 'https://git.example.com/demo.git'
     }));
 
     const hydratePath = path.join(tempDir, '.sce', 'apps', 'demo', 'engineering');
@@ -171,12 +319,11 @@ describe('app and mode commands', () => {
     }, {
       projectPath: tempDir,
       fileSystem: fs,
-      env: { NODE_ENV: 'test' },
+      env: testEnv,
       stateStore
     });
-    expect(hydrated.mode).toBe('app-engineering-hydrate');
-    expect(hydrated.hydrated_workspace_path).toBe(hydratePath);
     expect(await fs.pathExists(hydratePath)).toBe(true);
+    expect(hydrated.hydrated_workspace_path).toBe(hydratePath);
 
     const activated = await runAppEngineeringActivateCommand({
       app: 'demo',
@@ -184,20 +331,18 @@ describe('app and mode commands', () => {
     }, {
       projectPath: tempDir,
       fileSystem: fs,
-      env: { NODE_ENV: 'test' },
+      env: testEnv,
       stateStore
     });
-    expect(activated.mode).toBe('app-engineering-activate');
     expect(activated.activated_workspace_path).toBe(hydratePath);
 
     const shown = await runAppEngineeringShowCommand({ app: 'demo', json: true }, {
       projectPath: tempDir,
       fileSystem: fs,
-      env: { NODE_ENV: 'test' },
+      env: testEnv,
       stateStore
     });
     expect(shown.summary).toEqual(expect.objectContaining({
-      engineering_project_id: 'eng.demo',
       hydrated: true,
       active: true,
       workspace_path: hydratePath

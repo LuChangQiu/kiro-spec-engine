@@ -44,6 +44,7 @@ SCE changes completed and now available for MagicBall:
 - `docs/magicball-frontend-state-and-command-mapping.md`
 - `docs/magicball-ui-surface-checklist.md`
 - `docs/magicball-integration-doc-index.md`
+- `docs/magicball-cli-invocation-examples.md`
 - these docs now explicitly capture:
   - serialized `mode * home` loading as the safe default during `Issue 001` verification
   - `fallback + optional seed apply` as the recommended default for fresh-project ontology UX under `Issue 003`

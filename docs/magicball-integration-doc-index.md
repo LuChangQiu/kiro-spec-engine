@@ -37,7 +37,11 @@ It is a navigation layer, not a new source of truth.
    - task feedback cards
    - timeline view integration
 
-7. `docs/magicball-integration-issue-tracker.md`
+7. `docs/magicball-cli-invocation-examples.md`
+   - copy-ready CLI examples
+   - wrapper and smoke verification patterns
+
+8. `docs/magicball-integration-issue-tracker.md`
    - current cross-project truth
    - only open issues, active decisions, and verified resolutions
 
@@ -59,6 +63,11 @@ Use:
 Use:
 - `docs/magicball-write-auth-adaptation-guide.md`
 - `docs/magicball-frontend-state-and-command-mapping.md`
+- `docs/magicball-cli-invocation-examples.md`
+
+### I need copy-ready command examples for local integration
+Use:
+- `docs/magicball-cli-invocation-examples.md`
 
 ### I need to build task cards and timeline panels
 Use:
@@ -79,6 +88,7 @@ Use:
 | `magicball-frontend-state-and-command-mapping.md` | frontend implementation mapping | medium |
 | `magicball-write-auth-adaptation-guide.md` | auth/write behavior | low |
 | `magicball-task-feedback-timeline-guide.md` | task/timeline integration | low |
+| `magicball-cli-invocation-examples.md` | copy-ready command examples | medium |
 | `magicball-integration-issue-tracker.md` | live cross-project tracker | high |
 
 ## Current High-Priority Defaults

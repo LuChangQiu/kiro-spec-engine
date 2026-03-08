@@ -12,6 +12,7 @@ For the two currently active frontend-sensitive integration items, also use:
 - `docs/magicball-frontend-state-and-command-mapping.md`
 - `docs/magicball-ui-surface-checklist.md`
 - `docs/magicball-integration-doc-index.md`
+- `docs/magicball-cli-invocation-examples.md`
 
 ## Current Scope
 

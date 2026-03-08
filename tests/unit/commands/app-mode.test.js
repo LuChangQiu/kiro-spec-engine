@@ -5,7 +5,11 @@ const { SceStateStore } = require('../../../lib/state/sce-state-store');
 const {
   runAppBundleListCommand,
   runAppBundleShowCommand,
-  runAppBundleRegisterCommand
+  runAppBundleRegisterCommand,
+  runAppEngineeringShowCommand,
+  runAppEngineeringAttachCommand,
+  runAppEngineeringHydrateCommand,
+  runAppEngineeringActivateCommand
 } = require('../../../lib/commands/app');
 const {
   runModeHomeCommand
@@ -127,5 +131,76 @@ describe('app and mode commands', () => {
     expect(engineeringHome.view_model.primary_sections).toEqual([
       'source', 'timeline', 'diff', 'delivery', 'capability', 'assurance'
     ]);
+  });
+
+  test('attaches, hydrates, activates, and shows engineering projection', async () => {
+    await stateStore.registerAppBundle({
+      app_id: 'app.demo',
+      app_key: 'demo',
+      app_name: 'Demo App',
+      status: 'active',
+      environment: 'dev',
+      default_scene_id: 'scene.demo'
+    });
+
+    const attached = await runAppEngineeringAttachCommand({
+      app: 'demo',
+      repo: 'https://git.example.com/demo.git',
+      branch: 'main',
+      projectName: 'Demo App Project',
+      codeVersion: 'main@abc123',
+      json: true
+    }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: { NODE_ENV: 'test' },
+      stateStore
+    });
+    expect(attached.mode).toBe('app-engineering-attach');
+    expect(attached.engineering_project).toEqual(expect.objectContaining({
+      engineering_project_id: 'eng.demo',
+      repo_url: 'https://git.example.com/demo.git',
+      current_branch: 'main'
+    }));
+
+    const hydratePath = path.join(tempDir, '.sce', 'apps', 'demo', 'engineering');
+    const hydrated = await runAppEngineeringHydrateCommand({
+      app: 'demo',
+      workspacePath: hydratePath,
+      json: true
+    }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: { NODE_ENV: 'test' },
+      stateStore
+    });
+    expect(hydrated.mode).toBe('app-engineering-hydrate');
+    expect(hydrated.hydrated_workspace_path).toBe(hydratePath);
+    expect(await fs.pathExists(hydratePath)).toBe(true);
+
+    const activated = await runAppEngineeringActivateCommand({
+      app: 'demo',
+      json: true
+    }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: { NODE_ENV: 'test' },
+      stateStore
+    });
+    expect(activated.mode).toBe('app-engineering-activate');
+    expect(activated.activated_workspace_path).toBe(hydratePath);
+
+    const shown = await runAppEngineeringShowCommand({ app: 'demo', json: true }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: { NODE_ENV: 'test' },
+      stateStore
+    });
+    expect(shown.summary).toEqual(expect.objectContaining({
+      engineering_project_id: 'eng.demo',
+      hydrated: true,
+      active: true,
+      workspace_path: hydratePath
+    }));
   });
 });

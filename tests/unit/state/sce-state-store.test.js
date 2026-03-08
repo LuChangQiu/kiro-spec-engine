@@ -119,6 +119,26 @@ describe('sce-state-store', () => {
     }));
   });
 
+  test('retries retryable sqlite read lock errors before succeeding', async () => {
+    const store = new SceStateStore(tempDir, {
+      fileSystem: fs,
+      env: { NODE_ENV: 'production' },
+      sqliteModule: {}
+    });
+
+    let attempts = 0;
+    const result = await store._withReadRetry(() => {
+      attempts += 1;
+      if (attempts < 3) {
+        throw new Error('database is locked');
+      }
+      return 'ok';
+    }, { maxAttempts: 4, baseDelayMs: 1 });
+
+    expect(result).toBe('ok');
+    expect(attempts).toBe(3);
+  });
+
   test('supports auth lease lifecycle and auth events in memory fallback', async () => {
     const store = new SceStateStore(tempDir, {
       fileSystem: fs,

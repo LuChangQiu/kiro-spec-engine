@@ -73,6 +73,11 @@ Suggested SCE follow-up:
 2. Consider central helper for sqlite retry/backoff on read-only mode-home queries.
 3. Document whether frontend should assume all projection reads must be serialized.
 
+SCE action taken:
+- Added short read retry handling for retryable sqlite lock errors on app/mode/pm/ontology/assurance read paths.
+- Goal: reduce transient `database is locked` failures for read-heavy MagicBall integration flows.
+
 Status:
 - Frontend workaround applied
-- SCE follow-up recommended
+- SCE read-retry mitigation implemented
+- Keep sequential frontend loading as the current safe default until wider real-world verification is complete

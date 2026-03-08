@@ -138,25 +138,12 @@ Status:
 
 ## Resolved
 
-### SCE Update 001: Current capabilities ready for MagicBall integration
-
-Status:
-- ready for MagicBall integration
-- moved into `Current Contract`
-
 ### Issue 002: pm requirement upsert succeeds but requirement list still returns empty
 
 Resolution:
 - Reproduced against current source and CLI smoke path.
 - Current behavior is now correct.
 - `pm requirement upsert` followed by `pm requirement list` returns the newly written item in the same workspace context.
-
-Verification summary:
-1. wrote `REQ-TEST-001` through `sce pm requirement upsert --json`
-2. immediately executed `sce pm requirement list --json`
-3. result returned:
-   - `summary.total = 1`
-   - `items[0].requirement_id = REQ-TEST-001`
 
 Status:
 - resolved on current SCE source
@@ -170,31 +157,23 @@ Resolution:
 - `pm tracking upsert` followed by `pm tracking board` returns the newly written item in the same workspace context.
 - `pm issue upsert` followed by `pm issue board` returns the newly written item in the same workspace context.
 
-Verification summary:
-1. wrote `TRK-TEST-001` through `sce pm tracking upsert --json`
-2. immediately executed `sce pm tracking board --json`
-3. result returned:
-   - `summary.total = 1`
-   - `items[0].tracking_id = TRK-TEST-001`
-4. wrote `BUG-TEST-001` through `sce pm issue upsert --json`
-5. immediately executed `sce pm issue board --json`
-6. result returned:
-   - `summary.total = 1`
-   - `items[0].issue_id = BUG-TEST-001`
-
 Status:
 - resolved on current SCE source
 - keep closed unless MagicBall can reproduce with exact workspace path and command path
 
-### Verification 001: ontology ER/BR/DL upsert + list round-trip works in current SCE
+### Issue 005: pm planning/change list results lag after upsert and can hide the newest local row
 
-Verified commands:
-- `npx sce ontology er upsert --input .sce\\state\\mb-er-upsert-test.json --json`
-- `npx sce ontology br upsert --input .sce\\state\\mb-br-upsert-test.json --json`
-- `npx sce ontology dl upsert --input .sce\\state\\mb-dl-upsert-test.json --json`
-- `npx sce ontology er list --json`
-- `npx sce ontology br list --json`
-- `npx sce ontology dl list --json`
+Resolution:
+- Reproduced against current source and CLI smoke path.
+- Current behavior is now correct.
+- `pm planning upsert` followed by `pm planning board` returns the newest row first.
+- `pm change upsert` followed by `pm change list` returns the newest row first.
+
+Status:
+- resolved on current SCE source
+- keep closed unless MagicBall can reproduce with exact workspace path, input payloads, and command path
+
+### Verification 001: ontology ER/BR/DL upsert + list round-trip works in current SCE
 
 Observed result:
 - all three upsert commands return `success: true`
@@ -206,36 +185,3 @@ Implication for MagicBall:
 
 Status:
 - verified working
-## 2026-03-08
-
-### Issue 005: pm planning/change list results lag after upsert and can hide the newest local row
-
-Context:
-- Project: `E:\workspace\331-poc`
-- SCE source: `E:\workspace\kiro-spec-engine`
-- SCE local version observed: `3.6.34`
-
-Verified commands:
-- `npx sce pm planning upsert --input .sce\\state\\mb-plan-upsert-test-2.json --json`
-- `npx sce pm planning board --json`
-- `npx sce pm change upsert --input .sce\\state\\mb-change-upsert-test-2.json --json`
-- `npx sce pm change list --json`
-
-Observed behavior:
-- both upsert commands return `success: true`
-- subsequent list/board queries return data, but not the newest row just written
-- example: planning board still showed `PLN-TEST-001` after successful upsert of `PLN-TEST-002`
-- example: change list still showed `CR-TEST-001` after successful upsert of `CR-TEST-002`
-
-Impact on MagicBall:
-- frontend optimistic insert can be overwritten by stale list/board payload if it refreshes immediately after save
-- MagicBall now keeps PM save result locally instead of immediately trusting refreshed planning/change lists
-
-Suggested SCE follow-up:
-1. verify whether PM planning/change list queries are returning stale sqlite reads or cached snapshots
-2. verify whether write commit visibility differs between show and list/board paths
-3. clarify whether PM domain currently has eventual consistency semantics or this is unintended
-
-Status:
-- frontend workaround applied
-- SCE read-after-write consistency still needs investigation

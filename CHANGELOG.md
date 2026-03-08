@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added `lib/auto/handoff-release-gate-history-loaders-service.js` for release-gate history entry normalization, report discovery, seed loading, and merge selection.
+- Added `lib/auto/handoff-run-service.js` for full auto-handoff orchestration outside the command layer.
+- Added dedicated unit coverage in `tests/unit/auto/handoff-release-gate-history-loaders-service.test.js` and `tests/unit/auto/handoff-run-service.test.js`.
+
+### Changed
+- Moved `runAutoHandoff` out of `lib/commands/auto.js`, leaving the command layer as a thin dependency-injected wrapper.
+- Completed the high-value `auto-handoff` extraction round by splitting snapshot, release-gate loader, and run orchestration boundaries into dedicated services.
+
 ## [3.6.34] - 2026-03-08
 
 ### Added

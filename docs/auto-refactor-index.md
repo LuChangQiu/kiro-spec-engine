@@ -229,6 +229,15 @@ Reduce `lib/commands/auto.js` by extracting helper, presenter, policy, service, 
 - `buildAutoHandoffScenePackageBatchSnapshot`
 - `buildAutoHandoffCapabilityCoverageSnapshot`
 
+45. `lib/auto/handoff-release-gate-history-loaders-service.js`
+- `buildAutoHandoffReleaseGateHistoryEntry`
+- `loadAutoHandoffReleaseGateReports`
+- `loadAutoHandoffReleaseGateHistorySeed`
+- `mergeAutoHandoffReleaseGateHistoryEntries`
+
+46. `lib/auto/handoff-run-service.js`
+- `runAutoHandoff`
+
 ## Validation Coverage
 
 Unit tests:
@@ -249,7 +258,9 @@ Unit tests:
 - `tests/unit/auto/handoff-release-evidence-service.test.js`
 - `tests/unit/auto/handoff-evidence-review-service.test.js`
 - `tests/unit/auto/handoff-release-gate-history-service.test.js`
+- `tests/unit/auto/handoff-release-gate-history-loaders-service.test.js`
 - `tests/unit/auto/handoff-snapshots-service.test.js`
+- `tests/unit/auto/handoff-run-service.test.js`
 - `tests/unit/auto/close-loop-controller-service.test.js`
 - `tests/unit/auto/close-loop-recovery-service.test.js`
 - `tests/unit/auto/controller-lock-service.test.js`
@@ -301,9 +312,11 @@ Integration guardrails:
 - Handoff evidence snapshot/review-report/draft-context flow now delegates to `lib/auto/handoff-evidence-review-service.js`.
 - Handoff release gate history index/markdown flow now delegates to `lib/auto/handoff-release-gate-history-service.js`.
 - Handoff baseline / scene-batch / capability-coverage snapshots now delegate to `lib/auto/handoff-snapshots-service.js`.
+- Handoff release-gate history entry/report/seed merge loaders now delegate to `lib/auto/handoff-release-gate-history-loaders-service.js`.
+- Handoff run orchestration now delegates to `lib/auto/handoff-run-service.js`.
 - Controller queue, lock, and output helpers are extracted and wired into the controller service and command wrapper.
 - Dead duplicate controller queue helper definitions were removed from `lib/commands/auto.js` after cutover.
-- Remaining heavy boundaries are now concentrated in `runAutoHandoff` orchestration plus a small set of handoff renderers/loaders after the handoff snapshot, evidence, review, and history subdomains stabilized.
+- `lib/commands/auto.js` now keeps `auto-handoff` behavior as dependency-injected command wrappers rather than owning the full orchestration body.
 
 ## Working Rules
 

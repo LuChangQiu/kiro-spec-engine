@@ -238,6 +238,27 @@ Reduce `lib/commands/auto.js` by extracting helper, presenter, policy, service, 
 46. `lib/auto/handoff-run-service.js`
 - `runAutoHandoff`
 
+47. `lib/auto/recovery-memory-service.js`
+- `getCloseLoopRecoveryMemoryFile`
+- `loadCloseLoopRecoveryMemory`
+- `normalizeRecoveryMemoryToken`
+- `resolveRecoveryMemoryScope`
+- `resolveGitBranchToken`
+- `buildRecoveryMemorySignature`
+- `getRecoveryActionMemoryKey`
+- `selectRecoveryActionFromMemory`
+- `getRecoveryMemoryEntry`
+- `updateCloseLoopRecoveryMemory`
+- `summarizeRecoveryMemory`
+- `filterRecoveryMemoryByScope`
+- `buildRecoveryMemoryScopeStats`
+- `showCloseLoopRecoveryMemory`
+- `showCloseLoopRecoveryMemoryScopes`
+- `pruneCloseLoopRecoveryMemory`
+- `clearCloseLoopRecoveryMemory`
+- `resolveRecoveryActionSelection`
+- `applyRecoveryActionPatch`
+
 ## Validation Coverage
 
 Unit tests:
@@ -278,6 +299,7 @@ Unit tests:
 - `tests/unit/auto/governance-stats-service.test.js`
 - `tests/unit/auto/governance-summary.test.js`
 - `tests/unit/auto/program-diagnostics.test.js`
+- `tests/unit/auto/recovery-memory-service.test.js`
 - `tests/unit/auto/recovery-selection-service.test.js`
 - `tests/unit/auto/retention-policy.test.js`
 - `tests/unit/auto/session-metrics.test.js`
@@ -317,6 +339,7 @@ Integration guardrails:
 - Controller queue, lock, and output helpers are extracted and wired into the controller service and command wrapper.
 - Dead duplicate controller queue helper definitions were removed from `lib/commands/auto.js` after cutover.
 - `lib/commands/auto.js` now keeps `auto-handoff` behavior as dependency-injected command wrappers rather than owning the full orchestration body.
+- Recovery-memory persistence, scope resolution, pruning, and remediation-action selection now delegate to `lib/auto/recovery-memory-service.js`.
 
 ## Working Rules
 

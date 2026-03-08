@@ -2,62 +2,74 @@
 
 ## Goal
 
-Provide a stable adaptation guide for MagicBall to integrate the current SCE capability set.
+Provide the primary overview for MagicBall to integrate the current SCE capability set.
 
-This guide only covers implemented or ready-to-consume capabilities.
-It is intended for MagicBall frontend / integration work.
+This document is intentionally concise.
+It defines the stable integration shape, command families, and response contracts.
+Implementation detail should live in the specialized documents listed below.
 
-For the two currently active frontend-sensitive integration items, also use:
+## Primary Companion Docs
+
+Use these documents together:
+- `docs/magicball-integration-doc-index.md`
+- `docs/magicball-ui-surface-checklist.md`
 - `docs/magicball-mode-home-and-ontology-empty-state-playbook.md`
 - `docs/magicball-frontend-state-and-command-mapping.md`
-- `docs/magicball-ui-surface-checklist.md`
-- `docs/magicball-integration-doc-index.md`
 - `docs/magicball-cli-invocation-examples.md`
+- `docs/magicball-write-auth-adaptation-guide.md`
+- `docs/magicball-task-feedback-timeline-guide.md`
+- `docs/magicball-integration-issue-tracker.md`
 
 ## Current Scope
 
-SCE now provides:
-
+SCE currently provides MagicBall-facing support for:
 1. `app bundle registry`
 2. `application / ontology / engineering home projections`
-3. `app engineering attach / hydrate / activate`
-4. `app registry configure / sync`
-5. `app runtime show / releases / install / activate`
-6. `pm` delivery data plane
-7. `ontology` triad data plane
-8. `assurance` data plane
+3. `app runtime install / activate`
+4. `app engineering attach / hydrate / activate`
+5. `pm` delivery data plane
+6. `ontology` triad data plane
+7. `assurance` data plane
+8. `write authorization`
+9. `task feedback + timeline`
 
-## Recommended MagicBall Integration Strategy
+## Core Integration Positioning
 
-### 1. Use `app_id` / `app_key` as the primary application identity
+### 1. App identity
 
 MagicBall should keep both:
 - `app_id`
 - `app_key`
 
-Recommendation:
-- internal routing and state can use either
-- user-facing app selection should prefer `app_name`
-- cross-mode switching should use `app_key` or `app_id` consistently
+Recommended rule:
+- use `app_key` as the stable frontend route token
+- keep `app_id` as the bound SCE identity once resolved
+- prefer `app_name` for user-facing display
 
-### 2. Always enter a mode through SCE projection APIs
+### 2. Three-mode entry
 
-Do not let MagicBall reconstruct runtime / ontology / engineering relationships itself.
-Use:
+MagicBall should enter every app through SCE projections, not through frontend-reconstructed relationships.
+
+Top-level entry commands:
 - `sce mode application home --app <app-id|app-key> --json`
 - `sce mode ontology home --app <app-id|app-key> --json`
 - `sce mode engineering home --app <app-id|app-key> --json`
 
-These should be treated as the top-level source for each mode page.
-
-Operational constraint during current verification window:
-- MagicBall should load these projection commands sequentially, not in parallel
+Current default during `Issue 001` verification:
+- load `mode * home` sequentially, not in parallel
 - recommended order:
   1. `mode application home`
   2. `mode ontology home`
   3. `mode engineering home`
   4. `app engineering show`
-- reason: SCE already includes sqlite read-retry + short-lived projection cache mitigation, but frontend should still keep serialized loading as the safe default until wider field verification closes `Issue 001`
+
+### 3. Fresh ontology behavior
+
+Current default during `Issue 003` verification:
+- treat empty ontology as a valid fresh/local project state
+- use `fallback + optional seed apply`
+- do not auto-apply starter seed silently
+- keep seed apply explicit and user-triggered
 
 ## Remote Registry Sources
 
@@ -71,280 +83,73 @@ Operational constraint during current verification window:
 
 ## Demo Application
 
-MagicBall can use this demo as the first full-chain integration target:
+Current first integration target:
 - `app_id`: `app.customer-order-demo`
 - `app_key`: `customer-order-demo`
 
-## Phase 1 Commands To Consume
+## Command Families
 
-### A. App Bundle And Mode Entry
+This guide does not repeat full invocation examples.
+Use `docs/magicball-cli-invocation-examples.md` for copy-ready commands.
 
-#### Show app bundle
-```bash
-sce app bundle show --app customer-order-demo --json
-```
+### Mode entry
+- `sce app bundle show`
+- `sce mode application home`
+- `sce mode ontology home`
+- `sce mode engineering home`
+- `sce app engineering show`
 
-#### Application home
-```bash
-sce mode application home --app customer-order-demo --json
-```
+### Runtime and engineering control
+- `sce app runtime show/releases/install/activate`
+- `sce app engineering show/attach/hydrate/activate`
+- `sce app registry status/configure/sync*`
 
-#### Ontology home
-```bash
-sce mode ontology home --app customer-order-demo --json
-```
+### Engineering data plane
+- `sce pm requirement list/show/upsert`
+- `sce pm tracking board/show/upsert`
+- `sce pm planning board/show/upsert`
+- `sce pm change list/show/upsert`
+- `sce pm issue board/show/upsert`
 
-#### Engineering home
-```bash
-sce mode engineering home --app customer-order-demo --json
-```
+### Ontology data plane
+- `sce ontology triad summary`
+- `sce ontology er list/show/upsert`
+- `sce ontology br list/show/upsert`
+- `sce ontology dl list/show/upsert`
+- `sce ontology seed list/show/apply`
 
-### B. Registry Sync
+### Assurance and governance
+- `sce assurance resource status`
+- `sce assurance logs views`
+- `sce assurance backup list`
+- `sce assurance config switches`
+- `sce auth status/grant/revoke`
 
-#### Show registry config
-```bash
-sce app registry status --json
-```
+### Task and timeline
+- `sce studio events`
+- `sce timeline list/show`
 
-#### Configure local registry pointers
-```bash
-sce app registry configure \
-  --bundle-index-url <path-or-url> \
-  --service-index-url <path-or-url> \
-  --json
-```
+## Stable Response Contracts
 
-#### Sync bundle registry
-```bash
-sce app registry sync-bundles --json
-```
+### 1. Mode-home payloads
 
-#### Sync service catalog
-```bash
-sce app registry sync-catalog --json
-```
+MagicBall should treat the three `mode * home` commands as stable page-shell sources.
 
-#### Sync both
-```bash
-sce app registry sync --json
-```
-
-### C. Runtime Flow
-
-#### Show runtime projection
-```bash
-sce app runtime show --app customer-order-demo --json
-```
-
-#### List runtime releases
-```bash
-sce app runtime releases --app customer-order-demo --json
-```
-
-#### Install a release
-```bash
-sce app runtime install --app customer-order-demo --release <release-id> --json
-```
-
-#### Activate a release
-```bash
-sce app runtime activate --app customer-order-demo --release <release-id> --json
-```
-
-### D. Engineering Flow
-
-#### Show engineering projection
-```bash
-sce app engineering show --app customer-order-demo --json
-```
-
-#### Attach engineering metadata
-```bash
-sce app engineering attach \
-  --app customer-order-demo \
-  --repo <repo-url> \
-  --branch main \
-  --json
-```
-
-#### Hydrate engineering workspace
-```bash
-sce app engineering hydrate --app customer-order-demo --json
-```
-
-#### Activate engineering workspace
-```bash
-sce app engineering activate --app customer-order-demo --json
-```
-
-### E. PM Delivery Data Plane
-
-#### Requirements
-```bash
-sce pm requirement list --json
-sce pm requirement show --id REQ-001 --json
-sce pm requirement upsert --input requirement.json --json
-```
-
-#### Tracking
-```bash
-sce pm tracking board --json
-sce pm tracking show --id TRK-001 --json
-sce pm tracking upsert --input tracking.json --json
-```
-
-#### Planning
-```bash
-sce pm planning board --json
-sce pm planning show --id PLN-001 --json
-sce pm planning upsert --input plan.json --json
-```
-
-#### Change Requests
-```bash
-sce pm change list --json
-sce pm change show --id CR-001 --json
-sce pm change upsert --input change.json --json
-```
-
-#### Issues
-```bash
-sce pm issue board --json
-sce pm issue show --id BUG-001 --json
-sce pm issue upsert --input issue.json --json
-```
-
-### F. Ontology Data Plane
-
-#### ER
-```bash
-sce ontology er list --json
-sce ontology er show --id Requirement --json
-sce ontology er upsert --input er.json --json
-```
-
-#### BR
-```bash
-sce ontology br list --json
-sce ontology br show --id BR-001 --json
-sce ontology br upsert --input br.json --json
-```
-
-#### DL
-```bash
-sce ontology dl list --json
-sce ontology dl show --id DL-001 --json
-sce ontology dl upsert --input dl.json --json
-```
-
-#### Triad Summary
-```bash
-sce ontology triad summary --json
-```
-
-#### Starter Seed (optional for fresh projects)
-```bash
-sce ontology seed list --json
-sce ontology seed show --profile customer-order-demo --json
-sce ontology seed apply --profile customer-order-demo --json
-```
-
-Recommended fresh-project ontology policy:
-- default to `fallback + optional seed apply`
-- first render should use SCE payload `starter_seed` guidance plus a clear empty-state explanation
-- do not auto-apply seed silently on first load
-- expose an explicit `Initialize ontology starter data` action that calls `sce ontology seed apply --profile customer-order-demo --json`
-- after seed apply, refresh `mode ontology home`, `ontology triad summary`, `ontology er list`, `ontology br list`, and `ontology dl list`
-
-### G. Assurance Data Plane
-
-```bash
-sce assurance resource status --json
-sce assurance logs views --json
-sce assurance backup list --json
-sce assurance config switches --json
-```
-
-## Stable Response Patterns
-
-## 1. Mode Home Payload
-
-### `application home`
-Expected top-level fields:
+Common top-level fields:
 - `mode`
 - `query`
 - `summary`
-- `relations`
-- `items`
 - `view_model`
 - `mb_status`
 
-Important `summary` fields:
-- `app_name`
-- `runtime_version`
-- `environment`
-- `release_status`
-- `runtime_status`
-- `install_status`
-- `release_count`
+Important additional fields vary by mode:
+- `application home`: release/runtime state
+- `ontology home`: `ontology_core_ui`, triad readiness, `starter_seed`
+- `engineering home`: delivery summary, assurance summary, project metadata
 
-Important `view_model` fields:
-- `projection`
-- `entrypoint`
-- `current_release`
-- `current_environment`
-- `install_root`
-- `scene_binding_count`
-- `release_count`
+### 2. Table payloads
 
-### `ontology home`
-Important `summary` fields:
-- `app_name`
-- `ontology_version`
-- `template_version`
-- `triad_status`
-- `publish_readiness`
-- `triad_ready`
-- `triad_coverage_percent`
-
-Additional top-level fields:
-- `ontology_core`
-- `ontology_core_ui`
-
-Important `view_model` fields:
-- `projection`
-- `ontology_bundle_id`
-- `triad_summary`
-- `ontology_counts`
-- `capability_count`
-- `starter_seed` (present when ontology is empty and SCE recommends a starter profile)
-
-### `engineering home`
-Important `summary` fields:
-- `app_name`
-- `runtime_version`
-- `code_version`
-- `current_branch`
-- `dirty_state`
-- `scene_count`
-- `requirement_count`
-- `issue_count`
-- `plan_count`
-- `assurance_resource_count`
-
-Important `view_model` fields:
-- `projection`
-- `primary_sections`
-- `project_name`
-- `repo_url`
-- `workspace_path`
-- `default_scene_id`
-- `delivery_summary`
-- `assurance_summary`
-
-## 2. Table Payload Pattern
-
-The following command groups now follow a stable table-style output:
+The following command groups follow a stable table-style output:
 - `sce pm * list/board`
 - `sce ontology * list`
 - `sce assurance *`
@@ -359,8 +164,8 @@ Expected fields:
 - `view_model`
 - `mb_status`
 
-### `view_model`
-Current stable shape:
+Current stable `view_model` shape:
+
 ```json
 {
   "type": "table",
@@ -370,122 +175,29 @@ Current stable shape:
 
 MagicBall should use `view_model.columns` as the preferred visible-column contract.
 
-## Suggested MagicBall UI Mapping
+## Recommended Division Of Responsibility
 
-### Application Mode
+### This guide owns
+- overall integration shape
+- command family boundaries
+- top-level response contracts
+- current default product decisions
 
-Use these SCE sources:
-- home shell: `mode application home`
-- runtime details: `app runtime show`
-- release list: `app runtime releases`
-
-Recommended UI blocks:
-1. app hero summary
-2. active runtime release card
-3. release list panel
-4. install / activate actions
-
-### Ontology Mode
-
-Use these SCE sources:
-- home shell: `mode ontology home`
-- ER list: `ontology er list`
-- BR list: `ontology br list`
-- DL list: `ontology dl list`
-- triad summary: `ontology triad summary`
-
-Recommended UI blocks:
-1. ontology hero summary
-2. triad summary card
-3. ER table
-4. BR table
-5. DL table
-
-### Engineering Mode
-
-Use these SCE sources:
-- home shell: `mode engineering home`
-- requirements: `pm requirement list`
-- tracking: `pm tracking board`
-- planning: `pm planning board`
-- changes: `pm change list`
-- issues: `pm issue board`
-- resource: `assurance resource status`
-- logs: `assurance logs views`
-- backup: `assurance backup list`
-- config: `assurance config switches`
-
-Recommended UI blocks:
-1. engineering hero summary
-2. delivery summary cards
-3. assurance summary cards
-4. existing source / timeline / diff pages
-5. delivery and assurance tables
-
-## Recommended MagicBall Execution Flow
-
-### App Selection
-When the user selects an app:
-1. call `sce mode application home --app <key> --json`
-2. cache `app_id`, `app_key`, `relations`, `summary`
-3. use that same app identity for mode switching
-
-### Mode Switching
-When switching modes:
-1. `Application Mode` -> call `mode application home`
-2. `Ontology Mode` -> call `mode ontology home`
-3. `Engineering Mode` -> call `mode engineering home`
-
-Do not infer the bundle relationship locally.
-
-### Engineering Control Flow
-When entering Engineering Mode for an app:
-1. `sce app engineering show`
-2. if not attached -> `sce app engineering attach`
-3. if no workspace path -> `sce app engineering hydrate`
-4. then `sce app engineering activate`
-5. then open engineering pages using `mode engineering home`
-
-### Runtime Control Flow
-When entering Application Mode for an app:
-1. `sce app runtime show`
-2. if needed, `sce app runtime releases`
-3. if not installed -> `sce app runtime install`
-4. if release switch needed -> `sce app runtime activate`
-5. then open app via `view_model.entrypoint`
-
-## What MagicBall Should Do Next
-
-The following work can start now.
-
-### Priority 1
-- switch mode entry pages to use `sce mode * home`
-- use `app_key` as the stable app selection token
-- wire demo app `customer-order-demo`
-
-### Priority 2
-- replace Engineering Mode table tabs with real `sce pm` and `sce assurance` payloads
-- replace Ontology Mode table tabs with real `sce ontology` payloads
-
-### Priority 3
-- wire install / activate actions in Application Mode
-- wire attach / hydrate / activate actions in Engineering Mode
-
-## Actions MagicBall Needs To Coordinate With SCE
-
-MagicBall should coordinate on these points:
-
-1. confirm final top-level route keys for the three modes
-2. confirm whether frontend stores `app_id` or `app_key` as primary route param
-3. confirm whether write actions should be hidden when no `auth lease` is present
-4. confirm how install / activate progress should be surfaced in UI
-5. confirm whether empty-state fallback should still read `.sce/pm/*/index.md` after real data loads
+### Specialized docs own
+- page-level done criteria: `docs/magicball-ui-surface-checklist.md`
+- frontend state + command mapping: `docs/magicball-frontend-state-and-command-mapping.md`
+- mode-home + ontology empty-state behavior: `docs/magicball-mode-home-and-ontology-empty-state-playbook.md`
+- copy-ready commands: `docs/magicball-cli-invocation-examples.md`
+- write auth behavior: `docs/magicball-write-auth-adaptation-guide.md`
+- task/timeline behavior: `docs/magicball-task-feedback-timeline-guide.md`
+- live cross-project truth: `docs/magicball-integration-issue-tracker.md`
 
 ## Practical Conclusion
 
-MagicBall can now begin real integration against SCE instead of waiting on more foundation work.
-
-The most useful immediate adaptation is:
-1. consume `mode * home`
-2. consume `pm / ontology / assurance` table payloads
-3. use `customer-order-demo` as the first full-chain demo app
+MagicBall should now integrate SCE in this order:
+1. use `app_key` as the frontend app token
+2. bootstrap the workspace through serialized `mode * home`
+3. render page surfaces from SCE payloads directly
+4. keep ontology empty-state explicit and seed apply optional
+5. keep write flows lease-aware
+6. use task/timeline view contracts instead of raw event-first rendering

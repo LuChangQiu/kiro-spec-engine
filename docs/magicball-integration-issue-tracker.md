@@ -5,9 +5,16 @@
 > When SCE completes a relevant change that MagicBall needs to know about, the update should be synced here.
 > Once an item is verified and no longer needs cross-project coordination, it should be removed or compacted to avoid the file becoming too large, too noisy, or too hard to maintain.
 
-## 2026-03-08
+## Usage Rule
 
-### SCE Update 001: Current capabilities ready for MagicBall integration
+- Keep this file narrow.
+- Add only cross-project integration facts.
+- Prefer short status-oriented records over long design discussion.
+- Move completed items to `Resolved` or remove them once both sides no longer need them.
+
+## Current Contract
+
+### Current SCE capabilities ready for MagicBall integration
 
 SCE changes completed and now available for MagicBall:
 - `app bundle` registry local state and CLI
@@ -22,19 +29,18 @@ SCE changes completed and now available for MagicBall:
 - `assurance resource/logs/backup/config`
 - MagicBall-facing docs updated under `docs/`
 
-MagicBall recommended consumption order:
+### Current recommended MagicBall consumption order
 1. consume `mode * home` as the top-level source for the three modes
 2. consume `pm`, `ontology`, and `assurance` table payloads
 3. wire runtime install/activate and engineering attach/hydrate/activate actions
 4. use demo app: `customer-order-demo`
 
-Related SCE docs:
+### Related SCE docs
 - `docs/magicball-sce-adaptation-guide.md`
 - `docs/magicball-write-auth-adaptation-guide.md`
 - `docs/magicball-adaptation-task-checklist-v1.md`
 
-Status:
-- ready for MagicBall integration
+## Open Items
 
 ### Issue 001: SQLite lock when frontend triggers multiple SCE projection commands concurrently
 
@@ -56,7 +62,7 @@ Related commands that were being loaded together:
 - `sce mode engineering home --app customer-order-demo --json`
 - `sce app engineering show --app customer-order-demo --json`
 
-Frontend mitigation applied in MagicBall:
+MagicBall action taken:
 - Changed mode-home loading from parallel to sequential in local store.
 - MagicBall now serializes:
   1. application home
@@ -64,20 +70,23 @@ Frontend mitigation applied in MagicBall:
   3. engineering home
   4. engineering show
 
-Assessment:
-- This mitigation makes frontend behavior more stable.
-- However, from SCE side it would still be better if repeated mode-home reads were more concurrency-tolerant, or if read-only mode projections could avoid transient sqlite lock failures.
-
-Suggested SCE follow-up:
-1. Evaluate whether read-only projection commands can tolerate short lock contention with retry.
-2. Consider central helper for sqlite retry/backoff on read-only mode-home queries.
-3. Document whether frontend should assume all projection reads must be serialized.
-
 SCE action taken:
 - Added short read retry handling for retryable sqlite lock errors on app/mode/pm/ontology/assurance read paths.
 - Goal: reduce transient `database is locked` failures for read-heavy MagicBall integration flows.
 
+Current cross-project decision:
+- Keep sequential frontend loading as the current safe default.
+- Treat SCE read retry as mitigation, not as permission to switch back to parallel loading immediately.
+
 Status:
-- Frontend workaround applied
-- SCE read-retry mitigation implemented
-- Keep sequential frontend loading as the current safe default until wider real-world verification is complete
+- MagicBall workaround applied
+- SCE mitigation applied
+- still needs wider real-world verification before considering this fully closed
+
+## Resolved
+
+### SCE Update 001: Current capabilities ready for MagicBall integration
+
+Status:
+- ready for MagicBall integration
+- moved into `Current Contract`

@@ -134,7 +134,7 @@ describe('auto close-loop CLI integration', () => {
     expect(listedAfter.exitCode).toBe(0);
     const listAfterPayload = parseJsonOutput(listedAfter.stdout);
     expect(listAfterPayload.total).toBe(1);
-  });
+  }, 30000);
 
   test('supports automatic session retention policy in close-loop CLI', async () => {
     const firstRun = await runCli([

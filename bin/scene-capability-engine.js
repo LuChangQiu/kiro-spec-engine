@@ -983,6 +983,8 @@ const { registerAppCommands } = require('../lib/commands/app');
 const { registerModeCommands } = require('../lib/commands/mode');
 registerAppCommands(program);
 registerModeCommands(program);
+const { registerPmCommands } = require('../lib/commands/pm');
+registerPmCommands(program);
 
 // Template management commands
 const templatesCommand = require('../lib/commands/templates');

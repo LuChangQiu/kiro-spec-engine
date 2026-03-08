@@ -158,6 +158,23 @@ For IDEs, AI shells, or custom frontends, the most important SCE surfaces are:
 - `sce auth grant|status|revoke`
 - SQLite state at `.sce/state/sce-state.sqlite`
 
+MagicBall-specific integration surfaces now also include:
+
+- `sce app bundle list|show|register`
+- `sce app registry status|configure|sync*`
+- `sce app runtime show|releases|install|activate`
+- `sce app engineering show|attach|hydrate|activate`
+- `sce mode application|ontology|engineering home`
+- `sce pm requirement|tracking|planning|change|issue ... --json`
+- `sce ontology er|br|dl ... --json`
+- `sce ontology triad summary --json`
+- `sce assurance resource|logs|backup|config ... --json`
+
+Demo remote registries:
+- `magicball-app-bundle-registry`
+- `magicball-app-service-catalog`
+- demo app key: `customer-order-demo`
+
 ---
 
 ## Documentation

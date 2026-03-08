@@ -2,8 +2,8 @@
 
 > Quick reference for all `sce` commands
 
-**Version**: 3.5.2
-**Last Updated**: 2026-03-04
+**Version**: 3.6.34
+**Last Updated**: 2026-03-08
 
 ---
 
@@ -365,6 +365,98 @@ sce workspace takeover-apply --json
 # Legacy commands (still supported)
 sce workspace sync
 sce workspace team
+```
+
+### App Bundle & MagicBall Mode Projection
+
+```bash
+# List/show/register app bundles
+sce app bundle list --json
+sce app bundle show --app customer-order-demo --json
+sce app bundle register --input bundle.json --json
+
+# Configure and sync remote registries
+sce app registry status --json
+sce app registry configure --bundle-index-url <path-or-url> --service-index-url <path-or-url> --json
+sce app registry sync --json
+
+# Runtime projection
+sce app runtime show --app customer-order-demo --json
+sce app runtime releases --app customer-order-demo --json
+sce app runtime install --app customer-order-demo --release <release-id> --json
+sce app runtime activate --app customer-order-demo --release <release-id> --json
+
+# Engineering projection
+sce app engineering show --app customer-order-demo --json
+sce app engineering attach --app customer-order-demo --repo <repo-url> --branch main --json
+sce app engineering hydrate --app customer-order-demo --json
+sce app engineering activate --app customer-order-demo --json
+
+# Three-mode home projections
+sce mode application home --app customer-order-demo --json
+sce mode ontology home --app customer-order-demo --json
+sce mode engineering home --app customer-order-demo --json
+```
+
+### PM Delivery Data Plane
+
+```bash
+# Requirements
+sce pm requirement list --json
+sce pm requirement show --id REQ-001 --json
+sce pm requirement upsert --input requirement.json --json
+
+# Tracking
+sce pm tracking board --json
+sce pm tracking show --id TRK-001 --json
+sce pm tracking upsert --input tracking.json --json
+
+# Planning
+sce pm planning board --json
+sce pm planning show --id PLN-001 --json
+sce pm planning upsert --input plan.json --json
+
+# Change requests
+sce pm change list --json
+sce pm change show --id CR-001 --json
+sce pm change upsert --input change.json --json
+
+# Issues
+sce pm issue board --json
+sce pm issue show --id BUG-001 --json
+sce pm issue upsert --input issue.json --json
+```
+
+### Ontology Data Plane
+
+```bash
+# ER
+sce ontology er list --json
+sce ontology er show --id Requirement --json
+sce ontology er upsert --input er.json --json
+
+# BR
+sce ontology br list --json
+sce ontology br show --id BR-001 --json
+sce ontology br upsert --input br.json --json
+
+# DL
+sce ontology dl list --json
+sce ontology dl show --id DL-001 --json
+sce ontology dl upsert --input dl.json --json
+
+# Triad summary
+sce ontology triad summary --json
+```
+
+### Assurance Data Plane
+
+```bash
+# Engineering assurance summaries
+sce assurance resource status --json
+sce assurance logs views --json
+sce assurance backup list --json
+sce assurance config switches --json
 ```
 
 ### Environment Management

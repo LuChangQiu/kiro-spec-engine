@@ -163,6 +163,23 @@ SCE 默认是强治理的。
 - `sce auth grant|status|revoke`
 - SQLite 状态库：`.sce/state/sce-state.sqlite`
 
+面向 MagicBall 的当前关键接口还包括：
+
+- `sce app bundle list|show|register`
+- `sce app registry status|configure|sync*`
+- `sce app runtime show|releases|install|activate`
+- `sce app engineering show|attach|hydrate|activate`
+- `sce mode application|ontology|engineering home`
+- `sce pm requirement|tracking|planning|change|issue ... --json`
+- `sce ontology er|br|dl ... --json`
+- `sce ontology triad summary --json`
+- `sce assurance resource|logs|backup|config ... --json`
+
+远端示例 registry：
+- `magicball-app-bundle-registry`
+- `magicball-app-service-catalog`
+- 示例 app key：`customer-order-demo`
+
 ---
 
 ## 文档入口

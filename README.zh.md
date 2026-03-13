@@ -144,6 +144,7 @@ sce auth status --json
 SCE 默认是强治理的。
 
 - `studio plan` 默认执行 intake 与 scene/spec 治理，除非策略显式允许绕过
+- 缺少业务场景/模块/页面/实体上下文时，SCE 必须先进入澄清，而不是把未知业务范围直接变成一刀切禁用
 - 当 spec 绑定时，`verify` 和 `release` 默认执行 problem-closure 等相关门禁
 - `close-loop-program` 默认带 gate 评估、fallback-chain、governance replay、auto-remediation
 - 状态持久化默认优先走 SQLite，而不是零散本地缓存

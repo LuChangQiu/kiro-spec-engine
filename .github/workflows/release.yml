@@ -34,6 +34,13 @@ jobs:
       - name: Run Moqui rebuild gate
         run: npm run gate:moqui-rebuild
 
+      - name: Run clarification-first audit
+        run: |
+          node scripts/clarification-first-audit.js \
+            --fail-on-violation \
+            --out .sce/reports/clarification-first-audit-release-test.json \
+            --json
+
       - name: Run interactive governance gate
         run: node scripts/interactive-governance-report.js --period weekly --fail-on-alert --json
       
@@ -57,6 +64,23 @@ jobs:
       
       - name: Install dependencies
         run: npm ci
+
+      - name: Build clarification-first audit report
+        id: clarification_first_audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          NOTES_DIR=".sce/reports/release-evidence"
+          AUDIT_JSON="${NOTES_DIR}/clarification-first-audit-${TAG}.json"
+
+          mkdir -p "${NOTES_DIR}"
+          node scripts/clarification-first-audit.js \
+            --fail-on-violation \
+            --out "${AUDIT_JSON}" \
+            --json
+
+          echo "json_file=${AUDIT_JSON}" >> "$GITHUB_OUTPUT"
 
       - name: Build interactive governance report
         id: interactive_governance
@@ -1234,6 +1258,7 @@ jobs:
             ${{ steps.release_notes.outputs.asset_files }}
             ${{ steps.interactive_governance.outputs.json_file }}
             ${{ steps.interactive_governance.outputs.markdown_file }}
+            ${{ steps.clarification_first_audit.outputs.json_file }}
             ${{ steps.interactive_matrix_signals.outputs.signal_file }}
             ${{ steps.moqui_baseline.outputs.json_file }}
             ${{ steps.moqui_baseline.outputs.markdown_file }}

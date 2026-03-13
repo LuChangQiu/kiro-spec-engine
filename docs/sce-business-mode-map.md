@@ -34,6 +34,8 @@ After SCE integration is enabled:
 5. `gated execution`: runtime policy + authorization tier + approval gate.
 6. `execution + audit`: execute or block, then emit summary and evidence.
 
+If business scene or symbol evidence is incomplete, route to scope clarification first instead of using a blanket fallback disable.
+
 ## 5. Mode Playbooks
 
 ### 5.1 user-mode (business usage UI)
@@ -100,4 +102,3 @@ See also: `docs/security-governance-default-baseline.md`
 3. Enable required gate artifacts and audit logs.
 4. Run weekly governance and release gates.
 5. Keep capability matrix and ontology mapping updated per release.
-

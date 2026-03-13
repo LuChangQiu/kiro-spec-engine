@@ -27,7 +27,8 @@ node scripts/symbol-evidence-locate.js \
 
 Expected:
 - reliable evidence => `fallback_action=allow_write`
-- no reliable evidence => `fallback_action=block_high_risk_write` and exit code `2`
+- no reliable evidence => `fallback_action=clarify_business_scope` and exit code `2`
+- assistant must narrow module/page/entity and business constraints before deciding whether writes should proceed
 
 ## 3) Failure Attribution and Bounded Repair
 

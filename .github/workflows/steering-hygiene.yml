@@ -25,10 +25,15 @@ jobs:
       - name: Run steering audit
         run: node scripts/steering-content-audit.js --fail-on-error --json --out .sce/reports/steering-hygiene/audit.json
 
+      - name: Run clarification-first audit
+        run: node scripts/clarification-first-audit.js --fail-on-violation --json --out .sce/reports/steering-hygiene/clarification-first-audit.json
+
       - name: Upload steering audit artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: steering-hygiene-${{ github.run_id }}
           if-no-files-found: warn
-          path: .sce/reports/steering-hygiene/audit.json
+          path: |
+            .sce/reports/steering-hygiene/audit.json
+            .sce/reports/steering-hygiene/clarification-first-audit.json

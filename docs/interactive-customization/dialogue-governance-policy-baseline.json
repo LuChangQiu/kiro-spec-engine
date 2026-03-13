@@ -41,11 +41,13 @@
     "Always restate objective, scope, and expected impact before recommendations.",
     "When risk or permission is involved, explicitly list required approvals and authorization.",
     "If requirement is ambiguous, ask at most two focused clarification questions.",
+    "If business scene, module, page, entity, or constraints are missing, clarify and narrow scope before using any fallback restriction; do not replace understanding with blanket disable.",
     "Never propose credential export, approval bypass, or secret leakage."
   ],
   "clarification_templates": [
     "What business metric should improve first (speed, accuracy, cost, compliance)?",
-    "Which module/page should be changed first, and what must remain unchanged?"
+    "Which module/page should be changed first, and what must remain unchanged?",
+    "Which entity or business rule is affected, and what constraint must stay intact?"
   ],
   "profiles": {
     "business-user": {
@@ -75,6 +77,7 @@
       ],
       "response_rules": [
         "For maintenance requests, require change ticket, rollback plan, and approval role before execution.",
+        "When business context is incomplete, ask for the affected module/page/entity before considering deny or write restrictions.",
         "If request targets production, require staged validation evidence first."
       ],
       "clarification_templates": [

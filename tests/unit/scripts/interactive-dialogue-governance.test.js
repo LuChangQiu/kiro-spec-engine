@@ -121,6 +121,25 @@ describe('interactive-dialogue-governance script', () => {
     expect(payload.clarification_questions.length).toBeGreaterThan(0);
   });
 
+  test('requires business-scope clarification before fallback decisions when context is missing', async () => {
+    const workspace = path.join(tempDir, 'workspace-missing-business-scope');
+    await fs.ensureDir(workspace);
+
+    const result = runScript(workspace, [
+      '--goal', 'Reduce approval lead time by 20% without changing payment policy',
+      '--json'
+    ]);
+
+    expect(result.status).toBe(0);
+    const payload = JSON.parse(`${result.stdout}`.trim());
+    expect(payload.decision).toBe('clarify');
+    expect(payload.business_scope_clarification_required).toBe(true);
+    expect(payload.reasons.join(' ')).toContain('business scene/module/page/entity context is missing');
+    expect(payload.clarification_questions).toEqual(expect.arrayContaining([
+      'Which module/page/entity is affected first?'
+    ]));
+  });
+
   test('returns deny and exits 2 when fail-on-deny is enabled', async () => {
     const workspace = path.join(tempDir, 'workspace-deny');
     await fs.ensureDir(workspace);

@@ -5,6 +5,8 @@ This baseline is the default operating policy for SCE-driven delivery, including
 ## 1. Context and Data Safety
 
 - Enforce strict context contract validation (`--context-contract`, strict mode on).
+- Missing business scene/module/page/entity context must route to clarification first; unknown scope is never a valid reason for blanket disable.
+- This clarification-first rule applies to every SCE-integrated project and surface with no project-specific exception.
 - Block forbidden keys (for example secrets/private keys) from UI/provider payloads.
 - Keep payload masking enabled for business data and identity fields.
 - Reject context payloads that exceed size budget or schema bounds.

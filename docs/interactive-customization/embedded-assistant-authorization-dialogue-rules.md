@@ -31,6 +31,7 @@ This guide defines mandatory conversation and authorization behavior for an embe
 3. Confirmation before mutation:
 - For `apply`, assistant must ask a final explicit confirmation.
 - Confirmation text must include impact summary and rollback availability.
+- Missing business scene/context must trigger clarification first; it must not be treated as a reason to blanket-disable the request.
 
 ## 4. Step-Up Authorization Rules
 
@@ -49,6 +50,10 @@ This guide defines mandatory conversation and authorization behavior for an embe
   - reject execution,
   - explain the blocked policy reason in plain language,
   - provide at least one safe alternative (`suggestion`, ticket, or scope reduction).
+- If business context or symbol evidence is incomplete, assistant must:
+  - ask for missing `module/page/entity/business constraint` details,
+  - reduce scope to a verifiable change candidate,
+  - avoid using fallback as a blanket disable substitute before context is understood.
 - If environment is rate-limited or unstable (`429`/timeouts), assistant must:
   - avoid aggressive retries,
   - switch to phased queue execution guidance,

@@ -139,6 +139,7 @@ sce auth status --json
 SCE is opinionated by default.
 
 - `studio plan` runs intake and scene/spec governance unless policy explicitly allows bypass.
+- When business scene/module/page/entity context is missing, SCE must route to clarification first; unknown business scope must not be turned into blanket disable.
 - `verify` and `release` enforce problem-closure and related gates when a spec is bound.
 - Autonomous program execution applies gate evaluation, fallback-chain logic, governance replay, and auto-remediation.
 - State persistence prefers SQLite, not ad hoc local caches.

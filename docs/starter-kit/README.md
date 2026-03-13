@@ -2,6 +2,8 @@
 
 This starter kit is the default baseline for onboarding an external project (including Moqui-based solutions) into SCE without project-specific flags.
 
+It also inherits SCE's clarification-first rule: if business scene/module/page/entity context is missing, the assistant must narrow scope before any deny/disable fallback. This baseline applies to every onboarded project with no project-specific exception.
+
 ## Included Assets
 
 - `handoff-manifest.starter.json`: minimal manifest contract that works with `sce auto handoff` and `sce scene package-publish-batch`.
@@ -33,6 +35,7 @@ node scripts/release-ops-weekly-summary.js --json
 
 - `scene package publish-batch` gate passes.
 - capability lexicon unknown count is zero.
+- missing business scope is handled through clarification, not blanket disable fallback.
 - release preflight is not blocked for hard-gate profiles.
 - weekly ops summary risk is not `high` unless explicitly approved.
 

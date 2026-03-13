@@ -15,6 +15,7 @@ This project uses **Spec-driven development** - a structured approach where:
 - When user requests a feature → Check if Spec exists, if not, help create one
 - When implementing → Follow the Spec's requirements and design
 - When stuck → Read the Spec documents for context
+- When business scene/module/page/entity is unclear → Clarify scope first; do not replace missing understanding with blanket disable
 - Track progress by updating task status
 
 ---

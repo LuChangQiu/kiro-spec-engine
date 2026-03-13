@@ -86,7 +86,7 @@
           "type": "string",
           "enum": [
             "allow_write",
-            "block_high_risk_write"
+            "clarify_business_scope"
           ]
         },
         "advisory": {

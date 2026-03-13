@@ -46,11 +46,13 @@ const BUILTIN_POLICY = {
     'Always restate objective, scope, and expected impact before any action recommendation.',
     'When risk or permission is involved, explicitly tell user what approval is required.',
     'If requirement is ambiguous, ask at most two focused clarification questions.',
+    'If business scene, module, page, entity, or constraints are missing, clarify scope first; never replace missing understanding with blanket disable.',
     'Never propose credential export, approval bypass, or secret leakage.'
   ],
   clarification_templates: [
     'What business outcome should improve first (speed, accuracy, cost, compliance)?',
-    'Which page or module should be changed first, and what should stay unchanged?'
+    'Which page or module should be changed first, and what should stay unchanged?',
+    'Which entity or business rule is affected, and what constraint must remain unchanged?'
   ],
   profiles: {
     'business-user': {
@@ -80,6 +82,7 @@ const BUILTIN_POLICY = {
       ],
       response_rules: [
         'For maintenance requests, require change ticket, rollback plan, and approval role before execution.',
+        'When business context is incomplete, ask for the affected module/page/entity before deny or write restriction decisions.',
         'If request targets production, require staged validation evidence first.'
       ],
       clarification_templates: [
@@ -686,11 +689,18 @@ function evaluatePatternRules(goal, rules) {
 function pickClarificationQuestions(policy, context = {}) {
   const questions = [];
   const templates = Array.isArray(policy.clarification_templates) ? policy.clarification_templates : [];
-  if (!context.module) {
-    questions.push('Which module should be changed first?');
-  }
-  if (!context.page) {
-    questions.push('Which page or screen is currently problematic?');
+  if (!context.module && !context.page && !context.entity) {
+    questions.push('Which module/page/entity is affected first?');
+  } else {
+    if (!context.module) {
+      questions.push('Which module should be changed first?');
+    }
+    if (!context.page) {
+      questions.push('Which page or screen is currently problematic?');
+    }
+    if (!context.entity) {
+      questions.push('Which entity or business rule is affected?');
+    }
   }
   for (const template of templates) {
     if (questions.length >= 2) {
@@ -703,11 +713,26 @@ function pickClarificationQuestions(policy, context = {}) {
   return questions.slice(0, 2);
 }
 
+function contextHasBusinessScope(context = {}) {
+  const payload = context && typeof context === 'object' ? context : {};
+  return ['module', 'page', 'entity', 'scene_id', 'workflow_node']
+    .some((key) => normalizeText(payload[key]));
+}
+
+function goalMentionsBusinessScope(goal = '') {
+  const normalizedGoal = normalizeText(goal).toLowerCase();
+  if (!normalizedGoal) {
+    return false;
+  }
+  return /\b(page|screen|module|entity|workflow|scene)\b/.test(normalizedGoal);
+}
+
 function evaluateDialogue(goal, context = {}, policy) {
   const normalizedGoal = normalizeText(goal);
   const tokens = normalizedGoal.split(/\s+/).filter(Boolean);
   const denyHits = evaluatePatternRules(normalizedGoal, policy.deny_patterns);
   const clarifyHits = evaluatePatternRules(normalizedGoal, policy.clarify_patterns);
+  const missingBusinessScope = !contextHasBusinessScope(context) && !goalMentionsBusinessScope(normalizedGoal);
 
   const reasons = [];
   if (normalizedGoal.length < policy.length_policy.min_chars) {
@@ -719,6 +744,9 @@ function evaluateDialogue(goal, context = {}, policy) {
   if (tokens.length < policy.length_policy.min_significant_tokens) {
     reasons.push(`goal has too few significant tokens (< ${policy.length_policy.min_significant_tokens})`);
   }
+  if (missingBusinessScope) {
+    reasons.push('business scene/module/page/entity context is missing; clarify scope before fallback or execution');
+  }
   reasons.push(...denyHits.map(item => item.reason));
   reasons.push(...clarifyHits.map(item => item.reason));
 
@@ -726,6 +754,7 @@ function evaluateDialogue(goal, context = {}, policy) {
   if (denyHits.length > 0) {
     decision = 'deny';
   } else if (
+    missingBusinessScope ||
     clarifyHits.length > 0 ||
     normalizedGoal.length < policy.length_policy.min_chars ||
     tokens.length < policy.length_policy.min_significant_tokens
@@ -736,6 +765,7 @@ function evaluateDialogue(goal, context = {}, policy) {
   return {
     decision,
     reasons: Array.from(new Set(reasons)),
+    business_scope_clarification_required: missingBusinessScope,
     deny_hits: denyHits,
     clarify_hits: clarifyHits,
     response_rules: Array.isArray(policy.response_rules) ? policy.response_rules : [],
@@ -749,6 +779,7 @@ function toContextRef(context) {
     product: normalizeText(payload.product || payload.app || ''),
     module: normalizeText(payload.module || ''),
     page: normalizeText(payload.page || ''),
+    entity: normalizeText(payload.entity || ''),
     scene_id: normalizeText(payload.scene_id || '')
   };
 }

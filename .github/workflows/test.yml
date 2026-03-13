@@ -29,6 +29,13 @@ jobs:
 
       - name: Audit steering hygiene
         run: npm run audit:steering
+
+      - name: Audit clarification-first baseline
+        run: |
+          node scripts/clarification-first-audit.js \
+            --fail-on-violation \
+            --out .sce/reports/clarification-first-audit-ci.json \
+            --json
       
       - name: Run tests
         run: npm test -- --runInBand
@@ -100,6 +107,7 @@ jobs:
           path: |
             .sce/reports/interactive-governance-report.json
             .sce/reports/interactive-governance-report.md
+            .sce/reports/clarification-first-audit-ci.json
             .sce/reports/interactive-matrix-signals.jsonl
             .sce/reports/interactive-flow-smoke/interactive-flow-smoke.summary.json
             .sce/reports/moqui-template-baseline-ci.json

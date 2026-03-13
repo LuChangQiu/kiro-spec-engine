@@ -366,6 +366,8 @@ sce workspace takeover-apply --json
 # until manual migration is completed.
 # For adopted projects, startup auto-runs takeover baseline alignment
 # before command execution (best effort, non-blocking).
+# Takeover alignment now also repairs missing clarification-first
+# CORE_PRINCIPLES baseline when older adopted projects drift.
 
 # Legacy commands (still supported)
 sce workspace sync
@@ -1806,7 +1808,13 @@ Interactive dialogue governance helper (script-level communication-rule gate):
   - Default policy: `docs/interactive-customization/dialogue-governance-policy-baseline.json` (fallback builtin policy when missing)
   - Default authorization dialogue policy: `docs/interactive-customization/authorization-dialogue-policy-baseline.json`
   - Default profile: `business-user` (use `system-maintainer` for maintenance/operator conversations)
+  - Missing business scene/module/page/entity context defaults to `clarify`; unknown scope must not be converted into blanket disable fallback.
   - `--fail-on-deny` exits with code `2` to block unsafe requests in CI/automation.
+
+Clarification-first baseline audit helper:
+- `node scripts/clarification-first-audit.js [--project-path <path>] [--out <path>] [--fail-on-violation] [--json]`: verify that SCE global clarification-first baselines are present across core scripts, policy/docs, starter/template assets, and that legacy blanket-disable phrases do not reappear in tracked source/docs.
+  - Default behavior: audit current project root.
+  - `--fail-on-violation` exits with code `2` when required clarification-first baselines drift or prohibited legacy phrases are detected.
 
 Interactive change-plan generator helper (script-level stage-B planning bridge):
 - `node scripts/interactive-plan-build.js --intent <path> [--context <path>] [--execution-mode <suggestion|apply>] [--out-plan <path>] [--out-markdown <path>] [--json]`: generate structured `Change_Plan` from `Change_Intent`, including action candidates, risk level, verification checks, rollback plan, approval status, and gate hint command.

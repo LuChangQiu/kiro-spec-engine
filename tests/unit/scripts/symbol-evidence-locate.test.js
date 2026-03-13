@@ -58,7 +58,7 @@ describe('symbol-evidence-locate script', () => {
     }));
   });
 
-  test('blocks high-risk write when reliable evidence is not found', async () => {
+  test('requires business-scope clarification when reliable evidence is not found', async () => {
     const workspace = path.join(tempDir, 'workspace-no-match');
     await fs.ensureDir(path.join(workspace, 'src'));
     await fs.writeFile(
@@ -77,7 +77,8 @@ describe('symbol-evidence-locate script', () => {
     expect(result.status).toBe(2);
     const payload = JSON.parse(`${result.stdout}`.trim());
     expect(payload.evidence.reliable).toBe(false);
-    expect(payload.evidence.fallback_action).toBe('block_high_risk_write');
+    expect(payload.evidence.fallback_action).toBe('clarify_business_scope');
+    expect(payload.evidence.advisory).toContain('Clarify target module/page/entity');
     expect(payload.summary.reliable_hits).toBe(0);
   });
 });

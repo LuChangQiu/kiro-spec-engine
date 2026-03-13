@@ -3,7 +3,8 @@ const os = require('os');
 const path = require('path');
 const {
   applyTakeoverBaseline,
-  TAKEOVER_DEFAULTS
+  TAKEOVER_DEFAULTS,
+  CLARIFICATION_FIRST_CORE_PRINCIPLE_HEADING
 } = require('../../../lib/workspace/takeover-baseline');
 
 describe('takeover-baseline', () => {
@@ -45,6 +46,7 @@ describe('takeover-baseline', () => {
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'config', 'studio-intake-policy.json'))).toBe(true);
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'config', 'state-storage-policy.json'))).toBe(true);
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'steering', 'manifest.yaml'))).toBe(true);
+    expect(await fs.pathExists(path.join(tempDir, '.sce', 'steering', 'CORE_PRINCIPLES.md'))).toBe(true);
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'reports', 'takeover-baseline-latest.json'))).toBe(true);
 
     const adoptionConfig = await fs.readJson(path.join(tempDir, '.sce', 'adoption-config.json'));
@@ -62,6 +64,9 @@ describe('takeover-baseline', () => {
       require_step_confirmation: false,
       apply_all_work_by_default: true
     }));
+
+    const corePrinciples = await fs.readFile(path.join(tempDir, '.sce', 'steering', 'CORE_PRINCIPLES.md'), 'utf8');
+    expect(corePrinciples).toContain(CLARIFICATION_FIRST_CORE_PRINCIPLE_HEADING);
   });
 
   test('audit mode reports drift without mutating project files', async () => {
@@ -81,6 +86,9 @@ describe('takeover-baseline', () => {
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'adoption-config.json'))).toBe(false);
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'steering', 'manifest.yaml'))).toBe(false);
     expect(report.files.some((item) => item.status === 'pending')).toBe(true);
+    expect(report.files).toEqual(expect.arrayContaining([
+      expect.objectContaining({ path: '.sce/steering/CORE_PRINCIPLES.md', status: 'pending' })
+    ]));
   });
 
   test('is idempotent after baseline is already aligned', async () => {
@@ -105,6 +113,33 @@ describe('takeover-baseline', () => {
     expect(second.summary.updated).toBe(0);
     expect(second.summary.pending).toBe(0);
     expect(second.files.every((item) => item.status === 'unchanged')).toBe(true);
+
+    const corePrinciples = await fs.readFile(path.join(tempDir, '.sce', 'steering', 'CORE_PRINCIPLES.md'), 'utf8');
+    expect(corePrinciples.match(new RegExp(CLARIFICATION_FIRST_CORE_PRINCIPLE_HEADING, 'g'))).toHaveLength(1);
+  });
+
+  test('repairs missing clarification-first core principle for existing steering file', async () => {
+    await fs.ensureDir(path.join(tempDir, '.sce', 'steering'));
+    await fs.writeFile(
+      path.join(tempDir, '.sce', 'steering', 'CORE_PRINCIPLES.md'),
+      '# 核心开发原则（基准规则）\n\n## 1. Existing Rule\n\n- keep durable rules only.\n',
+      'utf8'
+    );
+
+    const report = await applyTakeoverBaseline(tempDir, {
+      apply: true,
+      writeReport: false,
+      sceVersion: '3.6.46'
+    });
+
+    expect(report.passed).toBe(true);
+    expect(report.files).toEqual(expect.arrayContaining([
+      expect.objectContaining({ path: '.sce/steering/CORE_PRINCIPLES.md', status: 'updated' })
+    ]));
+
+    const corePrinciples = await fs.readFile(path.join(tempDir, '.sce', 'steering', 'CORE_PRINCIPLES.md'), 'utf8');
+    expect(corePrinciples).toContain('## 1. Existing Rule');
+    expect(corePrinciples).toContain(CLARIFICATION_FIRST_CORE_PRINCIPLE_HEADING);
   });
 
   test('skips takeover when .sce directory is missing', async () => {

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Promoted "clarification before disable" to a global SCE baseline rule: missing business scene/module/page/entity context now defaults to clarification in builtin interactive governance, is written into steering/template core principles, and is documented as mandatory for all SCE-integrated projects with no exceptions.
+- Added `clarification-first-audit` as a release/audit guard so core scripts, policy/docs, starter/template baselines, and legacy fallback phrases are continuously checked for regression.
+- Wired `clarification-first-audit` into `test.yml`, `release.yml`, and `steering-hygiene.yml` so CI, tag releases, and scheduled hygiene runs all enforce the clarification-first baseline.
+- Extended takeover baseline auto-alignment so older adopted projects also repair missing clarification-first `CORE_PRINCIPLES` content during best-effort startup/default alignment.
+- Added CLI integration coverage for `sce adopt`, `sce upgrade`, and startup takeover auto-alignment so clarification-first baseline propagation is verified end-to-end on real project fixtures.
+
 ## [3.6.46] - 2026-03-13
 
 ### Added

@@ -7,6 +7,8 @@ const path = require('path');
 const DEFAULT_MAX_HITS = 10;
 const DEFAULT_MIN_SCORE = 0.35;
 const DEFAULT_MIN_RELIABLE_SCORE = 0.6;
+const FALLBACK_ACTION_ALLOW_WRITE = 'allow_write';
+const FALLBACK_ACTION_CLARIFY_BUSINESS_SCOPE = 'clarify_business_scope';
 const DEFAULT_EXTENSIONS = [
   '.js', '.cjs', '.mjs', '.ts', '.tsx', '.jsx',
   '.py', '.java', '.go', '.rb', '.php', '.cs',
@@ -121,7 +123,7 @@ function printHelpAndExit(code) {
     `  --min-score <0-1>             Minimum hit score (default: ${DEFAULT_MIN_SCORE})`,
     `  --min-reliable-score <0-1>    Reliability threshold (default: ${DEFAULT_MIN_RELIABLE_SCORE})`,
     `  --extensions <csv>            File extensions (default: ${DEFAULT_EXTENSIONS.join(',')})`,
-    '  --strict                      Exit code 2 when no reliable evidence is found',
+    '  --strict                      Exit code 2 when no reliable evidence is found and scope clarification is required',
     '  --json                        Print JSON payload',
     '  -h, --help                    Show this help'
   ];
@@ -306,10 +308,12 @@ function locateSymbolEvidence({
     evidence: {
       confidence,
       reliable,
-      fallback_action: reliable ? 'allow_write' : 'block_high_risk_write',
+      fallback_action: reliable
+        ? FALLBACK_ACTION_ALLOW_WRITE
+        : FALLBACK_ACTION_CLARIFY_BUSINESS_SCOPE,
       advisory: reliable
         ? 'Symbol evidence is reliable; scoped code change can proceed.'
-        : 'No reliable symbol evidence found. Fallback to answer-only mode and block high-risk writes.'
+        : 'No reliable symbol evidence found yet. Clarify target module/page/entity and business constraints before deciding whether scoped writes are safe.'
     },
     summary: {
       searched_files: candidateFiles.length,

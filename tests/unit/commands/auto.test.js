@@ -1,4 +1,5 @@
 const { Command } = require('commander');
+const { execSync, spawnSync } = require('child_process');
 const fs = require('fs-extra');
 const os = require('os');
 const path = require('path');
@@ -162,6 +163,38 @@ if (process.argv.includes('--json')) {
     program.exitOverride();
     registerAutoCommands(program);
     return program;
+  }
+
+  function resolveGitBinary() {
+    if (process.platform !== 'win32') {
+      return 'git';
+    }
+    const whereResult = spawnSync('where', ['git'], {
+      encoding: 'utf8',
+      windowsHide: true
+    });
+    const gitPath = `${whereResult.stdout || ''}`
+      .split(/\r?\n/)
+      .map(item => item.trim())
+      .find(Boolean);
+    return gitPath || 'git';
+  }
+
+  function runGit(repoPath, args) {
+    const command = [JSON.stringify(resolveGitBinary()), ...args.map(arg => JSON.stringify(String(arg)))].join(' ');
+    return execSync(command, {
+      cwd: repoPath,
+      encoding: 'utf8',
+      windowsHide: true
+    });
+  }
+
+  function initGitRepo(repoPath) {
+    runGit(repoPath, ['init', '-b', 'main']);
+    runGit(repoPath, ['config', 'user.email', 'bot@example.com']);
+    runGit(repoPath, ['config', 'user.name', 'bot']);
+    runGit(repoPath, ['add', '.']);
+    runGit(repoPath, ['commit', '-m', 'init']);
   }
 
   test('allows --resume latest without goal argument', async () => {
@@ -8718,6 +8751,43 @@ if (process.argv.includes('--json')) {
       blocked: false
     }));
     expect(Array.isArray(payload.recommended_commands)).toBe(true);
+  });
+
+  test('blocks handoff preflight-check when spec delivery sync audit finds untracked declared files', async () => {
+    initGitRepo(tempDir);
+
+    const specDir = path.join(tempDir, '.sce', 'specs', '121-00-spec-delivery-sync-integrity-gate');
+    const featureFile = path.join(tempDir, 'src', 'feature.js');
+    await fs.ensureDir(specDir);
+    await fs.ensureDir(path.dirname(featureFile));
+    await fs.writeJson(path.join(specDir, 'deliverables.json'), {
+      verification_mode: 'blocking',
+      declared_files: ['src/feature.js']
+    }, { spaces: 2 });
+    await fs.writeFile(featureFile, 'module.exports = true;\n', 'utf8');
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'sce',
+      'auto',
+      'handoff',
+      'preflight-check',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-preflight-check');
+    expect(payload.status).toBe('blocked');
+    expect(payload.policy).toEqual(expect.objectContaining({
+      require_spec_delivery_sync: true
+    }));
+    expect(payload.spec_delivery_sync).toEqual(expect.objectContaining({
+      passed: false,
+      reason: 'violations'
+    }));
+    expect(payload.reasons.some(item => item.includes('src/feature.js => not-tracked'))).toBe(true);
+    expect(payload.recommended_commands).toContain('sce workspace delivery-audit --json --strict');
   });
 
   test('fails handoff preflight-check with --require-pass when preflight is blocked', async () => {

@@ -33,6 +33,7 @@ const {
   migrateLegacyKiroDirectories,
 } = require('../lib/workspace/legacy-kiro-migrator');
 const { auditSceTracking } = require('../lib/workspace/sce-tracking-audit');
+const { auditSpecDeliverySync } = require('../lib/workspace/spec-delivery-audit');
 const { applyTakeoverBaseline } = require('../lib/workspace/takeover-baseline');
 
 const i18n = getI18n();
@@ -781,6 +782,45 @@ workspaceCmd
     console.log(chalk.gray(`Moved files: ${report.moved_files}`));
     console.log(chalk.gray(`Deduped files: ${report.deduped_files}`));
     console.log(chalk.gray(`Conflict files: ${report.conflict_files}`));
+  });
+
+workspaceCmd
+  .command('delivery-audit')
+  .description('Audit spec delivery manifests against git tracking and upstream sync state')
+  .option('--spec <name>', 'Audit one spec only')
+  .option('--require-manifest', 'Fail when no deliverables.json manifests are found')
+  .option('--json', 'Output in JSON format')
+  .option('--strict', 'Exit non-zero when delivery sync violations are found')
+  .action(async (options) => {
+    const report = await auditSpecDeliverySync(process.cwd(), {
+      spec: options.spec,
+      requireManifest: options.requireManifest === true
+    });
+
+    if (options.json) {
+      console.log(JSON.stringify(report, null, 2));
+    } else if (report.passed) {
+      if (report.reason === 'no-manifests') {
+        console.log(chalk.yellow('⚠ Spec delivery audit found no manifests.'));
+      } else {
+        console.log(chalk.green('✓ Spec delivery audit passed.'));
+      }
+      console.log(chalk.gray(`Manifest count: ${report.summary.manifest_count}`));
+      if (report.warnings.length > 0) {
+        report.warnings.forEach((item) => console.log(chalk.gray(`  - ${item}`)));
+      }
+    } else {
+      console.log(chalk.red('✖ Spec delivery audit failed.'));
+      report.violations.forEach((item) => console.log(chalk.gray(`  - ${item}`)));
+      if (report.warnings.length > 0) {
+        console.log(chalk.yellow('Warnings:'));
+        report.warnings.forEach((item) => console.log(chalk.gray(`  - ${item}`)));
+      }
+    }
+
+    if (!report.passed && options.strict) {
+      process.exitCode = 1;
+    }
   });
 
 workspaceCmd

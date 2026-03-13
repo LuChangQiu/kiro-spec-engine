@@ -1,0 +1,21 @@
+{
+  "verification_mode": "blocking",
+  "declared_files": [
+    "lib/workspace/spec-delivery-audit.js",
+    "bin/scene-capability-engine.js",
+    "lib/commands/studio.js",
+    "lib/commands/auto.js",
+    "lib/auto/handoff-run-service.js",
+    "tests/unit/workspace/spec-delivery-audit.test.js",
+    "tests/unit/commands/auto.test.js",
+    "tests/unit/auto/handoff-run-service.test.js",
+    "tests/unit/commands/studio.test.js",
+    "tests/integration/workspace-delivery-audit-cli.integration.test.js",
+    ".sce/specs/121-00-spec-delivery-sync-integrity-gate/requirements.md",
+    ".sce/specs/121-00-spec-delivery-sync-integrity-gate/design.md",
+    ".sce/specs/121-00-spec-delivery-sync-integrity-gate/tasks.md",
+    ".sce/specs/121-00-spec-delivery-sync-integrity-gate/deliverables.json"
+  ],
+  "optional_files": [],
+  "ignored_patterns": []
+}

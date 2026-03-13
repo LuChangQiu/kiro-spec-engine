@@ -456,7 +456,9 @@ if (require.main === module) {
 module.exports = {
   parseArgs,
   parseRemotes,
+  parseAheadBehind,
   parsePorcelainStatus,
+  runGit,
   evaluateGitManagedGate,
   runGitManagedGateScript
 };

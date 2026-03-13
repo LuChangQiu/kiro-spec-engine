@@ -45,6 +45,13 @@ describe('auto handoff run service', () => {
         phase.details = details;
       },
       evaluateAutoHandoffOntologyGateReasons: () => [],
+      auditSpecDeliverySync: async () => ({
+        passed: true,
+        reason: 'passed',
+        summary: { manifest_count: 1 },
+        violations: []
+      }),
+      evaluateAutoHandoffSpecDeliveryGateReasons: () => [],
       evaluateAutoHandoffReleaseGatePreflightGateReasons: () => [],
       failAutoHandoffRunPhase: (phase, error) => {
         phase.status = 'failed';
@@ -125,5 +132,95 @@ describe('auto handoff run service', () => {
     expect(result.gates).toEqual(expect.objectContaining({ passed: true }));
     expect(reportCalls).toHaveLength(2);
     expect(skippedPhases).toEqual(['execution', 'observability']);
+  });
+
+  test('fails in precheck when spec delivery sync gate is blocked', async () => {
+    const deps = {
+      AUTO_HANDOFF_RELEASE_EVIDENCE_FILE: '.sce/reports/release-evidence/handoff-runs.json',
+      buildAutoHandoffRunSessionId: () => 'handoff-session-2',
+      buildAutoHandoffRunPolicy: () => ({ require_spec_delivery_sync: true }),
+      beginAutoHandoffRunPhase: (result, id, title) => {
+        const phase = { id, title, status: 'running' };
+        result.phases.push(phase);
+        return phase;
+      },
+      buildAutoHandoffPlan: async () => ({
+        manifest_path: '.sce/handoff/manifest.json',
+        source_project: 'demo-project',
+        handoff: {
+          specs: [{ id: 'spec-01' }],
+          ontology_validation: { status: 'passed' }
+        },
+        validation: { passed: true },
+        phases: [{ id: 'plan' }]
+      }),
+      evaluateHandoffOntologyValidation: (payload) => payload || { status: 'unknown' },
+      auditSpecDeliverySync: async () => ({
+        passed: false,
+        reason: 'violations',
+        summary: { manifest_count: 1 },
+        violations: ['[121-00-spec-delivery-sync-integrity-gate] src/feature.js => not-tracked']
+      }),
+      buildAutoHandoffTemplateDiff: async () => ({ compatibility: 'compatible' }),
+      buildAutoHandoffReleaseGatePreflight: () => ({
+        available: true,
+        blocked: false,
+        reasons: []
+      }),
+      loadGovernanceReleaseGateSignals: async () => ({}),
+      completeAutoHandoffRunPhase: (phase, details) => {
+        phase.status = 'completed';
+        phase.details = details;
+      },
+      evaluateAutoHandoffOntologyGateReasons: () => [],
+      evaluateAutoHandoffSpecDeliveryGateReasons: (_policy, snapshot) => snapshot.violations,
+      evaluateAutoHandoffReleaseGatePreflightGateReasons: () => [],
+      failAutoHandoffRunPhase: (phase, error) => {
+        phase.status = 'failed';
+        phase.error = error && error.message ? error.message : `${error}`;
+      },
+      buildAutoHandoffMoquiBaselineSnapshot: async () => ({ status: 'passed', summary: {} }),
+      buildAutoHandoffMoquiBaselinePhaseDetails: (snapshot) => ({ status: snapshot.status }),
+      evaluateAutoHandoffMoquiBaselineGateReasons: () => [],
+      buildAutoHandoffScenePackageBatchSnapshot: async () => ({ status: 'passed', summary: {} }),
+      buildAutoHandoffScenePackageBatchPhaseDetails: (snapshot) => ({ status: snapshot.status }),
+      evaluateAutoHandoffScenePackageBatchGateReasons: () => [],
+      buildAutoHandoffCapabilityCoverageSnapshot: async () => ({
+        status: 'passed',
+        summary: { coverage_percent: 100, passed: true }
+      }),
+      evaluateAutoHandoffCapabilityCoverageGateReasons: () => [],
+      evaluateAutoHandoffCapabilityLexiconGateReasons: () => [],
+      buildAutoHandoffQueueFromContinueSource: async () => ({ goal_count: 0 }),
+      buildAutoHandoffQueue: async () => ({ goal_count: 0 }),
+      writeAutoHandoffQueueFile: async () => {},
+      skipAutoHandoffRunPhase: () => {},
+      buildAutoHandoffExecutionBatches: () => ({}),
+      buildAutoHandoffSpecStatus: () => ({}),
+      evaluateAutoHandoffRunGates: () => ({ passed: true, reasons: [] }),
+      executeAutoHandoffExecutionBatches: async () => ({ execution_plan: {}, summary: {} }),
+      buildAutoObservabilitySnapshot: async () => ({}),
+      extractAutoObservabilityWeeklyOpsStopTelemetry: () => ({}),
+      buildProgramKpiSnapshot: () => ({ risk_level: 'low' }),
+      buildAutoHandoffRegression: async () => ({ trend: 'stable' }),
+      maybeWriteAutoHandoffMoquiRemediationQueue: async () => null,
+      buildAutoHandoffRunFailureSummary: (result) => ({ status: result.status }),
+      buildAutoHandoffRunRecommendations: () => ['sce workspace delivery-audit --json --strict'],
+      writeAutoHandoffRunReport: async () => {},
+      mergeAutoHandoffRunIntoReleaseEvidence: async () => ({ merged: true })
+    };
+
+    const result = await runAutoHandoff('demo-project', { dryRun: true }, deps);
+
+    expect(result.status).toBe('failed');
+    expect(result.error).toContain('handoff spec delivery sync gate failed');
+    expect(result.spec_delivery_sync).toEqual(expect.objectContaining({
+      passed: false,
+      reason: 'violations'
+    }));
+    expect(result.phases[0]).toEqual(expect.objectContaining({
+      id: 'precheck',
+      status: 'failed'
+    }));
   });
 });

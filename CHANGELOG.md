@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.40] - 2026-03-13
+
+### Added
+- Added spec delivery sync auditing via `lib/workspace/spec-delivery-audit.js` and the new `sce workspace delivery-audit` command so specs can declare required deliverables in `.sce/specs/<spec>/deliverables.json`.
+- Added Spec `121-00-spec-delivery-sync-integrity-gate` with requirements, design, tasks, and a dogfooded delivery manifest to formalize this governance capability.
+- Added unit/integration coverage for delivery-sync behavior across workspace CLI, handoff preflight/run orchestration, and studio release gating.
+
+### Changed
+- Wired auto-handoff preflight and run precheck to evaluate declared spec deliverables against git tracking, worktree cleanliness, and upstream sync state.
+- Extended studio release gating so spec delivery sync audit is now a required release-evidence step alongside the existing git/errorbook/handoff gates.
+- Exported reusable git helper functions from `scripts/git-managed-gate.js` so higher-level workspace governance checks can share the same branch/upstream parsing logic.
+
 ## [3.6.39] - 2026-03-13
 
 ### Added

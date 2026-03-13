@@ -976,6 +976,11 @@ describe('studio command workflow', () => {
       enabled: true,
       required: true
     }));
+    expect(byId.get('spec-delivery-audit')).toEqual(expect.objectContaining({
+      required: true,
+      command: 'node',
+      args: ['bin/sce.js', 'workspace', 'delivery-audit', '--json', '--strict']
+    }));
     expect(byId.get('handoff-capability-matrix-gate')).toEqual(expect.objectContaining({
       enabled: true,
       required: true

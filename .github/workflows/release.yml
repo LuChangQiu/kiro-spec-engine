@@ -765,6 +765,7 @@ jobs:
           HISTORY_FILE="${NOTES_DIR}/release-gate-history.json"
           HISTORY_SUMMARY_FILE="${NOTES_DIR}/release-gate-history-${TAG}.json"
           HISTORY_CARD_FILE="${NOTES_DIR}/release-gate-history-${TAG}.md"
+          HISTORY_STDERR_FILE="${NOTES_DIR}/release-gate-history-${TAG}.stderr.log"
           LATEST_RELEASE_FILE="${NOTES_DIR}/latest-release-${TAG}.json"
           LATEST_RELEASE_API="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/latest"
 
@@ -790,11 +791,15 @@ jobs:
             --history-file "${HISTORY_FILE}" \
             --out "${HISTORY_FILE}" \
             --markdown-out "${HISTORY_CARD_FILE}" \
-            --json > "${HISTORY_SUMMARY_FILE}"; then
+            --json > "${HISTORY_SUMMARY_FILE}" 2> "${HISTORY_STDERR_FILE}"; then
+            if [[ -f "${HISTORY_STDERR_FILE}" ]]; then
+              cat "${HISTORY_STDERR_FILE}"
+            fi
             printf '%s\n' \
               '{' \
               '  "mode": "auto-handoff-release-gate-history",' \
-              '  "error": "failed to build release gate history index"' \
+              '  "error": "failed to build release gate history index",' \
+              "  \"stderr_file\": \"${HISTORY_STDERR_FILE}\"" \
               '}' > "${HISTORY_SUMMARY_FILE}"
             printf '%s\n' \
               '# Release Gate History' \
@@ -807,6 +812,8 @@ jobs:
                 '  "entries": []' \
                 '}' > "${HISTORY_FILE}"
             fi
+          else
+            rm -f "${HISTORY_STDERR_FILE}"
           fi
 
       - name: Append release gate trend summary

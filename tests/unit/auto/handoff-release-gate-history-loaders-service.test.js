@@ -69,5 +69,32 @@ describe('auto handoff release gate history loaders service', () => {
       await fs.remove(tempDir);
     }
   });
+
+  test('skips malformed report entries that fail normalization', async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-gate-history-'));
+    try {
+      const reportsDir = path.join(tempDir, 'reports');
+      await fs.ensureDir(reportsDir);
+      await fs.writeJson(path.join(reportsDir, 'release-gate-v1.0.0.json'), {
+        gate_passed: true,
+        evaluated_at: '2026-03-08T00:00:00.000Z'
+      }, { spaces: 2 });
+
+      const reports = await loadAutoHandoffReleaseGateReports(tempDir, reportsDir, {
+        ...commonDeps,
+        fs,
+        buildAutoHandoffReleaseGateHistoryEntry: () => {
+          throw new Error('normalize failed');
+        }
+      });
+
+      expect(reports.entries).toHaveLength(0);
+      expect(reports.warnings).toContainEqual(
+        expect.stringContaining('skip invalid release gate report entry')
+      );
+    } finally {
+      await fs.remove(tempDir);
+    }
+  });
 });
 

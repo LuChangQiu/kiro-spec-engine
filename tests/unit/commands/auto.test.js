@@ -8753,6 +8753,61 @@ if (process.argv.includes('--json')) {
     expect(Array.isArray(payload.recommended_commands)).toBe(true);
   });
 
+  test('falls back to latest release gate report when history index is empty', async () => {
+    const evidenceDir = path.join(tempDir, '.sce', 'reports', 'release-evidence');
+    const releaseGateHistoryFile = path.join(evidenceDir, 'release-gate-history.json');
+    const releaseGateReportFile = path.join(evidenceDir, 'release-gate-v9.9.9.json');
+    await fs.ensureDir(evidenceDir);
+    await fs.writeJson(releaseGateHistoryFile, {
+      mode: 'auto-handoff-release-gate-history',
+      entries: []
+    }, { spaces: 2 });
+    await fs.writeJson(releaseGateReportFile, {
+      mode: 'enforce',
+      enforce: true,
+      evidence_used: true,
+      require_evidence: true,
+      require_gate_pass: true,
+      gate_passed: true,
+      risk_level: 'medium',
+      scene_package_batch_passed: true,
+      scene_package_batch_failure_count: 0,
+      release_gate_preflight_available: true,
+      release_gate_preflight_blocked: false,
+      require_release_gate_preflight: true,
+      weekly_ops_blocked: false,
+      weekly_ops_runtime_block_rate_percent: 0,
+      weekly_ops_runtime_ui_mode_violation_total: 0,
+      weekly_ops_runtime_ui_mode_violation_rate_percent: 0,
+      drift_alert_count: 0,
+      drift_blocked: false,
+      evaluated_at: '2026-03-13T00:00:00.000Z'
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'sce',
+      'auto',
+      'handoff',
+      'preflight-check',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-preflight-check');
+    expect(payload.status).toBe('pass');
+    expect(payload.release_gate_preflight).toEqual(expect.objectContaining({
+      available: true,
+      blocked: false,
+      latest_tag: 'v9.9.9'
+    }));
+    expect(payload.release_gate_preflight.file).toContain('release-gate-v9.9.9.json');
+    expect(payload.signals).toEqual(expect.objectContaining({
+      total_entries: 1
+    }));
+  });
+
   test('blocks handoff preflight-check when spec delivery sync audit finds untracked declared files', async () => {
     initGitRepo(tempDir);
 

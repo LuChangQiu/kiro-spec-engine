@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.42] - 2026-03-13
+
+### Changed
+- Hardened release-gate preflight loading so `sce auto handoff preflight-check` now falls back to the latest `release-gate-*.json` report when the history index is missing, empty, or temporarily unavailable during release execution.
+- Improved release workflow diagnostics for `Build release gate history index` by capturing and surfacing the command stderr in release evidence artifacts instead of masking the underlying failure behind an empty summary.
+
+### Fixed
+- Fixed release history loading so a single malformed release-gate report or seed entry is skipped with a warning instead of aborting the entire gate-index build.
+
 ## [3.6.41] - 2026-03-13
 
 ### Added

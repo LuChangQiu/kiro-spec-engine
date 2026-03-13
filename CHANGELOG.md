@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.45] - 2026-03-13
+
+### Added
+- Added collaboration governance auditing via `lib/workspace/collab-governance-audit.js` and the new `sce workspace collab-governance-audit` command to check collaboration Git boundaries, runtime-state tracking drift, multi-agent config presence/validity, legacy `.kiro*` references, and steering boundary hygiene.
+- Added Spec `122-00-sce-collab-governance-audit` with requirements, design, tasks, and a dogfooded delivery manifest to formalize the new co-work governance capability.
+- Added unit/integration coverage for collaboration governance drift scenarios, including missing ignore rules, tracked runtime files, legacy naming references, and strict CLI failure behavior.
+
+### Changed
+- Expanded the repository `.gitignore` collaboration boundary rules to cover coordination logs, machine identity, spec lock directories, `tasks.md.lock`, and steering lock/pending runtime files.
+- Seeded `.sce/config/multi-agent.json` as the canonical project-level multi-agent config baseline for governance auditing and future co-work enablement.
+
+### Fixed
+- Removed `.sce/steering/CURRENT_CONTEXT.md` from Git tracking so the repository now conforms to its own runtime/personal-state governance boundary.
+
 ## [3.6.44] - 2026-03-13
 
 ### Fixed

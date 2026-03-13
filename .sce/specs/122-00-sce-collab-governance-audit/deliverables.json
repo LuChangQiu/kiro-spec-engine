@@ -1,0 +1,18 @@
+{
+  "verification_mode": "blocking",
+  "declared_files": [
+    "lib/workspace/collab-governance-audit.js",
+    "bin/scene-capability-engine.js",
+    "tests/unit/workspace/collab-governance-audit.test.js",
+    "tests/integration/workspace-collab-governance-audit-cli.integration.test.js",
+    "docs/command-reference.md",
+    ".gitignore",
+    ".sce/config/multi-agent.json",
+    ".sce/specs/122-00-sce-collab-governance-audit/requirements.md",
+    ".sce/specs/122-00-sce-collab-governance-audit/design.md",
+    ".sce/specs/122-00-sce-collab-governance-audit/tasks.md",
+    ".sce/specs/122-00-sce-collab-governance-audit/deliverables.json"
+  ],
+  "optional_files": [],
+  "ignored_patterns": []
+}

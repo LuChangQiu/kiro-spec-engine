@@ -347,6 +347,11 @@ sce workspace legacy-migrate --dry-run --json
 sce workspace tracking-audit
 sce workspace tracking-audit --json
 
+# Audit collaboration governance boundaries and legacy naming drift
+sce workspace collab-governance-audit
+sce workspace collab-governance-audit --json
+sce workspace collab-governance-audit --strict
+
 # Audit takeover baseline drift (non-mutating)
 sce workspace takeover-audit
 sce workspace takeover-audit --json

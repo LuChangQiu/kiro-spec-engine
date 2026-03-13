@@ -34,6 +34,7 @@ const {
 } = require('../lib/workspace/legacy-kiro-migrator');
 const { auditSceTracking } = require('../lib/workspace/sce-tracking-audit');
 const { auditSpecDeliverySync } = require('../lib/workspace/spec-delivery-audit');
+const { auditCollabGovernance } = require('../lib/workspace/collab-governance-audit');
 const { applyTakeoverBaseline } = require('../lib/workspace/takeover-baseline');
 
 const i18n = getI18n();
@@ -170,7 +171,9 @@ function isLegacyMigrationAllowlistedCommand(args) {
 
   if (command === 'workspace') {
     const subcommand = args[commandIndex + 1];
-    return subcommand === 'legacy-scan' || subcommand === 'legacy-migrate';
+    return subcommand === 'legacy-scan'
+      || subcommand === 'legacy-migrate'
+      || subcommand === 'collab-governance-audit';
   }
 
   return false;
@@ -198,7 +201,7 @@ function isTakeoverAutoApplySkippedCommand(args) {
   }
 
   const subcommand = args[commandIndex + 1];
-  return subcommand === 'takeover-audit';
+  return subcommand === 'takeover-audit' || subcommand === 'collab-governance-audit';
 }
 
 /**
@@ -782,6 +785,37 @@ workspaceCmd
     console.log(chalk.gray(`Moved files: ${report.moved_files}`));
     console.log(chalk.gray(`Deduped files: ${report.deduped_files}`));
     console.log(chalk.gray(`Conflict files: ${report.conflict_files}`));
+  });
+
+workspaceCmd
+  .command('collab-governance-audit')
+  .description('Audit collaboration governance boundaries, runtime git hygiene, and legacy naming drift')
+  .option('--json', 'Output in JSON format')
+  .option('--strict', 'Exit non-zero when collaboration governance violations are found')
+  .action(async (options) => {
+    const report = await auditCollabGovernance(process.cwd());
+
+    if (options.json) {
+      console.log(JSON.stringify(report, null, 2));
+    } else if (report.passed) {
+      console.log(chalk.green('✓ Collaboration governance audit passed.'));
+      console.log(chalk.gray(`Missing ignore rules: ${report.summary.missing_gitignore_rules}`));
+      console.log(chalk.gray(`Legacy references: ${report.summary.legacy_reference_count}`));
+      if (report.warnings.length > 0) {
+        report.warnings.forEach((item) => console.log(chalk.gray(`  - ${item}`)));
+      }
+    } else {
+      console.log(chalk.red('✖ Collaboration governance audit failed.'));
+      report.violations.forEach((item) => console.log(chalk.gray(`  - ${item}`)));
+      if (report.warnings.length > 0) {
+        console.log(chalk.yellow('Warnings:'));
+        report.warnings.forEach((item) => console.log(chalk.gray(`  - ${item}`)));
+      }
+    }
+
+    if (!report.passed && options.strict) {
+      process.exitCode = 1;
+    }
   });
 
 workspaceCmd

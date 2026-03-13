@@ -93,7 +93,15 @@ test-project/
 # .sce/tools/, .sce/config/ are committed by default
 # Runtime state files in config (DO NOT commit - machine/session specific)
 .sce/config/agent-registry.json
+.sce/config/coordination-log.json
 .sce/config/orchestration-status.json
+.sce/config/machine-id.json
+
+# Collaboration lock and pending files (DO NOT commit - runtime coordination state)
+.sce/specs/**/locks/
+.sce/specs/**/tasks.md.lock
+.sce/steering/*.lock
+.sce/steering/*.pending.*
 
 # Temporary files
 *.tmp

@@ -1,0 +1,8 @@
+{
+  "enabled": false,
+  "heartbeatIntervalMs": 60000,
+  "heartbeatTimeoutMs": 180000,
+  "coordinatorEnabled": false,
+  "maxRetries": 5,
+  "retryBaseDelayMs": 100
+}

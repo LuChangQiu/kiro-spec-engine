@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.47] - 2026-03-14
+
 ### Changed
 - Promoted "clarification before disable" to a global SCE baseline rule: missing business scene/module/page/entity context now defaults to clarification in builtin interactive governance, is written into steering/template core principles, and is documented as mandatory for all SCE-integrated projects with no exceptions.
 - Added `clarification-first-audit` as a release/audit guard so core scripts, policy/docs, starter/template baselines, and legacy fallback phrases are continuously checked for regression.

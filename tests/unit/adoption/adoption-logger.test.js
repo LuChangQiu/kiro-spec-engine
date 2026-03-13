@@ -289,7 +289,7 @@ describe('AdoptionLogger', () => {
 
     it('should log detection result', () => {
       const state = {
-        hasKiroDir: true,
+        hasSceDir: true,
         hasVersionFile: true,
         currentVersion: '1.7.0',
         targetVersion: '1.8.0',

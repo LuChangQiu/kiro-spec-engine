@@ -260,8 +260,8 @@ program
     }
 
     // 检查是否已存在 .sce 目录
-    const kiroDir = path.join(process.cwd(), '.sce');
-    if (fs.existsSync(kiroDir) && !options.force) {
+    const sceDir = path.join(process.cwd(), '.sce');
+    if (fs.existsSync(sceDir) && !options.force) {
       console.log(chalk.yellow(t('cli.commands.init.alreadyExists')));
       const { overwrite } = await inquirer.prompt([
         {

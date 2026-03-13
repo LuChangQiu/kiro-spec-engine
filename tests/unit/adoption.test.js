@@ -17,7 +17,7 @@ describe('Adoption System', () => {
     test('should determine fresh adoption mode', () => {
       const engine = new DetectionEngine();
       const result = {
-        hasKiroDir: false,
+        hasSceDir: false,
         hasVersionFile: false,
         hasSpecs: false,
         hasSteering: false,
@@ -34,7 +34,7 @@ describe('Adoption System', () => {
     test('should determine partial adoption mode', () => {
       const engine = new DetectionEngine();
       const result = {
-        hasKiroDir: true,
+        hasSceDir: true,
         hasVersionFile: false,
         hasSpecs: true,
         hasSteering: false,
@@ -51,7 +51,7 @@ describe('Adoption System', () => {
     test('should determine full adoption mode', () => {
       const engine = new DetectionEngine();
       const result = {
-        hasKiroDir: true,
+        hasSceDir: true,
         hasVersionFile: true,
         hasSpecs: true,
         hasSteering: true,

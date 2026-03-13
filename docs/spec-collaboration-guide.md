@@ -348,7 +348,7 @@ Collaboration metadata is stored in `.sce/specs/{spec-name}/collaboration.json`:
     }
   ],
   "assignment": {
-    "kiroInstance": "SCE-1",
+    "sceInstance": "SCE-1",
     "assignedAt": "2026-02-01T10:00:00Z"
   },
   "status": {

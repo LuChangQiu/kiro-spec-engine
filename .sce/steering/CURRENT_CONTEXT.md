@@ -1,10 +1,10 @@
 # 当前场景
 
-**版本**: `3.6.38` 准备发布  
-**状态**: 进入 steering 自治理收敛阶段  
-**当前主线**: 为 steering 增加定期审计、分层净化和定时监管能力，避免规则膨胀、错层和机制重复
+**版本**: `3.6.41` 已完成发布切版准备  
+**状态**: SCE 接管基线已对齐，进入遗留命名治理与兼容收敛阶段  
+**当前主线**: 消化高价值 legacy Kiro 命名残留，统一活跃路径的 SCE 语义，同时保留 `.kiro` 迁移兼容面
 
 **本轮重点**:
-- 落地 `steering-content-audit`，把“长历史、错层内容、任务状态、平行机制别名”转为可检查问题
-- 收缩 `.sce/steering/` 与模板中的基准内容，只保留长期有效的规则
-- 接入 CI 周期审查，确保 steering 长期保持精简和可用
+- 修复协作元数据写入仍使用 `kiroInstance` 的行为偏差，统一改为 `sceInstance`
+- 将 adoption / backup / bootstrap / spec gate / auto / repo config 等活跃模块内部命名迁移到 `sce*`
+- 保持 takeover baseline、branding consistency 和 legacy migration guard 同步成立，避免清理动作破坏兼容层

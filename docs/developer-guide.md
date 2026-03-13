@@ -424,7 +424,7 @@ Analyzes project structure and returns analysis result.
 {
   mode: 'fresh' | 'partial' | 'full',
   projectType: 'nodejs' | 'python' | 'mixed',
-  hasKiroDir: boolean,
+  hasSceDir: boolean,
   hasSpecs: boolean,
   hasVersion: boolean,
   conflicts: string[],

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.41] - 2026-03-13
+
+### Added
+- Added targeted regression coverage in `tests/unit/collab/collab-manager.test.js` to lock the collaboration assignment metadata migration on `sceInstance` while preserving legacy read compatibility.
+
+### Changed
+- Completed SCE takeover baseline alignment for the repository and committed the managed `.sce` baseline state used by takeover audit/apply flows.
+- Migrated active runtime naming from legacy `kiro*` internals to `sce*` across backup, adoption, bootstrap, spec-gate, auto, repo-config, and CLI-init paths so the live codebase reflects SCE ownership consistently.
+- Updated developer-facing docs and adoption tests to use `hasSceDir` / `sceInstance` as the canonical naming while preserving compatibility aliases where old project state may still exist.
+
+### Fixed
+- Fixed collaboration assignment persistence so new metadata writes `sceInstance` instead of the stale `kiroInstance` field, while graph/status readers still accept older metadata written by previous versions.
+
 ## [3.6.40] - 2026-03-13
 
 ### Added

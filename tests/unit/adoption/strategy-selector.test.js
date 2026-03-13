@@ -40,6 +40,7 @@ describe('StrategySelector', () => {
     test('should create ProjectState with default values', () => {
       const state = new ProjectState();
 
+      expect(state.hasSceDir).toBe(false);
       expect(state.hasKiroDir).toBe(false);
       expect(state.hasVersionFile).toBe(false);
       expect(state.currentVersion).toBeNull();
@@ -53,7 +54,7 @@ describe('StrategySelector', () => {
 
     test('should create ProjectState with provided values', () => {
       const state = new ProjectState({
-        hasKiroDir: true,
+        hasSceDir: true,
         hasVersionFile: true,
         currentVersion: '1.0.0',
         targetVersion: '1.8.0',
@@ -64,6 +65,7 @@ describe('StrategySelector', () => {
         versionComparison: -1
       });
 
+      expect(state.hasSceDir).toBe(true);
       expect(state.hasKiroDir).toBe(true);
       expect(state.hasVersionFile).toBe(true);
       expect(state.currentVersion).toBe('1.0.0');
@@ -82,6 +84,7 @@ describe('StrategySelector', () => {
 
       const state = await selector.detectProjectState('/test/project');
 
+      expect(state.hasSceDir).toBe(false);
       expect(state.hasKiroDir).toBe(false);
       expect(state.hasVersionFile).toBe(false);
       expect(state.currentVersion).toBeNull();
@@ -102,6 +105,7 @@ describe('StrategySelector', () => {
 
       const state = await selector.detectProjectState('/test/project');
 
+      expect(state.hasSceDir).toBe(true);
       expect(state.hasKiroDir).toBe(true);
       expect(state.hasVersionFile).toBe(false);
       expect(state.currentVersion).toBeNull();
@@ -117,6 +121,7 @@ describe('StrategySelector', () => {
 
       const state = await selector.detectProjectState('/test/project');
 
+      expect(state.hasSceDir).toBe(true);
       expect(state.hasKiroDir).toBe(true);
       expect(state.hasVersionFile).toBe(true);
       expect(state.currentVersion).toBe('1.0.0');
@@ -158,6 +163,7 @@ describe('StrategySelector', () => {
 
       const state = await selector.detectProjectState('/test/project');
 
+      expect(state.hasSceDir).toBe(true);
       expect(state.hasKiroDir).toBe(true);
       expect(state.hasVersionFile).toBe(true);
       expect(state.currentVersion).toBeNull();
@@ -181,7 +187,7 @@ describe('StrategySelector', () => {
   describe('selectMode', () => {
     test('should select FRESH mode when no .sce/ directory', () => {
       const state = new ProjectState({
-        hasKiroDir: false
+        hasSceDir: false
       });
 
       const mode = selector.selectMode(state);
@@ -191,7 +197,7 @@ describe('StrategySelector', () => {
 
     test('should select SMART_ADOPT mode when .sce/ exists but no version file', () => {
       const state = new ProjectState({
-        hasKiroDir: true,
+        hasSceDir: true,
         hasVersionFile: false
       });
 
@@ -202,7 +208,7 @@ describe('StrategySelector', () => {
 
     test('should select SMART_ADOPT mode when version file exists but no version', () => {
       const state = new ProjectState({
-        hasKiroDir: true,
+        hasSceDir: true,
         hasVersionFile: true,
         currentVersion: null
       });
@@ -214,7 +220,7 @@ describe('StrategySelector', () => {
 
     test('should select SKIP mode when versions are equal', () => {
       const state = new ProjectState({
-        hasKiroDir: true,
+        hasSceDir: true,
         hasVersionFile: true,
         currentVersion: '1.8.0',  // Must have currentVersion
         targetVersion: '1.8.0',
@@ -228,7 +234,7 @@ describe('StrategySelector', () => {
 
     test('should select SMART_UPDATE mode when current version is older', () => {
       const state = new ProjectState({
-        hasKiroDir: true,
+        hasSceDir: true,
         hasVersionFile: true,
         currentVersion: '1.0.0',
         targetVersion: '1.8.0',
@@ -242,7 +248,7 @@ describe('StrategySelector', () => {
 
     test('should select WARNING mode when current version is newer', () => {
       const state = new ProjectState({
-        hasKiroDir: true,
+        hasSceDir: true,
         hasVersionFile: true,
         currentVersion: '2.0.0',
         targetVersion: '1.8.0',
@@ -256,7 +262,7 @@ describe('StrategySelector', () => {
 
     test('should select SMART_ADOPT mode when version comparison is null', () => {
       const state = new ProjectState({
-        hasKiroDir: true,
+        hasSceDir: true,
         hasVersionFile: true,
         currentVersion: '1.0.0',
         targetVersion: '1.8.0',
@@ -288,6 +294,7 @@ describe('StrategySelector', () => {
 
       const result = await selector.detectAndSelect('/test/project');
 
+      expect(result.state.hasSceDir).toBe(true);
       expect(result.state.hasKiroDir).toBe(true);
       expect(result.state.currentVersion).toBe('1.0.0');
       expect(result.mode).toBe(AdoptionMode.SMART_UPDATE);
@@ -398,7 +405,7 @@ describe('StrategySelector', () => {
     test('should handle version comparison edge cases', () => {
       // Test with comparison = 0 (equal) - must have currentVersion
       let state = new ProjectState({ 
-        hasKiroDir: true, 
+        hasSceDir: true, 
         hasVersionFile: true, 
         currentVersion: '1.8.0',
         versionComparison: 0 
@@ -407,7 +414,7 @@ describe('StrategySelector', () => {
 
       // Test with comparison < 0 (older) - must have currentVersion
       state = new ProjectState({ 
-        hasKiroDir: true, 
+        hasSceDir: true, 
         hasVersionFile: true, 
         currentVersion: '1.0.0',
         versionComparison: -1 
@@ -416,7 +423,7 @@ describe('StrategySelector', () => {
 
       // Test with comparison > 0 (newer) - must have currentVersion
       state = new ProjectState({ 
-        hasKiroDir: true, 
+        hasSceDir: true, 
         hasVersionFile: true, 
         currentVersion: '2.0.0',
         versionComparison: 1 
@@ -425,7 +432,7 @@ describe('StrategySelector', () => {
 
       // Test with comparison = null (failed) - even with currentVersion
       state = new ProjectState({ 
-        hasKiroDir: true, 
+        hasSceDir: true, 
         hasVersionFile: true, 
         currentVersion: '1.0.0',
         versionComparison: null 
@@ -434,7 +441,7 @@ describe('StrategySelector', () => {
 
       // Test without currentVersion - should be SMART_ADOPT regardless of comparison
       state = new ProjectState({ 
-        hasKiroDir: true, 
+        hasSceDir: true, 
         hasVersionFile: true, 
         currentVersion: null,
         versionComparison: 0 
@@ -449,6 +456,7 @@ describe('StrategySelector', () => {
 
       const { state, mode } = await selector.detectAndSelect('/test/project');
 
+      expect(state.hasSceDir).toBe(false);
       expect(state.hasKiroDir).toBe(false);
       expect(mode).toBe(AdoptionMode.FRESH);
       expect(selector.getModeDescription(mode)).toContain('Fresh Adoption');
@@ -464,6 +472,7 @@ describe('StrategySelector', () => {
 
       const { state, mode } = await selector.detectAndSelect('/test/project');
 
+      expect(state.hasSceDir).toBe(true);
       expect(state.hasKiroDir).toBe(true);
       expect(state.hasVersionFile).toBe(true);
       expect(state.currentVersion).toBe('1.0.0');
@@ -484,6 +493,7 @@ describe('StrategySelector', () => {
 
       const { state, mode } = await selector.detectAndSelect('/test/project');
 
+      expect(state.hasSceDir).toBe(true);
       expect(state.hasKiroDir).toBe(true);
       expect(state.currentVersion).toBe(packageJson.version);
       expect(state.versionComparison).toBe(0);
@@ -502,6 +512,7 @@ describe('StrategySelector', () => {
 
       const { state, mode } = await selector.detectAndSelect('/test/project');
 
+      expect(state.hasSceDir).toBe(true);
       expect(state.hasKiroDir).toBe(true);
       expect(state.hasVersionFile).toBe(false);
       expect(state.currentVersion).toBeNull();
@@ -518,6 +529,7 @@ describe('StrategySelector', () => {
 
       const { state, mode } = await selector.detectAndSelect('/test/project');
 
+      expect(state.hasSceDir).toBe(true);
       expect(state.hasKiroDir).toBe(true);
       expect(state.currentVersion).toBe('99.0.0');
       expect(state.versionComparison).toBe(1);

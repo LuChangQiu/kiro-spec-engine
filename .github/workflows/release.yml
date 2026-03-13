@@ -1108,7 +1108,12 @@ jobs:
             CMD+=(--require-pass)
           fi
 
-          "${CMD[@]}" > "${PREFLIGHT_JSON}"
+          if ! "${CMD[@]}" > "${PREFLIGHT_JSON}"; then
+            if [[ -f "${PREFLIGHT_JSON}" ]]; then
+              cat "${PREFLIGHT_JSON}"
+            fi
+            exit 1
+          fi
           cat "${PREFLIGHT_JSON}"
           echo "json_file=${PREFLIGHT_JSON}" >> "$GITHUB_OUTPUT"
 

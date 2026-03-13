@@ -8910,6 +8910,60 @@ if (process.argv.includes('--json')) {
     }));
   });
 
+  test('does not block handoff preflight-check for advisory drift alerts without blocked runs', async () => {
+    const releaseGateHistoryFile = path.join(
+      tempDir,
+      '.sce',
+      'reports',
+      'release-evidence',
+      'release-gate-history.json'
+    );
+    await fs.writeJson(releaseGateHistoryFile, {
+      mode: 'auto-handoff-release-gate-history',
+      total_entries: 1,
+      latest: {
+        tag: 'v9.9.9',
+        gate_passed: true,
+        risk_level: 'medium'
+      },
+      aggregates: {
+        pass_rate_percent: 100,
+        scene_package_batch_pass_rate_percent: 100,
+        drift_alert_rate_percent: 100,
+        drift_alert_runs: 1,
+        drift_blocked_runs: 0
+      },
+      entries: [
+        {
+          tag: 'v9.9.9',
+          gate_passed: true,
+          risk_level: 'medium',
+          drift_alert_count: 2,
+          drift_blocked: false
+        }
+      ]
+    }, { spaces: 2 });
+
+    const program = buildProgram();
+    await program.parseAsync([
+      'node',
+      'sce',
+      'auto',
+      'handoff',
+      'preflight-check',
+      '--require-pass',
+      '--json'
+    ]);
+
+    const payload = JSON.parse(`${logSpy.mock.calls[0][0]}`);
+    expect(payload.mode).toBe('auto-handoff-preflight-check');
+    expect(payload.status).toBe('pass');
+    expect(payload.release_gate_preflight).toEqual(expect.objectContaining({
+      available: true,
+      blocked: false
+    }));
+  });
+
   test('supports advisory preflight-check mode via --no-require-release-gate-preflight', async () => {
     const releaseGateHistoryFile = path.join(
       tempDir,

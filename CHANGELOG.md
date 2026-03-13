@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.43] - 2026-03-13
+
+### Changed
+- Tightened release-gate preflight blocking semantics so advisory drift alerts no longer hard-block release publish unless drift produced blocked runs.
+- Updated the release workflow preflight step to print the captured preflight JSON when `sce auto handoff preflight-check --require-pass` fails, so future release failures expose the actual blocking reasons immediately.
+
 ## [3.6.42] - 2026-03-13
 
 ### Changed

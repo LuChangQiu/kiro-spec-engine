@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extended takeover baseline auto-alignment so older adopted projects also repair missing clarification-first `CORE_PRINCIPLES` content during best-effort startup/default alignment.
 - Added CLI integration coverage for `sce adopt`, `sce upgrade`, and startup takeover auto-alignment so clarification-first baseline propagation is verified end-to-end on real project fixtures.
 - Extended takeover baseline to auto-create `.sce/config/errorbook-registry.json` and to inventory project-defined mistake-book/postmortem style artifacts so SCE takeover converges them into the canonical `errorbook` flow instead of letting parallel mechanisms coexist.
+- Added three more global core principles to the steering baseline: forbid blind fixes without problem evidence, require evaluation before any steering entry is added/removed/rewritten, and default frontend/backend mismatch fixes to align the frontend to the existing backend API contract unless an interface change is explicitly requested.
 
 ## [3.6.46] - 2026-03-13
 

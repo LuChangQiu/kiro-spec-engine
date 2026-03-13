@@ -4,7 +4,10 @@ const path = require('path');
 const { runCliWithRetry } = require('./cli-runner');
 
 const {
-  CLARIFICATION_FIRST_CORE_PRINCIPLE_HEADING
+  CLARIFICATION_FIRST_CORE_PRINCIPLE_HEADING,
+  NO_BLIND_FIX_CORE_PRINCIPLE_HEADING,
+  STEERING_CHANGE_EVALUATION_CORE_PRINCIPLE_HEADING,
+  BACKEND_API_PRECEDENCE_CORE_PRINCIPLE_HEADING
 } = require('../../lib/workspace/takeover-baseline');
 const packageJson = require('../../package.json');
 
@@ -47,6 +50,9 @@ describe('adopt/upgrade clarification-first integration', () => {
 
     const corePrinciples = await fs.readFile(path.join(tempDir, '.sce', 'steering', 'CORE_PRINCIPLES.md'), 'utf8');
     expect(corePrinciples).toContain(CLARIFICATION_FIRST_CORE_PRINCIPLE_HEADING);
+    expect(corePrinciples).toContain(NO_BLIND_FIX_CORE_PRINCIPLE_HEADING);
+    expect(corePrinciples).toContain(STEERING_CHANGE_EVALUATION_CORE_PRINCIPLE_HEADING);
+    expect(corePrinciples).toContain(BACKEND_API_PRECEDENCE_CORE_PRINCIPLE_HEADING);
     expect(corePrinciples).toContain('不允许按项目例外绕过');
   });
 
@@ -71,6 +77,9 @@ describe('adopt/upgrade clarification-first integration', () => {
     const corePrinciples = await fs.readFile(path.join(tempDir, '.sce', 'steering', 'CORE_PRINCIPLES.md'), 'utf8');
     expect(corePrinciples).toContain('## 1. Existing Rule');
     expect(corePrinciples).toContain(CLARIFICATION_FIRST_CORE_PRINCIPLE_HEADING);
+    expect(corePrinciples).toContain(NO_BLIND_FIX_CORE_PRINCIPLE_HEADING);
+    expect(corePrinciples).toContain(STEERING_CHANGE_EVALUATION_CORE_PRINCIPLE_HEADING);
+    expect(corePrinciples).toContain(BACKEND_API_PRECEDENCE_CORE_PRINCIPLE_HEADING);
     expect(corePrinciples.match(new RegExp(CLARIFICATION_FIRST_CORE_PRINCIPLE_HEADING, 'g'))).toHaveLength(1);
   });
 
@@ -108,6 +117,9 @@ describe('adopt/upgrade clarification-first integration', () => {
     const corePrinciples = await fs.readFile(path.join(tempDir, '.sce', 'steering', 'CORE_PRINCIPLES.md'), 'utf8');
     expect(corePrinciples).toContain('## 1. Existing Rule');
     expect(corePrinciples).toContain(CLARIFICATION_FIRST_CORE_PRINCIPLE_HEADING);
+    expect(corePrinciples).toContain(NO_BLIND_FIX_CORE_PRINCIPLE_HEADING);
+    expect(corePrinciples).toContain(STEERING_CHANGE_EVALUATION_CORE_PRINCIPLE_HEADING);
+    expect(corePrinciples).toContain(BACKEND_API_PRECEDENCE_CORE_PRINCIPLE_HEADING);
     expect(corePrinciples.match(new RegExp(CLARIFICATION_FIRST_CORE_PRINCIPLE_HEADING, 'g'))).toHaveLength(1);
   });
 });

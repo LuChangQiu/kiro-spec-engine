@@ -5,6 +5,10 @@ const {
   applyTakeoverBaseline,
   TAKEOVER_DEFAULTS,
   CLARIFICATION_FIRST_CORE_PRINCIPLE_HEADING,
+  NO_BLIND_FIX_CORE_PRINCIPLE_HEADING,
+  STEERING_CHANGE_EVALUATION_CORE_PRINCIPLE_HEADING,
+  BACKEND_API_PRECEDENCE_CORE_PRINCIPLE_HEADING,
+  REQUIRED_CORE_PRINCIPLE_SECTIONS,
   ERRORBOOK_REGISTRY_DEFAULTS,
   ERRORBOOK_CONVERGENCE_DEFAULTS
 } = require('../../../lib/workspace/takeover-baseline');
@@ -81,6 +85,9 @@ describe('takeover-baseline', () => {
 
     const corePrinciples = await fs.readFile(path.join(tempDir, '.sce', 'steering', 'CORE_PRINCIPLES.md'), 'utf8');
     expect(corePrinciples).toContain(CLARIFICATION_FIRST_CORE_PRINCIPLE_HEADING);
+    expect(corePrinciples).toContain(NO_BLIND_FIX_CORE_PRINCIPLE_HEADING);
+    expect(corePrinciples).toContain(STEERING_CHANGE_EVALUATION_CORE_PRINCIPLE_HEADING);
+    expect(corePrinciples).toContain(BACKEND_API_PRECEDENCE_CORE_PRINCIPLE_HEADING);
   });
 
   test('audit mode reports drift without mutating project files', async () => {
@@ -129,10 +136,12 @@ describe('takeover-baseline', () => {
     expect(second.files.every((item) => item.status === 'unchanged')).toBe(true);
 
     const corePrinciples = await fs.readFile(path.join(tempDir, '.sce', 'steering', 'CORE_PRINCIPLES.md'), 'utf8');
-    expect(corePrinciples.match(new RegExp(CLARIFICATION_FIRST_CORE_PRINCIPLE_HEADING, 'g'))).toHaveLength(1);
+    REQUIRED_CORE_PRINCIPLE_SECTIONS.forEach(({ heading }) => {
+      expect(corePrinciples.match(new RegExp(heading, 'g'))).toHaveLength(1);
+    });
   });
 
-  test('repairs missing clarification-first core principle for existing steering file', async () => {
+  test('repairs missing required core principles for existing steering file', async () => {
     await fs.ensureDir(path.join(tempDir, '.sce', 'steering'));
     await fs.writeFile(
       path.join(tempDir, '.sce', 'steering', 'CORE_PRINCIPLES.md'),
@@ -154,6 +163,9 @@ describe('takeover-baseline', () => {
     const corePrinciples = await fs.readFile(path.join(tempDir, '.sce', 'steering', 'CORE_PRINCIPLES.md'), 'utf8');
     expect(corePrinciples).toContain('## 1. Existing Rule');
     expect(corePrinciples).toContain(CLARIFICATION_FIRST_CORE_PRINCIPLE_HEADING);
+    expect(corePrinciples).toContain(NO_BLIND_FIX_CORE_PRINCIPLE_HEADING);
+    expect(corePrinciples).toContain(STEERING_CHANGE_EVALUATION_CORE_PRINCIPLE_HEADING);
+    expect(corePrinciples).toContain(BACKEND_API_PRECEDENCE_CORE_PRINCIPLE_HEADING);
   });
 
   test('inventories project-defined mistake-book style artifacts into SCE errorbook convergence intake', async () => {

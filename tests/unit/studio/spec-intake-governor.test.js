@@ -9,6 +9,7 @@ const {
   runStudioSceneBackfill,
   runStudioSpecGovernance
 } = require('../../../lib/studio/spec-intake-governor');
+const { ensureSpecDomainArtifacts } = require('../../../lib/spec/domain-modeling');
 
 describe('studio spec-intake-governor', () => {
   let tempDir;
@@ -105,6 +106,50 @@ describe('studio spec-intake-governor', () => {
     expect(report.summary.total_specs).toBeGreaterThanOrEqual(2);
     expect(report.report_file).toBe('.sce/spec-governance/scene-portfolio.latest.json');
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'spec-governance', 'scene-index.json'))).toBe(true);
+  });
+
+  test('portfolio governance can ignore completed history duplicates', async () => {
+    const specA = 'auto-history-duplicate-a';
+    const specB = 'auto-history-duplicate-b';
+    const specARoot = path.join(tempDir, '.sce', 'specs', specA);
+    const specBRoot = path.join(tempDir, '.sce', 'specs', specB);
+
+    await fs.ensureDir(path.join(tempDir, '.sce', 'config'));
+    await fs.writeJson(path.join(tempDir, '.sce', 'config', 'studio-intake-policy.json'), {
+      governance: {
+        duplicate_detection_scope: 'non_completed'
+      }
+    }, { spaces: 2 });
+
+    await fs.ensureDir(specARoot);
+    await fs.ensureDir(specBRoot);
+    await fs.writeFile(path.join(specARoot, 'tasks.md'), '- [x] task a\n', 'utf8');
+    await fs.writeFile(path.join(specBRoot, 'tasks.md'), '- [x] task b\n', 'utf8');
+    await ensureSpecDomainArtifacts(tempDir, specA, {
+      fileSystem: fs,
+      force: true,
+      sceneId: 'scene.history-governance',
+      problemStatement: 'Order approval retry policy mismatch in checkout flow',
+      verificationPlan: 'Archive-only historical validation'
+    });
+    await ensureSpecDomainArtifacts(tempDir, specB, {
+      fileSystem: fs,
+      force: true,
+      sceneId: 'scene.history-governance',
+      problemStatement: 'Order approval retry policy mismatch for checkout process',
+      verificationPlan: 'Archive-only historical validation'
+    });
+
+    const report = await runStudioSpecGovernance({
+      apply: false
+    }, {
+      projectPath: tempDir,
+      fileSystem: fs
+    });
+
+    expect(report.summary.completed_specs).toBe(2);
+    expect(report.summary.duplicate_pairs).toBe(0);
+    expect(report.summary.alert_count).toBe(0);
   });
 
   test('blocks manual intake bypass when policy disallows override', async () => {

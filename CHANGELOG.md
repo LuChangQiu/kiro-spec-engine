@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.48] - 2026-03-14
+
+### Changed
+- Added `governance.duplicate_detection_scope` to studio spec governance policy with supported values `all`, `non_completed`, and `active_only`.
+- Changed the default duplicate governance scope to `non_completed`, so duplicate detection compares active and stale specs but no longer treats completed historical specs as duplicate noise.
+- Updated studio intake normalization and scene governance reporting to filter duplicate candidate sets by the configured scope before generating duplicate alerts.
+- Synced the new duplicate governance scope into takeover baseline defaults so adopted and upgraded projects inherit the same non-completed duplicate detection behavior by default.
+- Added regression coverage proving completed history specs do not trigger duplicate governance alerts under the new default scope.
+
 ## [3.6.47] - 2026-03-14
 
 ### Changed

@@ -17,7 +17,11 @@
 ### Current SCE capabilities ready for MagicBall integration
 
 SCE changes completed and now available for MagicBall:
+- `device current`
 - `app bundle` registry local state and CLI
+- `app collection list/show/apply`
+- `scene workspace list/show/apply`
+- `app install-state list`
 - `mode application home --app ... --json`
 - `mode ontology home --app ... --json`
 - `mode engineering home --app ... --json`
@@ -32,9 +36,10 @@ SCE changes completed and now available for MagicBall:
 
 ### Current recommended MagicBall consumption order
 1. consume `mode * home` as the top-level source for the three modes
-2. consume `pm`, `ontology`, and `assurance` table payloads
-3. wire runtime install/activate/uninstall and engineering attach/hydrate/activate actions
-4. use demo app: `customer-order-demo`
+2. consume `device current`, `app collection list/show/apply`, `scene workspace list/show/apply`, and `app install-state list` as the local device/install baseline
+3. consume `pm`, `ontology`, and `assurance` table payloads
+4. wire runtime install/activate/uninstall and engineering attach/hydrate/activate actions
+5. use demo app: `customer-order-demo`
 
 ### Related SCE docs
 - `docs/magicball-sce-adaptation-guide.md`
@@ -64,6 +69,11 @@ SCE changes completed and now available for MagicBall:
    - current payload
    - expected payload
    - UI impact
+
+### Cross-project decision recorded
+- The next install-management phase should not use a single global install set.
+- SCE will separate shared app intent from local device installation facts.
+- Planned phase-1 capability is documented in `docs/magicball-app-collection-phase-1.md`.
 
 ## Open Items
 
@@ -152,6 +162,35 @@ Status:
 - empty-ontology flow reverified locally on 2026-03-08 in `E:\workspace\331-poc\tmp\sce-empty-ontology-repro`
 - local verification covered: `triad summary` empty -> `seed list/show` preview -> `seed apply` -> `triad summary` ready
 - keep open until broader field verification confirms the UX is stable
+
+### Issue 006: scene-profile and app-collection install orchestration is not yet command-ready
+
+Context:
+- MagicBall now needs a scene-oriented install-management model above current per-app runtime controls.
+- Current SCE already supports per-app runtime install, activate, uninstall, but not shared app intent vs device fact resolution.
+
+Cross-project decision:
+- Do not model this as one global install set shared blindly across devices.
+- Separate:
+  - shared intent: `app_collection`, `scene_profile`
+  - local fact: `device_installation`
+  - local override: `device_override`
+- Keep shared intent file-backed or registry-backed.
+- Use SQLite only for local facts and rebuildable projections.
+- `apply` must be plan-first and require explicit execution confirmation.
+
+Reference:
+- `docs/magicball-app-collection-phase-1.md`
+- `.sce/specs/128-00-app-collection-scene-profile-device-installation/`
+
+Status:
+- architecture decision aligned
+- spec added in SCE
+- read-model and plan-first diff commands implemented
+- explicit execute path now implemented for non-blocked install/uninstall actions
+- execute remains blocked when unresolved collections, missing app bundles, or active-release protection skips are present
+- local `device_override` file is now respected during resolution, so per-device add/remove exceptions no longer require mutating shared intent definitions
+- local `device_override` now also has explicit `show/upsert` command support, so frontend or operator flows no longer need to hand-edit the override file
 
 ## Resolved
 

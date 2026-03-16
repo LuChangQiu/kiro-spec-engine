@@ -21,6 +21,46 @@ Assume:
 
 ## 1. Workspace Bootstrap
 
+### 1.0 Read current device baseline
+```bash
+sce device current --json
+sce device override show --json
+sce app collection list --json
+sce app collection show --collection sales-workbench --json
+sce app collection apply --collection sales-workbench --json
+sce scene workspace list --json
+sce scene workspace show --workspace sales --json
+sce scene workspace apply --workspace sales --json
+sce app install-state list --json
+```
+
+Expected use:
+- cache current device id / tags
+- load file-backed shared app collection intent
+- load file-backed shared scene workspace intent
+- render cross-app local install baseline before scene-oriented collection flows arrive
+
+Optional local override input:
+- `.sce/state/device/device-override.json`
+- use this for per-device add/remove exceptions instead of mutating shared collection/workspace definitions
+- update it explicitly via `sce device override upsert --input <json> --json`
+
+Example local override patch:
+```json
+{
+  "removed_apps": ["crm"],
+  "added_apps": [
+    {
+      "app_key": "notes",
+      "required": false
+    }
+  ],
+  "metadata": {
+    "reason": "tablet kiosk profile"
+  }
+}
+```
+
 ### 1.1 App bundle identity
 ```bash
 sce app bundle show --app customer-order-demo --json

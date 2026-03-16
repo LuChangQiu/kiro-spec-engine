@@ -14,6 +14,7 @@ It is a navigation layer, not a new source of truth.
 
 These are the current first-line integration documents:
 - `docs/magicball-sce-adaptation-guide.md`
+- `docs/magicball-app-collection-phase-1.md`
 - `docs/magicball-ui-surface-checklist.md`
 - `docs/magicball-mode-home-and-ontology-empty-state-playbook.md`
 - `docs/magicball-frontend-state-and-command-mapping.md`
@@ -32,28 +33,32 @@ These are the current first-line integration documents:
    - implementation checklist
    - milestone-oriented execution order
 
-3. `docs/magicball-mode-home-and-ontology-empty-state-playbook.md`
+3. `docs/magicball-app-collection-phase-1.md`
+   - current device / collection / workspace / override baseline
+   - shipped phase-1 install orchestration contract
+
+4. `docs/magicball-mode-home-and-ontology-empty-state-playbook.md`
    - two active frontend-sensitive defaults
    - serialized mode-home loading
    - ontology empty-state and starter-seed behavior
 
-4. `docs/magicball-frontend-state-and-command-mapping.md`
+5. `docs/magicball-frontend-state-and-command-mapping.md`
    - page state ownership
    - command-to-action mapping
    - error and retry boundaries
 
-5. `docs/magicball-write-auth-adaptation-guide.md`
+6. `docs/magicball-write-auth-adaptation-guide.md`
    - write authorization and lease handling
 
-6. `docs/magicball-task-feedback-timeline-guide.md`
+7. `docs/magicball-task-feedback-timeline-guide.md`
    - task feedback cards
    - timeline view integration
 
-7. `docs/magicball-cli-invocation-examples.md`
+8. `docs/magicball-cli-invocation-examples.md`
    - copy-ready CLI examples
    - wrapper and smoke verification patterns
 
-8. `docs/magicball-integration-issue-tracker.md`
+9. `docs/magicball-integration-issue-tracker.md`
    - current cross-project truth
    - only open issues, active decisions, and verified resolutions
 
@@ -62,6 +67,7 @@ These are the current first-line integration documents:
 ### I need to bootstrap the three-mode app shell
 Use:
 - `docs/magicball-sce-adaptation-guide.md`
+- `docs/magicball-app-collection-phase-1.md`
 - `docs/magicball-mode-home-and-ontology-empty-state-playbook.md`
 - `docs/magicball-frontend-state-and-command-mapping.md`
 
@@ -95,6 +101,7 @@ Use:
 | Document | Role | Should change often? |
 | --- | --- | --- |
 | `magicball-sce-adaptation-guide.md` | main overview | low |
+| `magicball-app-collection-phase-1.md` | next-phase install model | medium |
 | `magicball-adaptation-task-checklist-v1.md` | execution checklist | medium |
 | `magicball-mode-home-and-ontology-empty-state-playbook.md` | frontend behavior policy | medium |
 | `magicball-frontend-state-and-command-mapping.md` | frontend implementation mapping | medium |
@@ -127,6 +134,7 @@ As of the current tracker state:
 - fresh ontology pages use `fallback + optional seed apply`
 - seed apply stays explicit and user-triggered
 - command failures should be preserved in copyable form for AI-assisted diagnosis
+- app installation orchestration should use `scene_profile` and `app_collection` intent, not a global identical install set
 
 ## Maintenance Rule
 

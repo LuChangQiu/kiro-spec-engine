@@ -378,10 +378,25 @@ sce workspace team
 ### App Bundle & MagicBall Mode Projection
 
 ```bash
+# Current device baseline
+sce device current --json
+sce device override show --json
+sce device override upsert --input device-override.patch.json --json
+
 # List/show/register app bundles
 sce app bundle list --json
 sce app bundle show --app customer-order-demo --json
 sce app bundle register --input bundle.json --json
+
+# File-backed app collection intent
+sce app collection list --json
+sce app collection show --collection sales-workbench --json
+sce app collection apply --collection sales-workbench --json
+
+# File-backed scene workspace intent
+sce scene workspace list --json
+sce scene workspace show --workspace sales --json
+sce scene workspace apply --workspace sales --json
 
 # Configure and sync remote registries
 sce app registry status --json
@@ -395,6 +410,10 @@ sce app runtime install --app customer-order-demo --release <release-id> --json
 sce app runtime activate --app customer-order-demo --release <release-id> --json
 sce app runtime uninstall --app customer-order-demo --release <release-id> --json
 
+# Cross-app local install-state view
+sce app install-state list --json
+sce app install-state list --install-status installed --json
+
 # Engineering projection
 sce app engineering show --app customer-order-demo --json
 sce app engineering attach --app customer-order-demo --repo <repo-url> --branch main --json
@@ -406,6 +425,10 @@ sce mode application home --app customer-order-demo --json
 sce mode ontology home --app customer-order-demo --json
 sce mode engineering home --app customer-order-demo --json
 ```
+
+Device override notes:
+- `sce device override show` returns the normalized local per-device overlay from `.sce/state/device/device-override.json`.
+- `sce device override upsert --input <json>` merges only explicitly provided fields; omitted fields remain unchanged so local override policy is not blindly replaced.
 
 ### PM Delivery Data Plane
 

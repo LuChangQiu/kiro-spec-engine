@@ -1054,7 +1054,9 @@ registerStateCommands(program);
 registerCapabilityCommands(program);
 
 const { registerAppCommands } = require('../lib/commands/app');
+const { registerDeviceCommands } = require('../lib/commands/device');
 const { registerModeCommands } = require('../lib/commands/mode');
+registerDeviceCommands(program);
 registerAppCommands(program);
 registerModeCommands(program);
 const { registerPmCommands } = require('../lib/commands/pm');

@@ -163,7 +163,12 @@ For IDEs, AI shells, or custom frontends, the most important SCE surfaces are:
 
 MagicBall-specific integration surfaces now also include:
 
+- `sce device current`
+- `sce device override show|upsert`
 - `sce app bundle list|show|register`
+- `sce app collection list|show|apply`
+- `sce app install-state list`
+- `sce scene workspace list|show|apply`
 - `sce app registry status|configure|sync*`
 - `sce app runtime show|releases|install|activate|uninstall`
 - `sce app engineering show|attach|hydrate|activate`
@@ -218,5 +223,5 @@ MIT. See [LICENSE](LICENSE).
 
 ---
 
-**Version**: 3.6.54
+**Version**: 3.6.55
 **Last Updated**: 2026-03-16

@@ -12,6 +12,7 @@ Implementation detail should live in the specialized documents listed below.
 
 Use these documents together:
 - `docs/magicball-integration-doc-index.md`
+- `docs/magicball-app-collection-phase-1.md`
 - `docs/magicball-ui-surface-checklist.md`
 - `docs/magicball-mode-home-and-ontology-empty-state-playbook.md`
 - `docs/magicball-frontend-state-and-command-mapping.md`
@@ -23,15 +24,40 @@ Use these documents together:
 ## Current Scope
 
 SCE currently provides MagicBall-facing support for:
-1. `app bundle registry`
-2. `application / ontology / engineering home projections`
-3. `app runtime install / activate / uninstall`
-4. `app engineering attach / hydrate / activate`
-5. `pm` delivery data plane
-6. `ontology` triad data plane
-7. `assurance` data plane
-8. `write authorization`
-9. `task feedback + timeline`
+1. `device current` identity read model
+2. `device override show/upsert` local overlay governance
+3. `app bundle registry`
+4. `app collection list/show/apply` with plan-first diff and guarded explicit execution
+5. `scene workspace list/show/apply` with plan-first diff and guarded explicit execution
+6. `app install-state` local device projection
+7. `application / ontology / engineering home projections`
+8. `app runtime install / activate / uninstall`
+9. `app engineering attach / hydrate / activate`
+10. `pm` delivery data plane
+11. `ontology` triad data plane
+12. `assurance` data plane
+13. `write authorization`
+14. `task feedback + timeline`
+
+## Planned Next Scope
+
+The next planned SCE capability line for MagicBall is lightweight cross-device sync and richer collection resolution above the current shipped local-device-first baseline.
+
+Planned model split:
+- `app_collection` and `scene_profile` as shared intent
+- `device_installation` as local device fact
+- `device_override` as local device overlay
+
+Planned phase-1 position:
+- local device-first
+- file-backed shared intent
+- SQLite only for local facts and rebuildable projections
+- `apply` must be plan-first, not blind mutation
+- local device override is file-backed and applied during collection/workspace resolution
+- local device override mutation now uses explicit CLI upsert rather than manual-only file editing
+
+Reference:
+- `docs/magicball-app-collection-phase-1.md`
 
 ## Core Integration Positioning
 
@@ -100,6 +126,7 @@ Use `docs/magicball-cli-invocation-examples.md` for copy-ready commands.
 - `sce app engineering show`
 
 ### Runtime and engineering control
+- `sce device override show/upsert`
 - `sce app runtime show/releases/install/activate/uninstall`
 - `sce app engineering show/attach/hydrate/activate`
 - `sce app registry status/configure/sync*`

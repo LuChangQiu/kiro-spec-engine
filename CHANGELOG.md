@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.55] - 2026-03-16
+
+### Added
+- Added `sce device current` as a read-only current-device identity projection that avoids persisting a machine-id file when no persistent device id exists yet.
+- Added `sce device override show|upsert` so local per-device add/remove overlays can be inspected and updated through explicit CLI governance instead of hand-editing `.sce/state/device/device-override.json`.
+- Added `sce app collection list/show` as file-backed intent read models rooted at `.sce/app/collections/*.json`.
+- Added `sce scene workspace list/show` as file-backed scene-profile read models rooted at `.sce/app/scene-profiles/*.json`.
+- Added `sce app install-state list` so MagicBall and CLI users can inspect current cross-app installation facts from one local device-oriented view.
+- Added plan-first `sce app collection apply` and `sce scene workspace apply` diff commands with guarded explicit execution. `--execute` now reuses existing runtime install/uninstall only when the plan is fully resolvable; unresolved collections, missing app bundles, and active-release protection still block execution.
+
+### Changed
+- `sce app runtime install` and `sce app runtime uninstall` now stamp runtime installation metadata with the current device identifier and hostname, making local installation facts attributable without introducing a second install-management mechanism.
+- Collection/workspace resolution now respects file-backed local device overrides at `.sce/state/device/device-override.json` and item-level `capability_tags`, so per-device add/remove decisions and capability mismatch skips are explained in the generated plan instead of being silently ignored.
+
 ## [3.6.54] - 2026-03-16
 
 ### Added

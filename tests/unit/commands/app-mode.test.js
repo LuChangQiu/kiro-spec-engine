@@ -14,6 +14,7 @@ const {
   runAppRuntimeReleasesCommand,
   runAppRuntimeInstallCommand,
   runAppRuntimeActivateCommand,
+  runAppRuntimeUninstallCommand,
   runAppEngineeringShowCommand,
   runAppEngineeringAttachCommand,
   runAppEngineeringHydrateCommand,
@@ -240,7 +241,7 @@ describe('app and mode commands', () => {
     }));
   });
 
-  test('configures registries, syncs bundle/catalog, and installs runtime', async () => {
+  test('configures registries, syncs bundle/catalog, and projects install/activate/uninstall runtime state', async () => {
     const bundleDir = path.join(tempDir, 'bundle-registry', 'bundles', 'demo');
     const catalogDir = path.join(tempDir, 'service-catalog', 'catalog', 'apps');
     await fs.ensureDir(bundleDir);
@@ -343,6 +344,16 @@ describe('app and mode commands', () => {
       stateStore
     });
     expect(runtimeReleases.items).toHaveLength(2);
+    expect(runtimeReleases.summary).toEqual(expect.objectContaining({
+      installed_release_id: null,
+      active_release_id: 'rel.demo.2026030801'
+    }));
+    expect(runtimeReleases.items[0]).toEqual(expect.objectContaining({
+      release_id: 'rel.demo.2026030801',
+      active: true,
+      installed: false,
+      can_uninstall: false
+    }));
 
     const installRoot = path.join(tempDir, '.sce', 'apps', 'demo', 'runtime', 'rel.demo.2026030802');
     const installed = await runAppRuntimeInstallCommand({
@@ -361,6 +372,92 @@ describe('app and mode commands', () => {
       release_id: 'rel.demo.2026030802'
     }));
     expect(await fs.pathExists(installRoot)).toBe(true);
+
+    const shownAfterInstall = await runAppRuntimeShowCommand({ app: 'demo', json: true }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: testEnv,
+      stateStore
+    });
+    expect(shownAfterInstall.summary).toEqual(expect.objectContaining({
+      install_status: 'installed',
+      installed_release_id: 'rel.demo.2026030802',
+      active_release_id: 'rel.demo.2026030801',
+      release_count: 2
+    }));
+
+    const appHomeAfterInstall = await runModeHomeCommand('application', { app: 'demo', json: true }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: testEnv,
+      stateStore
+    });
+    expect(appHomeAfterInstall.summary).toEqual(expect.objectContaining({
+      install_status: 'installed',
+      installed_release_id: 'rel.demo.2026030802',
+      active_release_id: 'rel.demo.2026030801'
+    }));
+    expect(appHomeAfterInstall.view_model).toEqual(expect.objectContaining({
+      current_release: 'rel.demo.2026030801',
+      installed_release_id: 'rel.demo.2026030802',
+      active_release_id: 'rel.demo.2026030801'
+    }));
+
+    const releasesAfterInstall = await runAppRuntimeReleasesCommand({ app: 'demo', json: true }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: testEnv,
+      stateStore
+    });
+    expect(releasesAfterInstall.items[0]).toEqual(expect.objectContaining({
+      release_id: 'rel.demo.2026030801',
+      active: true,
+      installed: false,
+      can_uninstall: false
+    }));
+    expect(releasesAfterInstall.items[1]).toEqual(expect.objectContaining({
+      release_id: 'rel.demo.2026030802',
+      active: false,
+      installed: true,
+      can_uninstall: true
+    }));
+
+    const uninstalled = await runAppRuntimeUninstallCommand({
+      app: 'demo',
+      release: 'rel.demo.2026030802',
+      json: true
+    }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: testEnv,
+      stateStore
+    });
+    expect(uninstalled.summary).toEqual(expect.objectContaining({
+      install_status: 'not-installed',
+      installed_release_id: null,
+      active_release_id: 'rel.demo.2026030801'
+    }));
+    expect(uninstalled.runtime_installation).toEqual(expect.objectContaining({
+      status: 'not-installed',
+      previous_release_id: 'rel.demo.2026030802'
+    }));
+    expect(await fs.pathExists(installRoot)).toBe(false);
+
+    const reinstalled = await runAppRuntimeInstallCommand({
+      app: 'demo',
+      release: 'rel.demo.2026030802',
+      installRoot,
+      json: true
+    }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: testEnv,
+      stateStore
+    });
+    expect(reinstalled.runtime_installation).toEqual(expect.objectContaining({
+      status: 'installed',
+      release_id: 'rel.demo.2026030802'
+    }));
 
     const activated = await runAppRuntimeActivateCommand({
       app: 'demo',
@@ -385,9 +482,81 @@ describe('app and mode commands', () => {
     });
     expect(shown.summary).toEqual(expect.objectContaining({
       install_status: 'installed',
+      installed_release_id: 'rel.demo.2026030802',
       active_release_id: 'rel.demo.2026030802',
       release_count: 2
     }));
+
+    const releasesAfterActivate = await runAppRuntimeReleasesCommand({ app: 'demo', json: true }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: testEnv,
+      stateStore
+    });
+    expect(releasesAfterActivate.items[1]).toEqual(expect.objectContaining({
+      release_id: 'rel.demo.2026030802',
+      active: true,
+      installed: true,
+      can_uninstall: false
+    }));
+  });
+
+  test('blocks uninstall of the active runtime release', async () => {
+    await stateStore.registerAppBundle({
+      app_id: 'app.demo',
+      app_key: 'demo',
+      app_name: 'Demo App',
+      status: 'active',
+      environment: 'dev',
+      runtime_release_id: 'rel.demo.2026030802',
+      metadata: {
+        service_catalog: {
+          default_release_id: 'rel.demo.2026030801',
+          releases: [
+            {
+              release_id: 'rel.demo.2026030801',
+              runtime_version: 'v0.1.0',
+              release_channel: 'dev',
+              release_status: 'published',
+              runtime_status: 'ready'
+            },
+            {
+              release_id: 'rel.demo.2026030802',
+              runtime_version: 'v0.1.1',
+              release_channel: 'beta',
+              release_status: 'published',
+              runtime_status: 'ready'
+            }
+          ]
+        },
+        runtime_installation: {
+          status: 'installed',
+          release_id: 'rel.demo.2026030802',
+          install_root: path.join(tempDir, '.sce', 'apps', 'demo', 'runtime', 'rel.demo.2026030802')
+        },
+        runtime_activation: {
+          active_release_id: 'rel.demo.2026030802'
+        }
+      },
+      runtime: {
+        release_id: 'rel.demo.2026030802',
+        runtime_version: 'v0.1.1',
+        release_channel: 'beta',
+        release_status: 'published',
+        runtime_status: 'ready'
+      }
+    });
+
+    await expect(runAppRuntimeUninstallCommand({
+      app: 'demo',
+      release: 'rel.demo.2026030802',
+      json: true
+    }, {
+      projectPath: tempDir,
+      fileSystem: fs,
+      env: testEnv,
+      stateStore
+    })).rejects.toThrow('cannot uninstall active runtime release rel.demo.2026030802; activate another release first');
   });
 
   test('attaches, hydrates, activates, and shows engineering projection', async () => {

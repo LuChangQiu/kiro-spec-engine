@@ -55,6 +55,8 @@ Typical fields MagicBall cares about:
 - `summary.app_name`
 - `summary.runtime_version`
 - `summary.install_status`
+- `summary.installed_release_id`
+- `summary.active_release_id`
 - `summary.release_count`
 - `view_model.current_release`
 
@@ -71,6 +73,11 @@ sce app runtime install --app customer-order-demo --release rel-2026-03 --json
 ### 2.4 Activate a release
 ```bash
 sce app runtime activate --app customer-order-demo --release rel-2026-03 --json
+```
+
+### 2.5 Uninstall a non-active installed release
+```bash
+sce app runtime uninstall --app customer-order-demo --release rel-2026-03 --json
 ```
 
 ## 3. Ontology Mode Examples

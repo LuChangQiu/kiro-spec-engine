@@ -393,6 +393,7 @@ sce app runtime show --app customer-order-demo --json
 sce app runtime releases --app customer-order-demo --json
 sce app runtime install --app customer-order-demo --release <release-id> --json
 sce app runtime activate --app customer-order-demo --release <release-id> --json
+sce app runtime uninstall --app customer-order-demo --release <release-id> --json
 
 # Engineering projection
 sce app engineering show --app customer-order-demo --json

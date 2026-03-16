@@ -67,6 +67,7 @@ Current implemented write flows in SCE imply these practical action families:
 - `app:engineering:activate`
 - `app:runtime:install`
 - `app:runtime:activate`
+- `app:runtime:uninstall`
 
 ### Engineering mode PM data plane
 - `pm:requirement:upsert`
@@ -176,6 +177,7 @@ Recommended UI steps:
 | Activate engineering workspace | `sce app engineering activate` | `app:engineering:activate` |
 | Install runtime release | `sce app runtime install` | `app:runtime:install` |
 | Activate runtime release | `sce app runtime activate` | `app:runtime:activate` |
+| Uninstall runtime release | `sce app runtime uninstall` | `app:runtime:uninstall` |
 | Save requirement | `sce pm requirement upsert` | `pm:requirement:upsert` |
 | Save tracking item | `sce pm tracking upsert` | `pm:tracking:upsert` |
 | Save plan | `sce pm planning upsert` | `pm:planning:upsert` |
@@ -194,6 +196,11 @@ Recommended UI steps:
 ### Generic lease
 ```bash
 sce auth grant --scope app:runtime:activate --reason "activate selected runtime release" --json
+```
+
+### Runtime uninstall lease
+```bash
+sce auth grant --scope app:runtime:uninstall --reason "remove non-active installed runtime release" --json
 ```
 
 ### Multiple scopes if one workflow batches mutations

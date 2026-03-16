@@ -170,7 +170,7 @@ SCE 默认是强治理的。
 
 - `sce app bundle list|show|register`
 - `sce app registry status|configure|sync*`
-- `sce app runtime show|releases|install|activate`
+- `sce app runtime show|releases|install|activate|uninstall`
 - `sce app engineering show|attach|hydrate|activate`
 - `sce mode application|ontology|engineering home`
 - `sce pm requirement|tracking|planning|change|issue ... --json`

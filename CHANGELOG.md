@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added `sce app runtime uninstall` with active-release protection, explicit installed-vs-active runtime projection fields, and MagicBall-facing runtime uninstall/auth documentation.
+
 ## [3.6.51] - 2026-03-15
 
 ### Changed

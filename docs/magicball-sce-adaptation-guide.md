@@ -25,7 +25,7 @@ Use these documents together:
 SCE currently provides MagicBall-facing support for:
 1. `app bundle registry`
 2. `application / ontology / engineering home projections`
-3. `app runtime install / activate`
+3. `app runtime install / activate / uninstall`
 4. `app engineering attach / hydrate / activate`
 5. `pm` delivery data plane
 6. `ontology` triad data plane
@@ -100,7 +100,7 @@ Use `docs/magicball-cli-invocation-examples.md` for copy-ready commands.
 - `sce app engineering show`
 
 ### Runtime and engineering control
-- `sce app runtime show/releases/install/activate`
+- `sce app runtime show/releases/install/activate/uninstall`
 - `sce app engineering show/attach/hydrate/activate`
 - `sce app registry status/configure/sync*`
 

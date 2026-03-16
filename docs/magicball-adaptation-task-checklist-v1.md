@@ -70,6 +70,8 @@ Important fields:
 - `summary.app_name`
 - `summary.runtime_version`
 - `summary.install_status`
+- `summary.installed_release_id`
+- `summary.active_release_id`
 - `summary.release_count`
 - `view_model.current_release`
 - `view_model.entrypoint`
@@ -84,6 +86,7 @@ sce app runtime releases --app customer-order-demo --json
 Expected UI:
 - release table/list
 - active/default release marker
+- installed marker
 - runtime version
 - release status
 - entrypoint
@@ -112,6 +115,19 @@ sce app runtime activate --app customer-order-demo --release <release-id> --json
 Done when:
 - active release changes in UI
 - `mode application home` reflects the new active release after refresh
+
+### Task 2.5
+Wire uninstall action for installed-but-not-active release.
+
+Command:
+```bash
+sce app runtime uninstall --app customer-order-demo --release <release-id> --json
+```
+
+Done when:
+- uninstall button is shown only for installed and non-active release
+- uninstall removes local installed state after refresh
+- the same release can be installed again through existing install flow
 
 ## Phase 3: Ontology Mode
 
@@ -288,6 +304,7 @@ Commands that matter now:
 - `sce app engineering activate`
 - `sce app runtime install`
 - `sce app runtime activate`
+- `sce app runtime uninstall`
 - `sce pm * upsert`
 - `sce ontology * upsert`
 
@@ -371,7 +388,7 @@ MagicBall can be considered adapted to the current SCE version when:
 4. Ontology Mode reads `sce ontology *`
 5. Assurance tabs read `sce assurance *`
 6. write actions pass `--auth-lease`
-7. install / activate / attach / hydrate actions work from the UI
+7. install / activate / uninstall / attach / hydrate actions work from the UI
 
 ## Practical Conclusion
 

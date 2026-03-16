@@ -22,7 +22,7 @@ SCE changes completed and now available for MagicBall:
 - `mode ontology home --app ... --json`
 - `mode engineering home --app ... --json`
 - `app registry status/configure/sync*`
-- `app runtime show/releases/install/activate`
+- `app runtime show/releases/install/activate/uninstall`
 - `app engineering show/attach/hydrate/activate`
 - `pm requirement/tracking/planning/change/issue` data plane
 - `ontology er/br/dl` + `ontology triad summary`
@@ -33,7 +33,7 @@ SCE changes completed and now available for MagicBall:
 ### Current recommended MagicBall consumption order
 1. consume `mode * home` as the top-level source for the three modes
 2. consume `pm`, `ontology`, and `assurance` table payloads
-3. wire runtime install/activate and engineering attach/hydrate/activate actions
+3. wire runtime install/activate/uninstall and engineering attach/hydrate/activate actions
 4. use demo app: `customer-order-demo`
 
 ### Related SCE docs

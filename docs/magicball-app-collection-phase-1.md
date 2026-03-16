@@ -84,6 +84,22 @@ Recommended split:
 
 This boundary matters because SQLite is suitable for local query-heavy facts, but it should not become the only source of truth for portable shared intent.
 
+## Copy-ready examples
+
+Sample assets are available here:
+
+- `docs/examples/app-intent-phase1/.sce/app/collections/*.json`
+- `docs/examples/app-intent-phase1/.sce/app/scene-profiles/*.json`
+- `docs/examples/app-intent-phase1/README.md`
+
+These examples are intentionally realistic but still generic:
+
+- sales desktop workspace
+- planning desktop workspace
+- warehouse tablet workspace
+
+Use them as a starting point, then replace app keys and business metadata with project-specific values.
+
 ## Recommended phase-1 command shape
 
 Phase-1 overall command surface:
@@ -108,6 +124,10 @@ Execution rule:
 - local override updates now also have an explicit CLI governance surface instead of requiring manual file edits
 - execution should reuse the existing app runtime path
 
+JSON response contract:
+
+- `docs/app-intent-apply-contract.md`
+
 ## Frontend implication for MagicBall
 
 MagicBall should keep using current per-app runtime controls until this phase ships.
@@ -127,6 +147,23 @@ Once phase-1 lands, the preferred top-level interaction should become:
 2. inspect the proposed device diff
 3. explicitly apply the plan
 4. continue using per-app runtime controls for detail views
+
+## Phase 2 direction
+
+Phase-2 should be planned as lightweight user-intent sync, not as device-state sync.
+
+Recommended boundary:
+
+- sync shared `app_collection` / `scene_profile` selections or bindings
+- do not sync `device_installation` facts as the cross-device source of truth
+- keep `device_override` local unless a project explicitly introduces a higher-level policy mechanism
+
+Recommended deliverables for phase-2 planning:
+
+1. user binding model for scene/profile selection
+2. device-aware resolution order for `user intent + local override + capability tags`
+3. pull/push sync semantics with conflict visibility rather than silent overwrite
+4. explicit non-goal: do not force all devices into the same installed app set
 
 ## Practical conclusion
 

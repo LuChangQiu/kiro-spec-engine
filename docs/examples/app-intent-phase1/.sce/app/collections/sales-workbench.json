@@ -1,0 +1,40 @@
+{
+  "collection_id": "sales-workbench",
+  "name": "Sales Workbench",
+  "description": "Daily sales follow-up, quotation, and customer visit bundle for desktop users.",
+  "status": "active",
+  "tags": ["sales", "crm", "quotation"],
+  "items": [
+    {
+      "app_key": "crm",
+      "required": true,
+      "allow_local_remove": false,
+      "priority": 10,
+      "default_entry": "crm/home"
+    },
+    {
+      "app_key": "quotation",
+      "required": true,
+      "allow_local_remove": false,
+      "priority": 20,
+      "default_entry": "quotation/dashboard"
+    },
+    {
+      "app_key": "customer-visit",
+      "required": false,
+      "allow_local_remove": true,
+      "priority": 30,
+      "default_entry": "visit/agenda"
+    },
+    {
+      "app_key": "notes",
+      "required": false,
+      "allow_local_remove": true,
+      "priority": 40
+    }
+  ],
+  "metadata": {
+    "owner_role": "sales",
+    "recommended_device_profile": "desktop-sales"
+  }
+}

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added copy-ready phase-1 app intent examples under `docs/examples/app-intent-phase1/.sce/app/collections` and `docs/examples/app-intent-phase1/.sce/app/scene-profiles`, covering sales desktop, planning desktop, and warehouse tablet scenarios.
+- Added `docs/app-intent-apply-contract.md` to document the stable JSON contract for `sce app collection apply --json` and `sce scene workspace apply --json`.
+
+### Changed
+- MagicBall-facing docs and command reference now point directly to copy-ready sample assets, explicit apply JSON contract guidance, and the phase-2 direction of lightweight user-intent sync rather than device-state sync.
+
 ## [3.6.55] - 2026-03-16
 
 ### Added

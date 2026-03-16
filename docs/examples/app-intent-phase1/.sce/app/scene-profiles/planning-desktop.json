@@ -1,0 +1,23 @@
+{
+  "workspace_id": "planning-desktop",
+  "name": "Planning Desktop Workspace",
+  "description": "Desktop planning workspace that combines MRP, scheduling, and supply review.",
+  "status": "active",
+  "tags": ["planning", "desktop"],
+  "collection_refs": ["planning-workbench"],
+  "default_entry": "mrp/workbench",
+  "layout_hint": "wide-dashboard",
+  "items": [
+    {
+      "app_key": "supply-risk",
+      "required": false,
+      "allow_local_remove": true,
+      "priority": 40,
+      "capability_tags": ["desktop"]
+    }
+  ],
+  "metadata": {
+    "persona": "production-planner",
+    "device_type": "desktop"
+  }
+}

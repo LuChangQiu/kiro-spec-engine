@@ -188,6 +188,10 @@ SCE 默认是强治理的。
 - `magicball-app-service-catalog`
 - 示例 app key：`customer-order-demo`
 
+面向场景的安装管理参考：
+- 示例：`docs/examples/app-intent-phase1/.sce/app/...`
+- apply JSON 契约：`docs/app-intent-apply-contract.md`
+
 ---
 
 ## 文档入口

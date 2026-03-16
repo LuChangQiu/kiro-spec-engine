@@ -13,6 +13,7 @@ Implementation detail should live in the specialized documents listed below.
 Use these documents together:
 - `docs/magicball-integration-doc-index.md`
 - `docs/magicball-app-collection-phase-1.md`
+- `docs/app-intent-apply-contract.md`
 - `docs/magicball-ui-surface-checklist.md`
 - `docs/magicball-mode-home-and-ontology-empty-state-playbook.md`
 - `docs/magicball-frontend-state-and-command-mapping.md`
@@ -58,6 +59,7 @@ Planned phase-1 position:
 
 Reference:
 - `docs/magicball-app-collection-phase-1.md`
+- `docs/app-intent-apply-contract.md`
 
 ## Core Integration Positioning
 

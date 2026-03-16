@@ -44,6 +44,7 @@ Optional local override input:
 - `.sce/state/device/device-override.json`
 - use this for per-device add/remove exceptions instead of mutating shared collection/workspace definitions
 - update it explicitly via `sce device override upsert --input <json> --json`
+- copy-ready collection/workspace examples live under `docs/examples/app-intent-phase1/.sce/app/...`
 
 Example local override patch:
 ```json

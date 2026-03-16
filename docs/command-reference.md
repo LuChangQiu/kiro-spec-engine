@@ -429,6 +429,8 @@ sce mode engineering home --app customer-order-demo --json
 Device override notes:
 - `sce device override show` returns the normalized local per-device overlay from `.sce/state/device/device-override.json`.
 - `sce device override upsert --input <json>` merges only explicitly provided fields; omitted fields remain unchanged so local override policy is not blindly replaced.
+- Copy-ready collection/workspace examples live under `docs/examples/app-intent-phase1/.sce/app/...`.
+- Stable JSON contract for both apply commands is documented in `docs/app-intent-apply-contract.md`.
 
 ### PM Delivery Data Plane
 

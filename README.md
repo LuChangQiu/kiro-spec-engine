@@ -183,6 +183,10 @@ Demo remote registries:
 - `magicball-app-service-catalog`
 - demo app key: `customer-order-demo`
 
+Scene-oriented install-management references:
+- examples: `docs/examples/app-intent-phase1/.sce/app/...`
+- apply JSON contract: `docs/app-intent-apply-contract.md`
+
 ---
 
 ## Documentation

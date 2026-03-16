@@ -1,0 +1,34 @@
+{
+  "collection_id": "planning-workbench",
+  "name": "Planning Workbench",
+  "description": "MRP, scheduling, and inventory analysis bundle for planning teams.",
+  "status": "active",
+  "tags": ["planning", "mrp", "inventory"],
+  "items": [
+    {
+      "app_key": "mrp",
+      "required": true,
+      "allow_local_remove": false,
+      "priority": 10,
+      "default_entry": "mrp/workbench"
+    },
+    {
+      "app_key": "scheduling",
+      "required": true,
+      "allow_local_remove": false,
+      "priority": 20,
+      "default_entry": "schedule/board"
+    },
+    {
+      "app_key": "inventory-insight",
+      "required": false,
+      "allow_local_remove": true,
+      "priority": 30,
+      "default_entry": "inventory/analysis"
+    }
+  ],
+  "metadata": {
+    "owner_role": "planner",
+    "recommended_device_profile": "desktop-planning"
+  }
+}

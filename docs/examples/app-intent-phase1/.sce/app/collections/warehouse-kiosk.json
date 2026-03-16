@@ -1,0 +1,35 @@
+{
+  "collection_id": "warehouse-kiosk",
+  "name": "Warehouse Kiosk",
+  "description": "Lightweight warehouse execution bundle for tablet or kiosk devices.",
+  "status": "active",
+  "tags": ["warehouse", "tablet", "barcode"],
+  "items": [
+    {
+      "app_key": "barcode-scan",
+      "required": true,
+      "allow_local_remove": false,
+      "priority": 10,
+      "capability_tags": ["tablet"],
+      "default_entry": "scan/inbound"
+    },
+    {
+      "app_key": "inbound-receipt",
+      "required": true,
+      "allow_local_remove": false,
+      "priority": 20,
+      "capability_tags": ["tablet"]
+    },
+    {
+      "app_key": "label-print",
+      "required": false,
+      "allow_local_remove": true,
+      "priority": 30,
+      "capability_tags": ["tablet"]
+    }
+  ],
+  "metadata": {
+    "owner_role": "warehouse",
+    "recommended_device_profile": "tablet-kiosk"
+  }
+}

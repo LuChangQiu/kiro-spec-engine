@@ -1,0 +1,24 @@
+{
+  "workspace_id": "sales-desktop",
+  "name": "Sales Desktop Workspace",
+  "description": "Desktop-first workspace for sales follow-up, quotation, and optional analytics.",
+  "status": "active",
+  "tags": ["sales", "desktop"],
+  "collection_refs": ["sales-workbench"],
+  "default_entry": "crm/home",
+  "layout_hint": "two-column",
+  "items": [
+    {
+      "app_key": "analytics",
+      "required": false,
+      "allow_local_remove": true,
+      "priority": 50,
+      "capability_tags": ["desktop"],
+      "default_entry": "analytics/sales-pipeline"
+    }
+  ],
+  "metadata": {
+    "persona": "sales-representative",
+    "device_type": "desktop"
+  }
+}

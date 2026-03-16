@@ -1,0 +1,23 @@
+{
+  "workspace_id": "warehouse-tablet",
+  "name": "Warehouse Tablet Workspace",
+  "description": "Tablet-first warehouse workspace with scanning and receiving actions.",
+  "status": "active",
+  "tags": ["warehouse", "tablet"],
+  "collection_refs": ["warehouse-kiosk"],
+  "default_entry": "scan/inbound",
+  "layout_hint": "single-focus",
+  "items": [
+    {
+      "app_key": "notes",
+      "required": false,
+      "allow_local_remove": true,
+      "priority": 40,
+      "capability_tags": ["tablet"]
+    }
+  ],
+  "metadata": {
+    "persona": "warehouse-operator",
+    "device_type": "tablet"
+  }
+}

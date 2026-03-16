@@ -21,6 +21,49 @@ function buildRunGitMock(responses) {
   };
 }
 
+const PROJECT_SHARED_REGISTRY_PATH = '.sce/knowledge/errorbook/project-shared-registry.json';
+
+async function seedSharedErrorbookRegistry(tempDir, overrides = {}) {
+  await fs.ensureDir(path.join(tempDir, '.sce', 'config'));
+  await fs.ensureDir(path.join(tempDir, '.sce', 'knowledge', 'errorbook'));
+  await fs.writeJson(path.join(tempDir, '.sce', 'config', 'errorbook-registry.json'), {
+    enabled: true,
+    search_mode: 'remote',
+    cache_file: '.sce/errorbook/registry-cache.json',
+    project_shared_projection: {
+      enabled: true,
+      file: PROJECT_SHARED_REGISTRY_PATH,
+      statuses: ['verified', 'promoted'],
+      min_quality: 75
+    },
+    sources: [
+      {
+        name: 'central',
+        enabled: true,
+        url: 'https://raw.githubusercontent.com/heguangyong/sce-errorbook-registry/main/registry/errorbook-registry.json'
+      },
+      {
+        name: 'project-shared',
+        enabled: true,
+        file: PROJECT_SHARED_REGISTRY_PATH
+      }
+    ],
+    ...overrides
+  }, { spaces: 2 });
+  await fs.writeJson(path.join(tempDir, PROJECT_SHARED_REGISTRY_PATH), {
+    api_version: 'sce.errorbook.registry/v0.1',
+    generated_at: '2026-03-16T00:00:00.000Z',
+    source: {
+      project: 'demo',
+      scope: 'project-shared',
+      statuses: ['verified', 'promoted'],
+      min_quality: 75
+    },
+    total_entries: 0,
+    entries: []
+  }, { spaces: 2 });
+}
+
 describe('collab-governance-audit', () => {
   let tempDir;
 
@@ -97,18 +140,7 @@ describe('collab-governance-audit', () => {
       maxRetries: 5,
       retryBaseDelayMs: 100
     }, { spaces: 2 });
-    await fs.writeJson(path.join(tempDir, '.sce', 'config', 'errorbook-registry.json'), {
-      enabled: true,
-      search_mode: 'remote',
-      cache_file: '.sce/errorbook/registry-cache.json',
-      sources: [
-        {
-          name: 'central',
-          enabled: true,
-          url: 'https://raw.githubusercontent.com/heguangyong/sce-errorbook-registry/main/registry/errorbook-registry.json'
-        }
-      ]
-    }, { spaces: 2 });
+    await seedSharedErrorbookRegistry(tempDir);
     await fs.writeFile(path.join(tempDir, '.sce', 'steering', 'CORE_PRINCIPLES.md'), '# core\n', 'utf8');
     await fs.writeFile(path.join(tempDir, '.sce', 'steering', 'ENVIRONMENT.md'), '# env\n', 'utf8');
     await fs.writeFile(path.join(tempDir, '.sce', 'steering', 'CURRENT_CONTEXT.md'), '# current\n', 'utf8');
@@ -118,7 +150,11 @@ describe('collab-governance-audit', () => {
     const report = await auditCollabGovernance(tempDir, {}, {
       runGit: buildRunGitMock({
         'rev-parse --is-inside-work-tree': { status: 0, stdout: 'true\n', stderr: '' },
-        'ls-files': { status: 0, stdout: '.gitignore\n.sce/config/multi-agent.json\n', stderr: '' },
+        'ls-files': {
+          status: 0,
+          stdout: `.gitignore\n.sce/config/multi-agent.json\n.sce/config/errorbook-registry.json\n${PROJECT_SHARED_REGISTRY_PATH}\n`,
+          stderr: ''
+        },
         'status --porcelain': { status: 0, stdout: '', stderr: '' },
         'remote -v': { status: 0, stdout: '', stderr: '' },
         'rev-parse --abbrev-ref HEAD': { status: 0, stdout: 'main\n', stderr: '' }
@@ -130,6 +166,8 @@ describe('collab-governance-audit', () => {
     expect(report.gitignore.missing_rules).toEqual([]);
     expect(report.multi_agent.valid).toBe(true);
     expect(report.errorbook_registry.valid).toBe(true);
+    expect(report.errorbook_registry.project_shared_projection_exists).toBe(true);
+    expect(report.errorbook_registry.project_shared_projection_tracked).toBe(true);
     expect(report.steering_boundary.passed).toBe(true);
   });
 
@@ -162,16 +200,19 @@ describe('collab-governance-audit', () => {
     expect(missingReport.passed).toBe(false);
     expect(missingReport.violations).toContain('shared errorbook registry config is missing');
 
-    await fs.writeJson(path.join(tempDir, '.sce', 'config', 'errorbook-registry.json'), {
+    await seedSharedErrorbookRegistry(tempDir, {
       enabled: false,
-      cache_file: '.sce/errorbook/registry-cache.json',
       sources: []
-    }, { spaces: 2 });
+    });
 
     const disabledReport = await auditCollabGovernance(tempDir, {}, {
       runGit: buildRunGitMock({
         'rev-parse --is-inside-work-tree': { status: 0, stdout: 'true\n', stderr: '' },
-        'ls-files': { status: 0, stdout: '.gitignore\n.sce/config/multi-agent.json\n.sce/config/errorbook-registry.json\n', stderr: '' },
+        'ls-files': {
+          status: 0,
+          stdout: `.gitignore\n.sce/config/multi-agent.json\n.sce/config/errorbook-registry.json\n${PROJECT_SHARED_REGISTRY_PATH}\n`,
+          stderr: ''
+        },
         'status --porcelain': { status: 0, stdout: '', stderr: '' },
         'remote -v': { status: 0, stdout: '', stderr: '' },
         'rev-parse --abbrev-ref HEAD': { status: 0, stdout: 'main\n', stderr: '' }
@@ -200,17 +241,7 @@ describe('collab-governance-audit', () => {
       maxRetries: 5,
       retryBaseDelayMs: 100
     }, { spaces: 2 });
-    await fs.writeJson(path.join(tempDir, '.sce', 'config', 'errorbook-registry.json'), {
-      enabled: true,
-      cache_file: '.sce/errorbook/registry-cache.json',
-      sources: [
-        {
-          name: 'central',
-          enabled: true,
-          url: 'https://raw.githubusercontent.com/heguangyong/sce-errorbook-registry/main/registry/errorbook-registry.json'
-        }
-      ]
-    }, { spaces: 2 });
+    await seedSharedErrorbookRegistry(tempDir);
     await fs.writeJson(path.join(tempDir, '.sce', 'adoption-config.json'), {
       version: '1.0.0',
       adoptedAt: '2026-03-16T00:00:00.000Z',
@@ -233,7 +264,11 @@ describe('collab-governance-audit', () => {
     const report = await auditCollabGovernance(tempDir, {}, {
       runGit: buildRunGitMock({
         'rev-parse --is-inside-work-tree': { status: 0, stdout: 'true\n', stderr: '' },
-        'ls-files': { status: 0, stdout: '.gitignore\n.sce/config/multi-agent.json\n.sce/config/errorbook-registry.json\n.sce/adoption-config.json\n', stderr: '' },
+        'ls-files': {
+          status: 0,
+          stdout: `.gitignore\n.sce/config/multi-agent.json\n.sce/config/errorbook-registry.json\n${PROJECT_SHARED_REGISTRY_PATH}\n.sce/adoption-config.json\n`,
+          stderr: ''
+        },
         'status --porcelain': { status: 0, stdout: '', stderr: '' },
         'remote -v': { status: 0, stdout: '', stderr: '' },
         'rev-parse --abbrev-ref HEAD': { status: 0, stdout: 'main\n', stderr: '' }
@@ -259,24 +294,18 @@ describe('collab-governance-audit', () => {
     await fs.writeJson(path.join(tempDir, '.sce', 'config', 'multi-agent.json'), {
       enabled: false
     }, { spaces: 2 });
-    await fs.writeJson(path.join(tempDir, '.sce', 'config', 'errorbook-registry.json'), {
-      enabled: true,
-      cache_file: '.sce/errorbook/registry-cache.json',
-      sources: [
-        {
-          name: 'central',
-          enabled: true,
-          url: 'https://raw.githubusercontent.com/heguangyong/sce-errorbook-registry/main/registry/errorbook-registry.json'
-        }
-      ]
-    }, { spaces: 2 });
+    await seedSharedErrorbookRegistry(tempDir);
     await fs.writeFile(path.join(tempDir, '.sce', 'steering', 'CORE_PRINCIPLES.md'), '# core\n', 'utf8');
     await fs.writeFile(path.join(tempDir, '.sce', 'steering', 'analysis-notes.md'), '# drift\n', 'utf8');
 
     const report = await auditCollabGovernance(tempDir, {}, {
       runGit: buildRunGitMock({
         'rev-parse --is-inside-work-tree': { status: 0, stdout: 'true\n', stderr: '' },
-        'ls-files': { status: 0, stdout: '.gitignore\n.sce/config/multi-agent.json\n', stderr: '' },
+        'ls-files': {
+          status: 0,
+          stdout: `.gitignore\n.sce/config/multi-agent.json\n.sce/config/errorbook-registry.json\n${PROJECT_SHARED_REGISTRY_PATH}\n`,
+          stderr: ''
+        },
         'status --porcelain': { status: 0, stdout: '', stderr: '' },
         'remote -v': { status: 0, stdout: '', stderr: '' },
         'rev-parse --abbrev-ref HEAD': { status: 0, stdout: 'main\n', stderr: '' }

@@ -51,6 +51,7 @@ describe('takeover-baseline', () => {
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'auto', 'config.json'))).toBe(true);
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'config', 'takeover-baseline.json'))).toBe(true);
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'config', 'errorbook-registry.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(tempDir, '.sce', 'knowledge', 'errorbook', 'project-shared-registry.json'))).toBe(true);
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'config', 'multi-agent.json'))).toBe(true);
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'config', 'session-governance.json'))).toBe(true);
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'config', 'spec-domain-policy.json'))).toBe(true);
@@ -87,6 +88,14 @@ describe('takeover-baseline', () => {
 
     const errorbookRegistry = await fs.readJson(path.join(tempDir, '.sce', 'config', 'errorbook-registry.json'));
     expect(errorbookRegistry).toEqual(ERRORBOOK_REGISTRY_DEFAULTS);
+    const projectSharedRegistry = await fs.readJson(
+      path.join(tempDir, '.sce', 'knowledge', 'errorbook', 'project-shared-registry.json')
+    );
+    expect(projectSharedRegistry).toEqual(expect.objectContaining({
+      api_version: 'sce.errorbook.registry/v0.1',
+      total_entries: 0,
+      entries: []
+    }));
 
     const multiAgentConfig = await fs.readJson(path.join(tempDir, '.sce', 'config', 'multi-agent.json'));
     expect(multiAgentConfig).toEqual(MULTI_AGENT_CONFIG_DEFAULTS);

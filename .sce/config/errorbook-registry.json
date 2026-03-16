@@ -2,12 +2,26 @@
   "enabled": true,
   "search_mode": "remote",
   "cache_file": ".sce/errorbook/registry-cache.json",
+  "project_shared_projection": {
+    "enabled": true,
+    "file": ".sce/knowledge/errorbook/project-shared-registry.json",
+    "statuses": [
+      "verified",
+      "promoted"
+    ],
+    "min_quality": 75
+  },
   "sources": [
     {
       "name": "central",
       "enabled": true,
       "url": "https://raw.githubusercontent.com/heguangyong/sce-errorbook-registry/main/registry/errorbook-registry.json",
       "index_url": "https://raw.githubusercontent.com/heguangyong/sce-errorbook-registry/main/registry/errorbook-registry.index.json"
+    },
+    {
+      "name": "project-shared",
+      "enabled": true,
+      "file": ".sce/knowledge/errorbook/project-shared-registry.json"
     }
   ]
 }

@@ -72,12 +72,23 @@ Create `.sce/config/errorbook-registry.json`:
   "enabled": true,
   "search_mode": "remote",
   "cache_file": ".sce/errorbook/registry-cache.json",
+  "project_shared_projection": {
+    "enabled": true,
+    "file": ".sce/knowledge/errorbook/project-shared-registry.json",
+    "statuses": ["verified", "promoted"],
+    "min_quality": 75
+  },
   "sources": [
     {
       "name": "central",
       "enabled": true,
       "url": "https://raw.githubusercontent.com/heguangyong/sce-errorbook-registry/main/registry/errorbook-registry.json",
       "index_url": "https://raw.githubusercontent.com/heguangyong/sce-errorbook-registry/main/registry/errorbook-registry.index.json"
+    },
+    {
+      "name": "project-shared",
+      "enabled": true,
+      "file": ".sce/knowledge/errorbook/project-shared-registry.json"
     }
   ]
 }
@@ -87,23 +98,30 @@ Notes:
 - `url` must be a raw JSON URL (`raw.githubusercontent.com`) or use a local file path.
 - `search_mode` supports `cache|remote|hybrid` (recommended: `remote` for very large registries).
 - Local cache file is used by cache/hybrid mode.
-- Since `v3.3.23`, `sce init` / `sce adopt` template baselines include this config by default (central source enabled).
+- `project_shared_projection` is the Git-tracked same-project sharing path used for cross-computer co-work continuity.
+- Since `v3.3.23`, `sce init` / `sce adopt` template baselines include registry config by default; current baseline also seeds the tracked project-shared projection file.
 
 ## 4) Daily Workflow
 
-1. Export curated local entries:
+1. Keep project-shared same-project knowledge current:
+```bash
+# SCE refreshes this automatically after record/promote/deprecate/requalify
+.sce/knowledge/errorbook/project-shared-registry.json
+```
+
+2. Export curated local entries for central cross-project publication:
 ```bash
 sce errorbook export --status promoted --min-quality 75 --out .sce/errorbook/exports/registry.json --json
 ```
 
-2. Merge approved entries into central repo `registry/errorbook-registry.json`.
+3. Merge approved entries into central repo `registry/errorbook-registry.json`.
 
-3. Sync central registry into local cache:
+4. Sync central registry into local cache:
 ```bash
 sce errorbook sync-registry --source https://raw.githubusercontent.com/heguangyong/sce-errorbook-registry/main/registry/errorbook-registry.json --json
 ```
 
-4. Search local + shared entries:
+5. Search local + shared entries:
 ```bash
 sce errorbook find --query "approve order timeout" --include-registry --json
 sce errorbook find --query "approve order timeout" --include-registry --registry-mode remote --json
@@ -116,6 +134,7 @@ SCE_REGISTRY_HEALTH_STRICT=1 node scripts/errorbook-registry-health-gate.js --js
 
 ## 5) Governance Rules
 
+- Same-project co-work should rely on the tracked project-shared projection instead of committing raw `.sce/errorbook/**`.
 - Publish to central registry only curated entries (recommended: `status=promoted` and `quality>=75`).
 - Do not publish sensitive tenant/customer data.
 - Temporary mitigation entries must remain bounded and governed (exit criteria, cleanup task, deadline).

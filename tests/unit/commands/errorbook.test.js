@@ -5,6 +5,7 @@ const path = require('path');
 const {
   resolveErrorbookPaths,
   DEFAULT_ERRORBOOK_REGISTRY_CACHE,
+  DEFAULT_PROJECT_SHARED_ERRORBOOK_REGISTRY,
   normalizeOntologyTags,
   runErrorbookRecordCommand,
   runErrorbookExportCommand,
@@ -449,6 +450,45 @@ describe('errorbook command workflow', () => {
     expect(payload.entries[0].status).toBe('promoted');
   });
 
+  test('auto-refreshes tracked project-shared projection for verified and deprecated entries', async () => {
+    const recorded = await runErrorbookRecordCommand({
+      title: 'Project shared verified entry',
+      symptom: 'Approval flow fails with deterministic lock contention.',
+      rootCause: 'Approval and inventory writes acquire locks in reverse order.',
+      fixAction: ['Normalize lock acquisition order', 'Add contention regression test'],
+      verification: ['npm run test -- approval-lock-order'],
+      tags: 'order,approval',
+      ontology: 'entity,relation,decision_policy',
+      status: 'verified',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    const sharedPath = path.join(tempDir, DEFAULT_PROJECT_SHARED_ERRORBOOK_REGISTRY);
+    expect(recorded.project_shared_projection).toEqual(expect.objectContaining({
+      enabled: true,
+      refreshed: true,
+      total_entries: 1
+    }));
+    const verifiedProjection = await fs.readJson(sharedPath);
+    expect(verifiedProjection.total_entries).toBe(1);
+    expect(verifiedProjection.entries[0].status).toBe('verified');
+
+    const deprecated = await runErrorbookDeprecateCommand({
+      id: recorded.entry.id,
+      reason: 'Superseded by final v2 flow',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(deprecated.project_shared_projection.total_entries).toBe(0);
+    const deprecatedProjection = await fs.readJson(sharedPath);
+    expect(deprecatedProjection.total_entries).toBe(0);
+    expect(deprecatedProjection.entries).toEqual([]);
+  });
+
   test('syncs external registry from local json source', async () => {
     const sourcePath = path.join(tempDir, 'registry-source.json');
     await fs.writeJson(sourcePath, {
@@ -525,6 +565,71 @@ describe('errorbook command workflow', () => {
     expect(result.total_results).toBeGreaterThanOrEqual(1);
     expect(result.source_breakdown.registry_results).toBeGreaterThanOrEqual(1);
     expect(result.entries.some((item) => item.entry_source === 'registry-cache')).toBe(true);
+  });
+
+  test('find searches local project-shared registry source in remote mode without index', async () => {
+    const sharedPath = path.join(tempDir, '.sce', 'knowledge', 'errorbook', 'project-shared-registry.json');
+    await fs.ensureDir(path.dirname(sharedPath));
+    await fs.writeJson(sharedPath, {
+      api_version: 'sce.errorbook.registry/v0.1',
+      generated_at: '2026-03-16T00:00:00.000Z',
+      source: {
+        project: 'demo',
+        scope: 'project-shared',
+        statuses: ['verified', 'promoted'],
+        min_quality: 75
+      },
+      total_entries: 1,
+      entries: [{
+        id: 'shared-001',
+        title: 'Project shared lock fix',
+        symptom: 'Approve order timeout under contention.',
+        root_cause: 'Lock acquisition order diverged between services.',
+        fix_actions: ['Normalize lock ordering'],
+        verification_evidence: ['Approval regression suite passed'],
+        tags: ['order'],
+        ontology_tags: ['entity', 'decision_policy'],
+        status: 'verified',
+        quality_score: 88,
+        updated_at: '2026-03-16T00:00:00.000Z'
+      }]
+    }, { spaces: 2 });
+    await fs.ensureDir(path.join(tempDir, '.sce', 'config'));
+    await fs.writeJson(path.join(tempDir, '.sce', 'config', 'errorbook-registry.json'), {
+      enabled: true,
+      search_mode: 'remote',
+      cache_file: '.sce/errorbook/registry-cache.json',
+      project_shared_projection: {
+        enabled: true,
+        file: '.sce/knowledge/errorbook/project-shared-registry.json',
+        statuses: ['verified', 'promoted'],
+        min_quality: 75
+      },
+      sources: [
+        {
+          name: 'project-shared',
+          enabled: true,
+          file: '.sce/knowledge/errorbook/project-shared-registry.json'
+        }
+      ]
+    }, { spaces: 2 });
+
+    const found = await runErrorbookFindCommand({
+      query: 'approve order timeout',
+      includeRegistry: true,
+      registryMode: 'remote',
+      json: true
+    }, {
+      projectPath: tempDir
+    });
+
+    expect(found.total_results).toBe(1);
+    expect(found.entries[0]).toEqual(expect.objectContaining({
+      id: 'shared-001',
+      entry_source: 'registry-remote',
+      status: 'verified'
+    }));
+    expect(found.warnings).toContain('local registry file source scanned directly without index');
   });
 
   test('health-registry validates local source and index successfully', async () => {

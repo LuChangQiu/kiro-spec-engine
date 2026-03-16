@@ -135,7 +135,7 @@ Timeline policy:
 - default enabled with local retention under `.sce/timeline/snapshots/`
 - stage/key-event checkpoints are automatically captured for `studio` and `session` commands
 - interval auto-checkpoints are integrated in the same flow via timeline checkpoint capture
-- `timeline push` now blocks before snapshot/push when collaboration governance drifts, so tracked runtime state, missing co-work ignore rules, missing shared `errorbook` registry baseline, invalid multi-agent config, legacy `.kiro*` references, or steering boundary drift cannot pass through managed push flow
+- `timeline push` now blocks before snapshot/push when collaboration governance drifts, so tracked runtime state, missing co-work ignore rules, missing shared `errorbook` registry baseline, missing tracked project-shared errorbook projection, invalid multi-agent config, legacy `.kiro*` references, or steering boundary drift cannot pass through managed push flow
 
 ### Value Metrics
 
@@ -348,7 +348,7 @@ sce workspace legacy-migrate --dry-run --json
 sce workspace tracking-audit
 sce workspace tracking-audit --json
 
-# Audit collaboration governance boundaries and legacy naming drift
+# Audit collaboration governance boundaries, shared errorbook closure, and legacy naming drift
 sce workspace collab-governance-audit
 sce workspace collab-governance-audit --json
 sce workspace collab-governance-audit --strict
@@ -638,8 +638,10 @@ Curated quality policy (`宁缺毋滥，优胜略汰`) defaults:
   - missing exit/cleanup/deadline metadata
   - expired mitigation deadline
 - `export` outputs a machine-readable registry bundle from curated local entries (recommended default: `promoted`, `quality>=75`).
+- managed same-project sharing now uses a tracked projection file at `.sce/knowledge/errorbook/project-shared-registry.json`, refreshed automatically after `record`, `promote`, `deprecate`, and `requalify`
 - `sync-registry` pulls external registry JSON into local cache (`.sce/errorbook/registry-cache.json`) for unified `find` retrieval.
 - `find --include-registry --registry-mode remote` supports direct remote query for large registries (no full local sync required).
+- registry-inclusive lookup can also search the tracked project-shared local file in `remote` mode without a shard index.
 - Recommended for large registries: maintain a remote index file (`registry/errorbook-registry.index.json`) and shard files, then provide `index_url` in registry config.
 - Since `v3.3.23`, `sce init` / `sce adopt` default baseline includes enabled central registry config in `.sce/config/errorbook-registry.json`.
 - `health-registry` validates config readability, source/index accessibility, and index-to-shard resolution before release.

@@ -119,7 +119,8 @@
         "require_auto_on_plan": true,
         "max_active_specs_per_scene": 3,
         "stale_days": 14,
-        "duplicate_similarity_threshold": 0.66
+        "duplicate_similarity_threshold": 0.66,
+        "duplicate_detection_scope": "non_completed"
       },
       "backfill": {
         "enabled": true,

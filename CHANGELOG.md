@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added a tracked project-shared high-value errorbook projection at `.sce/knowledge/errorbook/project-shared-registry.json`, seeded by default in template/takeover baselines so same-project work on another computer can recover curated `verified` and `promoted` knowledge through Git without committing raw `.sce/errorbook/**`.
+
+### Changed
+- Errorbook mutation commands now auto-refresh the tracked project-shared projection, and registry-inclusive lookup can search that local file in `remote` mode without requiring an index.
+- Co-work governance auditing now treats the project-shared errorbook projection as a required closure artifact: config must stay enabled, the project-shared source must exist, the projection file must parse, and it must be Git-tracked.
+
 ## [3.6.52] - 2026-03-16
 
 ### Added

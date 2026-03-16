@@ -144,10 +144,18 @@
         "retryBaseDelayMs": 100
       }
     },
+    "errorbook_convergence": {
+      "enabled": true,
+      "canonical_mechanism": "errorbook",
+      "absorb_project_defined_mechanisms": true,
+      "disallow_parallel_mechanisms": true,
+      "intake_inventory_path": ".sce/errorbook/project-intake/custom-mechanism-inventory.json",
+      "strategy": "absorb_into_sce_errorbook"
+    },
     "migration_policy": {
       "legacy_kiro_supported": false,
       "require_manual_legacy_migration_confirmation": true
     }
   },
-  "lastAlignedSceVersion": "3.6.50"
+  "lastAlignedSceVersion": "3.6.52"
 }

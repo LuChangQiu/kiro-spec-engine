@@ -2,8 +2,8 @@
 
 > Enable multiple AI agents to work on the same sce project simultaneously without conflicts.
 
-**Version**: 3.6.51  
-**Last Updated**: 2026-03-15
+**Version**: 3.6.52  
+**Last Updated**: 2026-03-16
 
 ---
 

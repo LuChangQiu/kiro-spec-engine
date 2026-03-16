@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.52] - 2026-03-16
+
 ### Added
 - Added `sce app runtime uninstall` with active-release protection, explicit installed-vs-active runtime projection fields, and MagicBall-facing runtime uninstall/auth documentation.
+- Extended co-work governance auditing so shared `errorbook` registry baseline and managed `errorbook_convergence` defaults are now checked alongside multi-agent/runtime-state drift.
 
 ## [3.6.51] - 2026-03-15
 

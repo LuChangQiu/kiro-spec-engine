@@ -1,0 +1,16 @@
+{
+  "api_version": "sce.project-problem-projection/v0.1",
+  "generated_at": "2026-03-16T09:06:39.414Z",
+  "source": {
+    "project": "kiro-spec-engine",
+    "stale_days": 14,
+    "scope": "non_completed"
+  },
+  "summary": {
+    "total_entries": 0,
+    "active_entries": 0,
+    "stale_entries": 0,
+    "completed_entries": 0
+  },
+  "entries": []
+}

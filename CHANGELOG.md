@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.54] - 2026-03-16
+
+### Added
+- Added a tracked project-shared problem projection at `.sce/knowledge/problem/project-shared-problems.json`, derived from existing spec problem artifacts and seeded by default through template/takeover baselines.
+
+### Changed
+- Managed co-work gate now refreshes the project-shared problem projection before collaboration governance audit, so another computer can recover active/stale project problem facts through normal Git sync without asking for a separate local problem-library sync step.
+- Collaboration governance auditing now treats project-shared problem projection drift as a violation alongside errorbook and multi-agent baseline drift.
+
 ## [3.6.53] - 2026-03-16
 
 ### Added

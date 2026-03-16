@@ -135,7 +135,7 @@ Timeline policy:
 - default enabled with local retention under `.sce/timeline/snapshots/`
 - stage/key-event checkpoints are automatically captured for `studio` and `session` commands
 - interval auto-checkpoints are integrated in the same flow via timeline checkpoint capture
-- `timeline push` now blocks before snapshot/push when collaboration governance drifts, so tracked runtime state, missing co-work ignore rules, missing shared `errorbook` registry baseline, missing tracked project-shared errorbook projection, invalid multi-agent config, legacy `.kiro*` references, or steering boundary drift cannot pass through managed push flow
+- `timeline push` now refreshes the tracked project-shared problem projection before governance audit, then blocks before snapshot/push when collaboration governance drifts, so tracked runtime state, missing co-work ignore rules, missing shared `errorbook` registry baseline, missing tracked project-shared errorbook/problem projections, invalid multi-agent config, legacy `.kiro*` references, or steering boundary drift cannot pass through managed push flow
 
 ### Value Metrics
 
@@ -791,6 +791,11 @@ Studio gate execution defaults:
 Problem closure gate (default policy):
 - Script: `node scripts/problem-closure-gate.js`
 - Policy file: `.sce/config/problem-closure-policy.json` (auto-provisioned by `init/adopt/takeover`)
+- Shared problem projection:
+  - config field: `project_shared_projection`
+  - tracked file: `.sce/knowledge/problem/project-shared-problems.json`
+  - default scope: `non_completed`
+  - managed co-work gate refreshes this file automatically before governance audit/push/publish
 - Checks:
   - verify stage: `problem-contract` + spec domain validation + domain coverage
   - release stage: verify checks + verify report pass signal + governance high-alert block (configurable)

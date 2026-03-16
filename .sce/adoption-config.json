@@ -90,6 +90,11 @@
     "problem_closure": {
       "enabled": true,
       "governance_report_path": ".sce/reports/interactive-governance-report.json",
+      "project_shared_projection": {
+        "enabled": true,
+        "file": ".sce/knowledge/problem/project-shared-problems.json",
+        "scope": "non_completed"
+      },
       "verify": {
         "require_problem_contract": true,
         "require_domain_validation": true,
@@ -158,5 +163,5 @@
       "require_manual_legacy_migration_confirmation": true
     }
   },
-  "lastAlignedSceVersion": "3.6.53"
+  "lastAlignedSceVersion": "3.6.54"
 }

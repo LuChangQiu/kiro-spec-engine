@@ -22,6 +22,7 @@ function buildRunGitMock(responses) {
 }
 
 const PROJECT_SHARED_REGISTRY_PATH = '.sce/knowledge/errorbook/project-shared-registry.json';
+const PROJECT_SHARED_PROBLEM_PATH = '.sce/knowledge/problem/project-shared-problems.json';
 
 async function seedSharedErrorbookRegistry(tempDir, overrides = {}) {
   await fs.ensureDir(path.join(tempDir, '.sce', 'config'));
@@ -60,6 +61,51 @@ async function seedSharedErrorbookRegistry(tempDir, overrides = {}) {
       min_quality: 75
     },
     total_entries: 0,
+    entries: []
+  }, { spaces: 2 });
+}
+
+async function seedSharedProblemProjection(tempDir, overrides = {}) {
+  await fs.ensureDir(path.join(tempDir, '.sce', 'config'));
+  await fs.ensureDir(path.join(tempDir, '.sce', 'knowledge', 'problem'));
+  await fs.writeJson(path.join(tempDir, '.sce', 'config', 'problem-closure-policy.json'), {
+    schema_version: '1.0',
+    enabled: true,
+    governance_report_path: '.sce/reports/interactive-governance-report.json',
+    project_shared_projection: {
+      enabled: true,
+      file: PROJECT_SHARED_PROBLEM_PATH,
+      scope: 'non_completed'
+    },
+    verify: {
+      require_problem_contract: true,
+      require_domain_validation: true,
+      require_domain_coverage: true
+    },
+    release: {
+      require_problem_contract: true,
+      require_domain_validation: true,
+      require_domain_coverage: true,
+      require_verify_report: true,
+      require_governance_report: false,
+      block_on_high_governance_alerts: true
+    },
+    ...overrides
+  }, { spaces: 2 });
+  await fs.writeJson(path.join(tempDir, PROJECT_SHARED_PROBLEM_PATH), {
+    api_version: 'sce.project-problem-projection/v0.1',
+    generated_at: '2026-03-16T00:00:00.000Z',
+    source: {
+      project: 'demo',
+      scope: 'non_completed',
+      stale_days: 14
+    },
+    summary: {
+      total_entries: 0,
+      active_entries: 0,
+      stale_entries: 0,
+      completed_entries: 0
+    },
     entries: []
   }, { spaces: 2 });
 }
@@ -141,6 +187,7 @@ describe('collab-governance-audit', () => {
       retryBaseDelayMs: 100
     }, { spaces: 2 });
     await seedSharedErrorbookRegistry(tempDir);
+    await seedSharedProblemProjection(tempDir);
     await fs.writeFile(path.join(tempDir, '.sce', 'steering', 'CORE_PRINCIPLES.md'), '# core\n', 'utf8');
     await fs.writeFile(path.join(tempDir, '.sce', 'steering', 'ENVIRONMENT.md'), '# env\n', 'utf8');
     await fs.writeFile(path.join(tempDir, '.sce', 'steering', 'CURRENT_CONTEXT.md'), '# current\n', 'utf8');
@@ -152,7 +199,7 @@ describe('collab-governance-audit', () => {
         'rev-parse --is-inside-work-tree': { status: 0, stdout: 'true\n', stderr: '' },
         'ls-files': {
           status: 0,
-          stdout: `.gitignore\n.sce/config/multi-agent.json\n.sce/config/errorbook-registry.json\n${PROJECT_SHARED_REGISTRY_PATH}\n`,
+          stdout: `.gitignore\n.sce/config/multi-agent.json\n.sce/config/errorbook-registry.json\n.sce/config/problem-closure-policy.json\n${PROJECT_SHARED_REGISTRY_PATH}\n${PROJECT_SHARED_PROBLEM_PATH}\n`,
           stderr: ''
         },
         'status --porcelain': { status: 0, stdout: '', stderr: '' },
@@ -204,13 +251,14 @@ describe('collab-governance-audit', () => {
       enabled: false,
       sources: []
     });
+    await seedSharedProblemProjection(tempDir);
 
     const disabledReport = await auditCollabGovernance(tempDir, {}, {
       runGit: buildRunGitMock({
         'rev-parse --is-inside-work-tree': { status: 0, stdout: 'true\n', stderr: '' },
         'ls-files': {
           status: 0,
-          stdout: `.gitignore\n.sce/config/multi-agent.json\n.sce/config/errorbook-registry.json\n${PROJECT_SHARED_REGISTRY_PATH}\n`,
+          stdout: `.gitignore\n.sce/config/multi-agent.json\n.sce/config/errorbook-registry.json\n.sce/config/problem-closure-policy.json\n${PROJECT_SHARED_REGISTRY_PATH}\n${PROJECT_SHARED_PROBLEM_PATH}\n`,
           stderr: ''
         },
         'status --porcelain': { status: 0, stdout: '', stderr: '' },
@@ -242,6 +290,7 @@ describe('collab-governance-audit', () => {
       retryBaseDelayMs: 100
     }, { spaces: 2 });
     await seedSharedErrorbookRegistry(tempDir);
+    await seedSharedProblemProjection(tempDir);
     await fs.writeJson(path.join(tempDir, '.sce', 'adoption-config.json'), {
       version: '1.0.0',
       adoptedAt: '2026-03-16T00:00:00.000Z',
@@ -266,7 +315,7 @@ describe('collab-governance-audit', () => {
         'rev-parse --is-inside-work-tree': { status: 0, stdout: 'true\n', stderr: '' },
         'ls-files': {
           status: 0,
-          stdout: `.gitignore\n.sce/config/multi-agent.json\n.sce/config/errorbook-registry.json\n${PROJECT_SHARED_REGISTRY_PATH}\n.sce/adoption-config.json\n`,
+          stdout: `.gitignore\n.sce/config/multi-agent.json\n.sce/config/errorbook-registry.json\n.sce/config/problem-closure-policy.json\n${PROJECT_SHARED_REGISTRY_PATH}\n${PROJECT_SHARED_PROBLEM_PATH}\n.sce/adoption-config.json\n`,
           stderr: ''
         },
         'status --porcelain': { status: 0, stdout: '', stderr: '' },
@@ -283,6 +332,66 @@ describe('collab-governance-audit', () => {
     expect(report.summary.errorbook_convergence_violations).toBeGreaterThan(0);
   });
 
+  test('fails when project-shared problem projection is missing or not tracked', async () => {
+    await fs.ensureDir(path.join(tempDir, '.sce', 'config'));
+    await fs.writeFile(
+      path.join(tempDir, '.gitignore'),
+      `${REQUIRED_GITIGNORE_RULES.map((item) => item.rule).join('\n')}\n`,
+      'utf8'
+    );
+    await fs.writeJson(path.join(tempDir, '.sce', 'config', 'multi-agent.json'), {
+      enabled: true,
+      heartbeatIntervalMs: 60000,
+      heartbeatTimeoutMs: 180000,
+      coordinatorEnabled: false,
+      maxRetries: 5,
+      retryBaseDelayMs: 100
+    }, { spaces: 2 });
+    await seedSharedErrorbookRegistry(tempDir);
+    await seedSharedProblemProjection(tempDir);
+    await fs.remove(path.join(tempDir, PROJECT_SHARED_PROBLEM_PATH));
+
+    const missingReport = await auditCollabGovernance(tempDir, {}, {
+      runGit: buildRunGitMock({
+        'rev-parse --is-inside-work-tree': { status: 0, stdout: 'true\n', stderr: '' },
+        'ls-files': {
+          status: 0,
+          stdout: `.gitignore\n.sce/config/multi-agent.json\n.sce/config/errorbook-registry.json\n.sce/config/problem-closure-policy.json\n${PROJECT_SHARED_REGISTRY_PATH}\n`,
+          stderr: ''
+        },
+        'status --porcelain': { status: 0, stdout: '', stderr: '' },
+        'remote -v': { status: 0, stdout: '', stderr: '' },
+        'rev-parse --abbrev-ref HEAD': { status: 0, stdout: 'main\n', stderr: '' }
+      })
+    });
+
+    expect(missingReport.passed).toBe(false);
+    expect(missingReport.violations).toContain(
+      `shared project problem projection file is missing: ${PROJECT_SHARED_PROBLEM_PATH}`
+    );
+
+    await seedSharedProblemProjection(tempDir);
+    const untrackedReport = await auditCollabGovernance(tempDir, {}, {
+      runGit: buildRunGitMock({
+        'rev-parse --is-inside-work-tree': { status: 0, stdout: 'true\n', stderr: '' },
+        'ls-files': {
+          status: 0,
+          stdout: `.gitignore\n.sce/config/multi-agent.json\n.sce/config/errorbook-registry.json\n.sce/config/problem-closure-policy.json\n${PROJECT_SHARED_REGISTRY_PATH}\n`,
+          stderr: ''
+        },
+        'status --porcelain': { status: 0, stdout: '', stderr: '' },
+        'remote -v': { status: 0, stdout: '', stderr: '' },
+        'rev-parse --abbrev-ref HEAD': { status: 0, stdout: 'main\n', stderr: '' }
+      })
+    });
+
+    expect(untrackedReport.passed).toBe(false);
+    expect(untrackedReport.violations).toContain(
+      `shared project problem projection must be tracked by git: ${PROJECT_SHARED_PROBLEM_PATH}`
+    );
+    expect(untrackedReport.summary.problem_projection_violations).toBeGreaterThan(0);
+  });
+
   test('flags steering boundary drift', async () => {
     await fs.ensureDir(path.join(tempDir, '.sce', 'config'));
     await fs.ensureDir(path.join(tempDir, '.sce', 'steering'));
@@ -295,6 +404,7 @@ describe('collab-governance-audit', () => {
       enabled: false
     }, { spaces: 2 });
     await seedSharedErrorbookRegistry(tempDir);
+    await seedSharedProblemProjection(tempDir);
     await fs.writeFile(path.join(tempDir, '.sce', 'steering', 'CORE_PRINCIPLES.md'), '# core\n', 'utf8');
     await fs.writeFile(path.join(tempDir, '.sce', 'steering', 'analysis-notes.md'), '# drift\n', 'utf8');
 
@@ -303,7 +413,7 @@ describe('collab-governance-audit', () => {
         'rev-parse --is-inside-work-tree': { status: 0, stdout: 'true\n', stderr: '' },
         'ls-files': {
           status: 0,
-          stdout: `.gitignore\n.sce/config/multi-agent.json\n.sce/config/errorbook-registry.json\n${PROJECT_SHARED_REGISTRY_PATH}\n`,
+          stdout: `.gitignore\n.sce/config/multi-agent.json\n.sce/config/errorbook-registry.json\n.sce/config/problem-closure-policy.json\n${PROJECT_SHARED_REGISTRY_PATH}\n${PROJECT_SHARED_PROBLEM_PATH}\n`,
           stderr: ''
         },
         'status --porcelain': { status: 0, stdout: '', stderr: '' },

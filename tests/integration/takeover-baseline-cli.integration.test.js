@@ -44,6 +44,7 @@ describe('takeover baseline CLI integration', () => {
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'config', 'takeover-baseline.json'))).toBe(true);
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'config', 'errorbook-registry.json'))).toBe(true);
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'knowledge', 'errorbook', 'project-shared-registry.json'))).toBe(true);
+    expect(await fs.pathExists(path.join(tempDir, '.sce', 'knowledge', 'problem', 'project-shared-problems.json'))).toBe(true);
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'config', 'multi-agent.json'))).toBe(true);
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'config', 'problem-eval-policy.json'))).toBe(true);
     expect(await fs.pathExists(path.join(tempDir, '.sce', 'config', 'problem-closure-policy.json'))).toBe(true);

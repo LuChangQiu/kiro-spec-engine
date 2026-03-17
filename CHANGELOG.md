@@ -8,11 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added Spec `129-00-complex-problem-program-escalation` to formalize how SCE should decide between `single-spec`, `multi-spec-program`, and `research-program` for highly entangled problems.
+- Added read-only `sce spec strategy assess` so SCE can explicitly recommend `single-spec`, `multi-spec-program`, or `research-program` from either a broad goal or an existing Spec.
 - Added copy-ready phase-1 app intent examples under `docs/examples/app-intent-phase1/.sce/app/collections` and `docs/examples/app-intent-phase1/.sce/app/scene-profiles`, covering sales desktop, planning desktop, and warehouse tablet scenarios.
 - Added `docs/app-intent-apply-contract.md` to document the stable JSON contract for `sce app collection apply --json` and `sce scene workspace apply --json`.
 
 ### Changed
 - MagicBall-facing docs and command reference now point directly to copy-ready sample assets, explicit apply JSON contract guidance, and the phase-2 direction of lightweight user-intent sync rather than device-state sync.
+- Spec workflow and autonomous-control guidance now explicitly describe when a problem should escalate from one Spec to a coordinated program-level path.
 
 ## [3.6.55] - 2026-03-16
 

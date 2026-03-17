@@ -115,6 +115,46 @@ sce spec domain validate --spec <spec-id> --fail-on-gap --json
 
 This is the default way to avoid wrong-direction implementation and to force evidence-based correction loops.
 
+## When One Spec Is Not Enough
+
+Not every problem should be forced into a single Spec.
+
+Use this rule of thumb:
+
+- simple problem: stay with one Spec
+- medium complexity: split into a few implementation Specs and use orchestrate mode
+- very complex problem: first treat it as a program, not as a single implementation Spec
+
+Typical escalation signals:
+
+- one Spec keeps expanding but still cannot produce stable executable tasks
+- the problem spans multiple scenes, roles, or bounded contexts
+- API/data contracts are still unclear enough that task breakdown would be guesswork
+- business rules and policy boundaries are not yet settled
+- a single problem-domain chain already shows multiple semi-independent clusters
+
+Current SCE execution paths you can already use:
+
+```bash
+# read-only strategy assessment
+sce spec strategy assess --goal "broad complex goal" --json
+
+# multi-spec implementation program
+sce spec bootstrap --specs "spec-a,spec-b" --max-parallel 3
+
+# broad goal -> autonomous master/sub program decomposition
+sce auto close-loop-program "broad complex goal" --program-goals 4 --json
+```
+
+The strategic gap currently being formalized is:
+
+- how SCE should assess this threshold explicitly
+- when it should recommend `single-spec` vs `multi-spec-program` vs `research-program`
+
+Reference Spec:
+
+- `.sce/specs/129-00-complex-problem-program-escalation/`
+
 ---
 
 ## Stage 1: Requirements

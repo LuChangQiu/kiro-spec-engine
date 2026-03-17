@@ -21,6 +21,7 @@ const { registerSpecPipelineCommand } = require('../lib/commands/spec-pipeline')
 const { registerSpecGateCommand } = require('../lib/commands/spec-gate');
 const { registerSpecDomainCommand } = require('../lib/commands/spec-domain');
 const { registerSpecRelatedCommand } = require('../lib/commands/spec-related');
+const { registerSpecStrategyCommand } = require('../lib/commands/spec-strategy');
 const { registerTimelineCommands } = require('../lib/commands/timeline');
 const { registerValueCommands } = require('../lib/commands/value');
 const { registerTaskCommands } = require('../lib/commands/task');
@@ -67,6 +68,7 @@ const program = new Command();
  * - `sce spec gate ...` -> `sce spec-gate ...`
  * - `sce spec domain ...` -> `sce spec-domain ...`
  * - `sce spec related ...` -> `sce spec-related ...`
+ * - `sce spec strategy ...` -> `sce spec-strategy ...`
  * - `sce spec create <name> ...` -> `sce create-spec <name> ...`
  * - `sce spec <name> ...` -> `sce create-spec <name> ...` (legacy)
  *
@@ -108,6 +110,11 @@ function normalizeSpecCommandArgs(argv) {
 
   if (commandToken === 'related') {
     normalized.splice(commandIndex, 2, 'spec-related');
+    return normalized;
+  }
+
+  if (commandToken === 'strategy') {
+    normalized.splice(commandIndex, 2, 'spec-strategy');
     return normalized;
   }
 
@@ -413,6 +420,9 @@ registerSpecDomainCommand(program);
 
 // Spec related lookup command
 registerSpecRelatedCommand(program);
+
+// Spec strategy assessment command
+registerSpecStrategyCommand(program);
 
 // 系统诊断命令
 program

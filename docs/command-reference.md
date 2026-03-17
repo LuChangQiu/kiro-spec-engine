@@ -80,10 +80,17 @@ sce spec domain refresh --spec 01-00-feature-name --scene scene.customer-order-i
 sce spec related --query "customer order inventory reconciliation drift" --scene scene.customer-order-inventory --json
 sce spec related --spec 01-00-feature-name --limit 8 --json
 
+# Assess whether one Spec is enough before decomposition
+sce spec strategy assess --goal "broad complex goal" --json
+sce spec strategy assess --spec 01-00-feature-name --json
+
 # Multi-Spec mode defaults to orchestrate routing
 sce spec bootstrap --specs "spec-a,spec-b" --max-parallel 3
 sce spec pipeline run --specs "spec-a,spec-b" --max-parallel 3
 sce spec gate run --specs "spec-a,spec-b" --max-parallel 3
+
+# Very broad / entangled goals can use program mode first
+sce auto close-loop-program "broad complex goal" --program-goals 4 --json
 
 # Show Spec progress
 sce status --verbose
@@ -93,6 +100,7 @@ Spec session governance:
 - `spec bootstrap|pipeline run|gate run` must bind to an active scene primary session (`--scene <scene-id>` or implicit binding from latest/unique active scene).
 - When multiple active scenes exist, you must pass `--scene` explicitly.
 - Multi-Spec orchestrate fallback (`--specs ...`) follows the same scene binding and writes per-spec child-session archive records.
+- `sce spec strategy assess` is read-only and should be used when you are not sure whether the current problem still fits one Spec.
 - `spec bootstrap` always generates problem-domain, scene-spec, and `problem-contract` artifacts to force domain-first exploration.
 - `spec gate` now hard-fails when either of the following is missing or structurally incomplete:
   - `.sce/specs/<spec>/custom/problem-domain-map.md`
@@ -104,6 +112,7 @@ Spec session governance:
   - `scene-spec.md` must include `Closed-Loop Research Contract`
   - `problem-domain-chain.json` must include `research_coverage` contract
 - `sce spec domain coverage` reports coverage dimensions (scene boundary, entity/relation/rules/policy/flow, failure signals, debug evidence plan, verification gate).
+- When one Spec cannot produce stable executable tasks, prefer escalating to a coordinated multi-Spec or program path instead of forcing more blind decomposition into the same Spec.
 
 ### Timeline Snapshots
 

@@ -87,6 +87,16 @@ sce auto close-loop-program \
   --program-audit-out .sce/reports/close-loop-program-audit.json \
   --json
 
+Use this path when the problem is broader than one Spec and already clearly points to multiple coordinated implementation tracks.
+
+If the problem is still too unclear for direct implementation splitting, treat it as a research-first program and clarify domains/contracts/rules before expecting stable executable tasks from child Specs.
+
+Suggested preflight:
+
+```bash
+sce spec strategy assess --goal "broad complex goal" --json
+```
+
 # Controller command: drain queue goals with autonomous close-loop-program runtime
 sce auto close-loop-controller .sce/auto/program-queue.lines \
   --dequeue-limit 2 \

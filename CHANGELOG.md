@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.59] - 2026-03-19
+
+### Changed
+- Published a follow-up alignment patch so the npm package, Git tag, and repository release line all point at the final post-release state after shared project problem projection sync.
+- Kept runtime capability contracts unchanged from `3.6.58`; this patch is for release-state consistency rather than new engine behavior.
+
 ## [3.6.58] - 2026-03-19
 
 ### Added

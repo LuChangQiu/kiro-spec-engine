@@ -186,4 +186,43 @@ describe('project-problem-projection', () => {
     expect(after.generated_at).toBe(before.generated_at);
     expect(after.entries).toEqual(before.entries);
   });
+
+  test('sync stays idempotent when source age_days only drifts within the same day', async () => {
+    const specPortfolioBase = [{
+      spec_id: '01-00-active-problem',
+      scene_id: 'scene.demo',
+      lifecycle_state: 'active',
+      updated_at: '2026-03-19T08:00:00.000Z',
+      tasks_total: 1,
+      tasks_done: 0,
+      tasks_progress: 0,
+      problem_statement: 'Active problem',
+      age_days: 0.13
+    }];
+
+    await writeSpec(tempDir, '01-00-active-problem', {
+      problemStatement: 'Active problem',
+      tasks: '- [ ] todo\n',
+      updatedAt: '2026-03-19T08:00:00.000Z'
+    });
+
+    const first = await syncProjectSharedProblemProjection(tempDir, {}, {
+      specPortfolio: specPortfolioBase
+    });
+    const before = await fs.readJson(path.join(tempDir, DEFAULT_PROJECT_SHARED_PROBLEM_FILE));
+
+    const second = await syncProjectSharedProblemProjection(tempDir, {}, {
+      specPortfolio: [{
+        ...specPortfolioBase[0],
+        age_days: 0.14
+      }]
+    });
+    const after = await fs.readJson(path.join(tempDir, DEFAULT_PROJECT_SHARED_PROBLEM_FILE));
+
+    expect(first.refreshed).toBe(true);
+    expect(second.refreshed).toBe(false);
+    expect(before.entries[0].age_days).toBe(0);
+    expect(after.entries[0].age_days).toBe(0);
+    expect(after.generated_at).toBe(before.generated_at);
+  });
 });

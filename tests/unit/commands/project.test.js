@@ -3,6 +3,8 @@ const os = require('os');
 const path = require('path');
 const WorkspaceStateManager = require('../../../lib/workspace/multi/workspace-state-manager');
 const {
+  runProjectCandidateInspectCommand,
+  runProjectOnboardingImportCommand,
   runProjectPortfolioShowCommand,
   runProjectTargetResolveCommand,
   runProjectSupervisionShowCommand
@@ -234,6 +236,142 @@ describe('project portfolio show command', () => {
 
     const activeWorkspace = await stateManager.getActiveWorkspace();
     expect(activeWorkspace.name).toBe('alpha');
+  });
+
+  test('classifies workspace-backed, local-sce, directory, and invalid roots canonically', async () => {
+    const registeredRoot = path.join(tempDir, 'registered-root');
+    const localRoot = path.join(tempDir, 'local-root');
+    const ordinaryRoot = path.join(tempDir, 'ordinary-root');
+    const invalidMetadataRoot = path.join(tempDir, 'invalid-metadata-root');
+
+    await seedWorkspaceProject(registeredRoot, { specIds: ['01-00-registered'] });
+    await seedWorkspaceProject(localRoot, { specIds: ['02-00-local'] });
+    await fs.ensureDir(ordinaryRoot);
+    await fs.ensureDir(path.join(invalidMetadataRoot, '.sce'));
+    await fs.writeFile(path.join(invalidMetadataRoot, '.sce', 'version.json'), '{broken', 'utf8');
+
+    await stateManager.createWorkspace('registered-root', registeredRoot);
+
+    const workspaceCandidate = await runProjectCandidateInspectCommand({ root: registeredRoot, json: true }, {
+      fileSystem: fs,
+      stateManager
+    });
+    expect(workspaceCandidate).toEqual(expect.objectContaining({
+      kind: 'workspace-backed',
+      workspaceId: 'registered-root',
+      projectId: 'workspace:registered-root',
+      readiness: 'ready',
+      availability: 'accessible',
+      localCandidate: false
+    }));
+    expect(workspaceCandidate.reasonCodes).toEqual(expect.arrayContaining([
+      'project.workspace.registered',
+      'project.root.accessible',
+      'project.sce.present'
+    ]));
+
+    const localCandidate = await runProjectCandidateInspectCommand({ root: localRoot, json: true }, {
+      fileSystem: fs,
+      stateManager
+    });
+    expect(localCandidate).toEqual(expect.objectContaining({
+      kind: 'local-sce-candidate',
+      readiness: 'partial',
+      availability: 'degraded',
+      localCandidate: true
+    }));
+    expect(localCandidate.reasonCodes).toEqual(expect.arrayContaining([
+      'project.root.accessible',
+      'project.sce.unregistered',
+      'project.sce.present'
+    ]));
+
+    const ordinaryCandidate = await runProjectCandidateInspectCommand({ root: ordinaryRoot, json: true }, {
+      fileSystem: fs,
+      stateManager
+    });
+    expect(ordinaryCandidate).toEqual(expect.objectContaining({
+      kind: 'directory-candidate',
+      readiness: 'pending',
+      availability: 'accessible',
+      localCandidate: true
+    }));
+    expect(ordinaryCandidate.reasonCodes).toEqual(expect.arrayContaining([
+      'project.root.accessible',
+      'project.root.not_initialized'
+    ]));
+
+    const invalidMetadataCandidate = await runProjectCandidateInspectCommand({ root: invalidMetadataRoot, json: true }, {
+      fileSystem: fs,
+      stateManager
+    });
+    expect(invalidMetadataCandidate).toEqual(expect.objectContaining({
+      kind: 'local-sce-candidate',
+      readiness: 'blocked',
+      availability: 'degraded',
+      localCandidate: true
+    }));
+    expect(invalidMetadataCandidate.reasonCodes).toEqual(expect.arrayContaining([
+      'project.metadata.invalid'
+    ]));
+  });
+
+  test('imports an ordinary root by adopting it and registering a workspace without forcing activation', async () => {
+    const importRoot = path.join(tempDir, 'candidate-import');
+    await fs.ensureDir(importRoot);
+
+    const payload = await runProjectOnboardingImportCommand({ root: importRoot, json: true }, {
+      fileSystem: fs,
+      stateManager
+    });
+
+    expect(payload.mode).toBe('import');
+    expect(payload.success).toBe(true);
+    expect(payload.preview).toEqual(expect.objectContaining({
+      rootDir: importRoot.replace(/\\/g, '/'),
+      kind: 'workspace-backed',
+      workspaceId: 'candidate-import',
+      projectId: 'workspace:candidate-import',
+      localCandidate: false
+    }));
+    expect(payload.steps).toEqual([
+      expect.objectContaining({ key: 'register', status: 'done' }),
+      expect.objectContaining({ key: 'attach', status: 'done' }),
+      expect.objectContaining({ key: 'hydrate', status: 'done' }),
+      expect.objectContaining({
+        key: 'activate',
+        status: 'skipped',
+        reasonCode: 'project.onboarding.import_no_activate'
+      }),
+      expect.objectContaining({ key: 'scaffold', status: 'done' })
+    ]);
+    expect(await fs.pathExists(path.join(importRoot, '.sce'))).toBe(true);
+
+    const registeredWorkspace = await stateManager.getWorkspace('candidate-import');
+    expect(registeredWorkspace).not.toBeNull();
+    expect(registeredWorkspace.path).toBe(importRoot.replace(/\\/g, '/'));
+  });
+
+  test('imports an existing local .sce root by registering it without rewriting scaffold content', async () => {
+    const localRoot = path.join(tempDir, 'existing-local-import');
+    await seedWorkspaceProject(localRoot, { specIds: ['06-00-existing'] });
+
+    const payload = await runProjectOnboardingImportCommand({ root: localRoot, json: true }, {
+      fileSystem: fs,
+      stateManager
+    });
+
+    expect(payload.success).toBe(true);
+    expect(payload.preview).toEqual(expect.objectContaining({
+      kind: 'workspace-backed',
+      workspaceId: 'existing-local-import',
+      projectId: 'workspace:existing-local-import'
+    }));
+    expect(payload.steps).toEqual(expect.arrayContaining([
+      expect.objectContaining({ key: 'register', status: 'done' }),
+      expect.objectContaining({ key: 'hydrate', status: 'done', reasonCode: 'project.sce.present' }),
+      expect.objectContaining({ key: 'scaffold', status: 'skipped', reasonCode: 'project.onboarding.scaffold_reused' })
+    ]));
   });
 
   test('resolves current project when no routing request is provided', async () => {

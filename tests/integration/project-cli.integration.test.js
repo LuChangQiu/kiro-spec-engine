@@ -213,4 +213,73 @@ describe('project CLI integration', () => {
       expect.objectContaining({ kind: 'active', eventId: 'scene-alpha-c1' })
     ]));
   });
+
+  test('candidate inspect and root onboarding import work through the CLI entrypoint', async () => {
+    const importRoot = path.join(tempDir, 'local-import-root');
+    await fs.ensureDir(importRoot);
+
+    const inspectResult = await runCli([
+      'project',
+      'candidate',
+      'inspect',
+      '--root',
+      importRoot,
+      '--json'
+    ], {
+      cwd: tempDir,
+      env: cliEnv
+    });
+    expect(inspectResult.exitCode).toBe(0);
+    const inspection = JSON.parse(`${inspectResult.stdout}`.trim());
+    expect(inspection).toEqual(expect.objectContaining({
+      kind: 'directory-candidate',
+      readiness: 'pending',
+      availability: 'accessible',
+      localCandidate: true
+    }));
+
+    const importResult = await runCli([
+      'project',
+      'onboarding',
+      'import',
+      '--root',
+      importRoot,
+      '--json'
+    ], {
+      cwd: tempDir,
+      env: cliEnv,
+      timeoutMs: 30000
+    });
+    expect(importResult.exitCode).toBe(0);
+    const payload = JSON.parse(`${importResult.stdout}`.trim());
+    expect(payload).toEqual(expect.objectContaining({
+      mode: 'import',
+      success: true,
+      preview: expect.objectContaining({
+        kind: 'workspace-backed',
+        workspaceId: 'local-import-root',
+        projectId: 'workspace:local-import-root'
+      })
+    }));
+    expect(payload.steps).toEqual(expect.arrayContaining([
+      expect.objectContaining({ key: 'register', status: 'done' }),
+      expect.objectContaining({ key: 'attach', status: 'done' }),
+      expect.objectContaining({ key: 'hydrate', status: 'done' }),
+      expect.objectContaining({ key: 'scaffold', status: 'done' })
+    ]));
+    expect(await fs.pathExists(path.join(importRoot, '.sce'))).toBe(true);
+
+    const portfolioResult = await runCli(['project', 'portfolio', 'show', '--json'], {
+      cwd: tempDir,
+      env: cliEnv
+    });
+    expect(portfolioResult.exitCode).toBe(0);
+    const portfolio = JSON.parse(`${portfolioResult.stdout}`.trim());
+    expect(portfolio.projects).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        projectId: 'workspace:local-import-root',
+        workspaceId: 'local-import-root'
+      })
+    ]));
+  });
 });

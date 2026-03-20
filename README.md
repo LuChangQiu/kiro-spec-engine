@@ -174,7 +174,7 @@ MagicBall-specific integration surfaces now also include:
 - `sce app registry status|configure|sync*`
 - `sce app runtime show|releases|install|activate|uninstall`
 - `sce app engineering preview|ownership|open|import|show|attach|hydrate|scaffold|activate`
-- `sce project portfolio show|target resolve|supervision show`
+- `sce project portfolio show|candidate inspect|onboarding import|target resolve|supervision show`
 - `sce mode application|ontology|engineering home`
 - `sce pm requirement|tracking|planning|change|issue ... --json`
 - `sce ontology er|br|dl ... --json`
@@ -230,5 +230,5 @@ MIT. See [LICENSE](LICENSE).
 
 ---
 
-**Version**: 3.6.60
-**Last Updated**: 2026-03-19
+**Version**: 3.6.61
+**Last Updated**: 2026-03-20

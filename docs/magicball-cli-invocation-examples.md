@@ -24,6 +24,8 @@ Assume:
 ### 1.0 Read multi-project portfolio baseline
 ```bash
 sce project portfolio show --json
+sce project candidate inspect --root "C:/workspace/customer-order-demo" --json
+sce project onboarding import --root "C:/workspace/customer-order-demo" --json
 sce project target resolve --request "continue customer-order-demo" --json
 sce project supervision show --project workspace:customer-order-demo --json
 ```

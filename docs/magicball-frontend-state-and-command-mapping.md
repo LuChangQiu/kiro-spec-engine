@@ -65,6 +65,8 @@ Recommended shape:
 ```ts
 interface ProjectWorkspaceShellState {
   projectPortfolio: Record<string, unknown> | null
+  projectCandidate: Record<string, unknown> | null
+  projectOnboarding: Record<string, unknown> | null
   currentProjectId: string | null
   projectTarget: Record<string, unknown> | null
   projectSupervision: Record<string, unknown> | null
@@ -73,11 +75,14 @@ interface ProjectWorkspaceShellState {
 
 Owned commands:
 - `sce project portfolio show --json`
+- `sce project candidate inspect --root <path> --json`
+- `sce project onboarding import --root <path> --json`
 - `sce project target resolve --request <text> --current-project <project-id> --json`
 - `sce project supervision show --project <project-id> --json`
 
 Rule:
 - multi-project shell must consume engine-owned project truth directly
+- manual local-root import must preflight with `candidate inspect` before any onboarding mutation
 - target resolution must be treated as preflight and must not mutate active workspace selection implicitly
 
 ### 2.2 Ontology Page State

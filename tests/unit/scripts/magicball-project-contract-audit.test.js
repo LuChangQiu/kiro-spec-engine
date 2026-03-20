@@ -11,10 +11,12 @@ const {
 
 async function seedProject(rootDir) {
   const files = {
-    'README.md': '`sce project portfolio show|target resolve|supervision show`',
-    'README.zh.md': '`sce project portfolio show|target resolve|supervision show`',
+    'README.md': '`sce project portfolio show|candidate inspect|onboarding import|target resolve|supervision show`',
+    'README.zh.md': '`sce project portfolio show|candidate inspect|onboarding import|target resolve|supervision show`',
     'docs/command-reference.md': [
       'sce project portfolio show [options]',
+      'sce project candidate inspect --root <path> [options]',
+      'sce project onboarding import --root <path> [options]',
       'sce project target resolve [options]',
       'sce project supervision show --project <id> [options]'
     ].join('\n'),
@@ -30,34 +32,45 @@ async function seedProject(rootDir) {
     ].join('\n'),
     'docs/magicball-project-portfolio-contract.md': [
       'sce project portfolio show --json',
+      'sce project candidate inspect --root <path> --json',
+      'sce project onboarding import --root <path> --json',
       'sce project target resolve --json',
       'sce project supervision show --project <project-id> --json'
     ].join('\n'),
     'docs/magicball-frontend-state-and-command-mapping.md': [
       'projectPortfolio: Record<string, unknown> | null',
+      'projectCandidate: Record<string, unknown> | null',
+      'projectOnboarding: Record<string, unknown> | null',
       '`sce project portfolio show --json`',
+      '`sce project candidate inspect --root <path> --json`',
+      '`sce project onboarding import --root <path> --json`',
       '`sce project target resolve --request <text> --current-project <project-id> --json`',
       '`sce project supervision show --project <project-id> --json`'
     ].join('\n'),
     'docs/magicball-cli-invocation-examples.md': [
       'sce project portfolio show --json',
+      'sce project candidate inspect --root "C:/workspace/customer-order-demo" --json',
+      'sce project onboarding import --root "C:/workspace/customer-order-demo" --json',
       'sce project target resolve --request "continue customer-order-demo" --json',
       'sce project supervision show --project workspace:customer-order-demo --json'
     ].join('\n'),
     'docs/magicball-adaptation-task-checklist-v1.md': [
       '## Phase 0: Multi-project Workspace Shell',
       'sce project portfolio show --json',
+      'sce project candidate inspect --root "<path>" --json',
+      'sce project onboarding import --root "<path>" --json',
       'sce project target resolve --request "<text>" --current-project <project-id> --json',
       'sce project supervision show --project <project-id> --json'
     ].join('\n'),
     'docs/magicball-ui-surface-checklist.md': [
       '- `docs/magicball-project-portfolio-contract.md`',
       '- project switcher from `project portfolio show`',
+      '- local-root candidate receipt from `project candidate inspect`',
       '- project health summary from `project supervision show`'
     ].join('\n'),
     'docs/magicball-integration-issue-tracker.md': [
-      '- `project portfolio show/target resolve/supervision show`',
-      '5. treat `project portfolio / target resolve / supervision` as the default multi-project shell truth'
+      '- `project portfolio show/candidate inspect/onboarding import/target resolve/supervision show`',
+      '5. treat `project portfolio / candidate inspect / onboarding import / target resolve / supervision` as the default multi-project shell truth'
     ].join('\n'),
     'docs/release-checklist.md': [
       'npm run audit:magicball-project-contract',

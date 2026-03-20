@@ -94,7 +94,7 @@ rg -n "github.com/scene-capability-engine/sce" README.md README.zh.md docs START
 Additional expectation:
 
 - `audit:magicball-engineering-contract` passes so active MagicBall entry docs stay aligned with `scene delivery`, `engineering preview/ownership`, and `open/import/scaffold` contracts.
-- `audit:magicball-project-contract` passes so active MagicBall entry docs stay aligned with `project portfolio`, `project target resolve`, and `project supervision show` contracts.
+- `audit:magicball-project-contract` passes so active MagicBall entry docs stay aligned with `project portfolio`, `project candidate inspect`, `project onboarding import`, `project target resolve`, and `project supervision show` contracts.
 
 ---
 

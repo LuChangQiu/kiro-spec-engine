@@ -79,7 +79,7 @@ rg -n "github.com/scene-capability-engine/sce" README.md README.zh.md docs START
 额外预期：
 
 - `audit:magicball-engineering-contract` 通过，确保活跃的 MagicBall 入口文档与 `scene delivery`、`engineering preview/ownership`、`open/import/scaffold` 契约保持一致。
-- `audit:magicball-project-contract` 通过，确保活跃的 MagicBall 入口文档与 `project portfolio`、`project target resolve`、`project supervision show` 契约保持一致。
+- `audit:magicball-project-contract` 通过，确保活跃的 MagicBall 入口文档与 `project portfolio`、`project candidate inspect`、`project onboarding import`、`project target resolve`、`project supervision show` 契约保持一致。
 
 ---
 

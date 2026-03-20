@@ -68,6 +68,20 @@ Done when:
 - drillback panels use `items[]` directly
 - frontend does not present `cursor` as a raw event-stream offset
 
+### Task 0.5
+Preflight user-picked local roots with the canonical candidate contract, then onboard by root when needed.
+
+Commands:
+```bash
+sce project candidate inspect --root "<path>" --json
+sce project onboarding import --root "<path>" --json
+```
+
+Done when:
+- frontend does not infer project validity from ad hoc `.sce` path heuristics alone
+- existing local `.sce` roots are imported without rebuilding them blindly
+- ordinary directories can be onboarded without pretending to be app-library items first
+
 ## Phase 1: App Entry And Mode Switching
 
 ### Task 1.1

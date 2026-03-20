@@ -2660,7 +2660,7 @@ Overall Health: 2 healthy, 1 unhealthy
 
 ---
 
-## Project Portfolio And Supervision
+## Project Portfolio, Candidate Inspection, And Onboarding
 
 #### `sce project portfolio show`
 
@@ -2679,6 +2679,42 @@ sce project portfolio show [options]
 - Reuses registered workspace visibility from multi-workspace state
 - Marks inaccessible or partial projects explicitly instead of dropping them
 - Reuses project-local session governance signals to summarize active sessions and last activity
+
+#### `sce project candidate inspect`
+
+Inspect one local root through the canonical engine-owned project-candidate contract.
+
+**Usage:**
+```bash
+sce project candidate inspect --root <path> [options]
+```
+
+**Options:**
+- `--root <path>` - Local root directory to inspect
+- `--json` - Output the canonical `LocalProjectCandidateInspection`
+
+**Behavior:**
+- Distinguishes `workspace-backed`, `local-sce-candidate`, `directory-candidate`, and `invalid`
+- Reuses deterministic project/workspace identity when the root already maps to a registered workspace
+- Returns canonical readiness, availability, and reason codes without adapter-side path heuristics
+
+#### `sce project onboarding import`
+
+Import one local root into the canonical project portfolio using root-based onboarding.
+
+**Usage:**
+```bash
+sce project onboarding import --root <path> [options]
+```
+
+**Options:**
+- `--root <path>` - Local root directory to import
+- `--json` - Output the canonical `ProjectOnboardingImportResult`
+
+**Behavior:**
+- Accepts a local root as the primary onboarding target without app-bundle-first indirection
+- Reuses the canonical ordered step envelope (`register`, `attach`, `hydrate`, `activate`, `scaffold`)
+- Registers onboarded roots into the workspace-backed portfolio without inventing a second registry
 
 #### `sce project target resolve`
 

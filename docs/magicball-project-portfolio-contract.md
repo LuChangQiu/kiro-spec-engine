@@ -6,6 +6,8 @@ Define the stable phase-1 SCE contract for MagicBall multi-project surfaces.
 
 This document covers:
 - project roster projection
+- root candidate inspection
+- root-based onboarding import
 - target-project preflight resolution
 - project-scoped supervision snapshot
 
@@ -22,6 +24,7 @@ Use together with:
 
 Phase-1 is read-first and engine-owned:
 - project visibility comes from registered workspaces plus the current unregistered `.sce` project when applicable
+- local root inspection and onboarding reuse engine-owned identity and reason codes
 - project identity is deterministic and stable for registered workspaces
 - target resolution is preflight-only and does not mutate active workspace selection
 - supervision is a project-scoped snapshot, not a raw cross-project event stream
@@ -36,6 +39,8 @@ Phase-1 does not introduce:
 
 ```bash
 sce project portfolio show --json
+sce project candidate inspect --root <path> --json
+sce project onboarding import --root <path> --json
 sce project target resolve --json
 sce project supervision show --project <project-id> --json
 ```
@@ -102,6 +107,55 @@ interface ProjectPortfolioRecord {
 - Registered workspaces use stable `projectId` values derived from workspace identity, for example `workspace:<workspace-name>`.
 - An unregistered current `.sce` project may appear as one local `discovered` partial record.
 - `status=active` means the project matches caller context, not merely that it has background scene activity.
+
+## 2. Target Resolution
+
+## 1.5 Root Candidate Inspection And Onboarding
+
+### Commands
+
+```bash
+sce project candidate inspect --root <path> --json
+sce project onboarding import --root <path> --json
+```
+
+### Contract shape
+
+```ts
+interface LocalProjectCandidateInspection {
+  inspectedAt: string
+  rootDir: string
+  kind: 'workspace-backed' | 'local-sce-candidate' | 'directory-candidate' | 'invalid'
+  projectId?: string
+  workspaceId?: string
+  projectName?: string
+  readiness: 'ready' | 'partial' | 'pending' | 'blocked' | 'unknown'
+  availability: 'accessible' | 'inaccessible' | 'degraded'
+  localCandidate: boolean
+  reasonCodes: string[]
+}
+
+interface ProjectOnboardingImportResult {
+  mode: 'import'
+  generated_at: string
+  success: boolean
+  preview: LocalProjectCandidateInspection
+  steps: Array<{
+    key: 'register' | 'attach' | 'hydrate' | 'activate' | 'scaffold'
+    status: 'done' | 'skipped' | 'pending' | 'failed'
+    reasonCode?: string
+    detail?: string
+  }>
+}
+```
+
+### MagicBall rules
+
+- Adapter-owned filesystem scanning is allowed, but every chosen root must be normalized through `candidate inspect`.
+- Use `project onboarding import` when the user picks a local root directly; do not fake an app-library item just to enter onboarding.
+- If `kind=workspace-backed`, reuse returned `projectId/workspaceId` directly and avoid synthesizing a second registry identity.
+- If `kind=local-sce-candidate`, present it as a partial local project until onboarding import registers it.
+- Render `reasonCodes` directly in CLI/IDE receipts; do not replace them with frontend-only heuristics.
 
 ## 2. Target Resolution
 
@@ -201,10 +255,12 @@ interface ProjectSupervisionItem {
 ## 4. Recommended Multi-Project Frontend Flow
 
 1. Load `sce project portfolio show --json` when entering the multi-project shell.
-2. Store `activeProjectId` and render a project switcher from `projects[]`.
-3. When the user enters a cross-project free-text request, preflight with `sce project target resolve --json`.
-4. After project selection or successful resolution, load `sce project supervision show --project <project-id> --json`.
-5. Keep per-project tabs and page layout frontend-owned, but keep project truth engine-owned.
+2. When the user selects a local root manually, preflight it with `sce project candidate inspect --root <path> --json`.
+3. If the root is not yet portfolio-backed, import it through `sce project onboarding import --root <path> --json`.
+4. Store `activeProjectId` and render a project switcher from `projects[]`.
+5. When the user enters a cross-project free-text request, preflight with `sce project target resolve --json`.
+6. After project selection or successful resolution, load `sce project supervision show --project <project-id> --json`.
+7. Keep per-project tabs and page layout frontend-owned, but keep project truth engine-owned.
 
 ## 5. Minimal Acceptance Criteria For MagicBall
 

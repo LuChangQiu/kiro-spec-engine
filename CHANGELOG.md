@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.61] - 2026-03-20
+
+### Added
+- Added `sce project candidate inspect --root <path> --json` as the canonical single-root inspection contract for workspace-backed roots, local `.sce` candidates, ordinary directory candidates, and invalid roots.
+- Added `sce project onboarding import --root <path> --json` as the canonical root-based onboarding entry, reusing the ordered `register/attach/hydrate/activate/scaffold` step envelope instead of inventing a second import receipt.
+
+### Changed
+- MagicBall-facing multi-project docs, command reference, CLI examples, frontend mapping, and release-time project-contract audit now include `project candidate inspect` and `project onboarding import` alongside the existing portfolio/target/supervision contracts.
+- Root-based onboarding now suppresses internal adoption progress logs in `--json` mode so adapters receive clean machine-readable envelopes.
+
 ## [3.6.60] - 2026-03-19
 
 ### Changed

@@ -29,7 +29,7 @@ SCE changes completed and now available for MagicBall:
 - `app registry status/configure/sync*`
 - `app runtime show/releases/install/activate/uninstall`
 - `app engineering preview/ownership/open/import/show/attach/hydrate/scaffold/activate`
-- `project portfolio show/target resolve/supervision show`
+- `project portfolio show/candidate inspect/onboarding import/target resolve/supervision show`
 - `pm requirement/tracking/planning/change/issue` data plane
 - `ontology er/br/dl` + `ontology triad summary`
 - `ontology seed list/show/apply`
@@ -41,7 +41,7 @@ SCE changes completed and now available for MagicBall:
 2. consume `device current`, `app collection list/show/apply`, `scene workspace list/show/apply`, and `app install-state list` as the local device/install baseline
 3. consume `pm`, `ontology`, and `assurance` table payloads
 4. wire runtime install/activate/uninstall and engineering attach/hydrate/scaffold/activate actions
-5. treat `project portfolio / target resolve / supervision` as the default multi-project shell truth
+5. treat `project portfolio / candidate inspect / onboarding import / target resolve / supervision` as the default multi-project shell truth
 6. use demo app: `customer-order-demo`
 
 ### Related SCE docs

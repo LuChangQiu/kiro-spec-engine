@@ -8,19 +8,21 @@ const REQUIRED_CHECKS = [
   {
     path: 'README.md',
     requiredSnippets: [
-      '`sce project portfolio show|target resolve|supervision show`'
+      '`sce project portfolio show|candidate inspect|onboarding import|target resolve|supervision show`'
     ]
   },
   {
     path: 'README.zh.md',
     requiredSnippets: [
-      '`sce project portfolio show|target resolve|supervision show`'
+      '`sce project portfolio show|candidate inspect|onboarding import|target resolve|supervision show`'
     ]
   },
   {
     path: 'docs/command-reference.md',
     requiredSnippets: [
       'sce project portfolio show [options]',
+      'sce project candidate inspect --root <path> [options]',
+      'sce project onboarding import --root <path> [options]',
       'sce project target resolve [options]',
       'sce project supervision show --project <id> [options]'
     ]
@@ -45,6 +47,8 @@ const REQUIRED_CHECKS = [
     path: 'docs/magicball-project-portfolio-contract.md',
     requiredSnippets: [
       'sce project portfolio show --json',
+      'sce project candidate inspect --root <path> --json',
+      'sce project onboarding import --root <path> --json',
       'sce project target resolve --json',
       'sce project supervision show --project <project-id> --json'
     ]
@@ -53,7 +57,11 @@ const REQUIRED_CHECKS = [
     path: 'docs/magicball-frontend-state-and-command-mapping.md',
     requiredSnippets: [
       'projectPortfolio: Record<string, unknown> | null',
+      'projectCandidate: Record<string, unknown> | null',
+      'projectOnboarding: Record<string, unknown> | null',
       '`sce project portfolio show --json`',
+      '`sce project candidate inspect --root <path> --json`',
+      '`sce project onboarding import --root <path> --json`',
       '`sce project target resolve --request <text> --current-project <project-id> --json`',
       '`sce project supervision show --project <project-id> --json`'
     ]
@@ -62,6 +70,8 @@ const REQUIRED_CHECKS = [
     path: 'docs/magicball-cli-invocation-examples.md',
     requiredSnippets: [
       'sce project portfolio show --json',
+      'sce project candidate inspect --root "C:/workspace/customer-order-demo" --json',
+      'sce project onboarding import --root "C:/workspace/customer-order-demo" --json',
       'sce project target resolve --request "continue customer-order-demo" --json',
       'sce project supervision show --project workspace:customer-order-demo --json'
     ]
@@ -71,6 +81,8 @@ const REQUIRED_CHECKS = [
     requiredSnippets: [
       '## Phase 0: Multi-project Workspace Shell',
       'sce project portfolio show --json',
+      'sce project candidate inspect --root "<path>" --json',
+      'sce project onboarding import --root "<path>" --json',
       'sce project target resolve --request "<text>" --current-project <project-id> --json',
       'sce project supervision show --project <project-id> --json'
     ]
@@ -80,14 +92,15 @@ const REQUIRED_CHECKS = [
     requiredSnippets: [
       '- `docs/magicball-project-portfolio-contract.md`',
       '- project switcher from `project portfolio show`',
+      '- local-root candidate receipt from `project candidate inspect`',
       '- project health summary from `project supervision show`'
     ]
   },
   {
     path: 'docs/magicball-integration-issue-tracker.md',
     requiredSnippets: [
-      '- `project portfolio show/target resolve/supervision show`',
-      '5. treat `project portfolio / target resolve / supervision` as the default multi-project shell truth'
+      '- `project portfolio show/candidate inspect/onboarding import/target resolve/supervision show`',
+      '5. treat `project portfolio / candidate inspect / onboarding import / target resolve / supervision` as the default multi-project shell truth'
     ]
   },
   {

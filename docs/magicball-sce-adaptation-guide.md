@@ -142,6 +142,8 @@ Use `docs/magicball-cli-invocation-examples.md` for copy-ready commands.
 
 ### Multi-project control
 - `sce project portfolio show`
+- `sce project candidate inspect`
+- `sce project onboarding import`
 - `sce project target resolve`
 - `sce project supervision show`
 

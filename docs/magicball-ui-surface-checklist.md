@@ -136,11 +136,13 @@ MagicBall can treat the current SCE integration as baseline-ready when:
 
 ### Must render
 - project switcher from `project portfolio show`
+- local-root candidate receipt from `project candidate inspect`
 - current project marker
 - project health summary from `project supervision show`
 - explicit degraded / inaccessible project states
 
 ### Must behave correctly
+- manual root import preflights through `project candidate inspect` before `project onboarding import`
 - cross-project free-text routing preflights through `project target resolve`
 - ambiguous resolution does not auto-select silently
 - target resolution does not implicitly switch active workspace selection

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.64] - 2026-03-21
+
+### Fixed
+- Stabilized the tracked project-shared problem projection for co-work/publish flows by deriving `source.project` from a stable project identity and reusing prior entry timestamps when only clone-local mtimes drift.
+
 ## [3.6.63] - 2026-03-21
 
 ### Fixed

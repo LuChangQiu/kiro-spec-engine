@@ -61,6 +61,10 @@ describe('project-problem-projection', () => {
   beforeEach(async () => {
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sce-project-problem-projection-'));
     await fs.ensureDir(path.join(tempDir, '.sce', 'config'));
+    await fs.writeJson(path.join(tempDir, 'package.json'), {
+      name: 'stable-project-fixture',
+      version: '1.0.0'
+    }, { spaces: 2 });
     await fs.writeJson(path.join(tempDir, '.sce', 'config', 'problem-closure-policy.json'), {
       schema_version: '1.0',
       enabled: true,
@@ -105,6 +109,7 @@ describe('project-problem-projection', () => {
     const payload = await buildProjectSharedProblemProjection(tempDir);
 
     expect(payload.api_version).toBe('sce.project-problem-projection/v0.1');
+    expect(payload.source.project).toBe('stable-project-fixture');
     expect(payload.source.scope).toBe('non_completed');
     expect(payload.summary.total_entries).toBe(1);
     expect(payload.entries[0]).toEqual(expect.objectContaining({
@@ -223,6 +228,51 @@ describe('project-problem-projection', () => {
     expect(second.refreshed).toBe(false);
     expect(before.entries[0].age_days).toBe(0);
     expect(after.entries[0].age_days).toBe(0);
+    expect(after.generated_at).toBe(before.generated_at);
+  });
+
+  test('sync stays idempotent when clone-local project name and mtimes drift but logical content does not', async () => {
+    await writeSpec(tempDir, '01-00-active-problem', {
+      problemStatement: 'Active problem',
+      tasks: '- [ ] todo\n',
+      updatedAt: '2026-03-19T08:00:00.000Z'
+    });
+
+    const first = await syncProjectSharedProblemProjection(tempDir, {}, {
+      specPortfolio: [{
+        spec_id: '01-00-active-problem',
+        scene_id: 'scene.demo',
+        lifecycle_state: 'active',
+        updated_at: '2026-03-19T08:00:00.000Z',
+        tasks_total: 1,
+        tasks_done: 0,
+        tasks_progress: 0,
+        problem_statement: 'Active problem',
+        age_days: 1
+      }]
+    });
+    const before = await fs.readJson(path.join(tempDir, DEFAULT_PROJECT_SHARED_PROBLEM_FILE));
+
+    const second = await syncProjectSharedProblemProjection(tempDir, {}, {
+      specPortfolio: [{
+        spec_id: '01-00-active-problem',
+        scene_id: 'scene.demo',
+        lifecycle_state: 'active',
+        updated_at: '2026-03-21T02:34:54.422Z',
+        tasks_total: 1,
+        tasks_done: 0,
+        tasks_progress: 0,
+        problem_statement: 'Active problem',
+        age_days: 0
+      }]
+    });
+    const after = await fs.readJson(path.join(tempDir, DEFAULT_PROJECT_SHARED_PROBLEM_FILE));
+
+    expect(first.refreshed).toBe(true);
+    expect(second.refreshed).toBe(false);
+    expect(after.source.project).toBe('stable-project-fixture');
+    expect(after.entries[0].updated_at).toBe(before.entries[0].updated_at);
+    expect(after.entries[0].age_days).toBe(before.entries[0].age_days);
     expect(after.generated_at).toBe(before.generated_at);
   });
 });
